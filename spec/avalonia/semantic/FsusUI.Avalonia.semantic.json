@@ -12103,8 +12103,32 @@
       "isSealed": false,
       "properties": [
         {
+          "name": "ActionCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ActionLabel",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "CloseOnClick",
           "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Duration",
+          "type": "System.TimeSpan",
           "nullable": false,
           "canRead": true,
           "canWrite": true,
@@ -12159,8 +12183,46 @@
           "isStatic": false
         }
       ],
-      "avaloniaProperties": [],
-      "events": [],
+      "avaloniaProperties": [
+        {
+          "name": "ActionCommand",
+          "kind": "styled",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true
+        },
+        {
+          "name": "ActionLabel",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Message",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Title",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [
+        {
+          "name": "ActionActivated",
+          "kind": "clr",
+          "argsType": "System.EventHandler",
+          "isStatic": false
+        },
+        {
+          "name": "DismissRequested",
+          "kind": "clr",
+          "argsType": "System.EventHandler",
+          "isStatic": false
+        }
+      ],
       "methods": []
     },
     {
@@ -12171,8 +12233,32 @@
       "isSealed": true,
       "properties": [
         {
+          "name": "ActionCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ActionLabel",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "CloseOnClick",
           "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Duration",
+          "type": "System.TimeSpan",
           "nullable": false,
           "canRead": true,
           "canWrite": true,

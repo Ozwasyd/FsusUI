@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "282f99fba672f74156ee737a0cd0ddf8f89c022956adb59a684f18d6a4f791c4",
+      "hash": "e486077e8b7d96135bf231d5ba086f82847127cb457a23d19dc0cc330ed36898",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -55828,10 +55828,17 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Duration",
+            "categories": [
+              "TimeSpan"
+            ],
+            "type": "System.TimeSpan",
+            "nullable": false
+          },
+          "status": "partial",
           "drift": {
-            "type": null,
+            "type": "web number vs avalonia TimeSpan",
             "default": null,
             "nullability": null,
             "eventPayload": null,
@@ -55842,7 +55849,7 @@
             "scenario.v2.el-notification.input.duration"
           ],
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -56477,9 +56484,9 @@
         {
           "member": "duration",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -56653,6 +56660,45 @@
       ],
       "avaloniaExtras": [
         {
+          "member": "ActionActivated",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-notification.avalonia-extra.action-activated"
+          ]
+        },
+        {
+          "member": "ActionCommand",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-notification.avalonia-extra.action-command"
+          ]
+        },
+        {
+          "member": "ActionLabel",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-notification.avalonia-extra.action-label"
+          ]
+        },
+        {
           "member": "CloseOnClick",
           "kind": "avalonia-extra",
           "governance": {
@@ -56663,6 +56709,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-notification.avalonia-extra.close-on-click"
+          ]
+        },
+        {
+          "member": "DismissRequested",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-notification.avalonia-extra.dismiss-requested"
           ]
         },
         {
@@ -56736,10 +56795,10 @@
       "coverage": {
         "total": 18,
         "alignedCandidate": 0,
-        "partial": 3,
-        "missing": 15,
+        "partial": 4,
+        "missing": 14,
         "webOnly": 0,
-        "mappedPercent": 16.7
+        "mappedPercent": 22.2
       }
     },
     {
@@ -135589,7 +135648,7 @@
       "kind": "record",
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 7,
+      "memberCount": 10,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-notification-options"
       ],
@@ -137779,10 +137838,10 @@
   ],
   "coverage": {
     "aligned-candidate": 57,
-    "partial": 77,
-    "missing": 2025,
+    "partial": 78,
+    "missing": 2024,
     "web-only": 20,
     "total": 2179,
-    "mappedPercent": 6.1
+    "mappedPercent": 6.2
   }
 }
