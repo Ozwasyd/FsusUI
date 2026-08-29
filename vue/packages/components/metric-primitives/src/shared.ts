@@ -224,6 +224,7 @@ export const copyableDetailProps = buildProps({
     default: true,
   },
   inline: Boolean,
+  disabled: Boolean,
 } as const)
 
 export const copyableDetailEmits = {

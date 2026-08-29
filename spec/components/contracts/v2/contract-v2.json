@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "4a29e669ad310fc77dc7e0774b928374616963fb1aabc760bf91f81e197d0f87",
+      "hash": "76a293fd533a1baed0f660962a7ca287da17c74e7ac4d869adeeec4203ce074e",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "a861690e8a05f9bf0a72e2ef70aa6adec0bec0aa65623fbed4b184d4337a0d32",
+      "hash": "282f99fba672f74156ee737a0cd0ddf8f89c022956adb59a684f18d6a4f791c4",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -23519,6 +23519,46 @@
           }
         },
         {
+          "name": "disabled",
+          "kind": "input",
+          "web": {
+            "member": "disabled",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": {
+            "member": "IsDisabled",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-copyable-detail.input.disabled"
+          ],
+          "governance": null
+        },
+        {
           "name": "errorLabel",
           "kind": "input",
           "web": {
@@ -23878,16 +23918,27 @@
           {
             "name": "default",
             "kind": "initial"
+          },
+          {
+            "name": "disabled",
+            "kind": "derived"
           }
         ],
-        "transitions": []
+        "transitions": [
+          {
+            "from": "default",
+            "to": "disabled",
+            "trigger": "disabled input becomes true"
+          }
+        ]
       },
       "requirements": {
         "keyboard": [
           "All public operations must be keyboard reachable and activatable."
         ],
         "pointer": [
-          "Pointer/tap activation must raise the corresponding public output."
+          "Pointer/tap activation must raise the corresponding public output.",
+          "Disabled surfaces must not respond to pointer activation."
         ],
         "focus": [
           "Focus entry must surface the same public focus state on both platforms."
@@ -24043,6 +24094,7 @@
       ],
       "scenarioIds": [
         "scenario.v2.el-copyable-detail.input.copied-label",
+        "scenario.v2.el-copyable-detail.input.disabled",
         "scenario.v2.el-copyable-detail.input.error-label",
         "scenario.v2.el-copyable-detail.input.inline",
         "scenario.v2.el-copyable-detail.input.label",
@@ -24054,7 +24106,9 @@
         "scenario.v2.el-copyable-detail.content-region.default",
         "scenario.v2.el-copyable-detail.content-region.feedback",
         "scenario.v2.el-copyable-detail.state.default",
+        "scenario.v2.el-copyable-detail.state.disabled",
         "scenario.v2.el-copyable-detail.keyboard",
+        "scenario.v2.el-copyable-detail.pointer",
         "scenario.v2.el-copyable-detail.pointer",
         "scenario.v2.el-copyable-detail.focus",
         "scenario.v2.el-copyable-detail.a11y",
@@ -24063,12 +24117,12 @@
         "scenario.v2.el-copyable-detail.perf"
       ],
       "coverage": {
-        "total": 11,
-        "alignedCandidate": 0,
+        "total": 12,
+        "alignedCandidate": 1,
         "partial": 2,
         "missing": 9,
         "webOnly": 0,
-        "mappedPercent": 18.2
+        "mappedPercent": 25
       }
     },
     {
@@ -109734,6 +109788,46 @@
           }
         },
         {
+          "name": "disabled",
+          "kind": "input",
+          "web": {
+            "member": "disabled",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": {
+            "member": "IsDisabled",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-copyable-detail.input.disabled"
+          ],
+          "governance": null
+        },
+        {
           "name": "errorLabel",
           "kind": "input",
           "web": {
@@ -110093,16 +110187,27 @@
           {
             "name": "default",
             "kind": "initial"
+          },
+          {
+            "name": "disabled",
+            "kind": "derived"
           }
         ],
-        "transitions": []
+        "transitions": [
+          {
+            "from": "default",
+            "to": "disabled",
+            "trigger": "disabled input becomes true"
+          }
+        ]
       },
       "requirements": {
         "keyboard": [
           "All public operations must be keyboard reachable and activatable."
         ],
         "pointer": [
-          "Pointer/tap activation must raise the corresponding public output."
+          "Pointer/tap activation must raise the corresponding public output.",
+          "Disabled surfaces must not respond to pointer activation."
         ],
         "focus": [
           "Focus entry must surface the same public focus state on both platforms."
@@ -110258,6 +110363,7 @@
       ],
       "scenarioIds": [
         "scenario.v2.fsus-copyable-detail.input.copied-label",
+        "scenario.v2.fsus-copyable-detail.input.disabled",
         "scenario.v2.fsus-copyable-detail.input.error-label",
         "scenario.v2.fsus-copyable-detail.input.inline",
         "scenario.v2.fsus-copyable-detail.input.label",
@@ -110269,7 +110375,9 @@
         "scenario.v2.fsus-copyable-detail.content-region.default",
         "scenario.v2.fsus-copyable-detail.content-region.feedback",
         "scenario.v2.fsus-copyable-detail.state.default",
+        "scenario.v2.fsus-copyable-detail.state.disabled",
         "scenario.v2.fsus-copyable-detail.keyboard",
+        "scenario.v2.fsus-copyable-detail.pointer",
         "scenario.v2.fsus-copyable-detail.pointer",
         "scenario.v2.fsus-copyable-detail.focus",
         "scenario.v2.fsus-copyable-detail.a11y",
@@ -110278,12 +110386,12 @@
         "scenario.v2.fsus-copyable-detail.perf"
       ],
       "coverage": {
-        "total": 11,
-        "alignedCandidate": 0,
+        "total": 12,
+        "alignedCandidate": 1,
         "partial": 2,
         "missing": 9,
         "webOnly": 0,
-        "mappedPercent": 18.2
+        "mappedPercent": 25
       }
     },
     {
@@ -137670,11 +137778,11 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 55,
+    "aligned-candidate": 57,
     "partial": 77,
     "missing": 2025,
     "web-only": 20,
-    "total": 2177,
+    "total": 2179,
     "mappedPercent": 6.1
   }
 }

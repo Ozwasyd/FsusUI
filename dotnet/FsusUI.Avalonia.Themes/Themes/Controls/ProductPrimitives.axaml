@@ -46,6 +46,30 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
   </Style>
 
+  <Style Selector="fsus|FsusCopyableDetail">
+    <Setter Property="MinWidth" Value="40" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlSm}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <Style Selector="fsus|FsusCopyableDetail.fsus-mobile">
+    <Setter Property="MinWidth" Value="44" />
+    <Setter Property="MinHeight" Value="44" />
+  </Style>
+
+  <Style Selector="fsus|FsusCopyableDetail:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+
+  <Style Selector="fsus|FsusCopyableDetail:disabled, fsus|FsusCopyableDetail.fsus-disabled">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
   <Style Selector="fsus|FsusThreadPanel, fsus|FsusMessageTimeline, fsus|FsusReplyComposerShell, fsus|FsusInboxEmptyState">
     <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
