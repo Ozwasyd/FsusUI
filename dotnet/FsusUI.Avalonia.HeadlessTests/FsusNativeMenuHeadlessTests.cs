@@ -101,6 +101,51 @@ public class FsusNativeMenuHeadlessTests
   }
 
   [AvaloniaFact]
+  public void PreserveRootsProfileAttachesExactlySuppliedRootsAndKeepsCommandState()
+  {
+    var lockCommand = new FsusPlatformCommand("edit.lockSession", "Lock Session")
+    {
+      IsEnabled = false,
+      ExecuteAction = _ => { },
+    };
+    var roots = new[]
+    {
+      FsusNativeMenuItemModel.SubMenu(
+        "Edit",
+        FsusPlatformRole.Edit,
+        FsusNativeMenuItemModel.Action(lockCommand)),
+      FsusNativeMenuItemModel.SubMenu("Help", FsusPlatformRole.Help),
+    };
+
+    var window = new Window();
+    using var builder = new FsusNativeMenuBuilder();
+    builder.AttachTo(
+      window,
+      roots,
+      new FsusNativeMenuOptions
+      {
+        Profile = FsusNativeMenuProfile.PreserveRoots,
+      },
+      FsusShortcutPlatform.macOS);
+
+    var menu = NativeMenu.GetMenu(window);
+    Assert.NotNull(menu);
+    Assert.Equal(
+      ["Edit", "Help"],
+      menu.Items.OfType<NativeMenuItem>().Select(item => item.Header).ToArray());
+
+    var editItem = Assert.IsType<NativeMenuItem>(menu.Items[0]);
+    var lockItem = Assert.IsType<NativeMenuItem>(Assert.Single(editItem.Menu!.Items));
+    Assert.False(lockItem.IsEnabled);
+    Assert.Equal("edit.lockSession", FsusNativeMenuMetadata.GetCommandId(lockItem));
+
+    lockCommand.IsEnabled = true;
+    Assert.True(lockItem.IsEnabled);
+
+    window.Close();
+  }
+
+  [AvaloniaFact]
   public void CommandPaletteIntegratesWithSharedCommandsInHeadless()
   {
     var undoInvoked = false;

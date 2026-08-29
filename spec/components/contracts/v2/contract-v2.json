@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "a861690e8a05f9bf0a72e2ef70aa6adec0bec0aa65623fbed4b184d4337a0d32",
+      "hash": "2e87906d76638d7f3f37b843f0aee915778031d8c08a7dc4bcef17d6f0cdd2c1",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -135401,7 +135401,7 @@
       "kind": "class",
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 5,
+      "memberCount": 8,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-native-menu-builder"
       ],
@@ -135436,6 +135436,54 @@
       "memberCount": 3,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-native-menu-metadata"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusNativeMenuOptions",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 4,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-native-menu-options"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusNativeMenuProfile",
+      "kind": "enum",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-native-menu-profile"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusNativeMenuSynthesizedRoots",
+      "kind": "enum",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 6,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-native-menu-synthesized-roots"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",

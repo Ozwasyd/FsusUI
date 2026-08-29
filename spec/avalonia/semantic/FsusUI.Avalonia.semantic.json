@@ -11741,10 +11741,81 @@
           "returnType": "System.Void",
           "parameters": [
             {
+              "name": "topLevel",
+              "type": "Avalonia.Controls.TopLevel",
+              "optional": false
+            },
+            {
+              "name": "rootModels",
+              "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusNativeMenuItemModel\u003E",
+              "optional": false
+            },
+            {
+              "name": "options",
+              "type": "FsusUI.Avalonia.Controls.FsusNativeMenuOptions",
+              "optional": false
+            },
+            {
+              "name": "platform",
+              "type": "FsusUI.Avalonia.Controls.FsusShortcutPlatform",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "AttachTo",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
               "name": "app",
               "type": "Avalonia.Application",
               "optional": false
             },
+            {
+              "name": "rootModels",
+              "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusNativeMenuItemModel\u003E",
+              "optional": false
+            },
+            {
+              "name": "platform",
+              "type": "FsusUI.Avalonia.Controls.FsusShortcutPlatform",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "AttachTo",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "app",
+              "type": "Avalonia.Application",
+              "optional": false
+            },
+            {
+              "name": "rootModels",
+              "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusNativeMenuItemModel\u003E",
+              "optional": false
+            },
+            {
+              "name": "options",
+              "type": "FsusUI.Avalonia.Controls.FsusNativeMenuOptions",
+              "optional": false
+            },
+            {
+              "name": "platform",
+              "type": "FsusUI.Avalonia.Controls.FsusShortcutPlatform",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "Build",
+          "isStatic": false,
+          "returnType": "Avalonia.Controls.NativeMenu",
+          "parameters": [
             {
               "name": "rootModels",
               "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusNativeMenuItemModel\u003E",
@@ -11765,6 +11836,11 @@
             {
               "name": "rootModels",
               "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusNativeMenuItemModel\u003E",
+              "optional": false
+            },
+            {
+              "name": "options",
+              "type": "FsusUI.Avalonia.Controls.FsusNativeMenuOptions",
               "optional": false
             },
             {
@@ -12044,6 +12120,107 @@
               "optional": false
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusNativeMenuOptions",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Default",
+          "type": "FsusUI.Avalonia.Controls.FsusNativeMenuOptions",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "Profile",
+          "type": "FsusUI.Avalonia.Controls.FsusNativeMenuProfile",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SynthesizedRoots",
+          "type": "FsusUI.Avalonia.Controls.FsusNativeMenuSynthesizedRoots",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusNativeMenuOptions",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusNativeMenuProfile",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "StandardDocumentWindow",
+          "value": 0
+        },
+        {
+          "name": "PreserveRoots",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusNativeMenuSynthesizedRoots",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "None",
+          "value": 0
+        },
+        {
+          "name": "Application",
+          "value": 1
+        },
+        {
+          "name": "File",
+          "value": 2
+        },
+        {
+          "name": "Window",
+          "value": 4
+        },
+        {
+          "name": "Help",
+          "value": 8
+        },
+        {
+          "name": "All",
+          "value": 15
         }
       ]
     },
