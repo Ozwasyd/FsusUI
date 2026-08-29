@@ -35,6 +35,27 @@
     <Setter Property="Background" Value="{DynamicResource FsusThemeLoadingBrush}" />
   </Style>
 
+  <Style Selector="fsus|FsusLoadingIndicator">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Ellipse Name="PART_Arc" Stroke="{DynamicResource FsusColorActionPrimaryBrush}" StrokeThickness="2" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusLoadingIndicator.fsus-idle">
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusLoadingIndicator.fsus-active.fsus-motion-reduced">
+    <Setter Property="Opacity" Value="0.55" />
+  </Style>
+
   <Style Selector="fsus|FsusAffix">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />

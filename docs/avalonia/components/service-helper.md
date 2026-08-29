@@ -5,8 +5,18 @@ Component ID: `service-helper`
 ## Avalonia API
 
 Use `FsusMessageService`, `FsusNotificationService`, `FsusLoadingService`,
-`FsusMessageToast`, `FsusNotification`, `FsusLoadingOverlay`, `FsusAffix`, and
-`FsusBacktop`.
+`FsusMessageToast`, `FsusNotification`, `FsusLoadingOverlay`,
+`FsusLoadingIndicator`, `FsusAffix`, and `FsusBacktop`.
+
+`FsusLoadingIndicator` is a standalone compact loading primitive for
+16-24 px surfaces such as search fields and command palettes. `IsActive`
+shows or hides it, `IsIndeterminate` switches between an indeterminate arc
+and a `Value`-driven determinate stroke, sizes come from the control's own
+width and height, and colors resolve through theme tokens. It exposes the
+progress-bar control type with a stable accessible name and `loading`/`idle`
+item status instead of announcing animation frames, and it honors reduced
+motion through the `FsusMotionModeCurrent` theme resource or its own
+`ReducedMotion` flag.
 
 ## Vue Contract Mapping
 
