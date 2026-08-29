@@ -200,6 +200,194 @@ public class FsusTreePrimitiveTests
     Assert.Contains("\"id\": \"tree-table\"", performanceBudgets);
   }
 
+  [Fact]
+  public void TreeActivationEventsFireOnlyFromUserGestureEntries()
+  {
+    var tree = new FsusTree();
+    var root = new FsusTreeNode("root", "Root");
+    root.Children.Add(new FsusTreeNode("file-a", "File A"));
+    root.Children.Add(new FsusTreeNode("file-b", "File B") { IsDisabled = true });
+    tree.Nodes.Add(root);
+    tree.RefreshView();
+
+    var activations = new List<FsusTreeNodeActivatedEventArgs>();
+    tree.NodeActivated += (_, args) =>
+    {
+      args.Handled = true;
+      activations.Add(args);
+    };
+
+    tree.ToggleSelection("file-a");
+    tree.FocusNode("file-a");
+    tree.Expand("root");
+
+    Assert.Empty(activations);
+
+    Assert.True(tree.Activate("file-a", FsusTreeInteractionSource.Pointer));
+    var pointer = Assert.Single(activations);
+    Assert.Equal("file-a", pointer.Key);
+    Assert.Equal(FsusTreeInteractionSource.Pointer, pointer.Source);
+    Assert.True(pointer.Handled);
+    Assert.Equal("file-a", tree.FocusedKey);
+
+    Assert.False(tree.Activate("file-b", FsusTreeInteractionSource.Pointer));
+    Assert.False(tree.Activate("missing", FsusTreeInteractionSource.Keyboard));
+    Assert.Single(activations);
+  }
+
+  [Fact]
+  public async Task TreeEnterOnFocusedNodeActivatesExactlyOnce()
+  {
+    var tree = new KeyboardTree
+    {
+      SelectionMode = FsusTreeSelectionMode.Multiple,
+    };
+    tree.Nodes.Add(new FsusTreeNode("file-a", "File A"));
+    tree.RefreshView();
+
+    var activations = new List<FsusTreeNodeActivatedEventArgs>();
+    tree.NodeActivated += (_, args) => activations.Add(args);
+
+    Assert.True(await tree.PressAsync(Key.Down));
+    Assert.True(await tree.PressAsync(Key.Enter));
+
+    var activation = Assert.Single(activations);
+    Assert.Equal("file-a", activation.Key);
+    Assert.Equal(FsusTreeInteractionSource.Keyboard, activation.Source);
+    Assert.Equal("file-a", tree.FocusedKey);
+  }
+
+  [Fact]
+  public void TreeSelectionEventsReportDeltaAndFullSetMatchingAutomationState()
+  {
+    var tree = new FsusTree { SelectionMode = FsusTreeSelectionMode.Multiple };
+    tree.Nodes.Add(new FsusTreeNode("leaf-a", "Leaf A"));
+    tree.Nodes.Add(new FsusTreeNode("leaf-b", "Leaf B"));
+    tree.RefreshView();
+
+    var changes = new List<FsusTreeSelectionChangedEventArgs>();
+    tree.SelectionChanged += (_, args) => changes.Add(args);
+
+    Assert.True(tree.ToggleSelection("leaf-a"));
+    var added = changes[^1];
+    Assert.Equal(new[] { "leaf-a" }, added.AddedKeys);
+    Assert.Empty(added.RemovedKeys);
+    Assert.Equal(new[] { "leaf-a" }, added.SelectedKeys);
+    Assert.True(tree.GetNodeState("leaf-a").Selected);
+
+    Assert.True(tree.ToggleSelection("leaf-b"));
+    Assert.Equal(new[] { "leaf-b" }, changes[^1].AddedKeys);
+    Assert.Equal(new[] { "leaf-a", "leaf-b" }, changes[^1].SelectedKeys.Order());
+
+    Assert.True(tree.ToggleSelection("leaf-a"));
+    var removed = changes[^1];
+    Assert.Empty(removed.AddedKeys);
+    Assert.Equal(new[] { "leaf-a" }, removed.RemovedKeys);
+    Assert.Equal(new[] { "leaf-b" }, removed.SelectedKeys);
+    Assert.False(tree.GetNodeState("leaf-a").Selected);
+    Assert.Equal(3, changes.Count);
+
+    var single = new FsusTree();
+    single.Nodes.Add(new FsusTreeNode("only", "Only"));
+    single.RefreshView();
+    var singleChanges = new List<FsusTreeSelectionChangedEventArgs>();
+    single.SelectionChanged += (_, args) => singleChanges.Add(args);
+
+    Assert.True(single.ToggleSelection("only"));
+    Assert.True(single.ToggleSelection("only"));
+    var singleChange = Assert.Single(singleChanges);
+    Assert.Equal(new[] { "only" }, singleChange.AddedKeys);
+  }
+
+  [Fact]
+  public async Task TreeExpansionEventsFireFromKeyboardGesturesOnly()
+  {
+    var tree = new KeyboardTree();
+    var root = new FsusTreeNode("root", "Root");
+    root.Children.Add(new FsusTreeNode("child", "Child"));
+    tree.Nodes.Add(root);
+    tree.RefreshView();
+
+    var expansions = new List<FsusTreeExpansionChangedEventArgs>();
+    tree.ExpansionChanged += (_, args) => expansions.Add(args);
+
+    Assert.True(await tree.PressAsync(Key.Right));
+    var expanded = expansions[^1];
+    Assert.Equal("root", expanded.Key);
+    Assert.True(expanded.IsExpanded);
+    Assert.Equal(FsusTreeInteractionSource.Keyboard, expanded.Source);
+    Assert.Equal("expanded", tree.GetNodeState("root").ExpandedState);
+
+    Assert.True(await tree.PressAsync(Key.Left));
+    Assert.False(expansions[^1].IsExpanded);
+    Assert.Equal("collapsed", tree.GetNodeState("root").ExpandedState);
+
+    Assert.True(tree.Expand("root"));
+    Assert.Equal(2, expansions.Count);
+  }
+
+  [Fact]
+  public async Task TreeLazyLoadLifecycleReportsStartedCompletedCanceledAndFailed()
+  {
+    var first = new FsusTreeNode("lazy-a", "Lazy A") { HasLazyChildren = true };
+    var second = new FsusTreeNode("lazy-b", "Lazy B") { HasLazyChildren = true };
+    var tree = new FsusTree();
+    tree.Nodes.Add(first);
+    tree.Nodes.Add(second);
+    tree.RefreshView();
+
+    var lifecycle = new List<FsusTreeLazyLoadEventArgs>();
+    tree.LazyLoadStateChanged += (_, args) => lifecycle.Add(args);
+
+    var firstCompletion = new TaskCompletionSource<IReadOnlyList<FsusTreeNode>>();
+    var calls = 0;
+    tree.ChildrenLoader = (node, cancellationToken) =>
+    {
+      calls++;
+      if (calls == 1)
+      {
+        cancellationToken.Register(() =>
+          firstCompletion.TrySetCanceled(cancellationToken));
+        return new ValueTask<IReadOnlyList<FsusTreeNode>>(firstCompletion.Task);
+      }
+
+      return ValueTask.FromResult<IReadOnlyList<FsusTreeNode>>([
+        new FsusTreeNode($"{node.Key}-child", $"{node.Label} child"),
+      ]);
+    };
+
+    var stale = tree.LoadChildrenAsync("lazy-a");
+    var loaded = await tree.LoadChildrenAsync("lazy-b");
+    var staleResult = await stale;
+
+    Assert.False(staleResult);
+    Assert.True(loaded);
+    Assert.Equal(
+      new[] { FsusTreeLazyLoadState.Started, FsusTreeLazyLoadState.Canceled },
+      lifecycle.Where(args => args.Key == "lazy-a").Select(args => args.State));
+    Assert.Equal(
+      new[] { FsusTreeLazyLoadState.Started, FsusTreeLazyLoadState.Completed },
+      lifecycle.Where(args => args.Key == "lazy-b").Select(args => args.State));
+    Assert.All(
+      lifecycle.Where(args => args.Key == "lazy-a"),
+      args => Assert.NotEqual(FsusTreeLazyLoadState.Completed, args.State));
+    Assert.Equal("expanded", tree.GetNodeState("lazy-b").ExpandedState);
+    Assert.False(second.HasLazyChildren);
+
+    var failing = new FsusTreeNode("failing", "Failing") { HasLazyChildren = true };
+    tree.Nodes.Add(failing);
+    tree.ChildrenLoader = (_, _) => throw new InvalidOperationException("offline");
+    var failureCountBeforeThrow = lifecycle.Count;
+
+    await Assert.ThrowsAsync<InvalidOperationException>(
+      () => tree.LoadChildrenAsync("failing").AsTask());
+
+    var failure = lifecycle[failureCountBeforeThrow + 1];
+    Assert.Equal(FsusTreeLazyLoadState.Failed, failure.State);
+    Assert.IsType<InvalidOperationException>(failure.Exception);
+    Assert.Equal(FsusTreeLazyLoadState.Started, lifecycle[failureCountBeforeThrow].State);
+  }
+
   private sealed class KeyboardTree : FsusTree
   {
     public ValueTask<bool> PressAsync(Key key) => HandleKeyAsync(key);
