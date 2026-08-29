@@ -6068,6 +6068,18 @@
           "isStatic": false,
           "returnType": "System.Boolean",
           "parameters": []
+        },
+        {
+          "name": "SetExternalDragOver",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "isDragOver",
+              "type": "System.Boolean",
+              "optional": false
+            }
+          ]
         }
       ]
     },

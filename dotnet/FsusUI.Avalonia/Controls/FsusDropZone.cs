@@ -272,6 +272,28 @@ public class FsusDropZone : ContentControl
     private set => SetValue(IsDragOverProperty, value);
   }
 
+  public bool SetExternalDragOver(bool isDragOver)
+  {
+    if (isDragOver)
+    {
+      if (IsDisabled || !IsEnabled || IsLoading)
+      {
+        return false;
+      }
+
+      ResetDropResult();
+      IsDragOver = true;
+      SyncClasses();
+      SyncAutomation();
+      return true;
+    }
+
+    IsDragOver = false;
+    SyncClasses();
+    SyncAutomation();
+    return true;
+  }
+
   public string? Instruction
   {
     get => GetValue(InstructionProperty);
@@ -403,6 +425,7 @@ public class FsusDropZone : ContentControl
     }
 
     SetDropResult(accepted.Count, rejected.Count);
+    IsDragOver = false;
     SyncClasses();
     SyncAutomation();
   }
@@ -479,6 +502,7 @@ public class FsusDropZone : ContentControl
     }
 
     SetDropResult(accepted.Count, rejected.Count);
+    IsDragOver = false;
     SyncClasses();
     SyncAutomation();
   }
@@ -586,8 +610,27 @@ public class FsusDropZone : ContentControl
         Focusable = !IsDisabled && IsEnabled;
       }
 
+      if (
+        change.Property != IsDragOverProperty &&
+        IsDragOver &&
+        (IsDisabled || !IsEnabled || IsLoading)
+      )
+      {
+        IsDragOver = false;
+      }
+
       SyncClasses();
       SyncAutomation();
+    }
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnDetachedFromVisualTree(e);
+
+    if (IsDragOver)
+    {
+      IsDragOver = false;
     }
   }
 
