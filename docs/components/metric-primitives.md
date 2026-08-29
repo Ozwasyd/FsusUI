@@ -87,6 +87,12 @@ health semantics stay in the consuming app.
 Details are collapsed by default through native `details` / `summary`, so the
 toggle remains keyboard reachable.
 
+Inline actions use at least a 40×40px desktop target and a 44×44px mobile target.
+`FsusCopyableDetail` accepts `disabled`; the native button remains at full
+opacity while disabled colors and cursor tokens communicate the state. Inline
+actions that expose `aria-pressed="true"` or `aria-selected="true"` use the
+standard selected fill and accent tokens.
+
 ## Empty States
 
 Use `FsusEmptyState size="inline"` from the empty-state primitive for local
@@ -107,5 +113,7 @@ empty metric, distribution, or diagnostics sections.
 - Do not rely on color alone for status; provide explicit text.
 - Numeric values use tabular alignment where appropriate.
 - Copy buttons require accessible labels.
+- Disabled copy buttons preserve native `disabled` semantics and do not emit
+  copy events.
 - Mobile stacking preserves logical source order.
 - Reduced motion must not animate bars by default.
