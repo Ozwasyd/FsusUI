@@ -754,8 +754,40 @@
           "isStatic": false
         },
         {
+          "name": "ItemsSource",
+          "type": "System.Collections.IEnumerable",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "PlaceholderText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Popup",
+          "type": "Avalonia.Controls.Primitives.Popup",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
           "name": "RemoteSearchAsync",
           "type": "FsusUI.Avalonia.Controls.FsusRemoteOptionsProvider",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SelectedValue",
+          "type": "System.Object",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -768,11 +800,136 @@
           "canRead": true,
           "canWrite": false,
           "isStatic": false
+        },
+        {
+          "name": "Text",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "TextBox",
+          "type": "Avalonia.Controls.TextBox",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
         }
       ],
-      "avaloniaProperties": [],
+      "avaloniaProperties": [
+        {
+          "name": "ItemsSource",
+          "kind": "styled",
+          "type": "System.Collections.IEnumerable",
+          "nullable": true
+        },
+        {
+          "name": "PlaceholderText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "SelectedValue",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "Text",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
       "events": [],
       "methods": [
+        {
+          "name": "ApplyFilter",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "query",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "ClearSelection",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "CloseAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "parameters": []
+        },
+        {
+          "name": "ClosePopup",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "OnOverlayClosed",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "reason",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayCloseReason",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "OnOverlayOpened",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "entry",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "OpenPopup",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "ScrollToOption",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SelectOption",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "option",
+              "type": "FsusUI.Avalonia.Controls.FsusOption",
+              "optional": false
+            }
+          ]
+        },
         {
           "name": "TypeAsync",
           "isStatic": false,
