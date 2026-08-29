@@ -2,7 +2,7 @@
   {
     "Name": "icon-catalog-light",
     "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-light.png",
-    "Sha256": "d42c34ccdf51f9d571f7a76aebdca9711043d473887bc763095bb5cf59a6287c",
+    "Sha256": "7b4036c528430090565bfb360f39e094ad4a9f9c196f5f474a4a0ba35a309a61",
     "PixelWidth": 560,
     "PixelHeight": 260,
     "IconSize": 16,
@@ -109,7 +109,7 @@
   {
     "Name": "icon-catalog-dark",
     "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-dark.png",
-    "Sha256": "83f4b9c15fd5d00bcc901382cd80c98b23c73a19046c08ea7ec7a889626d8494",
+    "Sha256": "a8cec43c4d3c495b008629d55dd65563a8483f19d4b768ff07186f4dbe89ec76",
     "PixelWidth": 560,
     "PixelHeight": 260,
     "IconSize": 16,
