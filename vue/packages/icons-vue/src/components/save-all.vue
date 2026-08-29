@@ -1,0 +1,20 @@
+<template>
+  <svg
+    stroke-linejoin="round"
+    stroke-linecap="round"
+    stroke-width="112"
+    stroke="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 1024 1024"
+  >
+    <path
+      fill="currentColor"
+      d="M864 176 H912 a48 48 0 0 1 48 48 V864 a48 48 0 0 1 -48 48 H864 V848 H880 a16 16 0 0 0 16 -16 V256 a16 16 0 0 0 -16 -16 H864 Z M112 224 H752 a48 48 0 0 1 48 48 V912 a48 48 0 0 1 -48 48 H112 a48 48 0 0 1 -48 -48 V272 a48 48 0 0 1 48 -48 Z M144 880 H720 a16 16 0 0 0 16 -16 V304 a16 16 0 0 0 -16 -16 H144 a16 16 0 0 0 -16 16 V880 a16 16 0 0 0 16 16 Z M304 288 H560 a32 32 0 0 1 0 64 H304 a32 32 0 0 1 0 -64 Z M304 672 H560 a32 32 0 0 1 0 64 H304 a32 32 0 0 1 0 -64 Z"
+    />
+  </svg>
+</template>
+<script lang="ts" setup>
+defineOptions({
+  name: 'SaveAll',
+})
+</script>

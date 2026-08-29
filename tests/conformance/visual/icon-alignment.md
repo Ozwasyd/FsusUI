@@ -10,6 +10,24 @@ Required representative checks:
 - `warning`: status icon, non-decorative by default, md size token.
 - `chevron-right`: navigation glyph, RTL-mirroring reviewed before use in
   directional controls.
+- `folder`: Files / workspace explorer navigation glyph, folder-shaped, md
+  size token, md stroke token.
+- `outline`: document outline / table-of-contents navigation glyph, memo- or
+  list-shaped, md size token, md stroke token.
+- `save-all`: stacked-floppy action glyph for save-all document headers, md
+  size token, md stroke token.
+- `close-all`: stacked-window action glyph with an X knockout for close-all
+  document headers, md size token, md stroke token.
+- `confirm`: check/confirm/apply action glyph sourced from the shared check
+  geometry, decorative by default inside named icon-only buttons, md size
+  token, md stroke token.
+- `file-import`: import-document glyph (page with a down arrow into the
+  document) for icon-only actions and centered drop-zone empty states, md
+  size token, md stroke token.
+- `file` family (`file`, `file-text`, `file-markdown`, `file-code`,
+  `file-data`, `file-image`, `file-archive`, `file-document`): shared page
+  silhouette with folded corner, type-specific interior glyph, stable
+  `file` fallback for unknown types, md size token, md stroke token.
 - line icons: shared viewport, `currentColor`, `stroke-linecap="round"`,
   `stroke-linejoin="round"`, and the md stroke token.
 - solid icons: shared viewport and `currentColor` fill. Solid icons may keep
