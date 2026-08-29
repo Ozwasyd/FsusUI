@@ -225,6 +225,14 @@ const checkVisual = () => {
     'outline',
     'save-all',
     'close-all',
+    'file',
+    'file-text',
+    'file-markdown',
+    'file-code',
+    'file-data',
+    'file-image',
+    'file-archive',
+    'file-document',
   ]) {
     assertIncludes(icons, icon, 'tests/conformance/visual/icon-alignment.md')
     const baselineIcon = baseline.icons?.find((entry) => entry.id === icon)

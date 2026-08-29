@@ -30,6 +30,17 @@ public class FsusIconCatalogHeadlessTests
     FsusIconKeys.CloseAll,
   ];
 
+  private static readonly string[] FileTypeSampleNames =
+  [
+    "README.md",
+    "notes.txt",
+    "Program.cs",
+    "data.csv",
+    "photo.jpeg",
+    "archive.tar.gz",
+    "report.pdf",
+  ];
+
   [AvaloniaTheory]
   [InlineData(FsusIconKeys.Folder, "FsusIconFolder")]
   [InlineData(FsusIconKeys.Outline, "FsusIconOutline")]
@@ -194,15 +205,29 @@ public class FsusIconCatalogHeadlessTests
       application.Resources[FsusThemeResourceKeys.TextBrush]).Color;
 
     var iconSize = variant.IconSize;
+    var catalogRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 24 };
+    var fileRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 24 };
     var panel = new StackPanel
     {
-      Orientation = Orientation.Horizontal,
-      Spacing = 24,
+      Spacing = 20,
       VerticalAlignment = VerticalAlignment.Center,
       HorizontalAlignment = HorizontalAlignment.Center,
+      Children =
+      {
+        catalogRow,
+        fileRow,
+      },
     };
     var catalogIcons = CatalogIconKeys
       .Select(key => new FsusIcon { IconKey = key, Width = iconSize, Height = iconSize })
+      .ToList();
+    var fileTypeIcons = FileTypeSampleNames
+      .Select(name => new FsusIcon
+      {
+        IconKey = FsusFileTypeIcon.Resolve(name),
+        Width = iconSize,
+        Height = iconSize,
+      })
       .ToList();
     var disabledIcon = new FsusIcon
     {
@@ -220,11 +245,16 @@ public class FsusIconCatalogHeadlessTests
 
     foreach (var icon in catalogIcons)
     {
-      panel.Children.Add(icon);
+      catalogRow.Children.Add(icon);
     }
 
-    panel.Children.Add(disabledIcon);
-    panel.Children.Add(button);
+    foreach (var icon in fileTypeIcons)
+    {
+      fileRow.Children.Add(icon);
+    }
+
+    catalogRow.Children.Add(disabledIcon);
+    catalogRow.Children.Add(button);
 
     var surface = new Border
     {
@@ -236,7 +266,7 @@ public class FsusIconCatalogHeadlessTests
     var window = new Window
     {
       Width = 440,
-      Height = 200,
+      Height = 240,
       Content = surface,
       ShowInTaskbar = false,
     };
@@ -244,7 +274,7 @@ public class FsusIconCatalogHeadlessTests
     window.Show();
 
     using var bitmap = new RenderTargetBitmap(
-      new PixelSize(440, 200),
+      new PixelSize(440, 240),
       new Vector(96, 96));
     bitmap.Render(surface);
 
@@ -259,6 +289,22 @@ public class FsusIconCatalogHeadlessTests
         icon.IconKey,
       })
       .ToList();
+    var renderedFileTypes = fileTypeIcons
+      .Select(icon => new
+      {
+        Evidence = AnalyzeRegion(
+          bitmap,
+          CaptureBounds(icon, surface),
+          expectedForeground,
+          expectsForegroundMatch: true),
+        icon.IconKey,
+      })
+      .ToList();
+    Assert.All(
+      fileTypeIcons,
+      icon => Assert.True(
+        icon.TryFindResource(icon.IconKey!, out _),
+        $"{icon.IconKey} must resolve from the generated catalog."));
     var disabledEvidence = AnalyzeRegion(
       bitmap,
       CaptureBounds(disabledIcon, surface),
@@ -299,6 +345,11 @@ public class FsusIconCatalogHeadlessTests
       buttonEvidence.NonBackgroundRatio,
       buttonEvidence.ForegroundMatchRatio,
       buttonEvidence.ExpectsForegroundMatch));
+    icons.AddRange(renderedFileTypes.Select(item => new IconPixelEvidence(
+      item.IconKey!,
+      item.Evidence.NonBackgroundRatio,
+      item.Evidence.ForegroundMatchRatio,
+      item.Evidence.ExpectsForegroundMatch)));
 
     return new CatalogRenderEvidence(
       variant.Name,
