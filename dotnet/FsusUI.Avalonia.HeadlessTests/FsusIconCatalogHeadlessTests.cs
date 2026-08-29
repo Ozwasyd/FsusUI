@@ -26,11 +26,15 @@ public class FsusIconCatalogHeadlessTests
   [
     FsusIconKeys.Folder,
     FsusIconKeys.Outline,
+    FsusIconKeys.SaveAll,
+    FsusIconKeys.CloseAll,
   ];
 
   [AvaloniaTheory]
   [InlineData(FsusIconKeys.Folder, "FsusIconFolder")]
   [InlineData(FsusIconKeys.Outline, "FsusIconOutline")]
+  [InlineData(FsusIconKeys.SaveAll, "FsusIconSaveAll")]
+  [InlineData(FsusIconKeys.CloseAll, "FsusIconCloseAll")]
   public void GeneratedCatalogKeysResolveStreamGeometry(
     string iconKey,
     string expectedResourceKey)
@@ -231,7 +235,7 @@ public class FsusIconCatalogHeadlessTests
     };
     var window = new Window
     {
-      Width = 360,
+      Width = 440,
       Height = 200,
       Content = surface,
       ShowInTaskbar = false,
@@ -240,7 +244,7 @@ public class FsusIconCatalogHeadlessTests
     window.Show();
 
     using var bitmap = new RenderTargetBitmap(
-      new PixelSize(360, 200),
+      new PixelSize(440, 200),
       new Vector(96, 96));
     bitmap.Render(surface);
 

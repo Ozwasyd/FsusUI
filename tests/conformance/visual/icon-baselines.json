@@ -110,6 +110,38 @@
       "fill": "icon.fill.default",
       "decorativeByDefault": true,
       "aliases": []
+    },
+    {
+      "id": "save-all",
+      "source": "vue/packages/icons-svg/save-all.svg",
+      "vueComponent": "SaveAll",
+      "avaloniaResourceKey": "FsusIconSaveAll",
+      "sourcePathHash": "32c56d20e04aa8f6d117a67dde37e825c4a93c489f8b1af8737d3f644057b23d",
+      "viewBox": "0 0 1024 1024",
+      "strokeWidth": 112,
+      "strokeLineCap": "round",
+      "strokeLineJoin": "round",
+      "defaultSize": "icon.size.md",
+      "stroke": "icon.stroke.md",
+      "fill": "icon.fill.default",
+      "decorativeByDefault": true,
+      "aliases": []
+    },
+    {
+      "id": "close-all",
+      "source": "vue/packages/icons-svg/close-all.svg",
+      "vueComponent": "CloseAll",
+      "avaloniaResourceKey": "FsusIconCloseAll",
+      "sourcePathHash": "8564875a38e32322a7b9d5ee67fe2c1b397031c58ba14053898e2ddd525b1480",
+      "viewBox": "0 0 1024 1024",
+      "strokeWidth": 112,
+      "strokeLineCap": "round",
+      "strokeLineJoin": "round",
+      "defaultSize": "icon.size.md",
+      "stroke": "icon.stroke.md",
+      "fill": "icon.fill.default",
+      "decorativeByDefault": true,
+      "aliases": []
     }
   ]
 }

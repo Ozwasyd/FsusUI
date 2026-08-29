@@ -2,8 +2,8 @@
   {
     "Name": "icon-catalog-light",
     "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-light.png",
-    "Sha256": "bca6127e9e7d9d27ce09044c51b3fc687b506e1e9050fe54ddf294652ce604db",
-    "PixelWidth": 360,
+    "Sha256": "3f960f051c2765671875d6c2a29dfc0d0fe7e15f9c09d79a4e379d4317b65dab",
+    "PixelWidth": 440,
     "PixelHeight": 200,
     "IconSize": 16,
     "HighContrast": false,
@@ -18,6 +18,18 @@
         "IconKey": "FsusIconOutline",
         "NonBackgroundRatio": 0.861592,
         "ForegroundMatchRatio": 0.767068,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconSaveAll",
+        "NonBackgroundRatio": 0.726644,
+        "ForegroundMatchRatio": 0.847619,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconCloseAll",
+        "NonBackgroundRatio": 0.823529,
+        "ForegroundMatchRatio": 0.802521,
         "ExpectsForegroundMatch": true
       },
       {
@@ -37,8 +49,8 @@
   {
     "Name": "icon-catalog-dark",
     "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-dark.png",
-    "Sha256": "39a42d0f0dd5c5d87bba7a90109fb984e6b40579395a0f41caf615861ad5c082",
-    "PixelWidth": 360,
+    "Sha256": "52007b20d6c17ca19a323858a027049d63faff3d90ebc91cbbf1370a145874f4",
+    "PixelWidth": 440,
     "PixelHeight": 200,
     "IconSize": 16,
     "HighContrast": false,
@@ -53,6 +65,18 @@
         "IconKey": "FsusIconOutline",
         "NonBackgroundRatio": 0.861592,
         "ForegroundMatchRatio": 0.767068,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconSaveAll",
+        "NonBackgroundRatio": 0.726644,
+        "ForegroundMatchRatio": 0.847619,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconCloseAll",
+        "NonBackgroundRatio": 0.823529,
+        "ForegroundMatchRatio": 0.802521,
         "ExpectsForegroundMatch": true
       },
       {
@@ -72,8 +96,8 @@
   {
     "Name": "icon-catalog-high-contrast",
     "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-high-contrast.png",
-    "Sha256": "b8c8a0edc2748f1169d230f7fa42fe77bd33d3ac879e9da0a59226583fed4c99",
-    "PixelWidth": 360,
+    "Sha256": "c9c3e8650cd86d92b206bc0cf97f3911f09af3cfaef3402fc159d787c8552c44",
+    "PixelWidth": 440,
     "PixelHeight": 200,
     "IconSize": 16,
     "HighContrast": true,
@@ -88,6 +112,18 @@
         "IconKey": "FsusIconOutline",
         "NonBackgroundRatio": 0.861592,
         "ForegroundMatchRatio": 0.767068,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconSaveAll",
+        "NonBackgroundRatio": 0.726644,
+        "ForegroundMatchRatio": 0.847619,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconCloseAll",
+        "NonBackgroundRatio": 0.823529,
+        "ForegroundMatchRatio": 0.802521,
         "ExpectsForegroundMatch": true
       },
       {
@@ -107,8 +143,8 @@
   {
     "Name": "icon-catalog-zoom-200",
     "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-zoom-200.png",
-    "Sha256": "76eb5dd7a5f4613f9f0f45788a6e35568edd1ee6ceed34a8e5e917eaeab1262e",
-    "PixelWidth": 360,
+    "Sha256": "5c7da0020e1e446ea9d45e944236a1491af8bb4c8bbb069483532d16743e6a52",
+    "PixelWidth": 440,
     "PixelHeight": 200,
     "IconSize": 32,
     "HighContrast": false,
@@ -123,6 +159,18 @@
         "IconKey": "FsusIconOutline",
         "NonBackgroundRatio": 0.686869,
         "ForegroundMatchRatio": 0.744652,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconSaveAll",
+        "NonBackgroundRatio": 0.630854,
+        "ForegroundMatchRatio": 0.740902,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconCloseAll",
+        "NonBackgroundRatio": 0.681359,
+        "ForegroundMatchRatio": 0.743935,
         "ExpectsForegroundMatch": true
       },
       {

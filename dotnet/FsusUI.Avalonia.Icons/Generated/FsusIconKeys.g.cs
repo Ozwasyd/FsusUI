@@ -10,4 +10,6 @@ public static class FsusIconKeys
   public const string ChevronRight = "FsusIconChevronRight";
   public const string Folder = "FsusIconFolder";
   public const string Outline = "FsusIconOutline";
+  public const string SaveAll = "FsusIconSaveAll";
+  public const string CloseAll = "FsusIconCloseAll";
 }

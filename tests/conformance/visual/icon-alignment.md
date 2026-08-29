@@ -14,6 +14,10 @@ Required representative checks:
   size token, md stroke token.
 - `outline`: document outline / table-of-contents navigation glyph, memo- or
   list-shaped, md size token, md stroke token.
+- `save-all`: stacked-floppy action glyph for save-all document headers, md
+  size token, md stroke token.
+- `close-all`: stacked-window action glyph with an X knockout for close-all
+  document headers, md size token, md stroke token.
 - line icons: shared viewport, `currentColor`, `stroke-linecap="round"`,
   `stroke-linejoin="round"`, and the md stroke token.
 - solid icons: shared viewport and `currentColor` fill. Solid icons may keep

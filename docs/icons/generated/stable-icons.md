@@ -12,5 +12,7 @@ All stable icons are validated against the same SVG source files used by the Vue
 | `chevron-right` | `ArrowRight`  | `FsusIconChevronRight` | `icon.size.md`, `icon.stroke.md`, `icon.fill.default` | decorative by default |
 | `folder`        | `Folder`      | `FsusIconFolder`       | `icon.size.md`, `icon.stroke.md`, `icon.fill.default` | decorative by default |
 | `outline`       | `Memo`        | `FsusIconOutline`      | `icon.size.md`, `icon.stroke.md`, `icon.fill.default` | decorative by default |
+| `save-all`      | `SaveAll`     | `FsusIconSaveAll`      | `icon.size.md`, `icon.stroke.md`, `icon.fill.default` | decorative by default |
+| `close-all`     | `CloseAll`    | `FsusIconCloseAll`     | `icon.size.md`, `icon.stroke.md`, `icon.fill.default` | decorative by default |
 
 Icon-only controls must either expose a stable accessible name on the host control or explicitly mark the icon as decorative. Disabled, danger, muted, and current-color states inherit through the host foreground and the shared icon tokens above.
