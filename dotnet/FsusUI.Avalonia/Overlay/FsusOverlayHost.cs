@@ -292,10 +292,14 @@ public sealed class FsusOverlayHost : Panel
 
   protected override Size ArrangeOverride(Size finalSize)
   {
-    var centered = new HashSet<Visual>();
+    var arranged = new HashSet<Visual>();
     foreach (var entry in entries)
     {
-      entry.Scrim?.Arrange(new Rect(default, finalSize));
+      if (entry.Scrim is { } scrim)
+      {
+        scrim.Arrange(new Rect(default, finalSize));
+        arranged.Add(scrim);
+      }
 
       if (
         entry.Placement == FsusOverlayPlacement.Center &&
@@ -309,13 +313,18 @@ public sealed class FsusOverlayHost : Panel
           Math.Max(0, (finalSize.Width - width) / 2),
           Math.Max(0, (finalSize.Height - height) / 2));
         centeredContent.Arrange(new Rect(origin, new Size(width, height)));
-        centered.Add(centeredContent);
+        arranged.Add(centeredContent);
+      }
+      else if (entry.Content is Layoutable content)
+      {
+        content.Arrange(entry.Bounds);
+        arranged.Add(content);
       }
     }
 
     foreach (var child in Children)
     {
-      if (!centered.Contains(child))
+      if (!arranged.Contains(child))
       {
         child.Arrange(new Rect(default, finalSize));
       }
