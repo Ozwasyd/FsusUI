@@ -54,6 +54,53 @@ public class FsusNativeMenuHeadlessTests
   }
 
   [AvaloniaFact]
+  public void InitiallyDisabledCommandStaysDisabledInRenderedMenu()
+  {
+    var executed = false;
+    var saveCommand = new FsusPlatformCommand("doc.save", "Save", FsusPlatformRole.FileSave)
+    {
+      Gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control),
+      ExecuteAction = _ => executed = true,
+      IsEnabled = false,
+    };
+
+    var fileMenu = FsusNativeMenuItemModel.SubMenu(
+      "File",
+      FsusNativeMenuItemModel.Action(saveCommand));
+
+    var window = new Window();
+    using var builder = new FsusNativeMenuBuilder();
+    builder.AttachTo(window, [fileMenu], FsusShortcutPlatform.Windows);
+
+    var menu = NativeMenu.GetMenu(window);
+    Assert.NotNull(menu);
+
+    var fileItem = Assert.IsType<NativeMenuItem>(Assert.Single(menu.Items, i => i is NativeMenuItem m && m.Header == "File"));
+    Assert.NotNull(fileItem.Menu);
+    var saveItem = Assert.IsType<NativeMenuItem>(Assert.Single(fileItem.Menu.Items, i => i is NativeMenuItem m && m.Header == "Save"));
+
+    // A command disabled before the first build must render disabled through
+    // the attached (rendered) menu path instead of being coerced to enabled.
+    Assert.False(saveItem.IsEnabled);
+    Assert.NotNull(saveItem.Command);
+    Assert.False(saveItem.Command!.CanExecute(null));
+    Assert.Equal("Save", FsusNativeMenuMetadata.GetAutomationName(saveItem));
+    Assert.Equal("doc.save", FsusNativeMenuMetadata.GetCommandId(saveItem));
+
+    // The execution guard still prevents activation while disabled.
+    saveItem.Command.Execute(null);
+    Assert.False(executed);
+
+    // Automation-relevant state stays bound: enabling the command updates the
+    // rendered item synchronously.
+    saveCommand.IsEnabled = true;
+    Assert.True(saveItem.IsEnabled);
+    Assert.True(saveItem.Command.CanExecute(null));
+
+    window.Close();
+  }
+
+  [AvaloniaFact]
   public void CommandPaletteIntegratesWithSharedCommandsInHeadless()
   {
     var undoInvoked = false;
