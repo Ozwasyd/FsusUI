@@ -52,6 +52,12 @@ manager.Apply(
   });
 ```
 
+`FsusThemeManager.Apply` keeps the variant-aware semantic brushes current on
+every call. `{DynamicResource FsusColorActionPrimaryBrush}` resolves to
+`#2A599C` under the light palette and `#4B79CC` under the dark palette; an
+explicit `AccentOverride` replaces it while one is provided. Components bound
+through `{DynamicResource ...}` update immediately when the variant switches.
+
 ## Clean Consumer Sample
 
 `FsusUI.Avalonia.ConsumerSample` is a clean sample project that references
