@@ -383,4 +383,63 @@ public class FsusDropZoneTests
     public void Execute(object? parameter) => execute(parameter);
   }
 
+  [Fact]
+  public void ExternalDragOverDrivesVisualStateWithoutRaisingDropOrBrowseEvents()
+  {
+    var dropZone = new FsusDropZone();
+    var raisedEvents = 0;
+    dropZone.FilesDropped += (_, _) => raisedEvents++;
+    dropZone.FilesRejected += (_, _) => raisedEvents++;
+    dropZone.BrowseRequested += (_, _) => raisedEvents++;
+
+    Assert.True(dropZone.SetExternalDragOver(true));
+    Assert.True(dropZone.IsDragOver);
+    Assert.Contains("fsus-dragover", dropZone.Classes);
+    Assert.Contains(":dragover", dropZone.Classes);
+    Assert.Equal("dragover", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal(0, raisedEvents);
+
+    Assert.True(dropZone.SetExternalDragOver(false));
+    Assert.False(dropZone.IsDragOver);
+    Assert.DoesNotContain("fsus-dragover", dropZone.Classes);
+    Assert.DoesNotContain(":dragover", dropZone.Classes);
+    Assert.Equal("ready", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal(0, raisedEvents);
+  }
+
+  [Fact]
+  public void ExternalDragOverIsRejectedWhileGuardedAndResetsOnDisableLoadingAndDrop()
+  {
+    var dropZone = new FsusDropZone { IsDisabled = true };
+
+    Assert.False(dropZone.SetExternalDragOver(true));
+    Assert.False(dropZone.IsDragOver);
+
+    dropZone.IsDisabled = false;
+    dropZone.IsLoading = true;
+    Assert.False(dropZone.SetExternalDragOver(true));
+    Assert.False(dropZone.IsDragOver);
+
+    dropZone.IsLoading = false;
+    Assert.True(dropZone.SetExternalDragOver(true));
+    dropZone.IsDisabled = true;
+    Assert.False(dropZone.IsDragOver);
+    Assert.DoesNotContain("fsus-dragover", dropZone.Classes);
+
+    dropZone.IsDisabled = false;
+    Assert.True(dropZone.SetExternalDragOver(true));
+    dropZone.IsEnabled = false;
+    Assert.False(dropZone.IsDragOver);
+    dropZone.IsEnabled = true;
+
+    Assert.True(dropZone.SetExternalDragOver(true));
+    dropZone.IsLoading = true;
+    Assert.False(dropZone.IsDragOver);
+    dropZone.IsLoading = false;
+
+    Assert.True(dropZone.SetExternalDragOver(true));
+    dropZone.HandleDrop(new[] { "contract.pdf" });
+    Assert.False(dropZone.IsDragOver);
+    Assert.DoesNotContain("fsus-dragover", dropZone.Classes);
+  }
 }

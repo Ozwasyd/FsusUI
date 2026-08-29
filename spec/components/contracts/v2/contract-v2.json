@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "282f99fba672f74156ee737a0cd0ddf8f89c022956adb59a684f18d6a4f791c4",
+      "hash": "bbdc39aaeab2a5c749fd68b0b6aea826a4073ab3655af31db677b117f6ec2679",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -134389,7 +134389,7 @@
       "kind": "class",
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 48,
+      "memberCount": 49,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-drop-zone"
       ],
