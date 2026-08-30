@@ -115,15 +115,8 @@ public class FsusInputFocusThicknessHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRenderCapturesInputSelectionAndScrollbarFocusStates()
   {
-    var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "screenshots",
-      "avalonia");
-    Directory.CreateDirectory(outputRoot);
+    var outputRoot =
+      HeadlessVisualEvidence.CreateOutputDirectory("input-focus");
 
     var captures = new List<FocusRenderCapture>();
     foreach (var (themeName, highContrast, expectedThickness) in new[]
@@ -180,15 +173,11 @@ public class FsusInputFocusThicknessHeadlessTests
       Assert.Equal(64, capture.Sha256.Length);
       Assert.True(capture.PixelSize.Width > 0);
       Assert.True(capture.PixelSize.Height > 0);
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
+      Assert.True(File.Exists(Path.Combine(outputRoot, capture.File)));
     });
 
     var manifestPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      outputRoot,
       "issue-656-avalonia-focus-render-manifest.json");
     File.WriteAllText(
       manifestPath,
@@ -366,7 +355,7 @@ public class FsusInputFocusThicknessHeadlessTests
     window.Close();
 
     return new FocusRenderCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), outputPath).Replace('\\', '/'),
+      fileName,
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
