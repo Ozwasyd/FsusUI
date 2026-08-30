@@ -35,6 +35,24 @@ Every accepted override below is backed by `spec/platform-overrides/`.
 | MarkdownEditor transaction, selection, history, and composition | native-adapter | Preserve ordered non-overlapping changes, revision rejection, bounded change/inverse history, selection direction, external reset, and one composition-complete undo unit. | Web uses textarea UTF-16 offsets and DOM composition events; Avalonia must map native text/IME APIs to the same public semantics without exposing DOM or a private editor instance. |
 | ShortcutRecorder key capture and display                        | native-adapter | Preserve strongly typed key combinations, stable serialization string, cancellation, clearing, and collision detection.                                                    | macOS displays Command/Option symbols while Windows/Linux displays Ctrl/Alt text; underlying key codes and serialized semantics remain stable.                                      |
 | NativeMenu and platform roles                                   | native-adapter | Unified command model for native menus, command palette, and dock menus with synchronous enabled and gesture update.                                                      | macOS application menu and dock menu roles degrade gracefully on Windows and Linux; platform-standard File/Edit/View/Window/Help ordering is preserved.                             |
+| Desktop title bar and document cycling                          | native-adapter | Preserve typed title/path/status/actions, drag/no-drag regions, window actions and state, and forward/reverse document cycling.                                           | Windows/Linux can use embedded window buttons; macOS hosts retaining native traffic lights hide embedded buttons. Meta maps to Command while Control remains the neutral fallback.   |
+
+## Desktop Shell Window Behavior
+
+[`docs/avalonia/components/desktop-shell.md`](components/desktop-shell.md)
+defines the public activity rail, document tabs, and title-bar APIs. Window
+decoration and fullscreen animation remain native:
+
+- Windows uses extended-client-area composition and may replace focus resources
+  in high contrast.
+- macOS consumers that retain native traffic lights hide the embedded window
+  controls; Meta represents the Command modifier for document cycling.
+- Linux support depends on the current X11/Wayland compositor accepting
+  extended-client-area drag and requested window state.
+
+These host differences do not change typed action events, selected/dirty
+automation state, contextual-pane width bounds, or the no-drag attached
+property. They do not introduce a third theme preset or an unregistered token.
 
 ## Documentation Rule
 

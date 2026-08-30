@@ -11,6 +11,10 @@ Use `FsusTabs`, `FsusTabPane`, `FsusMenu`, `FsusMenuItem`, `FsusSubMenu`,
 `FsusNativeMenuItemModel`, `FsusNativeMenuBuilder`, `FsusNativeMenuOptions`,
 `FsusNativeMenuProfile`, and `FsusNativeMenuSynthesizedRoots`.
 
+Desktop editor shells use `FsusActivityRailShell`, `FsusDocumentTabs`, and
+`FsusNativeTitleBar`; their close, reorder, resize, overflow, window-state, and
+platform contracts are documented in [Desktop shell](desktop-shell.md).
+
 Tab headers raise the typed `PaneContextRequested` event
 (`FsusTabPaneContextEventArgs`) through right-click, `Shift+F10`/`Apps`, or
 `RequestPaneContext(key, source)` without changing the selected tab; compose it

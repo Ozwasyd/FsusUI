@@ -16,7 +16,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Grid RowDefinitions="Auto,*">
-          <ItemsPresenter Name="PART_ItemsPresenter" />
+          <ItemsPresenter
+            Name="PART_ItemsPresenter"
+            ItemsPanel="{TemplateBinding ItemsPanel}" />
           <ContentPresenter
             Name="PART_SelectedContentHost"
             Grid.Row="1"
