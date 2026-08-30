@@ -159,6 +159,11 @@ export const resolveDemoRoot = async (
     }
   }
 
+  if (searchParams.get('collapse') === '1') {
+    const { default: CollapseFixture } = await import('./CollapseFixture.vue')
+    return { component: CollapseFixture, themeMode }
+  }
+
   const { default: App } = await import('./App.vue')
   return {
     component: App,

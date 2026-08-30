@@ -16,9 +16,25 @@ public class FsusCollapseRenderedEvidenceTests
   {
     ApplyTheme(FsusThemeVariant.Light);
 
-    var item1 = new FsusCollapseItem { Title = "Options", ItemKey = "options" };
-    var item2 = new FsusCollapseItem { Title = "Advanced", ItemKey = "advanced" };
-    var item3 = new FsusCollapseItem { Title = "Disabled", ItemKey = "disabled", Disabled = true };
+    var item1 = new FsusCollapseItem
+    {
+      Title = "Options",
+      ItemKey = "options",
+      Content = "Options content.",
+    };
+    var item2 = new FsusCollapseItem
+    {
+      Title = "Advanced",
+      ItemKey = "advanced",
+      Content = "Advanced content.",
+    };
+    var item3 = new FsusCollapseItem
+    {
+      Title = "Disabled",
+      ItemKey = "disabled",
+      Disabled = true,
+      Content = "Disabled content.",
+    };
     var collapse = new FsusCollapse
     {
       Accordion = false,
