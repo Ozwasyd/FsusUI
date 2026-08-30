@@ -68,6 +68,12 @@ recommendation; it never silently changes profile.
 
 ## Verification and evidence boundaries
 
+Avalonia headless visual tests write ordinary-run evidence under the test
+output directory. Set `FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT` to export the same
+production-fixture PNG and manifest evidence to a caller-selected directory;
+each suite creates its own subdirectory below that root. Intentional tracked
+baseline updates remain a separate reviewed operation.
+
 `verify`, `verify:full`, and `verify:pr-fast` remain browser-free. Run
 `verify:visual:affected` explicitly for local or PR visual feedback.
 `verify:nightly` selects Full. Release/manual visual evidence selects Evidence.

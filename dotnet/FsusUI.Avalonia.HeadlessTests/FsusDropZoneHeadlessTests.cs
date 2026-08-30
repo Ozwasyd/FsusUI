@@ -430,15 +430,8 @@ public class FsusDropZoneHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts()
   {
-    var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "screenshots",
-      "avalonia");
-    Directory.CreateDirectory(outputRoot);
+    var outputRoot =
+      HeadlessVisualEvidence.CreateOutputDirectory("drop-zone");
 
     var captures = new List<DropZoneRenderCapture>();
 
@@ -503,7 +496,7 @@ public class FsusDropZoneHeadlessTests
       Assert.Equal(
         (int)Math.Round(160 * capture.ZoomPercent / 100.0),
         capture.PixelSize.Height);
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
+      Assert.True(File.Exists(Path.Combine(outputRoot, capture.File)));
     });
     foreach (var themeCaptures in captures
       .Where(capture =>
@@ -516,11 +509,7 @@ public class FsusDropZoneHeadlessTests
     }
 
     var manifestPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      outputRoot,
       "issue-655-avalonia-drop-zone-render-manifest.json");
     File.WriteAllText(
       manifestPath,
@@ -661,7 +650,7 @@ public class FsusDropZoneHeadlessTests
     window.Close();
 
     return new DropZoneRenderCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), outputPath).Replace('\\', '/'),
+      fileName,
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
@@ -732,11 +721,7 @@ public class FsusDropZoneHeadlessTests
     Assert.Equal(1, browseRequestedCount);
 
     var reportPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      HeadlessVisualEvidence.CreateOutputDirectory("drop-zone"),
       "issue-655-avalonia-drop-zone-automation-report.json");
     File.WriteAllText(
       reportPath,
