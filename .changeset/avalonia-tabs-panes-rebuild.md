@@ -2,4 +2,6 @@
 'element-plus': patch
 ---
 
-Make Avalonia `FsusTabs.Panes` clear-and-rebuild flows selection-safe and document `Panes` as the control's mutable tab source.
+Fix Avalonia `FsusTabs` selection reconciliation when consumers clear and
+repopulate the authoritative `Panes` collection, allowing immediate `SelectKey`
+without enumerating an in-flux `ItemsSource` or requiring a host workaround.

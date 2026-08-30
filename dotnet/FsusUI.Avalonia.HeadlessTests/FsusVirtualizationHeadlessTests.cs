@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace FsusUI.Avalonia.HeadlessTests;
 
-public class FsusVirtualizationPrimitiveTests
+public class FsusVirtualizationHeadlessTests
 {
   [AvaloniaFact]
   public void VirtualListRealizesFixedAndVariableWindowsWithMeasurementCacheAndRecycling()

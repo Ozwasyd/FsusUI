@@ -33,7 +33,7 @@ public class FsusSelectHeadlessTests
       new(100, "100%"),
       new(125, "125%"),
     };
-    var select = new FsusSelect
+    var select = new KeyboardSelect
     {
       AccessibleName = "Editor zoom",
       DisplayMemberPath = nameof(ZoomOption.Label),
@@ -449,6 +449,11 @@ public class FsusSelectHeadlessTests
   }
 
   private sealed record ZoomOption(int Value, string Label);
+
+  private sealed class KeyboardSelect : FsusSelect
+  {
+    public ValueTask<bool> PressAsync(Key key) => HandleKeyAsync(key);
+  }
 
   private sealed class ZoomSettings : INotifyPropertyChanged
   {
