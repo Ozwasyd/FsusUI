@@ -63,7 +63,7 @@
   </Style>
 
   <Style Selector="fsus|FsusCollapseItem.fsus-active /template/ Path#PART_Arrow">
-    <Setter Property="RenderTransform" Value="rotate(90deg)" />
+    <Setter Property="Data" Value="M6,6 L12,12 L18,6" />
   </Style>
 
   <Style Selector="fsus|FsusCollapseItem.fsus-active /template/ Border#PART_Header">
