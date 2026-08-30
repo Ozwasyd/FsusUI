@@ -115,15 +115,10 @@ public class FsusInputFocusThicknessHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRenderCapturesInputSelectionAndScrollbarFocusStates()
   {
-    var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "screenshots",
-      "avalonia");
-    Directory.CreateDirectory(outputRoot);
+    var repositoryRoot = FindRepositoryRoot();
+    var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
+      repositoryRoot,
+      "issue-656-input-focus");
 
     var captures = new List<FocusRenderCapture>();
     foreach (var (themeName, highContrast, expectedThickness) in new[]
@@ -180,15 +175,12 @@ public class FsusInputFocusThicknessHeadlessTests
       Assert.Equal(64, capture.Sha256.Length);
       Assert.True(capture.PixelSize.Width > 0);
       Assert.True(capture.PixelSize.Height > 0);
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
+      Assert.True(File.Exists(
+        HeadlessVisualEvidenceOutput.ResolveRecordedPath(repositoryRoot, capture.File)));
     });
 
     var manifestPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      outputRoot,
       "issue-656-avalonia-focus-render-manifest.json");
     File.WriteAllText(
       manifestPath,
@@ -198,6 +190,8 @@ public class FsusInputFocusThicknessHeadlessTests
           schemaVersion = 1,
           generatedBy =
             "FsusInputFocusThicknessHeadlessTests.RealHeadlessSkiaRenderCapturesInputSelectionAndScrollbarFocusStates",
+          outputRoot = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, outputRoot),
+          manifestPath = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, manifestPath),
           renderer = new
           {
             platform = "avalonia",
@@ -209,6 +203,7 @@ public class FsusInputFocusThicknessHeadlessTests
           captures,
         },
         new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    Assert.True(File.Exists(manifestPath));
   }
 
   [Fact]
@@ -366,7 +361,7 @@ public class FsusInputFocusThicknessHeadlessTests
     window.Close();
 
     return new FocusRenderCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), outputPath).Replace('\\', '/'),
+      HeadlessVisualEvidenceOutput.RecordPath(FindRepositoryRoot(), outputPath),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
