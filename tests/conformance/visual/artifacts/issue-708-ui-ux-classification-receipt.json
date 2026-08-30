@@ -56,7 +56,7 @@
     {
       "id": "platform-differences",
       "path": "docs/avalonia/platform-differences.md",
-      "digest": "fb789c0afd4f9df9c94d52dbd998dc2fb7bc2c2306d68df2e36d1eb848e0e159"
+      "digest": "2f8f9071f47aa6e233f0a5dd7f7a1afb549a099882e48c46a3b1880f73b987c9"
     },
     {
       "id": "api-stability",
@@ -69,13 +69,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "dd5b3bd478fd7ecad43178875c7c728fb973dbb6",
+    "revision": "29bf2b51848969ea14b230e8580f3a2b982e3e93",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "08f322919f5bad5a84027dd683ef46580b607223c19e96cf421fd247b27d51b4",
+    "authorityDigest": "2e1f48d3f98ba65a0a4f36a6629852bae459289b9e63c893c6029fe4f398a64b",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "d6c83f2a8603ccde260662887d6fa4d3759c2f0c",
-  "candidateDigest": "f4d14796d02ec8b380e52a3980ba5ffea177aaf93c7a4151a9d293c876fdffed",
+  "candidateSha": "6aa205c804b9b3e3a87f6968d9219b7a8f0df233",
+  "candidateDigest": "62d0832d1a9303dc6a9a0a5c4cbb0407afe8241f4dcd99223ff8eb43195f82a2",
   "stateEvidenceMatrix": [
     {
       "state": "built-in-light",
@@ -122,5 +122,5 @@
   "classificationEvidenceDigest": "b7dadf7dfc32c99c7c9abb0851e3ef38da2194448a8d67092c95ed2954892469",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "69cd63fbc3c096e49052ba879b8c73be97ad034fafeaf8ed3584dc3dc0e9a3d2"
+  "receiptDigest": "60b93def4b1aa5620ad04dfc04bf7eca9040ee2816a7ed5689f4cc4de907e736"
 }
