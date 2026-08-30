@@ -27,15 +27,17 @@ const registry = loadPlaywrightSuiteRegistry()
 validatePlaywrightSuiteRegistry(registry)
 
 const releasePlan = planPlaywrightSuites('release', registry)
-assert.equal(releasePlan.suites.length, 7)
+assert.equal(releasePlan.suites.length, 8)
 assert.equal(releasePlan.runBinding, 'current-workflow-run')
 assert.ok(releasePlan.digest)
 
-assert.equal(planPlaywrightSuites('main', registry).suites.length, 7)
-assert.equal(planPlaywrightSuites('pr', registry).suites.length, 3)
-assert.equal(planPlaywrightSuites('nightly', registry).suites.length, 7)
+assert.equal(planPlaywrightSuites('main', registry).suites.length, 8)
+assert.equal(planPlaywrightSuites('pr', registry).suites.length, 4)
+assert.equal(planPlaywrightSuites('nightly', registry).suites.length, 8)
 
-const reuse = registry.suites.find((suite) => suite.id === 'visual-runtime-reuse')
+const reuse = registry.suites.find(
+  (suite) => suite.id === 'visual-runtime-reuse',
+)
 assert.equal(reuse.countsTowardProductBrowserCoverage, false)
 assert.equal(reuse.runtime, 'runtime-contract')
 
@@ -50,19 +52,17 @@ for (const suite of registry.suites) {
   }
 }
 
-// Fixed seven suite ids
-assert.deepEqual(
-  registry.suites.map((suite) => suite.id).sort(),
-  [
-    'dom-layout',
-    'geometry-smoke',
-    'markdown-editor-interaction',
-    'motion-ssr',
-    'view-transitions',
-    'visual-boundary-audit',
-    'visual-runtime-reuse',
-  ],
-)
+// Fixed eight suite ids
+assert.deepEqual(registry.suites.map((suite) => suite.id).sort(), [
+  'dom-layout',
+  'geometry-smoke',
+  'markdown-editor-interaction',
+  'motion-ssr',
+  'view-transitions',
+  'visual-boundary-audit',
+  'visual-runtime-reuse',
+  'web-interaction-conformance',
+])
 
 // --- Negative fixtures (mutate in-memory registry) ---
 
@@ -118,9 +118,7 @@ expectFailure('chromium-only without browser', () => {
 
 expectFailure('reuse counted as product coverage', () => {
   const next = deepClone(registry)
-  const suite = next.suites.find(
-    (entry) => entry.id === 'visual-runtime-reuse',
-  )
+  const suite = next.suites.find((entry) => entry.id === 'visual-runtime-reuse')
   suite.countsTowardProductBrowserCoverage = true
   validatePlaywrightSuiteRegistry(next, root)
 })

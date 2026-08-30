@@ -8,6 +8,7 @@
       "playwright-layout",
       "playwright-boundary",
       "playwright-markdown",
+      "playwright-conformance",
       "visual-runtime-reuse"
     ]
   },
@@ -28,6 +29,7 @@
       "playwright-layout",
       "playwright-boundary",
       "playwright-markdown",
+      "playwright-conformance",
       "visual-runtime-reuse",
       "real-render-performance"
     ],
@@ -47,6 +49,7 @@
       "playwright-layout",
       "playwright-boundary",
       "playwright-markdown",
+      "playwright-conformance",
       "visual-runtime-reuse",
       "real-render-performance"
     ],
@@ -66,6 +69,7 @@
       "playwright-layout",
       "playwright-boundary",
       "playwright-markdown",
+      "playwright-conformance",
       "visual-runtime-reuse",
       "real-render-performance"
     ]
@@ -108,6 +112,7 @@
     "playwright-layout": { "cardinality": "playwright" },
     "playwright-boundary": { "cardinality": "playwright" },
     "playwright-markdown": { "cardinality": "playwright" },
+    "playwright-conformance": { "cardinality": "playwright" },
     "visual-runtime-reuse": { "cardinality": "playwright" },
     "real-render-performance": { "cardinality": "single" }
   },
