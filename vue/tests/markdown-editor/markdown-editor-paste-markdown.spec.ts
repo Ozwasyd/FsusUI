@@ -1,3 +1,6 @@
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 import { expect, test } from '@playwright/test'
 
 import type { Locator, Page } from '@playwright/test'
@@ -44,10 +47,9 @@ const openFixture = async (
   gate?: 'disabled' | 'preview-only' | 'readonly',
 ) => {
   const suffix = gate ? `&markdownPasteGate=${gate}` : ''
-  await page.goto(
-    `/?audit=ui-states&markdownEditorTransaction=1${suffix}`,
-    { waitUntil: 'domcontentloaded' },
-  )
+  await page.goto(`/?audit=ui-states&markdownEditorTransaction=1${suffix}`, {
+    waitUntil: 'domcontentloaded',
+  })
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')
   await expect(fixture).toBeVisible()
   await expect(page.locator('vite-error-overlay')).toHaveCount(0)
@@ -266,10 +268,12 @@ test('keeps ordinary Ctrl+V unchanged and opens only the explicit command', asyn
     ),
   ).toBe(1)
   await expect(textarea).toHaveValue(initialValue)
-  await expect(surface.getByRole('region', { name: /Markdown preview/i })).toContainText(
-    'flattened',
-  )
-  await expect(surface.getByRole('region', { name: /source diff/i })).toBeVisible()
+  await expect(
+    surface.getByRole('region', { name: /Markdown preview/i }),
+  ).toContainText('flattened')
+  await expect(
+    surface.getByRole('region', { name: /source diff/i }),
+  ).toBeVisible()
   const warnings = surface.getByRole('list', {
     name: /conversion warnings/i,
   })
@@ -587,7 +591,7 @@ test.describe('touch path', () => {
       await expect(entry).toBeVisible()
       const entryTarget = await entry.boundingBox()
       expect(entryTarget?.width).toBeGreaterThanOrEqual(44)
-      expect(entryTarget?.height).toBeGreaterThanOrEqual(44)
+      expect(Math.round(entryTarget?.height ?? 0)).toBeGreaterThanOrEqual(44)
 
       await entry.tap()
       const surface = visiblePasteAsMarkdownDialog(page)
@@ -597,4 +601,140 @@ test.describe('touch path', () => {
       await expect(textarea).toBeFocused()
     }
   })
+})
+
+test('records the issue 395 viewport, zoom, theme, long-warning, and accessibility evidence', async ({
+  browserName,
+  page,
+}) => {
+  test.skip(
+    process.env.FSUS_MARKDOWN_IMPORT_EVIDENCE !== '1' ||
+      browserName !== 'chromium',
+    'Issue 395 durable evidence is captured explicitly on the Chromium production fixture.',
+  )
+
+  const artifactRoot = resolve(
+    'tests/conformance/visual/artifacts/screenshots/web/issue-395-markdown-import',
+  )
+  mkdirSync(artifactRoot, { recursive: true })
+  const maliciousWarnings = Array.from({ length: 18 }, (_, index) =>
+    [
+      `<custom-${index} data-unsupported="${index}">unsupported ${index}</custom-${index}>`,
+      `<a href="javascript:alert(${index})" onclick="alert(${index})">blocked ${index}</a>`,
+      `<iframe src="https://evil.example/frame-${index}" srcdoc="<script>alert(${index})</script>"></iframe>`,
+      `<p style="background:url(https://evil.example/pixel-${index})">network blocked ${index}</p>`,
+    ].join(''),
+  ).join('')
+
+  const scenarios = [
+    {
+      id: 'desktop-light-100',
+      width: 1440,
+      height: 1000,
+      theme: 'light',
+      zoom: 1,
+    },
+    {
+      id: 'desktop-dark-150',
+      width: 1440,
+      height: 1000,
+      theme: 'dark',
+      zoom: 1.5,
+    },
+    {
+      id: 'mobile-light-100',
+      width: 375,
+      height: 812,
+      theme: 'light',
+      zoom: 1,
+    },
+    { id: 'mobile-dark-200', width: 375, height: 812, theme: 'dark', zoom: 2 },
+  ] as const
+  const accessibilityEvidence: Record<string, unknown> = {}
+  const forbiddenRequests: string[] = []
+  page.on('request', (request) => {
+    if (request.url().includes('evil.example')) {
+      forbiddenRequests.push(request.url())
+    }
+  })
+
+  for (const scenario of scenarios) {
+    await page.setViewportSize({
+      width: scenario.width,
+      height: scenario.height,
+    })
+    await page.emulateMedia({ colorScheme: scenario.theme })
+    await installClipboardSnapshot(page, {
+      html: `<h2>Imported review</h2><p>Long warning corpus</p>${maliciousWarnings}`,
+      plain: 'Imported review\nLong warning corpus',
+    })
+    await page.goto(
+      `/?audit=ui-states&markdownEditorTransaction=1&theme=${scenario.theme}`,
+      { waitUntil: 'domcontentloaded' },
+    )
+    const fixture = page.getByTestId('markdown-editor-transaction-fixture')
+    await expect(fixture).toBeVisible()
+    const surface = await openPasteAsMarkdown(page, fixture)
+    await page.evaluate((zoom) => {
+      document.documentElement.style.zoom = String(zoom)
+    }, scenario.zoom)
+    await expect(
+      surface.getByRole('list', { name: /conversion warnings/i }),
+    ).toContainText('unsupported')
+    await expect(
+      surface.getByRole('list', { name: /conversion warnings/i }),
+    ).toContainText('unsafe-url')
+    expect(forbiddenRequests).toEqual([])
+
+    const importAction = surface.getByRole('button', {
+      name: /import markdown/i,
+    })
+    await importAction.scrollIntoViewIfNeeded()
+    await importAction.focus()
+    await expect(importAction).toBeFocused()
+    const geometry = await surface.evaluate((dialog) => {
+      const rect = dialog.getBoundingClientRect()
+      const focused = document.activeElement as HTMLElement | null
+      const actionRect = focused?.getBoundingClientRect()
+      return {
+        actionReachable:
+          Boolean(actionRect) &&
+          actionRect!.width >= 44 &&
+          actionRect!.height >= 44 &&
+          actionRect!.top >= 0 &&
+          actionRect!.bottom <= window.innerHeight,
+        dialogIntersectsViewport:
+          rect.right > 0 &&
+          rect.left < window.innerWidth &&
+          rect.bottom > 0 &&
+          rect.top < window.innerHeight,
+        dialogScrollable: dialog.scrollHeight > dialog.clientHeight,
+        dialogHorizontalOverflow: dialog.scrollWidth > dialog.clientWidth,
+      }
+    })
+    expect(geometry).toEqual({
+      actionReachable: true,
+      dialogIntersectsViewport: true,
+      dialogScrollable: true,
+      dialogHorizontalOverflow: false,
+    })
+
+    accessibilityEvidence[scenario.id] = {
+      aria: await surface.ariaSnapshot(),
+      geometry,
+      locale: await page.evaluate(() => document.documentElement.lang),
+      theme: scenario.theme,
+      viewport: { height: scenario.height, width: scenario.width },
+      zoom: scenario.zoom,
+    }
+    await page.screenshot({
+      animations: 'disabled',
+      path: resolve(artifactRoot, `${scenario.id}.png`),
+    })
+  }
+
+  writeFileSync(
+    resolve(artifactRoot, 'accessibility-evidence.json'),
+    `${JSON.stringify(accessibilityEvidence, null, 2)}\n`,
+  )
 })

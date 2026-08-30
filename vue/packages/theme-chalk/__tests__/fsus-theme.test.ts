@@ -3571,6 +3571,12 @@ describe('Fsus theme visual baseline', () => {
       'display: grid;',
       'min-width: 0;',
     ])
+    expectCssRule(css, '.el-kpi-group', [
+      'grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));',
+    ])
+    expectCssRule(css, '.el-kpi-group--compact', [
+      'grid-template-columns: repeat(auto-fit, minmax(min(128px, 100%), 1fr));',
+    ])
     expectCssRule(css, '.el-metric-item__primary', [
       'font-size: 16px;',
       'font-weight: 700;',

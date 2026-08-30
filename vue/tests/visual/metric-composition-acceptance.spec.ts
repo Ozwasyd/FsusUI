@@ -1,14 +1,21 @@
-import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import {
+  writeIssue468ScreenshotEvidence,
+  writeIssue468TextEvidence,
+} from '../support/issue-468-conformance-evidence'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
+import {
+  expect,
+  test,
+  type VisualViewportName,
+} from '../support/visual-variant-fixture'
 import {
   buildVisualUrl,
   resolveVisualVariant,
 } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
-
 const stabilizePage = async (page: Page) => {
   await page.addStyleTag({
     content: `*,*::before,*::after{transition-duration:0s!important;animation-duration:0s!important;animation-delay:0s!important;scroll-behavior:auto!important}`,
@@ -129,6 +136,66 @@ test('ordinary metric labels and values stay within the approved typography budg
     expect([12, 14, 16], entry.className).toContain(entry.fontSize)
     expect(entry.fontWeight, entry.className).toBeLessThanOrEqual(500)
   }
+})
+
+test('single production composition contains twenty-plus realistic entries across all seven primitives and required states', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+
+  const root = page.getByTestId('metric-visual-fixtures')
+  const requiredPrimitives = [
+    '.el-metric-list',
+    '.el-kpi-group',
+    '.el-distribution-list',
+    '.el-key-value-grid',
+    '.el-status-summary',
+    '.el-diagnostics-list',
+    '.el-copyable-detail',
+  ]
+  for (const selector of requiredPrimitives) {
+    await expect(root.locator(selector).first(), selector).toBeVisible()
+  }
+
+  const aggregate = await root.evaluate((element) => {
+    const entrySelector = [
+      '.el-metric-item',
+      '.el-distribution-bar-row',
+      '.el-key-value-item',
+      '.el-status-summary',
+      '.el-diagnostics-item',
+      '.el-copyable-detail',
+    ].join(',')
+    const visibleText = element.textContent ?? ''
+    return {
+      entryCount: element.querySelectorAll(entrySelector).length,
+      hasPlaceholder: /\b(?:Metric\s+\d+|Item\s+\d+|Option\s+[A-Z])\b/u.test(
+        visibleText,
+      ),
+      toneClasses: [...element.querySelectorAll<HTMLElement>('[class]')]
+        .flatMap((node) => [...node.classList])
+        .filter((name) => /(?:success|warning|danger|info)/u.test(name)),
+    }
+  })
+  expect(aggregate.entryCount).toBeGreaterThanOrEqual(20)
+  expect(aggregate.hasPlaceholder).toBe(false)
+  for (const tone of ['success', 'warning', 'danger', 'info']) {
+    expect(aggregate.toneClasses.some((name) => name.includes(tone))).toBe(true)
+  }
+
+  await expect(
+    root.locator('[data-metric-variant="diag-loading"]'),
+  ).toHaveAttribute('aria-busy', 'true')
+  await expect(
+    root.locator('[data-metric-variant="diag-empty"] .el-empty-state'),
+  ).toBeVisible()
+  await expect(root.locator('[data-metric-typography="long"]')).toBeVisible()
+  await expect(
+    root.locator('details[open] .el-diagnostics-item__detail-body').first(),
+  ).toBeVisible()
 })
 
 test('default key labels omit punctuation and the explicit motif remains decorative gray', async ({
@@ -453,6 +520,105 @@ test('nested, mixed, empty, loading, long, RTL and zoom states remain stable', a
   }
 })
 
+test('keyboard, touch and screen-reader semantics keep status text and actions reachable', async ({
+  page,
+}, testInfo) => {
+  await openMetricFixtures(page, testInfo.project.name)
+  const { compact, theme } = resolveVisualVariant(testInfo.project.name)
+  const root = page.getByTestId('metric-visual-fixtures')
+  const copyButton = root.locator('.el-copyable-detail__button').first()
+
+  await copyButton.focus()
+  await expect(copyButton).toBeFocused()
+  await expect(copyButton).toHaveAccessibleName(/copy/iu)
+  await expect(
+    root.locator('[data-metric-variant="diag-loading"]'),
+  ).toHaveAttribute('aria-busy', 'true')
+  for (const status of ['Healthy', 'Over limit', 'In progress']) {
+    await expect(root.getByText(status, { exact: true })).toBeVisible()
+  }
+
+  if (compact) {
+    const closedDetails = root
+      .locator(
+        '[data-metric-variant="diag-mixed"] > .el-diagnostics-list > .el-diagnostics-item details',
+      )
+      .first()
+    await expect(closedDetails).not.toHaveAttribute('open', '')
+    const summary = closedDetails.locator('summary')
+    await summary.tap()
+    await expect(closedDetails).toHaveAttribute('open', '')
+  }
+
+  const ariaSnapshot = await root.ariaSnapshot()
+  expect(ariaSnapshot).toContain('Healthy')
+  expect(ariaSnapshot).toContain('Over limit')
+  expect(ariaSnapshot).toContain('Copy detail')
+  expect(ariaSnapshot).toContain('No diagnostics')
+  await writeIssue468TextEvidence(
+    `issue-468-metric-${theme}-${compact ? 'mobile' : 'desktop'}-aria.txt`,
+    `${ariaSnapshot}\n`,
+  )
+})
+
+test('required responsive and zoom cells retain production rendered evidence', async ({
+  page,
+  useVisualViewport,
+}, testInfo) => {
+  const { compact, theme } = resolveVisualVariant(testInfo.project.name)
+  const widths = compact
+    ? (['metric-320', 'metric-375'] as const)
+    : (['metric-768', 'metric-1366'] as const)
+  const cells = [
+    ...widths.map((viewport) => ({ viewport, zoom: 100 })),
+    { viewport: compact ? 'metric-375' : 'metric-1366', zoom: 150 },
+    { viewport: compact ? 'metric-375' : 'metric-1366', zoom: 200 },
+  ]
+
+  for (const cell of cells) {
+    await useVisualViewport(cell.viewport as VisualViewportName)
+    await openMetricFixtures(page, testInfo.project.name)
+    await page.evaluate((zoom) => {
+      document.documentElement.style.zoom = `${zoom}%`
+    }, cell.zoom)
+    await page.evaluate(async () => {
+      await document.fonts.ready
+      await new Promise<void>((resolveFrame) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolveFrame()))
+      })
+    })
+
+    const root = page.getByTestId('metric-visual-fixtures')
+    await expect(root).toBeVisible()
+    const geometry = await root.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+    }))
+    expect(
+      geometry.scrollWidth,
+      `${theme} ${cell.viewport}px at ${cell.zoom}% zoom`,
+    ).toBeLessThanOrEqual(geometry.clientWidth + 1)
+
+    const issues = await collectMetricSurfaceIssues(page, compact ? 44 : 40)
+    expect(issues.panelRows).toEqual([])
+    expect(issues.lowTargets).toEqual([])
+    expect(issues.fadedElements).toEqual([])
+    expect(issues.colorOnlyToneRows).toEqual([])
+
+    const screenshot = await page.screenshot({
+      fullPage: true,
+      animations: 'disabled',
+    })
+    await writeIssue468ScreenshotEvidence(
+      `issue-468-metric-${theme}-${cell.viewport.replace('metric-', '')}-zoom-${cell.zoom}.png`,
+      screenshot,
+    )
+    await page.evaluate(() => {
+      document.documentElement.style.zoom = ''
+    })
+  }
+})
+
 // Full-page screenshot
 test('metric variants render without visual break', async ({
   page,
@@ -494,6 +660,10 @@ type MetricSurfaceIssues = {
   lowTargets: string[]
   fadedElements: string[]
   colorOnlyToneRows: string[]
+  typographyViolations: string[]
+  defaultOrColorDots: string[]
+  decorativePiles: string[]
+  consumerOverrides: string[]
 }
 
 const collectMetricSurfaceIssues = async (
@@ -631,7 +801,66 @@ const collectMetricSurfaceIssues = async (
       }
     }
 
-    return { panelRows, lowTargets, fadedElements, colorOnlyToneRows }
+    const typographyViolations: string[] = []
+    for (const node of root.querySelectorAll<HTMLElement>(
+      [
+        '.el-distribution-bar-row__value',
+        '.el-key-value-item__label',
+        '.el-key-value-item__value',
+        '.el-status-summary__label',
+        '.el-status-summary__status',
+        '.el-diagnostics-item__detail-toggle',
+        '.el-copyable-detail__button',
+      ].join(','),
+    )) {
+      if (!visible(node)) continue
+      const style = getComputedStyle(node)
+      const fontSize = px(style.fontSize)
+      const fontWeight = Number.parseInt(style.fontWeight, 10)
+      if (![12, 14, 16].includes(fontSize) || fontWeight > 500) {
+        typographyViolations.push(
+          `${describe(node)} ${fontSize}px/${fontWeight}`,
+        )
+      }
+    }
+
+    const defaultOrColorDots: string[] = []
+    for (const label of root.querySelectorAll<HTMLElement>(
+      '.el-key-value-item__label',
+    )) {
+      if (!visible(label)) continue
+      const pseudo = getComputedStyle(label, '::before')
+      if (pseudo.content !== 'none' && pseudo.content !== 'normal') {
+        defaultOrColorDots.push(
+          `${describe(label)} content=${pseudo.content} color=${pseudo.color}`,
+        )
+      }
+    }
+
+    const decorativePiles = [
+      ...root.querySelectorAll<HTMLElement>(
+        '.el-badge, [data-metric-sparkline], .el-card .el-card, [data-metric-card-stack]',
+      ),
+    ]
+      .filter(visible)
+      .map((node) => describe(node))
+
+    const consumerOverrides = [
+      ...root.querySelectorAll<HTMLElement>(
+        'style[data-issue-468-consumer-override], [data-metric-consumer-override]',
+      ),
+    ].map((node) => describe(node))
+
+    return {
+      panelRows,
+      lowTargets,
+      fadedElements,
+      colorOnlyToneRows,
+      typographyViolations,
+      defaultOrColorDots,
+      decorativePiles,
+      consumerOverrides,
+    }
   }, minTargetSide)
 
 const openMetricFixtures = async (page: Page, projectName: string) => {
@@ -822,7 +1051,37 @@ test('surface gates kill documented regressions', async ({
     expected: keyof MetricSurfaceIssues
     issues: string[]
   }[] = []
-  const mutations = [
+  const mutations: Array<{
+    id: string
+    expected: keyof MetricSurfaceIssues
+    css?: string
+    html?: string
+  }> = [
+    {
+      id: 'thirteen-px-typography',
+      expected: 'typographyViolations',
+      css: '.el-status-summary__label{font-size:13px!important;}',
+    },
+    {
+      id: 'seventeen-px-typography',
+      expected: 'typographyViolations',
+      css: '.el-key-value-item__value{font-size:17px!important;}',
+    },
+    {
+      id: 'broad-ordinary-700-weight',
+      expected: 'typographyViolations',
+      css: '.el-distribution-bar-row__value,.el-key-value-item__label,.el-key-value-item__value,.el-status-summary__label,.el-status-summary__status,.el-diagnostics-item__detail-toggle,.el-copyable-detail__button{font-weight:700!important;}',
+    },
+    {
+      id: 'default-dot-forest',
+      expected: 'defaultOrColorDots',
+      css: '.el-key-value-item__label::before{content:"\u2022"!important;color:var(--fsus-dot-gray)!important;}',
+    },
+    {
+      id: 'colored-dot-forest',
+      expected: 'defaultOrColorDots',
+      css: '.el-key-value-item--success .el-key-value-item__label::before{content:"\u2022"!important;color:var(--el-color-success)!important;}',
+    },
     {
       id: 'diagnostic-card',
       expected: 'panelRows' as const,
@@ -862,10 +1121,47 @@ test('surface gates kill documented regressions', async ({
       expected: 'fadedElements' as const,
       css: '.el-copyable-detail.is-disabled { opacity: 0.55 !important; }',
     },
+    {
+      id: 'badge-pile',
+      expected: 'decorativePiles',
+      html: '<span class="el-badge">Repeated status badge</span>',
+    },
+    {
+      id: 'sparkline-pile',
+      expected: 'decorativePiles',
+      html: '<svg data-metric-sparkline width="80" height="24" aria-label="Decorative sparkline"><path d="M0 20 L40 4 L80 16" stroke="currentColor" fill="none" /></svg>',
+    },
+    {
+      id: 'card-stacking',
+      expected: 'decorativePiles',
+      html: '<div class="el-card" data-metric-card-stack><div class="el-card">Nested metric card</div></div>',
+    },
+    {
+      id: 'consumer-private-override',
+      expected: 'consumerOverrides',
+      html: '<style data-issue-468-consumer-override>.consumer-dashboard .el-metric-item{font-size:17px!important}</style><div data-metric-consumer-override>Private override marker</div>',
+    },
   ]
 
   for (const mutation of mutations) {
-    const handle = await page.addStyleTag({ content: mutation.css })
+    const handle = mutation.css
+      ? await page.addStyleTag({ content: mutation.css })
+      : undefined
+    if (mutation.html) {
+      await page.evaluate(
+        ({ id, html }) => {
+          const root = document.querySelector(
+            '[data-testid="metric-visual-fixtures"]',
+          )
+          if (!root) throw new Error('metric fixtures not rendered')
+          const host = document.createElement('div')
+          host.dataset.issue468Mutation = id
+          host.innerHTML = html
+          root.append(host)
+        },
+        { id: mutation.id, html: mutation.html },
+      )
+    }
     try {
       const issues = await collectMetricSurfaceIssues(page, minSide)
       findings.push({
@@ -879,7 +1175,10 @@ test('surface gates kill documented regressions', async ({
         `${mutation.id} went undetected`,
       ).toBeGreaterThan(0)
     } finally {
-      await handle.evaluate((style) => style.remove())
+      if (handle) await handle.evaluate((style) => style.remove())
+      await page.evaluate((id) => {
+        document.querySelector(`[data-issue468-mutation="${id}"]`)?.remove()
+      }, mutation.id)
     }
   }
 
@@ -889,6 +1188,10 @@ test('surface gates kill documented regressions', async ({
   expect(restored.lowTargets).toEqual([])
   expect(restored.fadedElements).toEqual([])
   expect(restored.colorOnlyToneRows).toEqual([])
+  expect(restored.typographyViolations).toEqual([])
+  expect(restored.defaultOrColorDots).toEqual([])
+  expect(restored.decorativePiles).toEqual([])
+  expect(restored.consumerOverrides).toEqual([])
 
   await testInfo.attach('mutation-probe-findings', {
     body: Buffer.from(`${JSON.stringify(findings, null, 2)}\n`),

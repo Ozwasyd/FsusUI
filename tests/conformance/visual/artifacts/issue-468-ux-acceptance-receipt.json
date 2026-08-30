@@ -1,0 +1,416 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "8c51b8e4c679ebf49c0db2c662ecd920f3d49cef19d2a8d1c058b374631acd9e",
+  "candidateSha": "1cf760d861abce8cb3da63b08a07a044c00939d2",
+  "candidateDigest": "f51bb9ef19308260ca89eedd7e04884e0a7d2ce6f5882907bb1c53a68ee5c202",
+  "verificationClass": "ux-system",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+    "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+    "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
+    "a259a52a313449613bfca0ac40588dc29ca590316569e5ded60cd7161a6eb3f7",
+    "f5e26a1a64f47a0f1af7b712727f0f55058a6c916aad35aebb648a93cb87ef24",
+    "f149631813fbfb060d49412329638555e0f0c371fb441cf89ab46cd64a3e3de6",
+    "77ce497adb60ba18ac10cce3cbfed08bea0b5805c74fa6bceb1e4ee57dc0e326"
+  ],
+  "activeBaselineIdentityDigest": "9591c70ca6293a89e0ed6eb1eb5dfdea890eef6d1e5ff668ccfb7f30585ebf7d",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "1a679e5775207c7b6251a229aea276dfc046bfc0d5d9e8ebe85fbe130fe68525",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "1366px at 100% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "dark",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "cb9d90c25c678bbe459e54cf22bec52fbee00d36810dd99a7b0bd7191af62ae9"
+    },
+    {
+      "viewport": "1366px at 150% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "dark",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "66f631bfa3620d16d62f6fca058d7bbce0186867fc5b5ae168f28b1cf248f532"
+    },
+    {
+      "viewport": "1366px at 200% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "dark",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "c7a5454c40e9ff1f81e75e0db8da2233ea325d64e7f1613501a571a099bfa290"
+    },
+    {
+      "viewport": "320px at 100% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "dark",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "e5a3fc2e0ce64b9f4ba132a165783b1723485b11094ded4f6055da82d2c27fb1"
+    },
+    {
+      "viewport": "375px at 100% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "dark",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "5cb701d816c29b28e617b20512b9d307c5378d6267b19d7661950204ae896313"
+    },
+    {
+      "viewport": "375px at 150% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "dark",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "dc7d01b649e24711b4d9bd76bbe2c29cbb6c5c6b82e72925a38c993d2b6caf99"
+    },
+    {
+      "viewport": "375px at 200% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "dark",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "2e8cad8f5a293634a384e4ecf615b68be2866091d94727f2660d2284a507da1d"
+    },
+    {
+      "viewport": "768px at 100% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "dark",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "6aab2dfe6899cb6c9c6796d4a0751e9e0f2389eec119070e7acb4042d183698d"
+    },
+    {
+      "viewport": "1366px at 100% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "light",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "0f3079fe153bf500bd1133012bc54c35c823b193f8789cf85111d6ee789870b0"
+    },
+    {
+      "viewport": "1366px at 150% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "light",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "c3d5345bb6b79c4227321ef815b4bae75f6fc0d6429775995cf2c854ca1eb965"
+    },
+    {
+      "viewport": "1366px at 200% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "light",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "89c243a92ad982b5250807eac895d859a38d84c8e20f2a016d8cd8f3ab823708"
+    },
+    {
+      "viewport": "320px at 100% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "light",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "de8e3337c1532f38c14b9e327565258fd1403ba0d08ff4e48f4d9fc937b983f5"
+    },
+    {
+      "viewport": "375px at 100% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "light",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "b212ad5f37233ba4506d62af764c90de249f56b9b2f30de4ae7dfcdd3d6aad7d"
+    },
+    {
+      "viewport": "375px at 150% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "light",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "e085b4b12689bd895a3604b1b37d02c26345fe875a24eaaf0fb736df2482b93c"
+    },
+    {
+      "viewport": "375px at 200% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "light",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "d8e6168a8a7cfcb6c2e9b2344854e44d5aff6bc082edc158d59d20972d933471"
+    },
+    {
+      "viewport": "768px at 100% zoom",
+      "state": "twenty-plus mixed metric entries; semantic, locale, RTL, loading, empty, long and technical states",
+      "theme": "light",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "zoom"
+      ],
+      "evidenceDigest": "97760ac9c9f9fba6d70978f9dffc8fa4abe42dfa7b7a8b04164b867c460efc16"
+    },
+    {
+      "viewport": "desktop production profile",
+      "state": "named actions, text status, disabled control and empty state accessibility tree",
+      "theme": "dark",
+      "inputModes": [
+        "keyboard",
+        "screen-reader"
+      ],
+      "evidenceDigest": "b45da1008da17d5f17451b33fdd0162283ca2999e3408998c5b525ab960f6552"
+    },
+    {
+      "viewport": "mobile production profile",
+      "state": "named actions, text status, disabled control and empty state accessibility tree",
+      "theme": "dark",
+      "inputModes": [
+        "touch",
+        "screen-reader"
+      ],
+      "evidenceDigest": "cb5b3d9dbf42c6367b3ec54a7fc005811d269dc9bb9b81f9518575354d727543"
+    },
+    {
+      "viewport": "desktop production profile",
+      "state": "named actions, text status, disabled control and empty state accessibility tree",
+      "theme": "light",
+      "inputModes": [
+        "keyboard",
+        "screen-reader"
+      ],
+      "evidenceDigest": "b45da1008da17d5f17451b33fdd0162283ca2999e3408998c5b525ab960f6552"
+    },
+    {
+      "viewport": "mobile production profile",
+      "state": "named actions, text status, disabled control and empty state accessibility tree",
+      "theme": "light",
+      "inputModes": [
+        "touch",
+        "screen-reader"
+      ],
+      "evidenceDigest": "cb5b3d9dbf42c6367b3ec54a7fc005811d269dc9bb9b81f9518575354d727543"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "issue-468-metric-dark-1366-zoom-100",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-1366-zoom-100.png",
+      "digest": "cb9d90c25c678bbe459e54cf22bec52fbee00d36810dd99a7b0bd7191af62ae9",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-1366-zoom-150",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-1366-zoom-150.png",
+      "digest": "66f631bfa3620d16d62f6fca058d7bbce0186867fc5b5ae168f28b1cf248f532",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-1366-zoom-200",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-1366-zoom-200.png",
+      "digest": "c7a5454c40e9ff1f81e75e0db8da2233ea325d64e7f1613501a571a099bfa290",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-320-zoom-100",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-320-zoom-100.png",
+      "digest": "e5a3fc2e0ce64b9f4ba132a165783b1723485b11094ded4f6055da82d2c27fb1",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-375-zoom-100",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-375-zoom-100.png",
+      "digest": "5cb701d816c29b28e617b20512b9d307c5378d6267b19d7661950204ae896313",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-375-zoom-150",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-375-zoom-150.png",
+      "digest": "dc7d01b649e24711b4d9bd76bbe2c29cbb6c5c6b82e72925a38c993d2b6caf99",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-375-zoom-200",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-375-zoom-200.png",
+      "digest": "2e8cad8f5a293634a384e4ecf615b68be2866091d94727f2660d2284a507da1d",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-768-zoom-100",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-768-zoom-100.png",
+      "digest": "6aab2dfe6899cb6c9c6796d4a0751e9e0f2389eec119070e7acb4042d183698d",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-1366-zoom-100",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-1366-zoom-100.png",
+      "digest": "0f3079fe153bf500bd1133012bc54c35c823b193f8789cf85111d6ee789870b0",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-1366-zoom-150",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-1366-zoom-150.png",
+      "digest": "c3d5345bb6b79c4227321ef815b4bae75f6fc0d6429775995cf2c854ca1eb965",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-1366-zoom-200",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-1366-zoom-200.png",
+      "digest": "89c243a92ad982b5250807eac895d859a38d84c8e20f2a016d8cd8f3ab823708",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-320-zoom-100",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-320-zoom-100.png",
+      "digest": "de8e3337c1532f38c14b9e327565258fd1403ba0d08ff4e48f4d9fc937b983f5",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-375-zoom-100",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-375-zoom-100.png",
+      "digest": "b212ad5f37233ba4506d62af764c90de249f56b9b2f30de4ae7dfcdd3d6aad7d",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-375-zoom-150",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-375-zoom-150.png",
+      "digest": "e085b4b12689bd895a3604b1b37d02c26345fe875a24eaaf0fb736df2482b93c",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-375-zoom-200",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-375-zoom-200.png",
+      "digest": "d8e6168a8a7cfcb6c2e9b2344854e44d5aff6bc082edc158d59d20972d933471",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-768-zoom-100",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-768-zoom-100.png",
+      "digest": "97760ac9c9f9fba6d70978f9dffc8fa4abe42dfa7b7a8b04164b867c460efc16",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-desktop-aria",
+      "kind": "accessibility-tree",
+      "path": "tests/conformance/visual/artifacts/issue-468-metric-dark-desktop-aria.txt",
+      "digest": "b45da1008da17d5f17451b33fdd0162283ca2999e3408998c5b525ab960f6552",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-dark-mobile-aria",
+      "kind": "accessibility-tree",
+      "path": "tests/conformance/visual/artifacts/issue-468-metric-dark-mobile-aria.txt",
+      "digest": "cb5b3d9dbf42c6367b3ec54a7fc005811d269dc9bb9b81f9518575354d727543",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-desktop-aria",
+      "kind": "accessibility-tree",
+      "path": "tests/conformance/visual/artifacts/issue-468-metric-light-desktop-aria.txt",
+      "digest": "b45da1008da17d5f17451b33fdd0162283ca2999e3408998c5b525ab960f6552",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-468-metric-light-mobile-aria",
+      "kind": "accessibility-tree",
+      "path": "tests/conformance/visual/artifacts/issue-468-metric-light-mobile-aria.txt",
+      "digest": "cb5b3d9dbf42c6367b3ec54a7fc005811d269dc9bb9b81f9518575354d727543",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "58de25a8f3a2731ed275cfa380a3e3568a211fa1f74247e7e6e56416a14010d6"
+}
