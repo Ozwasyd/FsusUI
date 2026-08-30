@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "policy": "no-growth-ratchet",
-  "provenance": "2026-08-28 consumer baseline refreshed on Node v24.18.0. Startup raw +126 / gzip +61 / brotli +34 and Markdown hydration raw +124 / gzip +60 / brotli -4 bytes come from rewriting the bundled @element-plus/icons-vue self-references to the artifact's own icons-vue module tree: the bare unpublished specifier previously resolved only inside this repository, so clean consumer installs could not resolve the root entry at all (prepare-npm-package bundled-workspace fix).",
+  "provenance": "2026-08-30 two consecutive measurements of the same locally built candidate on Node v24.18.0, zlib 1.3.1-e00f703, and Brotli 1.2.0 were identical. Startup raw remains 144019 (zero growth); gzip is the reproducible local value 46365 and Brotli remains the tighter 41554 ratchet. Markdown hydration is the exact fsus-markdown + fsus-wasm + shared-runtime closure after #704/#706 added controlled Markdown embed presentation and editor-frame behavior: raw 82240, gzip 29533, brotli 26829.",
   "startup": {
     "raw": 144019,
-    "gzip": 46357,
+    "gzip": 46365,
     "brotli": 41554
   },
   "markdownHydration": {
-    "raw": 82005,
-    "gzip": 29301,
-    "brotli": 26551
+    "raw": 82240,
+    "gzip": 29533,
+    "brotli": 26829
   }
 }
