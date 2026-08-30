@@ -13,6 +13,7 @@
     "stale",
     "timed_out"
   ],
+  "blockingLabels": ["dependency-blocked"],
   "branchProtection": {
     "strict": true,
     "requiredChecks": ["pr-fast", "pr-real-render-performance"]

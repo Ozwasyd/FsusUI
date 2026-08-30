@@ -9,7 +9,7 @@
     "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
   "installPackageCount": 94,
-  "note": "zero-version-change migration freeze; refreshed package.json hash after #407 added dependency required-check policy checks (no version-pin changes). Other files unchanged.",
+  "note": "zero-version-change migration freeze; refreshed package.json hash after #407/#409 added dependency PR policy checks (no version-pin changes). Other files unchanged.",
   "multiVersionUnifications": {
     "consola": {
       "from": [

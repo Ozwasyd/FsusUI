@@ -1,43 +1,60 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   auditRequiredChecks,
-  evaluateRequiredChecks,
+  evaluateAutomerge,
   loadPolicyModels,
 } from './check-dependency-pr-policy.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const models = loadPolicyModels(root)
 const clone = (value) => structuredClone(value)
-const requiredChecks = ['pr-fast', 'pr-real-render-performance']
+const fixture = JSON.parse(
+  readFileSync(
+    path.join(root, 'tests/fixtures/dependencies/automerge-cases.json'),
+    'utf8',
+  ),
+)
 
 assert.deepEqual(
   auditRequiredChecks(models),
   [],
-  'the repository required-checks authority must pass',
+  'the repository dependency PR policy must pass',
 )
 
-const cases = [
-  ['patch dependency', 'vue-runtime-dependencies', 'patch'],
-  ['minor dependency', 'vue-build-toolchain', 'minor'],
-  ['major dependency', 'avalonia-platform', 'major'],
-  ['digest image', 'node-dotnet-sdk-images', 'digest'],
-  ['lockfile maintenance', 'lockfile-maintenance', 'lockfile-maintenance'],
-]
-
-function policyFor(group) {
-  return group === 'lockfile-maintenance'
-    ? models.contract.lockfileMaintenance
-    : models.contract.groups[group]
+function policyFor(group, updateType) {
+  if (group === 'lockfile-maintenance') {
+    assert.equal(updateType, 'lockfile-maintenance')
+    return models.contract.lockfileMaintenance
+  }
+  const policy = models.contract.groups[group]
+  assert.ok(policy?.updateTypes.includes(updateType))
+  return policy
 }
 
-function passingCandidate(group, updateType) {
-  const policy = policyFor(group)
+function passingCandidate(candidate = {}) {
+  const group = candidate.group ?? 'vue-runtime-dependencies'
+  const updateType = candidate.updateType ?? 'patch'
+  const policy = policyFor(group, updateType)
   return {
     group,
     updateType,
+    draft: false,
+    mergeable: true,
+    directPush: false,
+    approvalsRequired: 0,
+    platformAutomerge: true,
+    projectionsFresh: true,
+    branchBaseSha: 'a'.repeat(40),
+    defaultBranchSha: 'a'.repeat(40),
+    currentTarget: '10.0.0',
+    latestStableTarget: '10.0.0',
+    labels: [],
+    securityUpdate: candidate.securityUpdate ?? false,
+    securityUsesStandardGates: true,
     checks: Object.fromEntries(
       policy.requiredChecks.map((check) => [check, 'success']),
     ),
@@ -47,36 +64,106 @@ function passingCandidate(group, updateType) {
   }
 }
 
-for (const [name, group, updateType] of cases) {
-  const policy = policyFor(group)
-  assert.deepEqual(policy.requiredChecks, requiredChecks, name)
+for (const candidate of fixture.positive) {
   assert.deepEqual(
-    evaluateRequiredChecks(
-      models.contract,
-      passingCandidate(group, updateType),
-    ),
-    { success: true, reasons: [] },
-    name,
+    evaluateAutomerge(models.contract, passingCandidate(candidate)),
+    { eligible: true, labelsToAdd: [], reasons: [] },
+    candidate.name,
   )
 }
 
-for (const conclusion of [
-  'action_required',
-  'cancelled',
-  'failure',
-  'missing',
-  'neutral',
-  'pending',
-  'skipped',
-  'stale',
-  'timed_out',
-]) {
-  const candidate = passingCandidate('vue-runtime-dependencies', 'patch')
-  if (conclusion === 'missing') delete candidate.checks['pr-fast']
-  else candidate.checks['pr-fast'] = conclusion
-  const result = evaluateRequiredChecks(models.contract, candidate)
-  assert.equal(result.success, false, conclusion)
-  assert.match(result.reasons.join('\n'), /required check pr-fast/u)
+const negativeMutations = {
+  draft(candidate) {
+    candidate.draft = true
+  },
+  conflict(candidate) {
+    candidate.mergeable = false
+  },
+  'blocking-label': function (candidate) {
+    candidate.labels = ['dependency-blocked']
+  },
+  'stale-base': function (candidate) {
+    candidate.branchBaseSha = 'b'.repeat(40)
+  },
+  'older-target': function (candidate) {
+    candidate.currentTarget = '9.9.0'
+  },
+  'stale-projections': function (candidate) {
+    candidate.projectionsFresh = false
+  },
+  'direct-push': function (candidate) {
+    candidate.directPush = true
+  },
+  'manual-approval': function (candidate) {
+    candidate.approvalsRequired = 1
+  },
+  'unknown-group': function (candidate) {
+    candidate.group = 'unregistered'
+  },
+  'unknown-update-type': function (candidate) {
+    candidate.updateType = 'pin'
+  },
+  'missing-check': function (candidate) {
+    delete candidate.checks['pr-fast']
+  },
+  'action-required-check': function (candidate) {
+    candidate.checks['pr-fast'] = 'action_required'
+  },
+  'failure-check': function (candidate) {
+    candidate.checks['pr-fast'] = 'failure'
+  },
+  'skipped-check': function (candidate) {
+    candidate.checks['pr-fast'] = 'skipped'
+  },
+  'neutral-check': function (candidate) {
+    candidate.checks['pr-fast'] = 'neutral'
+  },
+  'pending-check': function (candidate) {
+    candidate.checks['pr-fast'] = 'pending'
+  },
+  'cancelled-check': function (candidate) {
+    candidate.checks['pr-fast'] = 'cancelled'
+  },
+  'timed-out-check': function (candidate) {
+    candidate.checks['pr-fast'] = 'timed_out'
+  },
+  'missing-gate': function (candidate) {
+    delete candidate.gateEvidence['build-package']
+  },
+  'failed-gate': function (candidate) {
+    const gate = Object.keys(candidate.gateEvidence)[0]
+    candidate.gateEvidence[gate] = 'failure'
+  },
+  'security-bypass': function (candidate) {
+    candidate.securityUpdate = true
+    candidate.securityUsesStandardGates = false
+  },
+  'overdue-failure': function (candidate) {
+    candidate.checks['pr-fast'] = 'failure'
+    candidate.failureAgeHours = 25
+  },
+  'overdue-draft': function (candidate) {
+    candidate.draft = true
+    candidate.failureAgeHours = 25
+  },
+}
+
+for (const testCase of fixture.negative) {
+  const candidate = passingCandidate()
+  const mutate = negativeMutations[testCase.mutation]
+  assert.ok(mutate, `unknown negative fixture mutation ${testCase.mutation}`)
+  mutate(candidate)
+  const result = evaluateAutomerge(models.contract, candidate)
+  assert.equal(result.eligible, false, testCase.name)
+  assert.ok(
+    result.reasons.length > 0,
+    `${testCase.name} must explain rejection`,
+  )
+  if (testCase.mutation === 'overdue-failure') {
+    assert.deepEqual(result.labelsToAdd, ['dependency-blocked'])
+  } else {
+    assert.deepEqual(result.labelsToAdd, [])
+  }
 }
 
 const governanceMutations = [
@@ -109,6 +196,15 @@ const governanceMutations = [
       next.branchProtection.required_status_checks.strict = false
     },
     expected: /strict mode/u,
+  },
+  {
+    name: 'branch protection requires manual review',
+    mutate(next) {
+      next.branchProtection.required_pull_request_reviews = {
+        required_approving_review_count: 1,
+      }
+    },
+    expected: /manual pull request approval/u,
   },
   {
     name: 'group is unregistered',
@@ -170,11 +266,25 @@ const governanceMutations = [
     expected: /only accepted/u,
   },
   {
-    name: 'Renovate automerge enabled too early',
+    name: 'Renovate branch automerge bypass',
     mutate(next) {
-      next.renovate.automerge = true
+      next.renovate.automergeType = 'branch'
     },
-    expected: /must not enable Renovate automerge/u,
+    expected: /direct branch pushes/u,
+  },
+  {
+    name: 'Renovate ignores tests',
+    mutate(next) {
+      next.renovate.ignoreTests = true
+    },
+    expected: /wait for required checks/u,
+  },
+  {
+    name: 'Renovate merge window',
+    mutate(next) {
+      next.renovate.automergeSchedule = ['after 10pm']
+    },
+    expected: /merge time window/u,
   },
 ]
 
@@ -189,5 +299,5 @@ for (const mutation of governanceMutations) {
 }
 
 console.log(
-  `Dependency required-check fixtures passed: updateCases=${cases.length} nonSuccess=9 governanceMutations=${governanceMutations.length}.`,
+  `Dependency PR policy fixtures passed: positive=${fixture.positive.length} negative=${fixture.negative.length} governanceMutations=${governanceMutations.length}.`,
 )
