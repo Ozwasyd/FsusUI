@@ -160,11 +160,14 @@ public class FsusTabs : TabControl
     object? sender,
     global::Avalonia.Controls.SelectionChangedEventArgs e)
   {
-    if (
-      SelectedItem is not FsusTabPane pane ||
-      !pane.IsEnabled ||
-      pane.Key == SelectedKey)
+    if (SelectedItem is not FsusTabPane pane || !pane.IsEnabled)
     {
+      return;
+    }
+
+    if (pane.Key == SelectedKey)
+    {
+      SyncPanes();
       return;
     }
 

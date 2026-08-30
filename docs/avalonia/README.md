@@ -36,6 +36,7 @@ contracts to Avalonia controls.
 - [Text viewer](components/text-viewer.md)
 - [Text editor](components/text-editor.md)
 - [Public shell](components/public-shell.md)
+- [Desktop shell](components/desktop-shell.md)
 - [Product primitives](components/product-primitives.md)
 - [Perception challenge](components/perception-challenge.md)
 - [Locale formatting](components/locale-formatting.md)
