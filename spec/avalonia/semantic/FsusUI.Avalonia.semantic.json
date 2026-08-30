@@ -8655,6 +8655,89 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusLoadingIndicator",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.Primitives.TemplatedControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsActive",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsIndeterminate",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ReducedMotion",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Value",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "IsActive",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "IsIndeterminate",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "ReducedMotion",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "Value",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        }
+      ],
+      "events": [],
+      "methods": []
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusLoadingOptions",
       "kind": "record",
       "baseType": "System.Object",

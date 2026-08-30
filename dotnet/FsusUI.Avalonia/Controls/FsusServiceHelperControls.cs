@@ -1,8 +1,10 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -582,6 +584,174 @@ public class FsusLoadingOverlay : ContentControl
     AutomationProperties.SetName(this, Text);
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.ProgressBar);
     AutomationProperties.SetItemStatus(this, IsClosed ? "closed" : "loading");
+  }
+}
+
+public class FsusLoadingIndicator : TemplatedControl
+{
+  public static readonly StyledProperty<bool> IsActiveProperty =
+    AvaloniaProperty.Register<FsusLoadingIndicator, bool>(nameof(IsActive));
+
+  public static readonly StyledProperty<bool> IsIndeterminateProperty =
+    AvaloniaProperty.Register<FsusLoadingIndicator, bool>(
+      nameof(IsIndeterminate),
+      true);
+
+  public static readonly StyledProperty<double> ValueProperty =
+    AvaloniaProperty.Register<FsusLoadingIndicator, double>(nameof(Value));
+
+  public static readonly StyledProperty<bool> ReducedMotionProperty =
+    AvaloniaProperty.Register<FsusLoadingIndicator, bool>(nameof(ReducedMotion));
+
+  public static readonly StyledProperty<string?> AccessibleNameProperty =
+    AvaloniaProperty.Register<FsusLoadingIndicator, string?>(nameof(AccessibleName));
+
+  private const string ProgressArcPartName = "PART_Arc";
+
+  // Mirrors FsusThemeResourceKeys.MotionModeCurrent; the Themes project
+  // references this assembly, so the constant cannot be reused from here.
+  private const string MotionModeCurrentResourceKey = "FsusMotionModeCurrent";
+
+  private Ellipse? progressArc;
+
+  public FsusLoadingIndicator()
+  {
+    FsusComponentClasses.SetBaseClasses(this, "fsus-loading-indicator");
+    SyncState();
+  }
+
+  public bool IsActive
+  {
+    get => GetValue(IsActiveProperty);
+    set => SetValue(IsActiveProperty, value);
+  }
+
+  public bool IsIndeterminate
+  {
+    get => GetValue(IsIndeterminateProperty);
+    set => SetValue(IsIndeterminateProperty, value);
+  }
+
+  public double Value
+  {
+    get => GetValue(ValueProperty);
+    set => SetValue(ValueProperty, value);
+  }
+
+  public bool ReducedMotion
+  {
+    get => GetValue(ReducedMotionProperty);
+    set => SetValue(ReducedMotionProperty, value);
+  }
+
+  public string? AccessibleName
+  {
+    get => GetValue(AccessibleNameProperty);
+    set => SetValue(AccessibleNameProperty, value);
+  }
+
+  protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+  {
+    base.OnApplyTemplate(e);
+    if (progressArc is not null)
+    {
+      progressArc.PropertyChanged -= OnProgressArcPropertyChanged;
+    }
+
+    progressArc = e.NameScope.Find<Ellipse>(ProgressArcPartName);
+    if (progressArc is not null)
+    {
+      progressArc.PropertyChanged += OnProgressArcPropertyChanged;
+    }
+
+    UpdateProgressArc();
+  }
+
+  private void OnProgressArcPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+  {
+    if (e.Property == BoundsProperty || e.Property == Shape.StrokeThicknessProperty)
+    {
+      UpdateProgressArc();
+    }
+  }
+
+  protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToVisualTree(e);
+    SyncState();
+    // During a single Show() pass the window's resources can be applied after
+    // the attach callback runs; re-sync once the layout queue drains so the
+    // theme motion mode is reflected.
+    Dispatcher.UIThread.Post(SyncState, DispatcherPriority.Loaded);
+  }
+
+  protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+  {
+    base.OnPropertyChanged(change);
+
+    if (
+      change.Property == IsActiveProperty ||
+      change.Property == IsIndeterminateProperty ||
+      change.Property == ValueProperty ||
+      change.Property == ReducedMotionProperty ||
+      change.Property == AccessibleNameProperty)
+    {
+      SyncState();
+    }
+  }
+
+  internal void SyncState()
+  {
+    var reducedMotion = EffectiveReducedMotion();
+    FsusComponentClasses.Ensure(this, "fsus-active", IsActive);
+    FsusComponentClasses.Ensure(this, "fsus-idle", !IsActive);
+    FsusComponentClasses.Ensure(this, "fsus-indeterminate", IsIndeterminate);
+    FsusComponentClasses.Ensure(this, "fsus-determinate", !IsIndeterminate);
+    FsusComponentClasses.Ensure(this, "fsus-motion-reduced", reducedMotion);
+    AutomationProperties.SetName(this, AccessibleName ?? "Loading");
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.ProgressBar);
+    AutomationProperties.SetItemStatus(this, IsActive ? "loading" : "idle");
+    UpdateProgressArc();
+  }
+
+  private bool EffectiveReducedMotion()
+  {
+    if (ReducedMotion)
+    {
+      return true;
+    }
+
+    if (Application.Current is { } application &&
+        application.Resources.TryGetValue(MotionModeCurrentResourceKey, out var mode) &&
+        mode is string modeName &&
+        (modeName == "reduced" || modeName == "disabled"))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+  private void UpdateProgressArc()
+  {
+    if (progressArc is null || progressArc.Bounds.Width <= 0)
+    {
+      return;
+    }
+
+    var thickness = progressArc.StrokeThickness;
+    var radius = Math.Max(0d, (progressArc.Bounds.Width - thickness) / 2);
+    var circumference = 2 * Math.PI * radius;
+    var circumferenceUnits = thickness > 0 ? circumference / thickness : 0;
+    var dashUnits = IsIndeterminate
+      ? circumferenceUnits / 4
+      : Math.Clamp(Value, 0d, 1d) * circumferenceUnits;
+
+    progressArc.StrokeDashArray = new AvaloniaList<double>
+    {
+      dashUnits,
+      Math.Max(0d, circumferenceUnits - dashUnits),
+    };
   }
 }
 

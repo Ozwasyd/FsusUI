@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "21e2b841499ae85849e35a22d48675be14872176b71fb1c914fbefd3bf93973b",
+      "hash": "261aabf9832ef3cb85a77784f08899b9e0a8b34617a363f2cc4a4507830b6fae",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "40b8500f89e0f6bc6930570025b9b235091c04df545733ab9c062c96574dabf5",
+      "hash": "db4dbec3ad30fb7278d5393749131002340c66bed8a6a588887676100d436499",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -135109,6 +135109,22 @@
       "memberCount": 5,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-layout-gap"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusLoadingIndicator",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 10,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-loading-indicator"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
