@@ -31,8 +31,8 @@
     "authorityDigest": "368918f911bd9f99fcd7d657bbcda5da21efd3ff837a9a97139c19ee44a23fb3",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "7249cae11c218d21dbc059136d4f6c0c9d92cbdc",
-  "candidateDigest": "580eef4ab6ab33cfc1d6a2f84ba95dcfe4008cc7fc828c503f5693c32f8f1e89",
+  "candidateSha": "721ec87b77bacccb0c3f967162fc0cfc4aa8c0ad",
+  "candidateDigest": "b47c3509fcae250dceba2a88a0a8f366e8a9f1ca64891fa6b84817a07f105359",
   "stateEvidenceMatrix": [
     { "state": "default-and-changed-track-fill-thumb", "viewport": "desktop", "theme": "both", "evidenceDigest": "0af6198eae19c2a3f3f5f7f0385c442164506d71c090e209c839a6f7f331a631" },
     { "state": "pointer-press-drag-release-and-capture", "viewport": "desktop", "theme": "both", "evidenceDigest": "9cd7bc4d516fc76e904f95f40b633df61bd1beb73d7f06d50f640f518e1d9be2" },
@@ -56,5 +56,5 @@
   "classificationEvidenceDigest": "9dc0454600d0330981c747facde26ea1435f74debb2e408b52b2f01a85458fe1",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "c911c3ac77ba3472d067d7313ce35b97a5be70f41fe5724a8294a05bd9ad4d7b"
+  "receiptDigest": "acde6207717126829447418d74ab45a5191888169c83d1da61f5c89a7e6d1b9d"
 }
