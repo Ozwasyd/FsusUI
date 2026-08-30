@@ -1,7 +1,7 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 468,
-  "candidateSha": "31c6fb56d877513f62e39dcdcc4759345d67b9ef",
+  "candidateSha": "cfd40df78fa959d55bb1f422161e58853b5cf5ef",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": "vue/packages/demo-app/src/sections/MetricCompositionSection.vue",
