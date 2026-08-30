@@ -62,17 +62,83 @@ test('alignment is derived and readiness excludes partial contracts', () => {
     contracts: [
       {
         id: 'partial',
+        owner: 'FsusUI Core',
+        scenarioIds: ['scenario.partial.input.value', 'scenario.partial.a11y'],
         bindings: { avalonia: { status: 'bound' } },
         coverage: { missing: 1, partial: 0 },
+        inputs: [
+          {
+            kind: 'input',
+            name: 'value',
+            status: 'missing',
+            scenarioIds: ['scenario.partial.input.value'],
+            governance: {
+              reason: 'No matching real Avalonia public member.',
+              owner: 'FsusUI Core',
+              testPolicy: 'contract',
+              reviewPolicy: 'pr-review',
+            },
+          },
+        ],
+        requirements: {
+          a11y: ['The control must expose an accessible name and role.'],
+        },
       },
     ],
   }
   const alignment = deriveAlignment(registry)
   assert.equal(alignment.statuses[0].status, 'partial')
+  assert.deepEqual(alignment.gaps[0], {
+    contract: 'partial',
+    status: 'partial',
+    reason: 'No matching real Avalonia public member.',
+    owner: 'FsusUI Core',
+    requiredMembers: [
+      {
+        kind: 'input',
+        name: 'value',
+        status: 'missing',
+        reason: 'No matching real Avalonia public member.',
+        owner: 'FsusUI Core',
+        testPolicy: 'contract',
+        reviewPolicy: 'pr-review',
+        scenarioIds: ['scenario.partial.input.value'],
+      },
+    ],
+    requiredScenarios: [
+      'scenario.partial.input.value',
+      'scenario.partial.a11y',
+    ],
+    requiredEvidence: [
+      'required-member-coverage',
+      'same-identity-a11y-evidence',
+      'same-identity-cross-platform-comparison',
+    ],
+    evidencePolicy: {
+      realExecution: true,
+      allowSkip: false,
+      allowOverrideWithoutGovernance: false,
+    },
+    missingMembers: 1,
+    partialMembers: 0,
+    missingArtifacts: [
+      'required-member-coverage',
+      'same-identity-a11y-evidence',
+      'same-identity-cross-platform-comparison',
+    ],
+  })
   assert.throws(
     () => validateReadiness({ ...alignment, stable: ['partial'] }),
     /is partial/,
   )
+
+  const compared = deriveAlignment(registry, {
+    verdict: 'pass',
+    identity: { contract: 'partial' },
+  })
+  assert.deepEqual(compared.gaps[0].missingArtifacts, [
+    'required-member-coverage',
+  ])
 })
 
 test('T762-01 stable readiness rejects missing, stale, and tampered alignment', () => {

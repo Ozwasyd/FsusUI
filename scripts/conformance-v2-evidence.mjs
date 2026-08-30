@@ -359,6 +359,121 @@ export function validateMarkdownEvidence(candidate) {
     fail('ime.native evidence is synthetic')
 }
 
+const contractMembers = (contract) =>
+  ['inputs', 'outputs', 'operations', 'contentRegions'].flatMap((section) =>
+    (contract[section] ?? []).map((member) => ({ section, ...member })),
+  )
+
+const evidenceArtifactsFor = (contract, requiredMembers) => {
+  const artifacts = new Set()
+  if (contract.bindings?.avalonia?.status === 'unbound') {
+    artifacts.add('avalonia-public-api-baseline')
+    artifacts.add('contract-v2-avalonia-binding')
+  }
+  if (requiredMembers.length > 0) artifacts.add('required-member-coverage')
+  for (const [kind, requirements] of Object.entries(
+    contract.requirements ?? {},
+  )) {
+    if ((requirements ?? []).length > 0)
+      artifacts.add(`same-identity-${kind}-evidence`)
+  }
+  artifacts.add('same-identity-cross-platform-comparison')
+  return [...artifacts]
+}
+
+const deriveGap = (contract, status, comparison) => {
+  const requiredMembers = contractMembers(contract)
+    .filter((member) => member.status !== 'aligned-candidate')
+    .map((member) => ({
+      kind: member.kind,
+      name: member.name,
+      status: member.status,
+      reason: member.governance?.reason,
+      owner: member.governance?.owner,
+      testPolicy: member.governance?.testPolicy,
+      reviewPolicy: member.governance?.reviewPolicy,
+      scenarioIds: member.scenarioIds ?? [],
+    }))
+  const owner = contract.owner
+  let reason
+  if (requiredMembers.length > 0) {
+    reason = [...new Set(requiredMembers.map((member) => member.reason))].join(
+      ' ',
+    )
+  } else if (contract.bindings?.avalonia?.status === 'unbound') {
+    reason =
+      'The Avalonia binding is unbound; a real public implementation and semantic binding are required.'
+  } else {
+    reason =
+      'Static mapping has no member gap, but required same-identity cross-platform evidence is absent.'
+  }
+  const requiredScenarios = [...new Set(contract.scenarioIds ?? [])]
+  const requiredEvidence = evidenceArtifactsFor(contract, requiredMembers)
+  const hasCurrentComparison =
+    comparison?.verdict === 'pass' &&
+    comparison.identity?.contract === contract.id
+  return {
+    contract: contract.id,
+    status,
+    reason,
+    owner,
+    requiredMembers,
+    requiredScenarios,
+    requiredEvidence,
+    evidencePolicy: {
+      realExecution: true,
+      allowSkip: false,
+      allowOverrideWithoutGovernance: false,
+    },
+    missingMembers: contract.coverage?.missing ?? 0,
+    partialMembers: contract.coverage?.partial ?? 0,
+    missingArtifacts: requiredEvidence.filter(
+      (artifact) =>
+        !hasCurrentComparison || !artifact.startsWith('same-identity-'),
+    ),
+  }
+}
+
+const validateGap = (gap) => {
+  if (!gap.reason) fail(`alignment.gap.${gap.contract}.reason missing`)
+  if (!gap.owner) fail(`alignment.gap.${gap.contract}.owner missing`)
+  if (!Array.isArray(gap.requiredMembers))
+    fail(`alignment.gap.${gap.contract}.requiredMembers missing`)
+  if (
+    !Array.isArray(gap.requiredScenarios) ||
+    gap.requiredScenarios.length === 0
+  )
+    fail(`alignment.gap.${gap.contract}.requiredScenarios missing`)
+  if (!Array.isArray(gap.requiredEvidence) || gap.requiredEvidence.length === 0)
+    fail(`alignment.gap.${gap.contract}.requiredEvidence missing`)
+  if (
+    gap.evidencePolicy?.realExecution !== true ||
+    gap.evidencePolicy?.allowSkip !== false ||
+    gap.evidencePolicy?.allowOverrideWithoutGovernance !== false
+  )
+    fail(`alignment.gap.${gap.contract}.evidencePolicy invalid`)
+  for (const member of gap.requiredMembers) {
+    for (const field of [
+      'kind',
+      'name',
+      'status',
+      'reason',
+      'owner',
+      'testPolicy',
+      'reviewPolicy',
+    ]) {
+      if (!member[field])
+        fail(
+          `alignment.gap.${gap.contract}.member.${member.name}.${field} missing`,
+        )
+    }
+    if (!Array.isArray(member.scenarioIds) || member.scenarioIds.length === 0)
+      fail(
+        `alignment.gap.${gap.contract}.member.${member.name}.scenarioIds missing`,
+      )
+  }
+}
+
 export function deriveAlignment(registry, comparison = null) {
   const statuses = []
   const gaps = []
@@ -375,18 +490,7 @@ export function deriveAlignment(registry, comparison = null) {
       status = 'aligned'
     else status = 'blocked'
     statuses.push({ id: contract.id, status, source: 'derived' })
-    if (status !== 'aligned') {
-      gaps.push({
-        contract: contract.id,
-        status,
-        missingMembers: coverage.missing ?? 0,
-        partialMembers: coverage.partial ?? 0,
-        missingArtifacts:
-          comparison?.identity.contract === contract.id
-            ? []
-            : ['same-identity-cross-platform-evidence'],
-      })
-    }
+    if (status !== 'aligned') gaps.push(deriveGap(contract, status, comparison))
   }
   for (const type of registry.avaloniaOnlyTypes ?? []) {
     statuses.push({
@@ -420,6 +524,7 @@ export function validateReadiness(alignment, expected = {}) {
   const status = new Map(
     alignment.statuses.map((entry) => [entry.id, entry.status]),
   )
+  for (const gap of alignment.gaps ?? []) validateGap(gap)
   for (const id of alignment.stable ?? []) {
     if (status.get(id) !== 'aligned')
       fail(`readiness.stable.${id} is ${status.get(id) ?? 'missing'}`)
@@ -596,6 +701,33 @@ const mutationCases = (positive) => [
           { id: 'partial-component', status: 'partial', source: 'derived' },
         ],
         stable: ['partial-component'],
+      }),
+  ],
+  [
+    'gap-detail-missing-owner',
+    'alignment.gap.partial-component.owner missing',
+    () =>
+      validateReadiness({
+        statuses: [
+          { id: 'partial-component', status: 'partial', source: 'derived' },
+        ],
+        stable: [],
+        gaps: [
+          {
+            contract: 'partial-component',
+            status: 'partial',
+            reason: 'A real mapped member is missing.',
+            owner: '',
+            requiredMembers: [],
+            requiredScenarios: ['scenario.partial'],
+            requiredEvidence: ['required-member-coverage'],
+            evidencePolicy: {
+              realExecution: true,
+              allowSkip: false,
+              allowOverrideWithoutGovernance: false,
+            },
+          },
+        ],
       }),
   ],
   [
