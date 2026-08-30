@@ -87,6 +87,9 @@ export function auditRequiredChecks({
   if (!same(contract.rejectedConclusions, REJECTED_CONCLUSIONS)) {
     fail('rejected conclusions must cover every non-success terminal state')
   }
+  if (!same(contract.blockingLabels, ['dependency-blocked'])) {
+    fail('dependency-blocked must be the unique dependency blocking label')
+  }
   if (contract.branchProtection?.strict !== true) {
     fail('branch protection must require the latest default branch')
   }
@@ -147,6 +150,9 @@ export function auditRequiredChecks({
   }
   if (!same(branchChecks?.contexts, REQUIRED_CHECKS)) {
     fail('branch protection required checks have a bidirectional mismatch')
+  }
+  if (branchProtection?.required_pull_request_reviews !== null) {
+    fail('branch protection must not require manual pull request approval')
   }
 
   const groupNames = Object.keys(contract.groups ?? {})
@@ -219,33 +225,90 @@ export function auditRequiredChecks({
     }
   }
 
-  if (renovate.automerge !== false) {
-    fail('#407 must not enable Renovate automerge')
+  if (renovate.automerge !== true) fail('Renovate automerge must be enabled')
+  if (renovate.automergeType !== 'pr') {
+    fail('Renovate must use PR automerge instead of direct branch pushes')
+  }
+  if (renovate.platformAutomerge !== true) {
+    fail('Renovate must use platform-native automerge')
+  }
+  if (renovate.ignoreTests !== false) {
+    fail('Renovate must wait for required checks')
+  }
+  if (renovate.dependencyDashboardApproval !== false) {
+    fail('Renovate updates must not require manual dashboard approval')
+  }
+  if (renovate.rebaseWhen !== 'behind-base-branch') {
+    fail('Renovate must refresh branches that are behind the default branch')
+  }
+  if ('automergeSchedule' in renovate) {
+    fail('Renovate automerge must not use a merge time window')
+  }
+  for (const [key, value] of Object.entries({
+    automerge: renovate.lockFileMaintenance?.automerge,
+    automergeType: renovate.lockFileMaintenance?.automergeType,
+    platformAutomerge: renovate.lockFileMaintenance?.platformAutomerge,
+  })) {
+    const expected = key === 'automergeType' ? 'pr' : true
+    if (value !== expected) {
+      fail(`lockfile maintenance ${key} must be ${JSON.stringify(expected)}`)
+    }
   }
 
   return errors
 }
 
-export function evaluateRequiredChecks(contract, candidate) {
+export function evaluateAutomerge(contract, candidate) {
   const reasons = []
+  const labelsToAdd = []
+  let hasFailedRequiredGate = false
   const reject = (reason) => reasons.push(reason)
   const policy = policyFor(contract, candidate.group, candidate.updateType)
 
   if (!policy) reject('unregistered group or update type')
+  if (candidate.draft) reject('draft pull request')
+  if (!candidate.mergeable) reject('merge conflict or unknown mergeability')
+  if (candidate.directPush) reject('direct push is forbidden')
+  if (candidate.approvalsRequired !== 0) reject('manual approval is forbidden')
+  if (!candidate.platformAutomerge) reject('platform automerge is required')
+  if (!candidate.projectionsFresh) reject('controlled projections are stale')
+  if (candidate.branchBaseSha !== candidate.defaultBranchSha) {
+    reject('branch is behind the default branch')
+  }
+  if (candidate.currentTarget !== candidate.latestStableTarget) {
+    reject('dependency target is not the latest stable version')
+  }
+  if (
+    (candidate.labels ?? []).some((label) =>
+      contract.blockingLabels.includes(label),
+    )
+  ) {
+    reject('blocking label is present')
+  }
+  if (candidate.securityUpdate && !candidate.securityUsesStandardGates) {
+    reject('security update attempted to bypass standard gates')
+  }
+
   for (const check of policy?.requiredChecks ?? []) {
     const conclusion = candidate.checks?.[check] ?? 'missing'
     if (!contract.requiredConclusions.includes(conclusion)) {
+      hasFailedRequiredGate = true
       reject(`required check ${check} is ${conclusion}`)
     }
   }
   for (const gate of policy?.requiredGateEvidence ?? []) {
     const conclusion = candidate.gateEvidence?.[gate] ?? 'missing'
     if (!contract.requiredConclusions.includes(conclusion)) {
+      hasFailedRequiredGate = true
       reject(`required gate ${gate} is ${conclusion}`)
     }
   }
 
-  return { success: reasons.length === 0, reasons }
+  if (candidate.failureAgeHours > 24 && hasFailedRequiredGate) {
+    labelsToAdd.push('dependency-blocked')
+  }
+
+  return { eligible: reasons.length === 0, labelsToAdd, reasons }
 }
 
 export function loadPolicyModels(root = defaultRoot) {
