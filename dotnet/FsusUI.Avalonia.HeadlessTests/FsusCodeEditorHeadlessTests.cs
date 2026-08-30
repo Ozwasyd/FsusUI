@@ -165,15 +165,9 @@ public class FsusCodeEditorHeadlessTests
   public void HeadlessSkiaRendersThemeAndViewMatrixAndWritesManifest()
   {
     var root = FindRepositoryRoot();
-    var outputRoot = Path.Combine(
+    var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
       root,
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "screenshots",
-      "avalonia");
-    Directory.CreateDirectory(outputRoot);
+      "issue-645-code-editor-render");
     var captures = new List<RenderCapture>();
 
     foreach (var (theme, highContrast) in new[]
@@ -210,7 +204,7 @@ public class FsusCodeEditorHeadlessTests
         var bytes = File.ReadAllBytes(outputPath);
         Assert.True(bytes.Length > 2_000);
         captures.Add(new(
-          Path.GetRelativePath(root, outputPath).Replace('\\', '/'),
+          HeadlessVisualEvidenceOutput.RecordPath(root, outputPath),
           Convert.ToHexStringLower(SHA256.HashData(bytes)),
           themeName,
           state,
@@ -224,12 +218,10 @@ public class FsusCodeEditorHeadlessTests
 
     Assert.Equal(6, captures.Count);
     Assert.Equal(6, captures.Select(capture => capture.Sha256).Distinct().Count());
+    Assert.All(captures, capture => Assert.True(File.Exists(
+      HeadlessVisualEvidenceOutput.ResolveRecordedPath(root, capture.File))));
     var manifestPath = Path.Combine(
-      root,
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      outputRoot,
       "issue-645-avalonia-code-editor-render-manifest.json");
     File.WriteAllText(
       manifestPath,
@@ -240,6 +232,8 @@ public class FsusCodeEditorHeadlessTests
           issue = 645,
           generatedBy =
             "FsusCodeEditorHeadlessTests.HeadlessSkiaRendersThemeAndViewMatrixAndWritesManifest",
+          outputRoot = HeadlessVisualEvidenceOutput.RecordPath(root, outputRoot),
+          manifestPath = HeadlessVisualEvidenceOutput.RecordPath(root, manifestPath),
           evidenceClass = "local-headless-render",
           renderer = "Avalonia headless Skia",
           captures,
@@ -247,11 +241,13 @@ public class FsusCodeEditorHeadlessTests
             "These are deterministic local Skia renders, not physical-display or operating-system accessibility sessions.",
         },
         new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    Assert.True(File.Exists(manifestPath));
   }
 
   [AvaloniaFact]
   public void LocalAutomationAndCompositionSimulationWritesAccurateReceipt()
   {
+    var root = FindRepositoryRoot();
     var editor = CreateEditor();
     editor.LoadDocument(new("automation", 1), Source);
     var window = Mount(editor, FsusThemeVariant.Light);
@@ -265,12 +261,11 @@ public class FsusCodeEditorHeadlessTests
     var composingStatus = editor.IsComposing;
     editor.CommitComposition("かな");
 
+    var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
+      root,
+      "issue-645-code-editor-automation");
     var reportPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      outputRoot,
       "issue-645-avalonia-code-editor-automation-report.json");
     File.WriteAllText(
       reportPath,
@@ -281,6 +276,8 @@ public class FsusCodeEditorHeadlessTests
           issue = 645,
           generatedBy =
             "FsusCodeEditorHeadlessTests.LocalAutomationAndCompositionSimulationWritesAccurateReceipt",
+          outputRoot = HeadlessVisualEvidenceOutput.RecordPath(root, outputRoot),
+          receiptPath = HeadlessVisualEvidenceOutput.RecordPath(root, reportPath),
           evidenceClass = "local-headless-automation-and-composition-simulation",
           nativeInputOwner = new
           {
@@ -312,6 +309,7 @@ public class FsusCodeEditorHeadlessTests
     Assert.True(composingStatus);
     Assert.EndsWith("かな", editor.Text, StringComparison.Ordinal);
     Assert.Equal(editor.Text, peer.Value);
+    Assert.True(File.Exists(reportPath));
     window.Close();
   }
 
