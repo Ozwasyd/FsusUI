@@ -9,7 +9,7 @@ export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 const posixPath = (value) => value.replaceAll('\\', '/')
 
-const resolveArtifact = (file, baseRoot = root) => resolve(baseRoot, file)
+const resolveArtifact = (file) => resolve(root, file)
 
 const iconArtifactFiles = [
   'vue/packages/icons-vue/dist/index.js',
@@ -68,6 +68,8 @@ export const artifactGroups = {
       {
         id: 'bundle',
         fingerprintPath: 'vue/packages/wasm/dist/.artifact-fingerprint',
+        artifactDigestPath:
+          'vue/packages/wasm/dist/.bundle-artifact-content-digest',
         artifactFiles: wasmBundleArtifacts,
         inputPatterns: [
           'vue/packages/wasm/package.json',
@@ -116,9 +118,9 @@ export async function exists(file) {
   }
 }
 
-export async function expandInputPatterns(patterns, baseRoot = root) {
+export async function expandInputPatterns(patterns) {
   const files = await fg(patterns, {
-    cwd: baseRoot,
+    cwd: root,
     dot: true,
     ignore: [
       '**/node_modules/**',
@@ -133,13 +135,13 @@ export async function expandInputPatterns(patterns, baseRoot = root) {
   return files.map(posixPath).sort()
 }
 
-export async function hashInputPatterns(patterns, baseRoot = root) {
-  const files = await expandInputPatterns(patterns, baseRoot)
+export async function hashInputPatterns(patterns) {
+  const files = await expandInputPatterns(patterns)
   const hash = createHash('sha256')
   for (const file of files) {
     hash.update(file)
     hash.update('\0')
-    hash.update(await readFile(resolve(baseRoot, file)))
+    hash.update(await readFile(resolve(root, file)))
     hash.update('\0')
   }
   return {
@@ -148,100 +150,59 @@ export async function hashInputPatterns(patterns, baseRoot = root) {
   }
 }
 
-export async function readFingerprint(relativePath, baseRoot = root) {
+export async function readFingerprint(relativePath) {
   try {
-    const value = (
-      await readFile(resolve(baseRoot, relativePath), 'utf8')
-    ).trim()
-    try {
-      const parsed = JSON.parse(value)
-      if (
-        parsed?.schemaVersion === 1 &&
-        typeof parsed.sourceFingerprint === 'string' &&
-        typeof parsed.artifactFingerprint === 'string'
-      ) {
-        return parsed
-      }
-    } catch {
-      // Legacy fingerprints contained only the source hash.
-    }
-    return {
-      schemaVersion: 0,
-      sourceFingerprint: value,
-      artifactFingerprint: null,
-    }
+    return (await readFile(resolve(root, relativePath), 'utf8')).trim()
   } catch {
     return null
   }
 }
 
-export async function writeFingerprint(fingerprint, baseRoot = root) {
-  const artifactFingerprint = await hashArtifactFiles(
-    fingerprint.artifactFiles,
-    baseRoot,
-  )
-  if (artifactFingerprint === null) {
-    throw new Error(
-      `Cannot write ${fingerprint.id} fingerprint with missing artifacts.`,
-    )
-  }
-
-  const file = resolve(baseRoot, fingerprint.fingerprintPath)
+export async function writeFingerprint(relativePath, value) {
+  const file = resolve(root, relativePath)
   await mkdir(dirname(file), { recursive: true })
-  await writeFile(
-    file,
-    `${JSON.stringify(
-      {
-        schemaVersion: 1,
-        sourceFingerprint: fingerprint.currentFingerprint,
-        artifactFingerprint,
-      },
-      null,
-      2,
-    )}\n`,
-  )
+  await writeFile(file, `${value}\n`)
 }
 
-export async function getMissingArtifacts(artifactFiles, baseRoot = root) {
-  const missing = []
-  for (const file of artifactFiles) {
-    const absolute = resolveArtifact(file, baseRoot)
-    if (!(await exists(absolute))) missing.push(absolute)
-  }
-  return missing
-}
-
-export async function hashArtifactFiles(artifactFiles, baseRoot = root) {
-  if ((await getMissingArtifacts(artifactFiles, baseRoot)).length > 0) {
-    return null
-  }
-
+export async function hashArtifactFiles(artifactFiles) {
   const hash = createHash('sha256')
-  for (const file of [...artifactFiles].sort()) {
-    hash.update(posixPath(file))
+  for (const relativePath of [...artifactFiles].sort()) {
+    hash.update(posixPath(relativePath))
     hash.update('\0')
-    hash.update(await readFile(resolveArtifact(file, baseRoot)))
+    hash.update(await readFile(resolveArtifact(relativePath)))
     hash.update('\0')
   }
   return hash.digest('hex')
 }
 
-export async function inspectFingerprint(fingerprint, baseRoot = root) {
-  const { files, hash } = await hashInputPatterns(
-    fingerprint.inputPatterns,
-    baseRoot,
+export async function writeArtifactDigest(fingerprint) {
+  if (!fingerprint.artifactDigestPath) return
+  await writeFingerprint(
+    fingerprint.artifactDigestPath,
+    await hashArtifactFiles(fingerprint.artifactFiles),
   )
-  const cached = await readFingerprint(fingerprint.fingerprintPath, baseRoot)
-  const cachedFingerprint = cached?.sourceFingerprint ?? null
-  const cachedArtifactFingerprint = cached?.artifactFingerprint ?? null
-  const missingArtifacts = await getMissingArtifacts(
-    fingerprint.artifactFiles,
-    baseRoot,
-  )
-  const currentArtifactFingerprint = await hashArtifactFiles(
-    fingerprint.artifactFiles,
-    baseRoot,
-  )
+}
+
+export async function getMissingArtifacts(artifactFiles) {
+  const missing = []
+  for (const file of artifactFiles) {
+    const absolute = resolveArtifact(file)
+    if (!(await exists(absolute))) missing.push(absolute)
+  }
+  return missing
+}
+
+export async function inspectFingerprint(fingerprint) {
+  const { files, hash } = await hashInputPatterns(fingerprint.inputPatterns)
+  const cachedFingerprint = await readFingerprint(fingerprint.fingerprintPath)
+  const missingArtifacts = await getMissingArtifacts(fingerprint.artifactFiles)
+  const cachedArtifactDigest = fingerprint.artifactDigestPath
+    ? await readFingerprint(fingerprint.artifactDigestPath)
+    : null
+  const currentArtifactDigest =
+    fingerprint.artifactDigestPath && missingArtifacts.length === 0
+      ? await hashArtifactFiles(fingerprint.artifactFiles)
+      : null
   const staleReasons = []
 
   if (missingArtifacts.length > 0) {
@@ -257,36 +218,33 @@ export async function inspectFingerprint(fingerprint, baseRoot = root) {
   } else if (cachedFingerprint !== hash) {
     staleReasons.push(`${fingerprint.id} artifact fingerprint changed`)
   }
-  if (cachedFingerprint !== null && cachedArtifactFingerprint === null) {
-    staleReasons.push(
-      `${fingerprint.id} artifact integrity fingerprint is missing`,
-    )
-  } else if (
-    currentArtifactFingerprint !== null &&
-    cachedArtifactFingerprint !== currentArtifactFingerprint
-  ) {
-    staleReasons.push(`${fingerprint.id} artifact contents changed`)
+
+  if (fingerprint.artifactDigestPath) {
+    if (cachedArtifactDigest === null) {
+      staleReasons.push(`${fingerprint.id} artifact content digest is missing`)
+    } else if (cachedArtifactDigest !== currentArtifactDigest) {
+      staleReasons.push(`${fingerprint.id} artifact content digest changed`)
+    }
   }
 
   return {
     id: fingerprint.id,
     fingerprintPath: fingerprint.fingerprintPath,
-    artifactFiles: fingerprint.artifactFiles,
     files,
     currentFingerprint: hash,
     cachedFingerprint,
-    currentArtifactFingerprint,
-    cachedArtifactFingerprint,
+    cachedArtifactDigest,
+    currentArtifactDigest,
     missingArtifacts,
     staleReasons,
     fresh: staleReasons.length === 0,
   }
 }
 
-export async function inspectArtifactGroup(group, baseRoot = root) {
+export async function inspectArtifactGroup(group) {
   const fingerprints = []
   for (const fingerprint of group.fingerprints) {
-    fingerprints.push(await inspectFingerprint(fingerprint, baseRoot))
+    fingerprints.push(await inspectFingerprint(fingerprint))
   }
 
   const sourceHash = createHash('sha256')

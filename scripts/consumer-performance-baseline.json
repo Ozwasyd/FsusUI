@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "policy": "no-growth-ratchet",
-  "provenance": "2026-08-30 startup graph remeasured twice as raw 144019 / gzip 46365 / brotli 41541 on Linux with Node v24.16.0 and v24.18.0, zlib 1.3.1-e00f703, and Brotli 1.2.0. Raw remains identical to the 2026-08-28 baseline, Brotli improves by 13 bytes, and the reproducible gzip encoding is 8 bytes larger. Markdown hydration is raw 82240 / gzip 29533 / brotli 26829 after main added the controlled Markdown embed presentation and editor-frame behavior in #704 and #706. Exact no-growth ratchets remain in force from these measurements.",
+  "provenance": "2026-08-30 two consecutive measurements of the same locally built candidate on Node v24.18.0, zlib 1.3.1-e00f703, and Brotli 1.2.0 were identical. Startup raw remains 144019 (zero growth); gzip is the reproducible local value 46365 and Brotli remains the tighter 41554 ratchet. Markdown hydration is the exact fsus-markdown + fsus-wasm + shared-runtime closure after #704/#706 added controlled Markdown embed presentation and editor-frame behavior: raw 82240, gzip 29533, brotli 26829.",
   "startup": {
     "raw": 144019,
     "gzip": 46365,
