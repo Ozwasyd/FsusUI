@@ -16156,6 +16156,14 @@
           "isStatic": false
         },
         {
+          "name": "DisplayMemberPath",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "EstimatedRetainedOptionControls",
           "type": "System.Int32",
           "nullable": false,
@@ -16228,6 +16236,14 @@
           "isStatic": false
         },
         {
+          "name": "ItemsSource",
+          "type": "System.Collections.IEnumerable",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "OptionGroups",
           "type": "System.Collections.ObjectModel.Collection\u003CFsusUI.Avalonia.Controls.FsusOptionGroup\u003E",
           "nullable": true,
@@ -16286,6 +16302,14 @@
         {
           "name": "SelectedValue",
           "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SelectedValuePath",
+          "type": "System.String",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -16364,7 +16388,32 @@
           "isStatic": false
         }
       ],
-      "avaloniaProperties": [],
+      "avaloniaProperties": [
+        {
+          "name": "DisplayMemberPath",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "ItemsSource",
+          "kind": "styled",
+          "type": "System.Collections.IEnumerable",
+          "nullable": true
+        },
+        {
+          "name": "SelectedValue",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "SelectedValuePath",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
       "events": [
         {
           "name": "SelectionChanged",

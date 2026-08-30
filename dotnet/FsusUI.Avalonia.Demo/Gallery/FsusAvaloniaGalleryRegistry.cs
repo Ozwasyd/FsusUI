@@ -179,6 +179,9 @@ public static class FsusAvaloniaGalleryRegistry
         panel.Children.Add(upload);
         panel.Children.Add(dropZone);
         break;
+      case "picker":
+        AddProductionSelectStates(panel);
+        break;
       case "locale-formatting":
         var provider = FsusAvaloniaLocaleProvider.CreateDefault();
         provider.SetCulture("zh-cn");
@@ -191,6 +194,46 @@ public static class FsusAvaloniaGalleryRegistry
         break;
     }
   }
+
+  private static void AddProductionSelectStates(StackPanel panel)
+  {
+    var zoom = new FsusSelect
+    {
+      AccessibleName = "Editor zoom",
+      Width = 280,
+      HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left,
+      ItemsSource = new[]
+      {
+        new GallerySelectOption(80, "80%"),
+        new GallerySelectOption(100, "100%"),
+        new GallerySelectOption(125, "125%"),
+        new GallerySelectOption(150, "150%"),
+      },
+      DisplayMemberPath = nameof(GallerySelectOption.Label),
+      SelectedValuePath = nameof(GallerySelectOption.Value),
+      SelectedValue = 100,
+    };
+    var dependent = new FsusSelect
+    {
+      AccessibleName = "Custom zoom preset",
+      Width = 280,
+      HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left,
+      ItemsSource = new[] { "Fit page", "Fit width", "Actual size" },
+      SelectedValue = "Fit page",
+      IsEnabled = false,
+    };
+
+    panel.Children.Add(new TextBlock { Text = "Editor zoom / 編輯器縮放" });
+    panel.Children.Add(zoom);
+    panel.Children.Add(new CheckBox
+    {
+      Content = "Use custom zoom preset",
+      IsChecked = false,
+    });
+    panel.Children.Add(dependent);
+  }
+
+  private sealed record GallerySelectOption(int Value, string Label);
 
   private static void AddPerceptionCharacterStates(StackPanel panel)
   {

@@ -75,6 +75,7 @@ public static class FsusThemeResourceKeys
 public sealed class FsusThemeManager
 {
   private const string FocusBorderThicknessResourceKey = "FsusThemeFocusBorderThickness";
+  private const string PickerSurfaceResourceKey = "FsusThemePickerSurfaceBrush";
   private const string TreeSurfaceResourceKey = "FsusThemeTreeSurfaceBrush";
 
   private static readonly ThemePalette LightPalette =
@@ -188,6 +189,7 @@ public sealed class FsusThemeManager
     SetBrush(resources, FsusThemeResourceKeys.BackgroundBrush, palette.Background);
     SetBrush(resources, FsusThemeResourceKeys.SurfaceBrush, palette.Surface);
     SetBrush(resources, FsusThemeResourceKeys.SurfaceRaisedBrush, palette.SurfaceRaised);
+    SetBrush(resources, PickerSurfaceResourceKey, palette.TreeSurface);
     SetBrush(resources, TreeSurfaceResourceKey, palette.TreeSurface);
     SetBrush(resources, FsusThemeResourceKeys.TextBrush, palette.Text);
     SetBrush(resources, FsusThemeResourceKeys.MutedTextBrush, palette.MutedText);
