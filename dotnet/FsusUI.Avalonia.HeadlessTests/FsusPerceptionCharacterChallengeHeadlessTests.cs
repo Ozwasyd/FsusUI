@@ -114,15 +114,10 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
 
   private static void GenerateRealHeadlessSkiaEvidence()
   {
-    var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "screenshots",
-      "avalonia");
-    Directory.CreateDirectory(outputRoot);
+    var repositoryRoot = FindRepositoryRoot();
+    var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
+      repositoryRoot,
+      "perception-character-challenge");
 
     var captures = new List<RenderCapture>
     {
@@ -134,7 +129,8 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
 
     Assert.All(captures, capture =>
     {
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
+      Assert.True(File.Exists(
+        HeadlessVisualEvidenceOutput.ResolveRecordedPath(repositoryRoot, capture.File)));
       Assert.True(capture.PixelSize.Width > 0);
       Assert.True(capture.PixelSize.Height > 0);
       Assert.Equal(64, capture.Sha256.Length);
@@ -185,16 +181,14 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
     Assert.True(webBaseline.NonBackgroundPixelRatio > 0.01);
 
     var manifestPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      outputRoot,
       "perception-character-challenge-render-manifest.json");
     var manifest = new
     {
       schemaVersion = 1,
       generatedBy = "FsusPerceptionCharacterChallengeHeadlessTests.RealHeadlessSkiaRenderProducesEightStateContrastAndZoomEvidence",
+      outputRoot = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, outputRoot),
+      manifestPath = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, manifestPath),
       renderer = new
       {
         platform = "avalonia",
@@ -209,6 +203,7 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
     File.WriteAllText(
       manifestPath,
       JsonSerializer.Serialize(manifest, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    Assert.True(File.Exists(manifestPath));
   }
 
   private static readonly string[] ExpectedStates =
@@ -367,7 +362,7 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
     window.Close();
 
     var repositoryRoot = FindRepositoryRoot();
-    var relativePath = Path.GetRelativePath(repositoryRoot, outputPath).Replace('\\', '/');
+    var relativePath = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, outputPath);
     return new RenderCapture(
       Path.GetFileNameWithoutExtension(outputPath),
       relativePath,
