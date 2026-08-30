@@ -9,6 +9,8 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
     <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
     <Setter Property="Transitions">
       <Transitions>
         <DoubleTransition
@@ -23,6 +25,11 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
   </Style>
 
+  <Style Selector="fsus|FsusSelect:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
+  </Style>
+
   <Style Selector="fsus|FsusSelect.fsus-empty, fsus|FsusSelectV2.fsus-empty, fsus|FsusAutocomplete.fsus-empty, fsus|FsusCascader.fsus-empty">
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
   </Style>
@@ -32,6 +39,12 @@
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
 
+  <Style Selector="fsus|FsusSelect.fsus-disabled">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
   <Style Selector="fsus|FsusOptionGroup">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
@@ -39,10 +52,11 @@
   </Style>
 
   <Style Selector="fsus|FsusOption">
-    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensitySelectOptionY}" />
     <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
-    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
   </Style>
 
   <Style Selector="fsus|FsusOption.fsus-highlighted">
@@ -52,10 +66,20 @@
   <Style Selector="fsus|FsusOption.fsus-selected">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeFocusBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusOption.fsus-disabled">
-    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <Style Selector="Border.fsus-select-popup-border">
+    <Setter Property="Padding" Value="0,8" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemePickerSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
   </Style>
 
   <Style Selector="fsus|FsusCascaderPanel">

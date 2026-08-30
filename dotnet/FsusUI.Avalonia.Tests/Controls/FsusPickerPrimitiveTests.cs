@@ -1,14 +1,143 @@
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
+using Avalonia.Data;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace FsusUI.Avalonia.Tests.Controls;
 
 public class FsusPickerPrimitiveTests
 {
+  [Fact]
+  public void ProductionSelectBindsItemsDisplayAndValuePathsTwoWays()
+  {
+    var viewModel = new ZoomSettings { Zoom = 100 };
+    var zooms = new ObservableCollection<ZoomOption>
+    {
+      new(80, "80%"),
+      new(100, "100%"),
+      new(125, "125%"),
+    };
+    var select = new KeyboardSelect
+    {
+      AccessibleName = "Editor zoom",
+      DisplayMemberPath = nameof(ZoomOption.Label),
+      SelectedValuePath = nameof(ZoomOption.Value),
+      ItemsSource = zooms,
+    };
+    select.Bind(
+      FsusSelect.SelectedValueProperty,
+      new Binding(nameof(ZoomSettings.Zoom))
+      {
+        Source = viewModel,
+        Mode = BindingMode.TwoWay,
+      });
+    select.RefreshOptions();
+
+    Assert.Equal(3, select.TotalOptionCount);
+    Assert.Equal(100, select.SelectedValue);
+    Assert.Equal("100%", select.SelectedLabel);
+
+    Assert.True(select.SelectValue(125));
+    Assert.Equal(125, viewModel.Zoom);
+    Assert.Equal("125%", select.SelectedLabel);
+
+    zooms.Add(new ZoomOption(150, "150%"));
+    Assert.Equal(4, select.TotalOptionCount);
+  }
+
+  [Fact]
+  public void DependentSelectFollowsParentToggleState()
+  {
+    var viewModel = new ZoomSettings { UseCustomZoom = false };
+    var select = new FsusSelect
+    {
+      AccessibleName = "Custom zoom",
+      ItemsSource = new[] { 80, 100, 125 },
+      SelectedValue = 100,
+    };
+    select.Bind(
+      FsusSelect.IsEnabledProperty,
+      new Binding(nameof(ZoomSettings.UseCustomZoom))
+      {
+        Source = viewModel,
+        Mode = BindingMode.OneWay,
+      });
+
+    Assert.False(select.IsEnabled);
+    Assert.Contains("fsus-disabled", select.Classes);
+
+    viewModel.UseCustomZoom = true;
+
+    Assert.True(select.IsEnabled);
+    Assert.DoesNotContain("fsus-disabled", select.Classes);
+  }
+
+  [Fact]
+  public async Task ProductionSelectAutomaticallyOpensNavigatesSelectsAndDismisses()
+  {
+    var select = new KeyboardSelect { AccessibleName = "Zoom" };
+    select.Options.Add(new FsusOption { Value = 80, Label = "80%", IsDisabled = true });
+    select.Options.Add(new FsusOption { Value = 100, Label = "100%" });
+    select.Options.Add(new FsusOption { Value = 125, Label = "125%" });
+    select.RefreshOptions();
+
+    Assert.True(await select.PressAsync(Key.Down));
+    Assert.True(select.IsOpen);
+    Assert.Equal(1, select.HighlightedIndex);
+
+    Assert.True(await select.PressAsync(Key.Down));
+    Assert.Equal(2, select.HighlightedIndex);
+    Assert.True(await select.PressAsync(Key.Enter));
+    Assert.False(select.IsOpen);
+    Assert.Equal(125, select.SelectedValue);
+
+    Assert.True(await select.PressAsync(Key.Enter));
+    Assert.True(select.IsOpen);
+    Assert.True(await select.PressAsync(Key.Escape));
+    Assert.False(select.IsOpen);
+
+    select.IsEnabled = false;
+    Assert.False(await select.PressAsync(Key.Down));
+    Assert.False(select.IsOpen);
+    Assert.Contains("fsus-disabled", select.Classes);
+  }
+
+  [Fact]
+  public void ProductionSelectAutomationExposesComboBoxListboxSelectionAndDisabledState()
+  {
+    var select = new FsusSelect { AccessibleName = "Zoom" };
+    var disabled = new FsusOption { Value = 80, Label = "80%", IsDisabled = true };
+    var enabled = new FsusOption { Value = 100, Label = "100%" };
+    select.Options.Add(disabled);
+    select.Options.Add(enabled);
+    select.RefreshOptions();
+
+    var selectPeer = ControlAutomationPeer.CreatePeerForElement(select);
+    var expandCollapse = Assert.IsAssignableFrom<IExpandCollapseProvider>(selectPeer);
+    var selection = Assert.IsAssignableFrom<ISelectionProvider>(selectPeer);
+    var disabledPeer = ControlAutomationPeer.CreatePeerForElement(disabled);
+    var enabledPeer = ControlAutomationPeer.CreatePeerForElement(enabled);
+
+    Assert.Equal(AutomationControlType.ComboBox, selectPeer.GetAutomationControlType());
+    Assert.Equal(ExpandCollapseState.Collapsed, expandCollapse.ExpandCollapseState);
+    Assert.True(expandCollapse.ShowsMenu);
+    Assert.False(selection.CanSelectMultiple);
+    Assert.False(disabledPeer.IsEnabled());
+    Assert.Equal(AutomationControlType.ListItem, enabledPeer.GetAutomationControlType());
+
+    Assert.IsAssignableFrom<ISelectionItemProvider>(enabledPeer).Select();
+    Assert.Equal(100, select.SelectedValue);
+    Assert.Single(selection.GetSelection());
+    Assert.Equal("100%", AutomationProperties.GetName(enabled));
+    Assert.Equal("closed single 1 selected", AutomationProperties.GetItemStatus(select));
+  }
+
   [Fact]
   public async Task SelectFiltersKeyboardSelectsMultipleGroupedOptionsAndClears()
   {
@@ -218,6 +347,9 @@ public class FsusPickerPrimitiveTests
     Assert.Contains("FsusThemePickerSurfaceBrush", pickers);
     Assert.Contains("FsusMotionDurationEffective", pickers);
     Assert.Contains("FsusDensityControlDefaultY", pickers);
+    Assert.Contains("FsusDensitySelectOptionY", pickers);
+    Assert.Contains("fsus-select-popup-border", pickers);
+    Assert.Contains("FsusThemeFocusBorderThickness", pickers);
 
     var theme = ReadTheme("FsusTheme.axaml");
     Assert.Contains("Controls/Pickers.axaml", theme);
@@ -250,6 +382,46 @@ public class FsusPickerPrimitiveTests
   private sealed class KeyboardSelect : FsusSelect
   {
     public ValueTask<bool> PressAsync(Key key) => HandleKeyAsync(key);
+  }
+
+  private sealed record ZoomOption(int Value, string Label);
+
+  private sealed class ZoomSettings : INotifyPropertyChanged
+  {
+    private int zoom;
+    private bool useCustomZoom;
+
+    public int Zoom
+    {
+      get => zoom;
+      set
+      {
+        if (zoom == value)
+        {
+          return;
+        }
+        zoom = value;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Zoom)));
+      }
+    }
+
+    public bool UseCustomZoom
+    {
+      get => useCustomZoom;
+      set
+      {
+        if (useCustomZoom == value)
+        {
+          return;
+        }
+        useCustomZoom = value;
+        PropertyChanged?.Invoke(
+          this,
+          new PropertyChangedEventArgs(nameof(UseCustomZoom)));
+      }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
   }
 
   private sealed class KeyboardAutocomplete : FsusAutocomplete
