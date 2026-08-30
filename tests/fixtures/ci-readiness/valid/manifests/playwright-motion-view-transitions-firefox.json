@@ -29,7 +29,7 @@
     "dimensions": {
       "browser": "firefox"
     },
-    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "registryHash": "5666d3d139e25ac93cae2b2d63b7f2f11f626b9cd0de5947c4fa1167f8ad638a",
     "tests": {
       "total": 4,
       "passed": 4,

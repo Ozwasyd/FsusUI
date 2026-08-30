@@ -20,26 +20,27 @@ Workflow YAML and issue text must not invent a second matrix.
 
 ## Dimension semantics
 
-| Dimension | Meaning | Not this |
-|-----------|---------|----------|
-| `browser` | Playwright engine: `chromium`, `firefox`, `webkit` | Never `desktop-dark` |
-| `viewport` | Layout form factor: `desktop`, `mobile`, `tiny` | Not a browser |
-| `theme` | Color scheme: `light`, `dark` | Not a browser |
-| `safeArea` | Safe-area geometry matrix cell | Separate from viewport label |
-| `runtimeMode` | `ssr`, `reuse`, or `product` | Shard/worker counts are not dimensions |
+| Dimension     | Meaning                                            | Not this                               |
+| ------------- | -------------------------------------------------- | -------------------------------------- |
+| `browser`     | Playwright engine: `chromium`, `firefox`, `webkit` | Never `desktop-dark`                   |
+| `viewport`    | Layout form factor: `desktop`, `mobile`, `tiny`    | Not a browser                          |
+| `theme`       | Color scheme: `light`, `dark`                      | Not a browser                          |
+| `safeArea`    | Safe-area geometry matrix cell                     | Separate from viewport label           |
+| `runtimeMode` | `ssr`, `reuse`, or `product`                       | Shard/worker counts are not dimensions |
 
 Shard count, worker count, and test count are capacity details — they are **not**
 compatibility coverage.
 
 ## Fixed suite ids
 
-1. `view-transitions` — three browsers  
-2. `motion-ssr` — Chromium SSR cell  
-3. `dom-layout` — Chromium × viewport × theme  
-4. `geometry-smoke` — Chromium  
-5. `markdown-editor-interaction` — three browsers  
-6. `visual-boundary-audit` — viewport/theme + safe-area cells  
-7. `visual-runtime-reuse` — **runtime contract only**; does **not** count toward product browser coverage  
+1. `view-transitions` — three browsers
+2. `motion-ssr` — Chromium SSR cell
+3. `dom-layout` — Chromium × viewport × theme
+4. `geometry-smoke` — Chromium
+5. `markdown-editor-interaction` — three browsers
+6. `visual-boundary-audit` — viewport/theme + safe-area cells
+7. `visual-runtime-reuse` — **runtime contract only**; does **not** count toward product browser coverage
+8. `web-interaction-conformance` — Chromium, Firefox, and WebKit real-interaction cells
 
 ## Pure-data project contracts
 
@@ -64,6 +65,7 @@ external evidence.
 
 ## Workflow note
 
-This registry does **not** by itself execute suites in Actions. Follow-up issues
-wire cells into jobs and readiness aggregation. Until then, local commands remain
-the execution entry points listed in `package.json`.
+The reusable Playwright workflow derives its execution-owner cells from this
+registry. `web-interaction-conformance` has one owner and runs each browser
+project once; the fixed local entry point is
+`pnpm test:conformance:web-interaction`.
