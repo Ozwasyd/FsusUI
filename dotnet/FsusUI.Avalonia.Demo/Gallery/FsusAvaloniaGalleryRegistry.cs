@@ -127,6 +127,27 @@ public static class FsusAvaloniaGalleryRegistry
       case "text-editor":
         panel.Children.Add(new FsusTextEditor { AccessibleName = "Gallery editor" });
         break;
+      case "value-picker":
+        panel.Children.Add(new FsusSlider
+        {
+          AccessibleName = "Editor font size",
+          AccessibleValueText = "20 pixels",
+          Min = 12,
+          Max = 32,
+          Step = 1,
+          Value = 20,
+        });
+        panel.Children.Add(new FsusSlider
+        {
+          AccessibleName = "Disabled auto-save delay",
+          AccessibleValueText = "5 seconds",
+          Min = 1,
+          Max = 10,
+          Step = 1,
+          Value = 5,
+          IsDisabled = true,
+        });
+        break;
       case "markdown-editor":
         const string galleryMarkdown = "# Gallery\n\n中文 markdown editor";
         var markdownEditor = new FsusMarkdownEditor

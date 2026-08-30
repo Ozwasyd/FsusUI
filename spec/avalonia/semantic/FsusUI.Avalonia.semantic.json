@@ -19537,6 +19537,14 @@
           "isStatic": false
         },
         {
+          "name": "AccessibleValueText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "IsDisabled",
           "type": "System.Boolean",
           "nullable": false,
@@ -19601,10 +19609,65 @@
           "isStatic": false
         }
       ],
-      "avaloniaProperties": [],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "AccessibleValueText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "IsDisabled",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "Max",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "Min",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "Size",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
+          "nullable": false
+        },
+        {
+          "name": "Step",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "Value",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        }
+      ],
       "events": [
         {
           "name": "ValueChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusNumericValueChangedEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "ValueCommitted",
           "kind": "clr",
           "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusNumericValueChangedEventArgs\u003E",
           "isStatic": false
