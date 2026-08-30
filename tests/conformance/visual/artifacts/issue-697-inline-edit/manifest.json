@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "candidateSha": "cc1db80584dd61dbecfb5b006da4e79feb2b9d59",
+  "evidenceClass": "local-headless-skia-and-input-simulation",
+  "productionFixture": true,
+  "limitation": "Avalonia Headless Skia and automation-property inspection; no claim of a physical screen reader session.",
+  "motionMode": "reduced",
+  "states": [
+    "rename-selected-name",
+    "create-empty-row",
+    "validation-error"
+  ],
+  "captures": [
+    {
+      "path": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/tree-inline-edit/tests/conformance/visual/artifacts/issue-697-inline-edit/tree-inline-edit-light-default-zoom-100.png",
+      "theme": "light",
+      "density": "default",
+      "zoomPercent": 100,
+      "sha256": "9c6c666df2aaa0dc86cf8279470b7a4a1496c23c818443c4d87f895a624bbc20",
+      "editors": [
+        {
+          "id": "fsus-tree-inline-editor-editor",
+          "name": "Rename EditorView.axaml",
+          "status": "editing rename",
+          "help": "",
+          "invalid": false,
+          "text": "EditorView.axaml",
+          "focused": false,
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "presenters": [
+            {
+              "text": "EditorView.axaml",
+              "foreground": "#ff111827",
+              "bounds": {
+                "X": 0,
+                "Y": 0,
+                "Width": 226,
+                "Height": 30,
+                "Position": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "Size": {
+                  "AspectRatio": 7.533333333333333,
+                  "Width": 226,
+                  "Height": 30
+                },
+                "Right": 226,
+                "Bottom": 30,
+                "Left": 0,
+                "Top": 0,
+                "TopLeft": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "TopRight": {
+                  "X": 226,
+                  "Y": 0
+                },
+                "BottomLeft": {
+                  "X": 0,
+                  "Y": 30
+                },
+                "BottomRight": {
+                  "X": 226,
+                  "Y": 30
+                },
+                "Center": {
+                  "X": 113,
+                  "Y": 15
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "fsus-tree-inline-editor-draft",
+          "name": "New item name",
+          "status": "editing create",
+          "help": "",
+          "invalid": false,
+          "text": "",
+          "focused": false,
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "presenters": [
+            {
+              "text": "",
+              "foreground": "#ff111827",
+              "bounds": {
+                "X": 0,
+                "Y": 0,
+                "Width": 226,
+                "Height": 30,
+                "Position": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "Size": {
+                  "AspectRatio": 7.533333333333333,
+                  "Width": 226,
+                  "Height": 30
+                },
+                "Right": 226,
+                "Bottom": 30,
+                "Left": 0,
+                "Top": 0,
+                "TopLeft": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "TopRight": {
+                  "X": 226,
+                  "Y": 0
+                },
+                "BottomLeft": {
+                  "X": 0,
+                  "Y": 30
+                },
+                "BottomRight": {
+                  "X": 226,
+                  "Y": 30
+                },
+                "Center": {
+                  "X": 113,
+                  "Y": 15
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "fsus-tree-inline-editor-duplicate",
+          "name": "New item name",
+          "status": "editing create, invalid",
+          "help": "A sibling with this name already exists.",
+          "invalid": true,
+          "text": "EditorView.axaml",
+          "focused": true,
+          "selectionStart": 16,
+          "selectionEnd": 16,
+          "presenters": [
+            {
+              "text": "EditorView.axaml",
+              "foreground": "Black",
+              "bounds": {
+                "X": 0,
+                "Y": 0,
+                "Width": 224,
+                "Height": 28,
+                "Position": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "Size": {
+                  "AspectRatio": 8,
+                  "Width": 224,
+                  "Height": 28
+                },
+                "Right": 224,
+                "Bottom": 28,
+                "Left": 0,
+                "Top": 0,
+                "TopLeft": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "TopRight": {
+                  "X": 224,
+                  "Y": 0
+                },
+                "BottomLeft": {
+                  "X": 0,
+                  "Y": 28
+                },
+                "BottomRight": {
+                  "X": 224,
+                  "Y": 28
+                },
+                "Center": {
+                  "X": 112,
+                  "Y": 14
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/tree-inline-edit/tests/conformance/visual/artifacts/issue-697-inline-edit/tree-inline-edit-dark-spacious-zoom-200.png",
+      "theme": "dark",
+      "density": "spacious",
+      "zoomPercent": 200,
+      "sha256": "ede0df1bda67b5051ffa4f6f273a6b7c0deb23e27fba8c4d29ca22c028167bb5",
+      "editors": [
+        {
+          "id": "fsus-tree-inline-editor-editor",
+          "name": "Rename EditorView.axaml",
+          "status": "editing rename",
+          "help": "",
+          "invalid": false,
+          "text": "EditorView.axaml",
+          "focused": false,
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "presenters": [
+            {
+              "text": "EditorView.axaml",
+              "foreground": "#fff0f0f4",
+              "bounds": {
+                "X": 0,
+                "Y": 0,
+                "Width": 226,
+                "Height": 34,
+                "Position": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "Size": {
+                  "AspectRatio": 6.647058823529412,
+                  "Width": 226,
+                  "Height": 34
+                },
+                "Right": 226,
+                "Bottom": 34,
+                "Left": 0,
+                "Top": 0,
+                "TopLeft": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "TopRight": {
+                  "X": 226,
+                  "Y": 0
+                },
+                "BottomLeft": {
+                  "X": 0,
+                  "Y": 34
+                },
+                "BottomRight": {
+                  "X": 226,
+                  "Y": 34
+                },
+                "Center": {
+                  "X": 113,
+                  "Y": 17
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "fsus-tree-inline-editor-draft",
+          "name": "New item name",
+          "status": "editing create",
+          "help": "",
+          "invalid": false,
+          "text": "",
+          "focused": false,
+          "selectionStart": 0,
+          "selectionEnd": 0,
+          "presenters": [
+            {
+              "text": "",
+              "foreground": "#fff0f0f4",
+              "bounds": {
+                "X": 0,
+                "Y": 0,
+                "Width": 226,
+                "Height": 34,
+                "Position": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "Size": {
+                  "AspectRatio": 6.647058823529412,
+                  "Width": 226,
+                  "Height": 34
+                },
+                "Right": 226,
+                "Bottom": 34,
+                "Left": 0,
+                "Top": 0,
+                "TopLeft": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "TopRight": {
+                  "X": 226,
+                  "Y": 0
+                },
+                "BottomLeft": {
+                  "X": 0,
+                  "Y": 34
+                },
+                "BottomRight": {
+                  "X": 226,
+                  "Y": 34
+                },
+                "Center": {
+                  "X": 113,
+                  "Y": 17
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "fsus-tree-inline-editor-duplicate",
+          "name": "New item name",
+          "status": "editing create, invalid",
+          "help": "A sibling with this name already exists.",
+          "invalid": true,
+          "text": "EditorView.axaml",
+          "focused": true,
+          "selectionStart": 16,
+          "selectionEnd": 16,
+          "presenters": [
+            {
+              "text": "EditorView.axaml",
+              "foreground": "White",
+              "bounds": {
+                "X": 0,
+                "Y": 0,
+                "Width": 224,
+                "Height": 32,
+                "Position": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "Size": {
+                  "AspectRatio": 7,
+                  "Width": 224,
+                  "Height": 32
+                },
+                "Right": 224,
+                "Bottom": 32,
+                "Left": 0,
+                "Top": 0,
+                "TopLeft": {
+                  "X": 0,
+                  "Y": 0
+                },
+                "TopRight": {
+                  "X": 224,
+                  "Y": 0
+                },
+                "BottomLeft": {
+                  "X": 0,
+                  "Y": 32
+                },
+                "BottomRight": {
+                  "X": 224,
+                  "Y": 32
+                },
+                "Center": {
+                  "X": 112,
+                  "Y": 16
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
