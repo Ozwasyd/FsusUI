@@ -2076,7 +2076,7 @@
     }
   ],
   "governance": {
-    "automerge": false,
+    "automerge": true,
     "majorEnabled": true,
     "minorEnabled": true,
     "patchEnabled": true,
