@@ -38,6 +38,7 @@
     "NativeBinarySha256",
     "NativeDependencies",
     "PackageDigests",
+    "PartialCapabilities",
     "RuntimeIndependent",
     "StartedAtUtc",
     "EndedAtUtc",

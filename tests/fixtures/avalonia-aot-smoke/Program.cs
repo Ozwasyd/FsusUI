@@ -49,6 +49,7 @@ internal static class Program
           : "",
         NativeDependencies = options.NativeDependencies,
         PackageDigests = options.PackageDigests,
+        PartialCapabilities = ["FsusMarkdownEditor:required-after-issue-343"],
         RuntimeIndependent = true,
         StartedAtUtc = DateTimeOffset.UtcNow,
       };
@@ -570,6 +571,7 @@ internal sealed record SmokeReport
   public string NativeBinarySha256 { get; init; } = "";
   public IReadOnlyList<string> NativeDependencies { get; init; } = [];
   public IReadOnlyList<string> PackageDigests { get; init; } = [];
+  public IReadOnlyList<string> PartialCapabilities { get; init; } = [];
   public bool RuntimeIndependent { get; init; }
   public DateTimeOffset StartedAtUtc { get; init; }
   public DateTimeOffset EndedAtUtc { get; set; }

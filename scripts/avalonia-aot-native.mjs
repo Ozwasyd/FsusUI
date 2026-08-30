@@ -94,6 +94,13 @@ export const validateReport = (report, expected) => {
   if (!Array.isArray(report.PackageDigests) || report.PackageDigests.length < 1)
     throw new Error('smoke report package digests are missing')
   if (
+    !Array.isArray(report.PartialCapabilities) ||
+    !report.PartialCapabilities.includes(
+      'FsusMarkdownEditor:required-after-issue-343',
+    )
+  )
+    throw new Error('smoke report must retain FsusMarkdownEditor as partial')
+  if (
     report.Scenarios.some(
       (item) => !item.Component || !item.Resource || !item.Stage,
     )

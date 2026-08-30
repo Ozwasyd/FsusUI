@@ -71,4 +71,6 @@ also owns the required Native AOT scenario set. Use
 verify registry coverage, report and manifest identity, negative fixtures, and
 workflow tiering. The required native release axis is `linux-x64`; the current
 support evidence does not claim `win-x64` or `osx-arm64` when those optional
-off-host leaves are absent.
+off-host leaves are absent. Until issue #343's required capability is complete,
+the native report records `FsusMarkdownEditor` as partial instead of adding it
+to the stable-required scenario set.

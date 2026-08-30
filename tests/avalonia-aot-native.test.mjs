@@ -66,6 +66,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     NativeBinarySha256: 'c'.repeat(64),
     NativeDependencies: ['libc.so.6'],
     PackageDigests: ['FsusUI.Avalonia.nupkg:' + 'd'.repeat(64)],
+    PartialCapabilities: ['FsusMarkdownEditor:required-after-issue-343'],
     RuntimeIndependent: true,
     StartedAtUtc: '2026-01-01T00:00:00Z',
     EndedAtUtc: '2026-01-01T00:00:01Z',
@@ -117,6 +118,10 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
   assert.throws(
     () => validateReport({ ...report, NativeLogErrorCount: 1 }),
     /native log/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, PartialCapabilities: [] }),
+    /MarkdownEditor as partial/u,
   )
 })
 
