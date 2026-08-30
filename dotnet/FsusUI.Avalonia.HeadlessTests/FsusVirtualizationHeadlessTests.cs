@@ -1,15 +1,16 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using System.Runtime.CompilerServices;
 
-namespace FsusUI.Avalonia.Tests.Controls;
+namespace FsusUI.Avalonia.HeadlessTests;
 
-public class FsusVirtualizationPrimitiveTests
+public class FsusVirtualizationHeadlessTests
 {
-  [Fact]
+  [AvaloniaFact]
   public void VirtualListRealizesFixedAndVariableWindowsWithMeasurementCacheAndRecycling()
   {
     var list = new FsusVirtualList
@@ -59,7 +60,7 @@ public class FsusVirtualizationPrimitiveTests
     Assert.Contains(list.RealizedItems, item => item.Index == 499);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void VariableListUsesLogarithmicIndexMaintainsAnchorAndBoundsCachesAndPool()
   {
     var list = new FsusVirtualList
@@ -93,7 +94,7 @@ public class FsusVirtualizationPrimitiveTests
     Assert.True(list.DiscardedContainerCount > 0);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public async Task VirtualListBoundsLoadedWindowAndDoesNotRepeatAutomationWrites()
   {
     var list = new FsusVirtualList
@@ -116,7 +117,7 @@ public class FsusVirtualizationPrimitiveTests
     Assert.Equal(list.RealizedContainerCount, list.VisualHost.Children.Count);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public async Task VirtualListKeepsAnchorSupportsKeyboardStatesAndAsyncCancellation()
   {
     var list = new KeyboardVirtualList
@@ -190,7 +191,7 @@ public class FsusVirtualizationPrimitiveTests
     Assert.Equal("row-0", list.LoadedItems[0].Key);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget()
   {
     var resizer = new FsusAutoResizer
@@ -240,7 +241,7 @@ public class FsusVirtualizationPrimitiveTests
     Assert.Equal(AutomationControlType.DataGrid, AutomationProperties.GetControlTypeOverride(table));
   }
 
-  [Fact]
+  [AvaloniaFact]
   public async Task TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults()
   {
     var table = new KeyboardTableV2
@@ -288,7 +289,7 @@ public class FsusVirtualizationPrimitiveTests
     Assert.Equal(automationUpdates, table.AutomationUpdateCount);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34()
   {
     var virtualization = ReadControlTheme("Virtualization.axaml");
