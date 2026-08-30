@@ -23,8 +23,8 @@
     "authorityDigest": "e132a920ebf80ba4fb4b9f579dc334906137ba7824e03bcef7c282696d34e95b",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "7b57f8e83a60d48ebcb27995c96cef4477b08d5b",
-  "candidateDigest": "de458088cadd479b6adafb5594331cbbbc7ceb961138ad6d97be0d39d2172cc1",
+  "candidateSha": "b7f8206eb9130c6140d291c3c001633800c66db3",
+  "candidateDigest": "987987409385085d1b1dfeedade6928ec97996ceb4390c52e205a83514872530",
   "stateEvidenceMatrix": [
     { "state": "clear-add-selectkey-selection-and-automation", "viewport": "desktop 480x240", "theme": "light", "evidenceDigest": "8055b3c9efb80fe295068dab28df945ca051f8f3deb03eb78ad749ea5e706605" },
     { "state": "replacement-pane-rendered-selected", "viewport": "desktop 480x240", "theme": "light", "evidenceDigest": "9003780ad24cf63dccc0734fbc31bfc6306cfcc3ba96935176827e5eaa77fbf0" }
@@ -43,5 +43,5 @@
   "classificationEvidenceDigest": "8055b3c9efb80fe295068dab28df945ca051f8f3deb03eb78ad749ea5e706605",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "717519b02a8649a23cc98c0458250d85fedaea2d35741fc8e09492056f47756b"
+  "receiptDigest": "a392ad4fbf8afadfbc477432e4a6077cd8b3f79e5e74825e4c20994ee346a430"
 }
