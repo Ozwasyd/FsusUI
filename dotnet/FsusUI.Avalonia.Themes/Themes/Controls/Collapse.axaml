@@ -1,0 +1,79 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+
+  <Style Selector="fsus|FsusCollapse">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="0,1,0,1" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusCollapseItem">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel>
+          <Border
+            Name="PART_Header"
+            Height="48"
+            Padding="20,0"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="0,0,0,1"
+            Cursor="Hand">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock
+                Grid.Column="0"
+                Text="{TemplateBinding Title}"
+                VerticalAlignment="Center"
+                FontSize="{DynamicResource FsusTypographyBodySmSize}"
+                FontWeight="Medium"
+                Foreground="{TemplateBinding Foreground}" />
+              <Path
+                Grid.Column="1"
+                Name="PART_Arrow"
+                Width="16"
+                Height="16"
+                Margin="8,0,0,0"
+                VerticalAlignment="Center"
+                Stretch="Uniform"
+                Fill="{TemplateBinding Foreground}"
+                Data="M6,6 L12,12 L6,18" />
+            </Grid>
+          </Border>
+          <Border
+            Name="PART_Content"
+            Padding="20,0,20,25"
+            Background="{TemplateBinding Background}"
+            IsVisible="{TemplateBinding IsActive}">
+            <ContentPresenter
+              Content="{TemplateBinding Content}"
+              ContentTemplate="{TemplateBinding ContentTemplate}"
+              FontSize="{DynamicResource FsusTypographyBodySmSize}"
+              Foreground="{TemplateBinding Foreground}" />
+          </Border>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusCollapseItem.fsus-active /template/ Path#PART_Arrow">
+    <Setter Property="RenderTransform" Value="rotate(90deg)" />
+  </Style>
+
+  <Style Selector="fsus|FsusCollapseItem.fsus-active /template/ Border#PART_Header">
+    <Setter Property="BorderThickness" Value="0,0,0,0" />
+  </Style>
+
+  <Style Selector="fsus|FsusCollapseItem.fsus-disabled">
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+  <Style Selector="fsus|FsusCollapseItem.fsus-disabled /template/ Border#PART_Header">
+    <Setter Property="Cursor" Value="Arrow" />
+  </Style>
+</Styles>
