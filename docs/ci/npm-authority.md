@@ -10,25 +10,46 @@
 
 ## Semantics
 
-| Field | Meaning |
-|-------|---------|
-| `install` | Exact versions the monorepo installs for build/test/tools |
-| `published.dependencies` / `optionalDependencies` | Semver ranges in the published package; each must contain the install pin |
-| `published.peerDependencies` | Public peer contract ranges |
-| `consumerProfiles` | Exact version sets for consumer matrix profiles; may only reference registered packages |
+| Field                                             | Meaning                                                                                 |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `install`                                         | Exact versions the monorepo installs for build/test/tools                               |
+| `published.dependencies` / `optionalDependencies` | Semver ranges in the published package; each must contain the install pin               |
+| `published.peerDependencies`                      | Public peer contract ranges                                                             |
+| `consumerProfiles`                                | Exact version sets for consumer matrix profiles; may only reference registered packages |
 
 Internal packages use `workspace:` and are **not** listed as external authority entries.
+
+The consumer matrix has exactly three profiles: `npm-latest`, `pnpm-latest`,
+and `npm-peer-floor`. The first two project the current application toolchain;
+the peer-floor profile derives Vue with `semver.minVersion` from the candidate's
+published peer range and fails if the authority widens or overrides that floor.
+Each profile installs the same local candidate tarball with its named real
+installer and writes a JSON receipt outside the source tree.
+
+```bash
+pnpm test:consumer-matrix:fixtures
+pnpm test:consumer-matrix -- \
+  --candidate dist/npm-candidate/fsusui-npm-candidate.tgz \
+  --output .tmp/consumer-matrix
+```
+
+The matrix receipt binds all profile receipts to candidate, authority, profile,
+and test-configuration digests. Missing, skipped, failed, tampered, or
+mixed-candidate receipts fail closed. PR impact selection also fails closed:
+only an all-documentation diff may emit a machine-readable
+`no-package-impact:documentation-only` skip plan; every unclassified, runtime,
+exports, peer, build, or package path runs the matrix.
 
 ## `pnpm deps:sync` (#406)
 
 Projects authority into controlled manifests:
 
-| Role | Paths | External field rule |
-|------|-------|---------------------|
-| root | `package.json` | install exact (`npm:` alias → exact target pin) |
-| workspace | `vue/packages/*`, `vue/internal/*` | install exact; peers in `published.peerDependencies` use that range |
-| published-source | `vue/packages/element-plus/package.json` | runtime deps/optional/peers from `published.*`; devDependencies install exact; `workspace:` kept |
-| consumer-fixture | `vue/tests/consumer-install/template/package.json` | `consumerProfiles.npm-latest` when listed, else install exact |
+| Role             | Paths                                              | External field rule                                                                              |
+| ---------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| root             | `package.json`                                     | install exact (`npm:` alias → exact target pin)                                                  |
+| workspace        | `vue/packages/*`, `vue/internal/*`                 | install exact; peers in `published.peerDependencies` use that range                              |
+| published-source | `vue/packages/element-plus/package.json`           | runtime deps/optional/peers from `published.*`; devDependencies install exact; `workspace:` kept |
+| consumer-fixture | `vue/tests/consumer-install/template/package.json` | `consumerProfiles.npm-latest` when listed, else install exact                                    |
 
 Rules:
 
