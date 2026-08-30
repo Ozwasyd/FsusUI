@@ -35,6 +35,435 @@
       "methods": []
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusActivityRailInteractionSource",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Programmatic",
+          "value": 0
+        },
+        {
+          "name": "Pointer",
+          "value": 1
+        },
+        {
+          "name": "Keyboard",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusActivityRailSection",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Header",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Icon",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsSelected",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Header",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Icon",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "IsSelected",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "Key",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusActivityRailShell",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ActiveSection",
+          "type": "FsusUI.Avalonia.Controls.FsusActivityRailSection",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ActivityRailWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DefaultPaneWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsPaneOpen",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "KeyboardResizeStep",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MainContent",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MaxPaneWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MinPaneWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "PaneWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Sections",
+          "type": "System.Collections.ObjectModel.ObservableCollection\u003CFsusUI.Avalonia.Controls.FsusActivityRailSection\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "SelectedKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "ActivityRailWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "DefaultPaneWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "IsPaneOpen",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "KeyboardResizeStep",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "MainContent",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "MaxPaneWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "MinPaneWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "PaneWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "SelectedKey",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [
+        {
+          "name": "PaneResized",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusContextualPaneResizedEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "SectionActivated",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusActivitySectionActivatedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "ActivateKey",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "source",
+              "type": "FsusUI.Avalonia.Controls.FsusActivityRailInteractionSource",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "HandleSectionKey",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "section",
+              "type": "FsusUI.Avalonia.Controls.FsusActivityRailSection",
+              "optional": false
+            },
+            {
+              "name": "key",
+              "type": "Avalonia.Input.Key",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "HidePane",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "source",
+              "type": "FsusUI.Avalonia.Controls.FsusActivityRailInteractionSource",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "ResetPaneWidth",
+          "isStatic": false,
+          "returnType": "System.Double",
+          "parameters": []
+        },
+        {
+          "name": "ResizePane",
+          "isStatic": false,
+          "returnType": "System.Double",
+          "parameters": [
+            {
+              "name": "requestedWidth",
+              "type": "System.Double",
+              "optional": false
+            },
+            {
+              "name": "reason",
+              "type": "FsusUI.Avalonia.Controls.FsusContextualPaneResizeReason",
+              "optional": true
+            },
+            {
+              "name": "isCompleted",
+              "type": "System.Boolean",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "ShowPane",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "source",
+              "type": "FsusUI.Avalonia.Controls.FsusActivityRailInteractionSource",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusActivitySectionActivatedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "InteractionSource",
+          "type": "FsusUI.Avalonia.Controls.FsusActivityRailInteractionSource",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsPaneOpen",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "PreviousKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusAffix",
       "kind": "class",
       "baseType": "Avalonia.Controls.ContentControl",
@@ -4488,6 +4917,83 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusContextualPaneResizeReason",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Programmatic",
+          "value": 0
+        },
+        {
+          "name": "Pointer",
+          "value": 1
+        },
+        {
+          "name": "Keyboard",
+          "value": 2
+        },
+        {
+          "name": "Reset",
+          "value": 3
+        },
+        {
+          "name": "BoundsCoercion",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusContextualPaneResizedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "IsCompleted",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "NewWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "OldWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Reason",
+          "type": "FsusUI.Avalonia.Controls.FsusContextualPaneResizeReason",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusConversationContextBar",
       "kind": "class",
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
@@ -6246,6 +6752,35 @@
       "methods": []
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusDesktopPlatform",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Auto",
+          "value": 0
+        },
+        {
+          "name": "Windows",
+          "value": 1
+        },
+        {
+          "name": "MacOS",
+          "value": 2
+        },
+        {
+          "name": "Linux",
+          "value": 3
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusDestructiveActionPanel",
       "kind": "class",
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
@@ -6696,6 +7231,462 @@
               "name": "hasActiveWindow",
               "type": "System.Boolean",
               "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusDocumentTab",
+      "kind": "class",
+      "baseType": "FsusUI.Avalonia.Controls.FsusTabPane",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "CloseAccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsClosable",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsDirty",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "CloseAccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "IsClosable",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "IsDirty",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        }
+      ],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusDocumentTabCloseReason",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Programmatic",
+          "value": 0
+        },
+        {
+          "name": "CloseButton",
+          "value": 1
+        },
+        {
+          "name": "MiddleClick",
+          "value": 2
+        },
+        {
+          "name": "Keyboard",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusDocumentTabCloseRequestedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Cancel",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Document",
+          "type": "FsusUI.Avalonia.Controls.FsusDocumentTab",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Reason",
+          "type": "FsusUI.Avalonia.Controls.FsusDocumentTabCloseReason",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusDocumentTabContextRequestedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Anchor",
+          "type": "Avalonia.Controls.Control",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "AnchorBounds",
+          "type": "Avalonia.Rect",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Document",
+          "type": "FsusUI.Avalonia.Controls.FsusDocumentTab",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "InteractionSource",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeInteractionSource",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusDocumentTabReorderSource",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Programmatic",
+          "value": 0
+        },
+        {
+          "name": "Pointer",
+          "value": 1
+        },
+        {
+          "name": "Keyboard",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusDocumentTabReorderedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Document",
+          "type": "FsusUI.Avalonia.Controls.FsusDocumentTab",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "NewIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "OldIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Source",
+          "type": "FsusUI.Avalonia.Controls.FsusDocumentTabReorderSource",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusDocumentTabs",
+      "kind": "class",
+      "baseType": "FsusUI.Avalonia.Controls.FsusTabs",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "CanScrollBackward",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "CanScrollForward",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Documents",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusDocumentTab\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderExtentWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderScrollOffset",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderScrollStep",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderViewportWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "HeaderScrollStep",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        }
+      ],
+      "events": [
+        {
+          "name": "CloseRequested",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusDocumentTabCloseRequestedEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "DocumentContextRequested",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusDocumentTabContextRequestedEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "Reordered",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusDocumentTabReorderedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "AddDocument",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "document",
+              "type": "FsusUI.Avalonia.Controls.FsusDocumentTab",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "CycleDocuments",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "reverse",
+              "type": "System.Boolean",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "ReorderDocument",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "newIndex",
+              "type": "System.Int32",
+              "optional": false
+            },
+            {
+              "name": "source",
+              "type": "FsusUI.Avalonia.Controls.FsusDocumentTabReorderSource",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "RequestClose",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "reason",
+              "type": "FsusUI.Avalonia.Controls.FsusDocumentTabCloseReason",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "RequestDocumentContext",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "source",
+              "type": "FsusUI.Avalonia.Controls.FsusTreeInteractionSource",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "ScrollHeaders",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "forward",
+              "type": "System.Boolean",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SelectKey",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
             }
           ]
         }
@@ -13879,6 +14870,377 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusNativeTitleBar",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "AttachedWindow",
+          "type": "Avalonia.Controls.Window",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "CanClose",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CanMaximize",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CanMinimize",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DocumentPath",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DocumentTitle",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "EffectivePlatform",
+          "type": "FsusUI.Avalonia.Controls.FsusDesktopPlatform",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsFullScreen",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsMaximized",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "LeadingActions",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Platform",
+          "type": "FsusUI.Avalonia.Controls.FsusDesktopPlatform",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Status",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "TrailingActions",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "UseExtendedClientArea",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "WindowControlsVisible",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "CanClose",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "CanMaximize",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "CanMinimize",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "DocumentPath",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "DocumentTitle",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "IsFullScreen",
+          "kind": "direct",
+          "type": "FsusUI.Avalonia.Controls.FsusNativeTitleBar",
+          "nullable": true
+        },
+        {
+          "name": "IsMaximized",
+          "kind": "direct",
+          "type": "FsusUI.Avalonia.Controls.FsusNativeTitleBar",
+          "nullable": true
+        },
+        {
+          "name": "LeadingActions",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "Platform",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusDesktopPlatform",
+          "nullable": false
+        },
+        {
+          "name": "Status",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "TrailingActions",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "UseExtendedClientArea",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "WindowControlsVisible",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        }
+      ],
+      "events": [
+        {
+          "name": "WindowActionInvoked",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusNativeWindowActionEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "AttachTo",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "window",
+              "type": "Avalonia.Controls.Window",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Detach",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "Dispose",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "GetIsNoDrag",
+          "isStatic": true,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "control",
+              "type": "Avalonia.Controls.Control",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "InvokeWindowAction",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "action",
+              "type": "FsusUI.Avalonia.Controls.FsusNativeWindowAction",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SetIsNoDrag",
+          "isStatic": true,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "control",
+              "type": "Avalonia.Controls.Control",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "System.Boolean",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusNativeWindowAction",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Minimize",
+          "value": 0
+        },
+        {
+          "name": "Maximize",
+          "value": 1
+        },
+        {
+          "name": "Restore",
+          "value": 2
+        },
+        {
+          "name": "Close",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusNativeWindowActionEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Action",
+          "type": "FsusUI.Avalonia.Controls.FsusNativeWindowAction",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "CurrentState",
+          "type": "Avalonia.Controls.WindowState",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Platform",
+          "type": "FsusUI.Avalonia.Controls.FsusDesktopPlatform",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "PreviousState",
+          "type": "Avalonia.Controls.WindowState",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusNavigationActivatedEventArgs",
       "kind": "class",
       "baseType": "System.EventArgs",
@@ -17219,6 +18581,14 @@
           "isStatic": false
         },
         {
+          "name": "DisplayMemberPath",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "EstimatedRetainedOptionControls",
           "type": "System.Int32",
           "nullable": false,
@@ -17291,6 +18661,14 @@
           "isStatic": false
         },
         {
+          "name": "ItemsSource",
+          "type": "System.Collections.IEnumerable",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "OptionGroups",
           "type": "System.Collections.ObjectModel.Collection\u003CFsusUI.Avalonia.Controls.FsusOptionGroup\u003E",
           "nullable": true,
@@ -17349,6 +18727,14 @@
         {
           "name": "SelectedValue",
           "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SelectedValuePath",
+          "type": "System.String",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -17427,7 +18813,32 @@
           "isStatic": false
         }
       ],
-      "avaloniaProperties": [],
+      "avaloniaProperties": [
+        {
+          "name": "DisplayMemberPath",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "ItemsSource",
+          "kind": "styled",
+          "type": "System.Collections.IEnumerable",
+          "nullable": true
+        },
+        {
+          "name": "SelectedValue",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "SelectedValuePath",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
       "events": [
         {
           "name": "SelectionChanged",
@@ -19189,6 +20600,14 @@
           "isStatic": false
         },
         {
+          "name": "AccessibleValueText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "IsDisabled",
           "type": "System.Boolean",
           "nullable": false,
@@ -19253,10 +20672,65 @@
           "isStatic": false
         }
       ],
-      "avaloniaProperties": [],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "AccessibleValueText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "IsDisabled",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "Max",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "Min",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "Size",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
+          "nullable": false
+        },
+        {
+          "name": "Step",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "Value",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        }
+      ],
       "events": [
         {
           "name": "ValueChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusNumericValueChangedEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "ValueCommitted",
           "kind": "clr",
           "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusNumericValueChangedEventArgs\u003E",
           "isStatic": false

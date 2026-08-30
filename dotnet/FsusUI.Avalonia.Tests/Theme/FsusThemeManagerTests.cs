@@ -66,6 +66,7 @@ public class FsusThemeManagerTests
     manager.Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
 
     AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#2A599C");
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#EEF3FA");
 
     manager.Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Dark });
 
@@ -75,10 +76,12 @@ public class FsusThemeManagerTests
       FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey,
       "#4B79CC"
     );
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#243043");
 
     manager.Apply(resources, new FsusThemeOptions { HighContrast = true });
 
     AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#FFFF00");
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#1F2937");
   }
 
   [Fact]

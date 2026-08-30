@@ -80,9 +80,33 @@ internal static class Program
         new FsusMarkdownDocumentIdentity("native-aot", 1),
         "# AOT\n\n- Native editor");
       _ = codeEditor.FindNext("Native");
+      var documents = new FsusDocumentTabs();
+      documents.AddDocument(new FsusDocumentTab
+      {
+        Key = "aot-document",
+        Header = "Native AOT document",
+        Content = "Native AOT document content",
+      });
+      var activityShell = new FsusActivityRailShell
+      {
+        MainContent = documents,
+      };
+      activityShell.Sections.Add(new FsusActivityRailSection
+      {
+        Key = "explorer",
+        Header = "Explorer",
+        Content = "Native AOT contextual pane",
+      });
+      var titleBar = new FsusNativeTitleBar
+      {
+        DocumentTitle = "Native AOT shell",
+        Status = "Ready",
+      };
       var panel = new StackPanel();
       panel.Children.Add(button);
       panel.Children.Add(icon);
+      panel.Children.Add(titleBar);
+      panel.Children.Add(activityShell);
       panel.Children.Add(codeEditor);
 
       var window = new Window
@@ -106,12 +130,17 @@ internal static class Program
               report.CodeEditorReady =
                 codeEditor.Selection == new FsusCodeEditorSelection(9, 15) &&
                 codeEditor.HighlightSpans.Count > 0;
+              report.ActivitySectionCount = activityShell.Sections.Count;
+              report.DocumentCount = documents.Documents.Count;
+              report.TitleBarPlatform = titleBar.EffectivePlatform.ToString();
               report.ThemeDensity = FsusThemeOptions.Default.Density.ToString();
               report.ExitCode =
                 report.TopLevelCreated &&
                 report.DispatcherReached &&
                 report.PlatformHandleCreated &&
-                report.PackageControlCount == 3 &&
+                report.PackageControlCount == 5 &&
+                report.ActivitySectionCount == 1 &&
+                report.DocumentCount == 1 &&
                 report.CodeEditorReady
                   ? 0
                   : 1;
@@ -219,6 +248,9 @@ internal sealed record SmokeReport
   public bool PlatformHandleCreated { get; set; }
   public int PackageControlCount { get; set; }
   public bool CodeEditorReady { get; set; }
+  public int ActivitySectionCount { get; set; }
+  public int DocumentCount { get; set; }
+  public string? TitleBarPlatform { get; set; }
   public string? ThemeDensity { get; set; }
   public string? ProcessArchitecture { get; init; }
   public int ExitCode { get; set; } = 1;

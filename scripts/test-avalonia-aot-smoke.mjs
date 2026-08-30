@@ -133,11 +133,11 @@ for (const packageName of [
   'Microsoft.NETCore.App.Runtime.NativeAOT',
   'Microsoft.NETCore.App.Host',
 ]) {
-  const aliasPath = path.join(isolatedPacks, `${packageName}.linux-x64`)
-  if (existsSync(aliasPath)) continue
+  const destination = path.join(isolatedPacks, `${packageName}.linux-x64`)
+  if (existsSync(destination)) continue
   symlinkSync(
     path.join(systemDotnetRoot, 'packs', `${packageName}.${rid}`),
-    aliasPath,
+    destination,
     'dir',
   )
 }
@@ -320,6 +320,9 @@ try {
       platformHandleCreated: report.PlatformHandleCreated,
       packageControlCount: report.PackageControlCount,
       codeEditorReady: report.CodeEditorReady,
+      activitySectionCount: report.ActivitySectionCount,
+      documentCount: report.DocumentCount,
+      titleBarPlatform: report.TitleBarPlatform,
       exitCode: report.ExitCode,
     },
     {
@@ -327,8 +330,11 @@ try {
       topLevelCreated: true,
       dispatcherReached: true,
       platformHandleCreated: true,
-      packageControlCount: 3,
+      packageControlCount: 5,
       codeEditorReady: true,
+      activitySectionCount: 1,
+      documentCount: 1,
+      titleBarPlatform: 'Linux',
       exitCode: 0,
     },
   )
