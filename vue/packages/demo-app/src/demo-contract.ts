@@ -169,6 +169,11 @@ export const resolveDemoRoot = async (
     return { component: CheckTagFixture, themeMode }
   }
 
+  if (searchParams.get('avatar') === '1') {
+    const { default: AvatarFixture } = await import('./AvatarFixture.vue')
+    return { component: AvatarFixture, themeMode }
+  }
+
   const { default: App } = await import('./App.vue')
   return {
     component: App,
