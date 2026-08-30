@@ -102,4 +102,3 @@ spelling, developer-tools, Windows/Linux PDF, cancellation, stream ownership,
 tag markers, and hierarchical clickable-outline results. Those simulations
 verify the public contract and fail-closed behavior; they are not evidence that
 an external WebView engine executed in the current environment.
-
