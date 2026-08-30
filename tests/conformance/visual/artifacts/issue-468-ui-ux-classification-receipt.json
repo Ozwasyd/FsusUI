@@ -55,13 +55,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "af66a47d970f8f37e481e6fb38eab77109279198",
+    "revision": "31c6fb56d877513f62e39dcdcc4759345d67b9ef",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "d8ecafb74a61459fef449e1a14fdc5d1f06cfdb2790e031e7b1bafdba82f4e77",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "af66a47d970f8f37e481e6fb38eab77109279198",
-  "candidateDigest": "6c0fee24582628e7e04a121122322ed54209bf59e1987d78c349e1f919f1088c",
+  "candidateSha": "31c6fb56d877513f62e39dcdcc4759345d67b9ef",
+  "candidateDigest": "ab3498440a1c99ea36951e8ecbcd81fa0bdbdce81a7840025f26b78029f6886b",
   "stateEvidenceMatrix": [
     {
       "state": "twenty-plus-mixed-seven-primitives-and-semantic-states",
@@ -104,5 +104,5 @@
   "classificationEvidenceDigest": "154e15d95d7c59398d6c7062e9d066a37ff19ee92375bb114c2d2ae0cea221f2",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "338dcbc2eb7c98014c287c2863cc15d150af6644ec697fde1e912775de697682"
+  "receiptDigest": "bb61bbbe45ad800b82eec91949e1fb1340531e6ced9290d1f2f8587504872544"
 }
