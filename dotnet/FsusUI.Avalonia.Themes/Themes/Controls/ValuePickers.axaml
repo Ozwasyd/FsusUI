@@ -1,5 +1,6 @@
 <Styles
   xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:fsus="using:FsusUI.Avalonia.Controls">
   <Style Selector="fsus|FsusSlider, fsus|FsusRate, fsus|FsusColorPicker">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
@@ -20,11 +21,114 @@
   </Style>
 
   <Style Selector="fsus|FsusSlider">
-    <Setter Property="Background" Value="{DynamicResource FsusThemeValuePickerTrackBrush}" />
+    <Setter Property="MinWidth" Value="160" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Canvas
+          Name="PART_TrackHost"
+          Height="24"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Center">
+          <Border
+            Name="PART_Track"
+            Width="0"
+            Height="4"
+            Background="{DynamicResource FsusThemeValuePickerTrackBrush}"
+            CornerRadius="{DynamicResource FsusRadiusPill}" />
+          <Border
+            Name="PART_Fill"
+            Width="0"
+            Height="4"
+            Background="{DynamicResource FsusColorActionPrimaryBrush}"
+            CornerRadius="{DynamicResource FsusRadiusPill}">
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition
+                  Property="Width"
+                  Duration="{DynamicResource FsusMotionDurationEffective}"
+                  Easing="{DynamicResource FsusMotionEasingEffective}" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+          <Border
+            Name="PART_FocusRing"
+            Width="28"
+            Height="28"
+            Background="Transparent"
+            BorderBrush="{DynamicResource FsusThemeFocusBrush}"
+            BorderThickness="{DynamicResource FsusThemeFocusBorderThickness}"
+            CornerRadius="{DynamicResource FsusRadiusPill}"
+            IsHitTestVisible="False"
+            Opacity="0" />
+          <Border
+            Name="PART_Thumb"
+            Width="20"
+            Height="20"
+            Background="{DynamicResource FsusThemeSurfaceBrush}"
+            BorderBrush="{DynamicResource FsusColorActionPrimaryBrush}"
+            BorderThickness="2"
+            CornerRadius="{DynamicResource FsusRadiusPill}">
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition
+                  Property="Canvas.Left"
+                  Duration="{DynamicResource FsusMotionDurationEffective}"
+                  Easing="{DynamicResource FsusMotionEasingEffective}" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+        </Canvas>
+      </ControlTemplate>
+    </Setter>
   </Style>
 
-  <Style Selector="fsus|FsusSlider.fsus-has-marks">
-    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  <Style Selector="fsus|FsusSlider.fsus-size-sm">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-size-sm /template/ Border#PART_Thumb">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-size-sm /template/ Border#PART_FocusRing">
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="24" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-size-lg">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlSpaciousY}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-size-lg /template/ Border#PART_Thumb">
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="24" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-size-lg /template/ Border#PART_FocusRing">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider:pointerover /template/ Border#PART_Thumb">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-dragging /template/ Border#PART_Thumb">
+    <Setter Property="Background" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-focus-visible /template/ Border#PART_Thumb">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-focus-visible /template/ Border#PART_FocusRing">
+    <Setter Property="Opacity" Value="1" />
   </Style>
 
   <Style Selector="fsus|FsusRate.fsus-selected">
@@ -43,8 +147,21 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
   </Style>
 
-  <Style Selector="fsus|FsusSlider.fsus-disabled, fsus|FsusRate.fsus-disabled, fsus|FsusColorPicker.fsus-disabled">
+  <Style Selector="fsus|FsusRate.fsus-disabled, fsus|FsusColorPicker.fsus-disabled">
     <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-disabled /template/ Border#PART_Track">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-disabled /template/ Border#PART_Fill">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeBorderBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-disabled /template/ Border#PART_Thumb">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
   </Style>
 </Styles>

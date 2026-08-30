@@ -219,7 +219,13 @@ public class FsusTreeContextMenuHeadlessTests
   public void RealHeadlessSkiaRendersThemeZoomReducedMotionAndAutomationEvidence()
   {
     EnsureFullTheme();
-    var outputRoot = "/mnt/dev-cache/lyuaoss/fsusui-pr668-evidence/after";
+    var outputRoot =
+      Environment.GetEnvironmentVariable("FSUS_PR668_EVIDENCE_ROOT")
+      ?? Path.Combine(
+        AppContext.BaseDirectory,
+        "TestResults",
+        "fsus-pr668-rendered-evidence",
+        "after");
     Directory.CreateDirectory(outputRoot);
     var captures = new List<RenderCapture>();
     foreach (var (theme, density, zoom) in new[]

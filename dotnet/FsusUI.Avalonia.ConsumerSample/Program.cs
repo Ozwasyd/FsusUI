@@ -63,6 +63,18 @@ public static class ConsumerSampleSmoke
       CommandTree = [FsusNativeMenuItemModel.Action(command)],
       SearchPlaceholder = "Search workspace commands",
     };
+    var codeEditor = new FsusCodeEditor
+    {
+      AccessibleName = "Release notes source",
+      WordWrap = true,
+      ShowLineNumbers = true,
+      TabWidth = 4,
+    };
+    codeEditor.LoadDocument(
+      new FsusMarkdownDocumentIdentity("consumer-smoke", 1),
+      "# Release notes\n\n- Native editor");
+    var revealed = codeEditor.RevealLineColumn(3, 3);
+    _ = codeEditor.FindNext("Native");
 
     var page = new StackPanel();
     page.Children.Add(action);
@@ -70,18 +82,22 @@ public static class ConsumerSampleSmoke
     page.Children.Add(icon);
     page.Children.Add(dropZone);
     page.Children.Add(commandPalette);
+    page.Children.Add(codeEditor);
 
     var manager = new FsusThemeManager();
 
     return manager is not null &&
       themeOptions.Density == FsusDensity.Default &&
-      page.Children.Count == 5 &&
+      page.Children.Count == 6 &&
       action.AccessibleName == "Save settings" &&
       input.Text == "FsusUI" &&
       icon.IconKey == FsusIconKeys.Search &&
       dropZone.AccessibleName == "Document import zone" &&
       dropZone.Accepts == ".pdf, .png" &&
       commandPalette.CommandTree?.Single().Command?.Id == "workspace.publish" &&
-      commandPalette.SearchPlaceholder == "Search workspace commands";
+      commandPalette.SearchPlaceholder == "Search workspace commands" &&
+      codeEditor.DocumentIdentity?.Id == "consumer-smoke" &&
+      codeEditor.Selection == new FsusCodeEditorSelection(19, 25) &&
+      revealed == new FsusCodeEditorPosition(19, 3, 3);
   }
 }

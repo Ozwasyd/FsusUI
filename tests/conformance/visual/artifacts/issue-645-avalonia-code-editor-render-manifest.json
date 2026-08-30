@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "issue": 645,
+  "generatedBy": "FsusCodeEditorHeadlessTests.HeadlessSkiaRendersThemeAndViewMatrixAndWritesManifest",
+  "evidenceClass": "local-headless-render",
+  "renderer": "Avalonia headless Skia",
+  "captures": [
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-light-wrapped-lines.png",
+      "Sha256": "38c52fd53e0d504958c734a2f85dff9ffe56f452015b09d45bdf3ab6602eede3",
+      "Theme": "light",
+      "State": "wrapped-lines",
+      "WordWrap": true,
+      "ShowLineNumbers": true,
+      "Width": 760,
+      "Height": 400
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-light-unwrapped-no-lines.png",
+      "Sha256": "6658f857b34879c52e333038a5e6595d55cb6c8ec1215479faf27bbc14b53b4a",
+      "Theme": "light",
+      "State": "unwrapped-no-lines",
+      "WordWrap": false,
+      "ShowLineNumbers": false,
+      "Width": 760,
+      "Height": 400
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-dark-wrapped-lines.png",
+      "Sha256": "ea804fe7454b0aae6ac3a6b63ae650fd1a06c115fc7283963d8c640586402d9a",
+      "Theme": "dark",
+      "State": "wrapped-lines",
+      "WordWrap": true,
+      "ShowLineNumbers": true,
+      "Width": 760,
+      "Height": 400
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-dark-unwrapped-no-lines.png",
+      "Sha256": "e6fa578c1ead92d46b62c5c04112af6a34dc4c97b2e365200b75ff0c4989f355",
+      "Theme": "dark",
+      "State": "unwrapped-no-lines",
+      "WordWrap": false,
+      "ShowLineNumbers": false,
+      "Width": 760,
+      "Height": 400
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-highcontrast-wrapped-lines.png",
+      "Sha256": "a20f3ad6dd9aa7ffeb55f8787135b296cb84c78620ef712efb64f79234e062af",
+      "Theme": "highcontrast",
+      "State": "wrapped-lines",
+      "WordWrap": true,
+      "ShowLineNumbers": true,
+      "Width": 760,
+      "Height": 400
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-highcontrast-unwrapped-no-lines.png",
+      "Sha256": "d118dd9c190d21bd8aea6fcebf60398bfda8364a104b364cfed07b2dbf038d1b",
+      "Theme": "highcontrast",
+      "State": "unwrapped-no-lines",
+      "WordWrap": false,
+      "ShowLineNumbers": false,
+      "Width": 760,
+      "Height": 400
+    }
+  ],
+  "limitations": "These are deterministic local Skia renders, not physical-display or operating-system accessibility sessions."
+}

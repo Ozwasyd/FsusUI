@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
 
@@ -154,7 +153,7 @@ public class FsusCommandPaletteTests
     Assert.Equal(1, syncExecutions);
     Assert.False(syncPalette.IsOpen);
 
-    var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+    var completion = new TaskCompletionSource();
     var asyncCommand = new FsusPlatformCommand("workspace.refresh", "Refresh workspace")
     {
       ExecuteAsyncAction = async (_, cancellationToken) =>
@@ -172,12 +171,7 @@ public class FsusCommandPaletteTests
     Assert.True(asyncPalette.IsBusy);
     Assert.Equal(FsusCommandPaletteState.Executing, asyncPalette.State);
     completion.SetResult();
-    while (!execution.IsCompleted)
-    {
-      Dispatcher.UIThread.RunJobs();
-      Thread.Yield();
-    }
-    Assert.True(await execution);
+    Assert.True(await execution.WaitAsync(TimeSpan.FromSeconds(5)));
     Assert.False(asyncPalette.IsOpen);
 
     var disabledExecutions = 0;

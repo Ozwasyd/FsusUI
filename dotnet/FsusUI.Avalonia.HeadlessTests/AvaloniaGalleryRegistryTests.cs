@@ -32,6 +32,7 @@ public class AvaloniaGalleryRegistryTests
     "tree",
     "text-viewer",
     "text-editor",
+    "code-editor",
     "markdown-editor",
     "public-shell",
     "product-primitives",
@@ -120,6 +121,22 @@ public class AvaloniaGalleryRegistryTests
     Assert.Equal("aligned", editors[0].CapabilityState);
     Assert.NotNull(editors[0].ProjectionMap);
     Assert.Equal(typeof(FsusMarkdownEditor), editors[0].GetType());
+  }
+
+  [Fact]
+  public void CodeEditorGalleryInstantiatesConfiguredPublicFsusCodeEditor()
+  {
+    var route = Assert.Single(
+      FsusAvaloniaGalleryRegistry.StableRoutes,
+      candidate => candidate.ComponentId == "code-editor");
+    var page = route.CreatePage();
+    var editor = Assert.Single(page.GetLogicalDescendants().OfType<FsusCodeEditor>());
+
+    Assert.Equal(typeof(FsusCodeEditor), editor.GetType());
+    Assert.Equal("gallery-code", editor.DocumentIdentity?.Id);
+    Assert.True(editor.WordWrap);
+    Assert.True(editor.ShowLineNumbers);
+    Assert.NotEmpty(editor.HighlightSpans);
   }
 
   [Fact]

@@ -63,6 +63,7 @@ public static class FsusAvaloniaGalleryRegistry
     Entry("tree", "Tree"),
     Entry("text-viewer", "Text viewer"),
     Entry("text-editor", "Text editor"),
+    Entry("code-editor", "Code editor"),
     Entry("markdown-editor", "Markdown editor"),
     Entry("public-shell", "Public shell"),
     Entry("product-primitives", "Product primitives"),
@@ -127,6 +128,41 @@ public static class FsusAvaloniaGalleryRegistry
       case "text-editor":
         panel.Children.Add(new FsusTextEditor { AccessibleName = "Gallery editor" });
         break;
+      case "code-editor":
+        var codeEditor = new FsusCodeEditor
+        {
+          AccessibleName = "Gallery Markdown source",
+          WordWrap = true,
+          ShowLineNumbers = true,
+          TabWidth = 4,
+        };
+        codeEditor.LoadDocument(
+          new FsusMarkdownDocumentIdentity("gallery-code", 1),
+          "# Release notes\n\n- Preserve **native input**\n- Search 中文 source\n- Keep `offsets` exact");
+        _ = codeEditor.FindNext("native input");
+        panel.Children.Add(codeEditor);
+        break;
+      case "value-picker":
+        panel.Children.Add(new FsusSlider
+        {
+          AccessibleName = "Editor font size",
+          AccessibleValueText = "20 pixels",
+          Min = 12,
+          Max = 32,
+          Step = 1,
+          Value = 20,
+        });
+        panel.Children.Add(new FsusSlider
+        {
+          AccessibleName = "Disabled auto-save delay",
+          AccessibleValueText = "5 seconds",
+          Min = 1,
+          Max = 10,
+          Step = 1,
+          Value = 5,
+          IsDisabled = true,
+        });
+        break;
       case "markdown-editor":
         const string galleryMarkdown = "# Gallery\n\n中文 markdown editor";
         var markdownEditor = new FsusMarkdownEditor
@@ -179,6 +215,9 @@ public static class FsusAvaloniaGalleryRegistry
         panel.Children.Add(upload);
         panel.Children.Add(dropZone);
         break;
+      case "picker":
+        AddProductionSelectStates(panel);
+        break;
       case "locale-formatting":
         var provider = FsusAvaloniaLocaleProvider.CreateDefault();
         provider.SetCulture("zh-cn");
@@ -191,6 +230,46 @@ public static class FsusAvaloniaGalleryRegistry
         break;
     }
   }
+
+  private static void AddProductionSelectStates(StackPanel panel)
+  {
+    var zoom = new FsusSelect
+    {
+      AccessibleName = "Editor zoom",
+      Width = 280,
+      HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left,
+      ItemsSource = new[]
+      {
+        new GallerySelectOption(80, "80%"),
+        new GallerySelectOption(100, "100%"),
+        new GallerySelectOption(125, "125%"),
+        new GallerySelectOption(150, "150%"),
+      },
+      DisplayMemberPath = nameof(GallerySelectOption.Label),
+      SelectedValuePath = nameof(GallerySelectOption.Value),
+      SelectedValue = 100,
+    };
+    var dependent = new FsusSelect
+    {
+      AccessibleName = "Custom zoom preset",
+      Width = 280,
+      HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left,
+      ItemsSource = new[] { "Fit page", "Fit width", "Actual size" },
+      SelectedValue = "Fit page",
+      IsEnabled = false,
+    };
+
+    panel.Children.Add(new TextBlock { Text = "Editor zoom / 編輯器縮放" });
+    panel.Children.Add(zoom);
+    panel.Children.Add(new CheckBox
+    {
+      Content = "Use custom zoom preset",
+      IsChecked = false,
+    });
+    panel.Children.Add(dependent);
+  }
+
+  private sealed record GallerySelectOption(int Value, string Label);
 
   private static void AddPerceptionCharacterStates(StackPanel panel)
   {
