@@ -4,6 +4,7 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -46,6 +47,7 @@ public class FsusTabs : TabControl
     AvaloniaProperty.Register<FsusTabs, string?>(nameof(AccessibleName));
 
   private readonly ObservableCollection<FsusTabPane> panes = [];
+  private bool paneSelectionCommitPending;
 
   public FsusTabs()
   {
@@ -209,14 +211,12 @@ public class FsusTabs : TabControl
     {
       SelectedKey = string.Empty;
       FocusedKey = string.Empty;
-      SelectedItem = null;
     }
     else
     {
       if (!panes.Any((pane) => pane.Key == SelectedKey && pane.IsEnabled))
       {
         SelectedKey = firstEnabled.Key;
-        SelectedItem = firstEnabled;
       }
 
       if (!panes.Any((pane) => pane.Key == FocusedKey && pane.IsEnabled))
@@ -226,6 +226,27 @@ public class FsusTabs : TabControl
     }
 
     SyncPanes();
+    SchedulePaneSelectionCommit();
+  }
+
+  private void SchedulePaneSelectionCommit()
+  {
+    if (paneSelectionCommitPending)
+    {
+      return;
+    }
+
+    paneSelectionCommitPending = true;
+    Dispatcher.UIThread.Post(() =>
+    {
+      paneSelectionCommitPending = false;
+      var selectedPane = panes.FirstOrDefault(
+        (pane) => pane.Key == SelectedKey && pane.IsEnabled);
+      if (!ReferenceEquals(SelectedItem, selectedPane))
+      {
+        SelectedItem = selectedPane;
+      }
+    });
   }
 
   private void SyncPanes()
