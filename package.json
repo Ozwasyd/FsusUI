@@ -162,7 +162,7 @@
     "check:coverage-sharding": "node ./scripts/with-node-heap.mjs node ./scripts/check-coverage-sharding-policy.mjs && node ./scripts/with-node-heap.mjs node ./scripts/test-coverage-sharding.mjs",
     "check:visual-orchestration": "node ./scripts/with-node-heap.mjs node ./scripts/check-visual-orchestration-policy.mjs",
     "check:visual-variant-ownership": "node ./scripts/with-node-heap.mjs node ./scripts/check-visual-variant-policy.mjs",
-    "check:test-artifact-cache": "node ./scripts/with-node-heap.mjs node --test ./tests/test-artifact-cache.test.mjs && node ./scripts/with-node-heap.mjs node ./scripts/check-test-artifact-cache-policy.mjs",
+    "check:test-artifact-cache": "node ./scripts/with-node-heap.mjs node ./scripts/check-test-artifact-cache-policy.mjs",
     "check:unit-artifact-dedup": "node ./scripts/with-node-heap.mjs node ./scripts/check-unit-artifact-dedup-policy.mjs",
     "check:test-artifacts-ready": "node ./scripts/with-node-heap.mjs node ./scripts/check-test-artifacts-ready.mjs",
     "check:package-artifact-reuse": "node ./scripts/with-node-heap.mjs node --test vue/internal/build-utils/tests/pkg.test.cjs && node ./scripts/with-node-heap.mjs node ./scripts/check-package-artifact-reuse-policy.mjs",

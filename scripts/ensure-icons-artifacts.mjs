@@ -47,18 +47,14 @@ console.log(
   ].join('\n'),
 )
 
-const build = spawnSync(
-  'pnpm',
-  ['run', '-C', 'vue/packages/icons-vue', 'build'],
-  {
-    cwd: root,
-    stdio: 'inherit',
-    shell: process.platform === 'win32',
-  },
-)
+const build = spawnSync('pnpm', ['run', '-C', 'vue/packages/icons-vue', 'build'], {
+  cwd: root,
+  stdio: 'inherit',
+  shell: process.platform === 'win32',
+})
 
 if (build.status !== 0) {
   process.exit(build.status ?? 1)
 }
 
-await writeFingerprint(fingerprint)
+await writeFingerprint(fingerprint.fingerprintPath, fingerprint.currentFingerprint)
