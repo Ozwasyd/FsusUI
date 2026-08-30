@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "6fea4b9ab967ac6eeefb2486b930a5e7928e08954ec0e518139173093fff638e",
+      "hash": "04a3ca51b6e24d8ad520aeb78a9b42522ce301286070e6185eefd621e8ed886f",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -49196,6 +49196,33 @@
       ],
       "operations": [
         {
+          "name": "applyAttachmentResult",
+          "kind": "operation",
+          "web": {
+            "member": "applyAttachmentResult",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.apply-attachment-result"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "dispatchTransaction",
           "kind": "operation",
           "web": {
@@ -49924,6 +49951,17 @@
           }
         },
         {
+          "member": "applyAttachmentResult",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "insertMarkdownAtCursor",
           "kind": "operation",
           "status": "missing",
@@ -50206,6 +50244,7 @@
         "scenario.v2.el-markdown-editor.output.submit",
         "scenario.v2.el-markdown-editor.output.transaction",
         "scenario.v2.el-markdown-editor.output.upload-image",
+        "scenario.v2.el-markdown-editor.operation.apply-attachment-result",
         "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
         "scenario.v2.el-markdown-editor.operation.insert-markdown-at-cursor",
         "scenario.v2.el-markdown-editor.operation.redo",
@@ -50230,12 +50269,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 54,
+        "total": 55,
         "alignedCandidate": 6,
         "partial": 4,
-        "missing": 44,
+        "missing": 45,
         "webOnly": 0,
-        "mappedPercent": 18.5
+        "mappedPercent": 18.2
       },
       "markdownEditor": {
         "modes": [
@@ -139038,9 +139077,9 @@
   "coverage": {
     "aligned-candidate": 57,
     "partial": 79,
-    "missing": 2024,
+    "missing": 2025,
     "web-only": 20,
-    "total": 2180,
+    "total": 2181,
     "mappedPercent": 6.2
   }
 }
