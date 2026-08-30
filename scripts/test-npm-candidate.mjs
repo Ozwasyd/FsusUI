@@ -1,9 +1,12 @@
 import {
   appendFileSync,
   cpSync,
+  existsSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
+  renameSync,
   rmSync,
   writeFileSync,
 } from 'node:fs'
@@ -15,6 +18,7 @@ import {
   candidateTarballName,
   compareCandidates,
   createCandidate,
+  moveCandidateTarball,
   verifyCandidate,
 } from './npm-candidate-lib.mjs'
 
@@ -90,6 +94,86 @@ function createFixture(name, packageOverrides = {}) {
 }
 
 try {
+  const crossDeviceSource = path.join(tempRoot, 'cross-device-source.tgz')
+  const crossDeviceDestination = path.join(
+    tempRoot,
+    'cross-device-output',
+    candidateTarballName,
+  )
+  mkdirSync(path.dirname(crossDeviceDestination), { recursive: true })
+  writeFileSync(crossDeviceSource, 'candidate-bytes')
+  let simulatedCrossDeviceRename = true
+  moveCandidateTarball(crossDeviceSource, crossDeviceDestination, {
+    rename(source, destination) {
+      if (simulatedCrossDeviceRename) {
+        simulatedCrossDeviceRename = false
+        const error = new Error('simulated cross-device move')
+        error.code = 'EXDEV'
+        throw error
+      }
+      renameSync(source, destination)
+    },
+  })
+  if (
+    existsSync(crossDeviceSource) ||
+    readFileSync(crossDeviceDestination, 'utf8') !== 'candidate-bytes' ||
+    readdirSync(path.dirname(crossDeviceDestination)).some((name) =>
+      name.startsWith('.fsusui-candidate-move-'),
+    )
+  ) {
+    throw new Error(
+      'Cross-device candidate move did not preserve bytes and cleanup.',
+    )
+  }
+
+  const failedSource = path.join(tempRoot, 'failed-cross-device-source.tgz')
+  const failedDestination = path.join(
+    tempRoot,
+    'failed-cross-device-output',
+    candidateTarballName,
+  )
+  mkdirSync(path.dirname(failedDestination), { recursive: true })
+  writeFileSync(failedSource, 'must-not-publish')
+  assertThrows(
+    () =>
+      moveCandidateTarball(failedSource, failedDestination, {
+        copyFile() {
+          throw new Error('simulated copy failure')
+        },
+        rename() {
+          const error = new Error('simulated cross-device move')
+          error.code = 'EXDEV'
+          throw error
+        },
+      }),
+    /simulated copy failure/iu,
+    'cross-device copy failure fixture',
+  )
+  if (
+    !existsSync(failedSource) ||
+    existsSync(failedDestination) ||
+    readdirSync(path.dirname(failedDestination)).some((name) =>
+      name.startsWith('.fsusui-candidate-move-'),
+    )
+  ) {
+    throw new Error(
+      'Failed cross-device move left a canonical or staging artifact.',
+    )
+  }
+
+  assertThrows(
+    () =>
+      moveCandidateTarball('source', 'destination', {
+        rename() {
+          const error = new Error('simulated permission failure')
+          error.code = 'EACCES'
+          throw error
+        },
+      }),
+    /simulated permission failure/iu,
+    'non-cross-device move failure fixture',
+  )
+
   const valid = createFixture('valid')
   verifyCandidate({
     repoRoot,
@@ -246,7 +330,7 @@ try {
     'reproducibility mismatch fixture',
   )
 
-  console.log('[npm-candidate] 10 fixture scenarios passed')
+  console.log('[npm-candidate] 13 fixture scenarios passed')
 } finally {
   rmSync(tempRoot, { force: true, recursive: true })
 }
