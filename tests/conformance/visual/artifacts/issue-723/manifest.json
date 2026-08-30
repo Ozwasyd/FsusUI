@@ -1,0 +1,749 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "FsusNotificationHeadlessTests.ProductionThemeRenderCapturesThemeAndDensityMatrix",
+  "repository": "Ozwasyd/FsusUI",
+  "issue": 723,
+  "candidateRevision": "0fd2f09395566ee71f268b9c992eeeb16909ff68",
+  "renderer": "avalonia-headless-skia",
+  "limitation": "Deterministic local simulation; no physical display, native window compositor, touch hardware, or screen reader was available.",
+  "captures": [
+    {
+      "File": "notification-light-compact.png",
+      "Theme": "light",
+      "Density": "compact",
+      "Sha256": "694d94bcb1beff2c2e990e43f93c99d80b6c8c9625604447a8a9c8e8d34b9d45",
+      "ActionBounds": {
+        "X": 226,
+        "Y": 9,
+        "Width": 57,
+        "Height": 40,
+        "Position": {
+          "X": 226,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 1.425,
+          "Width": 57,
+          "Height": 40
+        },
+        "Right": 283,
+        "Bottom": 49,
+        "Left": 226,
+        "Top": 9,
+        "TopLeft": {
+          "X": 226,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 283,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 226,
+          "Y": 49
+        },
+        "BottomRight": {
+          "X": 283,
+          "Y": 49
+        },
+        "Center": {
+          "X": 254.5,
+          "Y": 29
+        }
+      },
+      "DismissBounds": {
+        "X": 287,
+        "Y": 9,
+        "Width": 24,
+        "Height": 40,
+        "Position": {
+          "X": 287,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 0.6,
+          "Width": 24,
+          "Height": 40
+        },
+        "Right": 311,
+        "Bottom": 49,
+        "Left": 287,
+        "Top": 9,
+        "TopLeft": {
+          "X": 287,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 311,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 287,
+          "Y": 49
+        },
+        "BottomRight": {
+          "X": 311,
+          "Y": 49
+        },
+        "Center": {
+          "X": 299,
+          "Y": 29
+        }
+      },
+      "NotificationBounds": {
+        "X": 280,
+        "Y": 0,
+        "Width": 320,
+        "Height": 80,
+        "Position": {
+          "X": 280,
+          "Y": 0
+        },
+        "Size": {
+          "AspectRatio": 4,
+          "Width": 320,
+          "Height": 80
+        },
+        "Right": 600,
+        "Bottom": 80,
+        "Left": 280,
+        "Top": 0,
+        "TopLeft": {
+          "X": 280,
+          "Y": 0
+        },
+        "TopRight": {
+          "X": 600,
+          "Y": 0
+        },
+        "BottomLeft": {
+          "X": 280,
+          "Y": 80
+        },
+        "BottomRight": {
+          "X": 600,
+          "Y": 80
+        },
+        "Center": {
+          "X": 440,
+          "Y": 40
+        }
+      }
+    },
+    {
+      "File": "notification-light-default.png",
+      "Theme": "light",
+      "Density": "default",
+      "Sha256": "12e92864925dd0fd568480f5ce2dace0afcd98ec8cd60aaf1557658cb4e0f076",
+      "ActionBounds": {
+        "X": 226,
+        "Y": 9,
+        "Width": 57,
+        "Height": 44,
+        "Position": {
+          "X": 226,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 1.2954545454545454,
+          "Width": 57,
+          "Height": 44
+        },
+        "Right": 283,
+        "Bottom": 53,
+        "Left": 226,
+        "Top": 9,
+        "TopLeft": {
+          "X": 226,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 283,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 226,
+          "Y": 53
+        },
+        "BottomRight": {
+          "X": 283,
+          "Y": 53
+        },
+        "Center": {
+          "X": 254.5,
+          "Y": 31
+        }
+      },
+      "DismissBounds": {
+        "X": 287,
+        "Y": 9,
+        "Width": 24,
+        "Height": 44,
+        "Position": {
+          "X": 287,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 0.5454545454545454,
+          "Width": 24,
+          "Height": 44
+        },
+        "Right": 311,
+        "Bottom": 53,
+        "Left": 287,
+        "Top": 9,
+        "TopLeft": {
+          "X": 287,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 311,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 287,
+          "Y": 53
+        },
+        "BottomRight": {
+          "X": 311,
+          "Y": 53
+        },
+        "Center": {
+          "X": 299,
+          "Y": 31
+        }
+      },
+      "NotificationBounds": {
+        "X": 280,
+        "Y": 0,
+        "Width": 320,
+        "Height": 80,
+        "Position": {
+          "X": 280,
+          "Y": 0
+        },
+        "Size": {
+          "AspectRatio": 4,
+          "Width": 320,
+          "Height": 80
+        },
+        "Right": 600,
+        "Bottom": 80,
+        "Left": 280,
+        "Top": 0,
+        "TopLeft": {
+          "X": 280,
+          "Y": 0
+        },
+        "TopRight": {
+          "X": 600,
+          "Y": 0
+        },
+        "BottomLeft": {
+          "X": 280,
+          "Y": 80
+        },
+        "BottomRight": {
+          "X": 600,
+          "Y": 80
+        },
+        "Center": {
+          "X": 440,
+          "Y": 40
+        }
+      }
+    },
+    {
+      "File": "notification-light-spacious.png",
+      "Theme": "light",
+      "Density": "spacious",
+      "Sha256": "a197849348531c8beee0de838e9546042461f40828b31996f09bed8337c9fc1d",
+      "ActionBounds": {
+        "X": 226,
+        "Y": 9,
+        "Width": 57,
+        "Height": 48,
+        "Position": {
+          "X": 226,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 1.1875,
+          "Width": 57,
+          "Height": 48
+        },
+        "Right": 283,
+        "Bottom": 57,
+        "Left": 226,
+        "Top": 9,
+        "TopLeft": {
+          "X": 226,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 283,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 226,
+          "Y": 57
+        },
+        "BottomRight": {
+          "X": 283,
+          "Y": 57
+        },
+        "Center": {
+          "X": 254.5,
+          "Y": 33
+        }
+      },
+      "DismissBounds": {
+        "X": 287,
+        "Y": 9,
+        "Width": 24,
+        "Height": 48,
+        "Position": {
+          "X": 287,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 0.5,
+          "Width": 24,
+          "Height": 48
+        },
+        "Right": 311,
+        "Bottom": 57,
+        "Left": 287,
+        "Top": 9,
+        "TopLeft": {
+          "X": 287,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 311,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 287,
+          "Y": 57
+        },
+        "BottomRight": {
+          "X": 311,
+          "Y": 57
+        },
+        "Center": {
+          "X": 299,
+          "Y": 33
+        }
+      },
+      "NotificationBounds": {
+        "X": 280,
+        "Y": 0,
+        "Width": 320,
+        "Height": 80,
+        "Position": {
+          "X": 280,
+          "Y": 0
+        },
+        "Size": {
+          "AspectRatio": 4,
+          "Width": 320,
+          "Height": 80
+        },
+        "Right": 600,
+        "Bottom": 80,
+        "Left": 280,
+        "Top": 0,
+        "TopLeft": {
+          "X": 280,
+          "Y": 0
+        },
+        "TopRight": {
+          "X": 600,
+          "Y": 0
+        },
+        "BottomLeft": {
+          "X": 280,
+          "Y": 80
+        },
+        "BottomRight": {
+          "X": 600,
+          "Y": 80
+        },
+        "Center": {
+          "X": 440,
+          "Y": 40
+        }
+      }
+    },
+    {
+      "File": "notification-dark-compact.png",
+      "Theme": "dark",
+      "Density": "compact",
+      "Sha256": "6160f4eac5e63593a4c7104575ca261f81bea68a7bf8506d4a781936ab4116c2",
+      "ActionBounds": {
+        "X": 226,
+        "Y": 9,
+        "Width": 57,
+        "Height": 40,
+        "Position": {
+          "X": 226,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 1.425,
+          "Width": 57,
+          "Height": 40
+        },
+        "Right": 283,
+        "Bottom": 49,
+        "Left": 226,
+        "Top": 9,
+        "TopLeft": {
+          "X": 226,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 283,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 226,
+          "Y": 49
+        },
+        "BottomRight": {
+          "X": 283,
+          "Y": 49
+        },
+        "Center": {
+          "X": 254.5,
+          "Y": 29
+        }
+      },
+      "DismissBounds": {
+        "X": 287,
+        "Y": 9,
+        "Width": 24,
+        "Height": 40,
+        "Position": {
+          "X": 287,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 0.6,
+          "Width": 24,
+          "Height": 40
+        },
+        "Right": 311,
+        "Bottom": 49,
+        "Left": 287,
+        "Top": 9,
+        "TopLeft": {
+          "X": 287,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 311,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 287,
+          "Y": 49
+        },
+        "BottomRight": {
+          "X": 311,
+          "Y": 49
+        },
+        "Center": {
+          "X": 299,
+          "Y": 29
+        }
+      },
+      "NotificationBounds": {
+        "X": 280,
+        "Y": 0,
+        "Width": 320,
+        "Height": 80,
+        "Position": {
+          "X": 280,
+          "Y": 0
+        },
+        "Size": {
+          "AspectRatio": 4,
+          "Width": 320,
+          "Height": 80
+        },
+        "Right": 600,
+        "Bottom": 80,
+        "Left": 280,
+        "Top": 0,
+        "TopLeft": {
+          "X": 280,
+          "Y": 0
+        },
+        "TopRight": {
+          "X": 600,
+          "Y": 0
+        },
+        "BottomLeft": {
+          "X": 280,
+          "Y": 80
+        },
+        "BottomRight": {
+          "X": 600,
+          "Y": 80
+        },
+        "Center": {
+          "X": 440,
+          "Y": 40
+        }
+      }
+    },
+    {
+      "File": "notification-dark-default.png",
+      "Theme": "dark",
+      "Density": "default",
+      "Sha256": "6a4b83888c911f6948608f38efcfc0e9766457019729b08d72cd029f44aa1789",
+      "ActionBounds": {
+        "X": 226,
+        "Y": 9,
+        "Width": 57,
+        "Height": 44,
+        "Position": {
+          "X": 226,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 1.2954545454545454,
+          "Width": 57,
+          "Height": 44
+        },
+        "Right": 283,
+        "Bottom": 53,
+        "Left": 226,
+        "Top": 9,
+        "TopLeft": {
+          "X": 226,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 283,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 226,
+          "Y": 53
+        },
+        "BottomRight": {
+          "X": 283,
+          "Y": 53
+        },
+        "Center": {
+          "X": 254.5,
+          "Y": 31
+        }
+      },
+      "DismissBounds": {
+        "X": 287,
+        "Y": 9,
+        "Width": 24,
+        "Height": 44,
+        "Position": {
+          "X": 287,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 0.5454545454545454,
+          "Width": 24,
+          "Height": 44
+        },
+        "Right": 311,
+        "Bottom": 53,
+        "Left": 287,
+        "Top": 9,
+        "TopLeft": {
+          "X": 287,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 311,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 287,
+          "Y": 53
+        },
+        "BottomRight": {
+          "X": 311,
+          "Y": 53
+        },
+        "Center": {
+          "X": 299,
+          "Y": 31
+        }
+      },
+      "NotificationBounds": {
+        "X": 280,
+        "Y": 0,
+        "Width": 320,
+        "Height": 80,
+        "Position": {
+          "X": 280,
+          "Y": 0
+        },
+        "Size": {
+          "AspectRatio": 4,
+          "Width": 320,
+          "Height": 80
+        },
+        "Right": 600,
+        "Bottom": 80,
+        "Left": 280,
+        "Top": 0,
+        "TopLeft": {
+          "X": 280,
+          "Y": 0
+        },
+        "TopRight": {
+          "X": 600,
+          "Y": 0
+        },
+        "BottomLeft": {
+          "X": 280,
+          "Y": 80
+        },
+        "BottomRight": {
+          "X": 600,
+          "Y": 80
+        },
+        "Center": {
+          "X": 440,
+          "Y": 40
+        }
+      }
+    },
+    {
+      "File": "notification-dark-spacious.png",
+      "Theme": "dark",
+      "Density": "spacious",
+      "Sha256": "22f33100e2933e5bf7356ba21666ed4ac31ec37a5eb70335171c96ea1e359e48",
+      "ActionBounds": {
+        "X": 226,
+        "Y": 9,
+        "Width": 57,
+        "Height": 48,
+        "Position": {
+          "X": 226,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 1.1875,
+          "Width": 57,
+          "Height": 48
+        },
+        "Right": 283,
+        "Bottom": 57,
+        "Left": 226,
+        "Top": 9,
+        "TopLeft": {
+          "X": 226,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 283,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 226,
+          "Y": 57
+        },
+        "BottomRight": {
+          "X": 283,
+          "Y": 57
+        },
+        "Center": {
+          "X": 254.5,
+          "Y": 33
+        }
+      },
+      "DismissBounds": {
+        "X": 287,
+        "Y": 9,
+        "Width": 24,
+        "Height": 48,
+        "Position": {
+          "X": 287,
+          "Y": 9
+        },
+        "Size": {
+          "AspectRatio": 0.5,
+          "Width": 24,
+          "Height": 48
+        },
+        "Right": 311,
+        "Bottom": 57,
+        "Left": 287,
+        "Top": 9,
+        "TopLeft": {
+          "X": 287,
+          "Y": 9
+        },
+        "TopRight": {
+          "X": 311,
+          "Y": 9
+        },
+        "BottomLeft": {
+          "X": 287,
+          "Y": 57
+        },
+        "BottomRight": {
+          "X": 311,
+          "Y": 57
+        },
+        "Center": {
+          "X": 299,
+          "Y": 33
+        }
+      },
+      "NotificationBounds": {
+        "X": 280,
+        "Y": 0,
+        "Width": 320,
+        "Height": 80,
+        "Position": {
+          "X": 280,
+          "Y": 0
+        },
+        "Size": {
+          "AspectRatio": 4,
+          "Width": 320,
+          "Height": 80
+        },
+        "Right": 600,
+        "Bottom": 80,
+        "Left": 280,
+        "Top": 0,
+        "TopLeft": {
+          "X": 280,
+          "Y": 0
+        },
+        "TopRight": {
+          "X": 600,
+          "Y": 0
+        },
+        "BottomLeft": {
+          "X": 280,
+          "Y": 80
+        },
+        "BottomRight": {
+          "X": 600,
+          "Y": 80
+        },
+        "Center": {
+          "X": 440,
+          "Y": 40
+        }
+      }
+    }
+  ]
+}
