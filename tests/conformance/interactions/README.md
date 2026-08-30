@@ -1,7 +1,9 @@
 # Interaction conformance scenarios
 
-Interaction conformance scenarios are the shared source for Web Playwright
-coverage and Avalonia headless xUnit coverage.
+Interaction conformance scenarios are planning inputs for Web and Avalonia
+execution. Their generated metadata is explicitly excluded from executable
+coverage; real coverage comes from platform runners such as
+`pnpm run conformance:v2`.
 
 ## Schema
 
@@ -34,10 +36,8 @@ Run `pnpm run interactions:generate` after editing scenario files. The generator
 writes:
 
 - `tests/conformance/interactions/generated/normalized-traces.json`
-- `tests/conformance/interactions/generated/web.generated.spec.ts`
-- `dotnet/FsusUI.Avalonia.HeadlessTests/Generated/InteractionConformanceTests.cs`
 - `tests/conformance/interactions/generated/run-interaction-conformance.mjs`
 
 `pnpm run conformance:interactions` checks deterministic output, validates
-negative fixtures, and executes the generated runner. Stable component issues
+negative fixtures, and validates the planning manifest. Stable component issues
 must add or update scenario coverage when they add interaction behavior.

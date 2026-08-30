@@ -33,6 +33,69 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
 
 jobs:
+  pr-avalonia-aot-plan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.plan.outputs.run }}
+      reason: ${{ steps.plan.outputs.reason }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Plan Native AOT impact
+        id: plan
+        run: |
+          mkdir -p .tmp
+          git diff --name-only '${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}' > .tmp/avalonia-aot-paths.txt
+          node scripts/avalonia-aot-native.mjs affected --paths .tmp/avalonia-aot-paths.txt --out .tmp/avalonia-aot-impact.json --github-output "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-aot-impact-plan
+          path: .tmp/avalonia-aot-impact.json
+
+  pr-avalonia-aot-candidate:
+    if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
+    needs: pr-avalonia-aot-plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      candidate-digest: ${{ steps.candidate.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - name: Build the immutable NuGet candidate once
+        id: candidate
+        env:
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node scripts/dotnet-package-verify.mjs
+          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr-dotnet-nuget-candidate
+          path: dotnet/artifacts
+          retention-days: 1
+
+  pr-avalonia-aot:
+    if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
+    needs:
+      - pr-avalonia-aot-plan
+      - pr-avalonia-aot-candidate
+    uses: ./.github/workflows/_avalonia-aot-leaf.yml
+    with:
+      group: pr-fast
+      candidate-artifact: pr-dotnet-nuget-candidate
+      candidate-digest: ${{ needs.pr-avalonia-aot-candidate.outputs.candidate-digest }}
+      commit-sha: ${{ github.event.pull_request.head.sha }}
+      rid: linux-x64
+
   pr-feedback:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest

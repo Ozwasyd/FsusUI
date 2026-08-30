@@ -648,7 +648,15 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     title: 'Bold',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '**', '**', 'text') }),
+    run: (context) => ({
+      transaction: wrapSelection(
+        context.value,
+        context.selection,
+        '**',
+        '**',
+        'text',
+      ),
+    }),
   },
   {
     key: 'italic',
@@ -659,7 +667,15 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     title: 'Italic',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '*', '*', 'text') }),
+    run: (context) => ({
+      transaction: wrapSelection(
+        context.value,
+        context.selection,
+        '*',
+        '*',
+        'text',
+      ),
+    }),
   },
   {
     key: 'heading',
@@ -670,7 +686,9 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     title: 'Heading',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: prefixSelectedLines(context.value, context.selection, '## ') }),
+    run: (context) => ({
+      transaction: prefixSelectedLines(context.value, context.selection, '## '),
+    }),
   },
   {
     key: 'quote',
@@ -680,7 +698,9 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     title: 'Quote',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: prefixSelectedLines(context.value, context.selection, '> ') }),
+    run: (context) => ({
+      transaction: prefixSelectedLines(context.value, context.selection, '> '),
+    }),
   },
   {
     key: 'code',
@@ -691,7 +711,15 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     title: 'Code',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '`', '`', 'code') }),
+    run: (context) => ({
+      transaction: wrapSelection(
+        context.value,
+        context.selection,
+        '`',
+        '`',
+        'code',
+      ),
+    }),
   },
   {
     key: 'link',
@@ -702,7 +730,15 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     title: 'Link',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '[', '](https://example.com)', 'label') }),
+    run: (context) => ({
+      transaction: wrapSelection(
+        context.value,
+        context.selection,
+        '[',
+        '](https://example.com)',
+        'label',
+      ),
+    }),
   },
   {
     key: 'image',
@@ -712,13 +748,15 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     title: '插入图片',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(
+    run: (context) => ({
+      transaction: wrapSelection(
         context.value,
         context.selection,
         '![',
         '](https://example.com/image.png)',
         'alt',
-      ) }),
+      ),
+    }),
   },
   {
     key: 'paste-as-markdown',
@@ -740,22 +778,38 @@ export const isMarkdownEditorCommandVisible = (
 export const isMarkdownEditorCommandEnabled = (
   command: MarkdownEditorCommand,
   context: MarkdownEditorCommandContext,
-) => !context.readonly && !context.signal.aborted && (command.enabled?.(context) ?? true)
+) =>
+  !context.readonly &&
+  !context.signal.aborted &&
+  (command.enabled?.(context) ?? true)
 
 export const getMarkdownEditorCommand = (
-  commands: readonly MarkdownEditorCommand[], key: string,
+  commands: readonly MarkdownEditorCommand[],
+  key: string,
 ) => commands.find((command) => command.key === key)
 
 export const filterMarkdownEditorCommands = (
-  commands: readonly MarkdownEditorCommand[], context: MarkdownEditorCommandContext,
+  commands: readonly MarkdownEditorCommand[],
+  context: MarkdownEditorCommandContext,
   presentation?: MarkdownEditorCommandPresentation,
-) => commands.filter((command) => isMarkdownEditorCommandVisible(command, context) && (!presentation || !command.presentation || command.presentation.includes(presentation)))
+) =>
+  commands.filter(
+    (command) =>
+      isMarkdownEditorCommandVisible(command, context) &&
+      (!presentation ||
+        !command.presentation ||
+        command.presentation.includes(presentation)),
+  )
 
 export const resolveMarkdownEditorShortcut = (
-  commands: readonly MarkdownEditorCommand[], shortcut: string,
+  commands: readonly MarkdownEditorCommand[],
+  shortcut: string,
 ) => {
-  const matches = commands.filter((command) => command.shortcut?.toLowerCase() === shortcut.toLowerCase())
-  if (matches.length > 1) throw new Error(`Markdown editor shortcut conflict: ${shortcut}`)
+  const matches = commands.filter(
+    (command) => command.shortcut?.toLowerCase() === shortcut.toLowerCase(),
+  )
+  if (matches.length > 1)
+    throw new Error(`Markdown editor shortcut conflict: ${shortcut}`)
   return matches[0]
 }
 
@@ -763,7 +817,11 @@ export const runMarkdownEditorCommand = async (
   command: MarkdownEditorCommand,
   context: MarkdownEditorCommandContext,
 ) => {
-  if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return undefined
+  if (
+    !isMarkdownEditorCommandVisible(command, context) ||
+    !isMarkdownEditorCommandEnabled(command, context)
+  )
+    return undefined
   return await command.run(context)
 }
 
@@ -771,6 +829,10 @@ export const markdownEditorProps = buildProps({
   modelValue: {
     type: String,
     default: '',
+  },
+  documentIdentity: {
+    type: definePropType<MarkdownEditorDocumentIdentity>(Object),
+    default: undefined,
   },
   defaultMode: {
     type: String as PropType<MarkdownEditorMode>,
@@ -914,7 +976,10 @@ export const markdownEditorEmits = {
   [CHANGE_EVENT]: (value: string) => typeof value === 'string',
   command: (command: MarkdownEditorCommand) => Boolean(command?.key),
   'mode-change': (mode: MarkdownEditorMode) =>
-    mode === 'source' || mode === 'live' || mode === 'split' || mode === 'preview',
+    mode === 'source' ||
+    mode === 'live' ||
+    mode === 'split' ||
+    mode === 'preview',
   save: (value: string) => typeof value === 'string',
   submit: (value: string) => typeof value === 'string',
   'upload-image': (_batch?: MarkdownAttachmentBatchIntent) => true,

@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "9956a6c412bf4decb23c20f85a28061b5a4cd27c708a5e038f48c1b441728b5a",
+      "hash": "6fea4b9ab967ac6eeefb2486b930a5e7928e08954ec0e518139173093fff638e",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -47633,6 +47633,51 @@
           }
         },
         {
+          "name": "documentIdentity",
+          "kind": "input",
+          "web": {
+            "member": "documentIdentity",
+            "categories": [
+              "object"
+            ],
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorDocumentIdentity",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": {
+            "member": "DocumentIdentity",
+            "categories": [
+              "FsusMarkdownDocumentIdentity"
+            ],
+            "type": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
+            "nullable": true
+          },
+          "status": "partial",
+          "drift": {
+            "type": "web object vs avalonia FsusMarkdownDocumentIdentity",
+            "default": null,
+            "nullability": "web nullable=false vs avalonia nullable=true",
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.document-identity"
+          ],
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "editorProfile",
           "kind": "input",
           "web": {
@@ -49439,6 +49484,17 @@
           }
         },
         {
+          "member": "documentIdentity",
+          "kind": "input",
+          "status": "partial",
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "editorProfile",
           "kind": "input",
           "status": "missing",
@@ -49944,19 +50000,6 @@
           ]
         },
         {
-          "member": "DocumentIdentity",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-markdown-editor.avalonia-extra.document-identity"
-          ]
-        },
-        {
           "member": "IsReadOnly",
           "kind": "avalonia-extra",
           "governance": {
@@ -50120,6 +50163,7 @@
         "scenario.v2.el-markdown-editor.input.commands",
         "scenario.v2.el-markdown-editor.input.default-mode",
         "scenario.v2.el-markdown-editor.input.disabled",
+        "scenario.v2.el-markdown-editor.input.document-identity",
         "scenario.v2.el-markdown-editor.input.editor-profile",
         "scenario.v2.el-markdown-editor.input.image-action-label",
         "scenario.v2.el-markdown-editor.input.interaction-profile",
@@ -50186,12 +50230,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 53,
+        "total": 54,
         "alignedCandidate": 6,
-        "partial": 3,
+        "partial": 4,
         "missing": 44,
         "webOnly": 0,
-        "mappedPercent": 17
+        "mappedPercent": 18.5
       },
       "markdownEditor": {
         "modes": [
@@ -138897,10 +138941,10 @@
   ],
   "coverage": {
     "aligned-candidate": 57,
-    "partial": 78,
+    "partial": 79,
     "missing": 2024,
     "web-only": 20,
-    "total": 2179,
+    "total": 2180,
     "mappedPercent": 6.2
   }
 }

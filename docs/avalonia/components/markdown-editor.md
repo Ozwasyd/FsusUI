@@ -7,8 +7,10 @@ Component ID: `markdown-editor`
 Use `FsusMarkdownEditor` for the public native Source and Live surface.
 Document, identity, mode, chrome, locale, status density, transaction commands,
 and canonical projection commits share one native input and selection owner.
-Split/Preview, complete platform IME acceptance, and AutomationPeer remain
-partial.
+Split/Preview, complete platform IME acceptance, and atomic-node automation
+actions remain partial. The editor itself exposes native Edit/Value automation
+semantics; its value is writable only while the control is enabled and not
+read-only, and the whole document is not a live region.
 
 ## Native Source and Live projection
 
@@ -122,7 +124,7 @@ editor.CommitProjection(new FsusMarkdownProjectionSnapshot(
 ## Known Limitations
 
 Split/Preview presentation, complete syntax-specific input behavior, real
-native IME matrix acceptance, AutomationPeer semantics, and final AOT
+native IME matrix acceptance, atomic-node AutomationPeer actions, and final AOT
 acceptance remain partial. When no current canonical snapshot exists, Live
 mode intentionally presents localized/current raw source fallback and reports
 `source-fallback`.

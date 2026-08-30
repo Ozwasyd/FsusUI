@@ -200,6 +200,23 @@ const runFixtureChecks = (spec) => {
 
 try {
   const spec = readJson('spec/ci/avalonia-stable-readiness.json')
+  const alignment = readJson('.tmp/conformance-v2/alignment.json')
+  if (alignment.schema !== 'fsusui.alignment.v2') {
+    throw new Error('Contract V2 alignment artifact schema invalid')
+  }
+  const derivedFamilies = alignment.consumers?.galleryStableFamilies ?? []
+  const missingStableFamilies = spec.requiredStableComponentFamilies.filter(
+    (family) => !derivedFamilies.includes(family),
+  )
+  const derivedReleaseReady = missingStableFamilies.length === 0
+  if (
+    alignment.consumers?.nugetStableEligible !== derivedReleaseReady ||
+    alignment.consumers?.releaseReady !== derivedReleaseReady
+  ) {
+    throw new Error(
+      'Avalonia stable readiness consumers do not match derived alignment',
+    )
+  }
   runFixtureChecks(spec)
 
   const packageJson = readJson('package.json')
@@ -230,7 +247,11 @@ try {
     'avalonia stable release evidence',
   )
   validateStableEvidenceBundle(spec)
-  console.log('Avalonia stable readiness check passed.')
+  console.log(
+    missingStableFamilies.length === 0
+      ? 'Avalonia stable readiness check passed: release eligible.'
+      : `Avalonia stable readiness check passed: release blocked by ${missingStableFamilies.length} derived alignment gaps.`,
+  )
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)
   process.exitCode = 1

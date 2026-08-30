@@ -294,3 +294,9 @@ const longEvidenceAttrs = {
   'data-metric-typography': 'long',
 }
 </script>
+
+<style scoped>
+#metric-visual :is(h2, h3) {
+  overflow-wrap: anywhere;
+}
+</style>
