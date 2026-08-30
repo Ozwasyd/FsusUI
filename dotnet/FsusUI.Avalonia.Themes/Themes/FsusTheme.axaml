@@ -49,4 +49,5 @@
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/ProductPrimitives.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/PerceptionChallenge.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Collapse.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/CheckTag.axaml" />
 </Styles>

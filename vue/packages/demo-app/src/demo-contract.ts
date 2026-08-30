@@ -164,6 +164,11 @@ export const resolveDemoRoot = async (
     return { component: CollapseFixture, themeMode }
   }
 
+  if (searchParams.get('checktag') === '1') {
+    const { default: CheckTagFixture } = await import('./CheckTagFixture.vue')
+    return { component: CheckTagFixture, themeMode }
+  }
+
   const { default: App } = await import('./App.vue')
   return {
     component: App,
