@@ -54,6 +54,16 @@
             </Border.Transitions>
           </Border>
           <Border
+            Name="PART_FocusRing"
+            Width="28"
+            Height="28"
+            Background="Transparent"
+            BorderBrush="{DynamicResource FsusThemeFocusBrush}"
+            BorderThickness="{DynamicResource FsusThemeFocusBorderThickness}"
+            CornerRadius="{DynamicResource FsusRadiusPill}"
+            IsHitTestVisible="False"
+            Opacity="0" />
+          <Border
             Name="PART_Thumb"
             Width="20"
             Height="20"
@@ -84,6 +94,11 @@
     <Setter Property="Height" Value="16" />
   </Style>
 
+  <Style Selector="fsus|FsusSlider.fsus-size-sm /template/ Border#PART_FocusRing">
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="24" />
+  </Style>
+
   <Style Selector="fsus|FsusSlider.fsus-size-lg">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlSpaciousY}" />
   </Style>
@@ -91,6 +106,11 @@
   <Style Selector="fsus|FsusSlider.fsus-size-lg /template/ Border#PART_Thumb">
     <Setter Property="Width" Value="24" />
     <Setter Property="Height" Value="24" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-size-lg /template/ Border#PART_FocusRing">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
   </Style>
 
   <Style Selector="fsus|FsusSlider:pointerover /template/ Border#PART_Thumb">
@@ -105,6 +125,10 @@
   <Style Selector="fsus|FsusSlider.fsus-focus-visible /template/ Border#PART_Thumb">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-focus-visible /template/ Border#PART_FocusRing">
+    <Setter Property="Opacity" Value="1" />
   </Style>
 
   <Style Selector="fsus|FsusRate.fsus-selected">

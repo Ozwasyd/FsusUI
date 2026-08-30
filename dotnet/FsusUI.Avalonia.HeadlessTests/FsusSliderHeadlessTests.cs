@@ -150,6 +150,7 @@ public class FsusSliderHeadlessTests
       var track = RequirePart<Border>(slider, FsusSlider.TrackPartName);
       var fill = RequirePart<Border>(slider, FsusSlider.FillPartName);
       var thumb = RequirePart<Border>(slider, FsusSlider.ThumbPartName);
+      var focusRing = RequirePart<Border>(slider, "PART_FocusRing");
       Assert.Equal(expectedHeight, slider.MinHeight);
       Assert.Equal(expectedThumb, thumb.Bounds.Width);
       Assert.Equal(4, track.Bounds.Height);
@@ -164,6 +165,11 @@ public class FsusSliderHeadlessTests
       Assert.Equal(
         window.Resources[FsusThemeResourceKeys.FocusBrush],
         thumb.BorderBrush);
+      Assert.Equal(
+        window.Resources[FsusThemeResourceKeys.FocusBrush],
+        focusRing.BorderBrush);
+      Assert.Equal(1, focusRing.GetBaseValue(Visual.OpacityProperty).Value);
+      Assert.True(focusRing.Bounds.Width > thumb.Bounds.Width);
       Assert.Equal(
         TimeSpan.FromMilliseconds(1),
         window.Resources[FsusThemeResourceKeys.MotionDurationEffective]);

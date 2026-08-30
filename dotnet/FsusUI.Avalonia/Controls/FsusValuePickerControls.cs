@@ -26,8 +26,11 @@ public sealed class FsusNumericValueChangedEventArgs(
 [TemplatePart(Name = TrackPartName, Type = typeof(Border))]
 [TemplatePart(Name = FillPartName, Type = typeof(Border))]
 [TemplatePart(Name = ThumbPartName, Type = typeof(Border))]
+[TemplatePart(Name = FocusRingPartName, Type = typeof(Border))]
 public class FsusSlider : ContentControl
 {
+  private const string FocusRingPartName = "PART_FocusRing";
+
   public const string TrackHostPartName = "PART_TrackHost";
   public const string TrackPartName = "PART_Track";
   public const string FillPartName = "PART_Fill";
@@ -63,6 +66,7 @@ public class FsusSlider : ContentControl
   private Border? trackPart;
   private Border? fillPart;
   private Border? thumbPart;
+  private Border? focusRingPart;
   private IPointer? capturedPointer;
   private double gestureStartValue;
   private double lastValue;
@@ -215,6 +219,7 @@ public class FsusSlider : ContentControl
     trackPart = e.NameScope.Find<Border>(TrackPartName);
     fillPart = e.NameScope.Find<Border>(FillPartName);
     thumbPart = e.NameScope.Find<Border>(ThumbPartName);
+    focusRingPart = e.NameScope.Find<Border>(FocusRingPartName);
     if (trackHostPart is not null)
     {
       trackHostPart.SizeChanged += OnTrackHostSizeChanged;
@@ -394,7 +399,7 @@ public class FsusSlider : ContentControl
   private void UpdateVisuals()
   {
     if (trackHostPart is not { } host || trackPart is null ||
-        fillPart is null || thumbPart is null)
+        fillPart is null || thumbPart is null || focusRingPart is null)
     {
       return;
     }
@@ -406,6 +411,11 @@ public class FsusSlider : ContentControl
     var trackLeft = thumbWidth / 2d;
     var trackTop = Math.Max(0d, (host.Bounds.Height - trackPart.Height) / 2d);
     var thumbTop = Math.Max(0d, (host.Bounds.Height - thumbPart.Height) / 2d);
+    var focusRingWidth = double.IsNaN(focusRingPart.Width)
+      ? Math.Max(0d, focusRingPart.Bounds.Width)
+      : focusRingPart.Width;
+    var focusRingTop = Math.Max(0d, (host.Bounds.Height - focusRingPart.Height) / 2d);
+    var thumbCenter = trackLeft + (trackWidth * ValueRatio);
 
     trackPart.Width = trackWidth;
     Canvas.SetLeft(trackPart, trackLeft);
@@ -413,7 +423,9 @@ public class FsusSlider : ContentControl
     fillPart.Width = trackWidth * ValueRatio;
     Canvas.SetLeft(fillPart, trackLeft);
     Canvas.SetTop(fillPart, trackTop);
-    Canvas.SetLeft(thumbPart, trackLeft + (trackWidth * ValueRatio) - (thumbWidth / 2d));
+    Canvas.SetLeft(focusRingPart, thumbCenter - (focusRingWidth / 2d));
+    Canvas.SetTop(focusRingPart, focusRingTop);
+    Canvas.SetLeft(thumbPart, thumbCenter - (thumbWidth / 2d));
     Canvas.SetTop(thumbPart, thumbTop);
   }
 
