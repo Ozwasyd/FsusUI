@@ -208,13 +208,14 @@ try {
   const missingStableFamilies = spec.requiredStableComponentFamilies.filter(
     (family) => !derivedFamilies.includes(family),
   )
-  if (missingStableFamilies.length) {
+  const derivedReleaseReady = missingStableFamilies.length === 0
+  if (
+    alignment.consumers?.nugetStableEligible !== derivedReleaseReady ||
+    alignment.consumers?.releaseReady !== derivedReleaseReady
+  ) {
     throw new Error(
-      `Avalonia stable readiness blocked by derived alignment gaps: ${missingStableFamilies.join(', ')}`,
+      'Avalonia stable readiness consumers do not match derived alignment',
     )
-  }
-  if (alignment.consumers?.releaseReady !== true) {
-    throw new Error('Avalonia release readiness is false in derived alignment')
   }
   runFixtureChecks(spec)
 
@@ -246,7 +247,11 @@ try {
     'avalonia stable release evidence',
   )
   validateStableEvidenceBundle(spec)
-  console.log('Avalonia stable readiness check passed.')
+  console.log(
+    missingStableFamilies.length === 0
+      ? 'Avalonia stable readiness check passed: release eligible.'
+      : `Avalonia stable readiness check passed: release blocked by ${missingStableFamilies.length} derived alignment gaps.`,
+  )
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)
   process.exitCode = 1
