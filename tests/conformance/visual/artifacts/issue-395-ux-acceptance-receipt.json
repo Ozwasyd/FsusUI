@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "10a327379e3234d3c5399acd0393b1ba7c9c3836a8576c668d212d17f90edf41",
-  "candidateSha": "9d2af5b9cf6c8a9478323d72bf605799be4b62fa",
-  "candidateDigest": "18ebd65d5499f6845e5a3372373caaaa28677462ff1affcd08ecf4ebaddf0137",
+  "classificationReceiptDigest": "eab1ebc37a3becd290493cfc1af15dfaa52d138bfcf10d4b1f27d012e289d0a0",
+  "candidateSha": "616cd36d6bde293e9bf35c5a185fdfaef9c91c08",
+  "candidateDigest": "240441c9d3cfedfdecbade2d3a1b0555b9d4ada77bb767d271d5b48a570b9641",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -17,7 +17,7 @@
   ],
   "activeBaselineIdentityDigest": "ecd166c0627407b28670486a1c535b6764fa02fde4876aa603b55eec4bbe38bd",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "35a1f7f4c7ec9802d61c9261bd91364e96c851b2fc93c97a541f242fbb9522fe",
+  "independenceEvidenceDigest": "d77ce7e73a8d370fcb6d480a76bed24c7eb13c0fe4ce4c9a2153b12e46ed8989",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -40,14 +40,14 @@
       "state": "long-warnings-stacked-actions-focus-and-touch-path",
       "theme": "light",
       "inputModes": ["keyboard", "touch", "screen-reader", "zoom"],
-      "evidenceDigest": "86865977623d95ddc73a6bd6089c167e7e376d888dab367c369907f49af9b5fe"
+      "evidenceDigest": "8dbb5a307b07f9e2b049ec5758ee62e722608aeb913b9be838198e33ec883de9"
     },
     {
       "viewport": "375x812@200%",
       "state": "long-warnings-stacked-actions-focus-and-touch-path",
       "theme": "dark",
       "inputModes": ["keyboard", "touch", "screen-reader", "zoom"],
-      "evidenceDigest": "d81bf51b0719e6ffb96f3c1f9bdd34897e1b82c61145daf007c3a395f86cc961"
+      "evidenceDigest": "86865977623d95ddc73a6bd6089c167e7e376d888dab367c369907f49af9b5fe"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -71,7 +71,7 @@
       "id": "mobile-light-100",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/web/issue-395-markdown-import/mobile-light-100.png",
-      "digest": "86865977623d95ddc73a6bd6089c167e7e376d888dab367c369907f49af9b5fe",
+      "digest": "8dbb5a307b07f9e2b049ec5758ee62e722608aeb913b9be838198e33ec883de9",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -79,7 +79,7 @@
       "id": "mobile-dark-200",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/web/issue-395-markdown-import/mobile-dark-200.png",
-      "digest": "d81bf51b0719e6ffb96f3c1f9bdd34897e1b82c61145daf007c3a395f86cc961",
+      "digest": "86865977623d95ddc73a6bd6089c167e7e376d888dab367c369907f49af9b5fe",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -94,5 +94,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "5379fd572dbf567c6a54232b47182037ab940bee57366d73be66d675481cb1a5"
+  "receiptDigest": "ea2959c38550d5f7c229c2bb6b621e6b386360b312efe005aa302dbcbcb74f07"
 }
