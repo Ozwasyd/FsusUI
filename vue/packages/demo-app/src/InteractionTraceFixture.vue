@@ -38,6 +38,7 @@
         <el-markdown-editor
           ref="markdownEditor"
           v-model="markdownValue"
+          :document-identity="markdownDocumentIdentity"
           :min-rows="6"
           :show-actions="false"
           :show-mode-switcher="false"
@@ -67,6 +68,16 @@
         >
           Undo through exposed method
         </button>
+      </div>
+      <div data-testid="trace-markdown-atomic-editor">
+        <el-markdown-editor
+          v-model="markdownAtomicValue"
+          :document-identity="markdownAtomicIdentity"
+          :min-rows="3"
+          :show-actions="false"
+          :show-mode-switcher="false"
+          default-mode="live"
+        />
       </div>
     </section>
 
@@ -99,6 +110,7 @@ const inputValue = ref('')
 const dialogOpen = ref(false)
 const markdownEditor = ref<MarkdownEditorInstance>()
 const markdownValue = ref('Trace start')
+const markdownAtomicValue = ref('```\natomic\n```\n')
 const markdownHistory = ref<MarkdownEditorHistoryState>({
   canRedo: false,
   canUndo: false,
@@ -110,7 +122,11 @@ const markdownSelection = ref<MarkdownEditorSelectionEvent | null>(null)
 const markdownLastOperation = ref<MarkdownEditorDispatchResult | null>(null)
 const markdownDocumentIdentity: MarkdownEditorDocumentIdentity = Object.freeze({
   id: 'markdown-editor-interaction-trace',
-  epoch: 347,
+  epoch: 348,
+})
+const markdownAtomicIdentity: MarkdownEditorDocumentIdentity = Object.freeze({
+  id: 'markdown-editor-interaction-trace-atomic',
+  epoch: 349,
 })
 
 const recordEvent = (name: string, payload?: unknown) => {

@@ -206,6 +206,40 @@
         />
       </div>
 
+      <div
+        v-for="atomicNode in atomicActionNodes"
+        :key="atomicNode.id"
+        :class="ns.e('visually-hidden')"
+        role="group"
+        :aria-label="`${atomicNode.kind} atomic Markdown actions`"
+        v-bind="{ 'data-markdown-atomic-actions': '' }"
+      >
+        <button
+          type="button"
+          tabindex="-1"
+          :aria-label="`${atomicNode.kind} enter before`"
+          @click="invokeAtomicNodeAction(atomicNode.id, 'caret-before')"
+        >
+          Enter before
+        </button>
+        <button
+          type="button"
+          tabindex="-1"
+          :aria-label="`${atomicNode.kind} enter after`"
+          @click="invokeAtomicNodeAction(atomicNode.id, 'caret-after')"
+        >
+          Enter after
+        </button>
+        <button
+          type="button"
+          tabindex="-1"
+          :aria-label="`${atomicNode.kind} edit source`"
+          @click="invokeAtomicNodeAction(atomicNode.id, 'enter-source')"
+        >
+          Edit source
+        </button>
+      </div>
+
       <el-markdown-renderer
         v-if="liveSurface.rendererVisible"
         :class="ns.e('preview')"
@@ -296,9 +330,7 @@
               :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
             >
               <h3>{{ localeText.pasteAsMarkdown.conversionWarnings }}</h3>
-              <ul
-                :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
-              >
+              <ul :aria-label="localeText.pasteAsMarkdown.conversionWarnings">
                 <li
                   v-for="warning in pasteAsMarkdownSession.preview.warnings"
                   :key="`${warning.kind}:${warning.code}:${warning.detail || ''}`"
@@ -423,6 +455,7 @@ import {
   type MarkdownLiveRevealIntent,
 } from './markdown-editor-live-reveal'
 import {
+  MARKDOWN_ATOMIC_NODE_KINDS,
   resolveMarkdownAtomicNodeIntent,
   resolveMarkdownLiveSelectionMotion,
   retainMarkdownLiveSelection,
@@ -496,7 +529,9 @@ const chromeRegions = computed(() =>
   }),
 )
 const textareaAriaLabel = computed(() =>
-  currentMode.value === 'live' ? 'Markdown editor live editing surface' : 'Markdown editor source',
+  currentMode.value === 'live'
+    ? 'Markdown editor live editing surface'
+    : 'Markdown editor source',
 )
 const compactMode = computed(() => props.mobileLayout === 'compact')
 const normalizeModeForLayout = (
@@ -511,7 +546,9 @@ const initialSelection: MarkdownEditorSelection = {
   end: props.modelValue.length,
   start: props.modelValue.length,
 }
-const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
+const documentIdentity = Object.freeze(
+  props.documentIdentity ?? { epoch: 0, id: commandTrayId },
+)
 const transactionStore = new MarkdownEditorTransactionStore(
   props.modelValue,
   initialSelection,
@@ -547,6 +584,31 @@ const pasteAsMarkdownGate = computed<
 })
 const atomicSession = ref<MarkdownAtomicNodeSession | null>(null)
 const liveAtomic = ref<MarkdownAtomicNodePlan | null>(null)
+const atomicActionNodes = computed(() => {
+  if (currentMode.value !== 'live') return []
+  return MARKDOWN_ATOMIC_NODE_KINDS.map((kind) =>
+    resolveMarkdownAtomicNodeIntent({
+      action: 'caret-before',
+      documentIdentity,
+      kind,
+      mode: currentMode.value,
+      revision: transactionStore.revision,
+      selection: transactionStore.selection,
+      source: editorValue.value,
+    }),
+  )
+    .filter(
+      (
+        plan,
+      ): plan is MarkdownAtomicNodePlan & { kind: string; nodeId: string } =>
+        plan.state === 'current' &&
+        plan.kind !== null &&
+        plan.nodeId !== null &&
+        (plan.kind !== 'attachment' ||
+          editorValue.value.includes('pending://')),
+    )
+    .map((plan) => ({ id: plan.nodeId, kind: plan.kind }))
+})
 const layoutGesture = ref<MarkdownLiveLayoutGesture | null>(null)
 const liveWindow = ref<MarkdownLiveVirtualWindow | null>(null)
 const liveLayout = ref<MarkdownLiveLayoutPlan>(
@@ -741,6 +803,26 @@ const applyAtomicIntent = (
     revision: transactionStore.revision,
     selection: captureSelection(),
     session: atomicSession.value,
+    source: transactionStore.value,
+  })
+  liveAtomic.value = plan.state === 'unsupported' ? null : plan
+  atomicSession.value = plan.session
+  if (plan.transaction) dispatchTransaction(plan.transaction)
+  refreshLiveReveal()
+  return plan
+}
+const invokeAtomicNodeAction = (
+  nodeId: string,
+  action: Parameters<typeof resolveMarkdownAtomicNodeIntent>[0]['action'],
+) => {
+  const plan = resolveMarkdownAtomicNodeIntent({
+    action,
+    composing: isComposing.value,
+    documentIdentity,
+    mode: currentMode.value,
+    nodeId,
+    revision: transactionStore.revision,
+    selection: captureSelection(),
     source: transactionStore.value,
   })
   liveAtomic.value = plan.state === 'unsupported' ? null : plan
@@ -1182,8 +1264,7 @@ const updateVisualViewportHeight = () => {
   frameScheduler.schedule({
     key: 'visual-viewport-read',
     measure: () => {
-      const height =
-        window.visualViewport?.height || window.innerHeight || 0
+      const height = window.visualViewport?.height || window.innerHeight || 0
       const previous = visualViewportHeight.value
       viewportHeightNext = height
       viewportTrigger =
@@ -1281,7 +1362,11 @@ const handleInput = (event: Event) => {
   })
   syncNativeComposing()
   beforeInputSnapshot = undefined
-  if (plan.action === 'dedup' || plan.action === 'prevent' || plan.action === 'ignore') {
+  if (
+    plan.action === 'dedup' ||
+    plan.action === 'prevent' ||
+    plan.action === 'ignore'
+  ) {
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     if (plan.restoreDisplay && target.value !== transactionStore.value) {
@@ -1370,15 +1455,15 @@ const handleCompositionEnd = (event: CompositionEvent) => {
       ? laggedSelection
       : readSelectionFrom(target),
     {
-    history: plan.history,
-    metadata: Object.freeze({
-      composition: true,
-      data: event.data,
-      identity: plan.identity,
-      inputType: 'insertCompositionText',
-    }),
-    origin: 'input',
-  },
+      history: plan.history,
+      metadata: Object.freeze({
+        composition: true,
+        data: event.data,
+        identity: plan.identity,
+        inputType: 'insertCompositionText',
+      }),
+      origin: 'input',
+    },
   )
   refreshLiveReveal()
 }
@@ -1450,7 +1535,10 @@ const handleDrop = (event: DragEvent) => {
 }
 
 const handleCopy = (event: ClipboardEvent) => {
-  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+  if (
+    currentMode.value === 'live' &&
+    atomicSession.value?.phase === 'selected'
+  ) {
     const atomic = applyAtomicIntent('copy-source')
     if (atomic.copy && 'payload' in atomic.copy) {
       event.preventDefault()
@@ -1476,7 +1564,10 @@ const handleCopy = (event: ClipboardEvent) => {
 }
 
 const handleCut = (event: ClipboardEvent) => {
-  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+  if (
+    currentMode.value === 'live' &&
+    atomicSession.value?.phase === 'selected'
+  ) {
     const atomic = applyAtomicIntent('cut')
     if (atomic.copy && 'payload' in atomic.copy) {
       event.preventDefault()
@@ -1485,7 +1576,10 @@ const handleCut = (event: ClipboardEvent) => {
     }
     if (atomic.copy && 'copy' in atomic.copy) {
       event.preventDefault()
-      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.copy.payload)
+      writeMarkdownClipboardPayload(
+        event.clipboardData,
+        atomic.copy.copy.payload,
+      )
       return
     }
   }
@@ -1719,9 +1813,17 @@ const runCommand = async (command: MarkdownEditorCommand) => {
       signal: commandController.signal,
       value,
     }
-    if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return
+    if (
+      !isMarkdownEditorCommandVisible(command, context) ||
+      !isMarkdownEditorCommandEnabled(command, context)
+    )
+      return
     const result = await runMarkdownEditorCommand(command, context)
-    if (commandController.signal.aborted || commandControllers.get(command.key) !== commandController) return
+    if (
+      commandController.signal.aborted ||
+      commandControllers.get(command.key) !== commandController
+    )
+      return
     if (!result?.transaction) return
     const dispatchResult = dispatchTransaction({
       ...result.transaction,
@@ -1855,7 +1957,12 @@ const handleKeydown = (event: KeyboardEvent) => {
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return
     }
-    if (event.key === 'Enter' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+    if (
+      event.key === 'Enter' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
       const atomic = resolveMarkdownAtomicNodeIntent({
         action: 'caret-before',
         composing: isComposing.value,
@@ -1978,12 +2085,7 @@ const handleKeydown = (event: KeyboardEvent) => {
           : event.key === 'Delete'
             ? 'delete'
             : null
-  if (
-    blockKey &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey
-  ) {
+  if (blockKey && !event.altKey && !event.ctrlKey && !event.metaKey) {
     const plan = resolveMarkdownBlockInputIntent({
       source: transactionStore.value,
       selection: captureSelection(),

@@ -39,7 +39,7 @@ public static class FsusAvaloniaGalleryRegistry
     "high-contrast",
   ];
 
-  public static IReadOnlyList<FsusGalleryRoute> StableRoutes { get; } =
+  public static IReadOnlyList<FsusGalleryRoute> AllRoutes { get; } =
   [
     Entry("button", "Button"),
     Entry("icon-text", "Icon and text"),
@@ -70,6 +70,11 @@ public static class FsusAvaloniaGalleryRegistry
     Entry("perception-challenge", "Perception challenge"),
     Entry("locale-formatting", "Locale formatting"),
   ];
+
+  public static IReadOnlyList<FsusGalleryRoute> StableRoutes { get; } =
+    AllRoutes
+      .Where(route => FsusGeneratedAlignment.StableFamilies.Contains(route.ComponentId))
+      .ToArray();
 
   private static FsusGalleryRoute Entry(string componentId, string title) =>
     new(

@@ -12,18 +12,78 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
+import { performance } from 'node:perf_hooks'
 import { createServer } from 'node:net'
+import crypto from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const demoAppDirectory = resolve(repositoryRoot, 'vue/packages/demo-app')
 const viteEntry = resolve(repositoryRoot, 'node_modules/vite/bin/vite.js')
-const atspiHelper = resolve(repositoryRoot, 'scripts/native-screen-reader-atspi.py')
+const atspiHelper = resolve(
+  repositoryRoot,
+  'scripts/native-screen-reader-atspi.py',
+)
 const defaultOut = resolve(repositoryRoot, '.tmp/native-screen-reader-evidence')
 
 const sleep = (ms) => new Promise((resolveWait) => setTimeout(resolveWait, ms))
+const sha256File = (relativePath) =>
+  crypto
+    .createHash('sha256')
+    .update(readFileSync(resolve(repositoryRoot, relativePath)))
+    .digest('hex')
+const runnerHash = crypto
+  .createHash('sha256')
+  .update(
+    readFileSync(
+      resolve(repositoryRoot, 'scripts/avalonia-conformance-v2.mjs'),
+    ),
+  )
+  .update(
+    readFileSync(
+      resolve(repositoryRoot, 'scripts/native-screen-reader-harness.mjs'),
+    ),
+  )
+  .update(
+    readFileSync(
+      resolve(repositoryRoot, 'scripts/conformance-v2-evidence.mjs'),
+    ),
+  )
+  .digest('hex')
+
+const cdpValue = (property) => property?.value?.value ?? property?.value ?? null
+const cdpBoolean = (property) => [true, 'true'].includes(cdpValue(property))
+const normalizeCdpNode = (node, tabOrder) => {
+  const properties = Object.fromEntries(
+    (node.properties || []).map((property) => [property.name, property]),
+  )
+  return {
+    control: node.backendDOMNodeId ?? node.nodeId,
+    role: cdpValue(node.role),
+    name: cdpValue(node.name),
+    description: cdpValue(node.description),
+    value: cdpValue(node.value),
+    selection: null,
+    states: {
+      disabled: cdpBoolean(properties.disabled),
+      readOnly: cdpBoolean(properties.readonly),
+      invalid: cdpBoolean(properties.invalid),
+      selected: cdpBoolean(properties.selected),
+      expanded: cdpValue(properties.expanded),
+      checkedState: cdpValue(properties.checked),
+    },
+    liveRegion: cdpValue(properties.live) ?? 'off',
+    logicalParent: node.parentId ?? null,
+    children: node.childIds ?? [],
+    focus: {
+      keyboardFocusable: cdpBoolean(properties.focusable),
+      focused: cdpBoolean(properties.focused),
+      tabOrder,
+    },
+  }
+}
 
 const findFreePort = async () => {
   const server = createServer()
@@ -59,7 +119,8 @@ const parseArguments = (argv) => {
   const options = { out: defaultOut, skipBuild: false }
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]
-    if (argument === '--out') options.out = resolve(process.cwd(), argv[++index])
+    if (argument === '--out')
+      options.out = resolve(process.cwd(), argv[++index])
     else if (argument === '--skip-build') options.skipBuild = true
   }
   return options
@@ -70,14 +131,16 @@ const chromePath = [
   '/usr/bin/google-chrome-stable',
   '/usr/bin/google-chrome',
   '/usr/bin/chromium',
-].filter(Boolean).find((candidate) => {
-  try {
-    readFileSync(candidate)
-    return true
-  } catch {
-    return false
-  }
-})
+]
+  .filter(Boolean)
+  .find((candidate) => {
+    try {
+      readFileSync(candidate)
+      return true
+    } catch {
+      return false
+    }
+  })
 
 const main = async () => {
   if (!process.env.DISPLAY) {
@@ -105,7 +168,15 @@ const main = async () => {
   const baseUrl = `http://127.0.0.1:${port}`
   const serverProcess = spawn(
     process.execPath,
-    [viteEntry, 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
+    [
+      viteEntry,
+      'preview',
+      '--host',
+      '127.0.0.1',
+      '--port',
+      String(port),
+      '--strictPort',
+    ],
     { cwd: demoAppDirectory, stdio: ['ignore', 'pipe', 'pipe'] },
   )
   await waitForServer(baseUrl, 30_000)
@@ -135,23 +206,75 @@ const main = async () => {
       viewport: { width: 1280, height: 1100 },
     })
     const page = context.pages()[0] ?? (await context.newPage())
-    const fixtureUrl = `${baseUrl}/?markdownEditorTransaction=1&audit=ui-states`
+    const fixtureUrl = `${baseUrl}/?interactionTrace=1`
     await page.goto(fixtureUrl, { waitUntil: 'domcontentloaded' })
-    await page.locator('.el-markdown-editor textarea').first().waitFor({
+    await page.getByTestId('interaction-trace-fixture').waitFor({
       timeout: 20_000,
     })
+    const interactionStart = performance.now()
+    const editor = page.getByTestId('trace-markdown-editor')
+    await editor.locator('textarea').first().focus()
+    const initialState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    )
+    const initialFocus = await page.evaluate(
+      () => document.activeElement?.tagName.toLowerCase() || null,
+    )
+    await page.getByTestId('trace-markdown-exposed').click()
+    const dispatchedState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    )
+    const dispatchedFocus = await page.evaluate(
+      () => document.activeElement?.tagName.toLowerCase() || null,
+    )
+    await page.getByTestId('trace-markdown-undo').click()
+    const publicState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    )
+    const undoFocus = await page.evaluate(
+      () => document.activeElement?.tagName.toLowerCase() || null,
+    )
+    const atomicEditor = page.getByTestId('trace-markdown-atomic-editor')
+    const atomicTextarea = atomicEditor.locator('textarea').first()
+    await atomicTextarea.focus()
+    await atomicTextarea.evaluate((element) => {
+      element.setSelectionRange(5, 5)
+      element.dispatchEvent(new Event('select', { bubbles: true }))
+    })
+    await atomicTextarea.press('ArrowRight')
+    await atomicEditor
+      .locator('[data-markdown-atomic-actions]')
+      .first()
+      .waitFor({ state: 'attached' })
+    const cdp = await page.context().newCDPSession(page)
+    const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
+    const screenshotPath = join(options.out, 'browser.png')
+    await page.screenshot({ path: screenshotPath })
+    writeFileSync(
+      join(options.out, 'browser-accessibility-tree.json'),
+      `${JSON.stringify(browserAccessibility, null, 2)}\n`,
+    )
 
     const domProbe = await page.evaluate(() => {
-      const editor = document.querySelector('.el-markdown-editor')
+      const editor = document.querySelector(
+        '[data-testid="trace-markdown-editor"] .el-markdown-editor',
+      )
       const textarea = editor?.querySelector('textarea')
       const live = [...document.querySelectorAll('[aria-live]')]
-        .filter((element) => editor?.contains(element) || element === document.body)
+        .filter(
+          (element) => editor?.contains(element) || element === document.body,
+        )
         .map((element) => ({
           tag: element.tagName,
           live: element.getAttribute('aria-live'),
           role: element.getAttribute('role'),
         }))
-      const tabStops = [...(editor?.querySelectorAll('p, [tabindex]') ?? [])].map((element) => ({
+      const tabStops = [
+        ...(editor?.querySelectorAll('p, [tabindex]') ?? []),
+      ].map((element) => ({
         tag: element.tagName,
         tabIndex: element.tabIndex,
         role: element.getAttribute('role'),
@@ -166,6 +289,15 @@ const main = async () => {
           ?.getAttribute('aria-hidden'),
         live,
         tabStops,
+        atomicActions: [
+          ...document.querySelectorAll(
+            '[data-testid="trace-markdown-atomic-editor"] [data-markdown-atomic-actions] button',
+          ),
+        ].map((element) => ({
+          name: element.getAttribute('aria-label'),
+          role: element.getAttribute('role') || 'button',
+          tabIndex: element.tabIndex,
+        })),
       }
     })
 
@@ -178,24 +310,73 @@ const main = async () => {
     try {
       atspiJson = JSON.parse(atspi.stdout || '{}')
     } catch {
-      atspiJson = { ok: false, parseError: true, stdout: atspi.stdout, stderr: atspi.stderr }
+      atspiJson = {
+        ok: false,
+        parseError: true,
+        stdout: atspi.stdout,
+        stderr: atspi.stderr,
+      }
     }
-    writeFileSync(join(options.out, 'atspi.json'), `${JSON.stringify(atspiJson, null, 2)}\n`)
-    writeFileSync(join(options.out, 'dom-probe.json'), `${JSON.stringify(domProbe, null, 2)}\n`)
+    writeFileSync(
+      join(options.out, 'atspi.json'),
+      `${JSON.stringify(atspiJson, null, 2)}\n`,
+    )
+    writeFileSync(
+      join(options.out, 'dom-probe.json'),
+      `${JSON.stringify(domProbe, null, 2)}\n`,
+    )
 
-    const textboxHit = (atspiJson.textboxCount ?? 0) > 0
+    const textboxHit = (atspiJson.markdownEditableCount ?? 0) > 0
     const noDocumentLive = !domProbe.live.some(
       (entry) => entry.tag === 'BODY' || entry.tag === 'SECTION',
     )
     const editableLabel =
       /markdown editor/i.test(domProbe.textareaLabel || '') ||
       /markdown editor/i.test(domProbe.regionLabel || '')
+    const atomicActionsExposed =
+      domProbe.atomicActions.length === 3 &&
+      domProbe.atomicActions.every(
+        (action) => action.role === 'button' && action.tabIndex === -1,
+      )
     const orcaPid = orca.pid ?? null
     const verdict =
-      textboxHit && noDocumentLive && atspiJson.ok !== false ? 'pass' : 'fail'
+      textboxHit &&
+      noDocumentLive &&
+      atomicActionsExposed &&
+      atspiJson.ok !== false
+        ? 'pass'
+        : 'fail'
 
+    const identity = {
+      executionId: `conformance-v2-${candidateSha}`,
+      checkpoint: 'markdown-after-undo',
+      candidate: candidateSha,
+      contractHash: sha256File('spec/components/contracts/v2/contract-v2.json'),
+      webBaselineHash: sha256File('spec/baselines/vue-current.json'),
+      avaloniaBaselineHash: sha256File(
+        'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
+      ),
+      scenario: 'scenario.v2.el-markdown-editor.real-interaction-trace',
+      contract: 'component-v2.el-markdown-editor',
+      documentId: publicState.markdown.documentIdentity.id,
+      documentEpoch: publicState.markdown.documentIdentity.epoch,
+      sourceRevision: publicState.markdown.revision,
+      theme: 'light',
+      density: 'default',
+      locale: 'zh-CN',
+      direction: 'ltr',
+      motion: 'full',
+      runnerHash,
+    }
+    const elapsedMilliseconds = performance.now() - interactionStart
+    const focusTarget = await page.evaluate(() => {
+      const active = document.activeElement
+      return active?.tagName === 'BUTTON'
+        ? 'button'
+        : active?.getAttribute('role') || active?.tagName.toLowerCase() || null
+    })
     const evidence = {
-      schemaVersion: 1,
+      schema: 'fsusui.conformance-evidence.v2',
       kind: 'native-screen-reader-linux-orca-atspi',
       verdict,
       candidateSha,
@@ -203,17 +384,87 @@ const main = async () => {
       display: process.env.DISPLAY ?? null,
       browser: chromePath,
       orcaPid,
+      identity,
+      browserAccessibility: {
+        source: 'chromium-cdp-accessibility',
+        nodeCount: browserAccessibility.nodes?.length ?? 0,
+        artifact: 'browser-accessibility-tree.json',
+        sameExecution: true,
+        nodes: (browserAccessibility.nodes || [])
+          .filter((node) => ['textbox', 'button'].includes(cdpValue(node.role)))
+          .map((node, index) => normalizeCdpNode(node, index + 1)),
+      },
+      steps: [
+        {
+          index: 0,
+          action: 'render',
+          target: 'ElMarkdownEditor',
+          focusTarget: initialFocus,
+          binding: identity,
+          observation: {
+            actual: { value: initialState.markdown.value },
+            passed: initialState.markdown.value === 'Trace start',
+          },
+        },
+        {
+          index: 1,
+          action: 'operation',
+          target: 'ElMarkdownEditor.dispatchTransaction',
+          focusTarget: dispatchedFocus,
+          binding: identity,
+          observation: {
+            actual: dispatchedState.markdown.lastOperation,
+            passed:
+              dispatchedState.markdown.lastOperation?.accepted === true &&
+              dispatchedState.markdown.lastOperation?.value ===
+                'Trace start exposed',
+          },
+        },
+        {
+          index: 2,
+          action: 'keyboard',
+          target: 'ElMarkdownEditor.undo',
+          focusTarget: undoFocus,
+          binding: identity,
+          observation: {
+            actual: publicState.markdown.lastOperation,
+            passed:
+              publicState.markdown.lastOperation?.accepted === true &&
+              publicState.markdown.lastOperation?.value === 'Trace start',
+          },
+        },
+      ],
+      publicState,
+      focusTarget,
+      performance: {
+        identity,
+        elapsedMilliseconds,
+        budgetMilliseconds: 2000,
+        passed: elapsedMilliseconds < 2000,
+      },
+      visual: {
+        identity,
+        artifact: 'browser.png',
+        sha256: sha256File(relative(repositoryRoot, screenshotPath)),
+        renderedTopLevel: true,
+      },
       optionalOffHost: ['NVDA', 'VoiceOver'],
       checks: {
         atspiReachable: atspiJson.ok !== false,
         textboxExposed: textboxHit,
         documentNotAriaLive: noDocumentLive,
         editableName: editableLabel,
-        decorationsHidden: domProbe.decorationsAriaHidden === 'true' || !domProbe.decorationsAriaHidden,
+        atomicActionsExposed,
+        decorationsHidden:
+          domProbe.decorationsAriaHidden === 'true' ||
+          !domProbe.decorationsAriaHidden,
       },
       domProbe,
     }
-    writeFileSync(join(options.out, 'manifest.json'), `${JSON.stringify(evidence, null, 2)}\n`)
+    writeFileSync(
+      join(options.out, 'manifest.json'),
+      `${JSON.stringify(evidence, null, 2)}\n`,
+    )
     writeFileSync(
       join(options.out, 'receipt.txt'),
       [
@@ -232,10 +483,7 @@ const main = async () => {
     if (verdict !== 'pass') process.exitCode = 8
   } finally {
     if (context) {
-      await Promise.race([
-        context.close().catch(() => {}),
-        sleep(3000),
-      ])
+      await Promise.race([context.close().catch(() => {}), sleep(3000)])
     }
     if (orca) {
       orca.kill('SIGTERM')

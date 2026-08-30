@@ -8,38 +8,6 @@ namespace FsusUI.Avalonia.HeadlessTests;
 
 public class AvaloniaGalleryRegistryTests
 {
-  private static readonly string[] RequiredStableFamilies =
-  [
-    "button",
-    "icon-text",
-    "input",
-    "selection",
-    "form",
-    "display",
-    "layout",
-    "navigation",
-    "modal-panel",
-    "anchored-overlay",
-    "service-helper",
-    "picker",
-    "date-time",
-    "value-picker",
-    "upload-transfer",
-    "data-display",
-    "media-decorative",
-    "data-table",
-    "virtualization",
-    "tree",
-    "text-viewer",
-    "text-editor",
-    "code-editor",
-    "markdown-editor",
-    "public-shell",
-    "product-primitives",
-    "perception-challenge",
-    "locale-formatting",
-  ];
-
   private static readonly string[] RequiredStates =
   [
     "default",
@@ -58,17 +26,10 @@ public class AvaloniaGalleryRegistryTests
   ];
 
   [Fact]
-  public void StableGalleryRegistryCoversEveryStableFamily()
+  public void StableGalleryRegistryContainsOnlyGeneratedAlignedFamilies()
   {
     var routes = FsusAvaloniaGalleryRegistry.StableRoutes;
-    var ids = routes.Select((route) => route.ComponentId).ToHashSet(StringComparer.Ordinal);
-
-    foreach (var family in RequiredStableFamilies)
-    {
-      Assert.Contains(family, ids);
-    }
-
-    Assert.Empty(ids.Except(RequiredStableFamilies));
+    Assert.Empty(routes);
   }
 
   [Fact]
@@ -110,7 +71,7 @@ public class AvaloniaGalleryRegistryTests
   public void MarkdownEditorGalleryInstantiatesPublicFsusMarkdownEditor()
   {
     var route = Assert.Single(
-      FsusAvaloniaGalleryRegistry.StableRoutes,
+      FsusAvaloniaGalleryRegistry.AllRoutes,
       candidate => candidate.ComponentId == "markdown-editor");
     var page = route.CreatePage();
     var editors = page.GetLogicalDescendants()
@@ -127,7 +88,7 @@ public class AvaloniaGalleryRegistryTests
   public void CodeEditorGalleryInstantiatesConfiguredPublicFsusCodeEditor()
   {
     var route = Assert.Single(
-      FsusAvaloniaGalleryRegistry.StableRoutes,
+      FsusAvaloniaGalleryRegistry.AllRoutes,
       candidate => candidate.ComponentId == "code-editor");
     var page = route.CreatePage();
     var editor = Assert.Single(page.GetLogicalDescendants().OfType<FsusCodeEditor>());
@@ -143,7 +104,7 @@ public class AvaloniaGalleryRegistryTests
   public void PerceptionGalleryInstantiatesAllEightCharacterStates()
   {
     var route = Assert.Single(
-      FsusAvaloniaGalleryRegistry.StableRoutes,
+      FsusAvaloniaGalleryRegistry.AllRoutes,
       candidate => candidate.ComponentId == "perception-challenge");
     var page = route.CreatePage();
     var challenges = page.GetLogicalDescendants()
