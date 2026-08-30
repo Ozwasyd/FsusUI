@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "issue": 645,
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "a664c0398efea301261a8a5cfb54d1598c5956d3",
+  "candidateDigest": "658c3a2a274fd34713367350282a5e18139c63f4ea80d6e586ba1b0b3ae71b38",
+  "classificationReceiptDigest": "e61ef3e868f68b1a1458a8e654ad7d61cd96409cfc9a60a1fde34acae3857277",
+  "productionFixture": true,
+  "initialReview": {
+    "status": "rejected",
+    "blockers": [
+      "The wrapped-line captures did not contain a line long enough to prove wrapping or continuation alignment."
+    ]
+  },
+  "resolution": "The realistic fixture now contains a 166-character review note. Wrapped variants show logical line 10 across three visual rows; unwrapped variants retain one row with horizontal overflow.",
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "The wrapped continuation is aligned after the gutter and logical line 11 remains correctly numbered.",
+      "The unwrapped variant retains one row with horizontal overflow.",
+      "Light, dark, and high-contrast focus borders, selection highlight, content, links, and line numbers remain distinguishable."
+    ]
+  },
+  "inspectedArtifacts": [
+    "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-light-wrapped-lines.png",
+    "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-light-unwrapped-no-lines.png",
+    "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-dark-wrapped-lines.png",
+    "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-dark-unwrapped-no-lines.png",
+    "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-highcontrast-wrapped-lines.png",
+    "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-highcontrast-unwrapped-no-lines.png"
+  ]
+}

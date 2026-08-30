@@ -54,6 +54,7 @@ public static class FsusThemeResourceKeys
   public const string BackgroundBrush = "FsusThemeBackgroundBrush";
   public const string SurfaceBrush = "FsusThemeSurfaceBrush";
   public const string SurfaceRaisedBrush = "FsusThemeSurfaceRaisedBrush";
+  public const string TextEditorSurfaceBrush = "FsusThemeTextEditorSurfaceBrush";
   public const string TextBrush = "FsusThemeTextBrush";
   public const string MutedTextBrush = "FsusThemeMutedTextBrush";
   public const string BorderBrush = "FsusThemeBorderBrush";
@@ -85,6 +86,7 @@ public sealed class FsusThemeManager
       "#FFFFFF",
       "#F8FAFC",
       "#FFFFFF",
+      "#FFFFFF",
       "#EEF3FA",
       "#111827",
       "#6B7280",
@@ -103,6 +105,7 @@ public sealed class FsusThemeManager
       "#171F2C",
       "#1F2937",
       "#1B2433",
+      "#1B2433",
       "#243043",
       "#F0F0F4",
       "#B6C0CF",
@@ -120,6 +123,7 @@ public sealed class FsusThemeManager
       "#000000",
       "#000000",
       "#111827",
+      "#000000",
       "#000000",
       "#1F2937",
       "#FFFFFF",
@@ -195,6 +199,7 @@ public sealed class FsusThemeManager
     SetBrush(resources, FsusThemeResourceKeys.SurfaceRaisedBrush, palette.SurfaceRaised);
     SetBrush(resources, PickerSurfaceResourceKey, palette.TreeSurface);
     SetBrush(resources, TreeSurfaceResourceKey, palette.TreeSurface);
+    SetBrush(resources, FsusThemeResourceKeys.TextEditorSurfaceBrush, palette.TextEditorSurface);
     SetBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, palette.ValuePickerTrack);
     SetBrush(resources, FsusThemeResourceKeys.TextBrush, palette.Text);
     SetBrush(resources, FsusThemeResourceKeys.MutedTextBrush, palette.MutedText);
@@ -319,6 +324,7 @@ public sealed class FsusThemeManager
     string Surface,
     string SurfaceRaised,
     string TreeSurface,
+    string TextEditorSurface,
     string ValuePickerTrack,
     string Text,
     string MutedText,
