@@ -110,6 +110,9 @@ public class FsusPlatformCommand : INotifyPropertyChanged
   private string? category;
   private string? description;
   private string? iconKey;
+  private Func<bool>? isEnabledPredicate;
+  private Func<bool>? isVisiblePredicate;
+  private Func<object?, CancellationToken, ValueTask>? executeAsyncAction;
 
   public FsusPlatformCommand(string id, string label, FsusPlatformRole role = FsusPlatformRole.None)
   {
@@ -208,6 +211,19 @@ public class FsusPlatformCommand : INotifyPropertyChanged
 
   public Action<object?>? ExecuteAction { get; set; }
 
+  public Func<object?, CancellationToken, ValueTask>? ExecuteAsyncAction
+  {
+    get => executeAsyncAction;
+    set
+    {
+      if (executeAsyncAction != value)
+      {
+        executeAsyncAction = value;
+        Notify(nameof(ExecuteAsyncAction));
+      }
+    }
+  }
+
   public object? CommandParameter { get; set; }
 
   public string? Category
@@ -249,10 +265,48 @@ public class FsusPlatformCommand : INotifyPropertyChanged
     }
   }
 
+  public Func<bool>? IsEnabledPredicate
+  {
+    get => isEnabledPredicate;
+    set
+    {
+      if (isEnabledPredicate != value)
+      {
+        isEnabledPredicate = value;
+        Notify(nameof(IsEnabledPredicate));
+      }
+    }
+  }
+
+  public Func<bool>? IsVisiblePredicate
+  {
+    get => isVisiblePredicate;
+    set
+    {
+      if (isVisiblePredicate != value)
+      {
+        isVisiblePredicate = value;
+        Notify(nameof(IsVisiblePredicate));
+      }
+    }
+  }
+
+  public bool IsEffectivelyEnabled => CanExecute();
+
+  public bool IsEffectivelyVisible => IsVisiblePredicate?.Invoke() ?? true;
+
+  public bool CanExecute(object? parameter = null)
+  {
+    var arg = parameter ?? CommandParameter;
+    return IsEnabled &&
+      (IsEnabledPredicate?.Invoke() ?? true) &&
+      (Command?.CanExecute(arg) ?? true);
+  }
+
   public void Execute(object? parameter = null)
   {
     var arg = parameter ?? CommandParameter;
-    if (!IsEnabled || (Command is not null && !Command.CanExecute(arg)))
+    if (!CanExecute(arg))
     {
       return;
     }
@@ -265,6 +319,29 @@ public class FsusPlatformCommand : INotifyPropertyChanged
     {
       Command?.Execute(arg);
     }
+  }
+
+  public async ValueTask<bool> ExecuteAsync(
+    object? parameter = null,
+    CancellationToken cancellationToken = default)
+  {
+    var arg = parameter ?? CommandParameter;
+    if (!CanExecute(arg))
+    {
+      return false;
+    }
+
+    cancellationToken.ThrowIfCancellationRequested();
+    if (ExecuteAsyncAction is not null)
+    {
+      await ExecuteAsyncAction(arg, cancellationToken);
+    }
+    else
+    {
+      Execute(arg);
+    }
+
+    return true;
   }
 
   public void NotifyStateChanged()
@@ -1573,10 +1650,12 @@ public sealed class FsusCommandPaletteModel(IEnumerable<FsusPlatformCommand> com
 
     foreach (var cmd in commandList)
     {
-      if (string.IsNullOrEmpty(trimmed) ||
+      if (cmd.IsEffectivelyVisible &&
+          (string.IsNullOrEmpty(trimmed) ||
+          cmd.Id.Contains(trimmed, StringComparison.OrdinalIgnoreCase) ||
           cmd.Label.Contains(trimmed, StringComparison.OrdinalIgnoreCase) ||
           (cmd.Category?.Contains(trimmed, StringComparison.OrdinalIgnoreCase) == true) ||
-          (cmd.Description?.Contains(trimmed, StringComparison.OrdinalIgnoreCase) == true))
+          (cmd.Description?.Contains(trimmed, StringComparison.OrdinalIgnoreCase) == true)))
       {
         results.Add(new FsusCommandPaletteItem(
           cmd.Id,
@@ -1584,7 +1663,7 @@ public sealed class FsusCommandPaletteModel(IEnumerable<FsusPlatformCommand> com
           cmd.Category,
           cmd.Description,
           cmd.Gesture?.ToDisplayText(platform) ?? string.Empty,
-          cmd.IsEnabled,
+          cmd.IsEffectivelyEnabled,
           cmd.Execute));
       }
     }

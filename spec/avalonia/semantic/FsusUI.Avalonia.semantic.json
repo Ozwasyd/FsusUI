@@ -4218,6 +4218,536 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPalette",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "BackLabel",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "BusyText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CommandTree",
+          "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusNativeMenuItemModel\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CurrentPath",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "EmptyText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "FailureMessage",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "FailureText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsBusy",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsOpen",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "OverlayEntry",
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "OverlaySize",
+          "type": "Avalonia.Size",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Providers",
+          "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusCommandPaletteProvider\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Query",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Results",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusCommandPaletteResult\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "SearchAccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SearchPlaceholder",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SearchingText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SelectedCommandId",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "SelectedIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ShortcutPlatform",
+          "type": "FsusUI.Avalonia.Controls.FsusShortcutPlatform",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "State",
+          "type": "FsusUI.Avalonia.Controls.FsusCommandPaletteState",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ViewportBounds",
+          "type": "Avalonia.Rect",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "BackLabel",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "BusyText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "CommandTree",
+          "kind": "styled",
+          "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusNativeMenuItemModel\u003E",
+          "nullable": true
+        },
+        {
+          "name": "EmptyText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "FailureText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Providers",
+          "kind": "styled",
+          "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusCommandPaletteProvider\u003E",
+          "nullable": true
+        },
+        {
+          "name": "Query",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "SearchAccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "SearchPlaceholder",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "SearchingText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [
+        {
+          "name": "CommandExecuted",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusCommandPaletteExecutedEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "Dismissed",
+          "kind": "clr",
+          "argsType": "System.EventHandler",
+          "isStatic": false
+        },
+        {
+          "name": "Failed",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusCommandPaletteFailedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "ActivateSelectedAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "parameters": [
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "BeginImeComposition",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "CloseAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "parameters": [
+            {
+              "name": "reason",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayCloseReason",
+              "optional": true
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "CommitImeComposition",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "text",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "HandleKeyAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "Avalonia.Input.Key",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "NavigateBackAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "parameters": [
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "OnOverlayClosed",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "reason",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayCloseReason",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "OnOverlayOpened",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "entry",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Open",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+          "parameters": [
+            {
+              "name": "host",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+              "optional": false
+            },
+            {
+              "name": "invoker",
+              "type": "Avalonia.Controls.Control",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "OpenAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Overlay.FsusOverlayEntry\u003E",
+          "parameters": [
+            {
+              "name": "host",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+              "optional": false
+            },
+            {
+              "name": "invoker",
+              "type": "Avalonia.Controls.Control",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "RefreshAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask",
+          "parameters": [
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "SetQueryAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask",
+          "parameters": [
+            {
+              "name": "query",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "UpdateImeComposition",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "text",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteExecutedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Result",
+          "type": "FsusUI.Avalonia.Controls.FsusCommandPaletteResult",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteFailedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "CommandId",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Exception",
+          "type": "System.Exception",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Stage",
+          "type": "FsusUI.Avalonia.Controls.FsusCommandPaletteFailureStage",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteFailureStage",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Search",
+          "value": 0
+        },
+        {
+          "name": "Execution",
+          "value": 1
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteItem",
       "kind": "class",
       "baseType": "System.Object",
@@ -4325,6 +4855,237 @@
               "optional": true
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteProvider",
+      "kind": "delegate",
+      "baseType": "System.MulticastDelegate",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "BeginInvoke",
+          "isStatic": false,
+          "returnType": "System.IAsyncResult",
+          "parameters": [
+            {
+              "name": "query",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": false
+            },
+            {
+              "name": "callback",
+              "type": "System.AsyncCallback",
+              "optional": false
+            },
+            {
+              "name": "object",
+              "type": "System.Object",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "EndInvoke",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusPlatformCommand\u003E\u003E",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "System.IAsyncResult",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Invoke",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusPlatformCommand\u003E\u003E",
+          "parameters": [
+            {
+              "name": "query",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteResult",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Category",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CommandId",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Description",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DisplayShortcut",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HasChildren",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IconKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsEnabled",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Label",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusCommandPaletteResult",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "CommandId",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Label",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Description",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Category",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "IconKey",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "DisplayShortcut",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsEnabled",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "HasChildren",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteState",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Closed",
+          "value": 0
+        },
+        {
+          "name": "Ready",
+          "value": 1
+        },
+        {
+          "name": "Searching",
+          "value": 2
+        },
+        {
+          "name": "Executing",
+          "value": 3
+        },
+        {
+          "name": "Failed",
+          "value": 4
         }
       ]
     },
@@ -16633,6 +17394,14 @@
           "isStatic": false
         },
         {
+          "name": "ExecuteAsyncAction",
+          "type": "System.Func\u003CSystem.Object, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "Gesture",
           "type": "FsusUI.Avalonia.Controls.FsusShortcutGesture",
           "nullable": true,
@@ -16665,9 +17434,41 @@
           "isStatic": false
         },
         {
+          "name": "IsEffectivelyEnabled",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsEffectivelyVisible",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
           "name": "IsEnabled",
           "type": "System.Boolean",
           "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsEnabledPredicate",
+          "type": "System.Func\u003CSystem.Boolean\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsVisiblePredicate",
+          "type": "System.Func\u003CSystem.Boolean\u003E",
+          "nullable": true,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -16714,6 +17515,18 @@
       ],
       "methods": [
         {
+          "name": "CanExecute",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "parameter",
+              "type": "System.Object",
+              "optional": true
+            }
+          ]
+        },
+        {
           "name": "Execute",
           "isStatic": false,
           "returnType": "System.Void",
@@ -16721,6 +17534,23 @@
             {
               "name": "parameter",
               "type": "System.Object",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "ExecuteAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "parameters": [
+            {
+              "name": "parameter",
+              "type": "System.Object",
+              "optional": true
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
               "optional": true
             }
           ]

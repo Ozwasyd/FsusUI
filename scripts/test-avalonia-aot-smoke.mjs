@@ -35,6 +35,7 @@ process.on('exit', () => {
 const feed = path.join(temporaryRoot, 'feed')
 const consumer = path.join(temporaryRoot, 'consumer')
 const repositoryPackages = path.join(temporaryRoot, 'repository-packages')
+const repositoryArtifacts = path.join(temporaryRoot, 'repository-artifacts')
 const consumerPackages = path.join(temporaryRoot, 'consumer-packages')
 const publishRoot = path.join(temporaryRoot, 'publish')
 const reportPath = path.join(temporaryRoot, 'reports/smoke.json')
@@ -133,23 +134,30 @@ for (const packageName of [
   'Microsoft.NETCore.App.Runtime.NativeAOT',
   'Microsoft.NETCore.App.Host',
 ]) {
-  const destination = path.join(isolatedPacks, `${packageName}.linux-x64`)
-  if (existsSync(destination)) continue
+  const alias = path.join(isolatedPacks, `${packageName}.linux-x64`)
+  if (!existsSync(alias)) {
+    symlinkSync(
+      path.join(systemDotnetRoot, 'packs', `${packageName}.${rid}`),
+      alias,
+      'dir',
+    )
+  }
+}
+const ilCompilerAlias = path.join(
+  isolatedPacks,
+  'runtime.linux-x64.Microsoft.DotNet.ILCompiler',
+)
+if (!existsSync(ilCompilerAlias)) {
   symlinkSync(
-    path.join(systemDotnetRoot, 'packs', `${packageName}.${rid}`),
-    destination,
+    path.join(
+      systemDotnetRoot,
+      'packs',
+      `runtime.${rid}.Microsoft.DotNet.ILCompiler`,
+    ),
+    ilCompilerAlias,
     'dir',
   )
 }
-symlinkSync(
-  path.join(
-    systemDotnetRoot,
-    'packs',
-    `runtime.${rid}.Microsoft.DotNet.ILCompiler`,
-  ),
-  path.join(isolatedPacks, 'runtime.linux-x64.Microsoft.DotNet.ILCompiler'),
-  'dir',
-)
 const isolatedDotnet = path.join(isolatedSdkRoot, 'dotnet')
 const linkerRoot = path.join(temporaryRoot, 'native-linker')
 mkdirSync(linkerRoot)
@@ -192,6 +200,8 @@ for (const project of publicProjects) {
       nugetConfig,
       '--packages',
       repositoryPackages,
+      '--artifacts-path',
+      repositoryArtifacts,
       '--no-cache',
       '--force',
     ],
@@ -207,6 +217,8 @@ for (const project of publicProjects) {
       '--no-restore',
       '--output',
       feed,
+      '--artifacts-path',
+      repositoryArtifacts,
       `-p:RestorePackagesPath=${repositoryPackages}`,
     ],
     { label: `local pack ${project}` },
@@ -257,18 +269,28 @@ assert.doesNotMatch(
   'native executable must not link to an installed .NET runtime',
 )
 
-const display = `:${100 + (process.pid % 500)}`
-const xvfb = spawn('/usr/bin/Xvfb', [
-  display,
-  '-screen',
-  '0',
-  '1024x768x24',
-  '-nolisten',
-  'tcp',
-])
+const inheritedDisplay = process.env.DISPLAY
+const inheritedDisplayReady =
+  Boolean(inheritedDisplay) &&
+  spawnSync('/usr/bin/xdpyinfo', ['-display', inheritedDisplay], {
+    stdio: 'ignore',
+  }).status === 0
+const display = inheritedDisplayReady
+  ? inheritedDisplay
+  : `:${100 + (process.pid % 500)}`
+const xvfb = inheritedDisplayReady
+  ? null
+  : spawn('/usr/bin/Xvfb', [
+      display,
+      '-screen',
+      '0',
+      '1024x768x24',
+      '-nolisten',
+      'tcp',
+    ])
 const wait = (milliseconds) =>
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds)
-let ready = false
+let ready = inheritedDisplayReady
 for (let attempt = 0; attempt < 50; attempt += 1) {
   const probe = spawnSync('/usr/bin/xdpyinfo', ['-display', display], {
     stdio: 'ignore',
@@ -283,6 +305,9 @@ assert.ok(ready, `Xvfb ${display} did not become ready`)
 
 const runtimeFreeEnvironment = {
   DISPLAY: display,
+  ...(inheritedDisplayReady && process.env.XAUTHORITY
+    ? { XAUTHORITY: process.env.XAUTHORITY }
+    : {}),
   HOME: path.join(temporaryRoot, 'home'),
   XDG_CACHE_HOME: path.join(temporaryRoot, 'xdg-cache'),
   XDG_CONFIG_HOME: path.join(temporaryRoot, 'xdg-config'),
@@ -319,6 +344,7 @@ try {
       dispatcherReached: report.DispatcherReached,
       platformHandleCreated: report.PlatformHandleCreated,
       packageControlCount: report.PackageControlCount,
+      commandPaletteTreeCount: report.CommandPaletteTreeCount,
       codeEditorReady: report.CodeEditorReady,
       activitySectionCount: report.ActivitySectionCount,
       documentCount: report.DocumentCount,
@@ -330,7 +356,8 @@ try {
       topLevelCreated: true,
       dispatcherReached: true,
       platformHandleCreated: true,
-      packageControlCount: 5,
+      packageControlCount: 6,
+      commandPaletteTreeCount: 1,
       codeEditorReady: true,
       activitySectionCount: 1,
       documentCount: 1,
@@ -403,7 +430,7 @@ try {
   console.log('negative=missing package, resource, and platform loader returned nonzero')
   if (positive.stdout) process.stdout.write(positive.stdout)
 } finally {
-  xvfb.kill('SIGTERM')
+  xvfb?.kill('SIGTERM')
   if (!keepTemporaryRoot) {
     rmSync(temporaryRoot, { recursive: true, force: true })
   } else {
