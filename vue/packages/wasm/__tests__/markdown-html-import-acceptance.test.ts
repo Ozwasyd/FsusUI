@@ -3,6 +3,8 @@ import { resolve } from 'node:path'
 
 import { describe, expect, it, vi } from 'vitest'
 
+import { getMarkdownXssSourceAttackFragment } from '../../../tests/support/markdown-xss-corpus'
+
 import {
   MARKDOWN_HTML_CONVERSION_BUDGET,
   convertMarkdownHtmlImportSnapshot,
@@ -114,10 +116,10 @@ describe('markdown HTML import aggregate acceptance corpus', () => {
     const outcome = importMarkdownClipboardSnapshot({
       explicit: true,
       html: [
-        '<script>globalThis.__executed = true</script>',
-        '<script src="https://evil.example/a.js">again()</script>',
-        '<svg><a xlink:href="javascript:alert(1)">svg</a></svg>',
-        '<iframe srcdoc="<script>top.x=1</script>" src="https://evil.example/frame"></iframe>',
+        getMarkdownXssSourceAttackFragment('mxss-raw-script-basic'),
+        getMarkdownXssSourceAttackFragment('mxss-raw-img-onerror'),
+        getMarkdownXssSourceAttackFragment('mxss-namespace-svg-foreignobject'),
+        getMarkdownXssSourceAttackFragment('mxss-container-iframe-srcdoc'),
         '<p style="background:url(https://evil.example/pixel)">safe text</p>',
         '<a href="jav&#x61;script&#58;alert(1)">encoded</a>',
         '<a href="java&NewLine;script:alert(1)">newline</a>',
