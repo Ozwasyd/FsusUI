@@ -70,9 +70,33 @@ internal static class Program
         IconKey = FsusIconKeys.Settings,
         IsDecorative = true,
       };
+      var documents = new FsusDocumentTabs();
+      documents.AddDocument(new FsusDocumentTab
+      {
+        Key = "aot-document",
+        Header = "Native AOT document",
+        Content = "Native AOT document content",
+      });
+      var activityShell = new FsusActivityRailShell
+      {
+        MainContent = documents,
+      };
+      activityShell.Sections.Add(new FsusActivityRailSection
+      {
+        Key = "explorer",
+        Header = "Explorer",
+        Content = "Native AOT contextual pane",
+      });
+      var titleBar = new FsusNativeTitleBar
+      {
+        DocumentTitle = "Native AOT shell",
+        Status = "Ready",
+      };
       var panel = new StackPanel();
       panel.Children.Add(button);
       panel.Children.Add(icon);
+      panel.Children.Add(titleBar);
+      panel.Children.Add(activityShell);
 
       var window = new Window
       {
@@ -92,12 +116,17 @@ internal static class Program
               report.DispatcherReached = Dispatcher.UIThread.CheckAccess();
               report.PlatformHandleCreated = window.TryGetPlatformHandle() is not null;
               report.PackageControlCount = panel.Children.Count;
+              report.ActivitySectionCount = activityShell.Sections.Count;
+              report.DocumentCount = documents.Documents.Count;
+              report.TitleBarPlatform = titleBar.EffectivePlatform.ToString();
               report.ThemeDensity = FsusThemeOptions.Default.Density.ToString();
               report.ExitCode =
                 report.TopLevelCreated &&
                 report.DispatcherReached &&
                 report.PlatformHandleCreated &&
-                report.PackageControlCount == 2
+                report.PackageControlCount == 4 &&
+                report.ActivitySectionCount == 1 &&
+                report.DocumentCount == 1
                   ? 0
                   : 1;
               if (report.ExitCode != 0)
@@ -203,6 +232,9 @@ internal sealed record SmokeReport
   public bool DispatcherReached { get; set; }
   public bool PlatformHandleCreated { get; set; }
   public int PackageControlCount { get; set; }
+  public int ActivitySectionCount { get; set; }
+  public int DocumentCount { get; set; }
+  public string? TitleBarPlatform { get; set; }
   public string? ThemeDensity { get; set; }
   public string? ProcessArchitecture { get; init; }
   public int ExitCode { get; set; } = 1;
