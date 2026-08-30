@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "b7675502536007d2d1ba9fbea6d313f145c010f640b80c6256c52d1a7686d247",
-  "candidateSha": "8f7c614262d26b2df117dfc09f9aaf0cc9f38143",
-  "candidateDigest": "02b454dceae21ee2bacfae29d0a5b30779c774d6ae259ea0ced8896fd966689d",
+  "classificationReceiptDigest": "338dcbc2eb7c98014c287c2863cc15d150af6644ec697fde1e912775de697682",
+  "candidateSha": "af66a47d970f8f37e481e6fb38eab77109279198",
+  "candidateDigest": "6c0fee24582628e7e04a121122322ed54209bf59e1987d78c349e1f919f1088c",
   "verificationClass": "ux-system",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,13 +13,13 @@
     "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
     "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
     "a259a52a313449613bfca0ac40588dc29ca590316569e5ded60cd7161a6eb3f7",
-    "a5e34780d008d5dfa4f04ceef8dffa1178702ba5c8edc882b0e3fa79a6855388",
+    "f5e26a1a64f47a0f1af7b712727f0f55058a6c916aad35aebb648a93cb87ef24",
     "f149631813fbfb060d49412329638555e0f0c371fb441cf89ab46cd64a3e3de6",
     "77ce497adb60ba18ac10cce3cbfed08bea0b5805c74fa6bceb1e4ee57dc0e326"
   ],
-  "activeBaselineIdentityDigest": "1fe4be3cb9ab8725947309342fed7edc0c7f41eed888b558afb8789b820b8a61",
+  "activeBaselineIdentityDigest": "823e681eb70e0dd8d7f3e357e05a4f9cbfcbc5d6e7cde38155e3298aef2615b8",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "cca020ca3fb75858768a0b96137ae683d1343c798510fa59cc9122d71988e020",
+  "independenceEvidenceDigest": "96e26ebe6972d81ff054e2ed896b5520d100d20c735061c33293e7ee7e304a23",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -412,5 +412,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "8b3730198d528a96871ff7ed9b68e94f2534c9c4ccee74976760b2917cb5bb94"
+  "receiptDigest": "ba4f164d4f118753290057911c7d5161a8252559154f7031481cb5eda175fde2"
 }

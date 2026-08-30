@@ -37,7 +37,7 @@
     {
       "id": "visual-testing",
       "path": "docs/visual-testing.md",
-      "digest": "a5e34780d008d5dfa4f04ceef8dffa1178702ba5c8edc882b0e3fa79a6855388"
+      "digest": "f5e26a1a64f47a0f1af7b712727f0f55058a6c916aad35aebb648a93cb87ef24"
     },
     {
       "id": "accessibility",
@@ -55,13 +55,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "8f7c614262d26b2df117dfc09f9aaf0cc9f38143",
+    "revision": "af66a47d970f8f37e481e6fb38eab77109279198",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "9384dee4899a5bab9634dd8b9fe461dac271d6d97cb601f5bac7f1732a19ad8c",
+    "authorityDigest": "d8ecafb74a61459fef449e1a14fdc5d1f06cfdb2790e031e7b1bafdba82f4e77",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "8f7c614262d26b2df117dfc09f9aaf0cc9f38143",
-  "candidateDigest": "02b454dceae21ee2bacfae29d0a5b30779c774d6ae259ea0ced8896fd966689d",
+  "candidateSha": "af66a47d970f8f37e481e6fb38eab77109279198",
+  "candidateDigest": "6c0fee24582628e7e04a121122322ed54209bf59e1987d78c349e1f919f1088c",
   "stateEvidenceMatrix": [
     {
       "state": "twenty-plus-mixed-seven-primitives-and-semantic-states",
@@ -104,5 +104,5 @@
   "classificationEvidenceDigest": "154e15d95d7c59398d6c7062e9d066a37ff19ee92375bb114c2d2ae0cea221f2",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "b7675502536007d2d1ba9fbea6d313f145c010f640b80c6256c52d1a7686d247"
+  "receiptDigest": "338dcbc2eb7c98014c287c2863cc15d150af6644ec697fde1e912775de697682"
 }
