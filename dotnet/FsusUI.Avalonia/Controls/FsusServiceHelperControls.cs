@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using FsusUI.Avalonia.Overlay;
+using System.Windows.Input;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -47,6 +48,18 @@ public sealed record FsusNotificationOptions
   public FsusServicePlacement Placement { get; init; } = FsusServicePlacement.TopRight;
   public bool CloseOnClick { get; init; }
   public bool ReducedMotion { get; init; }
+
+  /// <summary>
+  /// Auto-close delay. <see cref="TimeSpan.Zero"/> keeps the notification open
+  /// until it is dismissed or closed programmatically.
+  /// </summary>
+  public TimeSpan Duration { get; init; } = TimeSpan.Zero;
+
+  /// <summary>Optional visible label for a single notification action.</summary>
+  public string? ActionLabel { get; init; }
+
+  /// <summary>Executed when the action control is activated.</summary>
+  public ICommand? ActionCommand { get; init; }
 }
 
 public sealed record FsusLoadingOptions
@@ -147,7 +160,9 @@ public sealed class FsusMessageService(FsusOverlayHost host)
         activeMessages.Remove(current);
         return true;
       });
-    handle.OverlayEntry = host.Open(toast, FsusServiceVisuals.CreateServiceOverlayOptions(options.Placement));
+    handle.OverlayEntry = host.Open(
+      toast,
+      FsusServiceVisuals.CreateServiceOverlayOptions(options.Placement, host));
     activeMessages.Add(handle);
     return ValueTask.FromResult<FsusServiceHandle<FsusMessageToast>?>(handle);
   }
@@ -179,6 +194,9 @@ public sealed class FsusNotificationService(FsusOverlayHost host)
       Placement = options.Placement,
       CloseOnClick = options.CloseOnClick,
       ReducedMotion = options.ReducedMotion,
+      Duration = options.Duration,
+      ActionLabel = options.ActionLabel,
+      ActionCommand = options.ActionCommand,
     };
     notification.SyncState();
     var handle = new FsusServiceHandle<FsusNotification>(
@@ -197,7 +215,13 @@ public sealed class FsusNotificationService(FsusOverlayHost host)
         activeNotifications.Remove(current);
         return true;
       });
-    handle.OverlayEntry = host.Open(notification, FsusServiceVisuals.CreateServiceOverlayOptions(options.Placement));
+    notification.DismissRequested += (_, _) =>
+    {
+      _ = handle.CloseAsync();
+    };
+    handle.OverlayEntry = host.Open(
+      notification,
+      FsusServiceVisuals.CreateServiceOverlayOptions(options.Placement, host));
     activeNotifications.Add(handle);
     return ValueTask.FromResult<FsusServiceHandle<FsusNotification>?>(handle);
   }
@@ -292,13 +316,60 @@ public class FsusMessageToast : ContentControl
 
 public class FsusNotification : ContentControl
 {
-  public string Title { get; set; } = string.Empty;
-  public string Message { get; set; } = string.Empty;
+  public static readonly StyledProperty<string> TitleProperty =
+    AvaloniaProperty.Register<FsusNotification, string>(nameof(Title), string.Empty);
+
+  public static readonly StyledProperty<string> MessageProperty =
+    AvaloniaProperty.Register<FsusNotification, string>(nameof(Message), string.Empty);
+
+  public static readonly StyledProperty<string?> ActionLabelProperty =
+    AvaloniaProperty.Register<FsusNotification, string?>(nameof(ActionLabel));
+
+  public static readonly StyledProperty<ICommand?> ActionCommandProperty =
+    AvaloniaProperty.Register<FsusNotification, ICommand?>(nameof(ActionCommand));
+
+  private DispatcherTimer? timeoutTimer;
+  private Button? actionButton;
+  private Button? dismissButton;
+  private bool isPointerOver;
+
+  public string Title
+  {
+    get => GetValue(TitleProperty);
+    set => SetValue(TitleProperty, value);
+  }
+
+  public string Message
+  {
+    get => GetValue(MessageProperty);
+    set => SetValue(MessageProperty, value);
+  }
+
   public FsusServiceType Type { get; set; } = FsusServiceType.Info;
   public FsusServicePlacement Placement { get; set; } = FsusServicePlacement.TopRight;
   public bool CloseOnClick { get; set; }
   public bool ReducedMotion { get; set; }
+  public TimeSpan Duration { get; set; } = TimeSpan.Zero;
+
+  public string? ActionLabel
+  {
+    get => GetValue(ActionLabelProperty);
+    set => SetValue(ActionLabelProperty, value);
+  }
+
+  public ICommand? ActionCommand
+  {
+    get => GetValue(ActionCommandProperty);
+    set => SetValue(ActionCommandProperty, value);
+  }
+
   public bool IsClosed { get; private set; }
+
+  /// <summary>Raised when the action control is activated. Distinct from dismissal.</summary>
+  public event EventHandler? ActionActivated;
+
+  /// <summary>Raised by the dismiss control, surface click, or timeout.</summary>
+  public event EventHandler? DismissRequested;
 
   public FsusNotification()
   {
@@ -309,6 +380,7 @@ public class FsusNotification : ContentControl
   internal void MarkClosed()
   {
     IsClosed = true;
+    StopTimeout();
     SyncState();
   }
 
@@ -316,11 +388,173 @@ public class FsusNotification : ContentControl
   {
     FsusServiceVisuals.SyncServiceClasses(this, Type, Placement, ReducedMotion);
     FsusComponentClasses.Ensure(this, "fsus-close-on-click", CloseOnClick);
+    FsusComponentClasses.Ensure(this, "fsus-has-action", !string.IsNullOrWhiteSpace(ActionLabel));
+    FsusComponentClasses.Ensure(this, "fsus-has-title", !string.IsNullOrWhiteSpace(Title));
+    FsusComponentClasses.Ensure(this, "fsus-has-message", !string.IsNullOrWhiteSpace(Message));
     FsusComponentClasses.Ensure(this, "fsus-closed", IsClosed);
     AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(Title, Message));
     AutomationProperties.SetHelpText(this, Message);
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Group);
     AutomationProperties.SetItemStatus(this, FsusServiceVisuals.TypeName(Type));
+  }
+
+  protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+  {
+    base.OnApplyTemplate(e);
+    actionButton = e.NameScope.Find<Button>("PART_ActionButton");
+    dismissButton = e.NameScope.Find<Button>("PART_DismissButton");
+    if (actionButton is not null)
+    {
+      AutomationProperties.SetName(actionButton, ActionLabel ?? "Action");
+      actionButton.Click += OnActionClick;
+    }
+    if (dismissButton is not null)
+    {
+      AutomationProperties.SetName(dismissButton, "Dismiss");
+      dismissButton.Click += OnDismissClick;
+    }
+  }
+
+  protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToVisualTree(e);
+    isPointerOver = IsPointerOver;
+    ArmTimeout();
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnDetachedFromVisualTree(e);
+    isPointerOver = false;
+    StopTimeout();
+  }
+
+  protected override void OnPointerEntered(PointerEventArgs e)
+  {
+    base.OnPointerEntered(e);
+    isPointerOver = true;
+    StopTimeout();
+  }
+
+  protected override void OnPointerExited(PointerEventArgs e)
+  {
+    base.OnPointerExited(e);
+    isPointerOver = false;
+    ArmTimeout();
+  }
+
+  protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+  {
+    base.OnPointerCaptureLost(e);
+    if (!IsPointerOver)
+    {
+      isPointerOver = false;
+      ArmTimeout();
+    }
+  }
+
+  protected override void OnPointerPressed(PointerPressedEventArgs e)
+  {
+    base.OnPointerPressed(e);
+
+    if (!CloseOnClick || e.Handled || IsClosed)
+    {
+      return;
+    }
+
+    if (IsInsideNamedButton(e.Source as Control))
+    {
+      return;
+    }
+
+    RaiseDismissRequested();
+    e.Handled = true;
+  }
+
+  private void OnActionClick(object? sender, RoutedEventArgs e)
+  {
+    if (IsClosed)
+    {
+      return;
+    }
+
+    ActionActivated?.Invoke(this, EventArgs.Empty);
+  }
+
+  protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+  {
+    base.OnPropertyChanged(change);
+
+    if (
+      change.Property == TitleProperty ||
+      change.Property == MessageProperty ||
+      change.Property == ActionLabelProperty ||
+      change.Property == ActionCommandProperty)
+    {
+      SyncState();
+    }
+  }
+
+  private void OnDismissClick(object? sender, RoutedEventArgs e) => RaiseDismissRequested();
+
+  private void RaiseDismissRequested()
+  {
+    if (IsClosed)
+    {
+      return;
+    }
+
+    StopTimeout();
+    DismissRequested?.Invoke(this, EventArgs.Empty);
+  }
+
+  private void ArmTimeout()
+  {
+    if (Duration <= TimeSpan.Zero || IsClosed || isPointerOver)
+    {
+      return;
+    }
+
+    StopTimeout();
+    timeoutTimer = new DispatcherTimer { Interval = Duration };
+    timeoutTimer.Tick += OnTimeoutTick;
+    timeoutTimer.Start();
+  }
+
+  private void StopTimeout()
+  {
+    if (timeoutTimer is not null)
+    {
+      timeoutTimer.Stop();
+      timeoutTimer.Tick -= OnTimeoutTick;
+      timeoutTimer = null;
+    }
+  }
+
+  private void OnTimeoutTick(object? sender, EventArgs e) => RaiseDismissRequested();
+
+  private bool IsInsideNamedButton(Control? source)
+  {
+    if (source is null)
+    {
+      return false;
+    }
+
+    return (actionButton is not null && IsSelfOrDescendant(source, actionButton)) ||
+      (dismissButton is not null && IsSelfOrDescendant(source, dismissButton));
+  }
+
+  private static bool IsSelfOrDescendant(Control source, Control target)
+  {
+    for (var current = source; current is not null; current = current.Parent as Control)
+    {
+      if (ReferenceEquals(current, target))
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
@@ -705,7 +939,9 @@ internal static class FsusServiceVisuals
     FsusComponentClasses.Ensure(control, "fsus-motion-reduced", reducedMotion);
   }
 
-  public static FsusOverlayOptions CreateServiceOverlayOptions(FsusServicePlacement placement) =>
+  public static FsusOverlayOptions CreateServiceOverlayOptions(
+    FsusServicePlacement placement,
+    FsusOverlayHost host) =>
     new()
     {
       IsModal = false,
@@ -714,9 +950,9 @@ internal static class FsusServiceVisuals
       Placement = placement is FsusServicePlacement.TopLeft or FsusServicePlacement.BottomLeft
         ? FsusOverlayPlacement.TopStart
         : FsusOverlayPlacement.TopEnd,
-      AnchorBounds = new Rect(0, 0, 1920, 0),
+      AnchorBounds = new Rect(0, 0, host.Bounds.Width, 0),
       OverlaySize = new Size(320, 80),
-      ViewportBounds = new Rect(0, 0, 1920, 1080),
+      ViewportBounds = new Rect(0, 0, host.Bounds.Width, host.Bounds.Height),
     };
 
   public static string TypeName(FsusServiceType type) =>

@@ -8,4 +8,18 @@ public static class FsusIconKeys
   public const string Settings = "FsusIconSettings";
   public const string Warning = "FsusIconWarning";
   public const string ChevronRight = "FsusIconChevronRight";
+  public const string Folder = "FsusIconFolder";
+  public const string Outline = "FsusIconOutline";
+  public const string SaveAll = "FsusIconSaveAll";
+  public const string CloseAll = "FsusIconCloseAll";
+  public const string File = "FsusIconFile";
+  public const string FileText = "FsusIconFileText";
+  public const string FileMarkdown = "FsusIconFileMarkdown";
+  public const string FileCode = "FsusIconFileCode";
+  public const string FileData = "FsusIconFileData";
+  public const string FileImage = "FsusIconFileImage";
+  public const string FileArchive = "FsusIconFileArchive";
+  public const string FileDocument = "FsusIconFileDocument";
+  public const string Confirm = "FsusIconConfirm";
+  public const string FileImport = "FsusIconFileImport";
 }

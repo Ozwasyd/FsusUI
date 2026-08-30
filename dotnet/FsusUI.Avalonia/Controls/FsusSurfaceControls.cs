@@ -579,6 +579,7 @@ public class FsusDialog : FsusModalSurface
   public FsusDialog() : base("fsus-dialog-surface")
   {
     AddClass("fsus-dialog");
+    Focusable = true;
     AddHandler(
       InputElement.GotFocusEvent,
       OnChildGotFocus,
@@ -711,8 +712,12 @@ public class FsusDialog : FsusModalSurface
     FsusComponentClasses.Ensure(this, "fsus-scrollable-body", IsBodyScrollable);
     FsusComponentClasses.Ensure(
       this,
+      "fsus-has-legacy-content",
+      Content is not null);
+    FsusComponentClasses.Ensure(
+      this,
       "fsus-has-body-content",
-      IsBodyScrollable && BodyContent is not null);
+      BodyContent is not null);
 
     if (bodyScrollViewer is not null)
     {

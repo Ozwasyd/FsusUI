@@ -7,6 +7,47 @@
   },
   "semanticTypes": [
     {
+      "name": "FsusUI.Avalonia.Icons.FsusFileTypeIcon",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": true,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "Resolve",
+          "isStatic": true,
+          "returnType": "System.String",
+          "parameters": [
+            {
+              "name": "fileNameOrExtension",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "TryResolve",
+          "isStatic": true,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "fileNameOrExtension",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "resourceKey",
+              "type": "System.String\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Icons.FsusIconKeys",
       "kind": "class",
       "baseType": "System.Object",

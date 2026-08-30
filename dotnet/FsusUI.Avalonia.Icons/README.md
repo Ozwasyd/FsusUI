@@ -21,6 +21,27 @@ Avalonia resource key for every stable icon.
 `IconKey` plus `Data="{StaticResource ...}"` without changing the generated
 source set.
 
+## File Type Resolution
+
+`FsusUI.Avalonia.Icons.FsusFileTypeIcon` maps a file name or bare extension to
+a stable generated resource key for compact tree rows and content presenters:
+
+```csharp
+icon.IconKey = FsusFileTypeIcon.Resolve("README.md");   // FsusIconFileMarkdown
+icon.IconKey = FsusFileTypeIcon.Resolve("archive.tar.gz"); // FsusIconFileArchive
+icon.IconKey = FsusFileTypeIcon.Resolve("unknown.zzz"); // FsusIconFile (stable fallback)
+```
+
+The resolver distinguishes Markdown, plain text, code, data, image, archive,
+and document formats, and returns the stable `FsusIconFile` fallback for
+unknown, empty, or hidden inputs such as `Makefile`. Compound names use the
+last extension. Use `TryResolve` when the consumer must know that the fallback
+was applied.
+
+Pair every resolved icon with the row's visible file name label; the icon is
+decorative by default and must not duplicate the file name as an automation
+name. Icons inherit the host foreground color in every theme.
+
 ## Semantics
 
 Icon size, stroke, and fill names come from shared token ids:
