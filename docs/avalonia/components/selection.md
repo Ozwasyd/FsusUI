@@ -4,8 +4,9 @@ Component ID: `selection`
 
 ## Avalonia API
 
-Use `FsusCheckbox`, `FsusCheckboxGroup`, `FsusRadio`, `FsusRadioGroup`, and
-`FsusSwitch` for boolean, three-state, grouped, and exclusive selection.
+Use `FsusCheckbox`, `FsusCheckboxGroup`, `FsusCheckboxButton`, `FsusRadio`,
+`FsusRadioGroup`, `FsusCheckTag`, and `FsusSwitch` for boolean, three-state,
+button-styled, toggleable, grouped, and exclusive selection.
 
 `FsusSwitch` ships a native control template in
 `Themes/Controls/Switch.axaml` that resolves every template part
@@ -18,9 +19,9 @@ density sizing for `fsus-size-sm`, `fsus-size-md`, and `fsus-size-lg`.
 
 ## Vue Contract Mapping
 
-Vue checked values, radio groups, disabled items, loading state, and keyboard
-contracts map to `IsChecked`, `SelectedValues`, `SelectedValue`, `ItemValue`,
-and typed value-changed events.
+Vue checked values, checkbox buttons, check tags, radio groups, disabled
+items, loading state, and keyboard contracts map to `IsChecked`, `Label`,
+`SelectedValues`, `SelectedValue`, `ItemValue`, and typed value-changed events.
 
 ## Supported Platform Differences
 

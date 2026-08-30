@@ -7,7 +7,7 @@
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
-    <Setter Property="Padding" Value="16,8" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace4}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
@@ -19,7 +19,7 @@
           BorderBrush="{TemplateBinding BorderBrush}"
           BorderThickness="{TemplateBinding BorderThickness}"
           Padding="{TemplateBinding Padding}"
-          CornerRadius="4">
+          CornerRadius="{DynamicResource FsusRadiusControlSm}">
           <ContentPresenter
             Content="{TemplateBinding Content}"
             ContentTemplate="{TemplateBinding ContentTemplate}"
