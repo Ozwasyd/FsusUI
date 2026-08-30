@@ -1,0 +1,65 @@
+{
+  "positive": [
+    {
+      "name": "patch dependency",
+      "group": "vue-runtime-dependencies",
+      "updateType": "patch"
+    },
+    {
+      "name": "minor dependency",
+      "group": "npm-release-tooling",
+      "updateType": "minor"
+    },
+    {
+      "name": "Vue peer and build dependency",
+      "group": "vue-build-toolchain",
+      "updateType": "minor"
+    },
+    {
+      "name": "major dependency",
+      "group": "avalonia-platform",
+      "updateType": "major"
+    },
+    {
+      "name": "digest image",
+      "group": "node-dotnet-sdk-images",
+      "updateType": "digest"
+    },
+    {
+      "name": "lockfile maintenance",
+      "group": "lockfile-maintenance",
+      "updateType": "lockfile-maintenance"
+    },
+    {
+      "name": "security update uses the same gates",
+      "group": "github-actions",
+      "updateType": "patch",
+      "securityUpdate": true
+    }
+  ],
+  "negative": [
+    { "name": "draft", "mutation": "draft" },
+    { "name": "merge conflict", "mutation": "conflict" },
+    { "name": "blocking label", "mutation": "blocking-label" },
+    { "name": "stale base", "mutation": "stale-base" },
+    { "name": "older stable target", "mutation": "older-target" },
+    { "name": "stale controlled projections", "mutation": "stale-projections" },
+    { "name": "direct push", "mutation": "direct-push" },
+    { "name": "manual approval", "mutation": "manual-approval" },
+    { "name": "unknown group", "mutation": "unknown-group" },
+    { "name": "unknown update type", "mutation": "unknown-update-type" },
+    { "name": "missing check", "mutation": "missing-check" },
+    { "name": "action required check", "mutation": "action-required-check" },
+    { "name": "failed check", "mutation": "failure-check" },
+    { "name": "skipped check", "mutation": "skipped-check" },
+    { "name": "neutral check", "mutation": "neutral-check" },
+    { "name": "pending check", "mutation": "pending-check" },
+    { "name": "cancelled check", "mutation": "cancelled-check" },
+    { "name": "timed out check", "mutation": "timed-out-check" },
+    { "name": "missing gate evidence", "mutation": "missing-gate" },
+    { "name": "failed gate evidence", "mutation": "failed-gate" },
+    { "name": "security bypass", "mutation": "security-bypass" },
+    { "name": "overdue failure", "mutation": "overdue-failure" },
+    { "name": "old draft is not a failed dependency", "mutation": "overdue-draft" }
+  ]
+}

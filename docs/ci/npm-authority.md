@@ -88,7 +88,7 @@ parser/scan logs, Dependency Dashboard state, and real upgrade PRs (or a
 hosted no-update result) require repository-owner and hosted-service evidence;
 local dry-runs are not substitutes.
 
-## Required checks (#407)
+## Required checks and platform PR automerge (#407 / #409)
 
 `config/dependencies/required-checks.json` is the only dependency-PR check
 authority. It maps every governed dependency group and update type to the exact
@@ -99,8 +99,14 @@ package-producing `build-package` gate and its `consumer-install` consumer are
 mandatory for package runtime, Vue build/peer, npm release, Wasm, and mixed
 SDK/image updates.
 
-The local policy fixtures simulate branch-protection payloads, update-type
-mapping, and required-check conclusions. Renovate automerge remains disabled:
+Renovate creates PRs for patch, minor, major, digest, and lockfile-maintenance
+updates and requests platform-native automerge only after checks pass. It does
+not push dependency updates directly, request manual approval, use a merge
+window, or bypass the same gates for vulnerability alerts. Branches behind the
+default branch must be rebased before they become eligible.
+
+The local policy fixtures simulate branch-protection payloads, check
+conclusions, mergeability, target freshness, and platform-automerge decisions:
 
 ```bash
 pnpm check:dependency-pr-policy
@@ -108,9 +114,10 @@ pnpm test:dependency-pr-policy
 ```
 
 This simulation is repository evidence only. It does not prove that GitHub
-branch protection is currently configured. Repository owners must compare the
-live default-branch protection payload with the checked-in authority before
-treating the contract as hosted evidence.
+branch protection is currently configured or that GitHub has actually merged a
+Renovate PR. Repository owners must compare the live default-branch protection
+payload with the checked-in authority before treating hosted automerge as
+accepted evidence.
 
 ## What #405 / #406 / #408 cover
 
