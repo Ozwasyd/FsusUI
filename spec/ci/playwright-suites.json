@@ -292,6 +292,52 @@
       "countsTowardProductBrowserCoverage": true
     },
     {
+      "id": "web-interaction-conformance",
+      "command": "pnpm test:conformance:web-interaction",
+      "config": "vue/playwright.conformance-interaction.config.ts",
+      "runtime": "browser-product",
+      "projectContract": "spec/ci/playwright-project-contracts/web-interaction-conformance.json",
+      "cells": [
+        {
+          "id": "web-interaction-conformance/chromium",
+          "project": "chromium",
+          "dimensions": { "browser": "chromium" }
+        },
+        {
+          "id": "web-interaction-conformance/firefox",
+          "project": "firefox",
+          "dimensions": { "browser": "firefox" }
+        },
+        {
+          "id": "web-interaction-conformance/webkit",
+          "project": "webkit",
+          "dimensions": { "browser": "webkit" }
+        }
+      ],
+      "impactRoots": [
+        "spec/components/contracts/v2/**",
+        "spec/components/**",
+        "tests/conformance/interactions/**",
+        "scripts/interaction-conformance.mjs",
+        "vue/tests/markdown-editor/markdown-interaction-trace.spec.ts",
+        "vue/packages/wasm/markdown-interaction-trace.ts",
+        "vue/packages/components/**",
+        "vue/packages/demo-app/src/InteractionTraceFixture.vue",
+        "vue/packages/demo-app/src/demo-contract.ts",
+        "vue/playwright.conformance-interaction.config.ts"
+      ],
+      "artifacts": {
+        "namespace": "playwright-suite-web-interaction-conformance",
+        "reportDirectory": "playwright-report/conformance-interaction",
+        "traceDirectory": "vue/test-results/conformance-interaction",
+        "screenshotDirectory": "vue/test-results/conformance-interaction",
+        "receiptPath": ".readiness/receipts/playwright-web-interaction-conformance.json"
+      },
+      "allowAffectedSkip": true,
+      "skipReasonTypes": ["unaffected-sources"],
+      "countsTowardProductBrowserCoverage": true
+    },
+    {
       "id": "visual-runtime-reuse",
       "command": "pnpm test:visual:reuse",
       "config": "vue/playwright.reuse.config.ts",
@@ -367,6 +413,7 @@
       "suiteIds": [
         "geometry-smoke",
         "motion-ssr",
+        "web-interaction-conformance",
         "visual-runtime-reuse"
       ]
     },
@@ -377,6 +424,7 @@
         "dom-layout",
         "geometry-smoke",
         "markdown-editor-interaction",
+        "web-interaction-conformance",
         "visual-boundary-audit",
         "visual-runtime-reuse"
       ]
@@ -388,6 +436,7 @@
         "dom-layout",
         "geometry-smoke",
         "markdown-editor-interaction",
+        "web-interaction-conformance",
         "visual-boundary-audit",
         "visual-runtime-reuse"
       ]
@@ -399,6 +448,7 @@
         "dom-layout",
         "geometry-smoke",
         "markdown-editor-interaction",
+        "web-interaction-conformance",
         "visual-boundary-audit",
         "visual-runtime-reuse"
       ]
