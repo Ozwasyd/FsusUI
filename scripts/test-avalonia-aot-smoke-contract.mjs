@@ -60,7 +60,7 @@ mutate(
 )
 mutate(
   'scripts/test-avalonia-aot-smoke.mjs',
-  (text) => text.replace("'publish', consumerProject", "'run', consumerProject"),
+  (text) => text.replace(/'publish',\s*consumerProject/u, "'run', consumerProject"),
   'JIT run',
 )
 mutate(
@@ -77,7 +77,12 @@ mutate(
   (text) => text.replace('<SelfContained>true</SelfContained>', '<SelfContained>false</SelfContained>'),
   'runtime dependency',
 )
+mutate(
+  project,
+  (text) => text.replace('<InvariantGlobalization>false</InvariantGlobalization>', '<InvariantGlobalization>true</InvariantGlobalization>'),
+  'invariant globalization',
+)
 
 console.log(
-  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, external network, runtime dependency.',
+  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, external network, runtime dependency, invariant globalization.',
 )
