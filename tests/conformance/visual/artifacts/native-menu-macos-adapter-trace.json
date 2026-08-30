@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "issue": 688,
+  "fixtureClass": "production-builder-with-library-owned-adapter-seam",
+  "localSimulation": true,
+  "physicalMacOSHardware": false,
+  "servicesMenusMarkedForAvaloniaNativeExporter": 1,
+  "routedRoles": [
+    "Hide",
+    "HideOthers",
+    "ShowAll",
+    "WindowMinimize",
+    "WindowZoom",
+    "WindowBringAllToFront",
+    "Quit"
+  ],
+  "responderSelectors": [
+    "hide:",
+    "hideOtherApplications:",
+    "unhideAllApplications:",
+    "performMiniaturize:",
+    "performZoom:",
+    "arrangeInFront:",
+    "terminate:"
+  ],
+  "nonMacRoleCounts": {
+    "Windows": 0,
+    "Linux": 0
+  },
+  "note": "The trace proves deterministic builder-to-adapter routing and the Avalonia native exporter marker contract; it does not claim a physical macOS run."
+}

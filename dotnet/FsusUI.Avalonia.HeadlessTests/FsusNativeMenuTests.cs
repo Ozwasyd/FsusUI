@@ -1,16 +1,17 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Windows.Input;
 
-namespace FsusUI.Avalonia.Tests.Controls;
+namespace FsusUI.Avalonia.HeadlessTests;
 
 public class FsusNativeMenuTests
 {
-  [Fact]
+  [AvaloniaFact]
   public void SameCommandModelUsableByCommandPaletteAndNativeMenu()
   {
     var saveCommand = new FsusPlatformCommand("file.save", "Save Document", FsusPlatformRole.FileSave)
@@ -63,7 +64,7 @@ public class FsusNativeMenuTests
     Assert.True(executed);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void DocumentStateChangesSynchronouslyUpdateItemEnabledState()
   {
     var saveCommand = new FsusPlatformCommand("file.save", "Save", FsusPlatformRole.FileSave)
@@ -105,7 +106,7 @@ public class FsusNativeMenuTests
     Assert.False(exportMenuItem.IsEnabled);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator()
   {
     var command = new FsusPlatformCommand("file.save", "Save", FsusPlatformRole.FileSave)
@@ -134,7 +135,7 @@ public class FsusNativeMenuTests
     Assert.True(saveItem.Gesture.KeyModifiers.HasFlag(KeyModifiers.Shift));
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void MacPlatformRolesInCorrectPositionsAndOtherPlatformsDoNotHaveInvalidItems()
   {
     var aboutCmd = new FsusPlatformCommand("app.about", "About FsusUI", FsusPlatformRole.About);
@@ -207,7 +208,7 @@ public class FsusNativeMenuTests
     Assert.Contains("About FsusUI", winHelpHeaders);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void InitiallyDisabledCommandStaysDisabledAfterBuildAndReflectsNestedState()
   {
     var executed = false;
@@ -270,7 +271,7 @@ public class FsusNativeMenuTests
     public void Execute(object? parameter) => execute(parameter);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void PreserveRootsProfileReturnsExactlySuppliedRootsWithMetadataAndCommandState()
   {
     var aboutCommand =
@@ -327,7 +328,7 @@ public class FsusNativeMenuTests
       Headers(NativeMenu.GetMenu(app)!));
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void SynthesizedRootsOptionGatesMissingRequiredRoots()
   {
     var newCommand = new FsusPlatformCommand("file.new", "New", FsusPlatformRole.FileNew);
@@ -392,7 +393,7 @@ public class FsusNativeMenuTests
       item => item.Header == "Quit FsusUI");
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void DockMenuContractAndWindowlessRoutingFallbackWorks()
   {
     Assert.True(FsusDockMenuContract.IsSupported(FsusShortcutPlatform.macOS));
@@ -466,7 +467,7 @@ public class FsusNativeMenuTests
     Assert.True(windowlessInvoked);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void PlatformSimulationBindsRolesAndCanonicalTopLevelOrder()
   {
     var appMenu = FsusNativeMenuItemModel.SubMenu(
@@ -602,7 +603,7 @@ public class FsusNativeMenuTests
     }
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void RebuildAndDisposeDetachPreviousCommandListeners()
   {
     var command =
@@ -631,7 +632,7 @@ public class FsusNativeMenuTests
     Assert.Equal("Save Document", secondSave.Header);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void RecentSubmenuRebuildAndDockAttachmentUseNeutralRoles()
   {
     var opened = new List<string>();
@@ -695,7 +696,7 @@ public class FsusNativeMenuTests
               FsusPlatformRole.DockOpenRecent);
   }
 
-  [Fact]
+  [AvaloniaFact]
   public void LocalPlatformSimulationProducesBoundEvidence()
   {
     var save =
