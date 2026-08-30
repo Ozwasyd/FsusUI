@@ -29,8 +29,8 @@
     "authorityDigest": "8c8c67cf8b91bff708286daa31e98da393269af78f14b4f918acc0291c6d5fb3",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "c44c9ab32239d72f0ea4952f30b4926b1556ea45",
-  "candidateDigest": "19a6c66d68a1e4d5b252b217ea49caefceef659bebf13bc4e5eeb91b337a10d3",
+  "candidateSha": "0b78c8c47e07b23a919a02dee3824857f64669e4",
+  "candidateDigest": "234be2d589866454f008ca103d8e3b8de6d7559eea76c84157730bf8150dcc57",
   "stateEvidenceMatrix": [
     { "state": "context-menu-pointer-keyboard-spelling-native-fallback-focus-accessibility", "viewport": "desktop and narrow desktop", "theme": "both", "evidenceDigest": "23806ecaf6c721ec5f5a27f6d0bbcc4995b5ccf304f9dd9d2cab038022436c58" },
     { "state": "tagged-pdf-hierarchical-outline-capability-cancellation-stream", "viewport": "Windows and Linux adapter simulation", "theme": "both", "evidenceDigest": "2a02f77eb7d31d0ff9ed72ac986cea2c3718895ff98ad4a4c3737a5d0af113a9" }
@@ -51,5 +51,5 @@
   "classificationEvidenceDigest": "a40ed3ef1a0b5938f68d7606a17b2243056eb5e1c69b0d279ca3ef51385014b8",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "b578005790e7924943de990544ead792c61f1df0f82ee71473630692ecffc0b7"
+  "receiptDigest": "9d3c524bfc4d13fa546a2fd508363208b12f77340a5125bf5fd3816edb403dcf"
 }
