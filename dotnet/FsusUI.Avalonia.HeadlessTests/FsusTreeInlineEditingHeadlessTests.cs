@@ -11,6 +11,7 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.Themes.Fluent;
 using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Themes;
@@ -63,7 +64,7 @@ public class FsusTreeInlineEditingHeadlessTests
     Assert.NotNull(fixture.Tree.ActiveInlineEdit);
     editor = FindEditor(fixture.Tree, "draft");
     Assert.True(editor.IsFocused);
-    Assert.True(editor.IsInvalid);
+    Assert.Contains("fsus-invalid", editor.Classes);
     Assert.Equal(
       "A sibling with this name already exists.",
       AutomationProperties.GetHelpText(editor));
@@ -181,9 +182,9 @@ public class FsusTreeInlineEditingHeadlessTests
       Dispatcher.UIThread.RunJobs();
       Arrange(fixture.Root);
 
-      var editors = fixture.Root.GetLogicalDescendants().OfType<FsusInput>().ToArray();
+      var editors = fixture.Root.GetLogicalDescendants().OfType<TextBox>().ToArray();
       Assert.Equal(3, editors.Length);
-      Assert.Contains(editors, editor => editor.IsInvalid);
+      Assert.Contains(editors, editor => editor.Classes.Contains("fsus-invalid"));
       Assert.Contains(editors, editor => editor.Text == "EditorView.axaml");
       Assert.All(editors, editor =>
       {
@@ -216,7 +217,7 @@ public class FsusTreeInlineEditingHeadlessTests
           name = AutomationProperties.GetName(editor),
           status = AutomationProperties.GetItemStatus(editor),
           help = AutomationProperties.GetHelpText(editor),
-          invalid = editor.IsInvalid,
+          invalid = editor.Classes.Contains("fsus-invalid"),
           text = editor.Text,
           focused = editor.IsFocused,
           selectionStart = editor.SelectionStart,
@@ -266,6 +267,7 @@ public class FsusTreeInlineEditingHeadlessTests
     Grid.SetRow(tree, 1);
     root.Children.Add(tree);
     var window = new Window { Width = 960, Height = 560, Content = root, ShowInTaskbar = false };
+    ConfigureWindow(window, theme, density);
     return new Fixture(window, root, tree, source, editor, service, readme, lazy);
   }
 
@@ -299,6 +301,7 @@ public class FsusTreeInlineEditingHeadlessTests
       root.Children.Add(heading);
     }
     var window = new Window { Width = 960, Height = 560, Content = root, ShowInTaskbar = false };
+    ConfigureWindow(window, theme, density);
     return new EvidenceFixture(window, root, trees);
   }
 
@@ -352,6 +355,24 @@ public class FsusTreeInlineEditingHeadlessTests
     });
   }
 
+  private static void ConfigureWindow(
+    Window window,
+    FsusThemeVariant theme,
+    FsusDensity density)
+  {
+    window.Styles.Add(new FluentTheme());
+    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
+    {
+      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
+    });
+    new FsusThemeManager().Apply(window.Resources, new FsusThemeOptions
+    {
+      Variant = theme,
+      Density = density,
+      MotionMode = FsusMotionMode.Reduced,
+    });
+  }
+
   private static void Arrange(Control control)
   {
     control.InvalidateMeasure();
@@ -361,8 +382,8 @@ public class FsusTreeInlineEditingHeadlessTests
     AvaloniaHeadlessPlatform.ForceRenderTimerTick();
   }
 
-  private static FsusInput FindEditor(Control root, string key) =>
-    Assert.IsType<FsusInput>(FindByAutomationId(root, $"fsus-tree-inline-editor-{key}"));
+  private static TextBox FindEditor(Control root, string key) =>
+    Assert.IsType<TextBox>(FindByAutomationId(root, $"fsus-tree-inline-editor-{key}"));
 
   private static Control FindByAutomationId(Control root, string automationId) =>
     root.GetLogicalDescendants().OfType<Control>().Single(control =>

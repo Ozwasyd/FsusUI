@@ -213,7 +213,7 @@ public class FsusTree : ContentControl
   private readonly Dictionary<string, FsusTreeLazyLoadState> lazyLoadStates = new(StringComparer.Ordinal);
   private readonly StackPanel rowsPanel = new();
   private CancellationTokenSource? loadCancellation;
-  private FsusInput? inlineEditor;
+  private TextBox? inlineEditor;
   private TopLevel? inlineEditTopLevel;
   private int loadVersion;
 
@@ -851,34 +851,40 @@ public class FsusTree : ContentControl
   private Control BuildInlineEditContent(string accessibleTargetName)
   {
     var edit = ActiveInlineEdit!;
-    var editor = new FsusInput
+    var editor = new TextBox
     {
-      AccessibleName = edit.Kind == FsusTreeInlineEditKind.Rename
-        ? $"Rename {accessibleTargetName}"
-        : "New item name",
       Text = edit.Text,
-      IsInvalid = !string.IsNullOrWhiteSpace(edit.ValidationError),
       HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch,
     };
     FsusComponentClasses.Ensure(editor, "fsus-tree-inline-editor", true);
+    FsusComponentClasses.Ensure(
+      editor,
+      "fsus-invalid",
+      !string.IsNullOrWhiteSpace(edit.ValidationError));
     AutomationProperties.SetAutomationId(editor, $"fsus-tree-inline-editor-{edit.Key}");
+    AutomationProperties.SetName(
+      editor,
+      edit.Kind == FsusTreeInlineEditKind.Rename
+        ? $"Rename {accessibleTargetName}"
+        : "New item name");
     AutomationProperties.SetHelpText(editor, edit.ValidationError ?? string.Empty);
     AutomationProperties.SetItemStatus(
       editor,
       string.IsNullOrWhiteSpace(edit.ValidationError)
         ? $"editing {edit.Kind.ToString().ToLowerInvariant()}"
         : $"editing {edit.Kind.ToString().ToLowerInvariant()}, invalid");
-    editor.ValueChanged += (_, args) =>
+    editor.PropertyChanged += (_, args) =>
     {
       if (
+        args.Property == TextBox.TextProperty &&
         ReferenceEquals(ActiveInlineEdit, edit) &&
         ReferenceEquals(inlineEditor, editor))
       {
-        edit.Text = args.NewValue ?? string.Empty;
+        edit.Text = editor.Text ?? string.Empty;
         if (edit.ValidationError is not null)
         {
           edit.ValidationError = null;
-          editor.IsInvalid = false;
+          FsusComponentClasses.Ensure(editor, "fsus-invalid", false);
           AutomationProperties.SetHelpText(editor, string.Empty);
           AutomationProperties.SetItemStatus(
             editor,
@@ -926,7 +932,7 @@ public class FsusTree : ContentControl
   }
 
   private void FocusInlineEditor(
-    FsusInput editor,
+    TextBox editor,
     FsusTreeInlineEditState edit)
   {
     Dispatcher.UIThread.Post(() =>
