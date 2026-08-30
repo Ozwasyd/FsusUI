@@ -25,8 +25,8 @@
     "authorityDigest": "554345bd5f2c2c5575e263377be99a1c65b29374895b01e4c7108c7539feddf7",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "616cd36d6bde293e9bf35c5a185fdfaef9c91c08",
-  "candidateDigest": "240441c9d3cfedfdecbade2d3a1b0555b9d4ada77bb767d271d5b48a570b9641",
+  "candidateSha": "122c7caac52b55476b930cdd4d4f78d6f8348fc5",
+  "candidateDigest": "22464d71a0a85e635b6de5dcb44fe58a1b31d989fde79dadc26679202b9c6b96",
   "stateEvidenceMatrix": [
     { "state": "long-warnings-actions-and-focus", "viewport": "1440x1000@100%", "theme": "light", "evidenceDigest": "acc95344ed2d05ced1531062c76ccd9e0860f88618c75934b2271c349bce24c3" },
     { "state": "long-warnings-actions-and-focus", "viewport": "1440x1000@150%", "theme": "dark", "evidenceDigest": "849590403311b68753ca4e052420d33227ff3a47ba42c2e48ddbc75101f7fdbe" },
@@ -50,5 +50,5 @@
   "classificationEvidenceDigest": "fe84e33cb7ae32575ede3f7a2e4df4aa092d2ce47f93a368ca317adf57f6c22e",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "eab1ebc37a3becd290493cfc1af15dfaa52d138bfcf10d4b1f27d012e289d0a0"
+  "receiptDigest": "85fea128dd953b98c925a68b2f2084f350f77644a79bcd131127f46f6551ed3d"
 }
