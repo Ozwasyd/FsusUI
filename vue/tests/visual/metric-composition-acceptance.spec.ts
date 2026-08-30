@@ -1,20 +1,21 @@
-import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import { mkdir, writeFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import {
+  writeIssue468ScreenshotEvidence,
+  writeIssue468TextEvidence,
+} from '../support/issue-468-conformance-evidence'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
+import {
+  expect,
+  test,
+  type VisualViewportName,
+} from '../support/visual-variant-fixture'
 import {
   buildVisualUrl,
   resolveVisualVariant,
 } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
-const issue468EvidenceRoot = resolve(
-  process.cwd(),
-  'tests/conformance/visual/artifacts',
-)
-
 const stabilizePage = async (page: Page) => {
   await page.addStyleTag({
     content: `*,*::before,*::after{transition-duration:0s!important;animation-duration:0s!important;animation-delay:0s!important;scroll-behavior:auto!important}`,
@@ -554,34 +555,28 @@ test('keyboard, touch and screen-reader semantics keep status text and actions r
   expect(ariaSnapshot).toContain('Over limit')
   expect(ariaSnapshot).toContain('Copy detail')
   expect(ariaSnapshot).toContain('No diagnostics')
-  await mkdir(issue468EvidenceRoot, { recursive: true })
-  await writeFile(
-    resolve(
-      issue468EvidenceRoot,
-      `issue-468-metric-${theme}-${compact ? 'mobile' : 'desktop'}-aria.txt`,
-    ),
+  await writeIssue468TextEvidence(
+    `issue-468-metric-${theme}-${compact ? 'mobile' : 'desktop'}-aria.txt`,
     `${ariaSnapshot}\n`,
   )
 })
 
 test('required responsive and zoom cells retain production rendered evidence', async ({
   page,
+  useVisualViewport,
 }, testInfo) => {
   const { compact, theme } = resolveVisualVariant(testInfo.project.name)
-  const widths = compact ? [320, 375] : [768, 1366]
+  const widths = compact
+    ? (['metric-320', 'metric-375'] as const)
+    : (['metric-768', 'metric-1366'] as const)
   const cells = [
-    ...widths.map((width) => ({ width, zoom: 100 })),
-    { width: compact ? 375 : 1366, zoom: 150 },
-    { width: compact ? 375 : 1366, zoom: 200 },
+    ...widths.map((viewport) => ({ viewport, zoom: 100 })),
+    { viewport: compact ? 'metric-375' : 'metric-1366', zoom: 150 },
+    { viewport: compact ? 'metric-375' : 'metric-1366', zoom: 200 },
   ]
-  const screenshotRoot = resolve(issue468EvidenceRoot, 'screenshots/web')
-  await mkdir(screenshotRoot, { recursive: true })
 
   for (const cell of cells) {
-    await page.setViewportSize({
-      width: cell.width,
-      height: compact ? 900 : 1200,
-    })
+    await useVisualViewport(cell.viewport as VisualViewportName)
     await openMetricFixtures(page, testInfo.project.name)
     await page.evaluate((zoom) => {
       document.documentElement.style.zoom = `${zoom}%`
@@ -601,7 +596,7 @@ test('required responsive and zoom cells retain production rendered evidence', a
     }))
     expect(
       geometry.scrollWidth,
-      `${theme} ${cell.width}px at ${cell.zoom}% zoom`,
+      `${theme} ${cell.viewport}px at ${cell.zoom}% zoom`,
     ).toBeLessThanOrEqual(geometry.clientWidth + 1)
 
     const issues = await collectMetricSurfaceIssues(page, compact ? 44 : 40)
@@ -610,14 +605,14 @@ test('required responsive and zoom cells retain production rendered evidence', a
     expect(issues.fadedElements).toEqual([])
     expect(issues.colorOnlyToneRows).toEqual([])
 
-    await page.screenshot({
-      path: resolve(
-        screenshotRoot,
-        `issue-468-metric-${theme}-${cell.width}-zoom-${cell.zoom}.png`,
-      ),
+    const screenshot = await page.screenshot({
       fullPage: true,
       animations: 'disabled',
     })
+    await writeIssue468ScreenshotEvidence(
+      `issue-468-metric-${theme}-${cell.viewport.replace('metric-', '')}-zoom-${cell.zoom}.png`,
+      screenshot,
+    )
     await page.evaluate(() => {
       document.documentElement.style.zoom = ''
     })

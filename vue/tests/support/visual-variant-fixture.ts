@@ -20,6 +20,10 @@ const visualViewports = {
   'markdown-editor-768': { width: 768, height: 900 },
   'markdown-editor-1366': { width: 1366, height: 900 },
   'markdown-editor-1440': { width: 1440, height: 900 },
+  'metric-320': { width: 320, height: 900 },
+  'metric-375': { width: 375, height: 900 },
+  'metric-768': { width: 768, height: 1200 },
+  'metric-1366': { width: 1366, height: 1200 },
 } as const
 
 export type VisualViewportName = keyof typeof visualViewports
