@@ -35,9 +35,21 @@ public sealed record FsusThemeOptions
   public FsusDensity Density { get; init; } = FsusDensity.Default;
   public FsusMotionMode MotionMode { get; init; } = FsusMotionMode.System;
   public Color? AccentOverride { get; init; }
+  public FsusThemePaletteOptions? Palette { get; init; }
   public bool FollowSystemTheme { get; init; }
   public FsusTypographyOptions Typography { get; init; } =
     FsusTypographyOptions.Default;
+}
+
+public sealed record FsusThemePaletteOptions
+{
+  public Color? Background { get; init; }
+  public Color? Surface { get; init; }
+  public Color? SurfaceRaised { get; init; }
+  public Color? Text { get; init; }
+  public Color? MutedText { get; init; }
+  public Color? Border { get; init; }
+  public Color? Icon { get; init; }
 }
 
 public sealed record FsusTypographyOptions
@@ -58,6 +70,7 @@ public static class FsusThemeResourceKeys
   public const string TextBrush = "FsusThemeTextBrush";
   public const string MutedTextBrush = "FsusThemeMutedTextBrush";
   public const string BorderBrush = "FsusThemeBorderBrush";
+  public const string IconBrush = "FsusThemeIconBrush";
   public const string FocusBrush = "FsusThemeFocusBrush";
   public const string DangerBrush = "FsusThemeDangerBrush";
   public const string DisabledSurfaceBrush = "FsusThemeDisabledSurfaceBrush";
@@ -166,7 +179,7 @@ public sealed class FsusThemeManager
         ? DarkPalette
         : LightPalette;
 
-    ApplyPalette(resources, palette);
+    ApplyPalette(resources, palette, resolved.Palette);
     ApplyAccent(resources, resolved.AccentOverride);
     ApplyTypography(resources, resolved.Typography);
     ApplyDensity(resources, resolved.Density);
@@ -192,18 +205,22 @@ public sealed class FsusThemeManager
     return Enum.IsDefined(typeof(TEnum), value) ? value : fallback;
   }
 
-  private static void ApplyPalette(IResourceDictionary resources, ThemePalette palette)
+  private static void ApplyPalette(
+    IResourceDictionary resources,
+    ThemePalette palette,
+    FsusThemePaletteOptions? overrides)
   {
-    SetBrush(resources, FsusThemeResourceKeys.BackgroundBrush, palette.Background);
-    SetBrush(resources, FsusThemeResourceKeys.SurfaceBrush, palette.Surface);
-    SetBrush(resources, FsusThemeResourceKeys.SurfaceRaisedBrush, palette.SurfaceRaised);
+    SetBrush(resources, FsusThemeResourceKeys.BackgroundBrush, overrides?.Background, palette.Background);
+    SetBrush(resources, FsusThemeResourceKeys.SurfaceBrush, overrides?.Surface, palette.Surface);
+    SetBrush(resources, FsusThemeResourceKeys.SurfaceRaisedBrush, overrides?.SurfaceRaised, palette.SurfaceRaised);
     SetBrush(resources, PickerSurfaceResourceKey, palette.TreeSurface);
     SetBrush(resources, TreeSurfaceResourceKey, palette.TreeSurface);
     SetBrush(resources, FsusThemeResourceKeys.TextEditorSurfaceBrush, palette.TextEditorSurface);
     SetBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, palette.ValuePickerTrack);
-    SetBrush(resources, FsusThemeResourceKeys.TextBrush, palette.Text);
-    SetBrush(resources, FsusThemeResourceKeys.MutedTextBrush, palette.MutedText);
-    SetBrush(resources, FsusThemeResourceKeys.BorderBrush, palette.Border);
+    SetBrush(resources, FsusThemeResourceKeys.TextBrush, overrides?.Text, palette.Text);
+    SetBrush(resources, FsusThemeResourceKeys.MutedTextBrush, overrides?.MutedText, palette.MutedText);
+    SetBrush(resources, FsusThemeResourceKeys.BorderBrush, overrides?.Border, palette.Border);
+    SetBrush(resources, FsusThemeResourceKeys.IconBrush, overrides?.Icon, palette.Text);
     SetBrush(resources, FsusThemeResourceKeys.FocusBrush, palette.Focus);
     SetBrush(
       resources,
@@ -317,6 +334,15 @@ public sealed class FsusThemeManager
   private static void SetBrush(IResourceDictionary resources, string key, string color)
   {
     resources[key] = new SolidColorBrush(Color.Parse(color));
+  }
+
+  private static void SetBrush(
+    IResourceDictionary resources,
+    string key,
+    Color? color,
+    string fallback)
+  {
+    resources[key] = new SolidColorBrush(color ?? Color.Parse(fallback));
   }
 
   private sealed record ThemePalette(

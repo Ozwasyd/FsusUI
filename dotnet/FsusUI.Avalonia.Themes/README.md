@@ -32,17 +32,30 @@ manager.Apply(
     Density = FsusDensity.Compact,
     MotionMode = FsusMotionMode.Reduced,
     HighContrast = false,
+    Palette = new FsusThemePaletteOptions
+    {
+      Background = Color.Parse("#F7F4EE"),
+      Surface = Color.Parse("#FFFFFF"),
+      Text = Color.Parse("#24211C"),
+      Icon = Color.Parse("#4A453D"),
+    },
     FollowSystemTheme = false,
   });
 ```
 
 The manager applies resources in this order:
 
-1. light or dark palette
-2. high contrast overrides
+1. built-in light, dark, or high-contrast palette
+2. nullable `FsusThemePaletteOptions` fields
 3. accent override
 4. density resources
 5. motion resources
+
+`FsusThemePaletteOptions` can override `Background`, `Surface`,
+`SurfaceRaised`, `Text`, `MutedText`, `Border`, and `Icon` independently. A
+null field keeps the selected built-in value, including high-contrast values.
+Calling `Apply` again replaces the runtime resources, so controls consuming the
+corresponding `DynamicResource` update without replacing theme dictionaries.
 
 Unknown enum values fall back to light, default density, and system motion.
 `FollowSystemTheme` sets `Application.RequestedThemeVariant` to

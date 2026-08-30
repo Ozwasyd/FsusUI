@@ -4,8 +4,8 @@
   <Style Selector="fsus|FsusIcon">
     <Setter Property="Width" Value="{DynamicResource FsusIconSizeMd}" />
     <Setter Property="Height" Value="{DynamicResource FsusIconSizeMd}" />
-    <Setter Property="Fill" Value="{DynamicResource FsusThemeTextBrush}" />
-    <Setter Property="Stroke" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="Fill" Value="{DynamicResource FsusThemeIconBrush}" />
+    <Setter Property="Stroke" Value="{DynamicResource FsusThemeIconBrush}" />
     <Setter Property="StrokeThickness" Value="{DynamicResource FsusIconStrokeMd}" />
     <Setter Property="Opacity" Value="1" />
   </Style>

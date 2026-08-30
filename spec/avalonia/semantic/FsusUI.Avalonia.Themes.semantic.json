@@ -1022,6 +1022,14 @@
           "isStatic": false
         },
         {
+          "name": "Palette",
+          "type": "FsusUI.Avalonia.Themes.FsusThemePaletteOptions",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "Typography",
           "type": "FsusUI.Avalonia.Themes.FsusTypographyOptions",
           "nullable": true,
@@ -1045,6 +1053,81 @@
           "name": "\u003CClone\u003E$",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusThemePaletteOptions",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Background",
+          "type": "Avalonia.Media.Color?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Border",
+          "type": "Avalonia.Media.Color?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Icon",
+          "type": "Avalonia.Media.Color?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MutedText",
+          "type": "Avalonia.Media.Color?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Surface",
+          "type": "Avalonia.Media.Color?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SurfaceRaised",
+          "type": "Avalonia.Media.Color?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Text",
+          "type": "Avalonia.Media.Color?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusThemePaletteOptions",
           "parameters": []
         }
       ]

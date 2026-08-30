@@ -99,6 +99,61 @@ public class FsusThemeManagerTests
   }
 
   [Fact]
+  public void ApplyUsesPaletteOverridesWithPerFieldVariantFallbacks()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions
+      {
+        Variant = FsusThemeVariant.Dark,
+        Palette = new FsusThemePaletteOptions
+        {
+          Background = Color.Parse("#102030"),
+          Text = Color.Parse("#F0E0D0"),
+          Icon = Color.Parse("#ABCDEF"),
+        },
+      }
+    );
+
+    AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#102030");
+    AssertBrush(resources, FsusThemeResourceKeys.SurfaceBrush, "#171F2C");
+    AssertBrush(resources, FsusThemeResourceKeys.SurfaceRaisedBrush, "#1F2937");
+    AssertBrush(resources, FsusThemeResourceKeys.TextBrush, "#F0E0D0");
+    AssertBrush(resources, FsusThemeResourceKeys.MutedTextBrush, "#B6C0CF");
+    AssertBrush(resources, FsusThemeResourceKeys.BorderBrush, "#394657");
+    AssertBrush(resources, FsusThemeResourceKeys.IconBrush, "#ABCDEF");
+  }
+
+  [Fact]
+  public void ApplyPaletteOverridesHighContrastFieldsWithoutReplacingItsFallbacks()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions
+      {
+        HighContrast = true,
+        Palette = new FsusThemePaletteOptions
+        {
+          Surface = Color.Parse("#101010"),
+          Border = Color.Parse("#00FFFF"),
+        },
+      }
+    );
+
+    AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#000000");
+    AssertBrush(resources, FsusThemeResourceKeys.SurfaceBrush, "#101010");
+    AssertBrush(resources, FsusThemeResourceKeys.TextBrush, "#FFFFFF");
+    AssertBrush(resources, FsusThemeResourceKeys.BorderBrush, "#00FFFF");
+    AssertBrush(resources, FsusThemeResourceKeys.IconBrush, "#FFFFFF");
+  }
+
+  [Fact]
   public void ApplyFallsBackToStableDefaultsForUnknownOptions()
   {
     var resources = new ResourceDictionary();

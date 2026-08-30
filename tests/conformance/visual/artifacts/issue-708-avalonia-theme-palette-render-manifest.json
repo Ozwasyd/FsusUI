@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "issue": 708,
+  "generatedBy": "FsusThemeManagerHeadlessTests.RealHeadlessSkiaRendersPaletteFallbackMatrix",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "productionFixture": true,
+    "limitations": "Local deterministic headless rendering; no physical display or operating-system assistive technology is claimed."
+  },
+  "captures": [
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-light.png",
+      "sha256": "f4e3ea473f3bbf3122ca29840c9e275351ee0b5d6bbb60c68e150bb73fc6c60b",
+      "width": 640,
+      "height": 360,
+      "theme": "light",
+      "state": "built-in-fallback"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-dark.png",
+      "sha256": "b5a4211f9e3ec779ed45d4075fdcd99b1228faac845d3715c2da98300fce3b23",
+      "width": 640,
+      "height": 360,
+      "theme": "dark",
+      "state": "built-in-fallback"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-custom.png",
+      "sha256": "7597d3b9d7d7ab84b2a870ed74c3a1996df28b2c4cf43b341fabbf89261ca10a",
+      "width": 640,
+      "height": 360,
+      "theme": "light",
+      "state": "complete-custom-palette"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-partial-dark.png",
+      "sha256": "a9b6b207f9b97399fc26e01aad7e06f437094492b9296183a0d0b5ad51ad00c6",
+      "width": 640,
+      "height": 360,
+      "theme": "dark",
+      "state": "partial-custom-with-dark-fallback"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-highcontrast.png",
+      "sha256": "2ce289f4613c0e9dbc2fd7be14ba7fa6bf6bd122af24f96b1130f954d5808fc0",
+      "width": 640,
+      "height": 360,
+      "theme": "highcontrast",
+      "state": "built-in-fallback"
+    }
+  ]
+}

@@ -302,9 +302,20 @@ internal static class Program
         Variant = FsusThemeVariant.Dark,
         HighContrast = true,
         Density = FsusDensity.Compact,
+        Palette = new FsusThemePaletteOptions
+        {
+          Surface = Color.Parse("#102030"),
+          Icon = Color.Parse("#ABCDEF"),
+        },
       }
     );
     var highContrastBackground = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.BackgroundBrush]!).Color;
+    var customSurface = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.SurfaceBrush]!).Color;
+    var customIcon = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.IconBrush]!).Color;
+    if (customSurface != Color.Parse("#102030") || customIcon != Color.Parse("#ABCDEF"))
+    {
+      throw new InvalidOperationException("AOT theme palette overrides did not apply.");
+    }
     report.ThemeVariant = resolvedTheme.Variant.ToString();
     report.ThemeDensity = resolvedTheme.Density.ToString();
     report.ThemeHighContrast = resolvedTheme.HighContrast;
