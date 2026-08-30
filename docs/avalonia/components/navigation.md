@@ -47,6 +47,13 @@ of localized labels.
 macOS application menus use explicit About, Preferences, Services, Hide,
 Hide Others, Show All, Quit, and Window roles. Windows and Linux omit
 macOS-only roles and order top-level menus as File, Edit, View, Window, Help.
+On macOS, `FsusNativeMenuBuilder` marks the Services submenu for Avalonia's
+native exporter, which registers it as the application Services menu, and
+routes Hide, Hide Others, Show All, Minimize, Zoom, Bring All to Front, and
+Quit through the native responder chain. Consumers do not need AppKit interop;
+when the native adapter is unavailable, an associated consumer command remains
+the fallback. The adapter is internal and does not add AppKit types to the
+public API.
 `FsusNativeMenuOptions` selects the build profile for `Build` and both
 `AttachTo` overloads: `StandardDocumentWindow` (default) keeps the platform
 normalization above, while `PreserveRoots` returns exactly the supplied roots
@@ -227,8 +234,9 @@ Router integration belongs to the app shell; navigation controls do not own URL
 mutation. `FsusSettingsShell` does not filter categories when a search slot
 changes, persist category scroll offsets across control instances, or own native
 window lifetime; the consuming app supplies those behaviors. The repository
-verifies macOS/Windows role routing with local platform simulations; those
-fixtures do not claim execution on physical hardware.
+verifies macOS/Windows role routing and the Services exporter marker with local
+platform simulations; those fixtures do not claim execution on physical
+hardware.
 
 The command palette does not register a global shortcut, own an overlay host,
 persist recent commands, or localize its built-in labels. The application owns
