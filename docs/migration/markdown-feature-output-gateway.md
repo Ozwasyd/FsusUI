@@ -49,6 +49,12 @@ token，返回 discriminated `FeatureRenderOutput`。唯一的 FsusUI-owned gate
 外部资源、未知 namespace、未知标签和未声明属性。feature 失败节点只通过
 `textContent` 写入错误与原 source，不会把 source 交给 HTML parser。
 
+启用 `require-trusted-types-for 'script'` 的宿主如果同时用 CSP
+`trusted-types` 限制 policy 名称，必须显式允许 `fsusui-markdown-feature`。
+该 policy 由 feature gateway 私有创建，不是 default policy，也不借用
+`vue` / `fsusblog` 名称。policy 创建被拒绝时提交 fail closed，目标 DOM
+保持原样。
+
 ## Package subpath 迁移
 
 本次 major change 同时移除包级的宽泛 deep export。WASM generated/runtime

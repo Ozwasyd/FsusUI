@@ -73,6 +73,7 @@
     "check:markdown-no-js-path": "node ./scripts/with-node-heap.mjs node ./vue/tests/wasm/check-markdown-no-js-path.mjs",
     "check:markdown-extreme": "node ./scripts/with-node-heap.mjs node ./vue/tests/wasm/check-markdown-extreme.mjs",
     "check:markdown-xss": "node ./scripts/check-markdown-xss.mjs",
+    "check:markdown-feature-trusted-types": "node ./scripts/with-node-heap.mjs node ./scripts/check-markdown-feature-trusted-types.mjs",
     "check:markdown-xss:performance": "node ./scripts/benchmark-markdown-xss.mjs",
     "check:markdown-xss:release": "node ./scripts/benchmark-markdown-xss.mjs --release",
     "_check:markdown-xss:release": "node ./scripts/check-markdown-xss.mjs --release",
