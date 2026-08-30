@@ -1,0 +1,108 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "web-metric-primitives-task-surface",
+    "metric-primitives-production-composition",
+    "metric-primitives-semantic-visual-matrix"
+  ],
+  "uiDecisionClass": "prescribed",
+  "verificationClass": "ux-system",
+  "requiredAuthorities": [
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84"
+    },
+    {
+      "id": "visual-change",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+    },
+    {
+      "id": "metric-primitives",
+      "path": "docs/components/metric-primitives.md",
+      "digest": "a259a52a313449613bfca0ac40588dc29ca590316569e5ded60cd7161a6eb3f7"
+    },
+    {
+      "id": "visual-testing",
+      "path": "docs/visual-testing.md",
+      "digest": "a5e34780d008d5dfa4f04ceef8dffa1178702ba5c8edc882b0e3fa79a6855388"
+    },
+    {
+      "id": "accessibility",
+      "path": "spec/accessibility/README.md",
+      "digest": "f149631813fbfb060d49412329638555e0f0c371fb441cf89ab46cd64a3e3de6"
+    },
+    {
+      "id": "visual-profiles",
+      "path": "spec/ci/visual-profiles.json",
+      "digest": "77ce497adb60ba18ac10cce3cbfed08bea0b5805c74fa6bceb1e4ee57dc0e326"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "8f7c614262d26b2df117dfc09f9aaf0cc9f38143",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "9384dee4899a5bab9634dd8b9fe461dac271d6d97cb601f5bac7f1732a19ad8c",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "8f7c614262d26b2df117dfc09f9aaf0cc9f38143",
+  "candidateDigest": "02b454dceae21ee2bacfae29d0a5b30779c774d6ae259ea0ced8896fd966689d",
+  "stateEvidenceMatrix": [
+    {
+      "state": "twenty-plus-mixed-seven-primitives-and-semantic-states",
+      "viewport": "all-required",
+      "theme": "both",
+      "evidenceDigest": "404a05324f757585d99f42c2000b91e869a94a328c9a24b8586acb65a06e0f83"
+    },
+    {
+      "state": "responsive-typography-locale-rtl-and-zoom",
+      "viewport": "320-375-768-1366",
+      "theme": "both",
+      "evidenceDigest": "37525dd43eb30940054daf0ff588d2de50ee054925d63fc6a2cc970bc88a10e9"
+    },
+    {
+      "state": "status-copy-actions-and-accessibility-inputs",
+      "viewport": "desktop-and-mobile",
+      "theme": "both",
+      "evidenceDigest": "31b868aabaac4c48281d17e55c2937752e20f964568e96c375843c0a757535fb"
+    },
+    {
+      "state": "semantic-negative-and-visual-mutation-corpus",
+      "viewport": "all-required",
+      "theme": "both",
+      "evidenceDigest": "49d0c347e1618d4ecf099b60f19c42f2b5f6e587947d2b0a11084c9f6a425425"
+    }
+  ],
+  "inScope": [
+    "A production composition containing more than twenty realistic metric entries across MetricList, KpiGroup, DistributionList, KeyValueGrid, StatusSummary, DiagnosticsList and CopyableDetail",
+    "Normal, success, warning, danger, info, loading, empty, long-value and technical-detail states",
+    "The prescribed 12, 14 and 16 pixel typography ladder, bounded font weights, tabular numbers, default no-dot motif, flat internal rows and accessible inline action targets",
+    "Light and dark themes at 320, 375, 768 and 1366 pixel viewports, 150 and 200 percent zoom, CJK, Latin, RTL, keyboard, touch and screen-reader evidence",
+    "Mutation-sensitive rejection of 13 and 17 pixel typography, broad 700 weights, default or color-dot forests, diagnostic cards, 30 pixel targets, color-only status, badge, sparkline, card stacking and consumer overrides"
+  ],
+  "outOfScope": [
+    "Charts, trends, sparklines and KPI calculations",
+    "Consumer-specific field order, metric labels, thresholds or business semantics",
+    "New decorative surfaces, badges, motifs, tokens, wrappers or component variants",
+    "Changes to the already delivered #466 typography contract or #467 flat-surface and target contract unless final acceptance reveals a concrete regression"
+  ],
+  "classificationEvidenceDigest": "154e15d95d7c59398d6c7062e9d066a37ff19ee92375bb114c2d2ae0cea221f2",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "b7675502536007d2d1ba9fbea6d313f145c010f640b80c6256c52d1a7686d247"
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "fsusui-independent-ux-review.v1",
+  "issue": 468,
+  "candidateSha": "8f7c614262d26b2df117dfc09f9aaf0cc9f38143",
+  "reviewMode": "read-only-rendered-evidence-inspection",
+  "modifiedPaths": [],
+  "productionFixture": "vue/packages/demo-app/src/sections/MetricCompositionSection.vue",
+  "inspected": {
+    "screenshots": 16,
+    "accessibilityTrees": 4,
+    "themes": ["light", "dark"],
+    "viewports": [320, 375, 768, 1366],
+    "zoomPercent": [100, 150, 200],
+    "inputEvidence": ["keyboard", "touch-emulation", "screen-reader-tree"]
+  },
+  "observations": [
+    "All seven metric primitives and more than twenty realistic entries remain visible in the production composition.",
+    "Normal, success, warning, danger, info, loading, empty, long-value and technical-detail states remain distinguishable without color-only meaning.",
+    "Light and dark evidence reflows without horizontal clipping at every required viewport and zoom cell.",
+    "CJK, Latin and RTL content retain readable hierarchy; technical details wrap within their owning data region.",
+    "Keyboard focus, touch-emulated disclosure activation, named actions, disabled actions and textual status are present in the accessibility-tree evidence.",
+    "No chart, trend, KPI calculation, badge pile, sparkline, decorative card stack or consumer-specific field order was introduced."
+  ],
+  "blockers": [],
+  "status": "accepted"
+}
