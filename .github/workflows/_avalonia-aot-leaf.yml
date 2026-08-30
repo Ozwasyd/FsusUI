@@ -1,0 +1,73 @@
+name: Reusable Avalonia Native AOT leaf
+
+on:
+  workflow_call:
+    inputs:
+      group:
+        required: true
+        type: string
+      candidate-artifact:
+        required: true
+        type: string
+      candidate-digest:
+        required: true
+        type: string
+      commit-sha:
+        required: true
+        type: string
+      rid:
+        required: true
+        type: string
+    outputs:
+      manifest-digest:
+        description: SHA-256 of the validated leaf manifest
+        value: ${{ jobs.native-leaf.outputs.manifest-digest }}
+
+jobs:
+  native-leaf:
+    runs-on: ${{ inputs.rid == 'linux-x64' && 'ubuntu-latest' || inputs.rid == 'win-x64' && 'windows-latest' || 'macos-15' }}
+    timeout-minutes: 90
+    outputs:
+      manifest-digest: ${{ steps.manifest.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit-sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.candidate-artifact }}
+          path: .dotnet-candidate
+      - name: Install Linux virtual display
+        if: inputs.rid == 'linux-x64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes xvfb
+      - name: Publish and run the final native binary
+        if: inputs.rid == 'linux-x64'
+        env:
+          FSUSUI_AOT_CANDIDATE_ROOT: ${{ github.workspace }}/.dotnet-candidate/nuget
+          FSUSUI_AOT_CANDIDATE_MANIFEST: ${{ github.workspace }}/.dotnet-candidate/package/manifest.json
+          FSUSUI_AOT_EVIDENCE_OUT: ${{ github.workspace }}/.avalonia-aot-leaf/${{ inputs.rid }}
+        run: node scripts/test-avalonia-aot-smoke.mjs
+      - name: Validate leaf identity
+        if: inputs.rid == 'linux-x64'
+        run: >-
+          node scripts/avalonia-aot-native.mjs validate-leaf
+          --manifest .avalonia-aot-leaf/${{ inputs.rid }}/leaf-manifest.json
+          --commit-sha '${{ inputs.commit-sha }}'
+          --candidate-digest '${{ inputs.candidate-digest }}'
+          --rid '${{ inputs.rid }}'
+      - name: Record leaf manifest digest
+        id: manifest
+        if: inputs.rid == 'linux-x64'
+        run: echo "digest=$(sha256sum '.avalonia-aot-leaf/${{ inputs.rid }}/leaf-manifest.json' | cut -d ' ' -f 1)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avalonia-aot-leaf-${{ inputs.rid }}
+          path: .avalonia-aot-leaf/${{ inputs.rid }}
+          if-no-files-found: error
+          retention-days: 7
