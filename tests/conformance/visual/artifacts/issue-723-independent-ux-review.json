@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "issue": 723,
   "evidenceClass": "independent-rendered-evidence-review",
-  "candidateSha": "51a58456c6fe373258e89e10ddfa2b195c4126ce",
-  "candidateDigest": "e97273babd0cbf0ddde7922d1b58554ebbc641479f5d26aa10b876fd7f6586de",
-  "classificationReceiptDigest": "a5d38908b0ca1f58977f7a2385fdc859265c478ae3ec7b5d1371e3d95c48cbfd",
+  "candidateSha": "5abd62f79e84a06130a5337c55772c27bb461e3f",
+  "candidateDigest": "2610b64ee08d6ecc241b87599b2caf1f577ed39e1ac9c2f155a5dfb666fae461",
+  "classificationReceiptDigest": "4c741e483dd0c8bc4b78e1343a8142a2be599598212818e2c3ef16f2493dddb1",
   "productionFixture": true,
   "implementationModifiedPaths": [],
   "testResult": {
