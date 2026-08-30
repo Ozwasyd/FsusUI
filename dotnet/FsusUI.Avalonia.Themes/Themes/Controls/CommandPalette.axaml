@@ -1,0 +1,119 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="fsus|FsusCommandPalette">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace3}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          CornerRadius="{TemplateBinding CornerRadius}"
+          Padding="{TemplateBinding Padding}">
+          <ContentPresenter
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}"
+            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusCommandPalette.fsus-failed">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="Border.fsus-command-palette-search-frame">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+  </Style>
+
+  <Style Selector="Border.fsus-command-palette-search-frame:focus-within">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
+  </Style>
+
+  <Style Selector="fsus|FsusInput.fsus-command-palette-search">
+    <Setter Property="Theme" Value="{StaticResource {x:Type TextBox}}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualList.fsus-command-palette-results">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualListItemContainer.fsus-command-palette-result">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityMenuItemY}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualListItemContainer.fsus-command-palette-result:pointerover">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualListItemContainer.fsus-command-palette-result.fsus-selected">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualListItemContainer.fsus-command-palette-result.fsus-disabled">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualListItemContainer.fsus-command-palette-result:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
+  </Style>
+
+  <Style Selector="TextBlock.fsus-command-palette-result-meta, TextBlock.fsus-command-palette-result-shortcut, TextBlock.fsus-command-palette-path, TextBlock.fsus-command-palette-status">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+
+  <Style Selector="TextBlock.fsus-command-palette-result-label">
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+
+  <Style Selector="TextBlock.fsus-command-palette-result-nested">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="FontSize" Value="16" />
+  </Style>
+
+  <Style Selector="Button.fsus-command-palette-back">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+  </Style>
+
+  <Style Selector="fsus|FsusCommandPalette.fsus-failed TextBlock.fsus-command-palette-status">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+</Styles>

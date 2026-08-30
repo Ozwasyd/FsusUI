@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
@@ -70,6 +71,17 @@ internal static class Program
         IconKey = FsusIconKeys.Settings,
         IsDecorative = true,
       };
+      var command = new FsusPlatformCommand("workspace.publish", "Publish workspace")
+      {
+        Description = "Build and publish the active workspace",
+        Category = "Workspace",
+        Gesture = new FsusShortcutGesture(Key.P, KeyModifiers.Control | KeyModifiers.Shift),
+        ExecuteAsyncAction = (_, _) => ValueTask.CompletedTask,
+      };
+      var commandPalette = new FsusCommandPalette
+      {
+        CommandTree = [FsusNativeMenuItemModel.Action(command)],
+      };
       var codeEditor = new FsusCodeEditor
       {
         AccessibleName = "Native AOT Markdown source",
@@ -105,6 +117,7 @@ internal static class Program
       var panel = new StackPanel();
       panel.Children.Add(button);
       panel.Children.Add(icon);
+      panel.Children.Add(commandPalette);
       panel.Children.Add(titleBar);
       panel.Children.Add(activityShell);
       panel.Children.Add(codeEditor);
@@ -127,6 +140,7 @@ internal static class Program
               report.DispatcherReached = Dispatcher.UIThread.CheckAccess();
               report.PlatformHandleCreated = window.TryGetPlatformHandle() is not null;
               report.PackageControlCount = panel.Children.Count;
+              report.CommandPaletteTreeCount = commandPalette.CommandTree?.Count() ?? 0;
               report.CodeEditorReady =
                 codeEditor.Selection == new FsusCodeEditorSelection(9, 15) &&
                 codeEditor.HighlightSpans.Count > 0;
@@ -138,7 +152,8 @@ internal static class Program
                 report.TopLevelCreated &&
                 report.DispatcherReached &&
                 report.PlatformHandleCreated &&
-                report.PackageControlCount == 5 &&
+                report.PackageControlCount == 6 &&
+                report.CommandPaletteTreeCount == 1 &&
                 report.ActivitySectionCount == 1 &&
                 report.DocumentCount == 1 &&
                 report.CodeEditorReady
@@ -247,6 +262,7 @@ internal sealed record SmokeReport
   public bool DispatcherReached { get; set; }
   public bool PlatformHandleCreated { get; set; }
   public int PackageControlCount { get; set; }
+  public int CommandPaletteTreeCount { get; set; }
   public bool CodeEditorReady { get; set; }
   public int ActivitySectionCount { get; set; }
   public int DocumentCount { get; set; }

@@ -9,6 +9,8 @@ Use `FsusVirtualList`, `FsusVirtualListItem`, `FsusVirtualWindow`,
 content. `FsusVirtualListItemContainer` and `FsusTableV2CellContainer` are the
 recyclable visual containers used by those controls; applications normally set
 `ItemProvider`/`CellProvider` and templates instead of constructing containers.
+Realized list containers fill the current viewport width, including after the
+list is first realized before its final mounted width is known.
 
 ## Realization and recycling
 
