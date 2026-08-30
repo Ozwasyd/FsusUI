@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
@@ -70,9 +71,21 @@ internal static class Program
         IconKey = FsusIconKeys.Settings,
         IsDecorative = true,
       };
+      var command = new FsusPlatformCommand("workspace.publish", "Publish workspace")
+      {
+        Description = "Build and publish the active workspace",
+        Category = "Workspace",
+        Gesture = new FsusShortcutGesture(Key.P, KeyModifiers.Control | KeyModifiers.Shift),
+        ExecuteAsyncAction = (_, _) => ValueTask.CompletedTask,
+      };
+      var commandPalette = new FsusCommandPalette
+      {
+        CommandTree = [FsusNativeMenuItemModel.Action(command)],
+      };
       var panel = new StackPanel();
       panel.Children.Add(button);
       panel.Children.Add(icon);
+      panel.Children.Add(commandPalette);
 
       var window = new Window
       {
@@ -92,12 +105,14 @@ internal static class Program
               report.DispatcherReached = Dispatcher.UIThread.CheckAccess();
               report.PlatformHandleCreated = window.TryGetPlatformHandle() is not null;
               report.PackageControlCount = panel.Children.Count;
+              report.CommandPaletteTreeCount = commandPalette.CommandTree?.Count() ?? 0;
               report.ThemeDensity = FsusThemeOptions.Default.Density.ToString();
               report.ExitCode =
                 report.TopLevelCreated &&
                 report.DispatcherReached &&
                 report.PlatformHandleCreated &&
-                report.PackageControlCount == 2
+                report.PackageControlCount == 3 &&
+                report.CommandPaletteTreeCount == 1
                   ? 0
                   : 1;
               if (report.ExitCode != 0)
@@ -203,6 +218,7 @@ internal sealed record SmokeReport
   public bool DispatcherReached { get; set; }
   public bool PlatformHandleCreated { get; set; }
   public int PackageControlCount { get; set; }
+  public int CommandPaletteTreeCount { get; set; }
   public string? ThemeDensity { get; set; }
   public string? ProcessArchitecture { get; init; }
   public int ExitCode { get; set; } = 1;

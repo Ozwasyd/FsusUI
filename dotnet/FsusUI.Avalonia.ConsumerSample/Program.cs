@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Icons;
 using FsusUI.Avalonia.Themes;
@@ -50,21 +51,37 @@ public static class ConsumerSampleSmoke
       Accepts = ".pdf, .png",
     };
 
+    var command = new FsusPlatformCommand("workspace.publish", "Publish workspace")
+    {
+      Category = "Workspace",
+      Description = "Build and publish the active workspace",
+      Gesture = new FsusShortcutGesture(Key.P, KeyModifiers.Control | KeyModifiers.Shift),
+      ExecuteAsyncAction = (_, _) => ValueTask.CompletedTask,
+    };
+    var commandPalette = new FsusCommandPalette
+    {
+      CommandTree = [FsusNativeMenuItemModel.Action(command)],
+      SearchPlaceholder = "Search workspace commands",
+    };
+
     var page = new StackPanel();
     page.Children.Add(action);
     page.Children.Add(input);
     page.Children.Add(icon);
     page.Children.Add(dropZone);
+    page.Children.Add(commandPalette);
 
     var manager = new FsusThemeManager();
 
     return manager is not null &&
       themeOptions.Density == FsusDensity.Default &&
-      page.Children.Count == 4 &&
+      page.Children.Count == 5 &&
       action.AccessibleName == "Save settings" &&
       input.Text == "FsusUI" &&
       icon.IconKey == FsusIconKeys.Search &&
       dropZone.AccessibleName == "Document import zone" &&
-      dropZone.Accepts == ".pdf, .png";
+      dropZone.Accepts == ".pdf, .png" &&
+      commandPalette.CommandTree?.Single().Command?.Id == "workspace.publish" &&
+      commandPalette.SearchPlaceholder == "Search workspace commands";
   }
 }

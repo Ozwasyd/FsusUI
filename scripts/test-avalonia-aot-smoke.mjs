@@ -133,21 +133,30 @@ for (const packageName of [
   'Microsoft.NETCore.App.Runtime.NativeAOT',
   'Microsoft.NETCore.App.Host',
 ]) {
+  const alias = path.join(isolatedPacks, `${packageName}.linux-x64`)
+  if (!existsSync(alias)) {
+    symlinkSync(
+      path.join(systemDotnetRoot, 'packs', `${packageName}.${rid}`),
+      alias,
+      'dir',
+    )
+  }
+}
+const ilCompilerAlias = path.join(
+  isolatedPacks,
+  'runtime.linux-x64.Microsoft.DotNet.ILCompiler',
+)
+if (!existsSync(ilCompilerAlias)) {
   symlinkSync(
-    path.join(systemDotnetRoot, 'packs', `${packageName}.${rid}`),
-    path.join(isolatedPacks, `${packageName}.linux-x64`),
+    path.join(
+      systemDotnetRoot,
+      'packs',
+      `runtime.${rid}.Microsoft.DotNet.ILCompiler`,
+    ),
+    ilCompilerAlias,
     'dir',
   )
 }
-symlinkSync(
-  path.join(
-    systemDotnetRoot,
-    'packs',
-    `runtime.${rid}.Microsoft.DotNet.ILCompiler`,
-  ),
-  path.join(isolatedPacks, 'runtime.linux-x64.Microsoft.DotNet.ILCompiler'),
-  'dir',
-)
 const isolatedDotnet = path.join(isolatedSdkRoot, 'dotnet')
 const linkerRoot = path.join(temporaryRoot, 'native-linker')
 mkdirSync(linkerRoot)
@@ -317,6 +326,7 @@ try {
       dispatcherReached: report.DispatcherReached,
       platformHandleCreated: report.PlatformHandleCreated,
       packageControlCount: report.PackageControlCount,
+      commandPaletteTreeCount: report.CommandPaletteTreeCount,
       exitCode: report.ExitCode,
     },
     {
@@ -324,7 +334,8 @@ try {
       topLevelCreated: true,
       dispatcherReached: true,
       platformHandleCreated: true,
-      packageControlCount: 2,
+      packageControlCount: 3,
+      commandPaletteTreeCount: 1,
       exitCode: 0,
     },
   )

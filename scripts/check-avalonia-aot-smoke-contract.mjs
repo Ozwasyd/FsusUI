@@ -43,11 +43,19 @@ requireMatch(program, /StartWithClassicDesktopLifetime/u, 'a desktop lifetime is
 requireMatch(program, /window\.Show\(\)/u, 'the real Window must be shown')
 requireMatch(program, /TryGetPlatformHandle/u, 'the top-level platform handle must be verified')
 requireMatch(program, /Dispatcher\.UIThread/u, 'the UI dispatcher must be exercised')
+requireMatch(program, /new FsusCommandPalette/u, 'the command palette public control must be AOT-rooted')
+requireMatch(program, /CommandTree\s*=/u, 'the command palette tree binding must be AOT-rooted')
+requireMatch(program, /ExecuteAsyncAction\s*=/u, 'the async command delegate must be AOT-rooted')
 requireMatch(program, /\[JsonSerializable\(typeof\(SmokeReport\)\)\]/u, 'source-generated JSON is required')
 requireMatch(runner, /isolatedDotnet,\s*\[\s*'publish'/u, 'the runner must publish a RID-specific executable')
 requireMatch(runner, /execute\(\s*nativeBinary/u, 'the runner must execute the native binary directly')
 requireMatch(runner, /DOTNET_ROOT:\s*missingDotnetRoot/u, 'the runtime-free launch boundary is required')
 requireMatch(runner, /no-external-sources/u, 'the local-only restore receipt is required')
+requireMatch(
+  runner,
+  /if \(!existsSync\(alias\)\)/u,
+  'RID pack aliases must reuse an existing native pack link',
+)
 forbidMatch(runner, /\[\s*'run',\s*consumerProject/u, 'dotnet run/JIT execution is forbidden')
 
 if (failures.length) {
