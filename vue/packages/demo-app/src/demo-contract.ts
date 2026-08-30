@@ -174,6 +174,11 @@ export const resolveDemoRoot = async (
     return { component: AvatarFixture, themeMode }
   }
 
+  if (searchParams.get('checkboxbutton') === '1') {
+    const { default: CheckboxButtonFixture } = await import('./CheckboxButtonFixture.vue')
+    return { component: CheckboxButtonFixture, themeMode }
+  }
+
   const { default: App } = await import('./App.vue')
   return {
     component: App,
