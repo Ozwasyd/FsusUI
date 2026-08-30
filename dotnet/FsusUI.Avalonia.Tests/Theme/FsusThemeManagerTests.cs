@@ -92,6 +92,7 @@ public class FsusThemeManagerTests
       new FsusThemeOptions { Variant = FsusThemeVariant.Dark });
 
     AssertBrush(resources, "FsusThemeTreeSurfaceBrush", "#1B2433");
+    AssertBrush(resources, FsusThemeResourceKeys.TextEditorSurfaceBrush, "#1B2433");
   }
 
   [Fact]

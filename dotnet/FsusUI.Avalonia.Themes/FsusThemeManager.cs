@@ -54,6 +54,7 @@ public static class FsusThemeResourceKeys
   public const string BackgroundBrush = "FsusThemeBackgroundBrush";
   public const string SurfaceBrush = "FsusThemeSurfaceBrush";
   public const string SurfaceRaisedBrush = "FsusThemeSurfaceRaisedBrush";
+  public const string TextEditorSurfaceBrush = "FsusThemeTextEditorSurfaceBrush";
   public const string TextBrush = "FsusThemeTextBrush";
   public const string MutedTextBrush = "FsusThemeMutedTextBrush";
   public const string BorderBrush = "FsusThemeBorderBrush";
@@ -83,6 +84,7 @@ public sealed class FsusThemeManager
       "#FFFFFF",
       "#F8FAFC",
       "#FFFFFF",
+      "#FFFFFF",
       "#111827",
       "#6B7280",
       "#D9DEE8",
@@ -100,6 +102,7 @@ public sealed class FsusThemeManager
       "#171F2C",
       "#1F2937",
       "#1B2433",
+      "#1B2433",
       "#F0F0F4",
       "#B6C0CF",
       "#394657",
@@ -116,6 +119,7 @@ public sealed class FsusThemeManager
       "#000000",
       "#000000",
       "#111827",
+      "#000000",
       "#000000",
       "#FFFFFF",
       "#FDE68A",
@@ -189,6 +193,7 @@ public sealed class FsusThemeManager
     SetBrush(resources, FsusThemeResourceKeys.SurfaceBrush, palette.Surface);
     SetBrush(resources, FsusThemeResourceKeys.SurfaceRaisedBrush, palette.SurfaceRaised);
     SetBrush(resources, TreeSurfaceResourceKey, palette.TreeSurface);
+    SetBrush(resources, FsusThemeResourceKeys.TextEditorSurfaceBrush, palette.TextEditorSurface);
     SetBrush(resources, FsusThemeResourceKeys.TextBrush, palette.Text);
     SetBrush(resources, FsusThemeResourceKeys.MutedTextBrush, palette.MutedText);
     SetBrush(resources, FsusThemeResourceKeys.BorderBrush, palette.Border);
@@ -312,6 +317,7 @@ public sealed class FsusThemeManager
     string Surface,
     string SurfaceRaised,
     string TreeSurface,
+    string TextEditorSurface,
     string Text,
     string MutedText,
     string Border,

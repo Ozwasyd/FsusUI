@@ -1,0 +1,58 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "Avalonia code-editor task surface",
+    "Avalonia code-editor production gallery fixture"
+  ],
+  "uiDecisionClass": "interaction-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    { "id": "design", "path": "docs/design.md", "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039" },
+    { "id": "design-governance", "path": "docs/design/governance.md", "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5" },
+    { "id": "change-classification", "path": "docs/design/change-classification.md", "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84" },
+    { "id": "visual-workflow", "path": "docs/workflows/visual-change.md", "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4" },
+    { "id": "avalonia-index", "path": "docs/avalonia/README.md", "digest": "cece08332b3b42431e948857d96817dc79ca1202f32dc29949c90049f5178f98" },
+    { "id": "text-editor", "path": "docs/avalonia/components/text-editor.md", "digest": "bfd43d0e258938b485ada4fd87f96a8fff1b73230d0c12d13aa3edd6abc9c9fd" },
+    { "id": "markdown-editor", "path": "docs/avalonia/components/markdown-editor.md", "digest": "e2a141bd7241739693e94c140f3f43cff1587e44da94c741f804800e14b2a633" },
+    { "id": "virtualization", "path": "docs/avalonia/components/virtualization.md", "digest": "339ae5fb4d0ba1b91fd1c88e29b37f66764e4ada412c0cef400fab42565b8cdc" },
+    { "id": "input", "path": "docs/avalonia/components/input.md", "digest": "0d19909c5dc473d3e6226a5c85307e5890d66edb08f9b9e9410b993529ab44ba" },
+    { "id": "platform-differences", "path": "docs/avalonia/platform-differences.md", "digest": "cbff58971794751e3d8871307cbf9ac9a7a33091011bd9bdf5d81370eddc90a0" },
+    { "id": "semantic-baseline", "path": "docs/avalonia/semantic-baseline.md", "digest": "4af382d77024fcd99fc430e279ec2a3a7b4035465ded20b5a74a8f0cfa04563d" },
+    { "id": "api-stability", "path": "docs/api-stability.md", "digest": "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1" }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "7249cae11c218d21dbc059136d4f6c0c9d92cbdc",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "43257a109c27bf7df6db0eefeec41b5d5f04c38d929998e767b1a90940642fa5",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "7249cae11c218d21dbc059136d4f6c0c9d92cbdc",
+  "candidateDigest": "d85db1134eaef48db39ea4477bf671c9d165ece245c7757ff832b7b54f61ccca",
+  "stateEvidenceMatrix": [
+    { "state": "editable-selection-caret-highlight", "viewport": "desktop 760x420", "theme": "both", "evidenceDigest": "d3c9b4a0824a57708ad7ed6251a09d599c4943818e092eb3d8f2845a86df83d0" },
+    { "state": "wrap-and-line-number-toggles", "viewport": "narrow desktop 520x420", "theme": "both", "evidenceDigest": "b1183f145de03a08f1b69202fbae4eed00a922add3cf41c146d87d821042324f" },
+    { "state": "find-replace-reveal-document-switch", "viewport": "desktop 760x420", "theme": "both", "evidenceDigest": "e374daad26c15163648b9338b6128456582c9b3378514784734987295b8659be" },
+    { "state": "keyboard-ime-accessibility-large-document", "viewport": "desktop 760x420", "theme": "both", "evidenceDigest": "3d27ae29dcbd7de7261534aeef9e68da5824733b1401f1943a3e39aa5c63f1c0" }
+  ],
+  "inScope": [
+    "one public Avalonia FsusCodeEditor control matching every #645 capability and acceptance criterion",
+    "public typed API, theme, production gallery fixture, focused interaction/accessibility/performance/AOT evidence",
+    "nearest Avalonia component contract and consumer-visible changeset"
+  ],
+  "outOfScope": [
+    "Markdown preview or Live projection",
+    "syntax languages other than Markdown",
+    "consumer-specific document workflow or persistence",
+    "new canonical design tokens or platform overrides",
+    "changes to FsusMarkdownEditor or FsusTextEditor behavior"
+  ],
+  "classificationEvidenceDigest": "d85db1134eaef48db39ea4477bf671c9d165ece245c7757ff832b7b54f61ccca",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "2d9ed5fd6866219eb06ceaafe9f42c16f22d20d6772e84c8805cb7e6a82556d0"
+}

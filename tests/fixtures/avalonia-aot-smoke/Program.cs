@@ -70,9 +70,20 @@ internal static class Program
         IconKey = FsusIconKeys.Settings,
         IsDecorative = true,
       };
+      var codeEditor = new FsusCodeEditor
+      {
+        AccessibleName = "Native AOT Markdown source",
+        WordWrap = true,
+        ShowLineNumbers = true,
+      };
+      codeEditor.LoadDocument(
+        new FsusMarkdownDocumentIdentity("native-aot", 1),
+        "# AOT\n\n- Native editor");
+      _ = codeEditor.FindNext("Native");
       var panel = new StackPanel();
       panel.Children.Add(button);
       panel.Children.Add(icon);
+      panel.Children.Add(codeEditor);
 
       var window = new Window
       {
@@ -92,12 +103,16 @@ internal static class Program
               report.DispatcherReached = Dispatcher.UIThread.CheckAccess();
               report.PlatformHandleCreated = window.TryGetPlatformHandle() is not null;
               report.PackageControlCount = panel.Children.Count;
+              report.CodeEditorReady =
+                codeEditor.Selection == new FsusCodeEditorSelection(9, 15) &&
+                codeEditor.HighlightSpans.Count > 0;
               report.ThemeDensity = FsusThemeOptions.Default.Density.ToString();
               report.ExitCode =
                 report.TopLevelCreated &&
                 report.DispatcherReached &&
                 report.PlatformHandleCreated &&
-                report.PackageControlCount == 2
+                report.PackageControlCount == 3 &&
+                report.CodeEditorReady
                   ? 0
                   : 1;
               if (report.ExitCode != 0)
@@ -203,6 +218,7 @@ internal sealed record SmokeReport
   public bool DispatcherReached { get; set; }
   public bool PlatformHandleCreated { get; set; }
   public int PackageControlCount { get; set; }
+  public bool CodeEditorReady { get; set; }
   public string? ThemeDensity { get; set; }
   public string? ProcessArchitecture { get; init; }
   public int ExitCode { get; set; } = 1;

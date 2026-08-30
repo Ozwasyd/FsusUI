@@ -41,6 +41,7 @@
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Tree.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/TextViewer.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/TextEditor.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/CodeEditor.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/MarkdownEditor.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/PublicShell.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/ProductPrimitives.axaml" />
