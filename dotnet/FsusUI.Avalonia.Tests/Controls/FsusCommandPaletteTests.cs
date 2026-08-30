@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
@@ -55,6 +56,9 @@ public class FsusCommandPaletteTests
     };
     var host = new FsusOverlayHost();
     palette.Open(host);
+
+    Assert.Null(Application.Current?.ApplicationLifetime);
+    Assert.Null(TopLevel.GetTopLevel(palette));
 
     await palette.SetQueryAsync("PUBLISH");
 

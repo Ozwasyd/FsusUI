@@ -525,6 +525,11 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
   {
     OverlayEntry = entry;
     SetState(FsusCommandPaletteState.Ready);
+    if (TopLevel.GetTopLevel(this) is null)
+    {
+      return;
+    }
+
     Dispatcher.UIThread.Post(
       () =>
       {
@@ -743,6 +748,7 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
   }
 
   private static bool ShouldInvokeOnDispatcher() =>
+    Application.Current?.ApplicationLifetime is not null &&
     !Dispatcher.UIThread.CheckAccess();
 
   private IEnumerable<ResolvedEntry> ResolveLocalEntries(string query)
@@ -1050,6 +1056,12 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
   {
     if (!IsOpen || State == FsusCommandPaletteState.Executing)
     {
+      return;
+    }
+
+    if (Application.Current?.ApplicationLifetime is null)
+    {
+      _ = RefreshAsync();
       return;
     }
 

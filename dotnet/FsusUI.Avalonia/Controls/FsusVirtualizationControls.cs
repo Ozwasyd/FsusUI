@@ -589,7 +589,9 @@ public class FsusVirtualList : ContentControl
 
   private static async Task CommitOnUiThreadAsync(Action action)
   {
-    if (Dispatcher.UIThread.CheckAccess())
+    if (
+      Application.Current?.ApplicationLifetime is null ||
+      Dispatcher.UIThread.CheckAccess())
     {
       action();
       return;
