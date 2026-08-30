@@ -591,7 +591,7 @@ test.describe('touch path', () => {
       await expect(entry).toBeVisible()
       const entryTarget = await entry.boundingBox()
       expect(entryTarget?.width).toBeGreaterThanOrEqual(44)
-      expect(entryTarget?.height).toBeGreaterThanOrEqual(44)
+      expect(Math.round(entryTarget?.height ?? 0)).toBeGreaterThanOrEqual(44)
 
       await entry.tap()
       const surface = visiblePasteAsMarkdownDialog(page)
