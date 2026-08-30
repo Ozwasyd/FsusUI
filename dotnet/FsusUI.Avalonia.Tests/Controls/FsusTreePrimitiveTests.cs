@@ -258,6 +258,118 @@ public class FsusTreePrimitiveTests
   }
 
   [Fact]
+  public void TreeInlineRenameRequestsCommitKeepsValidationAndNeverMutatesNode()
+  {
+    var tree = new FsusTree();
+    var node = new FsusTreeNode("file-a", "File A.md");
+    tree.Nodes.Add(node);
+    tree.RefreshView();
+    tree.ToggleSelection(node.Key);
+    tree.FocusNode(node.Key);
+    var commitRequests = new List<FsusTreeInlineEditCommitEventArgs>();
+    var reject = true;
+    tree.InlineEditCommitRequested += (_, args) =>
+    {
+      commitRequests.Add(args);
+      if (reject)
+      {
+        args.ValidationError = "A file with this name already exists.";
+      }
+    };
+
+    Assert.True(tree.StartRename(node.Key, "File A.md"));
+    Assert.Equal(FsusTreeInlineEditKind.Rename, tree.ActiveInlineEdit?.Kind);
+    Assert.Equal(node.Key, tree.ActiveInlineEdit?.Key);
+    Assert.Equal("File A.md", tree.ActiveInlineEdit?.Text);
+    Assert.Contains(node.Key, tree.SelectedKeys);
+
+    Assert.False(tree.CommitInlineEdit());
+    var rejected = Assert.Single(commitRequests);
+    Assert.Equal(node.Key, rejected.Key);
+    Assert.Null(rejected.ParentKey);
+    Assert.Equal("File A.md", rejected.Text);
+    Assert.Equal("A file with this name already exists.", tree.ActiveInlineEdit?.ValidationError);
+    Assert.Equal("File A.md", node.Label);
+
+    reject = false;
+    Assert.True(tree.CommitInlineEdit());
+    Assert.Equal(2, commitRequests.Count);
+    Assert.Null(tree.ActiveInlineEdit);
+    Assert.Equal("File A.md", node.Label);
+    Assert.Contains(node.Key, tree.SelectedKeys);
+    Assert.Equal(node.Key, tree.FocusedKey);
+  }
+
+  [Fact]
+  public void TreeInlineCreateExpandsParentPersistsAcrossRefreshAndCancelsByStableKey()
+  {
+    var tree = new FsusTree();
+    var folder = new FsusTreeNode("src", "src");
+    folder.Children.Add(new FsusTreeNode("existing", "Existing.cs"));
+    tree.Nodes.Add(folder);
+    tree.Nodes.Add(new FsusTreeNode("readme", "README.md"));
+    tree.RefreshView();
+    tree.ToggleSelection("readme");
+    tree.FocusNode("readme");
+    var canceled = new List<FsusTreeInlineEditCanceledEventArgs>();
+    tree.InlineEditCanceled += (_, args) => canceled.Add(args);
+
+    Assert.True(tree.StartCreate("draft-file", folder.Key));
+    Assert.Contains(folder.Key, tree.ExpandedKeys);
+    Assert.Equal("draft-file", tree.FocusedKey);
+    Assert.Equal(string.Empty, tree.ActiveInlineEdit?.Text);
+    Assert.Equal(folder.Key, tree.ActiveInlineEdit?.ParentKey);
+    Assert.Contains("readme", tree.SelectedKeys);
+
+    tree.RefreshView();
+
+    Assert.Equal("draft-file", tree.FocusedKey);
+    Assert.Equal("draft-file", tree.ActiveInlineEdit?.Key);
+    Assert.Contains(folder.Key, tree.ExpandedKeys);
+    Assert.True(tree.CancelInlineEdit());
+    var cancel = Assert.Single(canceled);
+    Assert.Equal("draft-file", cancel.Key);
+    Assert.Equal(folder.Key, cancel.ParentKey);
+    Assert.Equal(FsusTreeInlineEditCancelReason.Programmatic, cancel.Reason);
+    Assert.Equal("readme", tree.FocusedKey);
+    Assert.Contains("readme", tree.SelectedKeys);
+    Assert.DoesNotContain(folder.Children, child => child.Key == "draft-file");
+
+    Assert.True(tree.StartCreate("root-draft"));
+    Assert.Null(tree.ActiveInlineEdit?.ParentKey);
+    Assert.True(tree.CancelInlineEdit());
+    Assert.DoesNotContain(tree.Nodes, child => child.Key == "root-draft");
+  }
+
+  [Fact]
+  public async Task TreeInlineEditSurvivesUnrelatedLazyLoadAndPreservesTreeState()
+  {
+    var folder = new FsusTreeNode("lazy", "Lazy") { HasLazyChildren = true };
+    var readme = new FsusTreeNode("readme", "README.md");
+    var tree = new FsusTree
+    {
+      ChildrenLoader = (_, _) => ValueTask.FromResult<IReadOnlyList<FsusTreeNode>>([
+        new FsusTreeNode("loaded", "Loaded.cs"),
+      ]),
+    };
+    tree.Nodes.Add(folder);
+    tree.Nodes.Add(readme);
+    tree.RefreshView();
+    tree.ToggleSelection(readme.Key);
+
+    Assert.True(tree.StartRename(readme.Key, readme.Label));
+    Assert.True(await tree.LoadChildrenAsync(folder.Key));
+
+    Assert.Equal(readme.Key, tree.ActiveInlineEdit?.Key);
+    Assert.Equal(readme.Label, tree.ActiveInlineEdit?.Text);
+    Assert.Equal(readme.Key, tree.FocusedKey);
+    Assert.Contains(readme.Key, tree.SelectedKeys);
+    Assert.Contains(folder.Key, tree.ExpandedKeys);
+    Assert.Contains(folder.Children, child => child.Key == "loaded");
+    Assert.Equal("README.md", readme.Label);
+  }
+
+  [Fact]
   public void TreeSelectionEventsReportDeltaAndFullSetMatchingAutomationState()
   {
     var tree = new FsusTree { SelectionMode = FsusTreeSelectionMode.Multiple };
