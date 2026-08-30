@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import type { CollapseModelValue } from '@element-plus/components/collapse'
 import { ElCollapse, ElCollapseItem } from '@element-plus/components/collapse'
+import { ref } from 'vue'
 
-const activeNames = ref<string[]>(['options'])
+const activeNames = ref<CollapseModelValue>(['options'])
 </script>
 
 <template>

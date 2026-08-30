@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import type { CheckboxValueType } from '@element-plus/components/checkbox'
 import { ref } from 'vue'
 import { ElCheckboxButton } from '@element-plus/components/checkbox'
 
-const first = ref(true)
-const second = ref(false)
-const third = ref(false)
+const first = ref<CheckboxValueType>(true)
+const second = ref<CheckboxValueType>(false)
+const third = ref<CheckboxValueType>(false)
 </script>
 
 <template>
