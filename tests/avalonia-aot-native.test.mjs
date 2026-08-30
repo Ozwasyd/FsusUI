@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { URL } from 'node:url'
 import {
   affectedDecision,
   aggregateLeaves,
@@ -65,7 +66,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     NativeBinaryBytes: 1024,
     NativeBinarySha256: 'c'.repeat(64),
     NativeDependencies: ['libc.so.6'],
-    PackageDigests: ['FsusUI.Avalonia.nupkg:' + 'd'.repeat(64)],
+    PackageDigests: [`FsusUI.Avalonia.nupkg:${'d'.repeat(64)}`],
     PartialCapabilities: ['FsusMarkdownEditor:required-after-issue-343'],
     RuntimeIndependent: true,
     StartedAtUtc: '2026-01-01T00:00:00Z',

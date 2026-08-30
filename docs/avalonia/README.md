@@ -67,7 +67,9 @@ and dispatcher. It does not define the component scenario registry.
 The stable component-family source in
 [`spec/ci/avalonia-stable-readiness.json`](../../spec/ci/avalonia-stable-readiness.json)
 also owns the required Native AOT scenario set. Use
-`pnpm run check:avalonia-aot-native` and `pnpm run test:avalonia-aot-native` to
+`node scripts/avalonia-aot-native.mjs check-scenarios`,
+`node scripts/avalonia-aot-native.mjs check-workflows`, and
+`node --test tests/avalonia-aot-native.test.mjs` to
 verify registry coverage, report and manifest identity, negative fixtures, and
 workflow tiering. The required native release axis is `linux-x64`; the current
 support evidence does not claim `win-x64` or `osx-arm64` when those optional

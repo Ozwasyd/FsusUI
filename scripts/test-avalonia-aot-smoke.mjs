@@ -573,7 +573,7 @@ try {
   )
   assert.match(loaderFailure.stderr, /loader failure|display|x11/iu)
 
-  const ignoredLogFailure = execute(
+  execute(
     nativeBinary,
     smokeArguments(path.join(temporaryRoot, 'reports/ignored-log.json'), [
       '--fail',
