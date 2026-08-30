@@ -1,0 +1,96 @@
+{
+  "schema": "fsusui.avalonia.markdown-projection-producer-vectors.v1",
+  "contractVersion": "1",
+  "vectors": [
+    {
+      "id": "canonical-valid",
+      "mutation": "none",
+      "accepted": true,
+      "reason": null
+    },
+    {
+      "id": "interim-valid",
+      "mutation": "interim-kind",
+      "accepted": true,
+      "reason": null
+    },
+    {
+      "id": "contract-drift",
+      "mutation": "contract-version",
+      "accepted": false,
+      "reason": "producer-contract-version"
+    },
+    {
+      "id": "second-runtime",
+      "mutation": "source-runtime",
+      "accepted": false,
+      "reason": "source-runtime-identity"
+    },
+    {
+      "id": "overlap",
+      "mutation": "overlapping-spans",
+      "accepted": false,
+      "reason": "invalid-projection"
+    },
+    {
+      "id": "span-kind-drift",
+      "mutation": "span-kind",
+      "accepted": false,
+      "reason": "invalid-projection"
+    },
+    {
+      "id": "semantic-drift",
+      "mutation": "semantic-kind",
+      "accepted": false,
+      "reason": "unsupported-semantic-kind"
+    },
+    {
+      "id": "stale",
+      "mutation": "revision",
+      "accepted": false,
+      "reason": "stale-revision"
+    },
+    {
+      "id": "document-mismatch",
+      "mutation": "document-identity",
+      "accepted": false,
+      "reason": "document-mismatch"
+    },
+    {
+      "id": "source-mismatch",
+      "mutation": "source",
+      "accepted": false,
+      "reason": "source-mismatch"
+    },
+    {
+      "id": "feature-revision-stale",
+      "mutation": "feature-revision",
+      "accepted": false,
+      "reason": "stale-feature-revision"
+    },
+    {
+      "id": "retired-reuse",
+      "mutation": "retired-node-reuse",
+      "accepted": false,
+      "reason": "retired-node-id-reuse"
+    },
+    {
+      "id": "missing-tombstone",
+      "mutation": "missing-retired-node",
+      "accepted": false,
+      "reason": "missing-retired-node-id"
+    },
+    {
+      "id": "cross-document-reuse",
+      "mutation": "cross-document-node-reuse",
+      "accepted": false,
+      "reason": "cross-document-node-id-reuse"
+    },
+    {
+      "id": "fallback-not-source",
+      "mutation": "source-fallback-text",
+      "accepted": false,
+      "reason": "invalid-source-fallback"
+    }
+  ]
+}

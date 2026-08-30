@@ -357,6 +357,11 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusMarkdownMappedRange` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownProjectionCommitResult` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownProjectionMap` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerContract` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerDescriptor` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerKind` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerValidationResult` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownProjectionProduction` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownProjectionRequestedEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownProjectionSnapshot` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownProjectionSpan` | `avalonia-extra` |
@@ -508,6 +513,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusWatermarkTile` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.IFsusFormFieldAdapter` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.IFsusImageLoader` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.IFsusMarkdownProjectionProducer` | `avalonia-extra` |
 | `FsusUI.Avalonia.FsusTokens` | `avalonia-extra` |
 | `FsusUI.Avalonia.Icons.FsusFileTypeIcon` | `avalonia-extra` |
 | `FsusUI.Avalonia.Icons.FsusIconKeys` | `avalonia-extra` |

@@ -47,6 +47,8 @@ requireMatch(program, /Dispatcher\.UIThread/u, 'the UI dispatcher must be exerci
 requireMatch(program, /new FsusCommandPalette/u, 'the command palette public control must be AOT-rooted')
 requireMatch(program, /CommandTree\s*=/u, 'the command palette tree binding must be AOT-rooted')
 requireMatch(program, /ExecuteAsyncAction\s*=/u, 'the async command delegate must be AOT-rooted')
+requireMatch(program, /IFsusMarkdownProjectionProducer/u, 'the Markdown projection producer contract must be AOT-rooted')
+requireMatch(program, /ProduceAndCommitAsync/u, 'the Markdown projection producer commit path must be AOT-rooted')
 requireMatch(program, /\[JsonSerializable\(typeof\(SmokeReport\)\)\]/u, 'source-generated JSON is required')
 requireMatch(runner, /isolatedDotnet,\s*\[\s*'publish'/u, 'the runner must publish a RID-specific executable')
 requireMatch(runner, /execute\(\s*nativeBinary/u, 'the runner must execute the native binary directly')

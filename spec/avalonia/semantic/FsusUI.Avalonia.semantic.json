@@ -13393,6 +13393,326 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerContract",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": true,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "SemanticKinds",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "ProduceAndCommitAsync",
+          "isStatic": true,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusMarkdownProjectionCommitResult\u003E",
+          "parameters": [
+            {
+              "name": "editor",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
+              "optional": false
+            },
+            {
+              "name": "producer",
+              "type": "FsusUI.Avalonia.Controls.IFsusMarkdownProjectionProducer",
+              "optional": false
+            },
+            {
+              "name": "request",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionRequestedEventArgs",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "Validate",
+          "isStatic": true,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerValidationResult",
+          "parameters": [
+            {
+              "name": "request",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionRequestedEventArgs",
+              "optional": false
+            },
+            {
+              "name": "production",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProduction",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerDescriptor",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "ContractVersion",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Kind",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerKind",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ProducerId",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ProducerVersion",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SourceRuntimeIdentity",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SourceRuntimeVersion",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerDescriptor",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "ContractVersion",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Kind",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerKind\u0026",
+              "optional": false
+            },
+            {
+              "name": "ProducerId",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "ProducerVersion",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "SourceRuntimeIdentity",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "SourceRuntimeVersion",
+              "type": "System.String\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerKind",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "CanonicalNativeBinding",
+          "value": 0
+        },
+        {
+          "name": "InterimHostBridge",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerValidationResult",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Accepted",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Reason",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerValidationResult",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Accepted",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "Reason",
+              "type": "System.String\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProduction",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Descriptor",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerDescriptor",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "PreviousSnapshot",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionSnapshot",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RetiredNodeIds",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Snapshot",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionSnapshot",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProduction",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Descriptor",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionProducerDescriptor\u0026",
+              "optional": false
+            },
+            {
+              "name": "Snapshot",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionSnapshot\u0026",
+              "optional": false
+            },
+            {
+              "name": "RetiredNodeIds",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "PreviousSnapshot",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionSnapshot\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionRequestedEventArgs",
       "kind": "class",
       "baseType": "System.EventArgs",
@@ -28165,6 +28485,34 @@
               "name": "cancellationToken",
               "type": "System.Threading.CancellationToken",
               "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.IFsusMarkdownProjectionProducer",
+      "kind": "interface",
+      "isAbstract": true,
+      "isSealed": false,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "ProduceAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusMarkdownProjectionProduction\u003E",
+          "parameters": [
+            {
+              "name": "request",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionRequestedEventArgs",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
             }
           ]
         }

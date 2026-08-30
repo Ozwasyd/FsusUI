@@ -128,6 +128,29 @@ internal static class Program
         new FsusMarkdownDocumentIdentity("native-aot", 1),
         "# AOT\n\n- Native editor");
       _ = codeEditor.FindNext("Native");
+      var projectionIdentity = new FsusMarkdownDocumentIdentity(
+        "native-aot-projection",
+        1);
+      var markdownEditor = new FsusMarkdownEditor
+      {
+        Document = "# AOT",
+        DocumentIdentity = projectionIdentity,
+        Mode = FsusMarkdownEditorMode.Live,
+      };
+      var projectionRequest = new FsusMarkdownProjectionRequestedEventArgs(
+        projectionIdentity,
+        0,
+        markdownEditor.Document,
+        0,
+        markdownEditor.SourceCoordinateMap);
+      var projectionCommit = FsusMarkdownProjectionProducerContract
+        .ProduceAndCommitAsync(
+          markdownEditor,
+          new AotProjectionProducer(projectionIdentity),
+          projectionRequest)
+        .AsTask()
+        .GetAwaiter()
+        .GetResult();
       var documents = new FsusDocumentTabs();
       documents.AddDocument(new FsusDocumentTab
       {
@@ -219,6 +242,9 @@ internal static class Program
               report.CodeEditorReady =
                 codeEditor.Selection == new FsusCodeEditorSelection(9, 15) &&
                 codeEditor.HighlightSpans.Count > 0;
+              report.MarkdownProjectionProducerReady =
+                projectionCommit.Accepted &&
+                markdownEditor.CapabilityState == "aligned";
               report.ActivitySectionCount = activityShell.Sections.Count;
               report.DocumentCount = documents.Documents.Count;
               report.TitleBarPlatform = titleBar.EffectivePlatform.ToString();
@@ -232,7 +258,8 @@ internal static class Program
                 report.CommandPaletteTreeCount == 1 &&
                 report.ActivitySectionCount == 1 &&
                 report.DocumentCount == 1 &&
-                report.CodeEditorReady
+                report.CodeEditorReady &&
+                report.MarkdownProjectionProducerReady
                   ? 0
                   : 1;
               if (report.ExitCode != 0)
@@ -518,6 +545,44 @@ internal sealed record SmokeScenarioResult(
   string? Exception
 );
 
+internal sealed class AotProjectionProducer(
+  FsusMarkdownDocumentIdentity identity) : IFsusMarkdownProjectionProducer
+{
+  public ValueTask<FsusMarkdownProjectionProduction> ProduceAsync(
+    FsusMarkdownProjectionRequestedEventArgs request,
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    return ValueTask.FromResult(new FsusMarkdownProjectionProduction(
+      new(
+        FsusMarkdownProjectionProducerContract.Version,
+        FsusMarkdownProjectionProducerKind.InterimHostBridge,
+        "native-aot-canonical-runtime-bridge",
+        "1.0.0",
+        FsusMarkdownProjectionProducerContract.CanonicalRuntimeIdentity,
+        "native-aot-runtime"),
+      new(
+        identity,
+        request.Revision,
+        request.Source,
+        [
+          new(
+            "heading",
+            new(0, 2),
+            FsusMarkdownProjectionSpanKind.HiddenMarker,
+            ""),
+          new(
+            "heading",
+            new(2, 5),
+            FsusMarkdownProjectionSpanKind.Text,
+            "AOT",
+            "heading"),
+        ],
+        request.FeatureRevision),
+      []));
+  }
+}
+
 internal sealed class ThirdPartyTextAdapter(TextBox control) : IFsusFormFieldAdapter
 {
   public FsusFormFieldAdapterCapabilities Capabilities =>
@@ -590,6 +655,7 @@ internal sealed record SmokeReport
   public int PackageControlCount { get; set; }
   public int CommandPaletteTreeCount { get; set; }
   public bool CodeEditorReady { get; set; }
+  public bool MarkdownProjectionProducerReady { get; set; }
   public int ActivitySectionCount { get; set; }
   public int DocumentCount { get; set; }
   public string? TitleBarPlatform { get; set; }
