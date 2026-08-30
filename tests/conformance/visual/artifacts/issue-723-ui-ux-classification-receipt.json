@@ -59,13 +59,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "d7cac9789c544382b854759894d2c60c8421a847",
+    "revision": "8f7c614262d26b2df117dfc09f9aaf0cc9f38143",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "de5ccd0b714395b5483cb36946b77d28217adcc60bd98a697991dd64a5d7179d",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "0fd2f09395566ee71f268b9c992eeeb16909ff68",
-  "candidateDigest": "7054efc98e5aadc998cb7f6b5e16b48eb827e0e1be61158012fbc002f898f187",
+  "candidateSha": "f34d87771bed9578f3f85223b0c7aceb87b8acb8",
+  "candidateDigest": "7262d044f59597cf86b371b31f3a412a1931b4c6f0e7b154863235bdaf688272",
   "stateEvidenceMatrix": [
     {
       "state": "title-message-action-dismiss-compact",
@@ -116,8 +116,8 @@
     "consumer persistence or composition changes",
     "physical display, native compositor, touch hardware, or screen-reader certification"
   ],
-  "classificationEvidenceDigest": "f6f50a183645db676299c5f066d4845b8168ea04b80cbb14ad7535e0ff431355",
+  "classificationEvidenceDigest": "7c5b40540c880eb81e9bdbfe159b2e69973d1e1828b5276ca400f27fa5c0cc0f",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "757e776065b1498f91de4e792dc5ebbb0f7d1cfd200bd484c89626aafe62e9d2"
+  "receiptDigest": "16911116019309d527a82e432c357272661ca4b496fdfa9e86301e20fd408912"
 }
