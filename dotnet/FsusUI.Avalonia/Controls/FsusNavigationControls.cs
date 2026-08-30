@@ -46,14 +46,16 @@ public class FsusTabs : TabControl
     AvaloniaProperty.Register<FsusTabs, string?>(nameof(AccessibleName));
 
   private readonly ObservableCollection<FsusTabPane> panes = [];
+  private bool isUpdatingPanes;
 
   public FsusTabs()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-tabs");
     Focusable = true;
-    panes.CollectionChanged += OnPanesChanged;
     base.SelectionChanged += OnBaseSelectionChanged;
+    panes.CollectionChanged += OnPanesChanging;
     ItemsSource = panes;
+    panes.CollectionChanged += OnPanesChanged;
     SyncAutomation();
   }
 
@@ -174,9 +176,12 @@ public class FsusTabs : TabControl
     SelectedKey = pane.Key;
     FocusedKey = pane.Key;
     SyncPanes();
-    SelectionChanged?.Invoke(
-      this,
-      new FsusNavigationSelectionChangedEventArgs(pane.Key));
+    if (!isUpdatingPanes)
+    {
+      SelectionChanged?.Invoke(
+        this,
+        new FsusNavigationSelectionChangedEventArgs(pane.Key));
+    }
   }
 
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -202,30 +207,40 @@ public class FsusTabs : TabControl
     return null;
   }
 
+  private void OnPanesChanging(object? sender, NotifyCollectionChangedEventArgs e) =>
+    isUpdatingPanes = true;
+
   private void OnPanesChanged(object? sender, NotifyCollectionChangedEventArgs e)
   {
-    var firstEnabled = panes.FirstOrDefault((pane) => pane.IsEnabled);
-    if (firstEnabled is null)
+    try
     {
-      SelectedKey = string.Empty;
-      FocusedKey = string.Empty;
-      SelectedItem = null;
-    }
-    else
-    {
-      if (!panes.Any((pane) => pane.Key == SelectedKey && pane.IsEnabled))
+      var firstEnabled = panes.FirstOrDefault((pane) => pane.IsEnabled);
+      if (firstEnabled is null)
       {
-        SelectedKey = firstEnabled.Key;
-        SelectedItem = firstEnabled;
+        SelectedKey = string.Empty;
+        FocusedKey = string.Empty;
+        SelectedItem = null;
+      }
+      else
+      {
+        if (!panes.Any((pane) => pane.Key == SelectedKey && pane.IsEnabled))
+        {
+          SelectedKey = firstEnabled.Key;
+          SelectedItem = firstEnabled;
+        }
+
+        if (!panes.Any((pane) => pane.Key == FocusedKey && pane.IsEnabled))
+        {
+          FocusedKey = SelectedKey;
+        }
       }
 
-      if (!panes.Any((pane) => pane.Key == FocusedKey && pane.IsEnabled))
-      {
-        FocusedKey = SelectedKey;
-      }
+      SyncPanes();
     }
-
-    SyncPanes();
+    finally
+    {
+      isUpdatingPanes = false;
+    }
   }
 
   private void SyncPanes()

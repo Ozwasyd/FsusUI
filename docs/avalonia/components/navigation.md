@@ -23,6 +23,12 @@ Tab headers raise the typed `PaneContextRequested` event
 `RequestPaneContext(key, source)` without changing the selected tab; compose it
 with the shared context-menu surface described in `tree.md`.
 
+Populate `FsusTabs` through `Panes`; the inherited `Items` collection is not a
+second mutable tab source while the control owns its internal `ItemsSource`.
+`Panes` supports incremental mutation and synchronous clear/rebuild flows. An
+empty collection clears selection, and the first enabled pane becomes selected
+when panes are added again.
+
 ## Vue Contract Mapping
 
 Vue active keys, tab panes, menu item groups, breadcrumbs, page header actions,
@@ -205,7 +211,12 @@ using FsusUI.Avalonia.Controls;
 
 var window = new Window();
 var tabs = new FsusTabs();
-tabs.Items.Add(new FsusTabPane { Header = "Overview", Content = "Ready" });
+tabs.Panes.Add(new FsusTabPane
+{
+  Key = "overview",
+  Header = "Overview",
+  Content = "Ready",
+});
 
 var save = new FsusPlatformCommand(
   "document.save",

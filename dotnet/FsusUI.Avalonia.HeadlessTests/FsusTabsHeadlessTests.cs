@@ -91,6 +91,29 @@ public class FsusTabsHeadlessTests
     Assert.Empty(selections);
   }
 
+  [AvaloniaFact]
+  public void PanesCanBeClearedAndRebuiltWithoutSelectionModelReentrancy()
+  {
+    var tabs = new FsusTabs();
+    tabs.Panes.Add(new FsusTabPane { Key = "first", Header = "First" });
+    tabs.Panes.Add(new FsusTabPane { Key = "second", Header = "Second" });
+    tabs.SelectKey("second");
+
+    tabs.Panes.Clear();
+
+    Assert.Empty(tabs.Panes);
+    Assert.Equal(string.Empty, tabs.SelectedKey);
+    Assert.Equal(string.Empty, tabs.FocusedKey);
+    Assert.Null(tabs.SelectedItem);
+
+    tabs.Panes.Add(new FsusTabPane { Key = "replacement", Header = "Replacement" });
+
+    Assert.Equal("replacement", tabs.SelectedKey);
+    Assert.Equal("replacement", tabs.FocusedKey);
+    Assert.Equal(tabs.Panes[0], tabs.SelectedItem);
+    Assert.True(tabs.Panes[0].IsSelected);
+  }
+
   private sealed class KeyboardTabs : FsusTabs
   {
     public void Press(Key key) => HandleKey(key);
