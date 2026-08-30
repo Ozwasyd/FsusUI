@@ -9,7 +9,7 @@ export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 const posixPath = (value) => value.replaceAll('\\', '/')
 
-const resolveArtifact = (file) => resolve(root, file)
+const resolveArtifact = (file, baseRoot = root) => resolve(baseRoot, file)
 
 const iconArtifactFiles = [
   'vue/packages/icons-vue/dist/index.js',
@@ -116,9 +116,9 @@ export async function exists(file) {
   }
 }
 
-export async function expandInputPatterns(patterns) {
+export async function expandInputPatterns(patterns, baseRoot = root) {
   const files = await fg(patterns, {
-    cwd: root,
+    cwd: baseRoot,
     dot: true,
     ignore: [
       '**/node_modules/**',
@@ -133,13 +133,13 @@ export async function expandInputPatterns(patterns) {
   return files.map(posixPath).sort()
 }
 
-export async function hashInputPatterns(patterns) {
-  const files = await expandInputPatterns(patterns)
+export async function hashInputPatterns(patterns, baseRoot = root) {
+  const files = await expandInputPatterns(patterns, baseRoot)
   const hash = createHash('sha256')
   for (const file of files) {
     hash.update(file)
     hash.update('\0')
-    hash.update(await readFile(resolve(root, file)))
+    hash.update(await readFile(resolve(baseRoot, file)))
     hash.update('\0')
   }
   return {
@@ -148,33 +148,100 @@ export async function hashInputPatterns(patterns) {
   }
 }
 
-export async function readFingerprint(relativePath) {
+export async function readFingerprint(relativePath, baseRoot = root) {
   try {
-    return (await readFile(resolve(root, relativePath), 'utf8')).trim()
+    const value = (
+      await readFile(resolve(baseRoot, relativePath), 'utf8')
+    ).trim()
+    try {
+      const parsed = JSON.parse(value)
+      if (
+        parsed?.schemaVersion === 1 &&
+        typeof parsed.sourceFingerprint === 'string' &&
+        typeof parsed.artifactFingerprint === 'string'
+      ) {
+        return parsed
+      }
+    } catch {
+      // Legacy fingerprints contained only the source hash.
+    }
+    return {
+      schemaVersion: 0,
+      sourceFingerprint: value,
+      artifactFingerprint: null,
+    }
   } catch {
     return null
   }
 }
 
-export async function writeFingerprint(relativePath, value) {
-  const file = resolve(root, relativePath)
+export async function writeFingerprint(fingerprint, baseRoot = root) {
+  const artifactFingerprint = await hashArtifactFiles(
+    fingerprint.artifactFiles,
+    baseRoot,
+  )
+  if (artifactFingerprint === null) {
+    throw new Error(
+      `Cannot write ${fingerprint.id} fingerprint with missing artifacts.`,
+    )
+  }
+
+  const file = resolve(baseRoot, fingerprint.fingerprintPath)
   await mkdir(dirname(file), { recursive: true })
-  await writeFile(file, `${value}\n`)
+  await writeFile(
+    file,
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        sourceFingerprint: fingerprint.currentFingerprint,
+        artifactFingerprint,
+      },
+      null,
+      2,
+    )}\n`,
+  )
 }
 
-export async function getMissingArtifacts(artifactFiles) {
+export async function getMissingArtifacts(artifactFiles, baseRoot = root) {
   const missing = []
   for (const file of artifactFiles) {
-    const absolute = resolveArtifact(file)
+    const absolute = resolveArtifact(file, baseRoot)
     if (!(await exists(absolute))) missing.push(absolute)
   }
   return missing
 }
 
-export async function inspectFingerprint(fingerprint) {
-  const { files, hash } = await hashInputPatterns(fingerprint.inputPatterns)
-  const cachedFingerprint = await readFingerprint(fingerprint.fingerprintPath)
-  const missingArtifacts = await getMissingArtifacts(fingerprint.artifactFiles)
+export async function hashArtifactFiles(artifactFiles, baseRoot = root) {
+  if ((await getMissingArtifacts(artifactFiles, baseRoot)).length > 0) {
+    return null
+  }
+
+  const hash = createHash('sha256')
+  for (const file of [...artifactFiles].sort()) {
+    hash.update(posixPath(file))
+    hash.update('\0')
+    hash.update(await readFile(resolveArtifact(file, baseRoot)))
+    hash.update('\0')
+  }
+  return hash.digest('hex')
+}
+
+export async function inspectFingerprint(fingerprint, baseRoot = root) {
+  const { files, hash } = await hashInputPatterns(
+    fingerprint.inputPatterns,
+    baseRoot,
+  )
+  const cached = await readFingerprint(fingerprint.fingerprintPath, baseRoot)
+  const cachedFingerprint = cached?.sourceFingerprint ?? null
+  const cachedArtifactFingerprint = cached?.artifactFingerprint ?? null
+  const missingArtifacts = await getMissingArtifacts(
+    fingerprint.artifactFiles,
+    baseRoot,
+  )
+  const currentArtifactFingerprint = await hashArtifactFiles(
+    fingerprint.artifactFiles,
+    baseRoot,
+  )
   const staleReasons = []
 
   if (missingArtifacts.length > 0) {
@@ -190,23 +257,36 @@ export async function inspectFingerprint(fingerprint) {
   } else if (cachedFingerprint !== hash) {
     staleReasons.push(`${fingerprint.id} artifact fingerprint changed`)
   }
+  if (cachedFingerprint !== null && cachedArtifactFingerprint === null) {
+    staleReasons.push(
+      `${fingerprint.id} artifact integrity fingerprint is missing`,
+    )
+  } else if (
+    currentArtifactFingerprint !== null &&
+    cachedArtifactFingerprint !== currentArtifactFingerprint
+  ) {
+    staleReasons.push(`${fingerprint.id} artifact contents changed`)
+  }
 
   return {
     id: fingerprint.id,
     fingerprintPath: fingerprint.fingerprintPath,
+    artifactFiles: fingerprint.artifactFiles,
     files,
     currentFingerprint: hash,
     cachedFingerprint,
+    currentArtifactFingerprint,
+    cachedArtifactFingerprint,
     missingArtifacts,
     staleReasons,
     fresh: staleReasons.length === 0,
   }
 }
 
-export async function inspectArtifactGroup(group) {
+export async function inspectArtifactGroup(group, baseRoot = root) {
   const fingerprints = []
   for (const fingerprint of group.fingerprints) {
-    fingerprints.push(await inspectFingerprint(fingerprint))
+    fingerprints.push(await inspectFingerprint(fingerprint, baseRoot))
   }
 
   const sourceHash = createHash('sha256')

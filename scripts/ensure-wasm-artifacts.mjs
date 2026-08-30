@@ -44,7 +44,9 @@ const native = status.fingerprints.find(
 )
 
 if (!bundle || !native) {
-  console.error('[ensure-wasm] internal artifact policy is missing fingerprints')
+  console.error(
+    '[ensure-wasm] internal artifact policy is missing fingerprints',
+  )
   process.exit(1)
 }
 
@@ -74,6 +76,12 @@ if (native.cachedFingerprint === null) {
   }
 } else if (native.cachedFingerprint !== native.currentFingerprint) {
   nativeStaleReasons.push('native artifact fingerprint changed')
+} else if (native.cachedArtifactFingerprint === null) {
+  nativeStaleReasons.push('native artifact integrity fingerprint is missing')
+} else if (
+  native.cachedArtifactFingerprint !== native.currentArtifactFingerprint
+) {
+  nativeStaleReasons.push('native artifact contents changed')
 }
 
 if (bundle.missingArtifacts.length > 0) {
@@ -88,6 +96,12 @@ if (bundle.cachedFingerprint === null) {
   bundleStaleReasons.push('bundle artifact fingerprint is missing')
 } else if (bundle.cachedFingerprint !== bundle.currentFingerprint) {
   bundleStaleReasons.push('bundle artifact fingerprint changed')
+} else if (bundle.cachedArtifactFingerprint === null) {
+  bundleStaleReasons.push('bundle artifact integrity fingerprint is missing')
+} else if (
+  bundle.cachedArtifactFingerprint !== bundle.currentArtifactFingerprint
+) {
+  bundleStaleReasons.push('bundle artifact contents changed')
 }
 
 if (nativeStaleReasons.length > 0) {
@@ -115,8 +129,8 @@ if (nativeStaleReasons.length > 0) {
     ].join('\n'),
   )
   await run('pnpm', ['run', '_build:wasm:artifacts'])
-  await writeFingerprint(bundle.fingerprintPath, bundle.currentFingerprint)
-  await writeFingerprint(native.fingerprintPath, native.currentFingerprint)
+  await writeFingerprint(bundle)
+  await writeFingerprint(native)
   process.exit(0)
 }
 
@@ -145,12 +159,12 @@ if (bundleStaleReasons.length > 0) {
     ].join('\n'),
   )
   await run('pnpm', ['run', '-C', 'vue/packages/wasm', 'build'])
-  await writeFingerprint(bundle.fingerprintPath, bundle.currentFingerprint)
+  await writeFingerprint(bundle)
   rebuiltBundleArtifacts = true
 }
 
 if (shouldWriteNativeFingerprint && !dryRun) {
-  await writeFingerprint(native.fingerprintPath, native.currentFingerprint)
+  await writeFingerprint(native)
 }
 
 console.info(
