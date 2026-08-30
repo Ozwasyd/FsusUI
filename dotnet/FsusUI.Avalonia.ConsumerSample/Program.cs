@@ -75,6 +75,29 @@ public static class ConsumerSampleSmoke
       "# Release notes\n\n- Native editor");
     var revealed = codeEditor.RevealLineColumn(3, 3);
     _ = codeEditor.FindNext("Native");
+    var markdownIdentity = new FsusMarkdownDocumentIdentity(
+      "consumer-projection",
+      1);
+    var markdownEditor = new FsusMarkdownEditor
+    {
+      Document = "**Draft**",
+      DocumentIdentity = markdownIdentity,
+      Mode = FsusMarkdownEditorMode.Live,
+    };
+    var projectionRequest = new FsusMarkdownProjectionRequestedEventArgs(
+      markdownIdentity,
+      0,
+      markdownEditor.Document,
+      0,
+      markdownEditor.SourceCoordinateMap);
+    var projectionCommit = FsusMarkdownProjectionProducerContract
+      .ProduceAndCommitAsync(
+        markdownEditor,
+        new ConsumerProjectionProducer(markdownIdentity),
+        projectionRequest)
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
 
     var page = new StackPanel();
     page.Children.Add(action);
@@ -83,12 +106,13 @@ public static class ConsumerSampleSmoke
     page.Children.Add(dropZone);
     page.Children.Add(commandPalette);
     page.Children.Add(codeEditor);
+    page.Children.Add(markdownEditor);
 
     var manager = new FsusThemeManager();
 
     return manager is not null &&
       themeOptions.Density == FsusDensity.Default &&
-      page.Children.Count == 6 &&
+      page.Children.Count == 7 &&
       action.AccessibleName == "Save settings" &&
       input.Text == "FsusUI" &&
       icon.IconKey == FsusIconKeys.Search &&
@@ -98,6 +122,51 @@ public static class ConsumerSampleSmoke
       commandPalette.SearchPlaceholder == "Search workspace commands" &&
       codeEditor.DocumentIdentity?.Id == "consumer-smoke" &&
       codeEditor.Selection == new FsusCodeEditorSelection(19, 25) &&
-      revealed == new FsusCodeEditorPosition(19, 3, 3);
+      revealed == new FsusCodeEditorPosition(19, 3, 3) &&
+      projectionCommit.Accepted &&
+      markdownEditor.CapabilityState == "aligned";
+  }
+
+  private sealed class ConsumerProjectionProducer(
+    FsusMarkdownDocumentIdentity identity) : IFsusMarkdownProjectionProducer
+  {
+    public ValueTask<FsusMarkdownProjectionProduction> ProduceAsync(
+      FsusMarkdownProjectionRequestedEventArgs request,
+      CancellationToken cancellationToken = default)
+    {
+      cancellationToken.ThrowIfCancellationRequested();
+      return ValueTask.FromResult(new FsusMarkdownProjectionProduction(
+        new(
+          FsusMarkdownProjectionProducerContract.Version,
+          FsusMarkdownProjectionProducerKind.InterimHostBridge,
+          "consumer-canonical-runtime-bridge",
+          "1.0.0",
+          FsusMarkdownProjectionProducerContract.CanonicalRuntimeIdentity,
+          "consumer-smoke-runtime"),
+        new(
+          identity,
+          request.Revision,
+          request.Source,
+          [
+            new(
+              "strong",
+              new(0, 2),
+              FsusMarkdownProjectionSpanKind.HiddenMarker,
+              ""),
+            new(
+              "strong",
+              new(2, 7),
+              FsusMarkdownProjectionSpanKind.Text,
+              "Draft",
+              "strong"),
+            new(
+              "strong",
+              new(7, 9),
+              FsusMarkdownProjectionSpanKind.HiddenMarker,
+              ""),
+          ],
+          request.FeatureRevision),
+        []));
+    }
   }
 }
