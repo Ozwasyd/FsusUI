@@ -1,0 +1,38 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+
+  <Style Selector="fsus|FsusAvatar">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          Name="PART_Clip"
+          Background="{TemplateBinding Background}"
+          Width="{TemplateBinding Size}"
+          Height="{TemplateBinding Size}"
+          ClipToBounds="True"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center">
+          <ContentPresenter
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Foreground="{TemplateBinding Foreground}"
+            FontSize="{DynamicResource FsusTypographyBodyMdSize}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusAvatar.fsus-circle /template/ Border#PART_Clip">
+    <Setter Property="CornerRadius" Value="999" />
+  </Style>
+
+  <Style Selector="fsus|FsusAvatar.fsus-square /template/ Border#PART_Clip">
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+</Styles>
