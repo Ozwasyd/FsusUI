@@ -164,16 +164,8 @@ public class FsusCodeEditorHeadlessTests
   [AvaloniaFact]
   public void HeadlessSkiaRendersThemeAndViewMatrixAndWritesManifest()
   {
-    var root = FindRepositoryRoot();
-    var outputRoot = Path.Combine(
-      root,
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "screenshots",
-      "avalonia");
-    Directory.CreateDirectory(outputRoot);
+    var outputRoot =
+      HeadlessVisualEvidence.CreateOutputDirectory("code-editor");
     var captures = new List<RenderCapture>();
 
     foreach (var (theme, highContrast) in new[]
@@ -210,7 +202,7 @@ public class FsusCodeEditorHeadlessTests
         var bytes = File.ReadAllBytes(outputPath);
         Assert.True(bytes.Length > 2_000);
         captures.Add(new(
-          Path.GetRelativePath(root, outputPath).Replace('\\', '/'),
+          fileName,
           Convert.ToHexStringLower(SHA256.HashData(bytes)),
           themeName,
           state,
@@ -224,12 +216,10 @@ public class FsusCodeEditorHeadlessTests
 
     Assert.Equal(6, captures.Count);
     Assert.Equal(6, captures.Select(capture => capture.Sha256).Distinct().Count());
+    Assert.All(captures, capture =>
+      Assert.True(File.Exists(Path.Combine(outputRoot, capture.File))));
     var manifestPath = Path.Combine(
-      root,
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      outputRoot,
       "issue-645-avalonia-code-editor-render-manifest.json");
     File.WriteAllText(
       manifestPath,
@@ -266,11 +256,7 @@ public class FsusCodeEditorHeadlessTests
     editor.CommitComposition("かな");
 
     var reportPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      HeadlessVisualEvidence.CreateOutputDirectory("code-editor"),
       "issue-645-avalonia-code-editor-automation-report.json");
     File.WriteAllText(
       reportPath,
@@ -312,6 +298,7 @@ public class FsusCodeEditorHeadlessTests
     Assert.True(composingStatus);
     Assert.EndsWith("かな", editor.Text, StringComparison.Ordinal);
     Assert.Equal(editor.Text, peer.Value);
+    Assert.True(File.Exists(reportPath));
     window.Close();
   }
 
