@@ -1,0 +1,130 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "d7aa4e636e4206b70fa475fc23ece72abaae8ec1156f29cfa8b4999e0b9e8a36",
+  "candidateSha": "507ed1d89a4360236c53e3579b96c06291f97eb7",
+  "candidateDigest": "63fabca138fab64c71da28d315c3a660e71a33c8c55cf83a6f7df1e8f4cd1ab4",
+  "verificationClass": "ux-system",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+    "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+    "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
+    "427a399416b901d39dc4545bd8337b153378cdeeb5ceff73419b61d308b5a0dd",
+    "fdf27f2ad6d153acd5d0abfafd13f3106708fe4df31490f5ebed80c8061e5650",
+    "298ff4b6078a9b5043e65703338cf03342e9a3577dbe7e3a1b0b1bd3c686260e",
+    "069c6efa2e44f775544bb037cd550a0edbdd8ca98a4e40bfc473f6a1bb0d9f74",
+    "9ed46eacfe99b595589c46d9018a5d58aa468bcaf2375ae16a6aa8a69713a98f",
+    "fb789c0afd4f9df9c94d52dbd998dc2fb7bc2c2306d68df2e36d1eb848e0e159",
+    "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1"
+  ],
+  "activeBaselineIdentityDigest": "91cee73e28f9da2080495854d84476ef84b48616501ab7fe3588d647559a2551",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "5907ba82caf24658fa476f752b0ef4a41fc48c3bc0e676c3797a7022b2fc318b",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "desktop-640x360",
+      "state": "built-in-light",
+      "theme": "light",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "f4e3ea473f3bbf3122ca29840c9e275351ee0b5d6bbb60c68e150bb73fc6c60b"
+    },
+    {
+      "viewport": "desktop-640x360",
+      "state": "built-in-dark",
+      "theme": "dark",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "b5a4211f9e3ec779ed45d4075fdcd99b1228faac845d3715c2da98300fce3b23"
+    },
+    {
+      "viewport": "desktop-640x360",
+      "state": "complete-custom-palette",
+      "theme": "light",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "7597d3b9d7d7ab84b2a870ed74c3a1996df28b2c4cf43b341fabbf89261ca10a"
+    },
+    {
+      "viewport": "desktop-640x360",
+      "state": "partial-custom-with-dark-fallback",
+      "theme": "dark",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "a9b6b207f9b97399fc26e01aad7e06f437094492b9296183a0d0b5ad51ad00c6"
+    },
+    {
+      "viewport": "desktop-640x360",
+      "state": "built-in-high-contrast",
+      "theme": "dark",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "2ce289f4613c0e9dbc2fd7be14ba7fa6bf6bd122af24f96b1130f954d5808fc0"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "light-built-in-fallback",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-light.png",
+      "digest": "f4e3ea473f3bbf3122ca29840c9e275351ee0b5d6bbb60c68e150bb73fc6c60b",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "dark-built-in-fallback",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-dark.png",
+      "digest": "b5a4211f9e3ec779ed45d4075fdcd99b1228faac845d3715c2da98300fce3b23",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "complete-custom-palette",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-custom.png",
+      "digest": "7597d3b9d7d7ab84b2a870ed74c3a1996df28b2c4cf43b341fabbf89261ca10a",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "partial-dark-fallback",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-partial-dark.png",
+      "digest": "a9b6b207f9b97399fc26e01aad7e06f437094492b9296183a0d0b5ad51ad00c6",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "high-contrast-fallback",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-highcontrast.png",
+      "digest": "2ce289f4613c0e9dbc2fd7be14ba7fa6bf6bd122af24f96b1130f954d5808fc0",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "678e8ca62e90187feead7d259e5eed74dbcb34e21439b46d376bc9ab343185cb"
+}
