@@ -1,7 +1,14 @@
 #!/usr/bin/env node
 
 import { createHash } from 'node:crypto'
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import {
@@ -35,6 +42,8 @@ const options = (name) => {
     return []
   })
 }
+const sha256FileContent = (target) =>
+  createHash('sha256').update(readFileSync(target)).digest('hex')
 const pairs = (values, label) =>
   Object.fromEntries(
     values.map((value) => {
@@ -95,9 +104,7 @@ const computeInputFingerprint = (root, explicitInputs) => {
 
 const runIdentity = () => ({
   id: String(option('run-id', process.env.GITHUB_RUN_ID ?? 'local')),
-  attempt: String(
-    option('run-attempt', process.env.GITHUB_RUN_ATTEMPT ?? '1'),
-  ),
+  attempt: String(option('run-attempt', process.env.GITHUB_RUN_ATTEMPT ?? '1')),
 })
 
 const baseManifest = (root, gate, group, status) => ({
@@ -119,11 +126,7 @@ const baseManifest = (root, gate, group, status) => ({
 const emitPlaywright = (root, gate, group) => {
   const evidenceRoot = path.resolve(root, option('evidence-root', '.readiness'))
   const profile = group === 'pr' ? 'pr' : group
-  const expected = expectedPlaywrightCells(
-    playwrightRegistry,
-    [gate],
-    profile,
-  )
+  const expected = expectedPlaywrightCells(playwrightRegistry, [gate], profile)
   let plan = null
   const planPath = option('playwright-plan')
   if (planPath) {
@@ -155,10 +158,7 @@ const emitPlaywright = (root, gate, group) => {
     : []
   const receiptsDir = path.resolve(
     root,
-    option(
-      'playwright-receipts',
-      path.join(evidenceRoot, 'receipts', gate),
-    ),
+    option('playwright-receipts', path.join(evidenceRoot, 'receipts', gate)),
   )
   const emitted = []
   for (const cell of cellsToRun) {
@@ -192,6 +192,43 @@ const emitPlaywright = (root, gate, group) => {
     copyFileSync(reportSource, reportDest)
     const receiptDigest = sha256Path(receiptPath)
     const reportDigest = sha256Path(reportDest)
+    const conformanceTraceArtifacts = []
+    let conformance = undefined
+    if (gate === 'playwright-conformance') {
+      if (!receipt.conformance || !Array.isArray(receipt.conformance.traces)) {
+        throw new Error(
+          `playwright receipt ${cell.cellId} missing conformance trace evidence.`,
+        )
+      }
+      const traces = []
+      for (const [index, trace] of receipt.conformance.traces.entries()) {
+        const traceSource = path.resolve(root, trace.path)
+        if (!existsSync(traceSource))
+          throw new Error(`missing conformance trace for ${cell.cellId}.`)
+        if (sha256FileContent(traceSource) !== trace.sha256)
+          throw new Error(
+            `conformance trace digest mismatch for ${cell.cellId}.`,
+          )
+        const traceRelative = path.join(
+          'receipts',
+          gate,
+          'traces',
+          cell.cellId.replaceAll('/', '-'),
+          `${index}.json`,
+        )
+        const traceDest = path.resolve(evidenceRoot, traceRelative)
+        mkdirSync(path.dirname(traceDest), { recursive: true })
+        copyFileSync(traceSource, traceDest)
+        const digest = sha256FileContent(traceDest)
+        traces.push({ path: traceRelative, sha256: digest })
+        conformanceTraceArtifacts.push({
+          name: `trace-${cell.cellId}-${index}`,
+          path: traceRelative,
+          sha256: digest,
+        })
+      }
+      conformance = { ...receipt.conformance, traces }
+    }
     const id = `${gate}-${cell.cellId.replaceAll('/', '-')}`
     const reportSummary = `reports/${id}.json`
     const browser = cell.dimensions.browser
@@ -216,6 +253,7 @@ const emitPlaywright = (root, gate, group) => {
           path: reportRelative,
           sha256: reportDigest,
         },
+        ...conformanceTraceArtifacts,
       ],
       dimensions: {},
       playwright: {
@@ -236,6 +274,7 @@ const emitPlaywright = (root, gate, group) => {
         report: { path: reportRelative, sha256: reportDigest },
         receiptPath: receiptRelative,
         receiptDigest,
+        ...(conformance ? { conformance } : {}),
       },
       reportSummary,
     }

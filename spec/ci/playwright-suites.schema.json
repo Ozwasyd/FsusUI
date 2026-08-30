@@ -61,6 +61,7 @@
             "dom-layout",
             "geometry-smoke",
             "markdown-editor-interaction",
+            "web-interaction-conformance",
             "visual-boundary-audit",
             "visual-runtime-reuse"
           ]

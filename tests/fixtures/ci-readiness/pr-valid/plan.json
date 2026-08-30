@@ -3,11 +3,9 @@
   "baseRef": "main",
   "headRef": "HEAD",
   "group": "pr",
-  "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+  "registryHash": "5666d3d139e25ac93cae2b2d63b7f2f11f626b9cd0de5947c4fa1167f8ad638a",
   "generatedAt": "2026-08-01T00:00:00.000Z",
-  "changedFiles": [
-    "vue/packages/components/button/src/button.vue"
-  ],
+  "changedFiles": ["vue/packages/components/button/src/button.vue"],
   "decisions": [
     {
       "suiteId": "view-transitions",
@@ -22,12 +20,8 @@
       "decision": "run",
       "reasonCode": "suite-source-changed",
       "reason": "fixture run decision",
-      "cells": [
-        "motion-ssr/chromium"
-      ],
-      "matchedRoots": [
-        "vue/packages/components/button/src/button.vue"
-      ]
+      "cells": ["motion-ssr/chromium"],
+      "matchedRoots": ["vue/packages/components/button/src/button.vue"]
     },
     {
       "suiteId": "dom-layout",
@@ -42,12 +36,8 @@
       "decision": "run",
       "reasonCode": "suite-source-changed",
       "reason": "fixture run decision",
-      "cells": [
-        "geometry-smoke/chromium"
-      ],
-      "matchedRoots": [
-        "vue/packages/components/button/src/button.vue"
-      ]
+      "cells": ["geometry-smoke/chromium"],
+      "matchedRoots": ["vue/packages/components/button/src/button.vue"]
     },
     {
       "suiteId": "markdown-editor-interaction",
