@@ -50,7 +50,8 @@ public class MarkdownEditorInteractionTraceTests
 
     Assert.True(result.Accepted);
     var peer = ControlAutomationPeer.CreatePeerForElement(editor);
-    var actions = Assert.NotNull(peer.GetChildren());
+    var actions = peer.GetChildren();
+    Assert.NotNull(actions);
     Assert.Collection(
       actions,
       before => Assert.Contains("enter-before", before.GetName()),
