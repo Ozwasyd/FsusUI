@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
   "classificationReceiptDigest": "11c59544f7992df4325e01b6c9ad6aad21cacbf91b918312a276508b81a92a53",
-  "candidateSha": "4cba6e9ca424cdb6d606ed9df34983996319f4fd",
-  "candidateDigest": "3d454fe0091954be01bdd6d8cfde1db9f13cdef078a50dd19a09b2ff25701cbd",
+  "candidateSha": "c87fb5233d685d44bff269875b68d25bb45ab501",
+  "candidateDigest": "3ac7a1f0278d23b94da0ee22462895d74970c4607ba0bcc60967d89f54354db1",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -42,14 +42,14 @@
       "state": "default-wheel-zoomed-drag-panned-source-reset-viewport-clipped",
       "theme": "dark",
       "inputModes": ["pointer", "keyboard"],
-      "evidenceDigest": "912b72dafe819422e55b72418a29424786c084d6710b1be42cd0893f69913ba1"
+      "evidenceDigest": "d85500843dfe09e822b90b5b45a2ed927a62e9b2fc3793b979945ac1d30cebaa"
     },
     {
       "viewport": "avalonia-headless-960x1020-144dpi",
       "state": "default-wheel-zoomed-drag-panned-source-reset-viewport-clipped",
       "theme": "dark",
       "inputModes": ["pointer", "keyboard"],
-      "evidenceDigest": "5a5f24e7907b9578d35c4086b3d1065c2563de014546f7ea715ea2a10f7f3d86"
+      "evidenceDigest": "3b4ee2d1e85f1a41fa02724ee09117f680314879c0101a627ef267ece428bcd2"
     },
     {
       "viewport": "local-headless-automation",
@@ -80,7 +80,7 @@
       "id": "image-viewer-dark-96dpi-state-matrix",
       "kind": "screenshot",
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/visual-evidence/issue-699-image-viewer-render/issue-699-image-viewer-dark-96dpi.png",
-      "digest": "912b72dafe819422e55b72418a29424786c084d6710b1be42cd0893f69913ba1",
+      "digest": "d85500843dfe09e822b90b5b45a2ed927a62e9b2fc3793b979945ac1d30cebaa",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -88,7 +88,7 @@
       "id": "image-viewer-dark-144dpi-state-matrix",
       "kind": "screenshot",
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/visual-evidence/issue-699-image-viewer-render/issue-699-image-viewer-dark-144dpi.png",
-      "digest": "5a5f24e7907b9578d35c4086b3d1065c2563de014546f7ea715ea2a10f7f3d86",
+      "digest": "3b4ee2d1e85f1a41fa02724ee09117f680314879c0101a627ef267ece428bcd2",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -103,5 +103,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "3989056ba4f07a30a1e9e54127884f7b787a12330e8829d6dc3c8bd2a342157a"
+  "receiptDigest": "bb4c27f31f24e5d32b066fd0254251fe8fdee40d1965174236e707d963d45f51"
 }
