@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "issue": 723,
   "evidenceClass": "independent-rendered-evidence-review",
-  "candidateSha": "f34d87771bed9578f3f85223b0c7aceb87b8acb8",
-  "candidateDigest": "7262d044f59597cf86b371b31f3a412a1931b4c6f0e7b154863235bdaf688272",
-  "classificationReceiptDigest": "16911116019309d527a82e432c357272661ca4b496fdfa9e86301e20fd408912",
+  "candidateSha": "51a58456c6fe373258e89e10ddfa2b195c4126ce",
+  "candidateDigest": "e97273babd0cbf0ddde7922d1b58554ebbc641479f5d26aa10b876fd7f6586de",
+  "classificationReceiptDigest": "a5d38908b0ca1f58977f7a2385fdc859265c478ae3ec7b5d1371e3d95c48cbfd",
   "productionFixture": true,
   "implementationModifiedPaths": [],
   "testResult": {
@@ -49,7 +49,7 @@
   ],
   "manifest": {
     "path": "tests/conformance/visual/artifacts/issue-723/manifest.json",
-    "digest": "759205eac7241988c4e78676411471f8cdc51218b34a036e91eef7f2681c4e53"
+    "digest": "a5f88dd7f860369986aff08348a3f8587e908ed3a4a4197643e78166a4f55af3"
   },
   "limitation": "Deterministic local Avalonia headless Skia simulation; no physical display, native compositor, touch hardware, or screen reader was available."
 }

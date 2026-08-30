@@ -3,7 +3,7 @@
   "generatedBy": "FsusNotificationHeadlessTests.ProductionThemeRenderCapturesThemeAndDensityMatrix",
   "repository": "Ozwasyd/FsusUI",
   "issue": 723,
-  "candidateRevision": "f34d87771bed9578f3f85223b0c7aceb87b8acb8",
+  "candidateRevision": "51a58456c6fe373258e89e10ddfa2b195c4126ce",
   "renderer": "avalonia-headless-skia",
   "limitation": "Deterministic local simulation; no physical display, native window compositor, touch hardware, or screen reader was available.",
   "captures": [
