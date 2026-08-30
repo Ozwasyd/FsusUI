@@ -14,7 +14,7 @@
   "playwright": {
     "decision": "skip",
     "suiteId": "visual-runtime-reuse",
-    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "registryHash": "5666d3d139e25ac93cae2b2d63b7f2f11f626b9cd0de5947c4fa1167f8ad638a",
     "impactPlanDigest": "c7dee84550f9ab52fb2680fb42bdf9632adf77b99ff9369d9048076308f6ed64",
     "tests": {
       "total": 0,

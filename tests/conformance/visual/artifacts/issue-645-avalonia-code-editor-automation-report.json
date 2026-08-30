@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "issue": 645,
+  "generatedBy": "FsusCodeEditorHeadlessTests.LocalAutomationAndCompositionSimulationWritesAccurateReceipt",
+  "evidenceClass": "local-headless-automation-and-composition-simulation",
+  "nativeInputOwner": {
+    "count": 1,
+    "AcceptsReturn": true,
+    "AcceptsTab": true,
+    "IsUndoEnabled": false
+  },
+  "automation": {
+    "name": "Release notes source",
+    "itemStatus": "line 11, column 3, 11 lines, 0 matches",
+    "controlType": "Edit",
+    "valuePattern": true,
+    "IsReadOnly": false
+  },
+  "composition": {
+    "composingStatus": true,
+    "committed": true
+  },
+  "relatedInteractionTest": "NativeInputAndPublicWorkflowCoverTypingCompositionSearchHistoryAndIdentity",
+  "limitations": "The test uses Avalonia\u0027s production TextBox in the headless backend and exercises the public composition lifecycle. It does not claim a real Windows TSF, macOS input method, Linux IBus, UIA, VoiceOver, AT-SPI, or physical keyboard session."
+}

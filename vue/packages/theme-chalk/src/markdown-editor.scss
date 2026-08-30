@@ -513,6 +513,10 @@
     }
 
     @include e(actions) {
+      /* Own toolbar row below the mode switcher: modes and actions share
+         the two-column grid only while their combined min-content fits, and
+         overflow made split/preview tabs unreachable to pointer input. */
+      grid-column: 1 / -1;
       justify-self: end;
       gap: 8px;
     }

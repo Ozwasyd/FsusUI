@@ -1,5 +1,6 @@
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
@@ -9,6 +10,66 @@ namespace FsusUI.Avalonia.Tests.Controls;
 
 public class FsusPickerPrimitiveTests
 {
+  [Fact]
+  public async Task ProductionSelectAutomaticallyOpensNavigatesSelectsAndDismisses()
+  {
+    var select = new KeyboardSelect { AccessibleName = "Zoom" };
+    select.Options.Add(new FsusOption { Value = 80, Label = "80%", IsDisabled = true });
+    select.Options.Add(new FsusOption { Value = 100, Label = "100%" });
+    select.Options.Add(new FsusOption { Value = 125, Label = "125%" });
+    select.RefreshOptions();
+
+    Assert.True(await select.PressAsync(Key.Down));
+    Assert.True(select.IsOpen);
+    Assert.Equal(1, select.HighlightedIndex);
+
+    Assert.True(await select.PressAsync(Key.Down));
+    Assert.Equal(2, select.HighlightedIndex);
+    Assert.True(await select.PressAsync(Key.Enter));
+    Assert.False(select.IsOpen);
+    Assert.Equal(125, select.SelectedValue);
+
+    Assert.True(await select.PressAsync(Key.Enter));
+    Assert.True(select.IsOpen);
+    Assert.True(await select.PressAsync(Key.Escape));
+    Assert.False(select.IsOpen);
+
+    select.IsEnabled = false;
+    Assert.False(await select.PressAsync(Key.Down));
+    Assert.False(select.IsOpen);
+    Assert.Contains("fsus-disabled", select.Classes);
+  }
+
+  [Fact]
+  public void ProductionSelectAutomationExposesComboBoxListboxSelectionAndDisabledState()
+  {
+    var select = new FsusSelect { AccessibleName = "Zoom" };
+    var disabled = new FsusOption { Value = 80, Label = "80%", IsDisabled = true };
+    var enabled = new FsusOption { Value = 100, Label = "100%" };
+    select.Options.Add(disabled);
+    select.Options.Add(enabled);
+    select.RefreshOptions();
+
+    var selectPeer = ControlAutomationPeer.CreatePeerForElement(select);
+    var expandCollapse = Assert.IsAssignableFrom<IExpandCollapseProvider>(selectPeer);
+    var selection = Assert.IsAssignableFrom<ISelectionProvider>(selectPeer);
+    var disabledPeer = ControlAutomationPeer.CreatePeerForElement(disabled);
+    var enabledPeer = ControlAutomationPeer.CreatePeerForElement(enabled);
+
+    Assert.Equal(AutomationControlType.ComboBox, selectPeer.GetAutomationControlType());
+    Assert.Equal(ExpandCollapseState.Collapsed, expandCollapse.ExpandCollapseState);
+    Assert.True(expandCollapse.ShowsMenu);
+    Assert.False(selection.CanSelectMultiple);
+    Assert.False(disabledPeer.IsEnabled());
+    Assert.Equal(AutomationControlType.ListItem, enabledPeer.GetAutomationControlType());
+
+    Assert.IsAssignableFrom<ISelectionItemProvider>(enabledPeer).Select();
+    Assert.Equal(100, select.SelectedValue);
+    Assert.Single(selection.GetSelection());
+    Assert.Equal("100%", AutomationProperties.GetName(enabled));
+    Assert.Equal("closed single 1 selected", AutomationProperties.GetItemStatus(select));
+  }
+
   [Fact]
   public async Task SelectFiltersKeyboardSelectsMultipleGroupedOptionsAndClears()
   {
@@ -218,6 +279,9 @@ public class FsusPickerPrimitiveTests
     Assert.Contains("FsusThemePickerSurfaceBrush", pickers);
     Assert.Contains("FsusMotionDurationEffective", pickers);
     Assert.Contains("FsusDensityControlDefaultY", pickers);
+    Assert.Contains("FsusDensitySelectOptionY", pickers);
+    Assert.Contains("fsus-select-popup-border", pickers);
+    Assert.Contains("FsusThemeFocusBorderThickness", pickers);
 
     var theme = ReadTheme("FsusTheme.axaml");
     Assert.Contains("Controls/Pickers.axaml", theme);

@@ -7,7 +7,34 @@ import json
 import sys
 import time
 
-import pyatspi
+try:
+    import pyatspi
+    BACKEND = 'pyatspi'
+except ModuleNotFoundError:
+    import gi
+    gi.require_version('Atspi', '2.0')
+    from gi.repository import Atspi
+    BACKEND = 'gi-atspi'
+
+
+def role_name(accessible):
+    return accessible.getRoleName() if BACKEND == 'pyatspi' else accessible.get_role_name()
+
+
+def accessible_name(accessible):
+    return (accessible.name if BACKEND == 'pyatspi' else accessible.get_name()) or ''
+
+
+def child_count(accessible):
+    return accessible.childCount if BACKEND == 'pyatspi' else accessible.get_child_count()
+
+
+def child_at(accessible, index):
+    return accessible.getChildAtIndex(index) if BACKEND == 'pyatspi' else accessible.get_child_at_index(index)
+
+
+def desktop():
+    return pyatspi.Registry.getDesktop(0) if BACKEND == 'pyatspi' else Atspi.get_desktop(0)
 
 
 def node_brief(accessible, depth=0, limit=400, collected=None):
@@ -16,12 +43,22 @@ def node_brief(accessible, depth=0, limit=400, collected=None):
     if len(collected) >= limit:
         return collected
     try:
-        role = accessible.getRoleName()
-        name = accessible.name or ''
-        states = [str(state) for state in accessible.getState().getStates()]
+        role = role_name(accessible)
+        name = accessible_name(accessible)
+        states = []
+        if BACKEND == 'pyatspi':
+            states = [str(state) for state in accessible.getState().getStates()]
+        else:
+            state_set = accessible.get_state_set()
+            states = [str(state) for state in (state_set.get_states() or [])]
         attrs = {}
         try:
-            attrs = dict(accessible.getAttributes() or [])
+            if BACKEND == 'pyatspi':
+                attrs = dict(accessible.getAttributes() or [])
+            else:
+                for entry in accessible.get_attributes_as_array() or []:
+                    key, _, value = entry.partition(':')
+                    attrs[key] = value
         except Exception:
             attrs = {}
         collected.append(
@@ -33,9 +70,9 @@ def node_brief(accessible, depth=0, limit=400, collected=None):
                 'attributes': attrs,
             }
         )
-        count = accessible.childCount
+        count = child_count(accessible)
         for index in range(count):
-            child = accessible.getChildAtIndex(index)
+            child = child_at(accessible, index)
             if child is None:
                 continue
             node_brief(child, depth + 1, limit, collected)
@@ -47,9 +84,10 @@ def node_brief(accessible, depth=0, limit=400, collected=None):
 def find_apps(deadline):
     apps = []
     while time.time() < deadline:
-        desktop = pyatspi.Registry.getDesktop(0)
-        apps = [app for app in desktop if app]
-        names = [app.name for app in apps]
+        root = desktop()
+        apps = [child_at(root, index) for index in range(child_count(root))]
+        apps = [app for app in apps if app]
+        names = [accessible_name(app) for app in apps]
         if any(
             'chrom' in (name or '').lower()
             or 'firefox' in (name or '').lower()
@@ -62,20 +100,25 @@ def find_apps(deadline):
     return apps
 
 
+def is_browser_app(app):
+    name = accessible_name(app).lower()
+    return any(token in name for token in ('chrom', 'firefox', 'minibrowser', 'webkit'))
+
+
 def main():
     deadline = time.time() + 20
-    apps = find_apps(deadline)
+    apps = [app for app in find_apps(deadline) if is_browser_app(app)]
     trees = []
     for app in apps:
         try:
             trees.append(
                 {
-                    'app': app.name,
+                    'app': accessible_name(app),
                     'nodes': node_brief(app, limit=500),
                 }
             )
         except Exception as exc:
-            trees.append({'app': getattr(app, 'name', None), 'error': str(exc)})
+            trees.append({'app': accessible_name(app), 'error': str(exc)})
 
     textboxes = []
     live_regions = []
@@ -92,14 +135,20 @@ def main():
             if role == 'article':
                 articles.append(node)
 
+    named_markdown_editables = [
+        node for node in textboxes if 'markdown editor' in (node.get('name') or '').lower()
+    ]
     result = {
-        'ok': True,
+        'ok': bool(apps) and bool(named_markdown_editables),
+        'backend': BACKEND,
         'appCount': len(trees),
         'apps': [tree.get('app') for tree in trees],
         'textboxCount': len(textboxes),
+        'markdownEditableCount': len(named_markdown_editables),
         'articleCount': len(articles),
         'liveRegionCount': len(live_regions),
         'textboxes': textboxes[:20],
+        'markdownEditables': named_markdown_editables[:20],
         'liveRegions': live_regions[:20],
         'trees': trees,
     }

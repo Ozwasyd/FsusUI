@@ -919,6 +919,10 @@ export const markdownEditorProps = buildProps({
     type: String,
     default: '',
   },
+  documentIdentity: {
+    type: definePropType<MarkdownEditorDocumentIdentity>(Object),
+    default: undefined,
+  },
   defaultMode: {
     type: String as PropType<MarkdownEditorMode>,
     values: ['source', 'live', 'split', 'preview'],

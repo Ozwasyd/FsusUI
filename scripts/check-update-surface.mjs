@@ -134,7 +134,25 @@ export function auditModels({
   if ('platform' in renovate || 'repositories' in renovate) {
     fail('repository config must not contain global-only platform/repositories')
   }
-  if (renovate.automerge !== false) fail('automerge must be false')
+  if (renovate.automerge !== true) fail('automerge must be true')
+  if (renovate.automergeType !== 'pr') {
+    fail('automergeType must keep dependency updates on pull requests')
+  }
+  if (renovate.platformAutomerge !== true) {
+    fail('platformAutomerge must use the hosting platform')
+  }
+  if (renovate.ignoreTests !== false) {
+    fail('ignoreTests must require repository checks')
+  }
+  if (renovate.dependencyDashboardApproval !== false) {
+    fail('dependencyDashboardApproval must not require manual approval')
+  }
+  if (renovate.rebaseWhen !== 'behind-base-branch') {
+    fail('rebaseWhen must refresh stale dependency branches')
+  }
+  if ('automergeSchedule' in renovate) {
+    fail('automergeSchedule must not create a merge window')
+  }
   if (renovate.separateMajorMinor !== false) {
     fail('semantic groups must combine major/minor by default')
   }
@@ -155,6 +173,13 @@ export function auditModels({
   }
   if (renovate.lockFileMaintenance?.enabled !== true) {
     fail('lockFileMaintenance must be enabled')
+  }
+  if (
+    renovate.lockFileMaintenance?.automerge !== true ||
+    renovate.lockFileMaintenance?.automergeType !== 'pr' ||
+    renovate.lockFileMaintenance?.platformAutomerge !== true
+  ) {
+    fail('lockFileMaintenance must use platform PR automerge')
   }
   if (
     !renovate.lockFileMaintenance?.schedule?.some((entry) =>
@@ -178,8 +203,14 @@ export function auditModels({
     if (key === 'enabled' && value === false) {
       fail(`disabled update surface forbidden at ${keyPath.join('.')}`)
     }
-    if (key === 'automerge' && value !== false) {
-      fail(`automerge forbidden at ${keyPath.join('.')}`)
+    if (key === 'automerge' && value !== true) {
+      fail(`automerge must stay enabled at ${keyPath.join('.')}`)
+    }
+    if (key === 'automergeType' && value !== 'pr') {
+      fail(`direct-push automerge forbidden at ${keyPath.join('.')}`)
+    }
+    if (key === 'platformAutomerge' && value !== true) {
+      fail(`platform automerge required at ${keyPath.join('.')}`)
     }
   })
   const exclusionPaths = new Set(

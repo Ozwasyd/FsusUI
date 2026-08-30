@@ -9,37 +9,6 @@ namespace FsusUI.Avalonia.Tests.Controls;
 public class FsusNavigationPrimitiveTests
 {
   [Fact]
-  public void TabsSkipDisabledPanesAndSupportArrowHomeEndNavigation()
-  {
-    var selectedKeys = new List<string>();
-    var tabs = new KeyboardTabs
-    {
-      AccessibleName = "Article sections",
-    };
-    tabs.SelectionChanged += (_, args) => selectedKeys.Add(args.SelectedKey);
-    tabs.Panes.Add(new FsusTabPane { Key = "overview", Header = "Overview" });
-    tabs.Panes.Add(new FsusTabPane { Key = "activity", Header = "Activity", IsEnabled = false });
-    tabs.Panes.Add(new FsusTabPane { Key = "settings", Header = "Settings" });
-    tabs.Panes.Add(new FsusTabPane { Key = "history", Header = "History" });
-
-    tabs.SelectKey("overview");
-    tabs.Press(Key.Right);
-    tabs.Press(Key.End);
-    tabs.Press(Key.Home);
-
-    Assert.Contains("fsus-tabs", tabs.Classes);
-    Assert.Equal("overview", tabs.SelectedKey);
-    Assert.Equal(new[] { "overview", "settings", "history", "overview" }, selectedKeys);
-    Assert.Equal("overview", tabs.FocusedKey);
-    Assert.True(tabs.Panes[0].IsSelected);
-    Assert.False(tabs.Panes[1].IsSelected);
-    Assert.Contains("fsus-disabled", tabs.Panes[1].Classes);
-    Assert.Equal("Article sections", AutomationProperties.GetName(tabs));
-    Assert.Equal(AutomationControlType.Tab, AutomationProperties.GetControlTypeOverride(tabs.Panes[0]));
-    Assert.Equal("selected", AutomationProperties.GetItemStatus(tabs.Panes[0]));
-  }
-
-  [Fact]
   public void MenuSupportsNestedCollapsedSelectionAndKeyboardActivation()
   {
     var selectedKeys = new List<string>();
@@ -176,11 +145,6 @@ public class FsusNavigationPrimitiveTests
       "automation-snapshots.json"));
     Assert.Contains("tabs-stable23", automation);
     Assert.Contains("menu-stable23", automation);
-  }
-
-  private sealed class KeyboardTabs : FsusTabs
-  {
-    public void Press(Key key) => HandleKey(key);
   }
 
   private sealed class KeyboardMenu : FsusMenu

@@ -110,6 +110,9 @@ public class FsusPlatformCommand : INotifyPropertyChanged
   private string? category;
   private string? description;
   private string? iconKey;
+  private Func<bool>? isEnabledPredicate;
+  private Func<bool>? isVisiblePredicate;
+  private Func<object?, CancellationToken, ValueTask>? executeAsyncAction;
 
   public FsusPlatformCommand(string id, string label, FsusPlatformRole role = FsusPlatformRole.None)
   {
@@ -208,6 +211,19 @@ public class FsusPlatformCommand : INotifyPropertyChanged
 
   public Action<object?>? ExecuteAction { get; set; }
 
+  public Func<object?, CancellationToken, ValueTask>? ExecuteAsyncAction
+  {
+    get => executeAsyncAction;
+    set
+    {
+      if (executeAsyncAction != value)
+      {
+        executeAsyncAction = value;
+        Notify(nameof(ExecuteAsyncAction));
+      }
+    }
+  }
+
   public object? CommandParameter { get; set; }
 
   public string? Category
@@ -249,10 +265,48 @@ public class FsusPlatformCommand : INotifyPropertyChanged
     }
   }
 
+  public Func<bool>? IsEnabledPredicate
+  {
+    get => isEnabledPredicate;
+    set
+    {
+      if (isEnabledPredicate != value)
+      {
+        isEnabledPredicate = value;
+        Notify(nameof(IsEnabledPredicate));
+      }
+    }
+  }
+
+  public Func<bool>? IsVisiblePredicate
+  {
+    get => isVisiblePredicate;
+    set
+    {
+      if (isVisiblePredicate != value)
+      {
+        isVisiblePredicate = value;
+        Notify(nameof(IsVisiblePredicate));
+      }
+    }
+  }
+
+  public bool IsEffectivelyEnabled => CanExecute();
+
+  public bool IsEffectivelyVisible => IsVisiblePredicate?.Invoke() ?? true;
+
+  public bool CanExecute(object? parameter = null)
+  {
+    var arg = parameter ?? CommandParameter;
+    return IsEnabled &&
+      (IsEnabledPredicate?.Invoke() ?? true) &&
+      (Command?.CanExecute(arg) ?? true);
+  }
+
   public void Execute(object? parameter = null)
   {
     var arg = parameter ?? CommandParameter;
-    if (!IsEnabled || (Command is not null && !Command.CanExecute(arg)))
+    if (!CanExecute(arg))
     {
       return;
     }
@@ -265,6 +319,29 @@ public class FsusPlatformCommand : INotifyPropertyChanged
     {
       Command?.Execute(arg);
     }
+  }
+
+  public async ValueTask<bool> ExecuteAsync(
+    object? parameter = null,
+    CancellationToken cancellationToken = default)
+  {
+    var arg = parameter ?? CommandParameter;
+    if (!CanExecute(arg))
+    {
+      return false;
+    }
+
+    cancellationToken.ThrowIfCancellationRequested();
+    if (ExecuteAsyncAction is not null)
+    {
+      await ExecuteAsyncAction(arg, cancellationToken);
+    }
+    else
+    {
+      Execute(arg);
+    }
+
+    return true;
   }
 
   public void NotifyStateChanged()
@@ -370,9 +447,49 @@ public class FsusNativeMenuItemModel
   }
 }
 
+public enum FsusNativeMenuProfile
+{
+  StandardDocumentWindow = 0,
+  PreserveRoots = 1,
+}
+
+[Flags]
+public enum FsusNativeMenuSynthesizedRoots
+{
+  None = 0,
+  Application = 1 << 0,
+  File = 1 << 1,
+  Window = 1 << 2,
+  Help = 1 << 3,
+  All = Application | File | Window | Help,
+}
+
+public sealed record FsusNativeMenuOptions
+{
+  public static FsusNativeMenuOptions Default { get; } = new();
+
+  public FsusNativeMenuProfile Profile { get; init; } =
+    FsusNativeMenuProfile.StandardDocumentWindow;
+
+  public FsusNativeMenuSynthesizedRoots SynthesizedRoots { get; init; } =
+    FsusNativeMenuSynthesizedRoots.All;
+}
+
 public sealed class FsusNativeMenuBuilder : IDisposable
 {
   private readonly List<Action> cleanupActions = [];
+  private readonly IFsusMacOSNativeMenuAdapter macOSAdapter;
+
+  public FsusNativeMenuBuilder()
+    : this(FsusMacOSNativeMenuAdapter.Instance)
+  {
+  }
+
+  internal FsusNativeMenuBuilder(IFsusMacOSNativeMenuAdapter macOSAdapter)
+  {
+    this.macOSAdapter = macOSAdapter ??
+      throw new ArgumentNullException(nameof(macOSAdapter));
+  }
 
   public int ActiveSubscriptionCount => cleanupActions.Count;
 
@@ -380,11 +497,21 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     IEnumerable<FsusNativeMenuItemModel> rootModels,
     FsusShortcutPlatform platform = FsusShortcutPlatform.Auto)
   {
+    return Build(rootModels, FsusNativeMenuOptions.Default, platform);
+  }
+
+  public NativeMenu Build(
+    IEnumerable<FsusNativeMenuItemModel> rootModels,
+    FsusNativeMenuOptions options,
+    FsusShortcutPlatform platform = FsusShortcutPlatform.Auto)
+  {
+    ArgumentNullException.ThrowIfNull(options);
     Dispose();
     var resolvedPlatform = ResolvePlatform(platform);
+    var resolvedOptions = NormalizeOptions(options);
     var menu = new NativeMenu();
 
-    var adaptedModels = AdaptForPlatform(rootModels, resolvedPlatform);
+    var adaptedModels = AdaptForPlatform(rootModels, resolvedOptions, resolvedPlatform);
     foreach (var model in adaptedModels)
     {
       var nativeItem = BuildItem(model, resolvedPlatform);
@@ -392,6 +519,11 @@ public sealed class FsusNativeMenuBuilder : IDisposable
       {
         menu.Items.Add(nativeItem);
       }
+    }
+
+    if (resolvedPlatform == FsusShortcutPlatform.macOS)
+    {
+      BindMacOSServicesMenu(menu);
     }
 
     return menu;
@@ -402,8 +534,17 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     IEnumerable<FsusNativeMenuItemModel> rootModels,
     FsusShortcutPlatform platform = FsusShortcutPlatform.Auto)
   {
+    AttachTo(topLevel, rootModels, FsusNativeMenuOptions.Default, platform);
+  }
+
+  public void AttachTo(
+    TopLevel topLevel,
+    IEnumerable<FsusNativeMenuItemModel> rootModels,
+    FsusNativeMenuOptions options,
+    FsusShortcutPlatform platform = FsusShortcutPlatform.Auto)
+  {
     ArgumentNullException.ThrowIfNull(topLevel);
-    var menu = Build(rootModels, platform);
+    var menu = Build(rootModels, options, platform);
     NativeMenu.SetMenu(topLevel, menu);
   }
 
@@ -412,8 +553,17 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     IEnumerable<FsusNativeMenuItemModel> rootModels,
     FsusShortcutPlatform platform = FsusShortcutPlatform.Auto)
   {
+    AttachTo(app, rootModels, FsusNativeMenuOptions.Default, platform);
+  }
+
+  public void AttachTo(
+    Application app,
+    IEnumerable<FsusNativeMenuItemModel> rootModels,
+    FsusNativeMenuOptions options,
+    FsusShortcutPlatform platform = FsusShortcutPlatform.Auto)
+  {
     ArgumentNullException.ThrowIfNull(app);
-    var menu = Build(rootModels, platform);
+    var menu = Build(rootModels, options, platform);
     NativeMenu.SetMenu(app, menu);
   }
 
@@ -479,15 +629,23 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     if (model.Command is not null)
     {
       var cmd = model.Command;
-      item.Command = new ActionCommand(_ => cmd.Execute());
+      var role = cmd.Role != FsusPlatformRole.None
+        ? cmd.Role
+        : model.Role;
+      var itemCommand = new ActionCommand(
+        () => cmd.IsEnabled &&
+          (cmd.Command?.CanExecute(cmd.CommandParameter) ?? true),
+        _ => ExecuteRoleOrCommand(role, platform, cmd));
+      item.Command = itemCommand;
       FsusNativeMenuMetadata.Set(
         item,
-        cmd.Role != FsusPlatformRole.None ? cmd.Role : model.Role,
+        role,
         cmd.Id,
         model.AccessibleName ?? cmd.Label);
 
       EventHandler onStateChanged = (_, _) =>
       {
+        itemCommand.RaiseCanExecuteChanged();
         item.Header = cmd.Label;
         item.IsEnabled = cmd.IsEnabled;
         item.IsChecked = cmd.IsChecked;
@@ -496,7 +654,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
         item.ToolTip = cmd.Description;
         FsusNativeMenuMetadata.Set(
           item,
-          cmd.Role != FsusPlatformRole.None ? cmd.Role : model.Role,
+          role,
           cmd.Id,
           model.AccessibleName ?? cmd.Label);
       };
@@ -506,6 +664,13 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     }
     else
     {
+      if (platform == FsusShortcutPlatform.macOS &&
+          IsMacOSNativeResponderRole(model.Role))
+      {
+        item.Command = new ActionCommand(
+          () => true,
+          _ => macOSAdapter.TryExecuteRole(model.Role));
+      }
       FsusNativeMenuMetadata.Set(
         item,
         model.Role,
@@ -515,6 +680,59 @@ public sealed class FsusNativeMenuBuilder : IDisposable
 
     return item;
   }
+
+  private void ExecuteRoleOrCommand(
+    FsusPlatformRole role,
+    FsusShortcutPlatform platform,
+    FsusPlatformCommand command)
+  {
+    if (platform != FsusShortcutPlatform.macOS ||
+        !IsMacOSNativeResponderRole(role) ||
+        !macOSAdapter.TryExecuteRole(role))
+    {
+      command.Execute();
+    }
+  }
+
+  private void BindMacOSServicesMenu(NativeMenu menu)
+  {
+    foreach (var item in EnumerateNativeItems(menu))
+    {
+      if (FsusNativeMenuMetadata.GetRole(item) == FsusPlatformRole.Services &&
+          item.Menu is not null)
+      {
+        macOSAdapter.BindServicesMenu(item.Menu);
+        return;
+      }
+    }
+  }
+
+  private static IEnumerable<NativeMenuItem> EnumerateNativeItems(
+    NativeMenu menu)
+  {
+    foreach (var item in menu.Items.OfType<NativeMenuItem>())
+    {
+      yield return item;
+      if (item.Menu is null)
+      {
+        continue;
+      }
+
+      foreach (var child in EnumerateNativeItems(item.Menu))
+      {
+        yield return child;
+      }
+    }
+  }
+
+  private static bool IsMacOSNativeResponderRole(FsusPlatformRole role) =>
+    role is FsusPlatformRole.Hide or
+      FsusPlatformRole.HideOthers or
+      FsusPlatformRole.ShowAll or
+      FsusPlatformRole.Quit or
+      FsusPlatformRole.WindowMinimize or
+      FsusPlatformRole.WindowZoom or
+      FsusPlatformRole.WindowBringAllToFront;
 
   private NativeMenuItem BuildRecentSubmenu(
     FsusNativeMenuItemModel model,
@@ -539,7 +757,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
         {
           Header = recentPath,
           ToolTip = $"Open recent item {recentPath}",
-          Command = new ActionCommand(_ => model.OpenRecentAction?.Invoke(recentPath)),
+          Command = new ActionCommand(() => true, _ => model.OpenRecentAction?.Invoke(recentPath)),
         };
         FsusNativeMenuMetadata.Set(
           recentItem,
@@ -556,7 +774,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
         {
           Header = "Clear Recent",
           ToolTip = "Clear the recent items list",
-          Command = new ActionCommand(_ => model.ClearRecentAction.Invoke()),
+          Command = new ActionCommand(() => true, _ => model.ClearRecentAction.Invoke()),
         };
         FsusNativeMenuMetadata.Set(
           clearItem,
@@ -583,24 +801,50 @@ public sealed class FsusNativeMenuBuilder : IDisposable
   private static string? NullIfEmpty(string value) =>
     string.IsNullOrWhiteSpace(value) ? null : value;
 
+  private static FsusNativeMenuOptions NormalizeOptions(
+    FsusNativeMenuOptions options)
+  {
+    return options with
+    {
+      Profile = Enum.IsDefined(typeof(FsusNativeMenuProfile), options.Profile)
+        ? options.Profile
+        : FsusNativeMenuProfile.StandardDocumentWindow,
+      SynthesizedRoots =
+        options.SynthesizedRoots & FsusNativeMenuSynthesizedRoots.All,
+    };
+  }
+
   private static IEnumerable<FsusNativeMenuItemModel> AdaptForPlatform(
     IEnumerable<FsusNativeMenuItemModel> roots,
+    FsusNativeMenuOptions options,
     FsusShortcutPlatform platform)
   {
-    if (platform == FsusShortcutPlatform.macOS)
+    if (options.Profile == FsusNativeMenuProfile.PreserveRoots)
     {
-      return AdaptForMac(roots);
+      return roots.Select(CloneModel);
     }
 
-    return AdaptForWindowsLinux(roots);
+    if (platform == FsusShortcutPlatform.macOS)
+    {
+      return AdaptForMac(roots, options.SynthesizedRoots);
+    }
+
+    return AdaptForWindowsLinux(roots, options.SynthesizedRoots);
   }
 
   private static IEnumerable<FsusNativeMenuItemModel> AdaptForMac(
-    IEnumerable<FsusNativeMenuItemModel> roots)
+    IEnumerable<FsusNativeMenuItemModel> roots,
+    FsusNativeMenuSynthesizedRoots synthesized)
   {
     var list = roots.Select(CloneModel).ToList();
     var appMenu = list.FirstOrDefault(IsApplicationMenu);
-    if (appMenu is null)
+    if (appMenu is not null)
+    {
+      appMenu.Header ??= "Application";
+      appMenu.AccessibleName ??= "Application menu";
+      appMenu.Role = FsusPlatformRole.Application;
+    }
+    else if (synthesized.HasFlag(FsusNativeMenuSynthesizedRoots.Application))
     {
       appMenu = new FsusNativeMenuItemModel
       {
@@ -610,103 +854,111 @@ public sealed class FsusNativeMenuBuilder : IDisposable
       };
       list.Insert(0, appMenu);
     }
-    else
+
+    if (appMenu is not null)
     {
-      appMenu.Header ??= "Application";
-      appMenu.AccessibleName ??= "Application menu";
-      appMenu.Role = FsusPlatformRole.Application;
+      var existingItems = appMenu.Items.ToList();
+      var standaloneRoleItems = list
+        .Where(item =>
+          !ReferenceEquals(item, appMenu) &&
+          IsMacApplicationRole(item.Role))
+        .ToArray();
+      foreach (var item in standaloneRoleItems)
+      {
+        existingItems.Add(item);
+        list.Remove(item);
+      }
+      var customItems = existingItems
+        .Where(item =>
+          !item.IsSeparator &&
+          item.Role is FsusPlatformRole.None or FsusPlatformRole.Application)
+        .ToArray();
+      appMenu.Items.Clear();
+
+      AppendSeparated(
+        appMenu.Items,
+        [
+          ResolveRoleItem(
+            existingItems,
+            FsusPlatformRole.About,
+            "app.about",
+            "About Application"),
+        ]);
+      AppendSeparated(
+        appMenu.Items,
+        [
+          ResolveRoleItem(
+            existingItems,
+            FsusPlatformRole.Preferences,
+            "app.preferences",
+            "Preferences...",
+            new FsusShortcutGesture(Key.OemComma, KeyModifiers.Control)),
+        ]);
+      AppendSeparated(appMenu.Items, customItems);
+      AppendSeparated(
+        appMenu.Items,
+        [
+          ResolveRoleItem(
+            existingItems,
+            FsusPlatformRole.Services,
+            "app.services",
+            "Services",
+            createCommand: false),
+        ]);
+      AppendSeparated(
+        appMenu.Items,
+        [
+          ResolveRoleItem(
+            existingItems,
+            FsusPlatformRole.Hide,
+            "app.hide",
+            "Hide Application",
+            new FsusShortcutGesture(Key.H, KeyModifiers.Control)),
+          ResolveRoleItem(
+            existingItems,
+            FsusPlatformRole.HideOthers,
+            "app.hideOthers",
+            "Hide Others",
+            new FsusShortcutGesture(
+              Key.H,
+              KeyModifiers.Control | KeyModifiers.Alt)),
+          ResolveRoleItem(
+            existingItems,
+            FsusPlatformRole.ShowAll,
+            "app.showAll",
+            "Show All",
+            createCommand: false),
+        ]);
+      AppendSeparated(
+        appMenu.Items,
+        [
+          ResolveRoleItem(
+            existingItems,
+            FsusPlatformRole.Quit,
+            "app.quit",
+            "Quit Application",
+            new FsusShortcutGesture(Key.Q, KeyModifiers.Control)),
+        ]);
     }
 
-    var existingItems = appMenu.Items.ToList();
-    var standaloneRoleItems = list
-      .Where(item =>
-        !ReferenceEquals(item, appMenu) &&
-        IsMacApplicationRole(item.Role))
-      .ToArray();
-    foreach (var item in standaloneRoleItems)
-    {
-      existingItems.Add(item);
-      list.Remove(item);
-    }
-    var customItems = existingItems
-      .Where(item =>
-        !item.IsSeparator &&
-        item.Role is FsusPlatformRole.None or FsusPlatformRole.Application)
-      .ToArray();
-    appMenu.Items.Clear();
-
-    AppendSeparated(
-      appMenu.Items,
-      [
-        ResolveRoleItem(
-          existingItems,
-          FsusPlatformRole.About,
-          "app.about",
-          "About Application"),
-      ]);
-    AppendSeparated(
-      appMenu.Items,
-      [
-        ResolveRoleItem(
-          existingItems,
-          FsusPlatformRole.Preferences,
-          "app.preferences",
-          "Preferences...",
-          new FsusShortcutGesture(Key.OemComma, KeyModifiers.Control)),
-      ]);
-    AppendSeparated(appMenu.Items, customItems);
-    AppendSeparated(
-      appMenu.Items,
-      [
-        ResolveRoleItem(
-          existingItems,
-          FsusPlatformRole.Services,
-          "app.services",
-          "Services",
-          createCommand: false),
-      ]);
-    AppendSeparated(
-      appMenu.Items,
-      [
-        ResolveRoleItem(
-          existingItems,
-          FsusPlatformRole.Hide,
-          "app.hide",
-          "Hide Application",
-          new FsusShortcutGesture(Key.H, KeyModifiers.Control)),
-        ResolveRoleItem(
-          existingItems,
-          FsusPlatformRole.HideOthers,
-          "app.hideOthers",
-          "Hide Others",
-          new FsusShortcutGesture(
-            Key.H,
-            KeyModifiers.Control | KeyModifiers.Alt)),
-        ResolveRoleItem(
-          existingItems,
-          FsusPlatformRole.ShowAll,
-          "app.showAll",
-          "Show All",
-          createCommand: false),
-      ]);
-    AppendSeparated(
-      appMenu.Items,
-      [
-        ResolveRoleItem(
-          existingItems,
-          FsusPlatformRole.Quit,
-          "app.quit",
-          "Quit Application",
-          new FsusShortcutGesture(Key.Q, KeyModifiers.Control)),
-      ]);
-
-    NormalizeMacWindowMenu(list);
+    NormalizeMacWindowMenu(list, synthesized);
     return SortTopLevelMenus(list, includeApplication: true);
   }
 
   private static IEnumerable<FsusNativeMenuItemModel> AdaptForWindowsLinux(
-    IEnumerable<FsusNativeMenuItemModel> roots)
+    IEnumerable<FsusNativeMenuItemModel> roots,
+    FsusNativeMenuSynthesizedRoots synthesized)
   {
+    var fileMenuAvailable = roots.Any(IsFileMenu) ||
+      synthesized.HasFlag(FsusNativeMenuSynthesizedRoots.File);
+    var helpMenuAvailable = roots.Any(IsHelpMenu) ||
+      synthesized.HasFlag(FsusNativeMenuSynthesizedRoots.Help);
+
+    if (!fileMenuAvailable || !helpMenuAvailable)
+    {
+      return AdaptConstrainedForWindowsLinux(roots);
+    }
+
     var result = new List<FsusNativeMenuItemModel>();
     FsusNativeMenuItemModel? aboutItem = null;
     FsusNativeMenuItemModel? preferencesItem = null;
@@ -779,6 +1031,31 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     return SortTopLevelMenus(result, includeApplication: false);
   }
 
+  private static IEnumerable<FsusNativeMenuItemModel>
+    AdaptConstrainedForWindowsLinux(IEnumerable<FsusNativeMenuItemModel> roots)
+  {
+    var result = new List<FsusNativeMenuItemModel>();
+    foreach (var root in roots)
+    {
+      FsusNativeMenuItemModel? unusedAbout = null;
+      FsusNativeMenuItemModel? unusedPreferences = null;
+      FsusNativeMenuItemModel? unusedQuit = null;
+      var filtered = FilterMenu(
+        root,
+        ref unusedAbout,
+        ref unusedPreferences,
+        ref unusedQuit,
+        relocateAbout: false,
+        relocatePreferencesQuit: false);
+      if (filtered is not null)
+      {
+        result.Add(filtered);
+      }
+    }
+
+    return SortTopLevelMenus(result, includeApplication: true);
+  }
+
   private static void ExtractRoles(
     FsusNativeMenuItemModel menu,
     ref FsusNativeMenuItemModel? about,
@@ -811,7 +1088,9 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     FsusNativeMenuItemModel source,
     ref FsusNativeMenuItemModel? about,
     ref FsusNativeMenuItemModel? preferences,
-    ref FsusNativeMenuItemModel? quit)
+    ref FsusNativeMenuItemModel? quit,
+    bool relocateAbout = true,
+    bool relocatePreferencesQuit = true)
   {
     if (source.Role is FsusPlatformRole.Services or
                        FsusPlatformRole.Hide or
@@ -825,19 +1104,19 @@ public sealed class FsusNativeMenuBuilder : IDisposable
       return null;
     }
 
-    if (source.Role == FsusPlatformRole.About)
+    if (relocateAbout && source.Role == FsusPlatformRole.About)
     {
       about ??= CloneModel(source);
       return null;
     }
 
-    if (source.Role == FsusPlatformRole.Preferences)
+    if (relocatePreferencesQuit && source.Role == FsusPlatformRole.Preferences)
     {
       preferences ??= CloneModel(source);
       return null;
     }
 
-    if (source.Role == FsusPlatformRole.Quit)
+    if (relocatePreferencesQuit && source.Role == FsusPlatformRole.Quit)
     {
       quit ??= CloneModel(source);
       return null;
@@ -864,7 +1143,13 @@ public sealed class FsusNativeMenuBuilder : IDisposable
 
     foreach (var item in source.Items)
     {
-      var filtered = FilterMenu(item, ref about, ref preferences, ref quit);
+      var filtered = FilterMenu(
+        item,
+        ref about,
+        ref preferences,
+        ref quit,
+        relocateAbout,
+        relocatePreferencesQuit);
       if (filtered is not null)
       {
         copy.Items.Add(filtered);
@@ -875,11 +1160,17 @@ public sealed class FsusNativeMenuBuilder : IDisposable
   }
 
   private static void NormalizeMacWindowMenu(
-    IList<FsusNativeMenuItemModel> menus)
+    IList<FsusNativeMenuItemModel> menus,
+    FsusNativeMenuSynthesizedRoots synthesized)
   {
     var windowMenu = menus.FirstOrDefault(IsWindowMenu);
     if (windowMenu is null)
     {
+      if (!synthesized.HasFlag(FsusNativeMenuSynthesizedRoots.Window))
+      {
+        return;
+      }
+
       windowMenu = new FsusNativeMenuItemModel
       {
         Header = "Window",
@@ -1210,17 +1501,17 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     return FsusShortcutPlatform.Linux;
   }
 
-  private sealed class ActionCommand(Action<object?> action) : ICommand
+  private sealed class ActionCommand(Func<bool> canExecute, Action<object?> action)
+    : ICommand
   {
-    public event EventHandler? CanExecuteChanged
-    {
-      add { }
-      remove { }
-    }
+    public event EventHandler? CanExecuteChanged;
 
-    public bool CanExecute(object? parameter) => true;
+    public bool CanExecute(object? parameter) => canExecute();
 
     public void Execute(object? parameter) => action(parameter);
+
+    public void RaiseCanExecuteChanged() =>
+      CanExecuteChanged?.Invoke(this, EventArgs.Empty);
   }
 }
 
@@ -1260,7 +1551,7 @@ public sealed class FsusDockMenuContract
         {
           Header = path,
           ToolTip = $"Open recent item {path}",
-          Command = new ActionCommand(_ => openRecentAction?.Invoke(path)),
+          Command = new ActionCommand(() => true, _ => openRecentAction?.Invoke(path)),
         };
         FsusNativeMenuMetadata.Set(
           recentItem,
@@ -1277,7 +1568,7 @@ public sealed class FsusDockMenuContract
         {
           Header = "Clear Recent",
           ToolTip = "Clear the recent items list",
-          Command = new ActionCommand(_ => clearRecentAction()),
+          Command = new ActionCommand(() => true, _ => clearRecentAction()),
         };
         FsusNativeMenuMetadata.Set(
           clearItem,
@@ -1305,7 +1596,10 @@ public sealed class FsusDockMenuContract
           ToggleType = (MenuItemToggleType)(int)cmd.ToggleType,
           Gesture = cmd.Gesture?.ToKeyGesture(),
           ToolTip = cmd.Description,
-          Command = new ActionCommand(_ => cmd.Execute()),
+          Command = new ActionCommand(
+            () => cmd.IsEnabled &&
+              (cmd.Command?.CanExecute(cmd.CommandParameter) ?? true),
+            _ => cmd.Execute()),
         };
         FsusNativeMenuMetadata.Set(
           item,
@@ -1343,7 +1637,8 @@ public sealed class FsusDockMenuContract
     return menu;
   }
 
-  private sealed class ActionCommand(Action<object?> action) : ICommand
+  private sealed class ActionCommand(Func<bool> canExecute, Action<object?> action)
+    : ICommand
   {
     public event EventHandler? CanExecuteChanged
     {
@@ -1351,7 +1646,7 @@ public sealed class FsusDockMenuContract
       remove { }
     }
 
-    public bool CanExecute(object? parameter) => true;
+    public bool CanExecute(object? parameter) => canExecute();
 
     public void Execute(object? parameter) => action(parameter);
   }
@@ -1435,10 +1730,12 @@ public sealed class FsusCommandPaletteModel(IEnumerable<FsusPlatformCommand> com
 
     foreach (var cmd in commandList)
     {
-      if (string.IsNullOrEmpty(trimmed) ||
+      if (cmd.IsEffectivelyVisible &&
+          (string.IsNullOrEmpty(trimmed) ||
+          cmd.Id.Contains(trimmed, StringComparison.OrdinalIgnoreCase) ||
           cmd.Label.Contains(trimmed, StringComparison.OrdinalIgnoreCase) ||
           (cmd.Category?.Contains(trimmed, StringComparison.OrdinalIgnoreCase) == true) ||
-          (cmd.Description?.Contains(trimmed, StringComparison.OrdinalIgnoreCase) == true))
+          (cmd.Description?.Contains(trimmed, StringComparison.OrdinalIgnoreCase) == true)))
       {
         results.Add(new FsusCommandPaletteItem(
           cmd.Id,
@@ -1446,7 +1743,7 @@ public sealed class FsusCommandPaletteModel(IEnumerable<FsusPlatformCommand> com
           cmd.Category,
           cmd.Description,
           cmd.Gesture?.ToDisplayText(platform) ?? string.Empty,
-          cmd.IsEnabled,
+          cmd.IsEffectivelyEnabled,
           cmd.Execute));
       }
     }

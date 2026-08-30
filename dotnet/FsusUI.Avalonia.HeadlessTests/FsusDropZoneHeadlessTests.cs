@@ -430,15 +430,10 @@ public class FsusDropZoneHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts()
   {
-    var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "screenshots",
-      "avalonia");
-    Directory.CreateDirectory(outputRoot);
+    var repositoryRoot = FindRepositoryRoot();
+    var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
+      repositoryRoot,
+      "issue-655-drop-zone");
 
     var captures = new List<DropZoneRenderCapture>();
 
@@ -503,7 +498,8 @@ public class FsusDropZoneHeadlessTests
       Assert.Equal(
         (int)Math.Round(160 * capture.ZoomPercent / 100.0),
         capture.PixelSize.Height);
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
+      Assert.True(File.Exists(
+        HeadlessVisualEvidenceOutput.ResolveRecordedPath(repositoryRoot, capture.File)));
     });
     foreach (var themeCaptures in captures
       .Where(capture =>
@@ -516,11 +512,7 @@ public class FsusDropZoneHeadlessTests
     }
 
     var manifestPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
+      outputRoot,
       "issue-655-avalonia-drop-zone-render-manifest.json");
     File.WriteAllText(
       manifestPath,
@@ -530,6 +522,8 @@ public class FsusDropZoneHeadlessTests
           schemaVersion = 2,
           generatedBy =
             "FsusDropZoneHeadlessTests.RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts",
+          outputRoot = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, outputRoot),
+          manifestPath = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, manifestPath),
           renderer = new
           {
             platform = "avalonia",
@@ -544,6 +538,7 @@ public class FsusDropZoneHeadlessTests
           captures,
         },
         new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    Assert.True(File.Exists(manifestPath));
   }
 
   private static DropZoneRenderCapture RenderDropZoneState(
@@ -661,7 +656,7 @@ public class FsusDropZoneHeadlessTests
     window.Close();
 
     return new DropZoneRenderCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), outputPath).Replace('\\', '/'),
+      HeadlessVisualEvidenceOutput.RecordPath(FindRepositoryRoot(), outputPath),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
@@ -781,6 +776,80 @@ public class FsusDropZoneHeadlessTests
       Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
     });
     return window;
+  }
+
+  [AvaloniaFact]
+  public void WindowLevelDragRoutingThroughExternalProxyDrivesVisualStateWithoutDropEvents()
+  {
+    var window = CreateStyledWindow();
+    var root = new Panel();
+    var contentHost = new Border();
+    var dropZone = new FsusDropZone
+    {
+      Width = 220,
+      Height = 90,
+      IsHitTestVisible = false,
+      AccessibleName = "Overlay drop surface",
+    };
+    root.Children.Add(contentHost);
+    root.Children.Add(dropZone);
+    window.Content = root;
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+
+    var raisedEvents = 0;
+    dropZone.FilesDropped += (_, _) => raisedEvents++;
+    dropZone.FilesRejected += (_, _) => raisedEvents++;
+    dropZone.BrowseRequested += (_, _) => raisedEvents++;
+
+    // Desktop-shell proxy pattern: only the window root receives the routed
+    // drag events and drives the overlay zone state through the public
+    // external-drag contract.
+    root.AddHandler(
+      DragDrop.DragEnterEvent,
+      (_, _) => dropZone.SetExternalDragOver(true));
+    root.AddHandler(
+      DragDrop.DragLeaveEvent,
+      (_, _) => dropZone.SetExternalDragOver(false));
+
+    var enterArgs = new DragEventArgs(
+      DragDrop.DragEnterEvent,
+      new DataTransfer(),
+      contentHost,
+      new Point(10, 10),
+      KeyModifiers.None);
+    contentHost.RaiseEvent(enterArgs);
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.True(dropZone.IsDragOver);
+    Assert.Contains("fsus-dragover", dropZone.Classes);
+    Assert.Contains(":dragover", dropZone.Classes);
+    Assert.Equal("dragover", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal(0, raisedEvents);
+
+    var leaveArgs = new DragEventArgs(
+      DragDrop.DragLeaveEvent,
+      new DataTransfer(),
+      contentHost,
+      new Point(10, 10),
+      KeyModifiers.None);
+    contentHost.RaiseEvent(leaveArgs);
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.False(dropZone.IsDragOver);
+    Assert.DoesNotContain("fsus-dragover", dropZone.Classes);
+    Assert.Equal("ready", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal(0, raisedEvents);
+
+    // The external state resets when the proxy overlay detaches.
+    Assert.True(dropZone.SetExternalDragOver(true));
+    root.Children.Remove(dropZone);
+    Dispatcher.UIThread.RunJobs();
+    Assert.False(dropZone.IsDragOver);
+    Assert.Equal("ready", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal(0, raisedEvents);
+
+    window.Close();
   }
 
   private static DragEventArgs RaiseDrag(

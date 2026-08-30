@@ -53,7 +53,8 @@ const requiredCommonMetadata = [
   'DebugType',
 ]
 
-const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8')
+const read = (relativePath) =>
+  fs.readFileSync(path.join(root, relativePath), 'utf8')
 const exists = (relativePath) => fs.existsSync(path.join(root, relativePath))
 const toPosix = (value) => value.split(path.sep).join('/')
 
@@ -83,7 +84,8 @@ const walk = (directory, predicate) => {
   return results.sort()
 }
 
-const stablePackageVersion = () => xmlValue(read('dotnet/Directory.Build.props'), 'Version')
+const stablePackageVersion = () =>
+  xmlValue(read('dotnet/Directory.Build.props'), 'Version')
 
 const collectPublicSymbols = (sourceRoot) => {
   const files = walk(sourceRoot, (file) => file.endsWith('.cs'))
@@ -102,7 +104,10 @@ const collectPublicSymbols = (sourceRoot) => {
 
 const validateCommonMetadata = (content) => {
   for (const field of requiredCommonMetadata) {
-    assert(hasXmlValue(content, field), `Directory.Build.props must define ${field}`)
+    assert(
+      hasXmlValue(content, field),
+      `Directory.Build.props must define ${field}`,
+    )
   }
   assert(
     xmlValue(content, 'PublishRepositoryUrl') === 'true',
@@ -121,20 +126,33 @@ const validateCommonMetadata = (content) => {
     'Directory.Build.props must use portable debug symbols',
   )
   assert(
-    !xmlValue(content, 'PackageReleaseNotes')?.includes('Preview package candidate'),
+    !xmlValue(content, 'PackageReleaseNotes')?.includes(
+      'Preview package candidate',
+    ),
     'Directory.Build.props release notes are stale',
   )
   assert(
-    xmlValue(content, 'PackageReleaseNotes')?.includes('Stable Avalonia package candidate'),
+    xmlValue(content, 'PackageReleaseNotes')?.includes(
+      'Stable Avalonia package candidate',
+    ),
     'Directory.Build.props release notes must describe stable Avalonia package validation',
   )
 }
 
 const validatePackableProjectMetadata = (project, content) => {
-  assert(content.includes('<IsPackable>true</IsPackable>'), `${project} must be packable`)
+  assert(
+    content.includes('<IsPackable>true</IsPackable>'),
+    `${project} must be packable`,
+  )
   assert(hasXmlValue(content, 'PackageId'), `${project} must define PackageId`)
-  assert(hasXmlValue(content, 'Description'), `${project} must define Description`)
-  assert(!content.includes(' Version="'), `${project} must use central package versions`)
+  assert(
+    hasXmlValue(content, 'Description'),
+    `${project} must define Description`,
+  )
+  assert(
+    !content.includes(' Version="'),
+    `${project} must use central package versions`,
+  )
 }
 
 const validateUnpublishedProject = (project, content) => {
@@ -161,7 +179,9 @@ const validatePublicApiBaseline = (baseline, currentSymbols, label) => {
 
   const current = new Set(currentSymbols)
   const required = new Set(baseline.publicSymbols)
-  const missing = baseline.publicSymbols.filter((symbol) => !current.has(symbol))
+  const missing = baseline.publicSymbols.filter(
+    (symbol) => !current.has(symbol),
+  )
   const added = currentSymbols.filter((symbol) => !required.has(symbol))
 
   assert(
@@ -175,7 +195,10 @@ const validatePublicApiBaseline = (baseline, currentSymbols, label) => {
 }
 
 const validateBaselineFile = (packageInfo) => {
-  assert(exists(packageInfo.baseline), `${packageInfo.baseline} public API baseline is missing`)
+  assert(
+    exists(packageInfo.baseline),
+    `${packageInfo.baseline} public API baseline is missing`,
+  )
   const baseline = JSON.parse(read(packageInfo.baseline))
   assert(
     baseline.packageId === packageInfo.id,
@@ -236,7 +259,10 @@ const validateNuspec = (packageInfo, packagePath) => {
     '<repository type="git" url="https://github.com/Ozwasyd/FsusUI"',
     '<tags>fsusui avalonia components design-system cross-platform</tags>',
   ]) {
-    assert(nuspec.includes(required), `${packageInfo.id} nuspec missing ${required}`)
+    assert(
+      nuspec.includes(required),
+      `${packageInfo.id} nuspec missing ${required}`,
+    )
   }
   assert(
     nuspec.includes('Stable Avalonia package candidate'),
@@ -256,7 +282,10 @@ const validateNuspec = (packageInfo, packagePath) => {
 }
 
 const validatePackageArtifacts = () => {
-  assert(fs.existsSync(artifactRoot), 'dotnet/artifacts/nuget must exist after dotnet pack')
+  assert(
+    fs.existsSync(artifactRoot),
+    'dotnet/artifacts/nuget must exist after dotnet pack',
+  )
   const artifactFiles = fs.readdirSync(artifactRoot)
 
   for (const file of artifactFiles) {
@@ -268,7 +297,10 @@ const validatePackageArtifacts = () => {
 
   for (const packageInfo of packageProjects) {
     const nupkg = path.join(artifactRoot, artifactName(packageInfo.id, 'nupkg'))
-    const snupkg = path.join(artifactRoot, artifactName(packageInfo.id, 'snupkg'))
+    const snupkg = path.join(
+      artifactRoot,
+      artifactName(packageInfo.id, 'snupkg'),
+    )
 
     assert(fs.existsSync(nupkg), `${packageInfo.id} nupkg is missing`)
     assert(fs.existsSync(snupkg), `${packageInfo.id} snupkg is missing`)
@@ -295,10 +327,15 @@ const validatePackedConsumerSample = () => {
   assert(exists(program), `${program} missing`)
 
   const projectXml = read(project)
-  assert(!projectXml.includes('ProjectReference'), `${project} must not use ProjectReference`)
+  assert(
+    !projectXml.includes('ProjectReference'),
+    `${project} must not use ProjectReference`,
+  )
   for (const packageInfo of packageProjects) {
     assert(
-      projectXml.includes(`Include="${packageInfo.id}" Version="${stablePackageVersion()}"`),
+      projectXml.includes(
+        `Include="${packageInfo.id}" Version="${stablePackageVersion()}"`,
+      ),
       `${project} must reference ${packageInfo.id} from local artifacts`,
     )
   }
@@ -320,7 +357,14 @@ const validatePackedConsumerSample = () => {
   })
   execFileSync(
     'dotnet',
-    ['run', '--project', path.join(root, project), '--no-build', '--', '--smoke'],
+    [
+      'run',
+      '--project',
+      path.join(root, project),
+      '--no-build',
+      '--',
+      '--smoke',
+    ],
     { stdio: 'pipe' },
   )
 }
@@ -345,7 +389,9 @@ const runFixtureChecks = () => {
     () =>
       validatePackableProjectMetadata(
         'tests/fixtures/avalonia-nuget-stable/missing-package-metadata.csproj',
-        read('tests/fixtures/avalonia-nuget-stable/missing-package-metadata.csproj'),
+        read(
+          'tests/fixtures/avalonia-nuget-stable/missing-package-metadata.csproj',
+        ),
       ),
     'PackageId',
   )
@@ -354,7 +400,9 @@ const runFixtureChecks = () => {
     () =>
       validateUnpublishedProject(
         'dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj',
-        read('tests/fixtures/avalonia-nuget-stable/accidental-demo-publication.csproj'),
+        read(
+          'tests/fixtures/avalonia-nuget-stable/accidental-demo-publication.csproj',
+        ),
       ),
     'unpublished',
   )
@@ -370,7 +418,11 @@ const runFixtureChecks = () => {
     'missing public API baseline fixture',
     () =>
       validatePublicApiBaseline(
-        JSON.parse(read('tests/fixtures/avalonia-nuget-stable/missing-public-api-baseline.json')),
+        JSON.parse(
+          read(
+            'tests/fixtures/avalonia-nuget-stable/missing-public-api-baseline.json',
+          ),
+        ),
         ['FsusButton'],
         'missing public API baseline fixture',
       ),
@@ -380,7 +432,11 @@ const runFixtureChecks = () => {
     'incompatible public API fixture',
     () =>
       validatePublicApiBaseline(
-        JSON.parse(read('tests/fixtures/avalonia-nuget-stable/incompatible-public-api-change.json')),
+        JSON.parse(
+          read(
+            'tests/fixtures/avalonia-nuget-stable/incompatible-public-api-change.json',
+          ),
+        ),
         ['FsusButton'],
         'incompatible public API fixture',
       ),
@@ -413,19 +469,38 @@ const check = () => {
     try {
       fn()
     } catch (error) {
-      failures.push(`${label}: ${error instanceof Error ? error.message : String(error)}`)
+      failures.push(
+        `${label}: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
+
+  record('Contract V2 alignment', () => {
+    const alignment = JSON.parse(read('.tmp/conformance-v2/alignment.json'))
+    assert(
+      alignment.schema === 'fsusui.alignment.v2',
+      'alignment artifact schema invalid',
+    )
+    assert(
+      alignment.consumers?.nugetStableEligible === true,
+      'NuGet stable candidate blocked by derived alignment gaps',
+    )
+  })
 
   record('fixtures', runFixtureChecks)
   record('common metadata', () =>
     validateCommonMetadata(read('dotnet/Directory.Build.props')),
   )
 
-  const packablePaths = new Set(packageProjects.map((project) => project.project))
+  const packablePaths = new Set(
+    packageProjects.map((project) => project.project),
+  )
   for (const packageInfo of packageProjects) {
     record(`${packageInfo.id} metadata`, () =>
-      validatePackableProjectMetadata(packageInfo.project, read(packageInfo.project)),
+      validatePackableProjectMetadata(
+        packageInfo.project,
+        read(packageInfo.project),
+      ),
     )
     record(`${packageInfo.id} public API baseline`, () =>
       validateBaselineFile(packageInfo),

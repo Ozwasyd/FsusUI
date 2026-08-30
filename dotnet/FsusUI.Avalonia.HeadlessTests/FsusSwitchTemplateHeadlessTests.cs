@@ -192,10 +192,10 @@ public class FsusSwitchTemplateHeadlessTests
   {
     ApplyTheme(FsusThemeVariant.Light);
     var small = new FsusSwitch
-      { AccessibleName = "Small", Size = FsusComponentSize.Sm, Content = "Small" };
+    { AccessibleName = "Small", Size = FsusComponentSize.Sm, Content = "Small" };
     var medium = new FsusSwitch { AccessibleName = "Medium", Content = "Medium" };
     var large = new FsusSwitch
-      { AccessibleName = "Large", Size = FsusComponentSize.Lg, Content = "Large" };
+    { AccessibleName = "Large", Size = FsusComponentSize.Lg, Content = "Large" };
     var window = MountWindow(
       [("small", small), ("medium", medium), ("large", large)],
       width: 560);

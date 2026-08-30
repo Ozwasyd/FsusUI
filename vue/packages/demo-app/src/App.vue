@@ -86,6 +86,7 @@ import FormSection from './sections/FormSection.vue'
 import IconsSection from './sections/IconsSection.vue'
 import IssuePrimitivesSection from './sections/IssuePrimitivesSection.vue'
 import MarkdownStressSection from './sections/MarkdownStressSection.vue'
+import MarkdownEditorChromeVisualSection from './sections/MarkdownEditorChromeVisualSection.vue'
 import NavigationSection from './sections/NavigationSection.vue'
 import OthersSection from './sections/OthersSection.vue'
 import PaginationMatrixSection from './sections/PaginationMatrixSection.vue'
@@ -159,6 +160,10 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
   [
     'markdown-stress',
     { component: markRaw(MarkdownStressSection) },
+  ],
+  [
+    'markdown-editor-chrome-visual',
+    { component: markRaw(MarkdownEditorChromeVisualSection) },
   ],
   ['foundation-boundary', { component: markRaw(FoundationBoundarySection) }],
   [
