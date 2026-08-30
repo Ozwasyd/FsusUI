@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": 699,
+  "generatedBy": "FsusImageViewerHeadlessTests.ImageViewerRealPointerWheelDragCaptureCancelAndSourceSwitchContract",
+  "evidenceClass": "local-headless-automation-simulation",
+  "notRealOsScreenReader": true,
+  "controlType": "Image",
+  "name": "Pointer gallery",
+  "statuses": {
+    "zoomed": "image 1 of 3, zoom 200%, pan 0 by 0",
+    "panned": "image 1 of 3, zoom 100%, pan 260 by 160",
+    "sourceReset": "image 3 of 3"
+  },
+  "preservedKeyboard": [
+    "ArrowLeft",
+    "ArrowRight",
+    "Escape"
+  ],
+  "preservedFocusRestorationTest": "ImageViewerHeadlessKeyboardNavigationEscapeAndFocusRestoration",
+  "limitations": "Inspects production Avalonia automation properties under the local headless backend; no Windows UIA, macOS VoiceOver, or Linux AT-SPI session is claimed."
+}

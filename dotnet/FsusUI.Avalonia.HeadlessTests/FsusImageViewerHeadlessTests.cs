@@ -2,15 +2,22 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
 using FsusUI.Avalonia.Themes;
+using System.Security.Cryptography;
+using System.Text.Json;
 using Xunit;
 
 namespace FsusUI.Avalonia.HeadlessTests;
@@ -254,6 +261,217 @@ public class FsusImageViewerHeadlessTests
     window.Close();
   }
 
+  [AvaloniaFact]
+  public async Task ImageViewerRealPointerWheelDragCaptureCancelAndSourceSwitchContract()
+  {
+    var window = CreateStyledWindow();
+    var viewer = new FsusImageViewer
+    {
+      Width = 320,
+      Height = 220,
+      AccessibleName = "Pointer gallery",
+      MinimumZoom = 0.5,
+      MaximumZoom = 2,
+      ZoomFactor = 2,
+      Sources = { "diagram-1.png", "diagram-2.png", "diagram-3.png" },
+      ImageLoader = (source, _) => Task.FromResult<object?>(new Border
+      {
+        Width = 280,
+        Height = 180,
+        Background = Brushes.CornflowerBlue,
+        Child = new TextBlock { Text = source },
+      }),
+    };
+    var root = new Border
+    {
+      Width = 600,
+      Height = 400,
+      Padding = new Thickness(40),
+      Child = viewer,
+    };
+    window.Content = root;
+    window.Show();
+    Assert.True(await viewer.LoadActiveSourceAsync());
+    Arrange(window);
+
+    var center = viewer.TranslatePoint(
+      new Point(viewer.Bounds.Width / 2, viewer.Bounds.Height / 2),
+      window) ?? throw new InvalidOperationException("Viewer is not attached.");
+
+    window.MouseWheel(center, new Vector(0, 1));
+    Assert.Equal(2, viewer.Zoom);
+    Assert.Contains("zoom 200%", AutomationProperties.GetItemStatus(viewer));
+    var zoomStatus = AutomationProperties.GetItemStatus(viewer);
+    window.MouseWheel(center, new Vector(0, 1));
+    Assert.Equal(2, viewer.Zoom);
+    window.MouseWheel(center, new Vector(0, -1));
+    window.MouseWheel(center, new Vector(0, -1));
+    window.MouseWheel(center, new Vector(0, -1));
+    Assert.Equal(0.5, viewer.Zoom);
+
+    viewer.ResetTransform();
+    window.MouseDown(center, MouseButton.Left);
+    Assert.True(viewer.IsPanning);
+    Assert.Contains("fsus-panning", viewer.Classes);
+    Assert.NotNull(viewer.Cursor);
+
+    var outsideViewer = new Point(560, 360);
+    window.MouseMove(outsideViewer, RawInputModifiers.LeftMouseButton);
+    Assert.True(viewer.IsPanning);
+    Assert.NotEqual(default, viewer.Translation);
+    var pannedStatus = AutomationProperties.GetItemStatus(viewer);
+    Assert.Contains("pan", pannedStatus);
+    var capturedTranslation = viewer.Translation;
+
+    viewer.ActiveIndex = 1;
+    Assert.False(viewer.IsPanning);
+    Assert.DoesNotContain("fsus-panning", viewer.Classes);
+    Assert.Equal(1, viewer.Zoom);
+    Assert.Equal(default, viewer.Translation);
+    Assert.True(await viewer.CurrentLoadTask!);
+
+    window.MouseWheel(center, new Vector(0, 1));
+    window.MouseDown(center, MouseButton.Left);
+    window.MouseMove(new Point(center.X + 24, center.Y + 18), RawInputModifiers.LeftMouseButton);
+    window.MouseUp(new Point(center.X + 24, center.Y + 18), MouseButton.Left);
+    Assert.False(viewer.IsPanning);
+    Assert.NotEqual(default, viewer.Translation);
+    viewer.PreserveTransformOnSourceChange = true;
+    var preservedZoom = viewer.Zoom;
+    var preservedTranslation = viewer.Translation;
+    viewer.ActiveIndex = 2;
+    Assert.True(await viewer.CurrentLoadTask!);
+    Assert.Equal(preservedZoom, viewer.Zoom);
+    Assert.Equal(preservedTranslation, viewer.Translation);
+
+    viewer.PreserveTransformOnSourceChange = false;
+    viewer.Sources[2] = "diagram-4.png";
+    Assert.True(await viewer.CurrentLoadTask!);
+    Assert.Equal("diagram-4.png", viewer.ActiveSource);
+    Assert.Equal(1, viewer.Zoom);
+    Assert.Equal(default, viewer.Translation);
+
+    viewer.ResetTransform();
+    Assert.Equal(1, viewer.Zoom);
+    Assert.Equal(default, viewer.Translation);
+    Assert.Equal("image 3 of 3", AutomationProperties.GetItemStatus(viewer));
+    Assert.True(viewer.ClipToBounds);
+    Assert.NotEqual(capturedTranslation, viewer.Translation);
+
+    var reportPath = Path.Combine(
+      FindRepositoryRoot(),
+      "tests", "conformance", "visual", "artifacts",
+      "issue-699-avalonia-image-viewer-automation-report.json");
+    File.WriteAllText(
+      reportPath,
+      JsonSerializer.Serialize(
+        new
+        {
+          schemaVersion = 1,
+          issue = 699,
+          generatedBy =
+            "FsusImageViewerHeadlessTests.ImageViewerRealPointerWheelDragCaptureCancelAndSourceSwitchContract",
+          evidenceClass = "local-headless-automation-simulation",
+          notRealOsScreenReader = true,
+          controlType = AutomationProperties.GetControlTypeOverride(viewer).ToString(),
+          name = AutomationProperties.GetName(viewer),
+          statuses = new
+          {
+            zoomed = zoomStatus,
+            panned = pannedStatus,
+            sourceReset = AutomationProperties.GetItemStatus(viewer),
+          },
+          preservedKeyboard = new[] { "ArrowLeft", "ArrowRight", "Escape" },
+          preservedFocusRestorationTest =
+            "ImageViewerHeadlessKeyboardNavigationEscapeAndFocusRestoration",
+          limitations =
+            "Inspects production Avalonia automation properties under the local headless backend; no Windows UIA, macOS VoiceOver, or Linux AT-SPI session is claimed.",
+        },
+        new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    Assert.True(File.Exists(reportPath));
+    window.Close();
+  }
+
+  [AvaloniaFact]
+  public void ImageViewerRejectsInvalidZoomConfiguration()
+  {
+    var viewer = new FsusImageViewer();
+    Assert.Throws<ArgumentOutOfRangeException>(() => viewer.MinimumZoom = 0);
+    Assert.Throws<ArgumentOutOfRangeException>(() => viewer.MaximumZoom = 0.05);
+    Assert.Throws<ArgumentOutOfRangeException>(() => viewer.ZoomFactor = 1);
+    Assert.Throws<ArgumentOutOfRangeException>(() => viewer.ZoomFactor = double.NaN);
+  }
+
+  [AvaloniaFact]
+  public async Task ImageViewerRealHeadlessSkiaRendersLightDarkDpiAndZoomStates()
+  {
+    var repositoryRoot = FindRepositoryRoot();
+    var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
+      repositoryRoot,
+      "issue-699-image-viewer-render");
+    var captures = new List<ImageViewerRenderCapture>();
+    foreach (var (theme, variant) in new[]
+      {
+        ("light", FsusThemeVariant.Light),
+        ("dark", FsusThemeVariant.Dark),
+      })
+    {
+      foreach (var dpi in new[] { 96, 144 })
+      {
+        captures.Add(await RenderStateMatrixAsync(
+          repositoryRoot,
+          outputRoot,
+          theme,
+          variant,
+          dpi));
+      }
+    }
+
+    Assert.Equal(4, captures.Count);
+    Assert.All(captures, capture =>
+    {
+      Assert.Equal(64, capture.Sha256.Length);
+      Assert.True(capture.PixelSize.Width > 0);
+      Assert.True(capture.PixelSize.Height > 0);
+      Assert.True(File.Exists(
+        HeadlessVisualEvidenceOutput.ResolveRecordedPath(repositoryRoot, capture.File)));
+    });
+
+    var manifestPath = Path.Combine(
+      outputRoot,
+      "issue-699-avalonia-image-viewer-render-manifest.json");
+    File.WriteAllText(
+      manifestPath,
+      JsonSerializer.Serialize(
+        new
+        {
+          schemaVersion = 1,
+          issue = 699,
+          generatedBy =
+            "FsusImageViewerHeadlessTests.ImageViewerRealHeadlessSkiaRendersLightDarkDpiAndZoomStates",
+          outputRoot = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, outputRoot),
+          renderer = new
+          {
+            platform = "avalonia",
+            runner = "headless-skia",
+            drawingBackend = "Skia",
+            productionFixture = true,
+            limitations =
+              "Local deterministic headless rendering; no physical display or operating-system assistive technology is claimed.",
+          },
+          states = new[]
+          {
+            "default-loaded", "wheel-zoomed", "drag-panned",
+            "source-reset", "viewport-clipped",
+          },
+          themes = new[] { "light", "dark" },
+          dpi = new[] { 96, 144 },
+          captures,
+        },
+        new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    Assert.True(File.Exists(manifestPath));
+  }
+
   private static Window CreateStyledWindow()
   {
     var window = new Window
@@ -269,6 +487,169 @@ public class FsusImageViewerHeadlessTests
     });
     return window;
   }
+
+  private static async Task<ImageViewerRenderCapture> RenderStateMatrixAsync(
+    string repositoryRoot,
+    string outputRoot,
+    string theme,
+    FsusThemeVariant variant,
+    int dpi)
+  {
+    var window = CreateStyledWindow();
+    window.Width = 640;
+    window.Height = 680;
+    window.RequestedThemeVariant = variant == FsusThemeVariant.Dark
+      ? ThemeVariant.Dark
+      : ThemeVariant.Light;
+    new FsusThemeManager().Apply(window.Resources, new FsusThemeOptions
+    {
+      Variant = variant,
+      Density = FsusDensity.Default,
+      MotionMode = FsusMotionMode.Reduced,
+    });
+    FsusImageViewer Viewer(string name) => new()
+    {
+      Width = 560,
+      Height = 180,
+      AccessibleName = name,
+      MinimumZoom = 0.5,
+      MaximumZoom = 3,
+      ZoomFactor = 1.5,
+      Sources = { "architecture-overview.png", "dependency-map.png" },
+      ImageLoader = (source, _) => Task.FromResult<object?>(new Border
+      {
+        Width = 500,
+        Height = 150,
+        Background = variant == FsusThemeVariant.Dark
+          ? new SolidColorBrush(Color.Parse("#242A35"))
+          : new SolidColorBrush(Color.Parse("#E7EDF6")),
+        BorderBrush = variant == FsusThemeVariant.Dark ? Brushes.LightSteelBlue : Brushes.SteelBlue,
+        BorderThickness = new Thickness(2),
+        Child = new TextBlock
+        {
+          Text = source == "architecture-overview.png"
+            ? "Architecture overview · API → loader → decoded content"
+            : "Dependency map · source switch reset",
+          HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center,
+          VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+          TextWrapping = TextWrapping.Wrap,
+        },
+      }),
+    };
+    var defaultViewer = Viewer("Default loaded gallery");
+    var transformedViewer = Viewer("Zoomed and panned gallery");
+    var resetViewer = Viewer("Source reset gallery");
+    var labelBrush = Assert.IsAssignableFrom<IBrush>(
+      window.Resources[FsusThemeResourceKeys.TextBrush]);
+    var matrix = new StackPanel { Spacing = 8 };
+    foreach (var (label, viewer) in new[]
+      {
+        ("Default loaded · 100% · zero translation", defaultViewer),
+        ("Wheel zoom + captured drag · 150% · clipped", transformedViewer),
+        ("Source switch · reset to 100% · zero translation", resetViewer),
+      })
+    {
+      matrix.Children.Add(new TextBlock
+      {
+        Text = label,
+        Foreground = labelBrush,
+        FontSize = 12,
+      });
+      matrix.Children.Add(viewer);
+    }
+    var surface = new Border
+    {
+      Width = 640,
+      Height = 680,
+      Padding = new Thickness(40, 20),
+      Background = Assert.IsAssignableFrom<IBrush>(
+        window.Resources[FsusThemeResourceKeys.BackgroundBrush]),
+      Child = matrix,
+    };
+    window.Content = surface;
+    window.Show();
+    Assert.True(await defaultViewer.LoadActiveSourceAsync());
+    Assert.True(await transformedViewer.LoadActiveSourceAsync());
+    Assert.True(await resetViewer.LoadActiveSourceAsync());
+    Arrange(window);
+
+    var center = transformedViewer.TranslatePoint(
+      new Point(transformedViewer.Bounds.Width / 2, transformedViewer.Bounds.Height / 2),
+      window) ?? throw new InvalidOperationException("Viewer is not attached.");
+    window.MouseWheel(center, new Vector(0, 1));
+    window.MouseDown(center, MouseButton.Left);
+    window.MouseMove(new Point(center.X + 72, center.Y + 48), RawInputModifiers.LeftMouseButton);
+    window.MouseUp(new Point(center.X + 72, center.Y + 48), MouseButton.Left);
+    Assert.Equal(1.5, transformedViewer.Zoom);
+    Assert.NotEqual(default, transformedViewer.Translation);
+    Assert.True(transformedViewer.ClipToBounds);
+    var presenter = transformedViewer
+      .GetVisualDescendants()
+      .OfType<ContentPresenter>()
+      .Single(candidate => candidate.Name == FsusImageViewer.ContentPresenterPartName);
+    Assert.IsType<TransformGroup>(presenter.RenderTransform);
+
+    var resetCenter = resetViewer.TranslatePoint(
+      new Point(resetViewer.Bounds.Width / 2, resetViewer.Bounds.Height / 2),
+      window) ?? throw new InvalidOperationException("Reset viewer is not attached.");
+    window.MouseWheel(resetCenter, new Vector(0, 1));
+    Assert.Equal(1.5, resetViewer.Zoom);
+    resetViewer.ActiveIndex = 1;
+    Assert.True(await resetViewer.CurrentLoadTask!);
+    Assert.Equal(1, resetViewer.Zoom);
+    Assert.Equal(default, resetViewer.Translation);
+    Arrange(window);
+
+    var pixelSize = new PixelSize(640 * dpi / 96, 680 * dpi / 96);
+    var output = Path.Combine(outputRoot, $"issue-699-image-viewer-{theme}-{dpi}dpi.png");
+    using var bitmap = new RenderTargetBitmap(pixelSize, new Vector(dpi, dpi));
+    bitmap.Render(surface);
+    using (var stream = File.Create(output))
+    {
+      bitmap.Save(stream);
+    }
+    window.Close();
+
+    return new ImageViewerRenderCapture(
+      HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, output),
+      Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(output))),
+      new PixelDimension(pixelSize.Width, pixelSize.Height),
+      theme,
+      dpi,
+      "default-wheel-zoomed-drag-panned-source-reset-viewport-clipped");
+  }
+
+  private static void Arrange(Window window)
+  {
+    window.Measure(new Size(window.Width, window.Height));
+    window.Arrange(new Rect(0, 0, window.Width, window.Height));
+    Dispatcher.UIThread.RunJobs();
+  }
+
+  private static string FindRepositoryRoot()
+  {
+    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
+      directory is not null;
+      directory = directory.Parent)
+    {
+      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
+      {
+        return directory.FullName;
+      }
+    }
+
+    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
+  }
+
+  private sealed record PixelDimension(int Width, int Height);
+
+  private sealed record ImageViewerRenderCapture(
+    string File,
+    string Sha256,
+    PixelDimension PixelSize,
+    string Theme,
+    int Dpi,
+    string State);
 
   private sealed class DisposableControl(string name) : Control, IDisposable
   {

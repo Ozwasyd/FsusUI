@@ -27,6 +27,14 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
   </Style>
 
+  <Style Selector="fsus|FsusImageViewer.fsus-loaded">
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+
+  <Style Selector="fsus|FsusImageViewer.fsus-panning">
+    <Setter Property="Cursor" Value="SizeAll" />
+  </Style>
+
   <Style Selector="fsus|FsusImageViewer.fsus-loading">
     <Setter Property="Opacity" Value="0.75" />
   </Style>

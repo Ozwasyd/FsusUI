@@ -6,6 +6,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Media;
 using FsusUI.Avalonia.Overlay;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -56,6 +57,14 @@ public sealed class FsusActiveSourceChangedEventArgs(string source, int index) :
 {
   public string Source { get; } = source;
   public int Index { get; } = index;
+}
+
+public sealed class FsusImageViewerTransformChangedEventArgs(
+  double zoom,
+  Vector translation) : EventArgs
+{
+  public double Zoom { get; } = zoom;
+  public Vector Translation { get; } = translation;
 }
 
 public class FsusImage : ContentControl
@@ -168,11 +177,23 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
   private Task<bool>? currentLoadTask;
   private string? currentLoadingSource;
   private object? renderedContent;
+  private ContentPresenter? contentPresenter;
+  private readonly ScaleTransform scaleTransform = new(1, 1);
+  private readonly TranslateTransform translateTransform = new();
+  private IPointer? capturedPointer;
+  private Point lastPointerPosition;
+  private double minimumZoom = 0.1;
+  private double maximumZoom = 10;
+  private double zoomFactor = 1.1;
+  private double zoom = 1;
+  private Vector translation;
+  private string transformSource = string.Empty;
 
   public FsusImageViewer()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-image-viewer");
     Focusable = true;
+    ClipToBounds = true;
     var initialSources = new ObservableCollection<string>();
     initialSources.CollectionChanged += OnSourcesCollectionChanged;
     sources = initialSources;
@@ -195,6 +216,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
       {
         newNotify.CollectionChanged += OnSourcesCollectionChanged;
       }
+      HandleActiveSourceTransformChange();
       SyncState();
     }
   }
@@ -272,7 +294,72 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
   public Task<bool>? CurrentLoadTask => currentLoadTask;
   public bool HasLoader => ImageLoader is not null || SourceLoader is not null || ContentFactory is not null;
 
+  public double MinimumZoom
+  {
+    get => minimumZoom;
+    set
+    {
+      if (!double.IsFinite(value) || value <= 0 || value > MaximumZoom)
+      {
+        throw new ArgumentOutOfRangeException(nameof(value));
+      }
+
+      minimumZoom = value;
+      SetZoom(Zoom);
+    }
+  }
+
+  public double MaximumZoom
+  {
+    get => maximumZoom;
+    set
+    {
+      if (!double.IsFinite(value) || value < MinimumZoom)
+      {
+        throw new ArgumentOutOfRangeException(nameof(value));
+      }
+
+      maximumZoom = value;
+      SetZoom(Zoom);
+    }
+  }
+
+  public double ZoomFactor
+  {
+    get => zoomFactor;
+    set
+    {
+      if (!double.IsFinite(value) || value <= 1)
+      {
+        throw new ArgumentOutOfRangeException(nameof(value));
+      }
+
+      zoomFactor = value;
+    }
+  }
+
+  public double Zoom => zoom;
+  public Vector Translation => translation;
+  public bool PreserveTransformOnSourceChange { get; set; }
+  public bool IsPanning => capturedPointer is not null;
+
   public event EventHandler<FsusActiveSourceChangedEventArgs>? ActiveSourceChanged;
+  public event EventHandler<FsusImageViewerTransformChangedEventArgs>? TransformChanged;
+
+  protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+  {
+    base.OnApplyTemplate(e);
+    contentPresenter = e.NameScope.Find<ContentPresenter>(ContentPresenterPartName);
+    if (contentPresenter is not null)
+    {
+      var transforms = new TransformGroup();
+      transforms.Children.Add(scaleTransform);
+      transforms.Children.Add(translateTransform);
+      contentPresenter.RenderTransform = transforms;
+      contentPresenter.RenderTransformOrigin = RelativePoint.Center;
+      ApplyTransform();
+    }
+  }
 
   public FsusOverlayEntry Open(FsusOverlayHost host, Control? restoreFocusTo = null)
   {
@@ -456,6 +543,94 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
     }
   }
 
+  protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+  {
+    base.OnPointerWheelChanged(e);
+    if (!e.Handled && Status == FsusImageStatus.Loaded && e.Delta.Y != 0)
+    {
+      SetZoom(e.Delta.Y > 0 ? Zoom * ZoomFactor : Zoom / ZoomFactor);
+      e.Handled = true;
+    }
+  }
+
+  protected override void OnPointerPressed(PointerPressedEventArgs e)
+  {
+    base.OnPointerPressed(e);
+    if (e.Handled || Status != FsusImageStatus.Loaded)
+    {
+      return;
+    }
+
+    var point = e.GetCurrentPoint(this);
+    if (!point.Properties.IsLeftButtonPressed)
+    {
+      return;
+    }
+
+    e.Pointer.Capture(this);
+    if (ReferenceEquals(e.Pointer.Captured, this))
+    {
+      capturedPointer = e.Pointer;
+      lastPointerPosition = point.Position;
+      FsusComponentClasses.Ensure(this, "fsus-panning", true);
+      e.Handled = true;
+    }
+  }
+
+  protected override void OnPointerMoved(PointerEventArgs e)
+  {
+    base.OnPointerMoved(e);
+    if (!ReferenceEquals(e.Pointer, capturedPointer))
+    {
+      return;
+    }
+
+    var point = e.GetCurrentPoint(this);
+    if (!point.Properties.IsLeftButtonPressed)
+    {
+      EndPan(e.Pointer);
+      return;
+    }
+
+    var delta = point.Position - lastPointerPosition;
+    lastPointerPosition = point.Position;
+    SetTranslation(Translation + new Vector(delta.X, delta.Y));
+    e.Handled = true;
+  }
+
+  protected override void OnPointerReleased(PointerReleasedEventArgs e)
+  {
+    base.OnPointerReleased(e);
+    if (ReferenceEquals(e.Pointer, capturedPointer))
+    {
+      EndPan(e.Pointer);
+      e.Handled = true;
+    }
+  }
+
+  protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+  {
+    base.OnPointerCaptureLost(e);
+    if (ReferenceEquals(e.Pointer, capturedPointer))
+    {
+      capturedPointer = null;
+      FsusComponentClasses.Ensure(this, "fsus-panning", false);
+    }
+  }
+
+  public void ResetTransform()
+  {
+    EndPan(capturedPointer);
+    var changed = Zoom != 1 || Translation != default;
+    zoom = Math.Clamp(1, MinimumZoom, MaximumZoom);
+    translation = default;
+    ApplyTransform();
+    if (changed)
+    {
+      OnTransformChanged();
+    }
+  }
+
   protected virtual async ValueTask<bool> HandleKeyAsync(Key key)
   {
     if (key == Key.Escape)
@@ -497,6 +672,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
 
   private void OnActiveSourceChanged()
   {
+    HandleActiveSourceTransformChange();
     ActiveSourceChanged?.Invoke(this, new FsusActiveSourceChangedEventArgs(ActiveSource, ActiveIndex));
     if (HasLoader && !string.IsNullOrWhiteSpace(ActiveSource))
     {
@@ -506,8 +682,13 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
 
   private void OnSourcesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
   {
+    var activeSourceChanged = HandleActiveSourceTransformChange();
     SyncState();
-    if (Status == FsusImageStatus.Idle && Sources.Count > 0 && HasLoader && !string.IsNullOrWhiteSpace(ActiveSource))
+    if (
+      (activeSourceChanged || Status == FsusImageStatus.Idle) &&
+      Sources.Count > 0 &&
+      HasLoader &&
+      !string.IsNullOrWhiteSpace(ActiveSource))
     {
       _ = LoadActiveSourceAsync();
     }
@@ -562,6 +743,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
 
   public void Dispose()
   {
+    EndPan(capturedPointer);
     currentLoadCts?.Cancel();
     currentLoadCts?.Dispose();
     currentLoadCts = null;
@@ -609,7 +791,87 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
       this,
       Sources.Count == 0
         ? "empty"
-        : $"image {(ActiveIndex + 1).ToString(CultureInfo.InvariantCulture)} of {Sources.Count.ToString(CultureInfo.InvariantCulture)}");
+        : TransformStatus($"image {(ActiveIndex + 1).ToString(CultureInfo.InvariantCulture)} of {Sources.Count.ToString(CultureInfo.InvariantCulture)}"));
+  }
+
+  private void SetZoom(double value)
+  {
+    var next = Math.Clamp(value, MinimumZoom, MaximumZoom);
+    if (Zoom == next)
+    {
+      return;
+    }
+
+    zoom = next;
+    ApplyTransform();
+    OnTransformChanged();
+  }
+
+  private void SetTranslation(Vector value)
+  {
+    if (Translation == value)
+    {
+      return;
+    }
+
+    translation = value;
+    ApplyTransform();
+    OnTransformChanged();
+  }
+
+  private void ApplyTransform()
+  {
+    scaleTransform.ScaleX = Zoom;
+    scaleTransform.ScaleY = Zoom;
+    translateTransform.X = Translation.X;
+    translateTransform.Y = Translation.Y;
+  }
+
+  private void OnTransformChanged()
+  {
+    FsusComponentClasses.Ensure(this, "fsus-transformed", Zoom != 1 || Translation != default);
+    SyncState();
+    TransformChanged?.Invoke(this, new FsusImageViewerTransformChangedEventArgs(Zoom, Translation));
+  }
+
+  private void EndPan(IPointer? pointer)
+  {
+    if (pointer is not null && ReferenceEquals(pointer.Captured, this))
+    {
+      pointer.Capture(null);
+    }
+
+    capturedPointer = null;
+    FsusComponentClasses.Ensure(this, "fsus-panning", false);
+  }
+
+  private bool HandleActiveSourceTransformChange()
+  {
+    var source = ActiveSource;
+    if (string.Equals(transformSource, source, StringComparison.Ordinal))
+    {
+      return false;
+    }
+
+    transformSource = source;
+    EndPan(capturedPointer);
+    if (!PreserveTransformOnSourceChange)
+    {
+      ResetTransform();
+    }
+    return true;
+  }
+
+  private string TransformStatus(string imageStatus)
+  {
+    if (Zoom == 1 && Translation == default)
+    {
+      return imageStatus;
+    }
+
+    return string.Create(
+      CultureInfo.InvariantCulture,
+      $"{imageStatus}, zoom {Zoom * 100:0}%, pan {Translation.X:0.#} by {Translation.Y:0.#}");
   }
 
   private static string StatusName(FsusImageStatus status) =>
