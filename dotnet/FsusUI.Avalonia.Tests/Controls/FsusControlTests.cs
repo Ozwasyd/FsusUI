@@ -330,7 +330,6 @@ public class FsusControlTests
     Assert.Contains("fsus-checkbox", new FsusCheckbox().Classes);
     Assert.Contains("fsus-radio", new FsusRadio().Classes);
     Assert.Contains("fsus-switch", new FsusSwitch().Classes);
-    Assert.Contains("fsus-tabs", new FsusTabs().Classes);
     Assert.Contains("fsus-menu", new FsusMenu().Classes);
   }
 

@@ -794,14 +794,38 @@ try {
     ].join('\n'),
   )
   stage('typecheck', () => {
-    run(packageManager, execArgs('vue-tsc', ['--noEmit']), {
-      cwd: fixtureRoot,
-    })
+    run(
+      'node',
+      [
+        path.join(repoRoot, 'scripts', 'with-node-heap.mjs'),
+        packageManager,
+        ...execArgs('vue-tsc', ['--noEmit']),
+      ],
+      {
+        cwd: fixtureRoot,
+        env: {
+          FSUS_NODE_HEAP_PROFILE: 'typecheck',
+          NODE_OPTIONS: '',
+        },
+      },
+    )
   })
   const viteOutput = stage('build', () =>
-    runAndCollect(packageManager, execArgs('vite', ['build']), {
-      cwd: fixtureRoot,
-    }),
+    runAndCollect(
+      'node',
+      [
+        path.join(repoRoot, 'scripts', 'with-node-heap.mjs'),
+        packageManager,
+        ...execArgs('vite', ['build']),
+      ],
+      {
+        cwd: fixtureRoot,
+        env: {
+          FSUS_NODE_HEAP_PROFILE: 'build',
+          NODE_OPTIONS: '',
+        },
+      },
+    ),
   )
   assertNoConsumerBuildWarnings(viteOutput)
   const artifactEvidence = stage('worker', inspectProductionArtifacts)
