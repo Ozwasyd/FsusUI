@@ -3,10 +3,7 @@
   "owners": {
     "playwright-layout": {
       "gate": "playwright-layout",
-      "suiteIds": [
-        "dom-layout",
-        "geometry-smoke"
-      ],
+      "suiteIds": ["dom-layout", "geometry-smoke"],
       "runtimeMode": "prepared-preview",
       "artifactNamespace": {
         "dom-layout": "playwright-layout-dom-{project}",
@@ -23,10 +20,7 @@
     },
     "playwright-motion": {
       "gate": "playwright-motion",
-      "suiteIds": [
-        "view-transitions",
-        "motion-ssr"
-      ],
+      "suiteIds": ["view-transitions", "motion-ssr"],
       "runtimeMode": "native",
       "artifactNamespace": {
         "view-transitions": "playwright-motion-view-transitions-{browser}",
@@ -37,9 +31,7 @@
     },
     "playwright-boundary": {
       "gate": "playwright-boundary",
-      "suiteIds": [
-        "visual-boundary-audit"
-      ],
+      "suiteIds": ["visual-boundary-audit"],
       "runtimeMode": "prepared-preview",
       "artifactNamespace": {
         "visual-boundary-audit": "playwright-boundary-{project}"
@@ -49,9 +41,7 @@
     },
     "playwright-markdown": {
       "gate": "playwright-markdown",
-      "suiteIds": [
-        "markdown-editor-interaction"
-      ],
+      "suiteIds": ["markdown-editor-interaction"],
       "runtimeMode": "native",
       "artifactNamespace": {
         "markdown-editor-interaction": "playwright-markdown-{browser}"
@@ -59,11 +49,19 @@
       "receiptDirectory": ".readiness/receipts/playwright-markdown",
       "evidenceDirectory": ".tmp/playwright-markdown"
     },
+    "playwright-conformance": {
+      "gate": "playwright-conformance",
+      "suiteIds": ["web-interaction-conformance"],
+      "runtimeMode": "native",
+      "artifactNamespace": {
+        "web-interaction-conformance": "playwright-conformance-{browser}"
+      },
+      "receiptDirectory": ".readiness/receipts/playwright-conformance",
+      "evidenceDirectory": ".tmp/playwright-conformance"
+    },
     "visual-runtime-reuse": {
       "gate": "visual-runtime-reuse",
-      "suiteIds": [
-        "visual-runtime-reuse"
-      ],
+      "suiteIds": ["visual-runtime-reuse"],
       "runtimeMode": "prepared-reuse",
       "artifactNamespace": {
         "visual-runtime-reuse": "visual-runtime-reuse-{project}"
