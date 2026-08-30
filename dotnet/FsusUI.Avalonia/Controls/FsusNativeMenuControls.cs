@@ -782,7 +782,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
             "Quit Application",
             new FsusShortcutGesture(Key.Q, KeyModifiers.Control)),
         ]);
-      }
+    }
 
     NormalizeMacWindowMenu(list, synthesized);
     return SortTopLevelMenus(list, includeApplication: true);
