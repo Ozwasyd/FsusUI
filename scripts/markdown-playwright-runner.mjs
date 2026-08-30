@@ -2,7 +2,13 @@
 
 import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { loadMarkdownOwnerPlan } from './markdown-playwright-plan.mjs'
@@ -145,8 +151,11 @@ const expandFingerprintInputs = async (inputs) => {
   return files
 }
 
-export async function computeMarkdownCellRuntime(cell) {
-  const inputs = MARKDOWN_FINGERPRINT_INPUTS[cell.suiteId]
+export async function computeMarkdownCellRuntime(
+  cell,
+  fingerprintInputsBySuite = MARKDOWN_FINGERPRINT_INPUTS,
+) {
+  const inputs = fingerprintInputsBySuite[cell.suiteId]
   if (!inputs) fail(`no markdown fingerprint inputs for suite ${cell.suiteId}`)
   const fingerprintFiles = await expandFingerprintInputs(inputs)
   const fingerprint = await fingerprintPaths(root, fingerprintFiles)
@@ -167,12 +176,17 @@ export async function computeMarkdownCellRuntime(cell) {
   }
 }
 
-export function writeMarkdownCellRuntimeManifest(cell, evidenceDir, runtime) {
+export function writeMarkdownCellRuntimeManifest(
+  cell,
+  evidenceDir,
+  runtime,
+  manifestId = cell.suiteId,
+) {
   const manifestPath = resolve(
     root,
     evidenceDir,
     'runtime-manifests',
-    `${cell.suiteId}.json`,
+    `${manifestId}.json`,
   )
   mkdirSync(dirname(manifestPath), { recursive: true })
   writeFileSync(
@@ -186,9 +200,11 @@ export function writeMarkdownCellRuntimeManifest(cell, evidenceDir, runtime) {
 }
 
 export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
-  const plan = loadMarkdownOwnerPlan(group)
+  const planLoader = options.planLoader ?? loadMarkdownOwnerPlan
+  const plan = planLoader(group)
   const cell = plan.cells.find((entry) => entry.id === cellId)
-  if (!cell) fail(`unknown markdown cell ${cellId} for owner ${ownerId}`)
+  const logPrefix = options.logPrefix ?? 'playwright-markdown'
+  if (!cell) fail(`unknown ${logPrefix} cell ${cellId} for owner ${ownerId}`)
   const evidenceDir = options.evidenceDir ?? '.tmp/playwright-markdown'
   const startedAt = new Date().toISOString()
   let failureReason = null
@@ -196,13 +212,27 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
 
   const reportRelative = `${evidenceDir}/reports/${cell.suiteId}/${cell.project}/report.json`
   const reportPath = resolve(root, reportRelative)
-  const outputDirectory = resolve(root, evidenceDir, 'output', cell.suiteId, cell.project)
+  const outputDirectory = resolve(
+    root,
+    evidenceDir,
+    'output',
+    cell.suiteId,
+    cell.project,
+  )
   mkdirSync(outputDirectory, { recursive: true })
   mkdirSync(dirname(reportPath), { recursive: true })
 
   try {
-    runtime = await computeMarkdownCellRuntime(cell)
-    runtime = writeMarkdownCellRuntimeManifest(cell, evidenceDir, runtime)
+    runtime = await computeMarkdownCellRuntime(
+      cell,
+      options.fingerprintInputsBySuite ?? MARKDOWN_FINGERPRINT_INPUTS,
+    )
+    runtime = writeMarkdownCellRuntimeManifest(
+      cell,
+      evidenceDir,
+      runtime,
+      options.runtimeManifestId?.(cell) ?? cell.suiteId,
+    )
     const result = spawnSync(
       'pnpm',
       [
@@ -227,14 +257,31 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
     writeFileSync(reportPath, stdout.trim() ? stdout : '{}')
     const status = result.status === 0 ? 'success' : 'failure'
 
-    const playwrightVersion = spawnSync('pnpm', ['exec', 'playwright', '--version'], {
-      cwd: root,
-      encoding: 'utf8',
-    })
+    const playwrightVersion = spawnSync(
+      'pnpm',
+      ['exec', 'playwright', '--version'],
+      {
+        cwd: root,
+        encoding: 'utf8',
+      },
+    )
+    const extension = options.receiptExtension
+      ? await options.receiptExtension({
+          cell,
+          group,
+          outputDirectory,
+          parsedReport: parsed,
+          reportPath,
+          reportRelative,
+          evidenceDir,
+          runtime,
+          tests,
+        })
+      : {}
     const receipt = {
       schemaVersion: 1,
       owner: ownerId,
-      gate: 'playwright-markdown',
+      gate: plan.gate,
       suiteId: cell.suiteId,
       cellId: cell.id,
       project: cell.project,
@@ -252,7 +299,10 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
       },
       toolchain: {
         node: process.version,
-        pnpm: spawnSync('pnpm', ['--version'], { cwd: root, encoding: 'utf8' }).stdout.trim(),
+        pnpm: spawnSync('pnpm', ['--version'], {
+          cwd: root,
+          encoding: 'utf8',
+        }).stdout.trim(),
         playwright:
           playwrightVersion.status === 0
             ? playwrightVersion.stdout.trim()
@@ -274,24 +324,31 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
       failureReason: null,
       startedAt,
       endedAt: new Date().toISOString(),
+      ...extension,
     }
     validateCellReceipt(receipt, cell)
+    options.validateReceipt?.(receipt, cell)
     const receiptRelative = cell.receiptPath
     const receiptPath = resolve(root, receiptRelative)
     mkdirSync(dirname(receiptPath), { recursive: true })
     writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`)
     console.log(
-      `[playwright-markdown] ${cell.id} status=${status} passed=${tests.passed} failed=${tests.failed} skipped=${tests.skipped} receipt=${receiptRelative}`,
+      `[${logPrefix}] ${cell.id} status=${status} passed=${tests.passed} failed=${tests.failed} skipped=${tests.skipped} receipt=${receiptRelative}`,
     )
-    return { ok: status === 'success', cellId: cell.id, status, receiptPath: receiptRelative }
+    return {
+      ok: status === 'success',
+      cellId: cell.id,
+      status,
+      receiptPath: receiptRelative,
+    }
   } catch (error) {
     failureReason = error instanceof Error ? error.message : String(error)
-    console.error(`[playwright-markdown] ${cellId} failed: ${failureReason}`)
+    console.error(`[${logPrefix}] ${cellId} failed: ${failureReason}`)
     if (runtime) {
       const receipt = {
         schemaVersion: 1,
         owner: ownerId,
-        gate: 'playwright-markdown',
+        gate: plan.gate,
         suiteId: cell.suiteId,
         cellId: cell.id,
         project: cell.project,
@@ -325,9 +382,21 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
       const receiptPath = resolve(root, cell.receiptPath)
       mkdirSync(dirname(receiptPath), { recursive: true })
       writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`)
-      return { ok: false, cellId: cell.id, status: 'failure', receiptPath: cell.receiptPath, error: failureReason }
+      return {
+        ok: false,
+        cellId: cell.id,
+        status: 'failure',
+        receiptPath: cell.receiptPath,
+        error: failureReason,
+      }
     }
-    return { ok: false, cellId: cell.id, status: 'failure', receiptPath: null, error: failureReason }
+    return {
+      ok: false,
+      cellId: cell.id,
+      status: 'failure',
+      receiptPath: null,
+      error: failureReason,
+    }
   }
 }
 
@@ -335,13 +404,17 @@ const option = (args, name, fallback) => {
   const index = args.indexOf(`--${name}`)
   if (index >= 0) return args[index + 1]
   const prefix = `--${name}=`
-  return args.find((arg) => arg.startsWith(prefix))?.slice(prefix.length) ?? fallback
+  return (
+    args.find((arg) => arg.startsWith(prefix))?.slice(prefix.length) ?? fallback
+  )
 }
 
 function main(argv = process.argv.slice(2)) {
   const command = argv[0]
   if (command !== 'cell-run') {
-    fail('Usage: markdown-playwright-runner.mjs cell-run --owner playwright-markdown --cell <cell> --group <g> [--evidence-dir <dir>]')
+    fail(
+      'Usage: markdown-playwright-runner.mjs cell-run --owner playwright-markdown --cell <cell> --group <g> [--evidence-dir <dir>]',
+    )
   }
   const ownerId = option(argv, 'owner', 'playwright-markdown')
   const cellId = option(argv, 'cell')
