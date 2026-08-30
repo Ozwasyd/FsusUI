@@ -214,12 +214,41 @@ const main = async () => {
     const interactionStart = performance.now()
     const editor = page.getByTestId('trace-markdown-editor')
     await editor.locator('textarea').first().focus()
+    const initialState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    )
+    const initialFocus = await page.evaluate(
+      () => document.activeElement?.tagName.toLowerCase() || null,
+    )
     await page.getByTestId('trace-markdown-exposed').click()
+    const dispatchedState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    )
+    const dispatchedFocus = await page.evaluate(
+      () => document.activeElement?.tagName.toLowerCase() || null,
+    )
     await page.getByTestId('trace-markdown-undo').click()
     const publicState = JSON.parse(
       (await page.getByTestId('interaction-trace-state').textContent()) ||
         'null',
     )
+    const undoFocus = await page.evaluate(
+      () => document.activeElement?.tagName.toLowerCase() || null,
+    )
+    const atomicEditor = page.getByTestId('trace-markdown-atomic-editor')
+    const atomicTextarea = atomicEditor.locator('textarea').first()
+    await atomicTextarea.focus()
+    await atomicTextarea.evaluate((element) => {
+      element.setSelectionRange(5, 5)
+      element.dispatchEvent(new Event('select', { bubbles: true }))
+    })
+    await atomicTextarea.press('ArrowRight')
+    await atomicEditor
+      .locator('[data-markdown-atomic-actions]')
+      .first()
+      .waitFor({ state: 'attached' })
     const cdp = await page.context().newCDPSession(page)
     const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
     const screenshotPath = join(options.out, 'browser.png')
@@ -260,6 +289,15 @@ const main = async () => {
           ?.getAttribute('aria-hidden'),
         live,
         tabStops,
+        atomicActions: [
+          ...document.querySelectorAll(
+            '[data-testid="trace-markdown-atomic-editor"] [data-markdown-atomic-actions] button',
+          ),
+        ].map((element) => ({
+          name: element.getAttribute('aria-label'),
+          role: element.getAttribute('role') || 'button',
+          tabIndex: element.tabIndex,
+        })),
       }
     })
 
@@ -295,9 +333,19 @@ const main = async () => {
     const editableLabel =
       /markdown editor/i.test(domProbe.textareaLabel || '') ||
       /markdown editor/i.test(domProbe.regionLabel || '')
+    const atomicActionsExposed =
+      domProbe.atomicActions.length === 3 &&
+      domProbe.atomicActions.every(
+        (action) => action.role === 'button' && action.tabIndex === -1,
+      )
     const orcaPid = orca.pid ?? null
     const verdict =
-      textboxHit && noDocumentLive && atspiJson.ok !== false ? 'pass' : 'fail'
+      textboxHit &&
+      noDocumentLive &&
+      atomicActionsExposed &&
+      atspiJson.ok !== false
+        ? 'pass'
+        : 'fail'
 
     const identity = {
       executionId: `conformance-v2-${candidateSha}`,
@@ -321,6 +369,12 @@ const main = async () => {
       runnerHash,
     }
     const elapsedMilliseconds = performance.now() - interactionStart
+    const focusTarget = await page.evaluate(() => {
+      const active = document.activeElement
+      return active instanceof HTMLButtonElement
+        ? 'button'
+        : active?.getAttribute('role') || active?.tagName.toLowerCase() || null
+    })
     const evidence = {
       schema: 'fsusui.conformance-evidence.v2',
       kind: 'native-screen-reader-linux-orca-atspi',
@@ -340,7 +394,48 @@ const main = async () => {
           .filter((node) => ['textbox', 'button'].includes(cdpValue(node.role)))
           .map((node, index) => normalizeCdpNode(node, index + 1)),
       },
+      steps: [
+        {
+          index: 0,
+          action: 'render',
+          target: 'ElMarkdownEditor',
+          focusTarget: initialFocus,
+          binding: identity,
+          observation: {
+            actual: { value: initialState.markdown.value },
+            passed: initialState.markdown.value === 'Trace start',
+          },
+        },
+        {
+          index: 1,
+          action: 'operation',
+          target: 'ElMarkdownEditor.dispatchTransaction',
+          focusTarget: dispatchedFocus,
+          binding: identity,
+          observation: {
+            actual: dispatchedState.markdown.lastOperation,
+            passed:
+              dispatchedState.markdown.lastOperation?.accepted === true &&
+              dispatchedState.markdown.lastOperation?.value ===
+                'Trace start exposed',
+          },
+        },
+        {
+          index: 2,
+          action: 'keyboard',
+          target: 'ElMarkdownEditor.undo',
+          focusTarget: undoFocus,
+          binding: identity,
+          observation: {
+            actual: publicState.markdown.lastOperation,
+            passed:
+              publicState.markdown.lastOperation?.accepted === true &&
+              publicState.markdown.lastOperation?.value === 'Trace start',
+          },
+        },
+      ],
       publicState,
+      focusTarget,
       performance: {
         identity,
         elapsedMilliseconds,
@@ -359,6 +454,7 @@ const main = async () => {
         textboxExposed: textboxHit,
         documentNotAriaLive: noDocumentLive,
         editableName: editableLabel,
+        atomicActionsExposed,
         decorationsHidden:
           domProbe.decorationsAriaHidden === 'true' ||
           !domProbe.decorationsAriaHidden,

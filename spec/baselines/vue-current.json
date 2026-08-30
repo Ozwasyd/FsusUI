@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "e3cbedb6a91893fee9c903b6776c9dfcb220b531",
+    "commitSha": "790469bc9c4b34d41f6c6b30b178f9a5c0ad8a8d",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "2bb010de96b7950be76e9bf58121745ac7d47a28c6840745a02f34f789255027",
+    "inputTreeHash": "f3d697ea8afa43e338fb2ab73487d3e092d219ac940a7a124e1d21c6251044c6",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "a8aa8ae4271d3bac7fa6033def0f8d6ecea7d9aa8450e2c7a84b18db718cce66"
+    "outputHash": "ff1d5fd9d3d3b938652f3087f3a4208ec5462d8447bf0ebbb8b698d9e9490d9c"
   },
   "summary": {
     "componentModules": 93,
@@ -11003,6 +11003,7 @@
         "commands",
         "defaultMode",
         "disabled",
+        "documentIdentity",
         "editorProfile",
         "imageActionLabel",
         "interactionProfile",
@@ -11135,6 +11136,18 @@
             "values": null,
             "default": {
               "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "documentIdentity",
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorDocumentIdentity",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false

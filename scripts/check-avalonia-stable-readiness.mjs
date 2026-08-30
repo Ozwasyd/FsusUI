@@ -200,6 +200,22 @@ const runFixtureChecks = (spec) => {
 
 try {
   const spec = readJson('spec/ci/avalonia-stable-readiness.json')
+  const alignment = readJson('.tmp/conformance-v2/alignment.json')
+  if (alignment.schema !== 'fsusui.alignment.v2') {
+    throw new Error('Contract V2 alignment artifact schema invalid')
+  }
+  const derivedFamilies = alignment.consumers?.galleryStableFamilies ?? []
+  const missingStableFamilies = spec.requiredStableComponentFamilies.filter(
+    (family) => !derivedFamilies.includes(family),
+  )
+  if (missingStableFamilies.length) {
+    throw new Error(
+      `Avalonia stable readiness blocked by derived alignment gaps: ${missingStableFamilies.join(', ')}`,
+    )
+  }
+  if (alignment.consumers?.releaseReady !== true) {
+    throw new Error('Avalonia release readiness is false in derived alignment')
+  }
   runFixtureChecks(spec)
 
   const packageJson = readJson('package.json')

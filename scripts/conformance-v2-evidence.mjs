@@ -82,10 +82,44 @@ export function validateEvidence(evidence, platform) {
     evidence.steps?.forEach((step, index) => {
       if (step.observation?.passed !== true)
         fail(`avalonia.steps[${index}] failed`)
+      for (const field of [
+        'scenario',
+        'contract',
+        'candidate',
+        'contractHash',
+        'webBaselineHash',
+        'avaloniaBaselineHash',
+        'os',
+        'avalonia',
+      ]) {
+        if (!step.binding?.[field])
+          fail(`avalonia.steps[${index}].binding.${field} missing`)
+      }
     })
+    for (const action of [
+      'pointer',
+      'keyboard',
+      'focus-input',
+      'ime-simulation',
+      'operation',
+      'open-close',
+    ]) {
+      if (!evidence.steps?.some((step) => step.action === action))
+        fail(`avalonia.required-step.${action} missing`)
+    }
+    const ime = evidence.steps.find((step) => step.action === 'ime-simulation')
+      ?.observation?.actual
+    if (
+      ime?.simulation !== true ||
+      ime?.physicalIme !== false ||
+      ime?.boundary !== 'linux-avalonia-text-input'
+    )
+      fail('avalonia.ime simulation boundary claim invalid')
     if (evidence.accessibility?.source !== 'real-avalonia-automation-peer') {
       fail('avalonia.accessibility fixture-only or metadata-only')
     }
+    if (evidence.accessibility?.markdown?.atomicActionCount < 3)
+      fail('avalonia.accessibility atomic actions missing')
   }
   if (platform === 'web') {
     if (evidence.verdict !== 'pass') fail('web.verdict failed')
@@ -101,6 +135,13 @@ export function validateEvidence(evidence, platform) {
     }
     if (!Number.isInteger(evidence.orcaPid) || evidence.orcaPid <= 0)
       fail('web.orcaPid missing')
+    if (evidence.checks?.atomicActionsExposed !== true)
+      fail('web.accessibility atomic actions missing')
+    evidence.steps?.forEach((step, index) => {
+      if (step.observation?.passed !== true) fail(`web.steps[${index}] failed`)
+      if (step.binding?.executionId !== evidence.identity.executionId)
+        fail(`web.steps[${index}].binding.executionId mismatch`)
+    })
   }
   for (const [index, entry] of (evidence.platformDifferences ?? []).entries())
     validateOverride(entry, index)
@@ -120,7 +161,8 @@ const normalizeWeb = (evidence) => {
   const markdown = evidence.publicState.markdown
   const node = evidence.browserAccessibility.nodes.find(
     (entry) =>
-      entry.role === 'textbox' && /markdown editor/i.test(entry.name ?? ''),
+      entry.role === 'textbox' &&
+      /^markdown editor source$/i.test(entry.name ?? ''),
   )
   if (!node) fail('web.accessibility.nodes markdown textbox missing')
   return {
@@ -179,6 +221,38 @@ const normalizeAvalonia = (evidence) => {
   }
 }
 
+const operationResult = (value) => ({
+  accepted: value.accepted,
+  beforeRevision: value.beforeRevision,
+  revision: value.revision,
+  value: value.value,
+  selection: value.selection,
+  history: value.history,
+  documentIdentity: value.documentIdentity,
+})
+
+const normalizedOperations = (evidence, platform) => {
+  const selected = evidence.steps.filter((step) =>
+    platform === 'web'
+      ? [
+          'ElMarkdownEditor.dispatchTransaction',
+          'ElMarkdownEditor.undo',
+        ].includes(step.target)
+      : [
+          'FsusMarkdownEditor.DispatchTransaction',
+          'FsusMarkdownEditor.Undo',
+        ].includes(step.target),
+  )
+  return selected.map((step) => ({
+    action: step.action,
+    focus:
+      platform === 'avalonia' && step.focusTarget === 'FsusMarkdownEditor'
+        ? 'textarea'
+        : step.focusTarget,
+    result: operationResult(step.observation.actual),
+  }))
+}
+
 export function compareEvidence(web, avalonia) {
   validateEvidence(web, 'web')
   validateEvidence(avalonia, 'avalonia')
@@ -219,6 +293,11 @@ export function compareEvidence(web, avalonia) {
     ].includes(name),
   )
   same(webSemanticEvents, right.events, 'events.transitionOrder')
+  same(
+    normalizedOperations(web, 'web'),
+    normalizedOperations(avalonia, 'avalonia'),
+    'steps.operationResults',
+  )
   for (const field of [
     'role',
     'name',
@@ -316,13 +395,22 @@ export function deriveAlignment(registry, comparison = null) {
       source: 'derived',
     })
   }
+  const stable = statuses
+    .filter((entry) => entry.status === 'aligned')
+    .map((entry) => entry.id)
   return {
     schema: 'fsusui.alignment.v2',
     statuses,
-    stable: statuses
-      .filter((entry) => entry.status === 'aligned')
-      .map((entry) => entry.id),
+    stable,
     gaps,
+    consumers: {
+      galleryStableFamilies: stable.map((id) =>
+        id.replace(/^component-v2\.el-/, ''),
+      ),
+      docsSupportContractIds: stable,
+      nugetStableEligible: gaps.length === 0,
+      releaseReady: gaps.length === 0,
+    },
   }
 }
 
@@ -336,12 +424,65 @@ export function validateReadiness(alignment, expected = {}) {
     if (status.get(id) !== 'aligned')
       fail(`readiness.stable.${id} is ${status.get(id) ?? 'missing'}`)
   }
+  const expectedStable = alignment.statuses
+    .filter((entry) => entry.status === 'aligned')
+    .map((entry) => entry.id)
+  same(alignment.stable, expectedStable, 'readiness.stable.derived')
+  same(
+    alignment.consumers,
+    {
+      galleryStableFamilies: expectedStable.map((id) =>
+        id.replace(/^component-v2\.el-/, ''),
+      ),
+      docsSupportContractIds: expectedStable,
+      nugetStableEligible: alignment.gaps.length === 0,
+      releaseReady: alignment.gaps.length === 0,
+    },
+    'readiness.consumers.derived',
+  )
   for (const field of ['candidate', 'contractHash', 'alignmentHash']) {
     if (
       expected[field] !== undefined &&
       alignment.identity?.[field] !== expected[field]
     )
       fail(`readiness.identity.${field} mismatch`)
+  }
+}
+
+const generatedGallerySource = (alignment) => `// <auto-generated />
+// Generated by scripts/conformance-v2-evidence.mjs from fsusui.alignment.v2.
+namespace FsusUI.Avalonia.Demo.Gallery;
+
+internal static class FsusGeneratedAlignment
+{
+  public static IReadOnlySet<string> StableFamilies { get; } = new HashSet<string>(StringComparer.Ordinal)
+  {
+${alignment.consumers.galleryStableFamilies.map((id) => `    "${id}",`).join('\n')}
+  };
+}
+`
+
+const generatedSupportMatrix = (
+  alignment,
+) => `<!-- Generated by scripts/conformance-v2-evidence.mjs. Do not edit by hand. -->
+# Contract V2 alignment support matrix
+
+The sole source is the derived \`fsusui.alignment.v2\` artifact. Only \`aligned\` contracts are stable; all other statuses remain excluded from stable Gallery and release consumers.
+
+| Contract | Derived status |
+| --- | --- |
+${alignment.statuses.map((entry) => `| \`${entry.id}\` | \`${entry.status}\` |`).join('\n')}
+`
+
+const writeConsumers = (alignment, args) => {
+  for (const [target, content] of [
+    [args.gallery, generatedGallerySource(alignment)],
+    [args.support, generatedSupportMatrix(alignment)],
+  ]) {
+    if (!target) continue
+    const absolute = path.resolve(root, target)
+    fs.mkdirSync(path.dirname(absolute), { recursive: true })
+    fs.writeFileSync(absolute, content)
   }
 }
 
@@ -620,6 +761,7 @@ async function cli() {
       identity: result.identity,
       gaps: result.gaps,
     })
+    writeConsumers(result, args)
     console.log(
       `conformance-v2 alignment derived: stable=${result.stable.length} gaps=${result.gaps.length}`,
     )
@@ -648,9 +790,21 @@ async function cli() {
     console.log(
       `conformance-v2 mutations passed: ${result.results.length}/${result.results.length}`,
     )
+  } else if (command === 'baseline') {
+    validateBaselineFreshness(readJson(args.input))
+    console.log('conformance-v2 baseline freshness passed')
+  } else if (command === 'coverage') {
+    validateCoverage(readJson(args.input))
+    console.log('conformance-v2 coverage passed')
+  } else if (command === 'markdown') {
+    validateMarkdownEvidence(readJson(args.input))
+    console.log('conformance-v2 Markdown evidence passed')
+  } else if (command === 'override') {
+    validateOverride(readJson(args.input))
+    console.log('conformance-v2 override passed')
   } else
     fail(
-      'Usage: conformance-v2-evidence.mjs <compare|derive|readiness|mutations> ...',
+      'Usage: conformance-v2-evidence.mjs <compare|derive|readiness|mutations|baseline|coverage|markdown|override> ...',
     )
 }
 

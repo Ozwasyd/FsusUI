@@ -193,6 +193,26 @@ internal static class ConformanceV2Runner
       passed = focused && input.IsFocused && input.Text == "after",
     });
 
+    input.RaiseEvent(new TextInputEventArgs
+    {
+      RoutedEvent = InputElement.TextInputEvent,
+      Source = input,
+      Text = "中",
+    });
+    var simulatedImeValue = input.Text;
+    input.Text = "after";
+    RecordStep(steps, "ime-simulation", "FsusInput", new
+    {
+      actual = new
+      {
+        value = simulatedImeValue,
+        simulation = true,
+        physicalIme = false,
+        boundary = "linux-avalonia-text-input",
+      },
+      passed = simulatedImeValue.Contains("中", StringComparison.Ordinal),
+    });
+
     var activatedBefore = events.Count;
     _ = button.Focus();
     button.RaiseEvent(new KeyEventArgs
@@ -206,6 +226,7 @@ internal static class ConformanceV2Runner
       passed = button.IsFocused && events.Count > activatedBefore,
     });
 
+    _ = editor.Focus();
     var dispatch = editor.DispatchTransaction(new FsusMarkdownEditorTransaction(
       [new FsusMarkdownEditorChange(editor.Document.Length, editor.Document.Length, " exposed")],
       History: "separate",
@@ -216,13 +237,30 @@ internal static class ConformanceV2Runner
     {
       actual = dispatch,
       passed = dispatch.Accepted && dispatch.Value == "Trace start exposed",
-    });
+    }, "FsusMarkdownEditor");
 
     var undo = editor.Undo();
     RecordStep(steps, "keyboard", "FsusMarkdownEditor.Undo", new
     {
       actual = undo,
       passed = undo.Accepted && undo.Value == "Trace start",
+    }, "FsusMarkdownEditor");
+    editor.Mode = FsusMarkdownEditorMode.Live;
+    var projectionCommit = editor.CommitProjection(new FsusMarkdownProjectionSnapshot(
+      identity,
+      editor.TransactionStore.Revision,
+      editor.Document,
+      [new(
+        "trace-atomic",
+        new FsusMarkdownSourceRange(0, editor.Document.Length),
+        FsusMarkdownProjectionSpanKind.Atomic,
+        editor.Document,
+        "code")],
+      editor.ProjectionFeatureRevision));
+    RecordStep(steps, "operation", "FsusMarkdownEditor.CommitProjection", new
+    {
+      actual = projectionCommit,
+      passed = projectionCommit.Accepted,
     });
 
     var childOpened = false;
@@ -309,17 +347,20 @@ internal static class ConformanceV2Runner
         source = "real-avalonia-automation-peer",
         sameExecution = true,
         nodes = new[]
-        {
-          AutomationNode(button, 1),
-          AutomationNode(input, 2),
-          AutomationNode(editor, 3, store.Selection),
-        },
+          {
+            AutomationNode(button, 1),
+            AutomationNode(input, 2),
+            AutomationNode(editor, 3, store.Selection),
+          }
+          .Concat(AutomationChildNodes(editor))
+          .ToArray(),
         markdown = new
         {
           editableMultiline = true,
           wholeDocumentLiveRegion = false,
           decorationDuplicate = false,
           paragraphTabStops = 0,
+          atomicActionCount = AutomationChildNodes(editor).Count,
         },
       },
       performance = new
@@ -379,7 +420,7 @@ internal static class ConformanceV2Runner
       },
       liveRegion = AutomationProperties.GetLiveSetting(control).ToString().ToLowerInvariant(),
       logicalParent = control.Parent?.GetType().Name,
-      children = Array.Empty<string>(),
+      children = peer.GetChildren()?.Select(child => child.GetName()).ToArray() ?? [],
       focus = new
       {
         keyboardFocusable = peer.IsKeyboardFocusable(),
@@ -389,13 +430,68 @@ internal static class ConformanceV2Runner
     };
   }
 
-  private static void RecordStep(List<object> steps, string action, string target, object observation)
+  private static IReadOnlyList<object> AutomationChildNodes(FsusMarkdownEditor editor)
+  {
+    var parent = ControlAutomationPeer.CreatePeerForElement(editor)
+      ?? throw new InvalidOperationException("No AutomationPeer for FsusMarkdownEditor.");
+    return parent.GetChildren()?.Select((peer, index) => (object)new
+    {
+      control = "FsusMarkdownAtomicAction",
+      role = peer.GetAutomationControlType().ToString().ToLowerInvariant(),
+      name = peer.GetName(),
+      description = peer.GetHelpText(),
+      value = peer.GetProvider<IValueProvider>()?.Value,
+      selection = (object?)null,
+      states = new
+      {
+        disabled = !peer.IsEnabled(),
+        readOnly = peer.GetProvider<IValueProvider>()?.IsReadOnly ?? false,
+        invalid = false,
+        selected = false,
+        expanded = false,
+        checkedState = (string?)null,
+      },
+      liveRegion = "off",
+      logicalParent = "FsusMarkdownEditor",
+      children = Array.Empty<string>(),
+      focus = new
+      {
+        keyboardFocusable = peer.IsKeyboardFocusable(),
+        focused = peer.HasKeyboardFocus(),
+        tabOrder = -1 - index,
+      },
+      action = new
+      {
+        invokable = peer.GetProvider<IInvokeProvider>() is not null,
+        sourceEntry = peer.GetName().Contains("edit-source", StringComparison.Ordinal),
+      },
+    }).ToArray() ?? [];
+  }
+
+  private static void RecordStep(
+    List<object> steps,
+    string action,
+    string target,
+    object observation,
+    string? focusTarget = null)
   {
     steps.Add(new
     {
       index = steps.Count,
       action,
       target,
+      focusTarget,
+      binding = new
+      {
+        scenario = "scenario.v2.el-markdown-editor.real-interaction-trace",
+        contract = "component-v2.el-markdown-editor",
+        candidate,
+        contractHash,
+        webBaselineHash,
+        avaloniaBaselineHash,
+        os = Environment.OSVersion.ToString(),
+        avalonia = Environment.Version.ToString(),
+      },
       observation,
     });
   }

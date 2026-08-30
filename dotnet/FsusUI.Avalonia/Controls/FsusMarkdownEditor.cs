@@ -735,5 +735,76 @@ public class FsusMarkdownEditor : TemplatedControl
       }
       Editor.Document = value ?? string.Empty;
     }
+
+    protected override IReadOnlyList<AutomationPeer>? GetChildrenCore()
+    {
+      var atomicSpans = Editor.projection.Snapshot?.Spans
+        .Where(span => span.Kind == FsusMarkdownProjectionSpanKind.Atomic)
+        .ToArray() ?? [];
+      if (atomicSpans.Length == 0)
+      {
+        return null;
+      }
+
+      var peers = new List<AutomationPeer>(atomicSpans.Length * 3);
+      foreach (var span in atomicSpans)
+      {
+        peers.Add(AtomicActionPeer(span, "enter-before", span.SourceRange.Start));
+        peers.Add(AtomicActionPeer(span, "enter-after", span.SourceRange.End));
+        peers.Add(AtomicActionPeer(span, "edit-source", span.SourceRange.Start));
+      }
+      return peers;
+    }
+
+    private AutomationPeer AtomicActionPeer(
+      FsusMarkdownProjectionSpan span,
+      string action,
+      int sourceOffset)
+    {
+      var control = new AtomicActionControl(Editor, sourceOffset)
+      {
+        Focusable = false,
+        IsHitTestVisible = false,
+      };
+      AutomationProperties.SetAccessibilityView(control, AccessibilityView.Control);
+      AutomationProperties.SetControlTypeOverride(control, AutomationControlType.Button);
+      AutomationProperties.SetName(
+        control,
+        $"{span.SemanticKind ?? "atomic"} {action}");
+      AutomationProperties.SetHelpText(control, span.DisplayText);
+      AutomationProperties.SetItemStatus(control, action);
+      return new AtomicActionAutomationPeer(control, span.DisplayText);
+    }
+  }
+
+  private sealed class AtomicActionControl(
+    FsusMarkdownEditor editor,
+    int sourceOffset) : Control
+  {
+    public void Invoke()
+    {
+      var previous = editor.store.Selection;
+      var next = new FsusMarkdownEditorSelection(sourceOffset, sourceOffset);
+      if (editor.store.SetSelection(next) && editor.store.Selection != previous)
+      {
+        editor.SelectionChange?.Invoke(editor, new(editor.store.Revision, editor.store.Selection));
+        editor.UpdateProjectionSelection();
+      }
+      _ = editor.Focus();
+    }
+  }
+
+  private sealed class AtomicActionAutomationPeer(
+    AtomicActionControl owner,
+    string value) : ControlAutomationPeer(owner), IInvokeProvider, IValueProvider
+  {
+    public bool IsReadOnly => true;
+
+    public string Value => value;
+
+    public void Invoke() => owner.Invoke();
+
+    public void SetValue(string? value) =>
+      throw new InvalidOperationException("Atomic Markdown actions are read-only.");
   }
 }
