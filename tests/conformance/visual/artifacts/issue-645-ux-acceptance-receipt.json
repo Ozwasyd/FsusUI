@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "2d9ed5fd6866219eb06ceaafe9f42c16f22d20d6772e84c8805cb7e6a82556d0",
-  "candidateSha": "7249cae11c218d21dbc059136d4f6c0c9d92cbdc",
-  "candidateDigest": "d85db1134eaef48db39ea4477bf671c9d165ece245c7757ff832b7b54f61ccca",
+  "classificationReceiptDigest": "e61ef3e868f68b1a1458a8e654ad7d61cd96409cfc9a60a1fde34acae3857277",
+  "candidateSha": "a664c0398efea301261a8a5cfb54d1598c5956d3",
+  "candidateDigest": "658c3a2a274fd34713367350282a5e18139c63f4ea80d6e586ba1b0b3ae71b38",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -12,18 +12,18 @@
     "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
     "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
     "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
-    "cece08332b3b42431e948857d96817dc79ca1202f32dc29949c90049f5178f98",
+    "30a437250c3f373bc5306a72eaf6bfb380afebd1bd0d937e317d168d3f75d56b",
     "bfd43d0e258938b485ada4fd87f96a8fff1b73230d0c12d13aa3edd6abc9c9fd",
     "e2a141bd7241739693e94c140f3f43cff1587e44da94c741f804800e14b2a633",
     "339ae5fb4d0ba1b91fd1c88e29b37f66764e4ada412c0cef400fab42565b8cdc",
     "0d19909c5dc473d3e6226a5c85307e5890d66edb08f9b9e9410b993529ab44ba",
-    "cbff58971794751e3d8871307cbf9ac9a7a33091011bd9bdf5d81370eddc90a0",
+    "be4d02b622db259891060ec9e13fce9d1f1ad3e150fa78e91c886934259a82b2",
     "4af382d77024fcd99fc430e279ec2a3a7b4035465ded20b5a74a8f0cfa04563d",
     "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1"
   ],
-  "activeBaselineIdentityDigest": "55e220b4d5e82075aad78b691b21c1bc0da35d07511391bc50365e9b8b5fb0f6",
+  "activeBaselineIdentityDigest": "fe938d0a9473c0ebf8d417641d385915a1177ba7da18c3c6e281b78cade83125",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "083f5099b9f19fcbb66299d0ec7800027f93c542cd6930a0aac11fc5ddf258ee",
+  "independenceEvidenceDigest": "9a93475c2dec99d1c0c98b49fc0d3239208a76b17f0f4ef9d6e0508117d1aca4",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -108,5 +108,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "02ecfc3a243f037cfa68324423f1832fc18eac941c523ad96f469d72ce2fd422"
+  "receiptDigest": "f84a62389595aae201ff1839dc81b0b9a5ff7676c91c14fdf8681be40b77b641"
 }

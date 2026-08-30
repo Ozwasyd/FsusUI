@@ -2,6 +2,9 @@
   "schemaVersion": 1,
   "issue": 645,
   "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "a664c0398efea301261a8a5cfb54d1598c5956d3",
+  "candidateDigest": "658c3a2a274fd34713367350282a5e18139c63f4ea80d6e586ba1b0b3ae71b38",
+  "classificationReceiptDigest": "e61ef3e868f68b1a1458a8e654ad7d61cd96409cfc9a60a1fde34acae3857277",
   "productionFixture": true,
   "initialReview": {
     "status": "rejected",
