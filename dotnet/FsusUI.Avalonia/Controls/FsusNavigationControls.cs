@@ -246,8 +246,6 @@ public class FsusTabs : TabControl
       {
         SelectedItem = selectedPane;
       }
-
-      SyncPanes();
     });
   }
 
