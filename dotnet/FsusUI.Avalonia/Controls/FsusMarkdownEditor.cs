@@ -1,4 +1,7 @@
 using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Presenters;
@@ -94,7 +97,13 @@ public class FsusMarkdownEditor : TemplatedControl
     FsusComponentClasses.SetBaseClasses(this, "fsus-markdown-editor");
     Focusable = true;
     SetCurrentValue(CapabilityStateProperty, "aligned");
+    AutomationProperties.SetAccessibilityView(this, AccessibilityView.Control);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Edit);
+    AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Off);
   }
+
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new MarkdownEditorAutomationPeer(this);
 
   public FsusMarkdownEditorTransactionStore TransactionStore => store;
 
@@ -707,5 +716,24 @@ public class FsusMarkdownEditor : TemplatedControl
   public bool TryRunCommand(string commandKey)
   {
     return !string.IsNullOrWhiteSpace(commandKey) && !IsReadOnly && IsEnabled;
+  }
+
+  private sealed class MarkdownEditorAutomationPeer(FsusMarkdownEditor owner)
+    : ControlAutomationPeer(owner), IValueProvider
+  {
+    private FsusMarkdownEditor Editor => (FsusMarkdownEditor)Owner;
+
+    public bool IsReadOnly => Editor.IsReadOnly;
+
+    public string Value => Editor.Document;
+
+    public void SetValue(string? value)
+    {
+      if (Editor.IsReadOnly || !Editor.IsEnabled)
+      {
+        throw new InvalidOperationException("The Markdown editor cannot accept edits.");
+      }
+      Editor.Document = value ?? string.Empty;
+    }
   }
 }

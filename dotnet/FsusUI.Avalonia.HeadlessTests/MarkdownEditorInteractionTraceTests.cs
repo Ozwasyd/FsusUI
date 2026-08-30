@@ -1,9 +1,31 @@
+using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using FsusUI.Avalonia.Controls;
 
 namespace FsusUI.Avalonia.HeadlessTests;
 
 public class MarkdownEditorInteractionTraceTests
 {
+  [Fact]
+  public void ExposesEditableNonLiveAutomationValue()
+  {
+    var editor = new FsusMarkdownEditor { Document = "Trace start" };
+    var peer = ControlAutomationPeer.CreatePeerForElement(editor);
+    var value = Assert.IsAssignableFrom<IValueProvider>(peer);
+
+    Assert.Equal(AutomationControlType.Edit, peer.GetAutomationControlType());
+    Assert.Equal(AutomationLiveSetting.Off, AutomationProperties.GetLiveSetting(editor));
+    Assert.False(value.IsReadOnly);
+    Assert.Equal("Trace start", value.Value);
+    value.SetValue("Changed");
+    Assert.Equal("Changed", editor.Document);
+
+    editor.IsReadOnly = true;
+    Assert.True(value.IsReadOnly);
+    Assert.Throws<InvalidOperationException>(() => value.SetValue("Rejected"));
+  }
+
   [Fact]
   public void ConstructsNativeEditorAndRecordsPublicTrace()
   {

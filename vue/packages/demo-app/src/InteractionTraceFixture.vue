@@ -110,7 +110,7 @@ const markdownSelection = ref<MarkdownEditorSelectionEvent | null>(null)
 const markdownLastOperation = ref<MarkdownEditorDispatchResult | null>(null)
 const markdownDocumentIdentity: MarkdownEditorDocumentIdentity = Object.freeze({
   id: 'markdown-editor-interaction-trace',
-  epoch: 347,
+  epoch: 348,
 })
 
 const recordEvent = (name: string, payload?: unknown) => {
