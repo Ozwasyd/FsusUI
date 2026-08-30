@@ -178,8 +178,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
   private string? currentLoadingSource;
   private object? renderedContent;
   private ContentPresenter? contentPresenter;
-  private readonly ScaleTransform scaleTransform = new(1, 1);
-  private readonly TranslateTransform translateTransform = new();
+  private readonly MatrixTransform imageTransform = new();
   private IPointer? capturedPointer;
   private Point lastPointerPosition;
   private double minimumZoom = 0.1;
@@ -352,10 +351,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
     contentPresenter = e.NameScope.Find<ContentPresenter>(ContentPresenterPartName);
     if (contentPresenter is not null)
     {
-      var transforms = new TransformGroup();
-      transforms.Children.Add(scaleTransform);
-      transforms.Children.Add(translateTransform);
-      contentPresenter.RenderTransform = transforms;
+      contentPresenter.SetValue(RenderTransformProperty, imageTransform);
       contentPresenter.RenderTransformOrigin = RelativePoint.Center;
       ApplyTransform();
     }
@@ -821,10 +817,13 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
 
   private void ApplyTransform()
   {
-    scaleTransform.ScaleX = Zoom;
-    scaleTransform.ScaleY = Zoom;
-    translateTransform.X = Translation.X;
-    translateTransform.Y = Translation.Y;
+    imageTransform.Matrix = new Matrix(
+      Zoom,
+      0,
+      0,
+      Zoom,
+      Translation.X,
+      Translation.Y);
   }
 
   private void OnTransformChanged()

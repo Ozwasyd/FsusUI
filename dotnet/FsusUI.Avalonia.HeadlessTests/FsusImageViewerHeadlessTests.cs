@@ -587,7 +587,7 @@ public class FsusImageViewerHeadlessTests
       .GetVisualDescendants()
       .OfType<ContentPresenter>()
       .Single(candidate => candidate.Name == FsusImageViewer.ContentPresenterPartName);
-    Assert.IsType<TransformGroup>(presenter.RenderTransform);
+    Assert.IsType<MatrixTransform>(presenter.RenderTransform);
 
     var resetCenter = resetViewer.TranslatePoint(
       new Point(resetViewer.Bounds.Width / 2, resetViewer.Bounds.Height / 2),
