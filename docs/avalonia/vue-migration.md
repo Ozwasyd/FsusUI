@@ -49,4 +49,7 @@ fallback escape hatch rather than throwing during layout.
 - Replace CSS class overrides with theme resources and component properties.
 - Replace SVG icon imports with `FsusIconKeys` plus the icon resource dictionary.
 - Replace browser-only locale formatting with `FsusAvaloniaLocaleProvider`.
+- Rebuild `FsusTabs` through its authoritative `Panes` collection; after
+  clearing and adding replacement panes, call `SelectKey` directly without a
+  host-owned `ItemsSource` or dispatcher workaround.
 - Review [platform differences](platform-differences.md) for native template, typography, focus, and virtualization behavior.

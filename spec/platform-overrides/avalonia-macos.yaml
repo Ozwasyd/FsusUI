@@ -40,4 +40,4 @@ overrides:
     testPolicy: local-platform-role-simulation-and-native-menu-contract
     owner: fsusui-core
     reviewAfter: 2026-11-01
-    linkedIssues: [649]
+    linkedIssues: [649, 688]
