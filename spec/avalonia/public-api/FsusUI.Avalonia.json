@@ -186,6 +186,11 @@
     "FsusMarkdownMappedRange",
     "FsusMarkdownProjectionCommitResult",
     "FsusMarkdownProjectionMap",
+    "FsusMarkdownProjectionProducerContract",
+    "FsusMarkdownProjectionProducerDescriptor",
+    "FsusMarkdownProjectionProducerKind",
+    "FsusMarkdownProjectionProducerValidationResult",
+    "FsusMarkdownProjectionProduction",
     "FsusMarkdownProjectionRequestedEventArgs",
     "FsusMarkdownProjectionSnapshot",
     "FsusMarkdownProjectionSpan",
@@ -393,6 +398,7 @@
     "FsusWatermarkTile",
     "IFsusFormFieldAdapter",
     "IFsusImageLoader",
+    "IFsusMarkdownProjectionProducer",
     "IFsusOverlayLifecycle"
   ]
 }
