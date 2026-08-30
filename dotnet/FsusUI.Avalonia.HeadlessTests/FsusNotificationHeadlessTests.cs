@@ -142,7 +142,6 @@ public class FsusNotificationHeadlessTests
       Duration = TimeSpan.FromMilliseconds(50),
       ActionLabel = "Details",
       ActionCommand = new TestCommand(_ => commandExecuted++),
-      Placement = FsusServicePlacement.TopLeft,
     });
     Assert.NotNull(handle);
     var notification = handle!.Control;
@@ -175,7 +174,6 @@ public class FsusNotificationHeadlessTests
       Duration = TimeSpan.FromMilliseconds(150),
       ActionLabel = "Settings",
       ActionCommand = new TestCommand(_ => commandExecuted++),
-      Placement = FsusServicePlacement.TopLeft,
     });
     Assert.NotNull(handle);
     var notification = handle!.Control;
@@ -258,6 +256,7 @@ public class FsusNotificationHeadlessTests
     var host = new FsusOverlayHost();
     window.Content = host;
     window.Show();
+    window.UpdateLayout();
     Dispatcher.UIThread.RunJobs();
     return (window, host, new FsusNotificationService(host));
   }
@@ -266,8 +265,10 @@ public class FsusNotificationHeadlessTests
   {
     var center = control.TransformToVisual(window)!.Value.Transform(new Point());
     var offset = new Point(control.Bounds.Width / 2, control.Bounds.Height / 2);
-    window.MouseDown(center + offset, MouseButton.Left);
-    window.MouseUp(center + offset, MouseButton.Left);
+    var point = center + offset;
+    window.MouseMove(point);
+    window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+    window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
     Dispatcher.UIThread.RunJobs();
   }
 

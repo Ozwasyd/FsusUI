@@ -158,7 +158,9 @@ public sealed class FsusMessageService(FsusOverlayHost host)
         activeMessages.Remove(current);
         return true;
       });
-    handle.OverlayEntry = host.Open(toast, FsusServiceVisuals.CreateServiceOverlayOptions(options.Placement));
+    handle.OverlayEntry = host.Open(
+      toast,
+      FsusServiceVisuals.CreateServiceOverlayOptions(options.Placement, host));
     activeMessages.Add(handle);
     return ValueTask.FromResult<FsusServiceHandle<FsusMessageToast>?>(handle);
   }
@@ -215,7 +217,9 @@ public sealed class FsusNotificationService(FsusOverlayHost host)
     {
       _ = handle.CloseAsync();
     };
-    handle.OverlayEntry = host.Open(notification, FsusServiceVisuals.CreateServiceOverlayOptions(options.Placement));
+    handle.OverlayEntry = host.Open(
+      notification,
+      FsusServiceVisuals.CreateServiceOverlayOptions(options.Placement, host));
     activeNotifications.Add(handle);
     return ValueTask.FromResult<FsusServiceHandle<FsusNotification>?>(handle);
   }
@@ -765,7 +769,9 @@ internal static class FsusServiceVisuals
     FsusComponentClasses.Ensure(control, "fsus-motion-reduced", reducedMotion);
   }
 
-  public static FsusOverlayOptions CreateServiceOverlayOptions(FsusServicePlacement placement) =>
+  public static FsusOverlayOptions CreateServiceOverlayOptions(
+    FsusServicePlacement placement,
+    FsusOverlayHost host) =>
     new()
     {
       IsModal = false,
@@ -774,9 +780,9 @@ internal static class FsusServiceVisuals
       Placement = placement is FsusServicePlacement.TopLeft or FsusServicePlacement.BottomLeft
         ? FsusOverlayPlacement.TopStart
         : FsusOverlayPlacement.TopEnd,
-      AnchorBounds = new Rect(0, 0, 1920, 0),
+      AnchorBounds = new Rect(0, 0, host.Bounds.Width, 0),
       OverlaySize = new Size(320, 80),
-      ViewportBounds = new Rect(0, 0, 1920, 1080),
+      ViewportBounds = new Rect(0, 0, host.Bounds.Width, host.Bounds.Height),
     };
 
   public static string TypeName(FsusServiceType type) =>
