@@ -35,6 +35,7 @@ contracts to Avalonia controls.
 - [Tree](components/tree.md)
 - [Text viewer](components/text-viewer.md)
 - [Text editor](components/text-editor.md)
+- [Code editor](components/code-editor.md)
 - [Public shell](components/public-shell.md)
 - [Desktop shell](components/desktop-shell.md)
 - [Product primitives](components/product-primitives.md)

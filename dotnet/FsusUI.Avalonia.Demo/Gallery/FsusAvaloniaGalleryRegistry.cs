@@ -63,6 +63,7 @@ public static class FsusAvaloniaGalleryRegistry
     Entry("tree", "Tree"),
     Entry("text-viewer", "Text viewer"),
     Entry("text-editor", "Text editor"),
+    Entry("code-editor", "Code editor"),
     Entry("markdown-editor", "Markdown editor"),
     Entry("public-shell", "Public shell"),
     Entry("product-primitives", "Product primitives"),
@@ -126,6 +127,20 @@ public static class FsusAvaloniaGalleryRegistry
         break;
       case "text-editor":
         panel.Children.Add(new FsusTextEditor { AccessibleName = "Gallery editor" });
+        break;
+      case "code-editor":
+        var codeEditor = new FsusCodeEditor
+        {
+          AccessibleName = "Gallery Markdown source",
+          WordWrap = true,
+          ShowLineNumbers = true,
+          TabWidth = 4,
+        };
+        codeEditor.LoadDocument(
+          new FsusMarkdownDocumentIdentity("gallery-code", 1),
+          "# Release notes\n\n- Preserve **native input**\n- Search 中文 source\n- Keep `offsets` exact");
+        _ = codeEditor.FindNext("native input");
+        panel.Children.Add(codeEditor);
         break;
       case "value-picker":
         panel.Children.Add(new FsusSlider

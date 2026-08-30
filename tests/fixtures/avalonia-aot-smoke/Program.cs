@@ -70,6 +70,16 @@ internal static class Program
         IconKey = FsusIconKeys.Settings,
         IsDecorative = true,
       };
+      var codeEditor = new FsusCodeEditor
+      {
+        AccessibleName = "Native AOT Markdown source",
+        WordWrap = true,
+        ShowLineNumbers = true,
+      };
+      codeEditor.LoadDocument(
+        new FsusMarkdownDocumentIdentity("native-aot", 1),
+        "# AOT\n\n- Native editor");
+      _ = codeEditor.FindNext("Native");
       var documents = new FsusDocumentTabs();
       documents.AddDocument(new FsusDocumentTab
       {
@@ -97,6 +107,7 @@ internal static class Program
       panel.Children.Add(icon);
       panel.Children.Add(titleBar);
       panel.Children.Add(activityShell);
+      panel.Children.Add(codeEditor);
 
       var window = new Window
       {
@@ -116,6 +127,9 @@ internal static class Program
               report.DispatcherReached = Dispatcher.UIThread.CheckAccess();
               report.PlatformHandleCreated = window.TryGetPlatformHandle() is not null;
               report.PackageControlCount = panel.Children.Count;
+              report.CodeEditorReady =
+                codeEditor.Selection == new FsusCodeEditorSelection(9, 15) &&
+                codeEditor.HighlightSpans.Count > 0;
               report.ActivitySectionCount = activityShell.Sections.Count;
               report.DocumentCount = documents.Documents.Count;
               report.TitleBarPlatform = titleBar.EffectivePlatform.ToString();
@@ -124,9 +138,10 @@ internal static class Program
                 report.TopLevelCreated &&
                 report.DispatcherReached &&
                 report.PlatformHandleCreated &&
-                report.PackageControlCount == 4 &&
+                report.PackageControlCount == 5 &&
                 report.ActivitySectionCount == 1 &&
-                report.DocumentCount == 1
+                report.DocumentCount == 1 &&
+                report.CodeEditorReady
                   ? 0
                   : 1;
               if (report.ExitCode != 0)
@@ -232,6 +247,7 @@ internal sealed record SmokeReport
   public bool DispatcherReached { get; set; }
   public bool PlatformHandleCreated { get; set; }
   public int PackageControlCount { get; set; }
+  public bool CodeEditorReady { get; set; }
   public int ActivitySectionCount { get; set; }
   public int DocumentCount { get; set; }
   public string? TitleBarPlatform { get; set; }
