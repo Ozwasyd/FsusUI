@@ -25,13 +25,13 @@
     "authorityDigest": "554345bd5f2c2c5575e263377be99a1c65b29374895b01e4c7108c7539feddf7",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "5209f8b27bc471d45c921f9922ba319105b1a139",
-  "candidateDigest": "51c9c8201bcce2aaca6992f03a30d2fcd059c168b51b1e6bb69b0302d10a8596",
+  "candidateSha": "9d2af5b9cf6c8a9478323d72bf605799be4b62fa",
+  "candidateDigest": "18ebd65d5499f6845e5a3372373caaaa28677462ff1affcd08ecf4ebaddf0137",
   "stateEvidenceMatrix": [
     { "state": "long-warnings-actions-and-focus", "viewport": "1440x1000@100%", "theme": "light", "evidenceDigest": "acc95344ed2d05ced1531062c76ccd9e0860f88618c75934b2271c349bce24c3" },
     { "state": "long-warnings-actions-and-focus", "viewport": "1440x1000@150%", "theme": "dark", "evidenceDigest": "849590403311b68753ca4e052420d33227ff3a47ba42c2e48ddbc75101f7fdbe" },
     { "state": "long-warnings-stacked-actions-and-focus", "viewport": "375x812@100%", "theme": "light", "evidenceDigest": "86865977623d95ddc73a6bd6089c167e7e376d888dab367c369907f49af9b5fe" },
-    { "state": "long-warnings-stacked-actions-and-focus", "viewport": "375x812@200%", "theme": "dark", "evidenceDigest": "0796f32b3bca3426484ead42be6ef37682334f7562d080793ac11e5f430550fc" },
+    { "state": "long-warnings-stacked-actions-and-focus", "viewport": "375x812@200%", "theme": "dark", "evidenceDigest": "d81bf51b0719e6ffb96f3c1f9bdd34897e1b82c61145daf007c3a395f86cc961" },
     { "state": "dialog-preview-diff-warnings-actions-accessibility-tree", "viewport": "desktop-and-mobile", "theme": "both", "evidenceDigest": "158dc44d72d1f0e8b9b13ddb7ffaf851b376757b006eedf755b24167b099a1dc" }
   ],
   "inScope": [
@@ -47,8 +47,8 @@
     "Remote conversion or consumer-local importers",
     "Adjacent Markdown editor visual redesign"
   ],
-  "classificationEvidenceDigest": "fe8326dc41a1b25653c3921add722fb3763699ef16719c345df5ef1ea7e753a1",
+  "classificationEvidenceDigest": "a38f11903b95a04df2a614c7c21dc0ded2d778f8f8c28ca2d9d23346eb68cb31",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "f2624edec2eab3fd7726b5932a0c35de0f3f18b099492995a97ad20305b35e37"
+  "receiptDigest": "10a327379e3234d3c5399acd0393b1ba7c9c3836a8576c668d212d17f90edf41"
 }

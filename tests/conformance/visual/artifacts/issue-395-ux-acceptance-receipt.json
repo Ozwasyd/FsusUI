@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "f2624edec2eab3fd7726b5932a0c35de0f3f18b099492995a97ad20305b35e37",
-  "candidateSha": "5209f8b27bc471d45c921f9922ba319105b1a139",
-  "candidateDigest": "51c9c8201bcce2aaca6992f03a30d2fcd059c168b51b1e6bb69b0302d10a8596",
+  "classificationReceiptDigest": "10a327379e3234d3c5399acd0393b1ba7c9c3836a8576c668d212d17f90edf41",
+  "candidateSha": "9d2af5b9cf6c8a9478323d72bf605799be4b62fa",
+  "candidateDigest": "18ebd65d5499f6845e5a3372373caaaa28677462ff1affcd08ecf4ebaddf0137",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -17,7 +17,7 @@
   ],
   "activeBaselineIdentityDigest": "ecd166c0627407b28670486a1c535b6764fa02fde4876aa603b55eec4bbe38bd",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "d55f5b0544d49ca8dc836b76d5061e08c2979554632e66d7df4986e68ff6997d",
+  "independenceEvidenceDigest": "35a1f7f4c7ec9802d61c9261bd91364e96c851b2fc93c97a541f242fbb9522fe",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -47,7 +47,7 @@
       "state": "long-warnings-stacked-actions-focus-and-touch-path",
       "theme": "dark",
       "inputModes": ["keyboard", "touch", "screen-reader", "zoom"],
-      "evidenceDigest": "0796f32b3bca3426484ead42be6ef37682334f7562d080793ac11e5f430550fc"
+      "evidenceDigest": "d81bf51b0719e6ffb96f3c1f9bdd34897e1b82c61145daf007c3a395f86cc961"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -79,7 +79,7 @@
       "id": "mobile-dark-200",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/web/issue-395-markdown-import/mobile-dark-200.png",
-      "digest": "0796f32b3bca3426484ead42be6ef37682334f7562d080793ac11e5f430550fc",
+      "digest": "d81bf51b0719e6ffb96f3c1f9bdd34897e1b82c61145daf007c3a395f86cc961",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -94,5 +94,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "cfccb7c7dc935ab594d6f7fc6a9c1391f0f84267136cd16debe5873438af141e"
+  "receiptDigest": "5379fd572dbf567c6a54232b47182037ab940bee57366d73be66d675481cb1a5"
 }
