@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "db4dbec3ad30fb7278d5393749131002340c66bed8a6a588887676100d436499",
+      "hash": "82e318636fa828e231a0cf816a5663b358d525160bda7e0c1673d6905ff4d033",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -85619,6 +85619,19 @@
           ]
         },
         {
+          "member": "AccessibleValueText",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-slider.avalonia-extra.accessible-value-text"
+          ]
+        },
+        {
           "member": "DragToRatio",
           "kind": "avalonia-extra",
           "governance": {
@@ -85681,6 +85694,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-slider.avalonia-extra.value-changed"
+          ]
+        },
+        {
+          "member": "ValueCommitted",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-slider.avalonia-extra.value-committed"
           ]
         }
       ],
