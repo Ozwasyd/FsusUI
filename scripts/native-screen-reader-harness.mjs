@@ -371,7 +371,7 @@ const main = async () => {
     const elapsedMilliseconds = performance.now() - interactionStart
     const focusTarget = await page.evaluate(() => {
       const active = document.activeElement
-      return active instanceof HTMLButtonElement
+      return active?.tagName === 'BUTTON'
         ? 'button'
         : active?.getAttribute('role') || active?.tagName.toLowerCase() || null
     })
