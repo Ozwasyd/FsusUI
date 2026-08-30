@@ -1,9 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { fileURLToPath } from 'node:url'
-
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+import {
+  currentIdentity,
+  readAlignment,
+  root,
+} from './avalonia-stable-readiness-lib.mjs'
 
 const read = (relativePath) =>
   fs.readFileSync(path.join(root, relativePath), 'utf8')
@@ -200,10 +202,10 @@ const runFixtureChecks = (spec) => {
 
 try {
   const spec = readJson('spec/ci/avalonia-stable-readiness.json')
-  const alignment = readJson('.tmp/conformance-v2/alignment.json')
-  if (alignment.schema !== 'fsusui.alignment.v2') {
-    throw new Error('Contract V2 alignment artifact schema invalid')
-  }
+  const alignment = readAlignment(
+    '.tmp/conformance-v2/alignment.json',
+    currentIdentity(),
+  )
   const derivedFamilies = alignment.consumers?.galleryStableFamilies ?? []
   const missingStableFamilies = spec.requiredStableComponentFamilies.filter(
     (family) => !derivedFamilies.includes(family),

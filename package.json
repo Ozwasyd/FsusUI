@@ -210,7 +210,7 @@
     "verify": "node ./scripts/with-node-heap.mjs run-s verify:full",
     "verify:pr-fast": "run-s prepare:test-artifacts build:theme _verify:pr-fast:parallel",
     "_verify:pr-fast:parallel": "node ./scripts/run-capacity-suite.mjs --suite=pr-fast",
-    "verify:full": "node ./scripts/with-node-heap.mjs run-s prepare:test-artifacts _verify:parallel build:demo",
+    "verify:full": "node ./scripts/with-node-heap.mjs run-s prepare:test-artifacts conformance:v2 _verify:parallel build:demo",
     "_verify:parallel": "node ./scripts/run-capacity-suite.mjs --suite=full",
     "verify:strict": "node ./scripts/with-node-heap.mjs run-s verify:release",
     "verify:stable": "node ./scripts/with-node-heap.mjs run-s tokens:check icons:check interactions:check visual:check a11y:check avalonia:performance:check conformance governance:check dotnet:verify",
