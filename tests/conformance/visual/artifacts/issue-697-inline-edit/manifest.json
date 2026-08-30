@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "candidateSha": "cc1db80584dd61dbecfb5b006da4e79feb2b9d59",
+  "candidateSha": "79a71be1ea7cc3e3b97272d309294d3f4daae337",
   "evidenceClass": "local-headless-skia-and-input-simulation",
   "productionFixture": true,
   "limitation": "Avalonia Headless Skia and automation-property inspection; no claim of a physical screen reader session.",

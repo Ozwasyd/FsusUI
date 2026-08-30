@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "cfab214d7330c9bc090fefac758c791d3bf855cea47538d3cf94b687dda637a3",
-  "candidateSha": "cc1db80584dd61dbecfb5b006da4e79feb2b9d59",
-  "candidateDigest": "7ae79545416475f6d14b40c3cd074b562996cdc6628d2101b807ff246414f894",
+  "classificationReceiptDigest": "5bd348b34fd7738880942de8f599e978f60f642634c43daa1f5b97f38dc2ca41",
+  "candidateSha": "79a71be1ea7cc3e3b97272d309294d3f4daae337",
+  "candidateDigest": "b5cd7102f9714281feff6f25a8910530da11b3f74781619300a24c907dbe19c3",
   "verificationClass": "ux-path",
   "requiredSkillDigests": ["c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"],
   "authorityDigests": [
@@ -17,7 +17,7 @@
   ],
   "activeBaselineIdentityDigest": "192c00bc3f4e54419b6b4dc3f715b6358bed96c9406cff5986dcf59a5e4f923b",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "3abacd48bf8318d170ee6af1f99c1599c34effceffe27274d9da05156eba3e62",
+  "independenceEvidenceDigest": "8298f10576bf492077ba541ea3c315ba5a8f6b7a39b4f9380b0a92c6fbda4313",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -40,7 +40,7 @@
       "state": "stable-key-commit-cancel-validation-focus-refresh-lazy",
       "theme": "light",
       "inputModes": ["pointer", "keyboard"],
-      "evidenceDigest": "2a3618135b506bf9c8b0e205bdb465a700295012476fbd9725d33d0e701a497c"
+      "evidenceDigest": "5b38039eb2bb19f54ad60982d6aee8e5eb97e65b3d7a28902187046f415dc0e3"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -64,12 +64,12 @@
       "id": "tree-inline-edit-headless-manifest",
       "kind": "accessibility-tree",
       "path": "tests/conformance/visual/artifacts/issue-697-inline-edit/manifest.json",
-      "digest": "2a3618135b506bf9c8b0e205bdb465a700295012476fbd9725d33d0e701a497c",
+      "digest": "5b38039eb2bb19f54ad60982d6aee8e5eb97e65b3d7a28902187046f415dc0e3",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "a90cd746a342e8bd5e8b1d7d1965218b62dd44a0bf04563f05d2001d86d87f60"
+  "receiptDigest": "63bf6378ce89691b2da87b6d00c51ef27f7fc7656fe5192008f81688d041a791"
 }
