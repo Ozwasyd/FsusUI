@@ -2,6 +2,8 @@
 
 Status: accepted for the local Avalonia Headless/Skia rendered-evidence class.
 
+Reviewer: root (independent of the implementation worktree changes).
+
 The five 640x360 production-fixture captures were individually inspected at
 original resolution, and their SHA-256 digests match the render manifest.
 
