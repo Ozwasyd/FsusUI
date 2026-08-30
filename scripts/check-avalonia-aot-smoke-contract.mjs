@@ -35,6 +35,7 @@ for (const packageId of [
 }
 requireMatch(project, /<PublishAot>\s*true\s*<\/PublishAot>/iu, 'PublishAot=true is required')
 requireMatch(project, /<SelfContained>\s*true\s*<\/SelfContained>/iu, 'SelfContained=true is required')
+requireMatch(project, /<InvariantGlobalization>\s*false\s*<\/InvariantGlobalization>/iu, 'locale scenarios require invariant globalization to be disabled')
 forbidMatch(project, /<ProjectReference\b/iu, 'ProjectReference is forbidden')
 requireMatch(config, /<clear\s*\/>/iu, 'NuGet sources must be cleared')
 requireMatch(config, /__FSUSUI_LOCAL_FEED__/u, 'NuGet config must bind the temporary local feed')

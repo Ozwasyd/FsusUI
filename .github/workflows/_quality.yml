@@ -155,6 +155,8 @@ jobs:
   dotnet-package:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      candidate-digest: ${{ steps.candidate.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -170,7 +172,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-sdk-${{ hashFiles('dotnet/global.json') }}-
       - name: Build and verify the unique NuGet candidate
-        run: node scripts/dotnet-package-verify.mjs
+        id: candidate
+        run: |
+          node scripts/dotnet-package-verify.mjs
+          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: dotnet-nuget-candidate
@@ -186,6 +191,50 @@ jobs:
           group: ${{ inputs.group }}
           status: ${{ job.status }}
           artifacts: nuget-candidate=dotnet/artifacts
+
+  avalonia-aot-linux:
+    needs: dotnet-package
+    uses: ./.github/workflows/_avalonia-aot-leaf.yml
+    with:
+      group: ${{ inputs.group }}
+      candidate-artifact: dotnet-nuget-candidate
+      candidate-digest: ${{ needs.dotnet-package.outputs.candidate-digest }}
+      commit-sha: ${{ github.sha }}
+      rid: linux-x64
+
+  avalonia-aot:
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - dotnet-package
+      - avalonia-aot-linux
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: avalonia-aot-leaf-linux-x64
+          path: .avalonia-aot-leaves
+      - name: Aggregate required and optional Native AOT leaves
+        run: >-
+          node scripts/avalonia-aot-native.mjs aggregate
+          --leaf-dir .avalonia-aot-leaves
+          --out .avalonia-aot-readiness/manifest.json
+          --commit-sha "$GITHUB_SHA"
+          --candidate-digest '${{ needs.dotnet-package.outputs.candidate-digest }}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-aot-readiness
+          path: .avalonia-aot-readiness
+          retention-days: 7
+      - name: Record Avalonia Native AOT readiness leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: avalonia-aot
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
+          artifacts: avalonia-aot=.avalonia-aot-readiness
 
   typecheck:
     runs-on: ubuntu-latest
@@ -779,6 +828,7 @@ jobs:
       - static-quality
       - dotnet-platform
       - dotnet-package
+      - avalonia-aot
       - typecheck
       - unit
       - coverage
@@ -835,6 +885,7 @@ jobs:
       - static-quality
       - dotnet-platform
       - dotnet-package
+      - avalonia-aot
       - typecheck
       - unit
       - coverage
@@ -884,6 +935,7 @@ jobs:
       - static-quality
       - dotnet-platform
       - dotnet-package
+      - avalonia-aot
       - typecheck
       - unit
       - coverage

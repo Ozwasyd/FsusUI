@@ -20,6 +20,7 @@
     "static-quality",
     "dotnet-platform",
     "dotnet-package",
+    "avalonia-aot",
     "typecheck",
     "unit",
     "coverage",
@@ -39,6 +40,7 @@
     "fsusui-npm-candidate",
     "dotnet-platform",
     "dotnet-nuget-candidate",
+    "avalonia-aot-readiness",
     "avalonia-screenshots",
     "avalonia-generated-artifacts",
     "readiness-manifest-"
