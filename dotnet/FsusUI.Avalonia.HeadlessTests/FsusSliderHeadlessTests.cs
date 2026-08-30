@@ -188,6 +188,8 @@ public class FsusSliderHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRendersIssue659ProductionStateMatrix()
   {
+    var outputRoot =
+      HeadlessVisualEvidence.CreateOutputDirectory("slider");
     var captures = new List<SliderRenderCapture>();
     foreach (var (name, variant, highContrast) in new[]
       {
@@ -196,7 +198,7 @@ public class FsusSliderHeadlessTests
         ("highcontrast", FsusThemeVariant.Dark, true),
       })
     {
-      captures.Add(RenderMatrix(name, variant, highContrast));
+      captures.Add(RenderMatrix(outputRoot, name, variant, highContrast));
     }
 
     Assert.Equal(3, captures.Count);
@@ -205,12 +207,11 @@ public class FsusSliderHeadlessTests
       Assert.Equal(64, capture.Sha256.Length);
       Assert.True(capture.PixelSize.Width > 0);
       Assert.True(capture.PixelSize.Height > 0);
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
+      Assert.True(File.Exists(Path.Combine(outputRoot, capture.File)));
     });
 
     var manifestPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests", "conformance", "visual", "artifacts",
+      outputRoot,
       "issue-659-avalonia-slider-render-manifest.json");
     File.WriteAllText(
       manifestPath,
@@ -270,8 +271,7 @@ public class FsusSliderHeadlessTests
       ControlAutomationPeer.CreatePeerForElement(disabled));
 
     var reportPath = Path.Combine(
-      FindRepositoryRoot(),
-      "tests", "conformance", "visual", "artifacts",
+      HeadlessVisualEvidence.CreateOutputDirectory("slider"),
       "issue-659-avalonia-slider-automation-report.json");
     File.WriteAllText(
       reportPath,
@@ -327,6 +327,7 @@ public class FsusSliderHeadlessTests
   }
 
   private static SliderRenderCapture RenderMatrix(
+    string outputRoot,
     string themeName,
     FsusThemeVariant variant,
     bool highContrast)
@@ -404,10 +405,8 @@ public class FsusSliderHeadlessTests
     Dispatcher.UIThread.RunJobs();
     Arrange(window, 760, 600);
 
-    var output = Path.Combine(
-      FindRepositoryRoot(),
-      "tests", "conformance", "visual", "artifacts", "screenshots", "avalonia",
-      $"issue-659-slider-{themeName}.png");
+    var fileName = $"issue-659-slider-{themeName}.png";
+    var output = Path.Combine(outputRoot, fileName);
     using var bitmap = new RenderTargetBitmap(new PixelSize(760, 600), new Vector(96, 96));
     bitmap.Render(surface);
     using (var stream = File.Create(output))
@@ -417,7 +416,7 @@ public class FsusSliderHeadlessTests
 
     window.Close();
     return new SliderRenderCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), output).Replace('\\', '/'),
+      fileName,
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(output))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
