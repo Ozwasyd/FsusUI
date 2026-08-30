@@ -22,12 +22,12 @@
     "authorityDigest": "de48e87a4a1587b424abaeeff35712a87e69afe901c411edda31fa65867e77f5",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "79a71be1ea7cc3e3b97272d309294d3f4daae337",
-  "candidateDigest": "b5cd7102f9714281feff6f25a8910530da11b3f74781619300a24c907dbe19c3",
+  "candidateSha": "4ec973b4a927971d14f96885da4096da098e08e0",
+  "candidateDigest": "af86eae60cd5edee8ec6b145dda59afd8d7ed4fa15f87efac74c6319c0f36cfc",
   "stateEvidenceMatrix": [
     { "state": "rename-selected-name-and-preserved-tree-state", "viewport": "desktop-960x560", "theme": "both", "evidenceDigest": "9c6c666df2aaa0dc86cf8279470b7a4a1496c23c818443c4d87f895a624bbc20" },
     { "state": "transient-create-empty-row-under-expanded-folder", "viewport": "desktop-960x560", "theme": "both", "evidenceDigest": "ede0df1bda67b5051ffa4f6f273a6b7c0deb23e27fba8c4d29ca22c028167bb5" },
-    { "state": "validation-error-editor-visible-focused-and-accessible", "viewport": "desktop-960x560", "theme": "both", "evidenceDigest": "5b38039eb2bb19f54ad60982d6aee8e5eb97e65b3d7a28902187046f415dc0e3" },
+    { "state": "validation-error-editor-visible-focused-and-accessible", "viewport": "desktop-960x560", "theme": "both", "evidenceDigest": "f0eab8e9b5a311ddbcc709cd726638596960775f74d4a4f7bef258c08cbd21d9" },
     { "state": "enter-escape-outside-refresh-lazy-interaction-path", "viewport": "local-headless-input", "theme": "not-applicable", "evidenceDigest": "2befbb9617b29b51bb873cecada961442a871e6862952a69246c6b3bed7e5613" }
   ],
   "inScope": [
@@ -46,5 +46,5 @@
   "classificationEvidenceDigest": "2befbb9617b29b51bb873cecada961442a871e6862952a69246c6b3bed7e5613",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "5bd348b34fd7738880942de8f599e978f60f642634c43daa1f5b97f38dc2ca41"
+  "receiptDigest": "06df8ceed5981256eac246800e901d944567ab9f1e8aace4e1a3893ebd1f361d"
 }
