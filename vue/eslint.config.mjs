@@ -172,7 +172,10 @@ export default [
   },
 
   {
-    files: ['scripts/check-markdown-xss-browser.mjs'],
+    files: [
+      'scripts/check-markdown-feature-trusted-types.mjs',
+      'scripts/check-markdown-xss-browser.mjs',
+    ],
     languageOptions: {
       globals: {
         URL: 'readonly',
