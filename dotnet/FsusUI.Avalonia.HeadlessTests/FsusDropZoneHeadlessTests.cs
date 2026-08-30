@@ -430,8 +430,10 @@ public class FsusDropZoneHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts()
   {
-    var outputRoot =
-      HeadlessVisualEvidence.CreateOutputDirectory("drop-zone");
+    var repositoryRoot = FindRepositoryRoot();
+    var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
+      repositoryRoot,
+      "issue-655-drop-zone");
 
     var captures = new List<DropZoneRenderCapture>();
 
@@ -496,7 +498,8 @@ public class FsusDropZoneHeadlessTests
       Assert.Equal(
         (int)Math.Round(160 * capture.ZoomPercent / 100.0),
         capture.PixelSize.Height);
-      Assert.True(File.Exists(Path.Combine(outputRoot, capture.File)));
+      Assert.True(File.Exists(
+        HeadlessVisualEvidenceOutput.ResolveRecordedPath(repositoryRoot, capture.File)));
     });
     foreach (var themeCaptures in captures
       .Where(capture =>
@@ -519,6 +522,8 @@ public class FsusDropZoneHeadlessTests
           schemaVersion = 2,
           generatedBy =
             "FsusDropZoneHeadlessTests.RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts",
+          outputRoot = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, outputRoot),
+          manifestPath = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, manifestPath),
           renderer = new
           {
             platform = "avalonia",
@@ -533,6 +538,7 @@ public class FsusDropZoneHeadlessTests
           captures,
         },
         new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    Assert.True(File.Exists(manifestPath));
   }
 
   private static DropZoneRenderCapture RenderDropZoneState(
@@ -650,7 +656,7 @@ public class FsusDropZoneHeadlessTests
     window.Close();
 
     return new DropZoneRenderCapture(
-      fileName,
+      HeadlessVisualEvidenceOutput.RecordPath(FindRepositoryRoot(), outputPath),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
@@ -721,7 +727,11 @@ public class FsusDropZoneHeadlessTests
     Assert.Equal(1, browseRequestedCount);
 
     var reportPath = Path.Combine(
-      HeadlessVisualEvidence.CreateOutputDirectory("drop-zone"),
+      FindRepositoryRoot(),
+      "tests",
+      "conformance",
+      "visual",
+      "artifacts",
       "issue-655-avalonia-drop-zone-automation-report.json");
     File.WriteAllText(
       reportPath,

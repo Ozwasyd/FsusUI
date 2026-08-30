@@ -110,3 +110,16 @@ Canonical profiles: `scripts/safe-area-profiles.mjs`. Projects:
 `safe-area-chromium` and `safe-area-webkit`. Assertions are bounding-box and
 reachability checks over #260 CSS variable overrides — not screenshot-only
 acceptance, and not a substitute for real iOS Safari release evidence.
+
+## Avalonia headless evidence outputs
+
+Ordinary `FsusUI.Avalonia.HeadlessTests` runs write production-fixture screenshots,
+manifests, and receipts below the ignored deterministic directory
+`dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/visual-evidence/`. Set
+`FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT` to an absolute path, or to a path relative
+to the repository root, when a caller needs the same evidence under an explicit
+review or regeneration root. Each fixture keeps its own stable subdirectory and
+records the resolved output, manifest, receipt, and capture paths in its JSON
+evidence. This variable changes only the destination; it does not select tests,
+update tracked baselines, or weaken render, pixel, geometry, automation, or
+composition assertions.

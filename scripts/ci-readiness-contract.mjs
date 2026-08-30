@@ -51,15 +51,28 @@ export function repositoryCommit(cwd = repoRoot) {
 }
 
 export const playwrightRegistry = loadPlaywrightRegistry(repoRoot)
-export const playwrightRegistryHash = computePlaywrightRegistryHash(
-  playwrightRegistry,
-)
+export const playwrightRegistryHash =
+  computePlaywrightRegistryHash(playwrightRegistry)
+
+const CONFORMANCE_IDENTITY_SOURCES = Object.freeze({
+  contractHash: 'spec/components/contracts/v2/contract-v2.json',
+  vueBaselineHash: 'spec/baselines/vue-current.json',
+  scenarioRegistryHash:
+    'tests/conformance/interactions/generated/normalized-traces.json',
+  runnerHash: 'vue/tests/markdown-editor/markdown-interaction-trace.spec.ts',
+})
+
+const sha256FileContent = (target) =>
+  createHash('sha256').update(fs.readFileSync(target)).digest('hex')
 
 export function manifestIdentity(manifest) {
   if (manifest.playwright?.cellId) {
     return `${manifest.gate}[${manifest.playwright.cellId}]`
   }
-  if (manifest.playwright?.suiteId && manifest.playwright?.decision === 'skip') {
+  if (
+    manifest.playwright?.suiteId &&
+    manifest.playwright?.decision === 'skip'
+  ) {
     return `${manifest.gate}[${manifest.playwright.suiteId}:skip]`
   }
   const dimensions = Object.entries(manifest.dimensions ?? {})
@@ -165,6 +178,39 @@ function validatePlaywrightShape(manifest, file) {
     if (!block.receiptPath || typeof block.receiptPath !== 'string')
       throw new Error(`${file}: playwright.receiptPath is required.`)
     assertHex(block.receiptDigest, `${file}: playwright.receiptDigest`)
+    if (block.suiteId === 'web-interaction-conformance') {
+      const evidence = block.conformance
+      if (!evidence || typeof evidence !== 'object')
+        throw new Error(`${file}: conformance evidence is required.`)
+      for (const key of Object.keys(CONFORMANCE_IDENTITY_SOURCES))
+        assertHex(evidence[key], `${file}: conformance.${key}`)
+      for (const key of ['scenarioCount', 'actionStepCount']) {
+        if (!Number.isInteger(evidence[key]) || evidence[key] <= 0)
+          throw new Error(`${file}: conformance.${key} must be positive.`)
+      }
+      if (
+        evidence.traceSchema !== 'fsusui.interaction.v2' ||
+        evidence.traceVersion !== 2
+      )
+        throw new Error(`${file}: conformance trace schema/version mismatch.`)
+      assertHex(evidence.traceDigest, `${file}: conformance.traceDigest`)
+      if (!Array.isArray(evidence.traces) || evidence.traces.length === 0)
+        throw new Error(`${file}: conformance traces are required.`)
+      for (const trace of evidence.traces) {
+        if (!trace.path)
+          throw new Error(`${file}: conformance trace path required.`)
+        assertHex(trace.sha256, `${file}: conformance trace digest`)
+      }
+      if (evidence.nativeImeAutomated !== false)
+        throw new Error(`${file}: synthetic IME cannot claim native evidence.`)
+      if (
+        stableStringify(evidence.nativeImeEvidenceReferences) !==
+        stableStringify(['#319', '#320'])
+      )
+        throw new Error(
+          `${file}: native IME evidence must reference #319/#320.`,
+        )
+    }
   } else {
     if (block.tests && block.tests.total !== 0)
       throw new Error(`${file}: skip manifest must declare zero tests.`)
@@ -217,7 +263,11 @@ function validateOwner(gate, manifests, owner) {
     )
 }
 
-function verifyManifestIdentity(manifest, file, { group, commitSha, runId, runAttempt }) {
+function verifyManifestIdentity(
+  manifest,
+  file,
+  { group, commitSha, runId, runAttempt },
+) {
   const identity = manifestIdentity(manifest)
   if (manifest.workflowGroup !== group)
     throw new Error(`${identity}: workflow group mismatch.`)
@@ -244,7 +294,10 @@ function verifyManifestFiles(manifest, file, identity, root, strict = false) {
     const artifactPath = path.resolve(root, artifact.path)
     if (strict && !fs.existsSync(artifactPath))
       throw new Error(`${identity}: artifact is missing for ${artifact.name}.`)
-    if (fs.existsSync(artifactPath) && sha256Path(artifactPath) !== artifact.sha256)
+    if (
+      fs.existsSync(artifactPath) &&
+      sha256Path(artifactPath) !== artifact.sha256
+    )
       throw new Error(
         `${identity}: artifact digest mismatch for ${artifact.name}.`,
       )
@@ -272,7 +325,9 @@ function validatePlaywrightRunCell(manifest, file, identity, cell, options) {
   if (block.tests.total === 0)
     throw new Error(`${identity}: success with zero tests is fail-closed.`)
   if (block.tests.passed === 0)
-    throw new Error(`${identity}: success with zero passed tests is fail-closed.`)
+    throw new Error(
+      `${identity}: success with zero passed tests is fail-closed.`,
+    )
   if (block.tests.failed !== 0)
     throw new Error(
       `${identity}: success manifest reports failed=${block.tests.failed}.`,
@@ -298,6 +353,87 @@ function validatePlaywrightRunCell(manifest, file, identity, cell, options) {
     throw new Error(`${identity}: cell receipt is missing.`)
   if (sha256Path(receiptPath) !== block.receiptDigest)
     throw new Error(`${identity}: cell receipt digest mismatch.`)
+  if (cell.suiteId === 'web-interaction-conformance') {
+    const evidence = block.conformance
+    const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'))
+    if (
+      receipt.owner !== 'playwright-conformance' ||
+      receipt.gate !== 'playwright-conformance' ||
+      receipt.suiteId !== cell.suiteId ||
+      receipt.cellId !== cell.cellId ||
+      receipt.project !== cell.project ||
+      receipt.dimensions?.browser !== cell.dimensions.browser ||
+      receipt.commitSha !== manifest.commitSha ||
+      String(receipt.run?.id) !== String(manifest.run.id) ||
+      String(receipt.run?.attempt) !== String(manifest.run.attempt)
+    )
+      throw new Error(
+        `${identity}: copied or stale conformance receipt identity.`,
+      )
+    if (stableStringify(receipt.conformance) !== stableStringify(evidence))
+      throw new Error(`${identity}: conformance receipt evidence mismatch.`)
+    for (const [key, relative] of Object.entries(
+      CONFORMANCE_IDENTITY_SOURCES,
+    )) {
+      const current = sha256FileContent(
+        path.resolve(options.repoRoot, relative),
+      )
+      if (evidence[key] !== current)
+        throw new Error(`${identity}: stale conformance ${key}.`)
+    }
+    if (evidence.browserRevision !== block.runtime.browserRevision)
+      throw new Error(`${identity}: conformance browser revision mismatch.`)
+    if (
+      stableStringify(evidence.traceBrowsers) !==
+        stableStringify([cell.dimensions.browser]) ||
+      stableStringify(evidence.traceCandidates) !==
+        stableStringify([manifest.commitSha])
+    )
+      throw new Error(
+        `${identity}: copied or stale conformance trace identity.`,
+      )
+    const traceDigests = []
+    let actions = 0
+    for (const traceEntry of evidence.traces) {
+      const tracePath = path.resolve(options.root, traceEntry.path)
+      if (!fs.existsSync(tracePath))
+        throw new Error(`${identity}: conformance trace is missing.`)
+      const digest = sha256FileContent(tracePath)
+      if (digest !== traceEntry.sha256)
+        throw new Error(`${identity}: conformance trace digest mismatch.`)
+      traceDigests.push(digest)
+      const trace = JSON.parse(fs.readFileSync(tracePath, 'utf8'))
+      if (
+        trace.schema !== 'fsusui.interaction.v2' ||
+        trace.browser !== cell.dimensions.browser ||
+        trace.browserIdentity?.project !== cell.project ||
+        trace.candidate !== manifest.commitSha ||
+        trace.runtime?.mount !== 'vue' ||
+        trace.runtime?.realBrowser !== true
+      )
+        throw new Error(`${identity}: metadata-only, mock, or copied trace.`)
+      const executed = (trace.steps ?? []).filter(
+        (step) => step.action !== 'assert',
+      )
+      if (
+        executed.length === 0 ||
+        executed.some(
+          (step) => step.actual === undefined || step.passed !== true,
+        )
+      )
+        throw new Error(
+          `${identity}: trace contains zero/no-op action evidence.`,
+        )
+      actions += executed.length
+    }
+    const aggregateTraceDigest = createHash('sha256')
+      .update(traceDigests.sort().join('\n'))
+      .digest('hex')
+    if (aggregateTraceDigest !== evidence.traceDigest)
+      throw new Error(`${identity}: aggregate trace digest mismatch.`)
+    if (actions !== evidence.actionStepCount)
+      throw new Error(`${identity}: action step cardinality mismatch.`)
+  }
 }
 
 function validatePlaywrightOwnerCells(gate, manifests, options) {
@@ -336,7 +472,9 @@ function validatePlaywrightOwnerCells(gate, manifests, options) {
     .map((cell) => cell.cellId)
     .filter((cellId) => !observed.has(cellId))
   if (missing.length)
-    throw new Error(`${gate}: missing playwright cell(s) ${missing.join(', ')}.`)
+    throw new Error(
+      `${gate}: missing playwright cell(s) ${missing.join(', ')}.`,
+    )
 }
 
 function aggregateDigest(evidence) {
@@ -345,12 +483,16 @@ function aggregateDigest(evidence) {
     if (key === 'aggregateDigest' || key === 'generatedAt') continue
     contract[key] = evidence[key]
   }
-  return createHash('sha256')
-    .update(stableStringify(contract))
-    .digest('hex')
+  return createHash('sha256').update(stableStringify(contract)).digest('hex')
 }
 
-function playwrightEvidence({ profile, planDigest, expectedCells, observedCells, manifestEntries }) {
+function playwrightEvidence({
+  profile,
+  planDigest,
+  expectedCells,
+  observedCells,
+  manifestEntries,
+}) {
   const cells = [...observedCells].sort((left, right) =>
     `${left.owner}\0${left.cellId}`.localeCompare(
       `${right.owner}\0${right.cellId}`,
@@ -414,7 +556,9 @@ export function validateReadiness({
     const orphanPlaywright = manifests.filter(({ manifest }) =>
       isPlaywrightGate(manifest.gate),
     )
-    if (orphanPlaywright.some(({ manifest }) => manifest.workflowGroup !== 'pr'))
+    if (
+      orphanPlaywright.some(({ manifest }) => manifest.workflowGroup !== 'pr')
+    )
       throw new Error(
         'playwright manifests in a pr playwright run must use workflowGroup=pr.',
       )
@@ -441,7 +585,8 @@ export function validateReadiness({
       file,
       identity,
       root,
-      isPlaywrightGate(manifest.gate) && manifest.playwright?.decision === 'run',
+      isPlaywrightGate(manifest.gate) &&
+        manifest.playwright?.decision === 'run',
     )
     manifestEntries.push({ manifest, file, identity })
   }
@@ -611,7 +756,8 @@ export function validatePlaywrightPrReadiness({
       file,
       identity,
       root,
-      isPlaywrightGate(manifest.gate) && manifest.playwright?.decision === 'run',
+      isPlaywrightGate(manifest.gate) &&
+        manifest.playwright?.decision === 'run',
     )
     manifestEntries.push({ manifest, file, identity })
   }
@@ -621,7 +767,9 @@ export function validatePlaywrightPrReadiness({
   for (const { manifest, file, identity } of manifestEntries) {
     const block = manifest.playwright
     if (!profileSuites.includes(block.suiteId))
-      throw new Error(`${identity}: suite ${block.suiteId} is not in the PR profile.`)
+      throw new Error(
+        `${identity}: suite ${block.suiteId} is not in the PR profile.`,
+      )
     const decision = decisions.get(block.suiteId)
     if (!decision)
       throw new Error(`${identity}: suite not selected in PR impact plan.`)
