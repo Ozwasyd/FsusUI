@@ -17,6 +17,27 @@ This document is the consumer-facing contract for tracking parents #273,
 
 WASM internals under `@ozwasyd/element-plus/es/wasm/*` stay unsupported.
 
+## Native host consumption
+
+The canonical native target is a .NET binding over the same C++ Markdown
+runtime that produces the Web WASM module. Its native packaging is not part of
+the current release, and the C++ ABI, generated WASM, and Emscripten glue remain
+internal implementation details.
+
+Until that binding ships, an Avalonia host uses the sanctioned
+`IFsusMarkdownProjectionProducer` bridge. The bridge adapts output already
+produced by this canonical runtime; it is not permission to add a C# parser,
+regex range reconstruction, WebView, or HTML round trip. Both the interim
+bridge and future native binding use the same versioned
+`FsusMarkdownProjectionProduction` envelope, so the editor-side consumption
+path does not change on upgrade.
+
+The machine authority for contract version, span tiling, semantic vocabulary,
+identity tombstones, invalidation, and upgrade behavior is
+[`spec/avalonia/markdown-projection-producer-contract.json`](../../spec/avalonia/markdown-projection-producer-contract.json).
+Frozen positive and negative cases live in
+[`spec/avalonia/markdown-projection-producer-vectors.json`](../../spec/avalonia/markdown-projection-producer-vectors.json).
+
 ## Consumer APIs
 
 | Tracking parent | Shipped function                                                                                                       | Reads                                                                |
@@ -151,3 +172,4 @@ duration, task id, invalidated ranges, retained identities, and heap deltas.
 - replacing every id after an ordinary edit or reusing ids across documents
 - using a normalized LF offset on a CRLF raw string
 - committing a stale Worker result or a deleted anchor
+- claiming a consumer parser as the canonical native projection runtime

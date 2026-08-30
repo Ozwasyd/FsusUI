@@ -83,7 +83,7 @@ Markdown 协议不接受原始 HTML。核心渲染器会在 sync、Worker、chun
 
 SSR 或可信缓存首显应把 runtime 返回的完整结果传给 `initial-render`。组件只复用持有 runtime authority，且 renderer version、规范化源文和 `sourceIdentity` 都与当前请求一致的结果；任一条件不匹配都会丢弃首显结果并重新渲染。
 
-启用 `require-trusted-types-for 'script'` 的宿主应传入 `trusted-html-factory` 与 `trusted-script-url-factory`。HTML factory 只接收 `MarkdownSafeHtml`，不负责清洗；worker factory 只接收构建生成的 Markdown worker `URL`。FsusUI 不创建或公开宿主的 Trusted Types policy。
+启用 `require-trusted-types-for 'script'` 的宿主应传入 `trusted-html-factory` 与 `trusted-script-url-factory`。HTML factory 只接收 `MarkdownSafeHtml`，不负责清洗；worker factory 只接收构建生成的 Markdown worker `URL`。内建 Mermaid、KaTeX、Shiki 的唯一 feature gateway 还会按需创建不公开、非 default 的 `fsusui-markdown-feature` policy，仅用于 inert `<template>` 解析；解析后的 DOM 仍必须通过对应 feature 的独立 sanitizer 与 root validation 才能提交。若宿主通过 CSP `trusted-types` 限制 policy 名称，必须显式允许 `fsusui-markdown-feature`；policy 创建被拒绝时 feature 提交 fail closed，目标 DOM 不会部分更新。真实 Chromium 生产 CSP 证据由 `pnpm run check:markdown-feature-trusted-types` 固定。
 
 ## Fsus 显式段落组
 
