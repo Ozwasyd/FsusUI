@@ -29,6 +29,11 @@ second mutable tab source while the control owns its internal `ItemsSource`.
 empty collection clears selection, and the first enabled pane becomes selected
 when panes are added again.
 
+For a host-owned strip-only layout, place `FsusTabs` in the host's horizontal
+scroll region, keep pane `Content` unset, and compose adjacent actions outside
+the control. Continue to populate `Panes`; replacing the internal source through
+inherited `Items` is not a supported strip-only adapter.
+
 ## Vue Contract Mapping
 
 Vue active keys, tab panes, menu item groups, breadcrumbs, page header actions,
