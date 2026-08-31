@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "6fea4b9ab967ac6eeefb2486b930a5e7928e08954ec0e518139173093fff638e",
+      "hash": "80e3bfe4b1ac417db039862235069832e156f55aeb1d8602e61c204571ff15f4",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "a17dd144005824e1a3ba893b62db6d7c290bc7c5798d960c4d4db78aeb6e8309",
+      "hash": "a428153b228dc3fd59be64682427b7cbdae518706eef8ec241210e8a12c7094e",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -102,6 +102,17 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAutoResizer",
+        "packageId": "avalonia"
+      },
+      "basis": "name-equality"
+    },
+    {
+      "vue": {
+        "name": "ElAvatar",
+        "module": "avatar"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusAvatar",
         "packageId": "avalonia"
       },
       "basis": "name-equality"
@@ -251,6 +262,17 @@
     },
     {
       "vue": {
+        "name": "ElCheckboxButton",
+        "module": "checkbox"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusCheckboxButton",
+        "packageId": "avalonia"
+      },
+      "basis": "name-equality"
+    },
+    {
+      "vue": {
         "name": "ElCheckboxGroup",
         "module": "checkbox"
       },
@@ -262,11 +284,44 @@
     },
     {
       "vue": {
+        "name": "ElCheckTag",
+        "module": "check-tag"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusCheckTag",
+        "packageId": "avalonia"
+      },
+      "basis": "name-equality"
+    },
+    {
+      "vue": {
         "name": "ElCol",
         "module": "col"
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCol",
+        "packageId": "avalonia"
+      },
+      "basis": "name-equality"
+    },
+    {
+      "vue": {
+        "name": "ElCollapse",
+        "module": "collapse"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusCollapse",
+        "packageId": "avalonia"
+      },
+      "basis": "name-equality"
+    },
+    {
+      "vue": {
+        "name": "ElCollapseItem",
+        "module": "collapse"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusCollapseItem",
         "packageId": "avalonia"
       },
       "basis": "name-equality"
@@ -586,6 +641,17 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInboxLayout",
+        "packageId": "avalonia"
+      },
+      "basis": "name-equality"
+    },
+    {
+      "vue": {
+        "name": "ElInfiniteScroll",
+        "module": "infinite-scroll"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusInfiniteScroll",
         "packageId": "avalonia"
       },
       "basis": "name-equality"
@@ -7390,7 +7456,7 @@
         "name": "ElAvatar",
         "module": "avatar",
         "classification": "portable",
-        "exportStatus": "missing"
+        "exportStatus": "partial"
       },
       "bindings": {
         "web": {
@@ -7402,9 +7468,9 @@
           }
         },
         "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
+          "status": "bound",
+          "package": "FsusUI.Avalonia",
+          "type": "FsusUI.Avalonia.Controls.FsusAvatar"
         }
       },
       "inputs": [
@@ -7545,10 +7611,17 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Shape",
+            "categories": [
+              "FsusAvatarShape"
+            ],
+            "type": "FsusUI.Avalonia.Controls.FsusAvatarShape",
+            "nullable": false
+          },
+          "status": "partial",
           "drift": {
-            "type": null,
+            "type": "web string vs avalonia FsusAvatarShape",
             "default": null,
             "nullability": null,
             "eventPayload": null,
@@ -7559,7 +7632,7 @@
             "scenario.v2.el-avatar.input.shape"
           ],
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -7584,10 +7657,17 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Size",
+            "categories": [
+              "number"
+            ],
+            "type": "System.Double",
+            "nullable": false
+          },
+          "status": "partial",
           "drift": {
-            "type": null,
+            "type": "web array vs avalonia number",
             "default": null,
             "nullability": null,
             "eventPayload": null,
@@ -7598,7 +7678,7 @@
             "scenario.v2.el-avatar.input.size"
           ],
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -7811,9 +7891,9 @@
         {
           "member": "shape",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -7822,9 +7902,9 @@
         {
           "member": "size",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -7875,7 +7955,34 @@
           }
         }
       ],
-      "avaloniaExtras": [],
+      "avaloniaExtras": [
+        {
+          "member": "FallbackText",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-avatar.avalonia-extra.fallback-text"
+          ]
+        },
+        {
+          "member": "Source",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-avatar.avalonia-extra.source"
+          ]
+        }
+      ],
       "scenarioIds": [
         "scenario.v2.el-avatar.input.alt",
         "scenario.v2.el-avatar.input.fit",
@@ -7898,10 +8005,10 @@
       "coverage": {
         "total": 9,
         "alignedCandidate": 0,
-        "partial": 0,
-        "missing": 9,
+        "partial": 2,
+        "missing": 7,
         "webOnly": 0,
-        "mappedPercent": 0
+        "mappedPercent": 22.2
       }
     },
     {
@@ -15314,9 +15421,9 @@
           }
         },
         "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
+          "status": "bound",
+          "package": "FsusUI.Avalonia",
+          "type": "FsusUI.Avalonia.Controls.FsusCheckTag"
         }
       },
       "inputs": [
@@ -15339,8 +15446,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Checked",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -15352,12 +15466,7 @@
           "scenarioIds": [
             "scenario.v2.el-check-tag.input.checked"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "outputs": [
@@ -15481,17 +15590,6 @@
       },
       "platformDifferences": [
         {
-          "member": "checked",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "[CHANGE_EVENT]",
           "kind": "output",
           "status": "missing",
@@ -15542,11 +15640,11 @@
       ],
       "coverage": {
         "total": 4,
-        "alignedCandidate": 0,
+        "alignedCandidate": 1,
         "partial": 0,
-        "missing": 4,
+        "missing": 3,
         "webOnly": 0,
-        "mappedPercent": 0
+        "mappedPercent": 25
       }
     },
     {
@@ -16541,7 +16639,7 @@
         "name": "ElCheckboxButton",
         "module": "checkbox",
         "classification": "native-adapter",
-        "exportStatus": "missing"
+        "exportStatus": "partial"
       },
       "bindings": {
         "web": {
@@ -16553,9 +16651,9 @@
           }
         },
         "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
+          "status": "bound",
+          "package": "FsusUI.Avalonia",
+          "type": "FsusUI.Avalonia.Controls.FsusCheckboxButton"
         }
       },
       "inputs": [
@@ -16615,8 +16713,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Checked",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -16628,12 +16733,7 @@
           "scenarioIds": [
             "scenario.v2.el-checkbox-button.input.checked"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "controls",
@@ -16691,8 +16791,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Disabled",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -16704,12 +16811,7 @@
           "scenarioIds": [
             "scenario.v2.el-checkbox-button.input.disabled"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "falseLabel",
@@ -16843,12 +16945,19 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Label",
+            "categories": [
+              "string"
+            ],
+            "type": "System.String",
+            "nullable": true
+          },
+          "status": "partial",
           "drift": {
-            "type": null,
+            "type": "web array vs avalonia string",
             "default": null,
-            "nullability": null,
+            "nullability": "web nullable=false vs avalonia nullable=true",
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -16857,7 +16966,7 @@
             "scenario.v2.el-checkbox-button.input.label"
           ],
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -17236,29 +17345,7 @@
           }
         },
         {
-          "member": "checked",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "controls",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "disabled",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -17304,9 +17391,9 @@
         {
           "member": "label",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -17412,7 +17499,21 @@
           }
         }
       ],
-      "avaloniaExtras": [],
+      "avaloniaExtras": [
+        {
+          "member": "ToggleChecked",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-checkbox-button.avalonia-extra.toggle-checked"
+          ]
+        }
+      ],
       "scenarioIds": [
         "scenario.v2.el-checkbox-button.input.border",
         "scenario.v2.el-checkbox-button.input.checked",
@@ -17444,11 +17545,11 @@
       ],
       "coverage": {
         "total": 17,
-        "alignedCandidate": 0,
-        "partial": 0,
-        "missing": 17,
+        "alignedCandidate": 2,
+        "partial": 1,
+        "missing": 14,
         "webOnly": 0,
-        "mappedPercent": 0
+        "mappedPercent": 17.6
       }
     },
     {
@@ -18967,9 +19068,9 @@
           }
         },
         "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
+          "status": "bound",
+          "package": "FsusUI.Avalonia",
+          "type": "FsusUI.Avalonia.Controls.FsusCollapse"
         }
       },
       "inputs": [
@@ -18991,8 +19092,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Accordion",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -19004,12 +19112,7 @@
           "scenarioIds": [
             "scenario.v2.el-collapse.input.accordion"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "modelValue",
@@ -19227,17 +19330,6 @@
       },
       "platformDifferences": [
         {
-          "member": "accordion",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "modelValue",
           "kind": "input",
           "status": "missing",
@@ -19304,7 +19396,21 @@
           }
         }
       ],
-      "avaloniaExtras": [],
+      "avaloniaExtras": [
+        {
+          "member": "ValueChanged",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-collapse.avalonia-extra.value-changed"
+          ]
+        }
+      ],
       "scenarioIds": [
         "scenario.v2.el-collapse.input.accordion",
         "scenario.v2.el-collapse.input.model-value",
@@ -19324,11 +19430,11 @@
       ],
       "coverage": {
         "total": 7,
-        "alignedCandidate": 0,
+        "alignedCandidate": 1,
         "partial": 0,
-        "missing": 7,
+        "missing": 6,
         "webOnly": 0,
-        "mappedPercent": 0
+        "mappedPercent": 14.3
       }
     },
     {
@@ -19340,7 +19446,7 @@
         "name": "ElCollapseItem",
         "module": "collapse",
         "classification": "native-adapter",
-        "exportStatus": "missing"
+        "exportStatus": "partial"
       },
       "bindings": {
         "web": {
@@ -19352,9 +19458,9 @@
           }
         },
         "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
+          "status": "bound",
+          "package": "FsusUI.Avalonia",
+          "type": "FsusUI.Avalonia.Controls.FsusCollapseItem"
         }
       },
       "inputs": [
@@ -19376,8 +19482,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Disabled",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -19389,12 +19502,7 @@
           "scenarioIds": [
             "scenario.v2.el-collapse-item.input.disabled"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "name",
@@ -19454,12 +19562,19 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Title",
+            "categories": [
+              "string"
+            ],
+            "type": "System.String",
+            "nullable": true
+          },
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": null,
+            "nullability": "web nullable=false vs avalonia nullable=true",
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -19468,7 +19583,7 @@
             "scenario.v2.el-collapse-item.input.title"
           ],
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -19608,17 +19723,6 @@
       },
       "platformDifferences": [
         {
-          "member": "disabled",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "name",
           "kind": "input",
           "status": "missing",
@@ -19632,9 +19736,9 @@
         {
           "member": "title",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -19674,7 +19778,34 @@
           }
         }
       ],
-      "avaloniaExtras": [],
+      "avaloniaExtras": [
+        {
+          "member": "IsActive",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-collapse-item.avalonia-extra.is-active"
+          ]
+        },
+        {
+          "member": "ItemKey",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-collapse-item.avalonia-extra.item-key"
+          ]
+        }
+      ],
       "scenarioIds": [
         "scenario.v2.el-collapse-item.input.disabled",
         "scenario.v2.el-collapse-item.input.name",
@@ -19694,11 +19825,11 @@
       ],
       "coverage": {
         "total": 6,
-        "alignedCandidate": 0,
-        "partial": 0,
-        "missing": 6,
+        "alignedCandidate": 1,
+        "partial": 1,
+        "missing": 4,
         "webOnly": 0,
-        "mappedPercent": 0
+        "mappedPercent": 33.3
       }
     },
     {
@@ -41000,9 +41131,9 @@
           }
         },
         "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
+          "status": "bound",
+          "package": "FsusUI.Avalonia",
+          "type": "FsusUI.Avalonia.Controls.FsusInfiniteScroll"
         }
       },
       "inputs": [],
@@ -41036,7 +41167,60 @@
         ]
       },
       "platformDifferences": [],
-      "avaloniaExtras": [],
+      "avaloniaExtras": [
+        {
+          "member": "Attach",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-infinite-scroll.avalonia-extra.attach"
+          ]
+        },
+        {
+          "member": "Detach",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-infinite-scroll.avalonia-extra.detach"
+          ]
+        },
+        {
+          "member": "FiredCount",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-infinite-scroll.avalonia-extra.fired-count"
+          ]
+        },
+        {
+          "member": "Loaded",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-infinite-scroll.avalonia-extra.loaded"
+          ]
+        }
+      ],
       "scenarioIds": [
         "scenario.v2.el-infinite-scroll.state.default",
         "scenario.v2.el-infinite-scroll.keyboard",
@@ -49313,6 +49497,33 @@
       ],
       "operations": [
         {
+          "name": "applyAttachmentResult",
+          "kind": "operation",
+          "web": {
+            "member": "applyAttachmentResult",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.apply-attachment-result"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "dispatchTransaction",
           "kind": "operation",
           "web": {
@@ -50041,6 +50252,17 @@
           }
         },
         {
+          "member": "applyAttachmentResult",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "insertMarkdownAtCursor",
           "kind": "operation",
           "status": "missing",
@@ -50323,6 +50545,7 @@
         "scenario.v2.el-markdown-editor.output.submit",
         "scenario.v2.el-markdown-editor.output.transaction",
         "scenario.v2.el-markdown-editor.output.upload-image",
+        "scenario.v2.el-markdown-editor.operation.apply-attachment-result",
         "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
         "scenario.v2.el-markdown-editor.operation.insert-markdown-at-cursor",
         "scenario.v2.el-markdown-editor.operation.redo",
@@ -50347,12 +50570,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 54,
+        "total": 55,
         "alignedCandidate": 6,
         "partial": 4,
-        "missing": 44,
+        "missing": 45,
         "webOnly": 0,
-        "mappedPercent": 18.5
+        "mappedPercent": 18.2
       },
       "markdownEditor": {
         "modes": [
@@ -134400,6 +134623,22 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusAvatarShape",
+      "kind": "enum",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-avatar-shape"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusButtonIconPlacement",
       "kind": "enum",
       "packageId": "avalonia",
@@ -134464,6 +134703,22 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusCheckboxButtonValueChangedEventArgs",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-checkbox-button-value-changed-event-args"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusCheckboxValueChangedEventArgs",
       "kind": "class",
       "packageId": "avalonia",
@@ -134471,6 +134726,22 @@
       "memberCount": 3,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-checkbox-value-changed-event-args"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusCheckTagValueChangedEventArgs",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-check-tag-value-changed-event-args"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
@@ -134631,6 +134902,22 @@
       "memberCount": 2,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-code-editor-selection-changed-event-args"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusCollapseValueChangedEventArgs",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-collapse-value-changed-event-args"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
@@ -139169,11 +139456,11 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 57,
-    "partial": 79,
-    "missing": 2024,
+    "aligned-candidate": 62,
+    "partial": 83,
+    "missing": 2016,
     "web-only": 20,
-    "total": 2180,
-    "mappedPercent": 6.2
+    "total": 2181,
+    "mappedPercent": 6.6
   }
 }

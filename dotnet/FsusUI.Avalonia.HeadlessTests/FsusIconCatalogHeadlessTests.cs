@@ -423,26 +423,26 @@ public class FsusIconCatalogHeadlessTests
     var nonBackground = 0L;
     var foregroundMatch = 0L;
     for (var y = minY; y <= maxY; y++)
-    for (var x = minX; x <= maxX; x++)
-    {
-      var offset = y * framebuffer.RowBytes + x * 4;
-      total++;
-      var isNonBackground = Math.Abs(pixels[offset] - background[0]) +
-        Math.Abs(pixels[offset + 1] - background[1]) +
-        Math.Abs(pixels[offset + 2] - background[2]) > 24;
-      if (!isNonBackground)
+      for (var x = minX; x <= maxX; x++)
       {
-        continue;
-      }
+        var offset = y * framebuffer.RowBytes + x * 4;
+        total++;
+        var isNonBackground = Math.Abs(pixels[offset] - background[0]) +
+          Math.Abs(pixels[offset + 1] - background[1]) +
+          Math.Abs(pixels[offset + 2] - background[2]) > 24;
+        if (!isNonBackground)
+        {
+          continue;
+        }
 
-      nonBackground++;
-      if (Math.Abs(pixels[offset + 2] - expectedForeground.R) <= 32 &&
-        Math.Abs(pixels[offset + 1] - expectedForeground.G) <= 32 &&
-        Math.Abs(pixels[offset] - expectedForeground.B) <= 32)
-      {
-        foregroundMatch++;
+        nonBackground++;
+        if (Math.Abs(pixels[offset + 2] - expectedForeground.R) <= 32 &&
+          Math.Abs(pixels[offset + 1] - expectedForeground.G) <= 32 &&
+          Math.Abs(pixels[offset] - expectedForeground.B) <= 32)
+        {
+          foregroundMatch++;
+        }
       }
-    }
 
     return new RegionPixelEvidence(
       total == 0 ? 0 : Math.Round(nonBackground / (double)total, 6),

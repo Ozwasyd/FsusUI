@@ -159,6 +159,26 @@ export const resolveDemoRoot = async (
     }
   }
 
+  if (searchParams.get('collapse') === '1') {
+    const { default: CollapseFixture } = await import('./CollapseFixture.vue')
+    return { component: CollapseFixture, themeMode }
+  }
+
+  if (searchParams.get('checktag') === '1') {
+    const { default: CheckTagFixture } = await import('./CheckTagFixture.vue')
+    return { component: CheckTagFixture, themeMode }
+  }
+
+  if (searchParams.get('avatar') === '1') {
+    const { default: AvatarFixture } = await import('./AvatarFixture.vue')
+    return { component: AvatarFixture, themeMode }
+  }
+
+  if (searchParams.get('checkboxbutton') === '1') {
+    const { default: CheckboxButtonFixture } = await import('./CheckboxButtonFixture.vue')
+    return { component: CheckboxButtonFixture, themeMode }
+  }
+
   const { default: App } = await import('./App.vue')
   return {
     component: App,

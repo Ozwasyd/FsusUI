@@ -1379,6 +1379,96 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusAvatar",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "FallbackText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Shape",
+          "type": "FsusUI.Avalonia.Controls.FsusAvatarShape",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Size",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Source",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "FallbackText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Shape",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusAvatarShape",
+          "nullable": false
+        },
+        {
+          "name": "Size",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "Source",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusAvatarShape",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Circle",
+          "value": 0
+        },
+        {
+          "name": "Square",
+          "value": 1
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusBacktop",
       "kind": "class",
       "baseType": "Avalonia.Controls.ContentControl",
@@ -2722,6 +2812,68 @@
       "methods": []
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusCheckTag",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "Checked",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "Checked",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        }
+      ],
+      "events": [
+        {
+          "name": "CheckedChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusCheckTagValueChangedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCheckTagValueChangedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "NewChecked",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "OldChecked",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusCheckbox",
       "kind": "class",
       "baseType": "Avalonia.Controls.CheckBox",
@@ -2811,6 +2963,103 @@
           "parameters": []
         }
       ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCheckboxButton",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "Checked",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Disabled",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Label",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "Checked",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "Disabled",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "Label",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [
+        {
+          "name": "CheckedChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusCheckboxButtonValueChangedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "ToggleChecked",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCheckboxButtonValueChangedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "NewChecked",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "OldChecked",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
     },
     {
       "name": "FsusUI.Avalonia.Controls.FsusCheckboxGroup",
@@ -4089,6 +4338,151 @@
           ]
         }
       ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCollapse",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "Accordion",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ActiveNames",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "Accordion",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "ActiveNames",
+          "kind": "styled",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
+          "nullable": true
+        }
+      ],
+      "events": [
+        {
+          "name": "ValueChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusCollapseValueChangedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCollapseItem",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "Disabled",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsActive",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ItemKey",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Title",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "Disabled",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "IsActive",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "ItemKey",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "Title",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCollapseValueChangedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "NewActiveNames",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "OldActiveNames",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
     },
     {
       "name": "FsusUI.Avalonia.Controls.FsusColorPicker",
@@ -10989,6 +11383,46 @@
       "avaloniaProperties": [],
       "events": [],
       "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusInfiniteScroll",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "FiredCount",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [
+        {
+          "name": "Loaded",
+          "kind": "clr",
+          "argsType": "System.EventHandler",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "Attach",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "Detach",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        }
+      ]
     },
     {
       "name": "FsusUI.Avalonia.Controls.FsusInlineActions",
