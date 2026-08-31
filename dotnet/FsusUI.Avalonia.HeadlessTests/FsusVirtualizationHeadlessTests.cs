@@ -432,6 +432,34 @@ public class FsusVirtualizationHeadlessTests
   }
 
   [AvaloniaFact]
+  public void TableV2SortsTypedRowsAndReportsColumnSort()
+  {
+    FsusTableV2Sort? sorted = null;
+    var table = new FsusTableV2
+    {
+      OnColumnSort = value => sorted = value,
+    };
+    table.Columns.Add(new FsusDataTableColumn("score", "Score")
+    {
+      Sortable = true,
+    });
+    foreach (var score in new[] { 3, 1, 2 })
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{score}", new Dictionary<string, object?>
+      {
+        ["score"] = score,
+      }));
+    }
+
+    Assert.True(table.SortColumn("score", FsusSortDirection.Ascending));
+    Assert.Equal([1, 2, 3], table.Data.Select(row => row.GetValue("score")));
+    Assert.Equal(new FsusTableV2Sort("score", FsusSortDirection.Ascending), sorted);
+    Assert.Equal(sorted, table.SortBy);
+    Assert.Equal(sorted, table.SortState);
+    Assert.False(table.SortColumn("missing", FsusSortDirection.Descending));
+  }
+
+  [AvaloniaFact]
   public async Task TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults()
   {
     var table = new KeyboardTableV2

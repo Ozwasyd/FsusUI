@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "77a3f302236b48578172f352158b2f6d551aa5005d0518c9b4033b42be6ec2a5",
+      "hash": "cb65a4cfbcdbc53055d1e4792edf7071e83545ce90331e38468498b06b68f345",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -109006,8 +109006,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "OnColumnSort",
+            "categories": [
+              "function"
+            ],
+            "type": "System.Action<FsusUI.Avalonia.Controls.FsusTableV2Sort>",
+            "nullable": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109019,12 +109026,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.on-column-sort"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "onEndReached",
@@ -109484,8 +109486,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "SortBy",
+            "categories": [
+              "object"
+            ],
+            "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+            "nullable": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109497,12 +109506,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.sort-by"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "sortState",
@@ -109522,8 +109526,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "SortState",
+            "categories": [
+              "object"
+            ],
+            "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+            "nullable": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109535,12 +109546,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.sort-state"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "style",
@@ -110244,17 +110250,6 @@
           }
         },
         {
-          "member": "onColumnSort",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "rowClass",
           "kind": "input",
           "status": "missing",
@@ -110300,28 +110295,6 @@
         },
         {
           "member": "scrollbarAlwaysOn",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "sortBy",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "sortState",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -110966,6 +110939,19 @@
           ]
         },
         {
+          "member": "SortColumn",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.sort-column"
+          ]
+        },
+        {
           "member": "UpdateRowIndexAsync",
           "kind": "avalonia-extra",
           "governance": {
@@ -111067,11 +111053,11 @@
       ],
       "coverage": {
         "total": 51,
-        "alignedCandidate": 23,
+        "alignedCandidate": 26,
         "partial": 1,
-        "missing": 27,
+        "missing": 24,
         "webOnly": 0,
-        "mappedPercent": 47.1
+        "mappedPercent": 52.9
       }
     },
     {
@@ -133011,6 +132997,22 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 4,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-sort"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusTabPaneContextEventArgs",
       "kind": "class",
       "packageId": "avalonia",
@@ -134820,11 +134822,11 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 223,
+    "aligned-candidate": 226,
     "partial": 50,
-    "missing": 1694,
+    "missing": 1691,
     "web-only": 45,
     "total": 2012,
-    "mappedPercent": 13.6
+    "mappedPercent": 13.7
   }
 }

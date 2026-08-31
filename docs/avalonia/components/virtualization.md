@@ -44,7 +44,8 @@ expanded-row changes update `ExpandedRowKeys` before invoking
 `OnRowExpand`/`OnExpandedRowsChange`. The Vue `cache`, `width`, `height`, and
 `maxHeight` inputs bind explicitly to `Overscan`, `ViewportWidth`,
 `ViewportHeight`, and `ViewportMaxHeight`; those values size the owned
-`ScrollViewer` and its realized window.
+`ScrollViewer` and its realized window. `SortColumn` orders typed row values,
+updates `SortBy`/`SortState`, and then invokes `OnColumnSort`.
 
 Measurement corrections before the active anchor adjust the scroll offset so
 the same logical item remains visually stable. `NotifyItemsInserted` preserves

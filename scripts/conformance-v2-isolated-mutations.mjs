@@ -213,6 +213,18 @@ const cases = [
     expected: 'contract-v2.json drifted from generated output',
   },
   {
+    id: 'table-v2-sort-object-category-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        "'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'object',",
+        "'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'unknown',",
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
     id: 'auto-resizer-web-disabled-width-mutated',
     file: 'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
     inject: () =>
@@ -326,6 +338,18 @@ const cases = [
       'Math.Min(ViewportHeight, ViewportMaxHeight ?? double.PositiveInfinity)',
       'ViewportHeight',
       'TableV2MapsViewportGeometryAndCacheToRealLayout',
+    ],
+    [
+      'table-v2-sort-direction-mutated',
+      'FsusSortDirection.Ascending => Data\n        .OrderBy(',
+      'FsusSortDirection.Ascending => Data\n        .OrderByDescending(',
+      'TableV2SortsTypedRowsAndReportsColumnSort',
+    ],
+    [
+      'table-v2-sort-callback-mutated',
+      'OnColumnSort?.Invoke(SortBy);',
+      '_ = SortBy;',
+      'TableV2SortsTypedRowsAndReportsColumnSort',
     ],
   ].map(([id, from, to, test]) => ({
     id,

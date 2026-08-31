@@ -81,6 +81,8 @@ public sealed record FsusTableV2ScrollPosition(double ScrollLeft, double ScrollT
 
 public sealed record FsusTableV2RowExpansion(FsusDataTableRow Row, bool Expanded);
 
+public sealed record FsusTableV2Sort(string Key, FsusSortDirection Order);
+
 public delegate ValueTask<IReadOnlyList<FsusVirtualListItem>> FsusVirtualListSourceProvider(
   FsusVirtualWindow window,
   CancellationToken cancellationToken);
@@ -785,10 +787,13 @@ public class FsusTableV2 : ContentControl
     set => CellTemplate = value;
   }
   public Action<double>? OnEndReached { get; set; }
+  public Action<FsusTableV2Sort>? OnColumnSort { get; set; }
   public Action<IReadOnlyList<string>>? OnExpandedRowsChange { get; set; }
   public Action<FsusTableV2RowExpansion>? OnRowExpand { get; set; }
   public Action<FsusTableV2RowsRendered>? OnRowsRendered { get; set; }
   public Action<FsusTableV2ScrollPosition>? OnScroll { get; set; }
+  public FsusTableV2Sort? SortBy { get; private set; }
+  public FsusTableV2Sort? SortState { get; set; }
   public int FocusedRowIndex { get; private set; }
   public int FocusedColumnIndex { get; private set; }
   public FsusTableV2Budget VirtualizationBudget { get; set; } = new(
@@ -1017,6 +1022,36 @@ public class FsusTableV2 : ContentControl
       ExpandedRowKeys.Add(rowKey);
     }
     OnExpandedRowsChange?.Invoke(ExpandedRowKeys.ToArray());
+  }
+
+  public bool SortColumn(string columnKey, FsusSortDirection direction)
+  {
+    ArgumentException.ThrowIfNullOrWhiteSpace(columnKey);
+    if (!Columns.Any(column => column.Key == columnKey && column.Sortable))
+    {
+      return false;
+    }
+
+    var sorted = direction switch
+    {
+      FsusSortDirection.Ascending => Data
+        .OrderBy(row => row.GetValue(columnKey), FsusTableV2ValueComparer.Instance)
+        .ToArray(),
+      FsusSortDirection.Descending => Data
+        .OrderByDescending(row => row.GetValue(columnKey), FsusTableV2ValueComparer.Instance)
+        .ToArray(),
+      _ => Data.ToArray(),
+    };
+    Data.Clear();
+    foreach (var row in sorted)
+    {
+      Data.Add(row);
+    }
+    SortBy = new FsusTableV2Sort(columnKey, direction);
+    SortState = SortBy;
+    RefreshLayout();
+    OnColumnSort?.Invoke(SortBy);
+    return true;
   }
 
   public async ValueTask<bool> UpdateRowIndexAsync(
@@ -1329,6 +1364,33 @@ public class FsusTableV2 : ContentControl
       AutomationProperties.SetItemStatus(this, automationStatus);
       lastAutomationStatus = automationStatus;
       AutomationUpdateCount++;
+    }
+  }
+
+  private sealed class FsusTableV2ValueComparer : IComparer<object?>
+  {
+    public static FsusTableV2ValueComparer Instance { get; } = new();
+
+    public int Compare(object? left, object? right)
+    {
+      if (ReferenceEquals(left, right)) return 0;
+      if (left is null) return -1;
+      if (right is null) return 1;
+      if (left is IComparable comparable)
+      {
+        try
+        {
+          return comparable.CompareTo(right);
+        }
+        catch (ArgumentException)
+        {
+          // Fall through to invariant text comparison for mixed value types.
+        }
+      }
+      return string.Compare(
+        Convert.ToString(left, CultureInfo.InvariantCulture),
+        Convert.ToString(right, CultureInfo.InvariantCulture),
+        StringComparison.Ordinal);
     }
   }
 }

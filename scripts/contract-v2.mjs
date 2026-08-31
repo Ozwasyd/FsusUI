@@ -155,6 +155,7 @@ const CLR_TO_CATEGORY = {
   'System.DateTimeOffset': 'date',
   'System.Uri': 'string',
   'System.Guid': 'string',
+  'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'object',
 }
 
 export const categoriesFromClrType = (type) => {

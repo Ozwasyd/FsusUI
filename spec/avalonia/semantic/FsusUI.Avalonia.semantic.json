@@ -23490,6 +23490,14 @@
           "isStatic": false
         },
         {
+          "name": "OnColumnSort",
+          "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2Sort\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "OnEndReached",
           "type": "System.Action\u003CSystem.Double\u003E",
           "nullable": true,
@@ -23647,6 +23655,22 @@
           "nullable": false,
           "canRead": true,
           "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "SortBy",
+          "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SortState",
+          "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
           "isStatic": false
         },
         {
@@ -23823,6 +23847,23 @@
             {
               "name": "expanded",
               "type": "System.Boolean",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SortColumn",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "columnKey",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "direction",
+              "type": "FsusUI.Avalonia.Controls.FsusSortDirection",
               "optional": false
             }
           ]
@@ -24231,6 +24272,58 @@
             {
               "name": "ScrollTop",
               "type": "System.Double\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Order",
+          "type": "FsusUI.Avalonia.Controls.FsusSortDirection",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Key",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Order",
+              "type": "FsusUI.Avalonia.Controls.FsusSortDirection\u0026",
               "optional": false
             }
           ]
