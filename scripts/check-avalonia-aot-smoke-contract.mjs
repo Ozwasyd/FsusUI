@@ -61,6 +61,16 @@ requireMatch(runner, /DOTNET_ROOT:\s*missingDotnetRoot/u, 'the runtime-free laun
 requireMatch(runner, /no-external-sources/u, 'the local-only restore receipt is required')
 requireMatch(
   runner,
+  /seedLocalFeed\(globalPackages,\s*\{\s*includeCandidatePackages:\s*false\s*\}\)/u,
+  'the global cache must not seed stale FsusUI candidate packages',
+)
+requireMatch(
+  runner,
+  /candidatePackagePattern\s*=\s*\n?\s*\/\^fsusui\\\.avalonia/u,
+  'FsusUI candidate package detection must be case-insensitive',
+)
+requireMatch(
+  runner,
   /if \(!existsSync\(alias\)\)/u,
   'RID pack aliases must reuse an existing native pack link',
 )

@@ -110,17 +110,29 @@ const globalPackagesOutput = execute(
 const globalPackages = realpathSync(
   globalPackagesOutput.slice(globalPackagesOutput.indexOf(':') + 1).trim(),
 )
-const seedLocalFeed = (directory) => {
+const candidatePackagePattern =
+  /^fsusui\.avalonia(?:\.themes|\.icons)?\..*\.nupkg$/iu
+const seedLocalFeed = (directory, options = {}) => {
+  const { includeCandidatePackages = true } = options
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const candidate = path.join(directory, entry.name)
     if (entry.isDirectory()) {
-      seedLocalFeed(candidate)
-    } else if (entry.isFile() && entry.name.endsWith('.nupkg')) {
+      seedLocalFeed(candidate, options)
+    } else if (
+      entry.isFile() &&
+      entry.name.endsWith('.nupkg') &&
+      (includeCandidatePackages || !candidatePackagePattern.test(entry.name))
+    ) {
       copyFileSync(candidate, path.join(feed, entry.name))
     }
   }
 }
-seedLocalFeed(globalPackages)
+seedLocalFeed(globalPackages, { includeCandidatePackages: false })
+assert.deepEqual(
+  readdirSync(feed).filter((name) => candidatePackagePattern.test(name)),
+  [],
+  'global NuGet cache must not seed stale FsusUI candidate packages',
+)
 
 const systemDotnet = realpathSync(
   execute('sh', ['-c', 'command -v dotnet'], {
@@ -262,7 +274,7 @@ if (suppliedCandidateRoot) {
 const candidatePackages = readdirSync(feed)
   .filter(
     (name) =>
-      /^FsusUI\.Avalonia(?:\.Themes|\.Icons)?\..*\.nupkg$/u.test(name) &&
+      candidatePackagePattern.test(name) &&
       !name.endsWith('.snupkg'),
   )
   .sort()

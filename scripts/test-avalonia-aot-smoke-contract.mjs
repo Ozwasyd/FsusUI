@@ -64,6 +64,15 @@ mutate(
   'JIT run',
 )
 mutate(
+  'scripts/test-avalonia-aot-smoke.mjs',
+  (text) =>
+    text.replace(
+      'seedLocalFeed(globalPackages, { includeCandidatePackages: false })',
+      'seedLocalFeed(globalPackages)',
+    ),
+  'stale FsusUI global package cache',
+)
+mutate(
   'tests/fixtures/avalonia-aot-smoke/NuGet.Config',
   (text) =>
     text.replace(
@@ -84,5 +93,5 @@ mutate(
 )
 
 console.log(
-  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, external network, runtime dependency, invariant globalization.',
+  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, stale FsusUI global package cache, external network, runtime dependency, invariant globalization.',
 )
