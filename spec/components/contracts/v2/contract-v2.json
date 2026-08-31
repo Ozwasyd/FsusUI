@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "80e3bfe4b1ac417db039862235069832e156f55aeb1d8602e61c204571ff15f4",
+      "hash": "c0c821a48017efc71c33b7e93ad4cb70a6ab1d96be145c242297e21c0f0589bc",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -48103,6 +48103,44 @@
           }
         },
         {
+          "name": "lang",
+          "kind": "input",
+          "web": {
+            "member": "lang",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.lang"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "loading",
           "kind": "input",
           "web": {
@@ -48379,6 +48417,48 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.input.model-value"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "nativeWritingTools",
+          "kind": "input",
+          "web": {
+            "member": "nativeWritingTools",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownNativeWritingToolsMode>",
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": "auto"
+            },
+            "values": [
+              "auto",
+              "disabled"
+            ],
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.native-writing-tools"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -48844,6 +48924,45 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.input.show-submit-action"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "spellcheck",
+          "kind": "input",
+          "web": {
+            "member": "spellcheck",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "PropType<MarkdownSpellcheckMode | boolean>",
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": "auto"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.spellcheck"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -49856,6 +49975,17 @@
           }
         },
         {
+          "member": "lang",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "loading",
           "kind": "input",
           "status": "missing",
@@ -49923,6 +50053,17 @@
         },
         {
           "member": "modelValue",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "nativeWritingTools",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -50055,6 +50196,17 @@
         },
         {
           "member": "showSubmitAction",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "spellcheck",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -50506,6 +50658,7 @@
         "scenario.v2.el-markdown-editor.input.editor-profile",
         "scenario.v2.el-markdown-editor.input.image-action-label",
         "scenario.v2.el-markdown-editor.input.interaction-profile",
+        "scenario.v2.el-markdown-editor.input.lang",
         "scenario.v2.el-markdown-editor.input.loading",
         "scenario.v2.el-markdown-editor.input.locale-text",
         "scenario.v2.el-markdown-editor.input.metrics",
@@ -50513,6 +50666,7 @@
         "scenario.v2.el-markdown-editor.input.mobile-layout",
         "scenario.v2.el-markdown-editor.input.mode",
         "scenario.v2.el-markdown-editor.input.model-value",
+        "scenario.v2.el-markdown-editor.input.native-writing-tools",
         "scenario.v2.el-markdown-editor.input.placeholder",
         "scenario.v2.el-markdown-editor.input.preview-base-url",
         "scenario.v2.el-markdown-editor.input.preview-csp-nonce",
@@ -50525,6 +50679,7 @@
         "scenario.v2.el-markdown-editor.input.show-mode-switcher",
         "scenario.v2.el-markdown-editor.input.show-save-action",
         "scenario.v2.el-markdown-editor.input.show-submit-action",
+        "scenario.v2.el-markdown-editor.input.spellcheck",
         "scenario.v2.el-markdown-editor.input.status-density",
         "scenario.v2.el-markdown-editor.input.submit-action-label",
         "scenario.v2.el-markdown-editor.input.surfaces",
@@ -50570,12 +50725,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 55,
+        "total": 58,
         "alignedCandidate": 6,
         "partial": 4,
-        "missing": 45,
+        "missing": 48,
         "webOnly": 0,
-        "mappedPercent": 18.2
+        "mappedPercent": 17.2
       },
       "markdownEditor": {
         "modes": [
@@ -139458,9 +139613,9 @@
   "coverage": {
     "aligned-candidate": 62,
     "partial": 83,
-    "missing": 2016,
+    "missing": 2019,
     "web-only": 20,
-    "total": 2181,
+    "total": 2184,
     "mappedPercent": 6.6
   }
 }
