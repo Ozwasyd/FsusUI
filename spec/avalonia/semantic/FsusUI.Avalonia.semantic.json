@@ -11080,6 +11080,14 @@
           "isStatic": false
         },
         {
+          "name": "IsPanning",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
           "name": "LoadedContent",
           "type": "System.Object",
           "nullable": true,
@@ -11088,9 +11096,33 @@
           "isStatic": false
         },
         {
+          "name": "MaximumZoom",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MinimumZoom",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "OverlayEntry",
           "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
           "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "PreserveTransformOnSourceChange",
+          "type": "System.Boolean",
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -11118,6 +11150,30 @@
           "canRead": true,
           "canWrite": true,
           "isStatic": false
+        },
+        {
+          "name": "Translation",
+          "type": "Avalonia.Vector",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Zoom",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ZoomFactor",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
         }
       ],
       "avaloniaProperties": [],
@@ -11126,6 +11182,12 @@
           "name": "ActiveSourceChanged",
           "kind": "clr",
           "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusActiveSourceChangedEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "TransformChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusImageViewerTransformChangedEventArgs\u003E",
           "isStatic": false
         }
       ],
@@ -11218,8 +11280,42 @@
               "optional": true
             }
           ]
+        },
+        {
+          "name": "ResetTransform",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
         }
       ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusImageViewerTransformChangedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Translation",
+          "type": "Avalonia.Vector",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Zoom",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
     },
     {
       "name": "FsusUI.Avalonia.Controls.FsusInboxEmptyState",

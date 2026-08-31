@@ -142,6 +142,7 @@
     "FsusImageLoadResult",
     "FsusImageStatus",
     "FsusImageViewer",
+    "FsusImageViewerTransformChangedEventArgs",
     "FsusInboxEmptyState",
     "FsusInboxLayout",
     "FsusInboxPane",
