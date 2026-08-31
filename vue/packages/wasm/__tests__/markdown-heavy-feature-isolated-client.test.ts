@@ -409,4 +409,37 @@ describe('markdown heavy feature isolated client', () => {
     expect(frame.isConnected).toBe(false)
     sourceSetter.mockRestore()
   })
+
+  it('cleans up the frame and ready listener when the Trusted Script URL factory throws', async () => {
+    const addListener = vi.spyOn(window, 'addEventListener')
+    const removeListener = vi.spyOn(window, 'removeEventListener')
+    const frameCount = document.querySelectorAll('iframe').length
+    const factoryError = new Error('trusted-script-url-denied')
+    const trustedScriptUrlFactory = vi.fn(() => {
+      throw factoryError
+    })
+
+    const handle = createMarkdownHeavyFeatureIsolatedRender(
+      validRequest,
+      trustedScriptUrlFactory,
+    )
+
+    await expect(handle.promise).rejects.toMatchObject({
+      cause: factoryError,
+      message: 'markdown_heavy_feature_frame_script_url_rejected',
+    })
+    const readyListener = addListener.mock.calls.find(
+      ([type]) => type === 'message',
+    )?.[1]
+    expect(readyListener).toBeTypeOf('function')
+    expect(removeListener).toHaveBeenCalledWith('message', readyListener)
+    expect(document.querySelectorAll('iframe')).toHaveLength(frameCount)
+    expect(handle.resources()).toEqual({
+      listeners: 0,
+      observers: 0,
+      runtimes: 0,
+      tasks: 0,
+    })
+    expect(trustedScriptUrlFactory).toHaveBeenCalledOnce()
+  })
 })

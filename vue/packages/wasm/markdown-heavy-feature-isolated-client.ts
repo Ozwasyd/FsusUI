@@ -243,10 +243,10 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
       MarkdownHeavyFeatureFrameUrl,
       window.location.href,
     )
-    const trustedModuleUrl = trustedScriptUrlFactory
-      ? trustedScriptUrlFactory(moduleUrl)
-      : moduleUrl
     try {
+      const trustedModuleUrl = trustedScriptUrlFactory
+        ? trustedScriptUrlFactory(moduleUrl)
+        : moduleUrl
       script.src = trustedModuleUrl as string
     } catch (cause) {
       active = false
