@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import test from 'node:test'
@@ -21,6 +22,19 @@ import {
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+test('stable readiness hashes the exact Contract V2 bytes', () => {
+  const contractPath = path.join(
+    root,
+    'spec/components/contracts/v2/contract-v2.json',
+  )
+  const expected = crypto
+    .createHash('sha256')
+    .update(fs.readFileSync(contractPath))
+    .digest('hex')
+
+  assert.equal(stableReadinessCurrentIdentity().contractHash, expected)
+})
 
 test('evidence rejects headless and fixture-only paths', () => {
   assert.throws(

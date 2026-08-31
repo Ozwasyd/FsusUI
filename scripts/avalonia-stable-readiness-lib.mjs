@@ -30,6 +30,7 @@ export const currentIdentity = () => {
   const contractHash = digest(
     fs.readFileSync(
       path.join(root, 'spec/components/contracts/v2/contract-v2.json'),
+      'utf8',
     ),
   )
   return { candidate: gitHead.stdout.trim(), contractHash }
