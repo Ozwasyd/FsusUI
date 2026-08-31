@@ -27,6 +27,7 @@ Every accepted override below is backed by `spec/platform-overrides/`.
 | web-browser-font-baseline-001           | text              | Browser and Skia line metrics are compared by content order, wrapping intent, and accessible names.                      |
 | visual-token-color-001                  | button            | Tokenized color variance must not change state meaning, contrast intent, or token role semantics.                        |
 | visual-text-baseline-001                | text              | Text baselines may vary within the shared visual threshold.                                                              |
+| visual-markdown-source-surface-002      | markdown-editor   | Dense CJK source text may rasterize with sub-pixel glyph placement differences; structure, wrapping, and token colors must match.                                                        |
 
 ## Native Adapter Classifications
 

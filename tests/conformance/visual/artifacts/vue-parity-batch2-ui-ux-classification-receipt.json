@@ -72,8 +72,8 @@
   "authorityDigest": "01afd68fe61bbde7b10dc88fad5dcaef0b7847b3abc38e7f17d34798d585c8d6",
   "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
  },
- "candidateSha": "c3bd2184effd2e75a6d86a4741a9c0cf75e806bb",
- "candidateDigest": "1b1e922592ef0d82a3504d5452ee95290bb901a364084e7bdcf4f971daf650bf",
+ "candidateSha": "3837751f4474088e953d9bc9a6f77da726e4672a",
+ "candidateDigest": "e52ceb78d3fe0c0e1fd28836994824430708b5797de07c0f83f0590a4dc04ab2",
  "stateEvidenceMatrix": [
   {
    "state": "markdown-editor-avalonia-rendered-light",
@@ -139,5 +139,5 @@
  "classificationEvidenceDigest": "c724729dabf40cca2f6d4b7285b2202697ebcabff467aba786679be906ce2aa3",
  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
  "status": "frozen",
- "receiptDigest": "1ed8be4cda40563fa230d2d171c5cfb669fc84bc89b05575d3e503b3596226bb"
+ "receiptDigest": "61cd16ea2e7f234af622352048ba0452434302f7ff5a1baef258da1c83a8e1b2"
 }
