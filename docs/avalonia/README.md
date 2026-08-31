@@ -41,6 +41,7 @@ contracts to Avalonia controls.
 - [Product primitives](components/product-primitives.md)
 - [Perception challenge](components/perception-challenge.md)
 - [Locale formatting](components/locale-formatting.md)
+- [WebView adapter](components/webview-adapter.md)
 
 ## Verification
 

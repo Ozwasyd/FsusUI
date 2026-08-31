@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\tests\fixtures\avalonia-webview\TestWebViewPdfDocument.cs" Link="Fixtures\TestWebViewPdfDocument.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>

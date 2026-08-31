@@ -29075,6 +29075,1028 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewAdapter",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Capabilities",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewCapabilities",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [
+        {
+          "name": "ContextCommandCompleted",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusWebViewCommandResult\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "ContextMenuRequested",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusWebViewContextMenuRequestedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "Dispose",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "ExecuteContextCommandAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusWebViewCommandResult\u003E",
+          "parameters": [
+            {
+              "name": "request",
+              "type": "FsusUI.Avalonia.Controls.FsusWebViewContextCommandRequest",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "ExportPdfAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusWebViewPdfExportResult\u003E",
+          "parameters": [
+            {
+              "name": "options",
+              "type": "FsusUI.Avalonia.Controls.FsusWebViewPdfExportOptions",
+              "optional": false
+            },
+            {
+              "name": "destination",
+              "type": "System.IO.Stream",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "OpenContextMenu",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+          "parameters": [
+            {
+              "name": "host",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+              "optional": false
+            },
+            {
+              "name": "menu",
+              "type": "FsusUI.Avalonia.Controls.FsusContextMenu",
+              "optional": false
+            },
+            {
+              "name": "request",
+              "type": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuRequest",
+              "optional": false
+            },
+            {
+              "name": "invoker",
+              "type": "Avalonia.Controls.Control",
+              "optional": false
+            },
+            {
+              "name": "labels",
+              "type": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuLabels",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "OpenDeveloperToolsAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusWebViewCommandResult\u003E",
+          "parameters": [
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewCapabilities",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "AddToDictionary",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DeveloperTools",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DocumentOutline",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "NativeContextMenu",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Platform",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewPlatform",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ReplaceWord",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SpellingSuggestions",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "TaggedPdf",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewCapabilities",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewCommandResult",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Detail",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Status",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewCommandStatus",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Succeeded",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewCommandResult",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Status",
+              "type": "FsusUI.Avalonia.Controls.FsusWebViewCommandStatus\u0026",
+              "optional": false
+            },
+            {
+              "name": "Detail",
+              "type": "System.String\u0026",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Unsupported",
+          "isStatic": true,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewCommandResult",
+          "parameters": [
+            {
+              "name": "detail",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewCommandStatus",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Succeeded",
+          "value": 0
+        },
+        {
+          "name": "Unsupported",
+          "value": 1
+        },
+        {
+          "name": "Rejected",
+          "value": 2
+        },
+        {
+          "name": "InvalidBackendResult",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewContextCommand",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Cut",
+          "value": 0
+        },
+        {
+          "name": "Copy",
+          "value": 1
+        },
+        {
+          "name": "Paste",
+          "value": 2
+        },
+        {
+          "name": "RichCopy",
+          "value": 3
+        },
+        {
+          "name": "CopyHtml",
+          "value": 4
+        },
+        {
+          "name": "PastePlainText",
+          "value": 5
+        },
+        {
+          "name": "InsertParagraph",
+          "value": 6
+        },
+        {
+          "name": "ReplaceWord",
+          "value": 7
+        },
+        {
+          "name": "AddToDictionary",
+          "value": 8
+        },
+        {
+          "name": "UseNativeMenu",
+          "value": 9
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewContextCommandRequest",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Command",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewContextCommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Replacement",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ViewportPoint",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewViewportPoint",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewContextCommandRequest",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuLabels",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "AddToDictionary",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Copy",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CopyHtml",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Cut",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "InsertParagraph",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Paste",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "PastePlainText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RichCopy",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "UseNativeMenu",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuLabels",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuOrigin",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Pointer",
+          "value": 0
+        },
+        {
+          "name": "Keyboard",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuRequest",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "EditCapabilities",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewEditCapabilities",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HasSelection",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsEditable",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsImageContent",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MisspelledWord",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "NativeMenuFallbackAvailable",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Origin",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuOrigin",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SpellingSuggestions",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusWebViewSpellingSuggestion\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ViewportPoint",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewViewportPoint",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuRequest",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuRequestedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Request",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewContextMenuRequest",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewDocumentOutlineNode",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Children",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusWebViewDocumentOutlineNode\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Destination",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HeadingLevel",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Title",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewDocumentOutlineNode",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewEditCapabilities",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "None",
+          "value": 0
+        },
+        {
+          "name": "Cut",
+          "value": 1
+        },
+        {
+          "name": "Copy",
+          "value": 2
+        },
+        {
+          "name": "Paste",
+          "value": 4
+        },
+        {
+          "name": "RichCopy",
+          "value": 8
+        },
+        {
+          "name": "HtmlCopy",
+          "value": 16
+        },
+        {
+          "name": "PlainTextPaste",
+          "value": 32
+        },
+        {
+          "name": "InsertParagraph",
+          "value": 64
+        },
+        {
+          "name": "RichEdit",
+          "value": 128
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewPdfExportOptions",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "GenerateDocumentOutline",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "GenerateTaggedPdf",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "PrintBackgrounds",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Theme",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewPrintTheme",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewPdfExportOptions",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewPdfExportResult",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "BytesWritten",
+          "type": "System.Int64",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DestinationLeftOpen",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Detail",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DocumentOutlineApplied",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Outline",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusWebViewDocumentOutlineNode\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Status",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewCommandStatus",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "TaggedPdfApplied",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewPdfExportResult",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewPlatform",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Unknown",
+          "value": 0
+        },
+        {
+          "name": "Windows",
+          "value": 1
+        },
+        {
+          "name": "Linux",
+          "value": 2
+        },
+        {
+          "name": "MacOS",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewPrintTheme",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Light",
+          "value": 0
+        },
+        {
+          "name": "Dark",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewSpellingSuggestion",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Replacement",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewSpellingSuggestion",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Replacement",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "AccessibleName",
+              "type": "System.String\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusWebViewViewportPoint",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "IsValid",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "X",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Y",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusWebViewViewportPoint",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "X",
+              "type": "System.Double\u0026",
+              "optional": false
+            },
+            {
+              "name": "Y",
+              "type": "System.Double\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.IFsusFormFieldAdapter",
       "kind": "interface",
       "isAbstract": true,
@@ -29195,6 +30217,84 @@
               "type": "FsusUI.Avalonia.Controls.FsusMarkdownProjectionRequestedEventArgs",
               "optional": false
             },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.IFsusWebViewBackendAdapter",
+      "kind": "interface",
+      "isAbstract": true,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "Capabilities",
+          "type": "FsusUI.Avalonia.Controls.FsusWebViewCapabilities",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [
+        {
+          "name": "ContextMenuRequested",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusWebViewContextMenuRequestedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "ExecuteContextCommandAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusWebViewCommandResult\u003E",
+          "parameters": [
+            {
+              "name": "request",
+              "type": "FsusUI.Avalonia.Controls.FsusWebViewContextCommandRequest",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "ExportPdfAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusWebViewPdfExportResult\u003E",
+          "parameters": [
+            {
+              "name": "options",
+              "type": "FsusUI.Avalonia.Controls.FsusWebViewPdfExportOptions",
+              "optional": false
+            },
+            {
+              "name": "destination",
+              "type": "System.IO.Stream",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "OpenDeveloperToolsAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusWebViewCommandResult\u003E",
+          "parameters": [
             {
               "name": "cancellationToken",
               "type": "System.Threading.CancellationToken",
