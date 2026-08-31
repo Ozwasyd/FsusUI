@@ -18,10 +18,10 @@
     "authorityDigest": "0301f8cf9dc78a13ad971ddb9058546ef3615b23a9a84187690342dd75061ea3",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "ba2a3e8b62e6305630c92c3855b813b9fa77fe70",
-  "candidateDigest": "0cc717ca1d5dbb3e7971f0b6f52e18814d96434df1b387fd37bb8d37864cd3d6",
+  "candidateSha": "4fec918c19da212b45113e63ef4ff8f8399bd80b",
+  "candidateDigest": "6abb77c456c892311570c03f5bdf25539c97138505e3cc9e7ea0bc6ff23d8281",
   "stateEvidenceMatrix": [
-    { "state": "focused-unchecked-after-pointer-keyboard", "viewport": "1280x1100", "theme": "light", "evidenceDigest": "c0aef2e97109394990e6fcea663dfd47b54c4ae32b59c3b73945437409318b19" },
+    { "state": "focused-unchecked-after-pointer-keyboard", "viewport": "87x24", "theme": "light", "evidenceDigest": "380508804f93e90e8c7604aa07dee78a92110bdb64395df4588bffefd3d2e070" },
     { "state": "focused-unchecked-after-pointer-keyboard", "viewport": "960x720", "theme": "light", "evidenceDigest": "eecf99d66b5c5aebc51db523287f08aa241216a1ee96a3dbd7ada9a70208e65c" }
   ],
   "inScope": [
@@ -34,8 +34,8 @@
     "Pixel equality between native renderers",
     "Adjacent component redesign"
   ],
-  "classificationEvidenceDigest": "b65dd811871094289bddba877a24a9eafa2aba926838b9e99f0add7458479a8f",
+  "classificationEvidenceDigest": "314cdf08854cc30e1f41285c47be9cd482c12259bdddf5565725f6acafee31f7",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "bb51d40561ddbe0b7c1be9b1ddf997ac74703151a04e1e345c0ad708a579c9e5"
+  "receiptDigest": "ea1bb18a3dd7bc0e92e9054315626a894aba1d2eb507cb2c1fff7e4f7eb42fb9"
 }

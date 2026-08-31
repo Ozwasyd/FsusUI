@@ -1,24 +1,24 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "ba2a3e8b62e6305630c92c3855b813b9fa77fe70",
+  "candidateSha": "4fec918c19da212b45113e63ef4ff8f8399bd80b",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-ba2a3e8b62e6305630c92c3855b813b9fa77fe70",
+    "executionId": "conformance-v2-check-tag-4fec918c19da212b45113e63ef4ff8f8399bd80b",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
     "contractHash": "0608240bb9ffc67f406ef5e11212ace88aea5111ce5af943a4de476a9d9190a7",
     "webBaselineHash": "b5847900ac006e00494148ab6f1bbf292dc63da835d1956cd3096849e9a5d3bf",
     "avaloniaBaselineHash": "c3cb90d0e58212aa7e93a851ee9096cdcc6c699cb247fdecbd57eb6073a5ba4d",
-    "runnerHash": "854432136eda4acd1fee2f212dea48407c38c8894bcee21ee2997ad02ca9af82"
+    "runnerHash": "320c8460988ddae0beddc2d33f7aa7db2fc273a3e1b1e6902f7326accc0cd5fb"
   },
   "viewportStateMatrix": [
     {
       "platform": "web",
-      "viewport": { "width": 1280, "height": 1100 },
+      "viewport": { "width": 87, "height": 24 },
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "density": "default",
@@ -26,7 +26,7 @@
       "direction": "ltr",
       "motion": "reduced",
       "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
-      "evidenceDigest": "c0aef2e97109394990e6fcea663dfd47b54c4ae32b59c3b73945437409318b19"
+      "evidenceDigest": "380508804f93e90e8c7604aa07dee78a92110bdb64395df4588bffefd3d2e070"
     },
     {
       "platform": "avalonia",
@@ -47,8 +47,8 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "c0aef2e97109394990e6fcea663dfd47b54c4ae32b59c3b73945437409318b19",
-      "bytes": 124238,
+      "digest": "380508804f93e90e8c7604aa07dee78a92110bdb64395df4588bffefd3d2e070",
+      "bytes": 1493,
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -86,12 +86,12 @@
     }
   ],
   "observations": [
-    "The focused CheckTag remains the single visible focus target in both production full-window captures.",
+    "The focused CheckTag remains the single visible focus target in the deterministic Web component capture and the Avalonia production full-window capture.",
     "Native font metrics and full-window viewport sizes differ, but component meaning, unchecked state, keyboard focus, label, and restrained focus treatment match.",
     "No new decoration, token, content, or adjacent layout change is present."
   ],
   "limitations": [
-    "The platforms use different native renderers and full-window viewport sizes, so this review does not claim pixel equality.",
+    "The Web evidence is a deterministic production component capture while Avalonia is a real full-window capture, so this review does not claim pixel or component-geometry equality.",
     "No CheckTag-specific numeric cross-platform geometry override exists; acceptance is limited to the governed qualitative focus-state criteria and the same-candidate bounds assertion."
   ],
   "blockers": [],
