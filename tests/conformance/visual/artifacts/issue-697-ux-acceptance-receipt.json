@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "eb5da1237707f7613a24c0ba2a8fea78a9b1ae33aa5a81f15720ce37b3f016ca",
-  "candidateSha": "f0b3e8bc7e0604fd1443e429cd2ca738b5b5515e",
-  "candidateDigest": "274f2540373606c9c3c775285630f0509fee398c474939d06d6f31b226acbe3a",
+  "classificationReceiptDigest": "f827f85bc299fcdce23ad0e3b51260000dffa4f20475fdfafc4e22e94bcea05e",
+  "candidateSha": "53aa4ebba9e1de3f9d03c91891897f3852187845",
+  "candidateDigest": "e97ee275ec57d1701e6565de078aebf51a2d39e2f4883629e8ec53799574c6c1",
   "verificationClass": "ux-path",
   "requiredSkillDigests": ["c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"],
   "authorityDigests": [
@@ -40,7 +40,7 @@
       "state": "stable-key-commit-cancel-validation-focus-refresh-lazy",
       "theme": "light",
       "inputModes": ["pointer", "keyboard"],
-      "evidenceDigest": "a9482b13b4a9d83ab6c08221f5ba5ef21ea8cd1812d3b79798de297e616a931f"
+      "evidenceDigest": "ea2c724eb5708f5950efce4a910204723aeec79e605d1de355d1b6d9e3827437"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -64,12 +64,12 @@
       "id": "tree-inline-edit-headless-manifest",
       "kind": "accessibility-tree",
       "path": "tests/conformance/visual/artifacts/issue-697-inline-edit/manifest.json",
-      "digest": "a9482b13b4a9d83ab6c08221f5ba5ef21ea8cd1812d3b79798de297e616a931f",
+      "digest": "ea2c724eb5708f5950efce4a910204723aeec79e605d1de355d1b6d9e3827437",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "cf4c651e88287060170726eb95f3b55873976becd1542b0b4e4b22bfaa600ab9"
+  "receiptDigest": "7b2cac8d32521c11212bbd57fa9923eb8acf708749ce4ec6bb92ffb1f77bf419"
 }

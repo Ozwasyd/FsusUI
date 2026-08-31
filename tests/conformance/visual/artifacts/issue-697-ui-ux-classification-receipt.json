@@ -22,13 +22,13 @@
     "authorityDigest": "7597edced071b3593e6f4f1fe8aa46f9f3491c2e6f8589b072f568ed7356441a",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "f0b3e8bc7e0604fd1443e429cd2ca738b5b5515e",
-  "candidateDigest": "274f2540373606c9c3c775285630f0509fee398c474939d06d6f31b226acbe3a",
+  "candidateSha": "53aa4ebba9e1de3f9d03c91891897f3852187845",
+  "candidateDigest": "e97ee275ec57d1701e6565de078aebf51a2d39e2f4883629e8ec53799574c6c1",
   "stateEvidenceMatrix": [
     { "state": "rename-selected-name-and-preserved-tree-state", "viewport": "desktop-960x560", "theme": "both", "evidenceDigest": "9c6c666df2aaa0dc86cf8279470b7a4a1496c23c818443c4d87f895a624bbc20" },
     { "state": "transient-create-empty-row-under-expanded-folder", "viewport": "desktop-960x560", "theme": "both", "evidenceDigest": "ede0df1bda67b5051ffa4f6f273a6b7c0deb23e27fba8c4d29ca22c028167bb5" },
-    { "state": "validation-error-editor-visible-focused-and-accessible", "viewport": "desktop-960x560", "theme": "both", "evidenceDigest": "a9482b13b4a9d83ab6c08221f5ba5ef21ea8cd1812d3b79798de297e616a931f" },
-    { "state": "enter-escape-outside-refresh-lazy-interaction-path", "viewport": "local-headless-input", "theme": "not-applicable", "evidenceDigest": "a9482b13b4a9d83ab6c08221f5ba5ef21ea8cd1812d3b79798de297e616a931f" }
+    { "state": "validation-error-editor-visible-focused-and-accessible", "viewport": "desktop-960x560", "theme": "both", "evidenceDigest": "ea2c724eb5708f5950efce4a910204723aeec79e605d1de355d1b6d9e3827437" },
+    { "state": "enter-escape-outside-refresh-lazy-interaction-path", "viewport": "local-headless-input", "theme": "not-applicable", "evidenceDigest": "ea2c724eb5708f5950efce4a910204723aeec79e605d1de355d1b6d9e3827437" }
   ],
   "inScope": [
     "existing visible FsusTree node inline rename",
@@ -46,5 +46,5 @@
   "classificationEvidenceDigest": "2befbb9617b29b51bb873cecada961442a871e6862952a69246c6b3bed7e5613",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "eb5da1237707f7613a24c0ba2a8fea78a9b1ae33aa5a81f15720ce37b3f016ca"
+  "receiptDigest": "f827f85bc299fcdce23ad0e3b51260000dffa4f20475fdfafc4e22e94bcea05e"
 }
