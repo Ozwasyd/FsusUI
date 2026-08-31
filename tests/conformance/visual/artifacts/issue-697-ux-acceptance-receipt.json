@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "06df8ceed5981256eac246800e901d944567ab9f1e8aace4e1a3893ebd1f361d",
-  "candidateSha": "4ec973b4a927971d14f96885da4096da098e08e0",
-  "candidateDigest": "af86eae60cd5edee8ec6b145dda59afd8d7ed4fa15f87efac74c6319c0f36cfc",
+  "classificationReceiptDigest": "eb5da1237707f7613a24c0ba2a8fea78a9b1ae33aa5a81f15720ce37b3f016ca",
+  "candidateSha": "f0b3e8bc7e0604fd1443e429cd2ca738b5b5515e",
+  "candidateDigest": "274f2540373606c9c3c775285630f0509fee398c474939d06d6f31b226acbe3a",
   "verificationClass": "ux-path",
   "requiredSkillDigests": ["c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"],
   "authorityDigests": [
@@ -11,11 +11,11 @@
     "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
     "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
     "069c6efa2e44f775544bb037cd550a0edbdd8ca98a4e40bfc473f6a1bb0d9f74",
-    "a0c7297aaf9a9d978b5cb304e3d8cfcdd7c6ae312ff0dc67c4a4ceef9072a785",
-    "fb789c0afd4f9df9c94d52dbd998dc2fb7bc2c2306d68df2e36d1eb848e0e159",
+    "d6baf2c71e5b39775e5cc238ac67a80c5af19d941e0fc66a5d2635635aab23e9",
+    "2f8f9071f47aa6e233f0a5dd7f7a1afb549a099882e48c46a3b1880f73b987c9",
     "f149631813fbfb060d49412329638555e0f0c371fb441cf89ab46cd64a3e3de6"
   ],
-  "activeBaselineIdentityDigest": "192c00bc3f4e54419b6b4dc3f715b6358bed96c9406cff5986dcf59a5e4f923b",
+  "activeBaselineIdentityDigest": "e178d7a45326e2d4412246c75a76106948cafd3abd05dbd02f7e5a7968a6c350",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "independenceEvidenceDigest": "faf0200efd5dfdfce6dd49d81f8bf9acddf151df4daf0f8ee7de8f6368d40132",
   "modifiedPaths": [],
@@ -40,7 +40,7 @@
       "state": "stable-key-commit-cancel-validation-focus-refresh-lazy",
       "theme": "light",
       "inputModes": ["pointer", "keyboard"],
-      "evidenceDigest": "f0eab8e9b5a311ddbcc709cd726638596960775f74d4a4f7bef258c08cbd21d9"
+      "evidenceDigest": "a9482b13b4a9d83ab6c08221f5ba5ef21ea8cd1812d3b79798de297e616a931f"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -64,12 +64,12 @@
       "id": "tree-inline-edit-headless-manifest",
       "kind": "accessibility-tree",
       "path": "tests/conformance/visual/artifacts/issue-697-inline-edit/manifest.json",
-      "digest": "f0eab8e9b5a311ddbcc709cd726638596960775f74d4a4f7bef258c08cbd21d9",
+      "digest": "a9482b13b4a9d83ab6c08221f5ba5ef21ea8cd1812d3b79798de297e616a931f",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "48418fac9cc2dde9b7598c017fbc15d1b22e999869f924c074dff3fd36da74b4"
+  "receiptDigest": "cf4c651e88287060170726eb95f3b55873976becd1542b0b4e4b22bfaa600ab9"
 }
