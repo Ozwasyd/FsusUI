@@ -283,7 +283,7 @@ const main = async () => {
             attributes: true,
           })
         },
-        { once: true },
+        { capture: true, once: true },
       )
     })
     await checkTag.click()
@@ -323,7 +323,7 @@ const main = async () => {
             attributes: true,
           })
         },
-        { once: true },
+        { capture: true, once: true },
       )
     })
     await checkTag.press('Space')
