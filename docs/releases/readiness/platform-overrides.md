@@ -23,5 +23,6 @@ active override id appears here.
 | `avalonia-windows-focus-ring-001`         | button, input         | avalonia-windows | low              | accessibility-and-visual-threshold | 2026-09-01   |
 | `scroll-anchoring-avalonia-presenter`     | virtual-list, table-v2 | avalonia         | low              | virtualization-anchor-and-budget-contract | 2026-10-01   |
 | `visual-text-baseline-001`                | text                  | all              | medium           | text-baseline-threshold            | 2026-09-01   |
+| `visual-markdown-source-surface-002`      | markdown-editor       | all              | medium           | pixelmatch-plus-lab                | 2026-10-01   |
 | `visual-token-color-001`                  | button                | all              | low              | color-delta                        | 2026-09-01   |
 | `web-browser-font-baseline-001`           | text                  | web              | medium           | visual-threshold                   | 2026-09-01   |
