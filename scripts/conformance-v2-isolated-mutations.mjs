@@ -193,7 +193,7 @@ const cases = [
         (value.browserAccessibility.nodes.find(
           (node) =>
             node.role === 'textbox' &&
-            /markdown editor source/i.test(node.name ?? ''),
+            /^markdown\s*源码\s*编辑区$/iu.test(node.name ?? ''),
         ).role = 'article'),
       'accessibility.nodes markdown textbox missing',
     ],
