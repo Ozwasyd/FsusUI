@@ -62,7 +62,7 @@
         {
           "name": "AccessibleName",
           "type": "System.String",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -86,7 +86,7 @@
         {
           "name": "Labels",
           "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggleLabels",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -94,7 +94,7 @@
         {
           "name": "ThemeManager",
           "type": "FsusUI.Avalonia.Themes.FsusThemeManager",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": false,
           "isStatic": false
@@ -118,7 +118,7 @@
         {
           "name": "VisibleLabels",
           "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": false,
           "isStatic": false
@@ -406,7 +406,7 @@
         {
           "name": "DurationToken",
           "type": "System.String",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -414,7 +414,7 @@
         {
           "name": "Easing",
           "type": "Avalonia.Animation.Easings.IEasing",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -422,7 +422,7 @@
         {
           "name": "EasingToken",
           "type": "System.String",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -438,7 +438,7 @@
         {
           "name": "From",
           "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -478,7 +478,7 @@
         {
           "name": "TerminalState",
           "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -486,7 +486,7 @@
         {
           "name": "To",
           "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -845,7 +845,7 @@
         {
           "name": "Terminal",
           "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": false,
           "isStatic": true
@@ -922,7 +922,7 @@
         {
           "name": "CurrentOptions",
           "type": "FsusUI.Avalonia.Themes.FsusThemeOptions",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -985,7 +985,7 @@
         {
           "name": "Default",
           "type": "FsusUI.Avalonia.Themes.FsusThemeOptions",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": false,
           "isStatic": true
@@ -1033,7 +1033,7 @@
         {
           "name": "Typography",
           "type": "FsusUI.Avalonia.Themes.FsusTypographyOptions",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -1175,7 +1175,7 @@
         {
           "name": "ApplicationFontFamilies",
           "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -1183,7 +1183,7 @@
         {
           "name": "ApplicationMonospaceFontFamilies",
           "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -1191,7 +1191,7 @@
         {
           "name": "Default",
           "type": "FsusUI.Avalonia.Themes.FsusTypographyOptions",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": false,
           "isStatic": true

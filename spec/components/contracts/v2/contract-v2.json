@@ -10,17 +10,17 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "9443071e04d4dcf2a62129670585778626d442946076dc7c9aa0721754eb9e1a",
+      "hash": "145ef09d896146ddc0e5ce9dd8b077cff06e0caeb838748b9322c525c4096a5d",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "a8b3fd44b50bf7d9b86783ff7f357f0b86467be6ba42fc7d06daf8225dd105f0",
+      "hash": "0f8e7b960a3b5bc347f0c00b08ef38361c1362e581e2addcfce77b8debe651ed",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "5e3a53d108850afc8f4129e056d0d625bccd073bda8114c8b977827776619a40",
+      "hash": "41cce465f04ffd5f8dd40c25ce525dcef1f525489083caa459619437df3dee7d",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
@@ -5399,7 +5399,7 @@
               "function"
             ],
             "type": "System.Action<Avalonia.Size>",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -10379,6 +10379,44 @@
           }
         },
         {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-button.input.motion"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "nativeType",
           "kind": "input",
           "web": {
@@ -11109,6 +11147,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "nativeType",
           "kind": "input",
           "status": "missing",
@@ -11384,6 +11433,7 @@
         "scenario.v2.el-button.input.link",
         "scenario.v2.el-button.input.loading",
         "scenario.v2.el-button.input.loading-icon",
+        "scenario.v2.el-button.input.motion",
         "scenario.v2.el-button.input.native-type",
         "scenario.v2.el-button.input.plain",
         "scenario.v2.el-button.input.round",
@@ -11415,12 +11465,12 @@
         "scenario.v2.el-button.perf"
       ],
       "coverage": {
-        "total": 28,
+        "total": 29,
         "alignedCandidate": 7,
         "partial": 1,
-        "missing": 20,
+        "missing": 21,
         "webOnly": 0,
-        "mappedPercent": 28.6
+        "mappedPercent": 27.6
       }
     },
     {
@@ -12616,6 +12666,44 @@
           }
         },
         {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-card.input.motion"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "shadow",
           "kind": "input",
           "web": {
@@ -12861,6 +12949,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "shadow",
           "kind": "input",
           "status": "missing",
@@ -12979,6 +13078,7 @@
         "scenario.v2.el-card.input.body-style",
         "scenario.v2.el-card.input.footer",
         "scenario.v2.el-card.input.header",
+        "scenario.v2.el-card.input.motion",
         "scenario.v2.el-card.input.shadow",
         "scenario.v2.el-card.content-region.default",
         "scenario.v2.el-card.content-region.footer",
@@ -12989,12 +13089,12 @@
         "scenario.v2.el-card.perf"
       ],
       "coverage": {
-        "total": 8,
+        "total": 9,
         "alignedCandidate": 1,
         "partial": 0,
-        "missing": 7,
+        "missing": 8,
         "webOnly": 0,
-        "mappedPercent": 12.5
+        "mappedPercent": 11.1
       }
     },
     {
@@ -20393,6 +20493,44 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-collapse.input.motion"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "outputs": [
@@ -20617,6 +20755,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "change",
           "kind": "output",
           "status": "missing",
@@ -20692,6 +20841,7 @@
       "scenarioIds": [
         "scenario.v2.el-collapse.input.accordion",
         "scenario.v2.el-collapse.input.model-value",
+        "scenario.v2.el-collapse.input.motion",
         "scenario.v2.el-collapse.output.change",
         "scenario.v2.el-collapse.output.update-model-value",
         "scenario.v2.el-collapse.operation.active-names",
@@ -20707,12 +20857,12 @@
         "scenario.v2.el-collapse.perf"
       ],
       "coverage": {
-        "total": 7,
+        "total": 8,
         "alignedCandidate": 2,
         "partial": 0,
-        "missing": 5,
+        "missing": 6,
         "webOnly": 0,
-        "mappedPercent": 28.6
+        "mappedPercent": 25
       }
     },
     {
@@ -25882,7 +26032,7 @@
         "name": "ElCopyableDetail",
         "module": "metric-primitives",
         "classification": "portable",
-        "exportStatus": "partial",
+        "exportStatus": "missing",
         "exports": [
           "ElCopyableDetail",
           "FsusCopyableDetail"
@@ -26089,7 +26239,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -26168,13 +26318,13 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -26182,12 +26332,7 @@
           "scenarioIds": [
             "scenario.v2.el-copyable-detail.input.value"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "outputs": [
@@ -26465,17 +26610,6 @@
           }
         },
         {
-          "member": "value",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "copy",
           "kind": "output",
           "status": "missing",
@@ -26574,8 +26708,8 @@
       ],
       "coverage": {
         "total": 12,
-        "alignedCandidate": 3,
-        "partial": 1,
+        "alignedCandidate": 4,
+        "partial": 0,
         "missing": 8,
         "webOnly": 0,
         "mappedPercent": 33.3
@@ -29961,7 +30095,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -32376,6 +32510,44 @@
           }
         },
         {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-dialog.input.motion"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "openDelay",
           "kind": "input",
           "web": {
@@ -33169,6 +33341,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "openDelay",
           "kind": "input",
           "status": "missing",
@@ -33397,6 +33580,7 @@
         "scenario.v2.el-dialog.input.modal",
         "scenario.v2.el-dialog.input.modal-class",
         "scenario.v2.el-dialog.input.model-value",
+        "scenario.v2.el-dialog.input.motion",
         "scenario.v2.el-dialog.input.open-delay",
         "scenario.v2.el-dialog.input.top",
         "scenario.v2.el-dialog.input.trap-focus",
@@ -33427,12 +33611,12 @@
         "scenario.v2.el-dialog.perf"
       ],
       "coverage": {
-        "total": 30,
+        "total": 31,
         "alignedCandidate": 1,
         "partial": 0,
-        "missing": 29,
+        "missing": 30,
         "webOnly": 0,
-        "mappedPercent": 3.3
+        "mappedPercent": 3.2
       }
     },
     {
@@ -35450,6 +35634,44 @@
           }
         },
         {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-dropdown.input.motion"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "placement",
           "kind": "input",
           "web": {
@@ -36180,6 +36402,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "placement",
           "kind": "input",
           "status": "missing",
@@ -36395,6 +36628,7 @@
         "scenario.v2.el-dropdown.input.id",
         "scenario.v2.el-dropdown.input.loop",
         "scenario.v2.el-dropdown.input.max-height",
+        "scenario.v2.el-dropdown.input.motion",
         "scenario.v2.el-dropdown.input.placement",
         "scenario.v2.el-dropdown.input.popper-class",
         "scenario.v2.el-dropdown.input.popper-options",
@@ -36423,12 +36657,12 @@
         "scenario.v2.el-dropdown.perf"
       ],
       "coverage": {
-        "total": 24,
+        "total": 25,
         "alignedCandidate": 1,
         "partial": 0,
-        "missing": 23,
+        "missing": 24,
         "webOnly": 0,
-        "mappedPercent": 4.2
+        "mappedPercent": 4
       }
     },
     {
@@ -59871,6 +60105,44 @@
           }
         },
         {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-message.input.motion"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "offset",
           "kind": "input",
           "web": {
@@ -60396,6 +60668,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "offset",
           "kind": "input",
           "status": "missing",
@@ -60526,6 +60809,7 @@
         "scenario.v2.el-message.input.icon",
         "scenario.v2.el-message.input.id",
         "scenario.v2.el-message.input.message",
+        "scenario.v2.el-message.input.motion",
         "scenario.v2.el-message.input.offset",
         "scenario.v2.el-message.input.on-close",
         "scenario.v2.el-message.input.repeat-num",
@@ -60547,10 +60831,10 @@
         "scenario.v2.el-message.perf"
       ],
       "coverage": {
-        "total": 18,
+        "total": 19,
         "alignedCandidate": 0,
         "partial": 0,
-        "missing": 18,
+        "missing": 19,
         "webOnly": 0,
         "mappedPercent": 0
       }
@@ -64306,6 +64590,44 @@
           }
         },
         {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-notification.input.motion"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "offset",
           "kind": "input",
           "web": {
@@ -64881,6 +65203,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "offset",
           "kind": "input",
           "status": "missing",
@@ -65104,6 +65437,7 @@
         "scenario.v2.el-notification.input.icon",
         "scenario.v2.el-notification.input.id",
         "scenario.v2.el-notification.input.message",
+        "scenario.v2.el-notification.input.motion",
         "scenario.v2.el-notification.input.offset",
         "scenario.v2.el-notification.input.on-click",
         "scenario.v2.el-notification.input.on-close",
@@ -65126,12 +65460,12 @@
         "scenario.v2.el-notification.perf"
       ],
       "coverage": {
-        "total": 18,
+        "total": 19,
         "alignedCandidate": 2,
         "partial": 3,
-        "missing": 13,
+        "missing": 14,
         "webOnly": 0,
-        "mappedPercent": 27.8
+        "mappedPercent": 26.3
       }
     },
     {
@@ -65269,7 +65603,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "partial",
           "drift": {
@@ -65605,7 +65939,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -69461,7 +69795,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -78370,7 +78704,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -78460,7 +78794,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -78501,7 +78835,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -78542,7 +78876,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -78583,7 +78917,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -84904,7 +85238,7 @@
               "array"
             ],
             "type": "System.Collections.ObjectModel.Collection<FsusUI.Avalonia.Controls.FsusResponsiveCollectionItem>",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -97963,7 +98297,7 @@
               "array"
             ],
             "type": "System.Collections.ObjectModel.Collection<FsusUI.Avalonia.Controls.FsusSliderMark>",
-            "nullable": true
+            "nullable": false
           },
           "status": "partial",
           "drift": {
@@ -100597,7 +100931,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -100637,7 +100971,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -100677,7 +101011,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -107736,7 +108070,7 @@
         "name": "ElTableV2",
         "module": "table-v2",
         "classification": "native-adapter",
-        "exportStatus": "missing",
+        "exportStatus": "partial",
         "exports": [
           "ElTableV2",
           "TableV2"
@@ -107894,8 +108228,15 @@
             "required": true,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Columns",
+            "categories": [
+              "array"
+            ],
+            "type": "System.Collections.ObjectModel.Collection<FsusUI.Avalonia.Controls.FsusDataTableColumn>",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -107907,12 +108248,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.columns"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "data",
@@ -107920,10 +108256,10 @@
           "web": {
             "member": "data",
             "categories": [
-              "unknown"
+              "array"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "any[]",
             "nullable": false,
             "default": {
               "kind": "missing"
@@ -107932,8 +108268,15 @@
             "required": true,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Data",
+            "categories": [
+              "array"
+            ],
+            "type": "System.Collections.ObjectModel.Collection<FsusUI.Avalonia.Controls.FsusDataTableRow>",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -107945,12 +108288,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.data"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "dataGetter",
@@ -108967,10 +109305,17 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "RowKey",
+            "categories": [
+              "string"
+            ],
+            "type": "System.String",
+            "nullable": false
+          },
+          "status": "partial",
           "drift": {
-            "type": null,
+            "type": "web array vs avalonia string",
             "default": null,
             "nullability": null,
             "eventPayload": null,
@@ -108981,7 +109326,7 @@
             "scenario.v2.el-table-v2.input.row-key"
           ],
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -109306,8 +109651,25 @@
               "parameters": []
             }
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "ScrollTo",
+            "signature": {
+              "returnType": "System.Void",
+              "parameters": [
+                {
+                  "name": "scrollLeft",
+                  "type": "System.Double",
+                  "optional": false
+                },
+                {
+                  "name": "scrollTop",
+                  "type": "System.Double",
+                  "optional": false
+                }
+              ]
+            }
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109319,12 +109681,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.operation.scroll-to"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public method in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "scrollToLeft",
@@ -109337,8 +109694,20 @@
               "parameters": []
             }
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "ScrollToLeft",
+            "signature": {
+              "returnType": "System.Void",
+              "parameters": [
+                {
+                  "name": "scrollLeft",
+                  "type": "System.Double",
+                  "optional": false
+                }
+              ]
+            }
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109350,12 +109719,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.operation.scroll-to-left"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public method in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "scrollToRow",
@@ -109368,8 +109732,20 @@
               "parameters": []
             }
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "ScrollToRow",
+            "signature": {
+              "returnType": "System.Void",
+              "parameters": [
+                {
+                  "name": "rowIndex",
+                  "type": "System.Int32",
+                  "optional": false
+                }
+              ]
+            }
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109381,12 +109757,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.operation.scroll-to-row"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public method in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "scrollToTop",
@@ -109399,8 +109770,20 @@
               "parameters": []
             }
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "ScrollToTop",
+            "signature": {
+              "returnType": "System.Void",
+              "parameters": [
+                {
+                  "name": "scrollTop",
+                  "type": "System.Double",
+                  "optional": false
+                }
+              ]
+            }
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109412,12 +109795,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.operation.scroll-to-top"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public method in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "contentRegions": [
@@ -109430,8 +109808,11 @@
             "scoped": true,
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "CellContent",
+            "content": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109443,12 +109824,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.content-region.cell"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia content region in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "empty",
@@ -109710,28 +110086,6 @@
         },
         {
           "member": "class",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "columns",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "data",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -110019,9 +110373,9 @@
         {
           "member": "rowKey",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -110110,61 +110464,6 @@
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "scrollTo",
-          "kind": "operation",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public method in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "scrollToLeft",
-          "kind": "operation",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public method in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "scrollToRow",
-          "kind": "operation",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public method in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "scrollToTop",
-          "kind": "operation",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public method in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "cell",
-          "kind": "contentRegion",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia content region in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -110392,6 +110691,32 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.discarded-cell-count"
+          ]
+        },
+        {
+          "member": "EffectiveColumnCount",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.effective-column-count"
+          ]
+        },
+        {
+          "member": "EffectiveRowCount",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.effective-row-count"
           ]
         },
         {
@@ -110795,11 +111120,11 @@
       ],
       "coverage": {
         "total": 51,
-        "alignedCandidate": 1,
-        "partial": 0,
-        "missing": 50,
+        "alignedCandidate": 8,
+        "partial": 1,
+        "missing": 42,
         "webOnly": 0,
-        "mappedPercent": 2
+        "mappedPercent": 17.6
       }
     },
     {
@@ -111056,6 +111381,44 @@
           },
           "scenarioIds": [
             "scenario.v2.el-tabs.input.model-value"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tabs.input.motion"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -111601,6 +111964,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "stretch",
           "kind": "input",
           "status": "missing",
@@ -111835,6 +112209,7 @@
         "scenario.v2.el-tabs.input.closable",
         "scenario.v2.el-tabs.input.editable",
         "scenario.v2.el-tabs.input.model-value",
+        "scenario.v2.el-tabs.input.motion",
         "scenario.v2.el-tabs.input.stretch",
         "scenario.v2.el-tabs.input.tab-position",
         "scenario.v2.el-tabs.input.type",
@@ -111856,10 +112231,10 @@
         "scenario.v2.el-tabs.perf"
       ],
       "coverage": {
-        "total": 17,
+        "total": 18,
         "alignedCandidate": 0,
         "partial": 0,
-        "missing": 17,
+        "missing": 18,
         "webOnly": 0,
         "mappedPercent": 0
       }
@@ -112085,6 +112460,44 @@
           },
           "scenarioIds": [
             "scenario.v2.el-tag.input.hit"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "motion",
+          "kind": "input",
+          "web": {
+            "member": "motion",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tag.input.motion"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -112433,6 +112846,17 @@
           }
         },
         {
+          "member": "motion",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "round",
           "kind": "input",
           "status": "missing",
@@ -112587,6 +113011,7 @@
         "scenario.v2.el-tag.input.disable-transitions",
         "scenario.v2.el-tag.input.effect",
         "scenario.v2.el-tag.input.hit",
+        "scenario.v2.el-tag.input.motion",
         "scenario.v2.el-tag.input.round",
         "scenario.v2.el-tag.input.size",
         "scenario.v2.el-tag.input.type",
@@ -112603,12 +113028,12 @@
         "scenario.v2.el-tag.perf"
       ],
       "coverage": {
-        "total": 11,
+        "total": 12,
         "alignedCandidate": 1,
         "partial": 0,
-        "missing": 10,
+        "missing": 11,
         "webOnly": 0,
-        "mappedPercent": 9.1
+        "mappedPercent": 8.3
       }
     },
     {
@@ -114163,7 +114588,7 @@
               "FsusThemeModeToggleLabels"
             ],
             "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggleLabels",
-            "nullable": true
+            "nullable": false
           },
           "status": "partial",
           "drift": {
@@ -116027,7 +116452,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -117554,7 +117979,7 @@
               "string"
             ],
             "type": "System.String",
-            "nullable": true
+            "nullable": false
           },
           "status": "aligned-candidate",
           "drift": {
@@ -134400,11 +134825,11 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 200,
+    "aligned-candidate": 208,
     "partial": 50,
-    "missing": 1708,
+    "missing": 1709,
     "web-only": 45,
-    "total": 2003,
-    "mappedPercent": 12.5
+    "total": 2012,
+    "mappedPercent": 12.8
   }
 }

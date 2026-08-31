@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "aad546edde238e5ea0461f83e9eb0b98a2cb0742",
+    "commitSha": "183b036af276f8619358b1f55c25e1c475e75a79",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
@@ -11,7 +11,7 @@
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "9ee665664f87ac893a616df9fefdfdbf2730bea5b3b9ab2ede5543f14ab69795"
+    "outputHash": "16c47922b10732c87c35a95dbcee33d5d5268a6dd357c9e52370bd6602fccafc"
   },
   "summary": {
     "componentModules": 93,
@@ -2020,6 +2020,7 @@
         "link",
         "loading",
         "loadingIcon",
+        "motion",
         "nativeType",
         "plain",
         "round",
@@ -2187,6 +2188,18 @@
             "default": {
               "kind": "function",
               "sourceHash": "1f8ac0e3bb8e5fb290780a9b5b3c373a22acfcafb54579ff66a9bb6301f76f12"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -2531,6 +2544,7 @@
         "bodyStyle",
         "footer",
         "header",
+        "motion",
         "shadow"
       ],
       "emits": [],
@@ -2598,6 +2612,18 @@
             "default": {
               "kind": "literal",
               "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -4320,7 +4346,7 @@
         "path": "vue/packages/components/collapse/src/collapse.vue",
         "hash": "c7c3a2769b4b274ca0062c34943f354d06f31e3d7b07ad8820a7e88a6602ab41"
       },
-      "props": ["...componentMotionProps", "accordion", "modelValue"],
+      "props": ["...componentMotionProps", "accordion", "modelValue", "motion"],
       "emits": [
         "[CHANGE_EVENT]",
         "[UPDATE_MODEL_EVENT]",
@@ -4357,6 +4383,18 @@
             "default": {
               "kind": "function",
               "sourceHash": "325c9e4a41b67f3fb810b33fbc9700ec433ba5e813a9aa8c207693373cafa08e"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -6960,6 +6998,7 @@
         "modal",
         "modalClass",
         "modelValue",
+        "motion",
         "openDelay",
         "top",
         "trapFocus",
@@ -7144,6 +7183,18 @@
             "values": null,
             "default": {
               "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -7683,6 +7734,7 @@
         "id",
         "loop",
         "maxHeight",
+        "motion",
         "placement",
         "popperClass",
         "popperOptions",
@@ -7807,6 +7859,18 @@
             "default": {
               "kind": "literal",
               "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -13144,6 +13208,7 @@
         "icon",
         "id",
         "message",
+        "motion",
         "offset",
         "onClose",
         "repeatNum",
@@ -13248,6 +13313,18 @@
             "default": {
               "kind": "expression",
               "sourceHash": "c5f1bd62f79f77009e3808ffc75db8e9790c62f25a345748ad37293eb242501b"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -14162,6 +14239,7 @@
         "icon",
         "id",
         "message",
+        "motion",
         "offset",
         "onClick",
         "onClose",
@@ -14254,6 +14332,18 @@
             "default": {
               "kind": "literal",
               "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -24432,8 +24522,8 @@
           },
           {
             "name": "data",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "any[]",
             "nullable": false,
             "values": null,
             "default": {
@@ -25042,6 +25132,7 @@
         "closable",
         "editable",
         "modelValue",
+        "motion",
         "stretch",
         "tabPosition",
         "type"
@@ -25132,6 +25223,18 @@
             "values": null,
             "default": {
               "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -25283,6 +25386,7 @@
         "disableTransitions",
         "effect",
         "hit",
+        "motion",
         "round",
         "size",
         "type"
@@ -25355,6 +25459,18 @@
             "values": null,
             "default": {
               "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "motion",
+            "runtimeType": "Array",
+            "semanticType": "ComponentMotion",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -34809,8 +34925,8 @@
           },
           {
             "name": "data",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "any[]",
             "nullable": false,
             "values": null,
             "default": {

@@ -7,6 +7,7 @@ namespace FsusUI.Avalonia.ApiTool;
 
 internal static class Program
 {
+  private static readonly NullabilityInfoContext NullabilityContext = new();
   private static readonly JsonSerializerOptions JsonOptions = new()
   {
     WriteIndented = true,
@@ -146,7 +147,7 @@ internal static class Program
       {
         Name = property.Name,
         Type = TypeName(property.PropertyType),
-        Nullable = IsNullable(property.PropertyType),
+        Nullable = IsNullable(property),
         CanRead = property.CanRead,
         CanWrite = property.CanWrite,
         IsStatic = property.GetMethod?.IsStatic ?? property.SetMethod?.IsStatic ?? false,
@@ -323,6 +324,25 @@ internal static class Program
     }
 
     return type.IsValueType == false;
+  }
+
+  private static bool IsNullable(PropertyInfo property)
+  {
+    if (property.PropertyType.IsGenericType &&
+        property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+    {
+      return true;
+    }
+
+    if (property.PropertyType.IsValueType)
+    {
+      return false;
+    }
+
+    var nullability = NullabilityContext.Create(property);
+    var state = property.CanWrite ? nullability.WriteState : nullability.ReadState;
+    return state == NullabilityState.Nullable ||
+      (state == NullabilityState.Unknown && IsNullable(property.PropertyType));
   }
 
   private static string TypeName(Type type)

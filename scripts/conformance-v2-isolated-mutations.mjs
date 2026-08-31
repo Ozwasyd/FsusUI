@@ -105,6 +105,18 @@ const cases = [
     expected: 'fixture TSX widget source identity was not exact',
   },
   {
+    id: 'vue-semantic-nested-spread-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        'const resolvedNode = unwrapExpression(resolved?.node)',
+        'const resolvedNode = resolved?.node',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
     id: 'vue-public-alias-mutated',
     file: 'vue/packages/components/collection-primitives/index.ts',
     inject: () =>
@@ -153,6 +165,18 @@ const cases = [
     expected: 'contract-v2.json drifted from generated output',
   },
   {
+    id: 'avalonia-semantic-nullability-mutated',
+    file: 'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+        'state == NullabilityState.Nullable ||',
+        'state == NullabilityState.NotNull ||',
+      ),
+    command: ['pnpm', ['run', 'avalonia:semantic:check']],
+    expected: 'FsusUI.Avalonia.semantic.json drifted',
+  },
+  {
     id: 'auto-resizer-web-disabled-width-mutated',
     file: 'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
     inject: () =>
@@ -180,11 +204,7 @@ const cases = [
       'DisableWidth ? Viewport.Width : viewport.Width',
       'viewport.Width',
     ],
-    [
-      'auto-resizer-avalonia-callback-mutated',
-      '    OnResize(next);\n',
-      '',
-    ],
+    ['auto-resizer-avalonia-callback-mutated', '    OnResize(next);\n', ''],
     [
       'auto-resizer-avalonia-arrange-mutated',
       '    Resize(finalSize);',

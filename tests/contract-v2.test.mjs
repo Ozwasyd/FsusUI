@@ -52,6 +52,27 @@ test('optional Vue absence matches nullable Avalonia inputs', () => {
   assert.match(required.drift.nullability, /web nullable=false/u)
 })
 
+test('Avalonia semantic nullability preserves non-null Table V2 collections', () => {
+  const table = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-table-v2',
+  )
+  for (const name of ['columns', 'data']) {
+    const input = table.inputs.find((member) => member.name === name)
+    assert.equal(input.avalonia?.nullable, false)
+    assert.equal(input.status, 'aligned-candidate')
+  }
+})
+
+test('Vue semantic extraction resolves nested imported prop spreads', () => {
+  const table = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-table-v2',
+  )
+  const data = table.inputs.find((member) => member.name === 'data')
+  assert.equal(data.web.runtimeType, 'Array')
+  assert.equal(data.web.semanticType, 'any[]')
+  assert.equal(data.status, 'aligned-candidate')
+})
+
 const replaceAtPath = (value, pointer, replacement) => {
   const segments = pointer
     .split('/')

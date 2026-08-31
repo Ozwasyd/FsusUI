@@ -267,6 +267,59 @@ public class FsusVirtualizationHeadlessTests
   }
 
   [AvaloniaFact]
+  public void TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll()
+  {
+    var table = new FsusTableV2
+    {
+      AccessibleName = "Typed table",
+      RowHeight = 32,
+      ColumnWidth = 120,
+      Overscan = 0,
+    };
+    table.Columns.Add(new FsusDataTableColumn("name", "Name")
+    {
+      Fixed = FsusDataTableFixedColumn.Left,
+    });
+    table.Columns.Add(new FsusDataTableColumn("score", "Score"));
+    table.Columns.Add(new FsusDataTableColumn("owner", "Owner")
+    {
+      Fixed = FsusDataTableFixedColumn.Right,
+    });
+    for (var row = 0; row < 100; row++)
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{row}", new Dictionary<string, object?>
+      {
+        ["name"] = $"Row {row}",
+        ["score"] = row,
+        ["owner"] = "FsusUI",
+      }));
+    }
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(240, 96) });
+    table.RefreshLayout();
+
+    Assert.Equal(100, table.EffectiveRowCount);
+    Assert.Equal(3, table.EffectiveColumnCount);
+    Assert.Contains(table.RealizedCells, cell => cell.ColumnIndex == 0);
+    Assert.Contains(table.RealizedCells, cell => cell.ColumnIndex == 2);
+
+    table.ScrollToRow(50);
+    Assert.Equal(50, table.FocusedRowIndex);
+    Assert.Contains(table.RealizedCells, cell => cell.RowIndex == 50 && Equals(cell.Content, "Row 50"));
+
+    var key = new KeyEventArgs
+    {
+      RoutedEvent = InputElement.KeyDownEvent,
+      Key = Key.Right,
+    };
+    table.RaiseEvent(key);
+
+    Assert.True(key.Handled);
+    Assert.Equal(1, table.FocusedColumnIndex);
+    table.ScrollToLeft(120);
+    Assert.Equal(1, table.RealizedColumnStartIndex);
+  }
+
+  [AvaloniaFact]
   public async Task TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults()
   {
     var table = new KeyboardTableV2

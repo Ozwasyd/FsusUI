@@ -688,14 +688,15 @@ class PropDescriptorParser {
           property.argument?.name,
           this.fromRelPath,
         )
-        if (resolved?.node?.type === 'ObjectExpression') {
+        const resolvedNode = unwrapExpression(resolved?.node)
+        if (resolvedNode?.type === 'ObjectExpression') {
           const source = this.resolver.readSource(resolved.relPath) || ''
           result.push(
             ...new PropDescriptorParser(
               this.resolver,
               source,
               resolved.relPath,
-            ).parseBuildPropsObject(resolved.node),
+            ).parseBuildPropsObject(resolvedNode),
           )
         }
         continue
@@ -858,13 +859,14 @@ class PropDescriptorParser {
           property.argument?.name,
           this.fromRelPath,
         )
-        if (resolved?.node?.type === 'ObjectExpression') {
+        const resolvedNode = unwrapExpression(resolved?.node)
+        if (resolvedNode?.type === 'ObjectExpression') {
           const source = this.resolver.readSource(resolved.relPath) || ''
           const merged = new PropDescriptorParser(
             this.resolver,
             source,
             resolved.relPath,
-          ).parseDescriptorObject(resolved.node, name)
+          ).parseDescriptorObject(resolvedNode, name)
           if (merged) {
             runtimeType = merged.runtimeType
             semanticType = merged.semanticType

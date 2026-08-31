@@ -31,6 +31,11 @@ measurement cache remains capped by `VirtualizationBudget.RetainedMeasurements`.
 union of the visible row/column window and frozen axes, so a 100K × 80 source
 does not create a source-sized visual tree. `ContainerPoolLimit`,
 `LoadedWindowLimit`, and `LoadedRowIndexLimit` are explicit hard limits.
+`Columns` and `Data` accept the typed `FsusDataTableColumn` and
+`FsusDataTableRow` model. Columns marked `Left` or `Right` remain realized while
+the horizontal window moves. `ScrollTo`, `ScrollToLeft`, `ScrollToRow`, and
+`ScrollToTop` update the owned scroll surface, and arrow-key events raised on
+the control move the focused cell through the same scrolling path.
 
 Measurement corrections before the active anchor adjust the scroll offset so
 the same logical item remains visually stable. `NotifyItemsInserted` preserves

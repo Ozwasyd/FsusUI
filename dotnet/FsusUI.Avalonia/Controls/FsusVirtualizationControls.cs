@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Threading;
+using System.Collections.ObjectModel;
 using System.Globalization;
 
 namespace FsusUI.Avalonia.Controls;
@@ -728,8 +729,8 @@ public class FsusTableV2 : ContentControl
       {
         viewport = scrollViewer.Viewport;
       }
-      realizedRowStartIndex = ResolveStart(scrollViewer.Offset.Y, RowHeight, RowCount, realizedRowCount);
-      realizedColumnStartIndex = ResolveStart(scrollViewer.Offset.X, ColumnWidth, ColumnCount, realizedColumnCount);
+      realizedRowStartIndex = ResolveStart(scrollViewer.Offset.Y, RowHeight, EffectiveRowCount, realizedRowCount);
+      realizedColumnStartIndex = ResolveStart(scrollViewer.Offset.X, ColumnWidth, EffectiveColumnCount, realizedColumnCount);
       RefreshLayout(updateScrollViewer: false);
     };
     Content = scrollViewer;
@@ -737,6 +738,9 @@ public class FsusTableV2 : ContentControl
   }
 
   public string? AccessibleName { get; set; }
+  public Collection<FsusDataTableColumn> Columns { get; } = [];
+  public Collection<FsusDataTableRow> Data { get; } = [];
+  public string RowKey { get; set; } = "id";
   public int RowCount { get; set; }
   public int ColumnCount { get; set; }
   public double RowHeight { get; set; } = 32d;
@@ -748,6 +752,11 @@ public class FsusTableV2 : ContentControl
   public int LoadedRowIndexLimit { get; set; } = 4096;
   public Func<int, int, object?>? CellProvider { get; set; }
   public IDataTemplate? CellTemplate { get; set; }
+  public IDataTemplate? CellContent
+  {
+    get => CellTemplate;
+    set => CellTemplate = value;
+  }
   public int FocusedRowIndex { get; private set; }
   public int FocusedColumnIndex { get; private set; }
   public FsusTableV2Budget VirtualizationBudget { get; set; } = new(
@@ -758,7 +767,9 @@ public class FsusTableV2 : ContentControl
     MemoryKb: 1024d);
 
   public bool IsVirtualized =>
-    RowCount > RealizedRowCount || ColumnCount > RealizedColumnCount;
+    EffectiveRowCount > RealizedRowCount || EffectiveColumnCount > RealizedColumnCount;
+  public int EffectiveRowCount => Data.Count > 0 ? Data.Count : RowCount;
+  public int EffectiveColumnCount => Columns.Count > 0 ? Columns.Count : ColumnCount;
   public int RealizedRowStartIndex => realizedRowStartIndex;
   public int RealizedColumnStartIndex => realizedColumnStartIndex;
   public int RealizedRowCount => realizedRowCount;
@@ -777,7 +788,7 @@ public class FsusTableV2 : ContentControl
   public IReadOnlyCollection<FsusTableV2CellContainer> RealizedCells => realizedCells.Values;
   public IReadOnlyList<int> LoadedRowIndex => loadedRowIndex;
   public string FocusedCellStatus =>
-    $"row {(FocusedRowIndex + 1).ToString(CultureInfo.InvariantCulture)} of {RowCount.ToString(CultureInfo.InvariantCulture)}, column {(FocusedColumnIndex + 1).ToString(CultureInfo.InvariantCulture)} of {ColumnCount.ToString(CultureInfo.InvariantCulture)}";
+    $"row {(FocusedRowIndex + 1).ToString(CultureInfo.InvariantCulture)} of {EffectiveRowCount.ToString(CultureInfo.InvariantCulture)}, column {(FocusedColumnIndex + 1).ToString(CultureInfo.InvariantCulture)} of {EffectiveColumnCount.ToString(CultureInfo.InvariantCulture)}";
 
   public void AttachResizer(FsusAutoResizer resizer)
   {
@@ -793,15 +804,26 @@ public class FsusTableV2 : ContentControl
 
   private void RefreshLayout(bool updateScrollViewer)
   {
+    var rowCount = EffectiveRowCount;
+    var columnCount = EffectiveColumnCount;
     realizedRowCount = Math.Min(
-      RowCount,
+      rowCount,
       Math.Max(1, (int)Math.Ceiling(viewport.Height / Math.Max(1d, RowHeight)) + Math.Max(0, Overscan)));
     realizedColumnCount = Math.Min(
-      ColumnCount,
+      columnCount,
       Math.Max(1, (int)Math.Ceiling(viewport.Width / Math.Max(1d, ColumnWidth)) + Math.Max(0, Overscan)));
     ClampStarts();
-    var rows = ResolveAxisIndices(realizedRowStartIndex, realizedRowCount, RowCount, FrozenRowCount);
-    var columns = ResolveAxisIndices(realizedColumnStartIndex, realizedColumnCount, ColumnCount, FrozenColumnCount);
+    var rows = ResolveAxisIndices(realizedRowStartIndex, realizedRowCount, rowCount, FrozenRowCount);
+    var fixedColumns = Columns
+      .Select((column, index) => (column, index))
+      .Where(entry => entry.column.Fixed != FsusDataTableFixedColumn.None)
+      .Select(entry => entry.index);
+    var columns = ResolveAxisIndices(
+      realizedColumnStartIndex,
+      realizedColumnCount,
+      columnCount,
+      FrozenColumnCount,
+      fixedColumns);
     var desired = new HashSet<(int Row, int Column)>();
     foreach (var row in rows)
     {
@@ -843,14 +865,21 @@ public class FsusTableV2 : ContentControl
     {
       var container = realizedCells[key];
       var sourceRow = ResolveSourceRow(key.Row);
-      var content = CellProvider?.Invoke(sourceRow, key.Column) ?? $"R{sourceRow + 1} C{key.Column + 1}";
+      var dataRow = sourceRow < Data.Count ? Data[sourceRow] : null;
+      var column = key.Column < Columns.Count ? Columns[key.Column] : null;
+      var content = CellProvider?.Invoke(sourceRow, key.Column) ??
+        (dataRow is not null && column is not null
+          ? column.CellRenderer?.Invoke(
+              new FsusDataTableCellContext(dataRow, column, dataRow.GetValue(column.Key), sourceRow, key.Column)) ??
+            dataRow.GetValue(column.Key)
+          : $"R{sourceRow + 1} C{key.Column + 1}");
       container.Bind(key.Row, key.Column, content, CellTemplate, ColumnWidth, RowHeight);
       Canvas.SetLeft(container, key.Column * Math.Max(1d, ColumnWidth));
       Canvas.SetTop(container, key.Row * Math.Max(1d, RowHeight));
     }
 
-    cellHost.Width = Math.Max(0, ColumnCount) * Math.Max(1d, ColumnWidth);
-    cellHost.Height = Math.Max(0, RowCount) * Math.Max(1d, RowHeight);
+    cellHost.Width = Math.Max(0, columnCount) * Math.Max(1d, ColumnWidth);
+    cellHost.Height = Math.Max(0, rowCount) * Math.Max(1d, RowHeight);
     if (updateScrollViewer)
     {
       ApplyScrollOffset();
@@ -860,16 +889,31 @@ public class FsusTableV2 : ContentControl
 
   public void ScrollToCell(int rowIndex, int columnIndex)
   {
-    FocusedRowIndex = Math.Clamp(rowIndex, 0, Math.Max(0, RowCount - 1));
-    FocusedColumnIndex = Math.Clamp(columnIndex, 0, Math.Max(0, ColumnCount - 1));
-    realizedRowStartIndex = Math.Clamp(FocusedRowIndex - Math.Max(0, Overscan), 0, Math.Max(0, RowCount - Math.Max(1, realizedRowCount)));
-    realizedColumnStartIndex = Math.Clamp(FocusedColumnIndex - Math.Max(0, Overscan), 0, Math.Max(0, ColumnCount - Math.Max(1, realizedColumnCount)));
+    FocusedRowIndex = Math.Clamp(rowIndex, 0, Math.Max(0, EffectiveRowCount - 1));
+    FocusedColumnIndex = Math.Clamp(columnIndex, 0, Math.Max(0, EffectiveColumnCount - 1));
+    realizedRowStartIndex = Math.Clamp(FocusedRowIndex - Math.Max(0, Overscan), 0, Math.Max(0, EffectiveRowCount - Math.Max(1, realizedRowCount)));
+    realizedColumnStartIndex = Math.Clamp(FocusedColumnIndex - Math.Max(0, Overscan), 0, Math.Max(0, EffectiveColumnCount - Math.Max(1, realizedColumnCount)));
     RefreshLayout();
     if (realizedCells.TryGetValue((FocusedRowIndex, FocusedColumnIndex), out var container))
     {
       container.Focus();
     }
   }
+
+  public void ScrollTo(double scrollLeft, double scrollTop)
+  {
+    realizedColumnStartIndex = ResolveStart(scrollLeft, ColumnWidth, EffectiveColumnCount, realizedColumnCount);
+    realizedRowStartIndex = ResolveStart(scrollTop, RowHeight, EffectiveRowCount, realizedRowCount);
+    RefreshLayout();
+  }
+
+  public void ScrollToLeft(double scrollLeft) =>
+    ScrollTo(scrollLeft, realizedRowStartIndex * Math.Max(1d, RowHeight));
+
+  public void ScrollToRow(int rowIndex) => ScrollToCell(rowIndex, FocusedColumnIndex);
+
+  public void ScrollToTop(double scrollTop) =>
+    ScrollTo(realizedColumnStartIndex * Math.Max(1d, ColumnWidth), scrollTop);
 
   public async ValueTask<bool> UpdateRowIndexAsync(
     Func<CancellationToken, ValueTask<IReadOnlyList<int>>> provider)
@@ -944,13 +988,24 @@ public class FsusTableV2 : ContentControl
     return ValueTask.FromResult(true);
   }
 
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (e.Handled)
+    {
+      return;
+    }
+
+    e.Handled = HandleKeyAsync(e.Key).GetAwaiter().GetResult();
+  }
+
   public FsusTableV2BudgetResult EvaluateBudget() =>
     new(RealizedRowCount, RealizedColumnCount, RealizedCellCount, VirtualizationBudget);
 
   private void ClampStarts()
   {
-    realizedRowStartIndex = Math.Clamp(realizedRowStartIndex, 0, Math.Max(0, RowCount - Math.Max(1, realizedRowCount)));
-    realizedColumnStartIndex = Math.Clamp(realizedColumnStartIndex, 0, Math.Max(0, ColumnCount - Math.Max(1, realizedColumnCount)));
+    realizedRowStartIndex = Math.Clamp(realizedRowStartIndex, 0, Math.Max(0, EffectiveRowCount - Math.Max(1, realizedRowCount)));
+    realizedColumnStartIndex = Math.Clamp(realizedColumnStartIndex, 0, Math.Max(0, EffectiveColumnCount - Math.Max(1, realizedColumnCount)));
   }
 
   private static int ResolveStart(double offset, double size, int count, int realizedCount) =>
@@ -959,7 +1014,12 @@ public class FsusTableV2 : ContentControl
       0,
       Math.Max(0, count - Math.Max(1, realizedCount)));
 
-  private static int[] ResolveAxisIndices(int start, int count, int total, int frozen)
+  private static int[] ResolveAxisIndices(
+    int start,
+    int count,
+    int total,
+    int frozen,
+    IEnumerable<int>? fixedIndices = null)
   {
     var indices = new HashSet<int>();
     for (var index = 0; index < Math.Min(total, Math.Max(0, frozen)); index++)
@@ -969,6 +1029,13 @@ public class FsusTableV2 : ContentControl
     for (var index = start; index < Math.Min(total, start + count); index++)
     {
       indices.Add(index);
+    }
+    foreach (var index in fixedIndices ?? [])
+    {
+      if (index >= 0 && index < total)
+      {
+        indices.Add(index);
+      }
     }
     return indices.Order().ToArray();
   }
@@ -1030,7 +1097,7 @@ public class FsusTableV2 : ContentControl
   private void SyncState()
   {
     FsusComponentClasses.Ensure(this, "fsus-virtualized", IsVirtualized);
-    var automationName = FsusComponentClasses.ResolveName(AccessibleName, RowCount);
+    var automationName = FsusComponentClasses.ResolveName(AccessibleName, EffectiveRowCount);
     if (!string.Equals(lastAutomationName, automationName, StringComparison.Ordinal))
     {
       AutomationProperties.SetName(this, automationName);
@@ -1042,7 +1109,7 @@ public class FsusTableV2 : ContentControl
       AutomationProperties.SetControlTypeOverride(this, AutomationControlType.DataGrid);
       AutomationUpdateCount++;
     }
-    var automationStatus = $"{RowCount.ToString(CultureInfo.InvariantCulture)} rows, {ColumnCount.ToString(CultureInfo.InvariantCulture)} columns, {RealizedCellCount.ToString(CultureInfo.InvariantCulture)} realized cells";
+    var automationStatus = $"{EffectiveRowCount.ToString(CultureInfo.InvariantCulture)} rows, {EffectiveColumnCount.ToString(CultureInfo.InvariantCulture)} columns, {RealizedCellCount.ToString(CultureInfo.InvariantCulture)} realized cells";
     if (!string.Equals(lastAutomationStatus, automationStatus, StringComparison.Ordinal))
     {
       AutomationProperties.SetItemStatus(this, automationStatus);
