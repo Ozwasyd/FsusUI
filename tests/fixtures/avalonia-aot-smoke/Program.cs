@@ -174,7 +174,12 @@ internal static class Program
         Status = "Ready",
       };
       var panel = new StackPanel();
-      var scenarios = CreateStableScenarios(button, icon);
+      var scenarios = CreateStableScenarios(
+        button,
+        icon,
+        activityShell,
+        documents,
+        titleBar);
       foreach (var scenario in scenarios)
       {
         panel.Children.Add(scenario.Control);
@@ -293,7 +298,12 @@ internal static class Program
     }
   }
 
-  private static IReadOnlyList<SmokeScenario> CreateStableScenarios(FsusButton button, FsusIcon icon)
+  private static IReadOnlyList<SmokeScenario> CreateStableScenarios(
+    FsusButton button,
+    FsusIcon icon,
+    FsusActivityRailShell activityShell,
+    FsusDocumentTabs documents,
+    FsusNativeTitleBar titleBar)
   {
     AutomationProperties.SetName(button, "Native AOT smoke");
     AutomationProperties.SetName(icon, "Settings icon");
@@ -316,6 +326,8 @@ internal static class Program
     thirdPartyItem.ResetField();
 
     var themeSurface = Named(new Border(), "AOT theme surface");
+    var themeMutedText = new FsusText { Text = "AOT muted shell status" };
+    titleBar.Status = themeMutedText;
     var themeResources = new ResourceDictionary();
     var themeManager = new FsusThemeManager();
     themeManager.Apply(themeResources, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
@@ -329,9 +341,77 @@ internal static class Program
         Variant = FsusThemeVariant.Dark,
         HighContrast = true,
         Density = FsusDensity.Compact,
+        Palette = new FsusThemePaletteOptions
+        {
+          Background = new SolidColorBrush(Color.Parse("#010203")),
+          Surface = new SolidColorBrush(Color.Parse("#102030")),
+          SurfaceRaised = new SolidColorBrush(Color.Parse("#203040")),
+          Text = new SolidColorBrush(Color.Parse("#F0E0D0")),
+          MutedText = new SolidColorBrush(Color.Parse("#C0B0A0")),
+          Border = new SolidColorBrush(Color.Parse("#405060")),
+          Icon = new SolidColorBrush(Color.Parse("#ABCDEF")),
+        },
       }
     );
     var highContrastBackground = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.BackgroundBrush]!).Color;
+    if (
+      BrushColor(themeResources, FsusThemeResourceKeys.BackgroundBrush) != Color.Parse("#000000") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.SurfaceBrush) != Color.Parse("#000000") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.SurfaceRaisedBrush) != Color.Parse("#111827") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.TextBrush) != Color.Parse("#FFFFFF") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.MutedTextBrush) != Color.Parse("#FDE68A") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.BorderBrush) != Color.Parse("#FFFFFF") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.IconBrush) != Color.Parse("#FFFFFF") ||
+      BrushColor(themeResources, "FsusThemeTreeSurfaceBrush") != Color.Parse("#000000") ||
+      BrushColor(themeResources, "FsusThemePickerSurfaceBrush") != Color.Parse("#000000") ||
+      BrushColor(themeResources, "FsusThemePublicShellSurfaceBrush") != Color.Parse("#000000") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.TextEditorSurfaceBrush) != Color.Parse("#000000") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.ValuePickerTrackBrush) != Color.Parse("#1F2937"))
+    {
+      throw new InvalidOperationException("AOT high-contrast theme precedence did not apply.");
+    }
+
+    themeManager.Apply(
+      themeResources,
+      new FsusThemeOptions
+      {
+        Variant = FsusThemeVariant.Dark,
+        Palette = new FsusThemePaletteOptions
+        {
+          Background = new SolidColorBrush(Color.Parse("#010203")),
+          Surface = new SolidColorBrush(Color.Parse("#102030")),
+          SurfaceRaised = new SolidColorBrush(Color.Parse("#203040")),
+          Text = new SolidColorBrush(Color.Parse("#F0E0D0")),
+          MutedText = new SolidColorBrush(Color.Parse("#C0B0A0")),
+          Border = new SolidColorBrush(Color.Parse("#405060")),
+          Icon = new SolidColorBrush(Color.Parse("#ABCDEF")),
+        },
+      });
+    if (
+      BrushColor(themeResources, FsusThemeResourceKeys.BackgroundBrush) != Color.Parse("#010203") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.SurfaceBrush) != Color.Parse("#102030") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.SurfaceRaisedBrush) != Color.Parse("#203040") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.TextBrush) != Color.Parse("#F0E0D0") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.MutedTextBrush) != Color.Parse("#C0B0A0") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.BorderBrush) != Color.Parse("#405060") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.IconBrush) != Color.Parse("#ABCDEF") ||
+      BrushColor(themeResources, "FsusThemeTreeSurfaceBrush") != Color.Parse("#102030") ||
+      BrushColor(themeResources, "FsusThemePickerSurfaceBrush") != Color.Parse("#102030") ||
+      BrushColor(themeResources, "FsusThemePublicShellSurfaceBrush") != Color.Parse("#102030") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.TextEditorSurfaceBrush) != Color.Parse("#102030") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.ValuePickerTrackBrush) != Color.Parse("#203040"))
+    {
+      throw new InvalidOperationException("AOT theme palette overrides did not reach shell aliases.");
+    }
+    themeSurface.Background = ThemeBrush(themeResources, FsusThemeResourceKeys.SurfaceBrush);
+    activityShell.Background = ThemeBrush(themeResources, FsusThemeResourceKeys.BackgroundBrush);
+    activityShell.Foreground = ThemeBrush(themeResources, FsusThemeResourceKeys.TextBrush);
+    documents.Background = ThemeBrush(themeResources, FsusThemeResourceKeys.BackgroundBrush);
+    titleBar.Background = ThemeBrush(themeResources, FsusThemeResourceKeys.SurfaceRaisedBrush);
+    titleBar.Foreground = ThemeBrush(themeResources, FsusThemeResourceKeys.TextBrush);
+    titleBar.BorderBrush = ThemeBrush(themeResources, FsusThemeResourceKeys.BorderBrush);
+    themeMutedText.Foreground = ThemeBrush(themeResources, FsusThemeResourceKeys.MutedTextBrush);
+    icon.Fill = ThemeBrush(themeResources, FsusThemeResourceKeys.IconBrush);
     report.ThemeVariant = resolvedTheme.Variant.ToString();
     report.ThemeDensity = resolvedTheme.Density.ToString();
     report.ThemeHighContrast = resolvedTheme.HighContrast;
@@ -401,7 +481,7 @@ internal static class Program
     var stable = new Dictionary<string, SmokeScenario>(StringComparer.Ordinal)
     {
       ["button"] = new("button", button, () => button.IsEnabled && AutomationProperties.GetName(button) == "Native AOT smoke"),
-      ["icon-text"] = new("icon-text", themeSurface, () => icon.IconKey == FsusIconKeys.Settings && icon.IsDecorative && AutomationProperties.GetName(icon) == "Settings icon" && lightBackground != darkBackground && highContrastBackground != darkBackground && resolvedTheme.HighContrast && resolvedTheme.Density == FsusDensity.Compact),
+      ["icon-text"] = new("icon-text", themeSurface, () => icon.IconKey == FsusIconKeys.Settings && icon.IsDecorative && AutomationProperties.GetName(icon) == "Settings icon" && lightBackground != darkBackground && highContrastBackground != darkBackground && resolvedTheme.HighContrast && resolvedTheme.Density == FsusDensity.Compact && BrushColor(activityShell.Background, "activity shell background") == Color.Parse("#010203") && BrushColor(themeSurface.Background, "theme surface") == Color.Parse("#102030") && BrushColor(titleBar.Background, "title bar background") == Color.Parse("#203040") && BrushColor(activityShell.Foreground, "activity shell foreground") == Color.Parse("#F0E0D0") && BrushColor(themeMutedText.Foreground, "muted shell status") == Color.Parse("#C0B0A0") && BrushColor(titleBar.BorderBrush, "title bar border") == Color.Parse("#405060") && BrushColor(icon.Fill, "icon fill") == Color.Parse("#ABCDEF")),
       ["input"] = new("input", input, () => input.Text?.Contains("CJK 漢字 emoji 🚀", StringComparison.Ordinal) is true && AutomationProperties.GetName(input) == "AOT input"),
       ["selection"] = new("selection", checkbox, () => checkbox.IsChecked == true),
       ["form"] = new("form", form, () => form.Children.Count == 2 && generatedItem.FieldAdapterError is null && thirdPartyItem.FieldAdapterError is null && generatedInput.Text == "generated-adapter" && thirdPartyInput.Text == "third-party-adapter"),
@@ -440,6 +520,23 @@ internal static class Program
     AutomationProperties.SetName(control, name);
     return control;
   }
+
+  private static Color BrushColor(IResourceDictionary resources, string key) =>
+    BrushColor((IBrush?)resources[key]);
+
+  private static IBrush ThemeBrush(IResourceDictionary resources, string key) =>
+    (IBrush?)resources[key]
+      ?? throw new InvalidOperationException($"Expected theme brush resource {key}.");
+
+  private static Color BrushColor(IBrush? brush) =>
+    brush is SolidColorBrush solid
+      ? solid.Color
+      : throw new InvalidOperationException("Expected a solid theme brush.");
+
+  private static Color BrushColor(IBrush? brush, string role) =>
+    brush is SolidColorBrush solid
+      ? solid.Color
+      : throw new InvalidOperationException($"Expected a solid theme brush for {role}.");
 
   private static int Fail(string kind, Exception error)
   {

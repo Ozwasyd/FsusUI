@@ -548,6 +548,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Themes.FsusResolvedMotionMode` | `avalonia-extra` |
 | `FsusUI.Avalonia.Themes.FsusThemeManager` | `avalonia-extra` |
 | `FsusUI.Avalonia.Themes.FsusThemeOptions` | `avalonia-extra` |
+| `FsusUI.Avalonia.Themes.FsusThemePaletteOptions` | `avalonia-extra` |
 | `FsusUI.Avalonia.Themes.FsusThemeResourceKeys` | `avalonia-extra` |
 | `FsusUI.Avalonia.Themes.FsusThemeVariant` | `avalonia-extra` |
 | `FsusUI.Avalonia.Themes.FsusTypographyOptions` | `avalonia-extra` |

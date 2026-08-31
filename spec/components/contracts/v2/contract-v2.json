@@ -20,7 +20,7 @@
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "15d373751462196c80a30a090bfa913f338dac98f121d536dc49242892cf83db",
+      "hash": "5e3a53d108850afc8f4129e056d0d625bccd073bda8114c8b977827776619a40",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
@@ -145214,9 +145214,25 @@
       "kind": "record",
       "packageId": "avaloniaThemes",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "memberCount": 9,
+      "memberCount": 10,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-theme-options"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Themes.FsusThemePaletteOptions",
+      "kind": "record",
+      "packageId": "avaloniaThemes",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
+      "memberCount": 8,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-theme-palette-options"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
