@@ -60,7 +60,7 @@ export const createMarkdownHeavyLifecycleSource = (blockCount = 3000) =>
       return `Paragraph ${index} with stable lifecycle filler text and Unicode 中文.`
     }
     if (technicalIndex % 3 === 0) {
-      return `\`\`\`typescript\nconst heavyNode${technicalIndex}: number = ${technicalIndex}\n\`\`\``
+      return `\`\`\`typescript\nconst heavyNode${technicalIndex}: number = ${technicalIndex}; // stable lifecycle node\n\`\`\``
     }
     if (technicalIndex % 3 === 1) {
       return `\`\`\`mermaid\ngraph LR\nA${technicalIndex}-->B${technicalIndex}\n\`\`\``

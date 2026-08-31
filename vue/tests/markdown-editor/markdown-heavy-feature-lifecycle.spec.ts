@@ -657,7 +657,10 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
     retainedResources: number
     rendererOverflow: number
     screenshot: string | null
+    screenshotScrollMax: number | null
     screenshotScrollLeft: number | null
+    terminalTokenVisibleAtLeft: boolean
+    terminalTokenVisibleAtRight: boolean
     theme: 'dark' | 'light'
     viewportWidth: number
     zoomPercent: number
@@ -700,14 +703,57 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
         await expect
           .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
           .toBe(0)
-        const geometry = await renderer.evaluate((element) => {
+        const geometry = await renderer.evaluate(async (element) => {
+          await document.fonts.ready
+          await new Promise<void>((resolveFrame) =>
+            requestAnimationFrame(() =>
+              requestAnimationFrame(() => resolveFrame()),
+            ),
+          )
           const code = element.querySelector<HTMLElement>('pre')
+          const terminalRange = (() => {
+            if (!code) return null
+            const walker = document.createTreeWalker(code, NodeFilter.SHOW_TEXT)
+            let terminalNode: Text | null = null
+            for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+              if (/\S/u.test(node.textContent ?? ''))
+                terminalNode = node as Text
+            }
+            if (!terminalNode) return null
+            const terminalOffset = terminalNode.data.trimEnd().length
+            if (terminalOffset === 0) return null
+            const range = document.createRange()
+            range.setStart(terminalNode, terminalOffset - 1)
+            range.setEnd(terminalNode, terminalOffset)
+            return range
+          })()
+          const terminalTokenVisible = () => {
+            if (!code || !terminalRange) return false
+            const codeRect = code.getBoundingClientRect()
+            const tokenRect = terminalRange.getBoundingClientRect()
+            return (
+              tokenRect.left >= codeRect.left - 1 &&
+              tokenRect.right <= codeRect.right + 1
+            )
+          }
+          if (code) code.scrollLeft = 0
+          await new Promise<void>((resolveFrame) =>
+            requestAnimationFrame(() => resolveFrame()),
+          )
+          const terminalTokenVisibleAtLeft = terminalTokenVisible()
           if (code) code.scrollLeft = code.scrollWidth
+          await new Promise<void>((resolveFrame) =>
+            requestAnimationFrame(() => resolveFrame()),
+          )
           const codeScrollLeft = code?.scrollLeft ?? 0
           const codeScrollMax = code
             ? Math.max(0, code.scrollWidth - code.clientWidth)
             : 0
+          const terminalTokenVisibleAtRight = terminalTokenVisible()
           if (code) code.scrollLeft = 0
+          await new Promise<void>((resolveFrame) =>
+            requestAnimationFrame(() => resolveFrame()),
+          )
           return {
             codeScrollLeft,
             codeScrollMax,
@@ -715,6 +761,12 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
               document.documentElement.scrollWidth -
               document.documentElement.clientWidth,
             rendererOverflow: element.scrollWidth - element.clientWidth,
+            screenshotScrollLeft: code?.scrollLeft ?? 0,
+            screenshotScrollMax: code
+              ? Math.max(0, code.scrollWidth - code.clientWidth)
+              : 0,
+            terminalTokenVisibleAtLeft,
+            terminalTokenVisibleAtRight,
           }
         })
         expect(geometry.documentOverflow).toBeLessThanOrEqual(1)
@@ -722,25 +774,37 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
         expect(geometry.codeScrollLeft).toBeGreaterThanOrEqual(
           geometry.codeScrollMax - 1,
         )
+        expect(geometry.terminalTokenVisibleAtRight).toBe(true)
+        if (!geometry.terminalTokenVisibleAtLeft) {
+          expect(geometry.codeScrollMax).toBeGreaterThan(0)
+        }
+        expect(geometry.screenshotScrollMax).toBe(geometry.codeScrollMax)
+        expect(geometry.screenshotScrollLeft).toBeLessThanOrEqual(1)
         const metrics = await readMetrics(page)
         const screenshotName =
           zoom > 1
             ? `${theme}-${width}-zoom-${Math.round(zoom * 100)}.png`
             : null
-        const screenshotScrollLeft =
+        const screenshotState =
           zoom > 1
-            ? await renderer.locator('pre').evaluate(
-                (element) =>
-                  new Promise<number>((resolveScrollLeft) => {
-                    element.scrollLeft = 0
-                    requestAnimationFrame(() =>
-                      resolveScrollLeft(element.scrollLeft),
-                    )
-                  }),
-              )
+            ? await renderer.locator('pre').evaluate(async (element) => {
+                await document.fonts.ready
+                element.scrollLeft = 0
+                await new Promise<void>((resolveFrame) =>
+                  requestAnimationFrame(() => resolveFrame()),
+                )
+                return {
+                  scrollLeft: element.scrollLeft,
+                  scrollMax: Math.max(
+                    0,
+                    element.scrollWidth - element.clientWidth,
+                  ),
+                }
+              })
             : null
-        if (screenshotScrollLeft !== null) {
-          expect(screenshotScrollLeft).toBeLessThanOrEqual(1)
+        if (screenshotState) {
+          expect(screenshotState.scrollLeft).toBeLessThanOrEqual(1)
+          expect(screenshotState.scrollMax).toBe(geometry.codeScrollMax)
         }
         renderedStates.push({
           active: metrics?.active ?? -1,
@@ -750,7 +814,10 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
           retainedResources: metrics?.retainedResources ?? -1,
           rendererOverflow: geometry.rendererOverflow,
           screenshot: screenshotName,
-          screenshotScrollLeft,
+          screenshotScrollLeft: screenshotState?.scrollLeft ?? null,
+          screenshotScrollMax: screenshotState?.scrollMax ?? null,
+          terminalTokenVisibleAtLeft: geometry.terminalTokenVisibleAtLeft,
+          terminalTokenVisibleAtRight: geometry.terminalTokenVisibleAtRight,
           theme,
           viewportWidth: width,
           zoomPercent: Math.round(zoom * 100),
