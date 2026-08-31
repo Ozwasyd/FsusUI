@@ -135,6 +135,101 @@ public class FsusTableV2RenderedEvidenceTests
     window.Close();
   }
 
+  [AvaloniaFact]
+  public void RendersWholeHeaderAndOverlayContentRegionsToPng()
+  {
+    var table = CreateTable();
+    table.ViewportHeight = 180;
+    table.HeaderContent = new FuncDataTemplate<object>((_, _) =>
+      new Border
+      {
+        Padding = new Thickness(10, 7),
+        Background = new SolidColorBrush(Color.Parse("#F4F6F8")),
+        BorderBrush = new SolidColorBrush(Color.Parse("#D5DCE5")),
+        BorderThickness = new Thickness(0, 0, 0, 1),
+        Child = new TextBlock
+        {
+          Text = "Contract review queue",
+          FontWeight = FontWeight.SemiBold,
+        },
+      });
+    table.OverlayContent = new FuncDataTemplate<object>((_, _) =>
+      new Border
+      {
+        Background = new SolidColorBrush(Color.Parse("#E6FFFFFF")),
+        Child = new Border
+        {
+          Padding = new Thickness(12, 8),
+          Background = new SolidColorBrush(Color.Parse("#F4F6F8")),
+          BorderBrush = new SolidColorBrush(Color.Parse("#D5DCE5")),
+          BorderThickness = new Thickness(1),
+          CornerRadius = new CornerRadius(6),
+          HorizontalAlignment = HorizontalAlignment.Center,
+          VerticalAlignment = VerticalAlignment.Center,
+          Child = new TextBlock { Text = "Refreshing rows" },
+        },
+      });
+    table.RefreshLayout();
+
+    var surface = new Border
+    {
+      Width = 488,
+      Height = 320,
+      Padding = new Thickness(24),
+      Background = Brushes.White,
+      Child = new StackPanel
+      {
+        Spacing = 20,
+        Children =
+        {
+          new TextBlock
+          {
+            Text = "Table V2 overlay state",
+            FontSize = 18,
+            FontWeight = FontWeight.SemiBold,
+          },
+          table,
+        },
+      },
+    };
+    var window = new Window
+    {
+      Width = 488,
+      Height = 320,
+      Content = surface,
+      ShowInTaskbar = false,
+    };
+    AttachTheme(window);
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(488, 320));
+    window.Arrange(new Rect(0, 0, 488, 320));
+    surface.Measure(new Size(488, 320));
+    surface.Arrange(new Rect(0, 0, 488, 320));
+    Dispatcher.UIThread.RunJobs();
+
+    var outputDirectory = Path.Combine(
+      FindRepositoryRoot(),
+      "tests",
+      "conformance",
+      "visual",
+      "artifacts",
+      "issue-285-table-v2");
+    Directory.CreateDirectory(outputDirectory);
+    var outputPath = Path.Combine(outputDirectory, "table-v2-whole-header-overlay-light.png");
+    using var bitmap = new RenderTargetBitmap(new PixelSize(488, 320), new Vector(96, 96));
+    bitmap.Render(surface);
+    using (var stream = File.Create(outputPath))
+    {
+      bitmap.Save(stream);
+    }
+
+    Assert.Equal(1, table.HeaderContentPresenterCount);
+    Assert.True(table.IsOverlayContentVisible);
+    Assert.True(new FileInfo(outputPath).Length > 4_000);
+    window.Close();
+  }
+
   private static FsusTableV2 CreateTable()
   {
     var table = new FsusTableV2
