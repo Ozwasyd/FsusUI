@@ -6,6 +6,10 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
+import {
+  digestValue,
+  validateFsusUIReceiptPair,
+} from './check-fsusui-design-conformance.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const requiredIdentity = [
@@ -28,6 +32,15 @@ const requiredIdentity = [
   'runnerHash',
 ]
 const validatedComparisons = new WeakSet()
+const validatedVisualReviews = new WeakSet()
+const checkTagReviewFiles = {
+  classification:
+    'tests/conformance/visual/artifacts/issue-285-check-tag-ui-ux-classification-receipt.json',
+  acceptance:
+    'tests/conformance/visual/artifacts/issue-285-check-tag-ux-acceptance-receipt.json',
+  independent:
+    'tests/conformance/visual/artifacts/issue-285-check-tag-independent-ux-review.json',
+}
 const scenarioArtifactPolicy = (scenario) => {
   if (scenario.includes('.input.')) return { action: 'render', artifacts: ['interaction', 'state'] }
   if (scenario.includes('.output.')) return { action: 'event', artifacts: ['event'] }
@@ -69,6 +82,142 @@ const writeJson = (file, value) => {
 }
 const fail = (message) => {
   throw new Error(message)
+}
+
+export async function loadCurrentCheckTagVisualReview(web, avalonia) {
+  const entries = Object.entries(checkTagReviewFiles)
+  const existing = entries.filter(([, file]) =>
+    fs.existsSync(path.resolve(root, file)),
+  )
+  if (existing.length === 0) return null
+  if (existing.length !== entries.length)
+    fail('check-tag.visual-review receipt set incomplete')
+  const classification = readJson(checkTagReviewFiles.classification)
+  const acceptance = readJson(checkTagReviewFiles.acceptance)
+  const independent = readJson(checkTagReviewFiles.independent)
+  await validateFsusUIReceiptPair(classification, acceptance)
+  if (
+    independent.schema !== 'fsusui-independent-ux-review.v1' ||
+    independent.issue !== 285 ||
+    independent.status !== 'accepted' ||
+    independent.productionFixture !== true ||
+    independent.modifiedPaths?.length !== 0 ||
+    independent.blockers?.length !== 0
+  )
+    fail('check-tag.visual-review independent receipt invalid')
+  if (
+    acceptance.independenceEvidenceDigest !==
+    digestFile(checkTagReviewFiles.independent)
+  )
+    fail('check-tag.visual-review independence digest mismatch')
+  const webExecution = web.contractExecutions?.['component-v2.el-check-tag']
+  const avaloniaExecution =
+    avalonia.contractExecutions?.['component-v2.el-check-tag']
+  if (!webExecution || !avaloniaExecution)
+    fail('check-tag.visual-review current executions missing')
+  for (const field of [
+    'checkpoint',
+    'contract',
+    'scenario',
+    'contractHash',
+    'webBaselineHash',
+    'avaloniaBaselineHash',
+    'runnerHash',
+  ]) {
+    same(
+      webExecution.identity[field],
+      independent.identity?.[field],
+      `check-tag.visual-review.identity.${field}`,
+    )
+    same(
+      webExecution.identity[field],
+      avaloniaExecution.identity[field],
+      `check-tag.visual-review.platform-identity.${field}`,
+    )
+  }
+  same(
+    classification.candidateSha,
+    independent.candidateSha,
+    'check-tag.visual-review.candidateSha',
+  )
+  const candidateDigest = digestValue({
+    candidateSha: classification.candidateSha,
+    contractHash: independent.identity.contractHash,
+    webBaselineHash: independent.identity.webBaselineHash,
+    avaloniaBaselineHash: independent.identity.avaloniaBaselineHash,
+    runnerHash: independent.identity.runnerHash,
+  })
+  same(
+    candidateDigest,
+    classification.candidateDigest,
+    'check-tag.visual-review.candidateDigest',
+  )
+  for (const authority of classification.requiredAuthorities ?? [])
+    same(
+      digestFile(authority.path),
+      authority.digest,
+      `check-tag.visual-review.authority.${authority.id}`,
+    )
+  for (const skillDigest of classification.requiredSkillDigests ?? [])
+    if (
+      skillDigest !==
+      digestFile('.agents/skills/fsusui-design-conformance/SKILL.md')
+    )
+      fail('check-tag.visual-review skill digest mismatch')
+  const ancestor = spawnSync(
+    'git',
+    ['merge-base', '--is-ancestor', classification.candidateSha, 'HEAD'],
+    { cwd: root },
+  )
+  if (ancestor.status !== 0)
+    fail('check-tag.visual-review candidate is not an ancestor')
+  const changed = spawnSync(
+    'git',
+    ['diff', '--name-only', `${classification.candidateSha}..HEAD`],
+    { cwd: root, encoding: 'utf8' },
+  )
+    .stdout.trim()
+    .split('\n')
+    .filter(Boolean)
+  if (
+    changed.some(
+      (file) =>
+        !file.startsWith(
+          'tests/conformance/visual/artifacts/issue-285-check-tag',
+        ),
+    )
+  )
+    fail('check-tag.visual-review candidate has non-receipt drift')
+  const artifacts = acceptance.inspectedRenderedArtifacts ?? []
+  for (const [platform, execution] of [
+    ['web', webExecution],
+    ['avalonia', avaloniaExecution],
+  ]) {
+    const artifact = artifacts.find((entry) => entry.id.includes(platform))
+    if (
+      !artifact ||
+      artifact.inspected !== true ||
+      artifact.fixtureClass !== 'production'
+    )
+      fail(`check-tag.visual-review.${platform} inspected artifact missing`)
+    same(
+      execution.visual.sha256,
+      artifact.digest,
+      `check-tag.visual-review.${platform}.digest`,
+    )
+    same(
+      artifact.digest,
+      digestFile(artifact.path),
+      `check-tag.visual-review.${platform}.tracked-digest`,
+    )
+  }
+  const review = {
+    classificationReceiptDigest: classification.receiptDigest,
+    acceptanceReceiptDigest: acceptance.receiptDigest,
+    independentReviewDigest: digestFile(checkTagReviewFiles.independent),
+  }
+  validatedVisualReviews.add(review)
+  return review
 }
 
 export function validateOverride(entry, index = 0) {
@@ -306,7 +455,7 @@ const checkedState = (value) => {
   return null
 }
 
-const compareCheckTagExecution = (web, avalonia) => {
+const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
   const contractId = 'component-v2.el-check-tag'
   validateContractExecution(web, 'web', contractId)
   validateContractExecution(avalonia, 'avalonia', contractId)
@@ -367,6 +516,19 @@ const compareCheckTagExecution = (web, avalonia) => {
       `${contractId}.${platform}.visual.observation`,
     )
   }
+  if (visualReview && !validatedVisualReviews.has(visualReview))
+    fail('check-tag.visual-review was not current-validated')
+  const comparedArtifacts = [
+    'required-member-coverage',
+    'same-identity-keyboard-evidence',
+    'same-identity-pointer-evidence',
+    'same-identity-focus-evidence',
+    'same-identity-a11y-evidence',
+    'same-identity-motion-evidence',
+    'same-identity-perf-evidence',
+    'same-identity-cross-platform-comparison',
+  ]
+  if (visualReview) comparedArtifacts.push('same-identity-visual-evidence')
   return {
     schema: 'fsusui.conformance-contract-comparison.v2',
     verdict: 'pass',
@@ -374,16 +536,8 @@ const compareCheckTagExecution = (web, avalonia) => {
     evidenceDigests: { web: digest(web), avalonia: digest(avalonia) },
     coverage: web.coverage,
     performanceBudget: web.performance.budget,
-    comparedArtifacts: [
-      'required-member-coverage',
-      'same-identity-keyboard-evidence',
-      'same-identity-pointer-evidence',
-      'same-identity-focus-evidence',
-      'same-identity-a11y-evidence',
-      'same-identity-motion-evidence',
-      'same-identity-perf-evidence',
-      'same-identity-cross-platform-comparison',
-    ],
+    comparedArtifacts,
+    visualReview,
   }
 }
 const normalizeWeb = (evidence) => {
@@ -482,7 +636,7 @@ const normalizedOperations = (evidence, platform) => {
   }))
 }
 
-export function compareEvidence(web, avalonia) {
+export function compareEvidence(web, avalonia, visualReview = null) {
   validateEvidence(web, 'web')
   validateEvidence(avalonia, 'avalonia')
   for (const field of requiredIdentity)
@@ -563,6 +717,7 @@ export function compareEvidence(web, avalonia) {
       receipts[contractId] = compareCheckTagExecution(
         web.contractExecutions[contractId],
         avalonia.contractExecutions[contractId],
+        visualReview,
       )
       continue
     }
@@ -603,6 +758,7 @@ export function validateCurrentComparison(
   web,
   avalonia,
   expected,
+  visualReview = null,
 ) {
   if (comparison?.schema !== 'fsusui.conformance-comparison.v2')
     fail('comparison.schema invalid')
@@ -645,7 +801,7 @@ export function validateCurrentComparison(
     if (!comparison.compared?.includes(artifact))
       fail(`comparison.requiredArtifact.${artifact} missing`)
   }
-  const recomputed = compareEvidence(web, avalonia)
+  const recomputed = compareEvidence(web, avalonia, visualReview)
   same(recomputed, comparison, 'comparison.recomputed')
   validatedComparisons.add(comparison)
   return comparison
@@ -1099,8 +1255,12 @@ const writeConsumers = (alignment, args) => {
   }
 }
 
-const mutationCases = (positive) => {
-  const currentComparison = compareEvidence(positive.web, positive.avalonia)
+const mutationCases = (positive, visualReview = null) => {
+  const currentComparison = compareEvidence(
+    positive.web,
+    positive.avalonia,
+    visualReview,
+  )
   const expectedComparisonIdentity = { ...currentComparison.identity }
   return [
   [
@@ -1460,9 +1620,13 @@ const mutationCases = (positive) => {
   ]
 }
 
-export function runMutations(positive) {
-  const comparison = compareEvidence(positive.web, positive.avalonia)
-  const results = mutationCases(positive).map(
+export function runMutations(positive, visualReview = null) {
+  const comparison = compareEvidence(
+    positive.web,
+    positive.avalonia,
+    visualReview,
+  )
+  const results = mutationCases(positive, visualReview).map(
     ([id, expectedError, execute]) => {
       let actualError = ''
       try {
@@ -1512,7 +1676,10 @@ async function cli() {
   const [command, ...argv] = process.argv.slice(2)
   const args = parseArgs(argv)
   if (command === 'compare') {
-    const result = compareEvidence(readJson(args.web), readJson(args.avalonia))
+    const web = readJson(args.web)
+    const avalonia = readJson(args.avalonia)
+    const visualReview = await loadCurrentCheckTagVisualReview(web, avalonia)
+    const result = compareEvidence(web, avalonia, visualReview)
     writeJson(args.out, result)
     console.log(`conformance-v2 comparator passed: ${args.out}`)
   } else if (command === 'derive') {
@@ -1521,12 +1688,14 @@ async function cli() {
       fail('derive current Web and Avalonia evidence paths are required')
     const web = readJson(args.web)
     const avalonia = readJson(args.avalonia)
+    const visualReview = await loadCurrentCheckTagVisualReview(web, avalonia)
     const expectedComparisonIdentity = currentComparisonIdentity(args.contract)
     validateCurrentComparison(
       comparison,
       web,
       avalonia,
       expectedComparisonIdentity,
+      visualReview,
     )
     const result = deriveAlignment(readJson(args.contract), comparison)
     result.identity = {
@@ -1566,10 +1735,10 @@ async function cli() {
     validateReadiness(alignment, expected)
     console.log('conformance-v2 readiness passed')
   } else if (command === 'mutations') {
-    const result = runMutations({
-      web: readJson(args.web),
-      avalonia: readJson(args.avalonia),
-    })
+    const web = readJson(args.web)
+    const avalonia = readJson(args.avalonia)
+    const visualReview = await loadCurrentCheckTagVisualReview(web, avalonia)
+    const result = runMutations({ web, avalonia }, visualReview)
     writeJson(args.out, result)
     console.log(
       `conformance-v2 mutations passed: ${result.results.length}/${result.results.length}`,

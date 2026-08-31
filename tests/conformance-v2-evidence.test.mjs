@@ -75,6 +75,11 @@ test('derive comparison validation rejects stale identity and tampered evidence'
   const comparison = compareEvidence(web, avalonia)
   const expected = { ...comparison.identity }
 
+  assert.throws(
+    () => compareEvidence(web, avalonia, {}),
+    /visual-review was not current-validated/,
+  )
+
   validateCurrentComparison(comparison, web, avalonia, expected)
 
   const registry = JSON.parse(
