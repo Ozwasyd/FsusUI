@@ -5,9 +5,11 @@ import test from 'node:test'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
+  compareEvidence,
   deriveAlignment,
   validateCoverage,
   validateEvidence,
+  validateCurrentComparison,
   validateOverride,
   validateReadiness,
 } from '../scripts/conformance-v2-evidence.mjs'
@@ -54,6 +56,63 @@ test('platform overrides require exact governed fields', () => {
         reviewPolicy: 'x',
       }),
     /broad override/,
+  )
+})
+
+test('derive comparison validation rejects stale identity and tampered evidence', () => {
+  const web = JSON.parse(
+    fs.readFileSync(
+      path.join(root, '.tmp/conformance-v2/web-a11y/manifest.json'),
+      'utf8',
+    ),
+  )
+  const avalonia = JSON.parse(
+    fs.readFileSync(
+      path.join(root, '.tmp/conformance-v2/avalonia.json'),
+      'utf8',
+    ),
+  )
+  const comparison = compareEvidence(web, avalonia)
+  const expected = { ...comparison.identity }
+
+  validateCurrentComparison(comparison, web, avalonia, expected)
+
+  assert.throws(
+    () =>
+      validateCurrentComparison(
+        {
+          ...comparison,
+          identity: { ...comparison.identity, candidate: 'stale-candidate' },
+        },
+        web,
+        avalonia,
+        expected,
+      ),
+    /comparison\.identity\.candidate mismatch/,
+  )
+
+  const tamperedWeb = structuredClone(web)
+  tamperedWeb.publicState.markdown.value = 'tampered after comparison'
+  assert.throws(
+    () =>
+      validateCurrentComparison(
+        comparison,
+        tamperedWeb,
+        avalonia,
+        expected,
+      ),
+    /comparison\.evidenceDigests\.web mismatch/,
+  )
+
+  assert.throws(
+    () =>
+      validateCurrentComparison(
+        { ...comparison, compared: ['public-state'] },
+        web,
+        avalonia,
+        expected,
+      ),
+    /comparison\.requiredArtifact\.transition-order missing/,
   )
 })
 
@@ -132,13 +191,14 @@ test('alignment is derived and readiness excludes partial contracts', () => {
     /is partial/,
   )
 
-  const compared = deriveAlignment(registry, {
-    verdict: 'pass',
-    identity: { contract: 'partial' },
-  })
-  assert.deepEqual(compared.gaps[0].missingArtifacts, [
-    'required-member-coverage',
-  ])
+  assert.throws(
+    () =>
+      deriveAlignment(registry, {
+        verdict: 'pass',
+        identity: { contract: 'partial' },
+      }),
+    /was not current-validated/,
+  )
 })
 
 test('web-only contracts remain explicit without becoming Avalonia gaps', () => {
@@ -147,12 +207,28 @@ test('web-only contracts remain explicit without becoming Avalonia gaps', () => 
       {
         id: 'web-only-bound',
         component: { exportStatus: 'web-only' },
+        platformException: {
+          reason: 'Browser-only primitive.',
+          alternative: 'Use the native overlay primitive.',
+          owner: 'FsusUI Core',
+          testPolicy: 'Real browser regression test.',
+          reviewPolicy: 'Review on each minor release.',
+          reviewedAt: '2026-08-30',
+        },
         bindings: { avalonia: { status: 'bound' } },
         coverage: { missing: 0, partial: 0, webOnly: 1 },
       },
       {
         id: 'web-only-unbound',
         component: { exportStatus: 'web-only' },
+        platformException: {
+          reason: 'Browser-only primitive.',
+          alternative: 'Use the native overlay primitive.',
+          owner: 'FsusUI Core',
+          testPolicy: 'Real browser regression test.',
+          reviewPolicy: 'Review on each minor release.',
+          reviewedAt: '2026-08-30',
+        },
         bindings: { avalonia: { status: 'unbound' } },
         coverage: { missing: 0, partial: 0, webOnly: 1 },
       },
@@ -175,6 +251,25 @@ test('web-only contracts remain explicit without becoming Avalonia gaps', () => 
   assert.equal(alignment.consumers.nugetStableEligible, true)
   assert.equal(alignment.consumers.releaseReady, true)
   validateReadiness(alignment)
+})
+
+test('unreviewed web-only labels remain release-blocking gaps', () => {
+  const alignment = deriveAlignment({
+    contracts: [
+      {
+        id: 'unreviewed-web-only',
+        owner: 'FsusUI Core',
+        component: { exportStatus: 'web-only' },
+        bindings: { avalonia: { status: 'unbound' } },
+        coverage: { missing: 0, partial: 0, webOnly: 1 },
+        scenarioIds: ['scenario.unreviewed'],
+        requirements: {},
+      },
+    ],
+  })
+  assert.equal(alignment.statuses[0].status, 'missing')
+  assert.equal(alignment.gaps.length, 1)
+  assert.equal(alignment.consumers.releaseReady, false)
 })
 
 test('T762-01 stable readiness rejects missing, stale, and tampered alignment', () => {
@@ -229,7 +324,11 @@ test('T762-01 stable readiness rejects missing, stale, and tampered alignment', 
   fs.writeFileSync(tamperedPath, `${JSON.stringify(tampered, null, 2)}\n`)
   try {
     assert.throws(
-      () => stableReadinessReadAlignment(tamperedPath, currentExpected),
+      () =>
+        stableReadinessReadAlignment(tamperedPath, {
+          candidate: valid.identity.candidate,
+          contractHash: valid.identity.contractHash,
+        }),
       /integrity hash is invalid/u,
     )
   } finally {

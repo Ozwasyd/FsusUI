@@ -27,6 +27,7 @@ const requiredIdentity = [
   'motion',
   'runnerHash',
 ]
+const validatedComparisons = new WeakSet()
 const governedOverride = [
   'field',
   'reason',
@@ -39,6 +40,11 @@ const digest = (value) =>
   crypto
     .createHash('sha256')
     .update(typeof value === 'string' ? value : stableJson(value))
+    .digest('hex')
+const digestFile = (file) =>
+  crypto
+    .createHash('sha256')
+    .update(fs.readFileSync(path.resolve(root, file)))
     .digest('hex')
 const readJson = (file) =>
   JSON.parse(fs.readFileSync(path.resolve(root, file), 'utf8'))
@@ -155,6 +161,186 @@ const same = (left, right, field) => {
     fail(
       `${field} mismatch expected=${JSON.stringify(left)} actual=${JSON.stringify(right)}`,
     )
+  }
+}
+
+const validateContractExecution = (execution, platform, contractId) => {
+  if (!execution || typeof execution !== 'object')
+    fail(`${platform}.contractExecutions.${contractId} missing`)
+  for (const field of requiredIdentity) {
+    if (
+      execution.identity?.[field] === undefined ||
+      execution.identity[field] === ''
+    )
+      fail(`${platform}.${contractId}.identity.${field} missing`)
+  }
+  if (execution.identity.contract !== contractId)
+    fail(`${platform}.${contractId}.identity.contract mismatch`)
+  if (!Array.isArray(execution.steps) || execution.steps.length === 0)
+    fail(`${platform}.${contractId}.steps missing`)
+  execution.steps.forEach((step, index) => {
+    if (step.index !== index)
+      fail(`${platform}.${contractId}.steps[${index}].index mismatch`)
+    if (step.observation?.passed !== true)
+      fail(`${platform}.${contractId}.steps[${index}] failed`)
+    same(
+      execution.identity,
+      step.binding,
+      `${platform}.${contractId}.steps[${index}].binding`,
+    )
+    if (!Number.isFinite(step.elapsedMilliseconds))
+      fail(`${platform}.${contractId}.steps[${index}].elapsedMilliseconds missing`)
+  })
+  const coverage = execution.coverage
+  if (!Array.isArray(coverage?.requiredMembers))
+    fail(`${platform}.${contractId}.coverage.requiredMembers missing`)
+  if (!coverage?.memberScenarios || typeof coverage.memberScenarios !== 'object')
+    fail(`${platform}.${contractId}.coverage.memberScenarios missing`)
+  if (!Array.isArray(coverage?.requiredScenarios))
+    fail(`${platform}.${contractId}.coverage.requiredScenarios missing`)
+  if (!coverage?.executions || typeof coverage.executions !== 'object')
+    fail(`${platform}.${contractId}.coverage.executions missing`)
+  for (const member of coverage.requiredMembers) {
+    if (!coverage.memberScenarios[member]?.length)
+      fail(`${platform}.${contractId}.coverage.member.${member} missing scenario`)
+  }
+  for (const scenario of coverage.requiredScenarios) {
+    const receipt = coverage.executions[scenario]
+    if (receipt?.real !== true)
+      fail(`${platform}.${contractId}.coverage.scenario.${scenario} metadata-only`)
+    if (!Array.isArray(receipt.stepIndexes) || receipt.stepIndexes.length === 0)
+      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes missing`)
+    if (
+      receipt.stepIndexes.some(
+        (index) =>
+          !Number.isInteger(index) ||
+          index < 0 ||
+          index >= execution.steps.length,
+      )
+    )
+      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes invalid`)
+    if (!Array.isArray(receipt.artifacts) || receipt.artifacts.length === 0)
+      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.artifacts missing`)
+  }
+  same(execution.identity, execution.visual?.identity, `${platform}.${contractId}.visual.identity`)
+  same(
+    execution.identity,
+    execution.performance?.identity,
+    `${platform}.${contractId}.performance.identity`,
+  )
+  if (
+    execution.visual?.renderedTopLevel !== true ||
+    !execution.visual?.sha256 ||
+    execution.visual?.observation?.focusIndicatorVisible !== true
+  )
+    fail(`${platform}.${contractId}.visual rendered focused artifact missing`)
+  if (
+    execution.performance?.passed !== true ||
+    !Number.isFinite(execution.performance?.elapsedMilliseconds) ||
+    !Number.isFinite(execution.performance?.budgetMilliseconds) ||
+    execution.performance.elapsedMilliseconds >
+      execution.performance.budgetMilliseconds
+  )
+    fail(`${platform}.${contractId}.performance budget failed`)
+  if (!execution.accessibility?.node)
+    fail(`${platform}.${contractId}.accessibility node missing`)
+  if (
+    platform === 'web' &&
+    (execution.accessibility.source !==
+      'chromium-cdp-accessibility-and-atspi' ||
+      execution.accessibility.atspiReachable !== true)
+  )
+    fail(`web.${contractId}.accessibility AT-SPI evidence missing`)
+  if (
+    platform === 'avalonia' &&
+    execution.accessibility.source !== 'real-avalonia-automation-peer'
+  )
+    fail(`avalonia.${contractId}.accessibility AutomationPeer evidence missing`)
+  return execution
+}
+
+const checkedState = (value) => {
+  if ([true, 'true', 'on', 'checked'].includes(value)) return true
+  if ([false, 'false', 'off', 'unchecked'].includes(value)) return false
+  return null
+}
+
+const compareCheckTagExecution = (web, avalonia) => {
+  const contractId = 'component-v2.el-check-tag'
+  validateContractExecution(web, 'web', contractId)
+  validateContractExecution(avalonia, 'avalonia', contractId)
+  for (const field of requiredIdentity)
+    same(web.identity[field], avalonia.identity[field], `${contractId}.identity.${field}`)
+  same(web.coverage, avalonia.coverage, `${contractId}.coverage`)
+  same(false, web.state.checked, `${contractId}.web.state.checked`)
+  same(false, avalonia.state.checked, `${contractId}.avalonia.state.checked`)
+  same(web.state.revision, avalonia.state.revision, `${contractId}.state.revision`)
+  same('checkbox', web.state.focus, `${contractId}.web.state.focus`)
+  same('checkbox', avalonia.state.focus, `${contractId}.avalonia.state.focus`)
+  same(
+    ['change', 'update:checked', 'change', 'update:checked'],
+    web.events.map((event) => event.name),
+    `${contractId}.web.events.order`,
+  )
+  same(
+    [true, true, false, false],
+    web.events.map((event) => event.payload),
+    `${contractId}.web.events.payload`,
+  )
+  same(
+    [true, false],
+    avalonia.events.map((event) => event.payload),
+    `${contractId}.avalonia.events.payload`,
+  )
+  same(
+    web.events.filter((event) => event.name === 'change').map((event) => event.payload),
+    avalonia.events.map((event) => event.payload),
+    `${contractId}.events.semantic`,
+  )
+  for (const [platform, execution] of [
+    ['web', web],
+    ['avalonia', avalonia],
+  ]) {
+    const node = execution.accessibility.node
+    same('checkbox', node.role, `${contractId}.${platform}.a11y.role`)
+    same('Check tag', node.name, `${contractId}.${platform}.a11y.name`)
+    same(false, checkedState(node.states.checkedState), `${contractId}.${platform}.a11y.checked`)
+    same(true, node.focus.keyboardFocusable, `${contractId}.${platform}.a11y.focusable`)
+    same('reduced', execution.state.motion.mode, `${contractId}.${platform}.motion.mode`)
+    same(false, execution.state.motion.active, `${contractId}.${platform}.motion.active`)
+    same(
+      {
+        checked: false,
+        content: 'Check tag',
+        focused: true,
+        focusIndicatorVisible: true,
+      },
+      {
+        checked: execution.visual.observation.checked,
+        content: execution.visual.observation.content,
+        focused: execution.visual.observation.focused,
+        focusIndicatorVisible:
+          execution.visual.observation.focusIndicatorVisible,
+      },
+      `${contractId}.${platform}.visual.observation`,
+    )
+  }
+  return {
+    schema: 'fsusui.conformance-contract-comparison.v2',
+    verdict: 'pass',
+    identity: web.identity,
+    evidenceDigests: { web: digest(web), avalonia: digest(avalonia) },
+    coverage: web.coverage,
+    comparedArtifacts: [
+      'required-member-coverage',
+      'same-identity-keyboard-evidence',
+      'same-identity-pointer-evidence',
+      'same-identity-focus-evidence',
+      'same-identity-a11y-evidence',
+      'same-identity-motion-evidence',
+      'same-identity-perf-evidence',
+      'same-identity-cross-platform-comparison',
+    ],
   }
 }
 const normalizeWeb = (evidence) => {
@@ -308,6 +494,52 @@ export function compareEvidence(web, avalonia) {
   ]) {
     same(left.a11y[field], right.a11y[field], `accessibility.markdown.${field}`)
   }
+  const markdownReceipt = {
+    schema: 'fsusui.conformance-contract-comparison.v2',
+    verdict: 'pass',
+    identity: web.identity,
+    evidenceDigests: { web: digest(web), avalonia: digest(avalonia) },
+    comparedArtifacts: [
+      'same-identity-keyboard-evidence',
+      'same-identity-focus-evidence',
+      'same-identity-a11y-evidence',
+      'same-identity-perf-evidence',
+      'same-identity-cross-platform-comparison',
+    ],
+  }
+  const webContractIds = Object.keys(web.contractExecutions ?? {}).sort()
+  const avaloniaContractIds = Object.keys(
+    avalonia.contractExecutions ?? {},
+  ).sort()
+  same(webContractIds, avaloniaContractIds, 'contractExecutions.ids')
+  const receipts = {
+    [web.identity.contract]: markdownReceipt,
+  }
+  for (const contractId of webContractIds) {
+    if (contractId === 'component-v2.el-check-tag') {
+      receipts[contractId] = compareCheckTagExecution(
+        web.contractExecutions[contractId],
+        avalonia.contractExecutions[contractId],
+      )
+      continue
+    }
+    fail(`contractExecutions.${contractId} comparator missing`)
+  }
+  for (const [contractId, receipt] of Object.entries(receipts)) {
+    for (const field of [
+      'candidate',
+      'contractHash',
+      'webBaselineHash',
+      'avaloniaBaselineHash',
+      'runnerHash',
+    ]) {
+      same(
+        web.identity[field],
+        receipt.identity?.[field],
+        `receipts.${contractId}.identity.${field}`,
+      )
+    }
+  }
   return {
     schema: 'fsusui.conformance-comparison.v2',
     verdict: 'pass',
@@ -319,6 +551,95 @@ export function compareEvidence(web, avalonia) {
       'accessibility',
       'performance',
     ],
+    receipts,
+  }
+}
+
+export function validateCurrentComparison(
+  comparison,
+  web,
+  avalonia,
+  expected,
+) {
+  if (comparison?.schema !== 'fsusui.conformance-comparison.v2')
+    fail('comparison.schema invalid')
+  if (comparison.verdict !== 'pass') fail('comparison.verdict failed')
+  for (const field of [
+    'candidate',
+    'contractHash',
+    'webBaselineHash',
+    'avaloniaBaselineHash',
+    'runnerHash',
+  ]) {
+    same(
+      expected[field],
+      comparison.identity?.[field],
+      `comparison.identity.${field}`,
+    )
+  }
+  if (comparison.identity?.contract !== expected.contract)
+    fail('comparison.identity.contract mismatch')
+  if (comparison.identity?.scenario !== expected.scenario)
+    fail('comparison.identity.scenario mismatch')
+  if (!comparison.evidenceDigests?.web || !comparison.evidenceDigests?.avalonia)
+    fail('comparison.evidenceDigests missing')
+  same(
+    comparison.evidenceDigests.web,
+    digest(web),
+    'comparison.evidenceDigests.web',
+  )
+  same(
+    comparison.evidenceDigests.avalonia,
+    digest(avalonia),
+    'comparison.evidenceDigests.avalonia',
+  )
+  for (const artifact of [
+    'public-state',
+    'transition-order',
+    'accessibility',
+    'performance',
+  ]) {
+    if (!comparison.compared?.includes(artifact))
+      fail(`comparison.requiredArtifact.${artifact} missing`)
+  }
+  const recomputed = compareEvidence(web, avalonia)
+  same(recomputed, comparison, 'comparison.recomputed')
+  validatedComparisons.add(comparison)
+  return comparison
+}
+
+const currentComparisonIdentity = (contractPath) => {
+  const candidate = spawnSync('git', ['rev-parse', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+  }).stdout.trim()
+  return {
+    candidate,
+    contractHash: digestFile(contractPath),
+    webBaselineHash: digestFile('spec/baselines/vue-current.json'),
+    avaloniaBaselineHash: digestFile(
+      'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
+    ),
+    runnerHash: crypto
+      .createHash('sha256')
+      .update(
+        fs.readFileSync(
+          path.resolve(root, 'scripts/avalonia-conformance-v2.mjs'),
+        ),
+      )
+      .update(
+        fs.readFileSync(
+          path.resolve(root, 'scripts/native-screen-reader-harness.mjs'),
+        ),
+      )
+      .update(
+        fs.readFileSync(
+          path.resolve(root, 'scripts/conformance-v2-evidence.mjs'),
+        ),
+      )
+      .digest('hex'),
+    contract: 'component-v2.el-markdown-editor',
+    scenario: 'scenario.v2.el-markdown-editor.real-interaction-trace',
   }
 }
 
@@ -364,13 +685,14 @@ const contractMembers = (contract) =>
     (contract[section] ?? []).map((member) => ({ section, ...member })),
   )
 
-const evidenceArtifactsFor = (contract, requiredMembers) => {
+const evidenceArtifactsFor = (contract) => {
   const artifacts = new Set()
   if (contract.bindings?.avalonia?.status === 'unbound') {
     artifacts.add('avalonia-public-api-baseline')
     artifacts.add('contract-v2-avalonia-binding')
   }
-  if (requiredMembers.length > 0) artifacts.add('required-member-coverage')
+  if (contractMembers(contract).length > 0)
+    artifacts.add('required-member-coverage')
   for (const [kind, requirements] of Object.entries(
     contract.requirements ?? {},
   )) {
@@ -381,7 +703,7 @@ const evidenceArtifactsFor = (contract, requiredMembers) => {
   return [...artifacts]
 }
 
-const deriveGap = (contract, status, comparison) => {
+const deriveGap = (contract, status, receipt) => {
   const requiredMembers = contractMembers(contract)
     .filter((member) => member.status !== 'aligned-candidate')
     .map((member) => ({
@@ -408,10 +730,7 @@ const deriveGap = (contract, status, comparison) => {
       'Static mapping has no member gap, but required same-identity cross-platform evidence is absent.'
   }
   const requiredScenarios = [...new Set(contract.scenarioIds ?? [])]
-  const requiredEvidence = evidenceArtifactsFor(contract, requiredMembers)
-  const hasCurrentComparison =
-    comparison?.verdict === 'pass' &&
-    comparison.identity?.contract === contract.id
+  const requiredEvidence = evidenceArtifactsFor(contract)
   return {
     contract: contract.id,
     status,
@@ -428,8 +747,7 @@ const deriveGap = (contract, status, comparison) => {
     missingMembers: contract.coverage?.missing ?? 0,
     partialMembers: contract.coverage?.partial ?? 0,
     missingArtifacts: requiredEvidence.filter(
-      (artifact) =>
-        !hasCurrentComparison || !artifact.startsWith('same-identity-'),
+      (artifact) => !receipt?.comparedArtifacts?.includes(artifact),
     ),
   }
 }
@@ -474,25 +792,91 @@ const validateGap = (gap) => {
   }
 }
 
+const validReviewedPlatformException = (contract) => {
+  const exception = contract.platformException
+  return [
+    'reason',
+    'alternative',
+    'owner',
+    'testPolicy',
+    'reviewPolicy',
+    'reviewedAt',
+  ].every(
+    (field) =>
+      typeof exception?.[field] === 'string' && exception[field].trim() !== '',
+  )
+}
+
+const validateReceiptForContract = (contract, receipt) => {
+  if (!receipt) return null
+  if (receipt.schema !== 'fsusui.conformance-contract-comparison.v2')
+    fail(`alignment.receipt.${contract.id}.schema invalid`)
+  if (receipt.verdict !== 'pass')
+    fail(`alignment.receipt.${contract.id}.verdict failed`)
+  if (receipt.identity?.contract !== contract.id)
+    fail(`alignment.receipt.${contract.id}.identity mismatch`)
+  const expectedScenarios = [...new Set(contract.scenarioIds ?? [])].sort()
+  const expectedMembers = contractMembers(contract)
+    .map((member) => `${toCoverageKind(member.kind)}.${member.name}`)
+    .sort()
+  if (expectedMembers.length > 0) {
+    same(
+      expectedScenarios,
+      [...(receipt.coverage?.requiredScenarios ?? [])].sort(),
+      `alignment.receipt.${contract.id}.coverage.requiredScenarios`,
+    )
+    same(
+      expectedMembers,
+      [...(receipt.coverage?.requiredMembers ?? [])].sort(),
+      `alignment.receipt.${contract.id}.coverage.requiredMembers`,
+    )
+    for (const member of expectedMembers) {
+      if (!receipt.coverage?.memberScenarios?.[member]?.length)
+        fail(`alignment.receipt.${contract.id}.coverage.member.${member} missing`)
+    }
+  }
+  return receipt
+}
+
+const toCoverageKind = (kind) =>
+  kind === 'contentRegion' ? 'content-region' : kind
+
 export function deriveAlignment(registry, comparison = null) {
+  if (comparison && !validatedComparisons.has(comparison))
+    fail('alignment.comparison receipt was not current-validated')
   const statuses = []
   const gaps = []
   for (const contract of registry.contracts ?? []) {
     const coverage = contract.coverage ?? {}
-    let status
-    if (contract.component?.exportStatus === 'web-only') status = 'web-only'
-    else if (contract.bindings?.avalonia?.status === 'unbound') status = 'missing'
-    else if ((coverage.missing ?? 0) > 0 || (coverage.partial ?? 0) > 0)
-      status = 'partial'
-    else if (
-      comparison?.verdict === 'pass' &&
-      comparison.identity.contract === contract.id
+    const receipt = validateReceiptForContract(
+      contract,
+      comparison?.receipts?.[contract.id] ?? null,
     )
+    const requiredEvidence = evidenceArtifactsFor(contract)
+    const hasCompleteReceipt =
+      receipt &&
+      requiredEvidence.every((artifact) =>
+        receipt.comparedArtifacts?.includes(artifact),
+      )
+    let status
+    if (
+      contract.component?.exportStatus === 'web-only' &&
+      validReviewedPlatformException(contract)
+    )
+      status = 'web-only'
+    else if (contract.bindings?.avalonia?.status === 'unbound') status = 'missing'
+    else if (
+      (coverage.missing ?? 0) > 0 ||
+      (coverage.partial ?? 0) > 0 ||
+      (coverage.webOnly ?? 0) > 0
+    )
+      status = 'partial'
+    else if (hasCompleteReceipt)
       status = 'aligned'
     else status = 'blocked'
     statuses.push({ id: contract.id, status, source: 'derived' })
     if (status !== 'aligned' && status !== 'web-only')
-      gaps.push(deriveGap(contract, status, comparison))
+      gaps.push(deriveGap(contract, status, receipt))
   }
   for (const type of registry.avaloniaOnlyTypes ?? []) {
     statuses.push({
@@ -603,7 +987,10 @@ const writeConsumers = (alignment, args) => {
   }
 }
 
-const mutationCases = (positive) => [
+const mutationCases = (positive) => {
+  const currentComparison = compareEvidence(positive.web, positive.avalonia)
+  const expectedComparisonIdentity = { ...currentComparison.identity }
+  return [
   [
     'vue-prop-removed',
     'vue.baseline.inputTreeHash stale',
@@ -703,6 +1090,141 @@ const mutationCases = (positive) => [
     'stale-evidence-hash',
     'identity.contractHash mismatch',
     () => same('current', 'stale', 'identity.contractHash'),
+  ],
+  [
+    'stale-comparison-candidate',
+    'comparison.identity.candidate mismatch',
+    () =>
+      validateCurrentComparison(
+        {
+          ...currentComparison,
+          identity: {
+            ...currentComparison.identity,
+            candidate: 'stale-candidate',
+          },
+        },
+        positive.web,
+        positive.avalonia,
+        expectedComparisonIdentity,
+      ),
+  ],
+  [
+    'stale-comparison-contract',
+    'comparison.identity.contractHash mismatch',
+    () =>
+      validateCurrentComparison(
+        {
+          ...currentComparison,
+          identity: {
+            ...currentComparison.identity,
+            contractHash: 'stale-contract',
+          },
+        },
+        positive.web,
+        positive.avalonia,
+        expectedComparisonIdentity,
+      ),
+  ],
+  [
+    'stale-comparison-web-baseline',
+    'comparison.identity.webBaselineHash mismatch',
+    () =>
+      validateCurrentComparison(
+        {
+          ...currentComparison,
+          identity: {
+            ...currentComparison.identity,
+            webBaselineHash: 'stale-web-baseline',
+          },
+        },
+        positive.web,
+        positive.avalonia,
+        expectedComparisonIdentity,
+      ),
+  ],
+  [
+    'stale-comparison-avalonia-baseline',
+    'comparison.identity.avaloniaBaselineHash mismatch',
+    () =>
+      validateCurrentComparison(
+        {
+          ...currentComparison,
+          identity: {
+            ...currentComparison.identity,
+            avaloniaBaselineHash: 'stale-avalonia-baseline',
+          },
+        },
+        positive.web,
+        positive.avalonia,
+        expectedComparisonIdentity,
+      ),
+  ],
+  [
+    'stale-comparison-runner',
+    'comparison.identity.runnerHash mismatch',
+    () =>
+      validateCurrentComparison(
+        {
+          ...currentComparison,
+          identity: {
+            ...currentComparison.identity,
+            runnerHash: 'stale-runner',
+          },
+        },
+        positive.web,
+        positive.avalonia,
+        expectedComparisonIdentity,
+      ),
+  ],
+  [
+    'stale-comparison-scenario',
+    'comparison.identity.scenario mismatch',
+    () =>
+      validateCurrentComparison(
+        {
+          ...currentComparison,
+          identity: {
+            ...currentComparison.identity,
+            scenario: 'scenario.stale',
+          },
+        },
+        positive.web,
+        positive.avalonia,
+        expectedComparisonIdentity,
+      ),
+  ],
+  [
+    'tampered-comparison-web-evidence-digest',
+    'comparison.evidenceDigests.web mismatch',
+    () =>
+      validateCurrentComparison(
+        {
+          ...currentComparison,
+          evidenceDigests: {
+            ...currentComparison.evidenceDigests,
+            web: 'tampered-web-evidence',
+          },
+        },
+        positive.web,
+        positive.avalonia,
+        expectedComparisonIdentity,
+      ),
+  ],
+  [
+    'comparison-required-artifact-removed',
+    'comparison.requiredArtifact.accessibility missing',
+    () =>
+      validateCurrentComparison(
+        {
+          ...currentComparison,
+          compared: currentComparison.compared.filter(
+            (artifact) => artifact !== 'accessibility',
+          ),
+        },
+        positive.web,
+        positive.avalonia,
+        expectedComparisonIdentity,
+      ),
   ],
   [
     'partial-enters-stable',
@@ -823,7 +1345,8 @@ const mutationCases = (positive) => [
         reviewPolicy: 'per-release',
       }),
   ],
-]
+  ]
+}
 
 export function runMutations(positive) {
   const comparison = compareEvidence(positive.web, positive.avalonia)
@@ -882,17 +1405,22 @@ async function cli() {
     console.log(`conformance-v2 comparator passed: ${args.out}`)
   } else if (command === 'derive') {
     const comparison = args.comparison ? readJson(args.comparison) : null
+    if (!args.web || !args.avalonia)
+      fail('derive current Web and Avalonia evidence paths are required')
+    const web = readJson(args.web)
+    const avalonia = readJson(args.avalonia)
+    const expectedComparisonIdentity = currentComparisonIdentity(args.contract)
+    validateCurrentComparison(
+      comparison,
+      web,
+      avalonia,
+      expectedComparisonIdentity,
+    )
     const result = deriveAlignment(readJson(args.contract), comparison)
-    const candidate =
-      !args.candidate || args.candidate === 'git'
-        ? spawnSync('git', ['rev-parse', 'HEAD'], {
-            cwd: root,
-            encoding: 'utf8',
-          }).stdout.trim()
-        : args.candidate
     result.identity = {
-      candidate,
-      contractHash: digest(fs.readFileSync(path.resolve(root, args.contract))),
+      ...expectedComparisonIdentity,
+      comparisonHash: digest(comparison),
+      evidenceDigests: comparison.evidenceDigests,
     }
     result.identity.alignmentHash = digest({
       statuses: result.statuses,

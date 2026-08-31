@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "7b13c097524b3a2b7b20d35a86909a64b61adcd9",
+    "commitSha": "4e44fd12d5b3c06181d8c7deaab4a0a9c0f28fb7",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "3223235f07d91bd62ab7b88084784669c1a30841e1f94e5a46d2a0ef8de1b971",
+    "inputTreeHash": "1ee91e319cadbe6c0494c036f0dc9bb6e63deb5354d57bdbac6b37f557d5091d",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "b1f288d90de5391e87d1669997e960850b579727dc0734bce7fbcd0e0e4a6f29"
+    "outputHash": "19b74ec38569ac9199b0d1340ab462886595f68a60770a6705a10a83dee75897"
   },
   "summary": {
     "componentModules": 93,
@@ -24,9 +24,9 @@
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
-      "native-adapter": 73,
+      "native-adapter": 76,
       "platform-override": 21,
-      "web-only": 8
+      "web-only": 5
     }
   },
   "installableComponents": [
@@ -1254,7 +1254,7 @@
     {
       "name": "ElAffix",
       "module": "affix",
-      "classification": "web-only",
+      "classification": "native-adapter",
       "props": ["offset", "position", "target", "zIndex"],
       "emits": ["[CHANGE_EVENT]", "scroll"],
       "slots": [
@@ -2144,7 +2144,7 @@
     {
       "name": "ElBacktop",
       "module": "backtop",
-      "classification": "web-only",
+      "classification": "native-adapter",
       "props": ["bottom", "right", "target", "visibilityHeight"],
       "emits": ["click"],
       "slots": [
@@ -9495,7 +9495,7 @@
     {
       "name": "ElInfiniteScroll",
       "module": "infinite-scroll",
-      "classification": "web-only",
+      "classification": "native-adapter",
       "props": [],
       "emits": [],
       "slots": [],
@@ -31094,7 +31094,7 @@
     {
       "name": "ElInfiniteScroll",
       "source": "@element-plus/components/infinite-scroll",
-      "classification": "web-only"
+      "classification": "native-adapter"
     },
     {
       "name": "ElLoading",
@@ -35446,10 +35446,7 @@
     }
   ],
   "webOnlyApis": [
-    "ElAffix",
-    "ElBacktop",
     "ElCollapseTransition",
-    "ElInfiniteScroll",
     "ElPopper",
     "ElPopperArrow",
     "ElPopperContent",

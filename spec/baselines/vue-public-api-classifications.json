@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "componentModules": {
-    "affix": "web-only",
+    "affix": "native-adapter",
     "alert": "portable",
     "autocomplete": "native-adapter",
     "avatar": "portable",
-    "backtop": "web-only",
+    "backtop": "native-adapter",
     "badge": "portable",
     "breadcrumb": "portable",
     "button": "portable",
@@ -37,7 +37,7 @@
     "image": "native-adapter",
     "image-viewer": "platform-override",
     "inbox-primitives": "portable",
-    "infinite-scroll": "web-only",
+    "infinite-scroll": "native-adapter",
     "input": "native-adapter",
     "input-number": "native-adapter",
     "link": "portable",
@@ -107,7 +107,7 @@
     "ElNotification": "platform-override"
   },
   "plugins": {
-    "ElInfiniteScroll": "web-only",
+    "ElInfiniteScroll": "native-adapter",
     "ElLoading": "platform-override",
     "ElMessage": "platform-override",
     "ElMessageBox": "platform-override",

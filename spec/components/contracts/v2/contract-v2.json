@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "c0c821a48017efc71c33b7e93ad4cb70a6ab1d96be145c242297e21c0f0589bc",
+      "hash": "b5847900ac006e00494148ab6f1bbf292dc63da835d1956cd3096849e9a5d3bf",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -4330,8 +4330,8 @@
       "component": {
         "name": "ElAffix",
         "module": "affix",
-        "classification": "web-only",
-        "exportStatus": "web-only"
+        "classification": "native-adapter",
+        "exportStatus": "missing"
       },
       "bindings": {
         "web": {
@@ -4376,7 +4376,7 @@
             "type": "System.Double",
             "nullable": false
           },
-          "status": "web-only",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -4388,12 +4388,7 @@
           "scenarioIds": [
             "scenario.v2.el-affix.input.offset"
           ],
-          "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "position",
@@ -4418,7 +4413,7 @@
             "readonly": false
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -4431,7 +4426,7 @@
             "scenario.v2.el-affix.input.position"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -4457,7 +4452,7 @@
             "readonly": false
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -4470,7 +4465,7 @@
             "scenario.v2.el-affix.input.target"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -4496,7 +4491,7 @@
             "readonly": false
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -4509,7 +4504,7 @@
             "scenario.v2.el-affix.input.z-index"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -4534,7 +4529,7 @@
             "payloadType": "boolean"
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -4547,7 +4542,7 @@
             "scenario.v2.el-affix.output.change"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -4570,7 +4565,7 @@
             "payloadType": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -4583,7 +4578,7 @@
             "scenario.v2.el-affix.output.scroll"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -4603,7 +4598,7 @@
             }
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -4616,7 +4611,7 @@
             "scenario.v2.el-affix.operation.update"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -4634,7 +4629,7 @@
             }
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -4647,7 +4642,7 @@
             "scenario.v2.el-affix.operation.update-root"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -4668,7 +4663,7 @@
             "member": "Content",
             "content": true
           },
-          "status": "web-only",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -4680,12 +4675,7 @@
           "scenarioIds": [
             "scenario.v2.el-affix.content-region.default"
           ],
-          "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "states": {
@@ -4719,7 +4709,85 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
-      "platformDifferences": [],
+      "platformDifferences": [
+        {
+          "member": "position",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "target",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "zIndex",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "change",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "scroll",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "update",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "updateRoot",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
       "avaloniaExtras": [
         {
           "member": "AffixedChanged",
@@ -4821,11 +4889,11 @@
       ],
       "coverage": {
         "total": 9,
-        "alignedCandidate": 0,
+        "alignedCandidate": 2,
         "partial": 0,
-        "missing": 0,
-        "webOnly": 9,
-        "mappedPercent": 0
+        "missing": 7,
+        "webOnly": 0,
+        "mappedPercent": 22.2
       }
     },
     {
@@ -8540,8 +8608,8 @@
       "component": {
         "name": "ElBacktop",
         "module": "backtop",
-        "classification": "web-only",
-        "exportStatus": "web-only"
+        "classification": "native-adapter",
+        "exportStatus": "missing"
       },
       "bindings": {
         "web": {
@@ -8577,7 +8645,7 @@
             "payloadType": "MouseEvent"
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -8590,7 +8658,7 @@
             "scenario.v2.el-backtop.output.click"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -8612,7 +8680,7 @@
             "member": "Content",
             "content": true
           },
-          "status": "web-only",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -8624,12 +8692,7 @@
           "scenarioIds": [
             "scenario.v2.el-backtop.content-region.default"
           ],
-          "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "states": {
@@ -8663,7 +8726,19 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
-      "platformDifferences": [],
+      "platformDifferences": [
+        {
+          "member": "click",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
       "avaloniaExtras": [
         {
           "member": "Activate",
@@ -8758,11 +8833,11 @@
       ],
       "coverage": {
         "total": 2,
-        "alignedCandidate": 0,
+        "alignedCandidate": 1,
         "partial": 0,
-        "missing": 0,
-        "webOnly": 2,
-        "mappedPercent": 0
+        "missing": 1,
+        "webOnly": 0,
+        "mappedPercent": 50
       }
     },
     {
@@ -42143,8 +42218,8 @@
       "component": {
         "name": "ElInfiniteScroll",
         "module": "infinite-scroll",
-        "classification": "web-only",
-        "exportStatus": "web-only"
+        "classification": "native-adapter",
+        "exportStatus": "aligned-candidate"
       },
       "bindings": {
         "web": {
@@ -143752,11 +143827,11 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 180,
+    "aligned-candidate": 183,
     "partial": 86,
-    "missing": 1976,
-    "web-only": 20,
+    "missing": 1984,
+    "web-only": 9,
     "total": 2262,
-    "mappedPercent": 11.8
+    "mappedPercent": 11.9
   }
 }
