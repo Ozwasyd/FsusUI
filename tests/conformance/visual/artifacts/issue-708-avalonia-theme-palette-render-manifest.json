@@ -7,12 +7,14 @@
     "runner": "headless-skia",
     "drawingBackend": "Skia",
     "productionFixture": true,
+    "inputModes": ["keyboard"],
+    "motionMode": "reduced",
     "limitations": "Local deterministic headless rendering; no physical display or operating-system assistive technology is claimed."
   },
   "captures": [
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-light.png",
-      "sha256": "fba35d1fd70c12afa972da71c4ea3a9d03fcc89b62c7e02b574f2408de8e79c7",
+      "sha256": "2778ac74e1b4705a6db0f8f79a63ca6d6ac210ef8ee9b8cf1677dc85c6ded49f",
       "width": 960,
       "height": 540,
       "theme": "light",
@@ -20,7 +22,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-dark.png",
-      "sha256": "b47df095cba2fc531045a685e357e4defea2a42a764f488eac0fa8269d29a125",
+      "sha256": "677bf7ea53ab2d0b841cc85b31d42ffaa4ae430de54ca539c9d5dadcc4029909",
       "width": 960,
       "height": 540,
       "theme": "dark",
@@ -28,7 +30,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-custom.png",
-      "sha256": "d1a6159292dcd24345806977f1714fca30e11404a62b567f57e097dd859618cf",
+      "sha256": "974d75c45c8051a5c2157058b8bc7ce52fb0b54e09d5e6d5a41e69f1aec4330b",
       "width": 960,
       "height": 540,
       "theme": "light",
@@ -36,7 +38,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-partial-dark.png",
-      "sha256": "1394401e47735e4d0667b02fc0e134f198ca14f374c17c87ac9ef5dc22a5fb14",
+      "sha256": "1ba0b68807a5ca6820940f49a9cfba8bcde7550355c7a1900811755362cb77c1",
       "width": 960,
       "height": 540,
       "theme": "dark",
@@ -44,7 +46,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-highcontrast.png",
-      "sha256": "e99c36aa761ef1185c3b6e6e626afb45ed9241f9d6463ec141eb6a54c90f56c5",
+      "sha256": "e8d59809dc3ada3131cd0c87768e84a013f60368674748db0177e0e8d87d09cb",
       "width": 960,
       "height": 540,
       "theme": "highcontrast",

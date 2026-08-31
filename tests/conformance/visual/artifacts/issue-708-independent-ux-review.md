@@ -2,8 +2,8 @@
 
 Status: accepted for the local Avalonia Headless/Skia rendered-evidence class.
 
-Reviewers: root and `/root/acceptance_audit` (both independent of the
-implementation worktree changes).
+Reviewer: `/root/acceptance_audit` (independent of the implementation
+worktree changes).
 
 The five 960x540 production-fixture captures were individually inspected at
 original resolution, and their SHA-256 digests match the render manifest. Each
@@ -11,6 +11,8 @@ capture uses the production desktop Markdown shell composite
 `FsusNativeTitleBar` + `FsusActivityRailShell` + `FsusDocumentTabs`, together
 with `FsusTextEditor`, `FsusMarkdownEditor`, `FsusTree`, `FsusSelect`,
 `FsusIcon`, and `FsusText` controls rather than palette swatches.
+Every capture applies reduced motion and places keyboard focus on the
+production `FsusSelect`; no pointer interaction is claimed by this evidence.
 
 - Light preserves distinct window/shell background, contextual/component
   surface, title/tab/rail raised surface, primary text, muted text, border, and

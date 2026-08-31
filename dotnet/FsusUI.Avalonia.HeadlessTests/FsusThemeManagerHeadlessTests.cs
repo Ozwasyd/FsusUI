@@ -344,9 +344,6 @@ public class FsusThemeManagerHeadlessTests
     root.Measure(new Size(width, height));
     root.Arrange(new Rect(0, 0, width, height));
     Dispatcher.UIThread.RunJobs();
-    Assert.True(select.Focus(NavigationMethod.Tab));
-    Dispatcher.UIThread.RunJobs();
-
     var activityRail = shell.GetVisualDescendants()
       .OfType<Border>()
       .Single(control => control.Classes.Contains("fsus-activity-rail"));
@@ -376,6 +373,9 @@ public class FsusThemeManagerHeadlessTests
     AssertControlBrush(raisedEditor.Background, expectedRaised);
     AssertControlBrush(mutedText.Foreground, expectedMutedText);
     AssertControlBrush(icon.Fill, expectedIcon);
+
+    Assert.True(select.Focus(NavigationMethod.Tab));
+    Dispatcher.UIThread.RunJobs();
 
     using var bitmap = new RenderTargetBitmap(new PixelSize(width, height), new Vector(96, 96));
     bitmap.Render(root);
