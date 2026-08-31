@@ -387,6 +387,13 @@ const main = async () => {
     const checkTagVisualBounds = await checkTag.boundingBox()
     if (!checkTagVisualBounds)
       throw new Error('CheckTag visual bounds are unavailable')
+    await page.mouse.move(1279, 1099)
+    await page.waitForFunction(
+      () =>
+        !document
+          .querySelector('[data-testid="trace-check-tag"]')
+          ?.matches(':hover'),
+    )
     writeFileSync(
       checkTagScreenshotPath,
       await captureDeterministicLocatorPng(checkTag),
