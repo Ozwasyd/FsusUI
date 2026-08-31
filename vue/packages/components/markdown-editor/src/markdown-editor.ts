@@ -1,3 +1,32 @@
+export {
+  commitMarkdownLanguageToolMutation,
+  createMarkdownLanguageToolSession,
+  resolveMarkdownLanguageToolCapability,
+  resolveMarkdownLanguageToolContextCapability,
+  type MarkdownLanguageToolCapability,
+  type MarkdownLanguageToolCommitInput,
+  type MarkdownLanguageToolCommitResult,
+  type MarkdownLanguageToolConfig,
+  type MarkdownLanguageToolReason,
+  type MarkdownLanguageToolSession,
+  type MarkdownLanguageToolSessionKind,
+  type MarkdownLanguageToolStatus,
+  type MarkdownNativeWritingToolsMode,
+  type MarkdownSpellcheckMode,
+} from './markdown-editor-language-tools'
+export {
+  bindMarkdownWebLanguageTools,
+  planMarkdownWebReplacement,
+  resolveMarkdownWebLanguageCoordinates,
+  type MarkdownWebLanguageBeforeInput,
+  type MarkdownWebLanguageController,
+  type MarkdownWebLanguageCoordinates,
+  type MarkdownWebTextareaLike,
+} from './markdown-editor-language-web'
+import type {
+  MarkdownNativeWritingToolsMode,
+  MarkdownSpellcheckMode,
+} from './markdown-editor-language-tools'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { buildProps, definePropType } from '@element-plus/utils'
 
@@ -1057,6 +1086,19 @@ export const markdownEditorProps = buildProps({
   minRows: {
     type: Number,
     default: 12,
+  },
+  spellcheck: {
+    type: [String, Boolean] as PropType<MarkdownSpellcheckMode | boolean>,
+    default: 'auto',
+  },
+  lang: {
+    type: String,
+    default: undefined,
+  },
+  nativeWritingTools: {
+    type: String as PropType<MarkdownNativeWritingToolsMode>,
+    values: ['auto', 'disabled'],
+    default: 'auto',
   },
 } as const)
 
