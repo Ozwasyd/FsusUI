@@ -39,8 +39,8 @@
     "authorityDigest": "0301f8cf9dc78a13ad971ddb9058546ef3615b23a9a84187690342dd75061ea3",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "e6b2b00e36068096c62892931f10914e5387ba46",
-  "candidateDigest": "de52c0416da01a2c649dd4a1e8359d59aa03414333899b19055cebdf549a4a95",
+  "candidateSha": "0755059867c9a344a3c06e67ba0efdfec04d26b7",
+  "candidateDigest": "360bd850adea9e2e2e639a390f4bbf5f478a35c43eaa1ab9b754975ed001a1f6",
   "stateEvidenceMatrix": [
     {
       "state": "focused-unchecked-after-pointer-keyboard",
@@ -65,8 +65,8 @@
     "Pixel equality between native renderers",
     "Adjacent component redesign"
   ],
-  "classificationEvidenceDigest": "70c41ba91cdea9b5e1371c51b6db84755a4e793e5ff103d31f5210adb6e717bf",
+  "classificationEvidenceDigest": "12f32cc1a0529b37bda1cc30cab41d17f7e11b1d7cc6c30447db06484572ed98",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "39052fa532a2548d630f6e4c1bb81bf5f413129169f3f54cdde5ac534392501f"
+  "receiptDigest": "e25848804e25eb0266c27e6d0a45211047924333d03d351a3bdc728a7ee24545"
 }
