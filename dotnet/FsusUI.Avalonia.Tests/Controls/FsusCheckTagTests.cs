@@ -22,6 +22,7 @@ public class FsusCheckTagTests
     Assert.Contains("Name=\"PART_FocusRing\"", theme);
     Assert.Contains("Border#PART_FocusRing", theme);
     Assert.Contains("BorderThickness\" Value=\"2\"", theme);
+    Assert.Contains("FocusAdorner\" Value=\"{x:Null}\"", theme);
     Assert.DoesNotContain("Background=\"{DynamicResource FsusThemeFocusRingBrush}\"", theme);
 
     var webTheme = File.ReadAllText(Path.Combine(

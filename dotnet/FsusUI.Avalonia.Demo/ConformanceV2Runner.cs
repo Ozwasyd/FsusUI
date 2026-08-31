@@ -12,9 +12,11 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
+using FsusUI.Avalonia.Themes;
 
 namespace FsusUI.Avalonia.Demo;
 
@@ -99,6 +101,13 @@ internal static class ConformanceV2Runner
       Title = "FsusUI Contract V2 real-window runner",
       Width = 960,
     };
+    window.RequestedThemeVariant = ThemeVariant.Light;
+    new FsusThemeManager().Apply(window.Resources, new FsusThemeOptions
+    {
+      Variant = FsusThemeVariant.Light,
+      Density = FsusDensity.Default,
+      MotionMode = FsusMotionMode.Reduced,
+    });
 
     window.Opened += async (_, _) =>
     {

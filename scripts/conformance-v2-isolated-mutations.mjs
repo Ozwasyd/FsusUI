@@ -172,6 +172,12 @@ const cases = [
       'BorderThickness" Value="0"',
     ],
     [
+      'check-tag-avalonia-default-focus-adorner-mutated',
+      'dotnet/FsusUI.Avalonia.Themes/Themes/Controls/CheckTag.axaml',
+      '    <Setter Property="FocusAdorner" Value="{x:Null}" />\n',
+      '',
+    ],
+    [
       'check-tag-web-motion-mutated',
       'vue/packages/theme-chalk/src/check-tag.scss',
       'transition-duration: 1ms',
@@ -182,12 +188,14 @@ const cases = [
     file,
     inject: () => mutateText(file, from, to),
     command:
-      id === 'check-tag-avalonia-focus-ring-mutated'
+      id.startsWith('check-tag-avalonia-')
         ? ['dotnet', ['test', 'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj', '--filter', 'FullyQualifiedName~FsusCheckTagHeadlessTests']]
         : ['pnpm', ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', 'vue/packages/theme-chalk/__tests__/fsus-theme.test.ts', '-t', 'uses Scholarly Blue state tokens']],
     expected:
-      id === 'check-tag-avalonia-focus-ring-mutated'
-        ? 'Assert.Equal() Failure'
+      id === 'check-tag-avalonia-default-focus-adorner-mutated'
+        ? 'Assert.Null() Failure'
+        : id === 'check-tag-avalonia-focus-ring-mutated'
+          ? 'Assert.Equal() Failure'
         : 'expected',
   })),
   ...[

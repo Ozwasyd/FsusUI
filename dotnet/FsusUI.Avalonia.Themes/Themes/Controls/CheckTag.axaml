@@ -11,6 +11,7 @@
     <Setter Property="FontWeight" Value="Bold" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
     <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="Template">
       <ControlTemplate>
