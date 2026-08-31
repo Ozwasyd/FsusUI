@@ -464,9 +464,6 @@ internal static class Program
     var upload = new FsusUpload { AccessibleName = "AOT upload" };
     var uploadItem = upload.AddItem("proof.txt", 5, "text/plain");
     if (uploadItem is not null) upload.SetProgress(uploadItem.Id, 1);
-    var locale = FsusAvaloniaLocaleProvider.CreateDefault();
-    locale.SetCulture("zh-cn");
-
     var progress = new FsusProgress { Value = 50 };
     var space = new FsusSpace { Spacing = 8 };
     var tabs = Named(new FsusTabs(), "AOT tabs");
@@ -480,7 +477,6 @@ internal static class Program
     var shell = Named(new FsusPublicShell(), "AOT public shell");
     var settingsHeader = Named(new FsusSettingsSectionHeader { Content = "Settings" }, "AOT settings");
     var challenge = Named(new FsusTextTaskChallenge(), "AOT challenge");
-    var localeText = new FsusText { Text = $"{locale.T("el.messagebox.confirm")} {locale.FormatNumber(1234.5m, "N1")}" };
     var stable = new Dictionary<string, SmokeScenario>(StringComparer.Ordinal)
     {
       ["button"] = new("button", button, () => button.IsEnabled && AutomationProperties.GetName(button) == "Native AOT smoke"),

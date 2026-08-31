@@ -41,6 +41,7 @@ export const alignmentHash = (alignment) =>
     statuses: alignment.statuses,
     stable: alignment.stable,
     gaps: alignment.gaps,
+    consumers: alignment.consumers,
   })
 
 export const deriveReleaseScopeFamilies = (registry) => {
@@ -92,6 +93,79 @@ export const readContractRegistry = (
   return { registry, releaseScopeFamilies }
 }
 
+export const deriveStableConsumers = (
+  registry,
+  { statuses, stable, webOnly, gaps },
+) => {
+  const byContract = registry.consumerBindings?.byContract
+  const releaseScopeFamilies = deriveReleaseScopeFamilies(registry)
+  const componentStatuses = statuses.filter((entry) =>
+    entry.id.startsWith('component-v2.'),
+  )
+  const statusByContract = new Map(
+    componentStatuses.map((entry) => [entry.id, entry.status]),
+  )
+  const contractIds = [...statusByContract.keys()].sort()
+  const bindingIds = Object.keys(byContract).sort()
+  if (JSON.stringify(bindingIds) !== JSON.stringify(contractIds)) {
+    throw new Error('Contract V2 alignment consumer contracts are incomplete')
+  }
+  const galleryStableContractsByRoute = {}
+  for (const contractId of stable) {
+    if (!contractId.startsWith('component-v2.')) continue
+    const route = byContract[contractId]?.galleryRoute
+    if (!route) {
+      throw new Error(`Contract V2 alignment ${contractId} Gallery route missing`)
+    }
+    ;(galleryStableContractsByRoute[route] ??= []).push(contractId)
+  }
+  for (const contracts of Object.values(galleryStableContractsByRoute)) {
+    contracts.sort()
+  }
+  const contractsByFamily = new Map(
+    releaseScopeFamilies.map((family) => [family, []]),
+  )
+  for (const contractId of contractIds) {
+    const binding = byContract[contractId]
+    const contracts = contractsByFamily.get(binding.releaseFamily)
+    if (!contracts || !binding.galleryRoute) {
+      throw new Error(`Contract V2 alignment ${contractId} consumer binding invalid`)
+    }
+    contracts.push(contractId)
+  }
+  const releaseStableFamilies = []
+  const releaseFamilyGaps = []
+  for (const family of releaseScopeFamilies) {
+    const contracts = contractsByFamily.get(family).sort()
+    const blockingContracts = contracts.filter(
+      (contractId) =>
+        !['aligned', 'web-only'].includes(statusByContract.get(contractId)),
+    )
+    if (blockingContracts.length === 0) releaseStableFamilies.push(family)
+    else releaseFamilyGaps.push({ family, blockingContracts })
+  }
+  const fullSurfaceReleaseReady =
+    gaps.length === 0 && releaseFamilyGaps.length === 0
+  return {
+    galleryStableContractIds: stable.filter((id) =>
+      id.startsWith('component-v2.'),
+    ),
+    galleryStableRoutes: Object.keys(galleryStableContractsByRoute).sort(),
+    galleryStableContractsByRoute,
+    docsSupportContractIds: stable,
+    webOnlyContractIds: webOnly,
+    releaseScopeFamilies,
+    releaseStableFamilies,
+    releaseFamilyGaps,
+    alignmentGapCount: gaps.length,
+    conformanceIntegrityReady: true,
+    stableSubsetEligible: stable.length > 0,
+    fullSurfaceReleaseReady,
+    nugetStableEligible: fullSurfaceReleaseReady,
+    releaseReady: fullSurfaceReleaseReady,
+  }
+}
+
 export const readAlignment = (relativePath, expected) => {
   const alignmentPath = path.isAbsolute(relativePath)
     ? relativePath
@@ -132,21 +206,17 @@ export const readStableConsumerAuthority = ({
 } = {}) => {
   const { registry, releaseScopeFamilies } = readContractRegistry(registryPath)
   const alignment = readAlignment(alignmentPath, expected)
-  if (
-    JSON.stringify(alignment.consumers?.releaseScopeFamilies) !==
-    JSON.stringify(releaseScopeFamilies)
-  ) {
+  const consumers = deriveStableConsumers(registry, alignment)
+  if (JSON.stringify(alignment.consumers) !== JSON.stringify(consumers)) {
     throw new Error(
-      'Contract V2 alignment release scope does not match consumer binding authority',
+      'Contract V2 alignment consumers do not match exact derived authority',
     )
   }
+  evaluateStableRelease(alignment)
   return { alignment, registry, releaseScopeFamilies }
 }
 
-export const evaluateStableRelease = (
-  alignment,
-  { diagnostic = false } = {},
-) => {
+export const evaluateStableRelease = (alignment) => {
   const missingReleaseFamilies = alignment.consumers?.releaseFamilyGaps ?? []
   const alignmentGapCount = alignment.consumers?.alignmentGapCount
   if (alignmentGapCount !== alignment.gaps.length) {
@@ -156,18 +226,60 @@ export const evaluateStableRelease = (
   }
   const releaseReady =
     alignmentGapCount === 0 && missingReleaseFamilies.length === 0
+  const statusById = new Map()
+  for (const entry of alignment.statuses ?? []) {
+    if (entry.source !== 'derived' || statusById.has(entry.id)) {
+      throw new Error('Avalonia stable readiness statuses are not uniquely derived')
+    }
+    statusById.set(entry.id, entry.status)
+  }
+  for (const id of alignment.stable ?? []) {
+    if (statusById.get(id) !== 'aligned') {
+      throw new Error(`Avalonia stable subset leaks non-aligned contract ${id}`)
+    }
+  }
+  const expectedGaps = [...statusById]
+    .filter(([, status]) => ['partial', 'missing', 'blocked'].includes(status))
+    .map(([id]) => id)
+    .sort()
+  const actualGaps = (alignment.gaps ?? []).map((gap) => gap.contract).sort()
+  if (JSON.stringify(actualGaps) !== JSON.stringify(expectedGaps)) {
+    throw new Error('Avalonia stable readiness gap structure is incomplete')
+  }
+  for (const gap of alignment.gaps ?? []) {
+    if (
+      !gap.reason ||
+      !gap.owner ||
+      !Array.isArray(gap.requiredScenarios) ||
+      gap.requiredScenarios.length === 0 ||
+      !Array.isArray(gap.requiredEvidence) ||
+      gap.requiredEvidence.length === 0 ||
+      gap.evidencePolicy?.realExecution !== true ||
+      gap.evidencePolicy?.allowSkip !== false ||
+      gap.evidencePolicy?.allowOverrideWithoutGovernance !== false
+    ) {
+      throw new Error(`Avalonia stable readiness gap ${gap.contract} is ungoverned`)
+    }
+  }
   if (
     alignment.consumers?.nugetStableEligible !== releaseReady ||
-    alignment.consumers?.releaseReady !== releaseReady
+    alignment.consumers?.releaseReady !== releaseReady ||
+    alignment.consumers?.fullSurfaceReleaseReady !== releaseReady ||
+    alignment.consumers?.conformanceIntegrityReady !== true ||
+    alignment.consumers?.stableSubsetEligible !==
+      ((alignment.stable ?? []).length > 0)
   ) {
     throw new Error(
       'Avalonia stable readiness consumers do not match derived alignment',
     )
   }
-  if (!releaseReady && !diagnostic) {
-    throw new Error(
-      `Avalonia stable readiness blocked by ${alignmentGapCount} alignment gaps and ${missingReleaseFamilies.length} missing release families`,
-    )
-  }
   return { alignmentGapCount, missingReleaseFamilies, releaseReady }
+}
+
+export const requireNugetStableRelease = (alignment) => {
+  const release = evaluateStableRelease(alignment)
+  if (!release.releaseReady || alignment.consumers?.nugetStableEligible !== true) {
+    throw new Error('NuGet stable candidate blocked by derived alignment gaps')
+  }
+  return release
 }

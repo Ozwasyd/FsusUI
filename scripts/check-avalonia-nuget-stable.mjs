@@ -3,6 +3,11 @@ import path from 'node:path'
 import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import {
+  currentIdentity,
+  readStableConsumerAuthority,
+  requireNugetStableRelease,
+} from './avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const dotnetRoot = path.join(root, 'dotnet')
@@ -476,15 +481,10 @@ const check = () => {
   }
 
   record('Contract V2 alignment', () => {
-    const alignment = JSON.parse(read('.tmp/conformance-v2/alignment.json'))
-    assert(
-      alignment.schema === 'fsusui.alignment.v2',
-      'alignment artifact schema invalid',
-    )
-    assert(
-      alignment.consumers?.nugetStableEligible === true,
-      'NuGet stable candidate blocked by derived alignment gaps',
-    )
+    const { alignment } = readStableConsumerAuthority({
+      expected: currentIdentity(),
+    })
+    requireNugetStableRelease(alignment)
   })
 
   record('fixtures', runFixtureChecks)

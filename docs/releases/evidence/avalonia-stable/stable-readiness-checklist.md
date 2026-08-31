@@ -81,4 +81,3 @@ is marked not required.
 | `public-shell` | `docs/releases/evidence/avalonia-stable/stable-readiness-checklist.md` |
 | `product-primitives` | `docs/releases/evidence/avalonia-stable/stable-readiness-checklist.md` |
 | `perception-challenge` | `docs/releases/evidence/avalonia-stable/stable-readiness-checklist.md` |
-| `locale-formatting` | `docs/releases/evidence/avalonia-stable/stable-readiness-checklist.md` |

@@ -14,11 +14,15 @@ const sha256 = (content) => createHash('sha256').update(content).digest('hex')
 const fullSha = /^[0-9a-f]{40}$/u
 const digest = /^[0-9a-f]{64}$/u
 
-export const stableFamilies = () => [
-  ...readStableConsumerAuthority({
-    registryPath: nativeSpec.contractRegistry,
-    alignmentPath: nativeSpec.alignmentArtifact,
-  }).releaseScopeFamilies,
+export const resolveStableConsumerAuthority = (authority = {}) =>
+  readStableConsumerAuthority({
+    registryPath: authority.registryPath ?? nativeSpec.contractRegistry,
+    alignmentPath: authority.alignmentPath ?? nativeSpec.alignmentArtifact,
+    expected: authority.expected,
+  })
+
+export const stableFamilies = (authority = {}) => [
+  ...resolveStableConsumerAuthority(authority).releaseScopeFamilies,
 ]
 
 export const validateScenarioBindings = (

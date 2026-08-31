@@ -252,7 +252,9 @@ try {
   console.log(
     derivedReleaseReady
       ? 'Avalonia stable readiness check passed: release eligible.'
-      : `Avalonia stable readiness diagnostic: release blocked by ${alignmentGapCount} alignment gaps and ${missingReleaseFamilies.length} missing release families.`,
+      : diagnostic
+        ? `Avalonia stable readiness diagnostic: full-surface release blocked by ${alignmentGapCount} governed gaps and ${missingReleaseFamilies.length} incomplete release families.`
+        : `Avalonia stable readiness check passed: aligned subset is exact; full-surface release remains blocked by ${alignmentGapCount} governed gaps and ${missingReleaseFamilies.length} incomplete release families.`,
   )
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

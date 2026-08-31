@@ -1,20 +1,53 @@
 import assert from 'node:assert/strict'
+import os from 'node:os'
+import path from 'node:path'
 import test from 'node:test'
 import { URL } from 'node:url'
 import {
   affectedDecision,
   aggregateLeaves,
+  stableFamilies,
   validateLeaf,
   validateReport,
   validateScenarioBindings,
   validateWorkflowContracts,
 } from '../scripts/avalonia-aot-native.mjs'
-import { readContractRegistry } from '../scripts/avalonia-stable-readiness-lib.mjs'
+import {
+  alignmentHash,
+  deriveStableConsumers,
+  readContractRegistry,
+} from '../scripts/avalonia-stable-readiness-lib.mjs'
 import fs from 'node:fs'
 
 const commitSha = 'a'.repeat(40)
 const candidateSha256 = 'b'.repeat(64)
-const stableFamilies = () => readContractRegistry().releaseScopeFamilies
+const authorityRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fsusui-aot-authority-'))
+const registryPath = path.join(authorityRoot, 'contract-v2.json')
+const alignmentPath = path.join(authorityRoot, 'alignment.json')
+const registrySource = fs.readFileSync(
+  new URL('../spec/components/contracts/v2/contract-v2.json', import.meta.url),
+)
+fs.writeFileSync(registryPath, registrySource)
+const { registry, releaseScopeFamilies } = readContractRegistry(registryPath)
+const expected = { candidate: 'c'.repeat(40), contractHash: 'd'.repeat(64) }
+const alignment = {
+  schema: 'fsusui.alignment.v2',
+  identity: expected,
+  statuses: registry.contracts.map(({ id }) => ({
+    id,
+    status: 'aligned',
+    source: 'derived',
+  })),
+  stable: registry.contracts.map(({ id }) => id),
+  webOnly: [],
+  gaps: [],
+}
+alignment.consumers = deriveStableConsumers(registry, alignment)
+alignment.identity.alignmentHash = alignmentHash(alignment)
+fs.writeFileSync(alignmentPath, `${JSON.stringify(alignment, null, 2)}\n`)
+const authority = { registryPath, alignmentPath, expected }
+const expectedStableFamilies = () => stableFamilies(authority)
+test.after(() => fs.rmSync(authorityRoot, { recursive: true, force: true }))
 const leaf = (overrides = {}) => ({
   schemaVersion: 'fsusui.avalonia-aot-leaf-manifest.v1',
   status: 'success',
@@ -28,7 +61,7 @@ const leaf = (overrides = {}) => ({
   nativeBinary: { runtimeIndependent: true, sha256: 'c'.repeat(64) },
   report: {
     sha256: 'd'.repeat(64),
-    passed: stableFamilies().length,
+    passed: expectedStableFamilies().length,
     failed: 0,
     skipped: 0,
   },
@@ -41,17 +74,36 @@ test('stable registry owns the native scenario set', () => {
     'utf8',
   )
   assert.deepEqual(
-    validateScenarioBindings(source, stableFamilies()),
-    stableFamilies(),
+    validateScenarioBindings(source, expectedStableFamilies()),
+    expectedStableFamilies(),
   )
   assert.throws(
     () =>
       validateScenarioBindings(
         source.replace('["tree"] =', '["tree-missing"] ='),
-        stableFamilies(),
+        expectedStableFamilies(),
       ),
     /binding mismatch/u,
   )
+  const stale = JSON.parse(fs.readFileSync(alignmentPath, 'utf8'))
+  stale.identity.candidate = 'e'.repeat(40)
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(stale, null, 2)}\n`)
+  assert.throws(() => stableFamilies(authority), /identity candidate is stale/u)
+  const duplicate = structuredClone(alignment)
+  duplicate.statuses.push({ ...duplicate.statuses[0] })
+  duplicate.identity.alignmentHash = alignmentHash(duplicate)
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(duplicate, null, 2)}\n`)
+  assert.throws(() => stableFamilies(authority), /not uniquely derived/u)
+  const ungoverned = structuredClone(alignment)
+  const partialId = ungoverned.statuses[0].id
+  ungoverned.statuses[0].status = 'partial'
+  ungoverned.stable = ungoverned.stable.filter((id) => id !== partialId)
+  ungoverned.gaps = [{ contract: partialId }]
+  ungoverned.consumers = deriveStableConsumers(registry, ungoverned)
+  ungoverned.identity.alignmentHash = alignmentHash(ungoverned)
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(ungoverned, null, 2)}\n`)
+  assert.throws(() => stableFamilies(authority), /is ungoverned/u)
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(alignment, null, 2)}\n`)
 })
 
 test('report rejects stale identity, skipped behavior and incomplete registry coverage', () => {
@@ -76,7 +128,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     RuntimeIndependent: true,
     StartedAtUtc: '2026-01-01T00:00:00Z',
     EndedAtUtc: '2026-01-01T00:00:01Z',
-    Scenarios: stableFamilies().map((Id) => ({
+    Scenarios: expectedStableFamilies().map((Id) => ({
       Id,
       Component: `Fsus.${Id}`,
       Resource: 'packaged-template',
@@ -85,8 +137,8 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
       Error: null,
       Exception: null,
     })),
-    ScenarioCount: stableFamilies().length,
-    ScenarioPassed: stableFamilies().length,
+    ScenarioCount: expectedStableFamilies().length,
+    ScenarioPassed: expectedStableFamilies().length,
     ScenarioFailed: 0,
     ScenarioSkipped: 0,
     NativeLogErrorCount: 0,
@@ -99,7 +151,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     validateReport(
       report,
       { commitSha, candidateSha256, rid: 'linux-x64' },
-      stableFamilies(),
+      expectedStableFamilies(),
     ),
     true,
   )
@@ -108,7 +160,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
       validateReport(
         { ...report, CandidateSha256: 'e'.repeat(64) },
         { candidateSha256 },
-        stableFamilies(),
+        expectedStableFamilies(),
       ),
     /candidate mismatch/u,
   )
@@ -117,7 +169,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
       validateReport(
         { ...report, Scenarios: report.Scenarios.slice(1) },
         undefined,
-        stableFamilies(),
+        expectedStableFamilies(),
       ),
     /coverage/u,
   )
@@ -131,7 +183,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
           ),
         },
         undefined,
-        stableFamilies(),
+        expectedStableFamilies(),
       ),
     /failed/u,
   )
@@ -140,7 +192,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
       validateReport(
         { ...report, NativeLogErrorCount: 1 },
         undefined,
-        stableFamilies(),
+        expectedStableFamilies(),
       ),
     /native log/u,
   )
@@ -149,7 +201,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
       validateReport(
         { ...report, PartialCapabilities: [] },
         undefined,
-        stableFamilies(),
+        expectedStableFamilies(),
       ),
     /MarkdownEditor as partial/u,
   )

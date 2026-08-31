@@ -242,6 +242,37 @@ const cases = [
     expected: 'the AOT runner must derive scenarios from the identity-bound alignment',
   },
   {
+    id: 'aot-production-authority-bypass-mutated',
+    file: 'scripts/avalonia-aot-native.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/avalonia-aot-native.mjs',
+        `export const resolveStableConsumerAuthority = (authority = {}) =>
+  readStableConsumerAuthority({
+    registryPath: authority.registryPath ?? nativeSpec.contractRegistry,
+    alignmentPath: authority.alignmentPath ?? nativeSpec.alignmentArtifact,
+    expected: authority.expected,
+  })`,
+        `export const resolveStableConsumerAuthority = (authority = {}) => ({
+  releaseScopeFamilies: readJson(authority.registryPath ?? nativeSpec.contractRegistry).consumerBindings.releaseScopeFamilies,
+})`,
+      ),
+    command: ['node', ['--test', 'tests/avalonia-aot-native.test.mjs']],
+    expected: 'Missing expected exception',
+  },
+  {
+    id: 'nuget-publish-block-mutated',
+    file: 'scripts/avalonia-stable-readiness-lib.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/avalonia-stable-readiness-lib.mjs',
+        'if (!release.releaseReady || alignment.consumers?.nugetStableEligible !== true) {',
+        'if (release.releaseReady || alignment.consumers?.nugetStableEligible !== true) {',
+      ),
+    command: ['node', ['--test', 'tests/conformance-v2-evidence.test.mjs']],
+    expected: 'Missing expected exception',
+  },
+  {
     id: 'consumer-binding-unknown-contract-mutated',
     file: 'spec/components/contracts/v2/contract-v2.json',
     inject: () =>

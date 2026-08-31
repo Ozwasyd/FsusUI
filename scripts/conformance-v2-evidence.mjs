@@ -1209,6 +1209,9 @@ const derivedConsumers = (registry, statuses, stable, webOnly, gaps) => {
       releaseStableFamilies: [],
       releaseFamilyGaps: [],
       alignmentGapCount: gaps.length,
+      conformanceIntegrityReady: true,
+      stableSubsetEligible: stable.length > 0,
+      fullSurfaceReleaseReady: gaps.length === 0,
       nugetStableEligible: gaps.length === 0,
       releaseReady: gaps.length === 0,
     }
@@ -1275,7 +1278,12 @@ const derivedConsumers = (registry, statuses, stable, webOnly, gaps) => {
     releaseStableFamilies,
     releaseFamilyGaps,
     alignmentGapCount: gaps.length,
-    nugetStableEligible: gaps.length === 0,
+    conformanceIntegrityReady: true,
+    stableSubsetEligible: stable.length > 0,
+    fullSurfaceReleaseReady:
+      gaps.length === 0 && releaseFamilyGaps.length === 0,
+    nugetStableEligible:
+      gaps.length === 0 && releaseFamilyGaps.length === 0,
     releaseReady: gaps.length === 0 && releaseFamilyGaps.length === 0,
   }
 }
@@ -1373,6 +1381,15 @@ export function validateReadiness(alignment, expected = {}) {
   same(alignment.webOnly, expectedWebOnly, 'readiness.webOnly.derived')
   if (alignment.consumers?.alignmentGapCount !== alignment.gaps.length)
     fail('readiness.consumers alignment gap diagnostic mismatch')
+  const expectedGaps = alignment.statuses
+    .filter((entry) => ['partial', 'missing', 'blocked'].includes(entry.status))
+    .map((entry) => entry.id)
+    .sort()
+  same(
+    alignment.gaps.map((gap) => gap.contract).sort(),
+    expectedGaps,
+    'readiness.gaps.derived',
+  )
   same(
     alignment.consumers?.docsSupportContractIds,
     expectedStable,
@@ -1402,13 +1419,22 @@ export function validateReadiness(alignment, expected = {}) {
   )
   if (
     alignment.consumers?.nugetStableEligible !==
-    (alignment.gaps.length === 0)
-  )
-    fail('readiness.consumers NuGet eligibility mismatch')
-  if (
-    alignment.consumers?.releaseReady !==
     (alignment.gaps.length === 0 &&
       alignment.consumers?.releaseFamilyGaps?.length === 0)
+  )
+    fail('readiness.consumers NuGet eligibility mismatch')
+  if (alignment.consumers?.conformanceIntegrityReady !== true)
+    fail('readiness.consumers conformance integrity mismatch')
+  if (
+    alignment.consumers?.stableSubsetEligible !== (expectedStable.length > 0)
+  )
+    fail('readiness.consumers stable subset eligibility mismatch')
+  if (
+    alignment.consumers?.fullSurfaceReleaseReady !==
+      (alignment.gaps.length === 0 &&
+        alignment.consumers?.releaseFamilyGaps?.length === 0) ||
+    alignment.consumers?.releaseReady !==
+      alignment.consumers?.fullSurfaceReleaseReady
   )
     fail('readiness.consumers release eligibility mismatch')
   for (const field of ['candidate', 'contractHash', 'alignmentHash']) {
@@ -1927,6 +1953,7 @@ async function cli() {
       statuses: result.statuses,
       stable: result.stable,
       gaps: result.gaps,
+      consumers: result.consumers,
     })
     writeJson(args.out, result)
     writeJson(args.gaps, {
@@ -1950,6 +1977,7 @@ async function cli() {
         statuses: alignment.statuses,
         stable: alignment.stable,
         gaps: alignment.gaps,
+        consumers: alignment.consumers,
       }),
     }
     validateReadiness(alignment, expected)

@@ -19,9 +19,11 @@ import {
   alignmentHash as stableReadinessAlignmentHash,
   currentIdentity as stableReadinessCurrentIdentity,
   deriveReleaseScopeFamilies,
+  deriveStableConsumers,
   evaluateStableRelease,
   readAlignment as stableReadinessReadAlignment,
   readStableConsumerAuthority,
+  requireNugetStableRelease,
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -59,11 +61,16 @@ test('stable consumers derive scope from exact contract bindings and fail closed
   const alignment = {
     schema: 'fsusui.alignment.v2',
     identity: expected,
-    statuses: [],
-    stable: [],
+    statuses: registry.contracts.map(({ id }) => ({
+      id,
+      status: 'aligned',
+      source: 'derived',
+    })),
+    stable: registry.contracts.map(({ id }) => id),
+    webOnly: [],
     gaps: [],
-    consumers: { releaseScopeFamilies: ['alpha', 'beta'] },
   }
+  alignment.consumers = deriveStableConsumers(registry, alignment)
   alignment.identity.alignmentHash = stableReadinessAlignmentHash(alignment)
   fs.writeFileSync(registryPath, `${JSON.stringify(registry, null, 2)}\n`)
   fs.writeFileSync(alignmentPath, `${JSON.stringify(alignment, null, 2)}\n`)
@@ -77,7 +84,14 @@ test('stable consumers derive scope from exact contract bindings and fail closed
   fs.writeFileSync(alignmentPath, `${JSON.stringify(staleAlignment, null, 2)}\n`)
   assert.throws(
     () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
-    /does not match consumer binding authority/u,
+    /integrity hash is invalid/u,
+  )
+  staleAlignment.identity.alignmentHash =
+    stableReadinessAlignmentHash(staleAlignment)
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(staleAlignment, null, 2)}\n`)
+  assert.throws(
+    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    /consumers do not match exact derived authority/u,
   )
   const staleRegistry = structuredClone(registry)
   staleRegistry.consumerBindings.releaseScopeFamilies = ['alpha']
@@ -89,22 +103,79 @@ test('stable consumers derive scope from exact contract bindings and fail closed
   fs.rmSync(temporary, { recursive: true, force: true })
 })
 
-test('stable release gate is hard by default and diagnostic only when explicit', () => {
+test('stable readiness accepts governed product gaps but rejects leakage and forged eligibility', () => {
   const blocked = {
-    gaps: [{ id: 'component-v2.a' }],
+    statuses: [
+      { id: 'component-v2.aligned', status: 'aligned', source: 'derived' },
+      { id: 'component-v2.partial', status: 'partial', source: 'derived' },
+    ],
+    stable: ['component-v2.aligned'],
+    gaps: [
+      {
+        contract: 'component-v2.partial',
+        reason: 'A required member is not implemented.',
+        owner: 'FsusUI Core',
+        requiredScenarios: ['scenario.partial'],
+        requiredEvidence: ['same-identity-comparison'],
+        evidencePolicy: {
+          realExecution: true,
+          allowSkip: false,
+          allowOverrideWithoutGovernance: false,
+        },
+      },
+    ],
     consumers: {
       alignmentGapCount: 1,
-      releaseFamilyGaps: ['alpha'],
+      releaseFamilyGaps: [{ family: 'alpha', blockingContracts: ['component-v2.partial'] }],
+      conformanceIntegrityReady: true,
+      stableSubsetEligible: true,
+      fullSurfaceReleaseReady: false,
       nugetStableEligible: false,
       releaseReady: false,
     },
   }
-  assert.throws(() => evaluateStableRelease(blocked), /readiness blocked/u)
-  assert.deepEqual(evaluateStableRelease(blocked, { diagnostic: true }), {
+  assert.deepEqual(evaluateStableRelease(blocked), {
     alignmentGapCount: 1,
-    missingReleaseFamilies: ['alpha'],
+    missingReleaseFamilies: blocked.consumers.releaseFamilyGaps,
     releaseReady: false,
   })
+  assert.throws(
+    () => requireNugetStableRelease(blocked),
+    /NuGet stable candidate blocked/u,
+  )
+  assert.throws(
+    () =>
+      evaluateStableRelease({
+        ...blocked,
+        stable: ['component-v2.aligned', 'component-v2.partial'],
+      }),
+    /leaks non-aligned/u,
+  )
+  assert.throws(
+    () =>
+      evaluateStableRelease({
+        ...blocked,
+        gaps: [{ ...blocked.gaps[0], owner: '' }],
+      }),
+    /is ungoverned/u,
+  )
+  assert.throws(
+    () => evaluateStableRelease({ ...blocked, gaps: [] }),
+    /gap diagnostic|gap structure/u,
+  )
+  assert.throws(
+    () =>
+      evaluateStableRelease({
+        ...blocked,
+        consumers: {
+          ...blocked.consumers,
+          nugetStableEligible: true,
+          releaseReady: true,
+          fullSurfaceReleaseReady: true,
+        },
+      }),
+    /do not match derived alignment/u,
+  )
 })
 
 test('evidence rejects headless and fixture-only paths', () => {
