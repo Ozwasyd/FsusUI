@@ -2,21 +2,25 @@
 
 Status: accepted for the local Avalonia Headless/Skia rendered-evidence class.
 
-Reviewer: root (independent of the implementation worktree changes).
+Reviewers: root and `/root/acceptance_audit` (both independent of the
+implementation worktree changes).
 
-The five 640x360 production-fixture captures were individually inspected at
+The five 960x540 production-fixture captures were individually inspected at
 original resolution, and their SHA-256 digests match the render manifest. Each
-capture uses the production `FsusPublicShell`, `FsusTextEditor`,
-`FsusMarkdownEditor`, `FsusTree`, `FsusSelect`, `FsusIcon`, and `FsusText`
-controls rather than palette swatches.
+capture uses the production desktop Markdown shell composite
+`FsusNativeTitleBar` + `FsusActivityRailShell` + `FsusDocumentTabs`, together
+with `FsusTextEditor`, `FsusMarkdownEditor`, `FsusTree`, `FsusSelect`,
+`FsusIcon`, and `FsusText` controls rather than palette swatches.
 
-- Light preserves distinct background, shell/component surface, raised surface,
-  primary text, muted text, border, and icon roles.
+- Light preserves distinct window/shell background, contextual/component
+  surface, title/tab/rail raised surface, primary text, muted text, border, and
+  icon roles.
 - Dark preserves the expected dark surface hierarchy with legible primary and
   muted text and a distinct icon role.
-- The complete custom palette visibly reaches the shell, both editor controls,
-  tree, picker, read-only raised state, text roles, borders, and real icon; its
-  diagnostic brushes are evidence, not a proposed product palette.
+- The complete custom palette visibly reaches title bar, activity rail,
+  contextual pane, document tabs, both editor controls, tree, picker, read-only
+  raised state, text roles, borders, and real icons; its diagnostic brushes are
+  evidence, not a proposed product palette.
 - The partial dark palette keeps the built-in dark background, raised surface,
   text, and border while independently overriding shell/component surfaces and
   the icon brush.

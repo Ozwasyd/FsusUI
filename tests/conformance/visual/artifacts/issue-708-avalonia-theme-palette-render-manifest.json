@@ -12,41 +12,41 @@
   "captures": [
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-light.png",
-      "sha256": "7550b74eeb660cfc1b3357ac5065c1b82cefe1e45549fc9cd409c50fc05cba2c",
-      "width": 640,
-      "height": 360,
+      "sha256": "fba35d1fd70c12afa972da71c4ea3a9d03fcc89b62c7e02b574f2408de8e79c7",
+      "width": 960,
+      "height": 540,
       "theme": "light",
       "state": "built-in-fallback"
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-dark.png",
-      "sha256": "f28322f2aa9bb0e69033637e7ba25a64cec17b19ce9b549982ec8ccde3f97e0e",
-      "width": 640,
-      "height": 360,
+      "sha256": "b47df095cba2fc531045a685e357e4defea2a42a764f488eac0fa8269d29a125",
+      "width": 960,
+      "height": 540,
       "theme": "dark",
       "state": "built-in-fallback"
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-custom.png",
-      "sha256": "907456032b786b54b9b5042ae1181667f16c9cadef64967249c99d766084222e",
-      "width": 640,
-      "height": 360,
+      "sha256": "d1a6159292dcd24345806977f1714fca30e11404a62b567f57e097dd859618cf",
+      "width": 960,
+      "height": 540,
       "theme": "light",
       "state": "complete-custom-palette"
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-partial-dark.png",
-      "sha256": "a6ca9990de9b9c844e3d3ed8d0d7e4b58ff5961051ce650f6feb9f76c7504193",
-      "width": 640,
-      "height": 360,
+      "sha256": "1394401e47735e4d0667b02fc0e134f198ca14f374c17c87ac9ef5dc22a5fb14",
+      "width": 960,
+      "height": 540,
       "theme": "dark",
       "state": "partial-custom-with-dark-fallback"
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-highcontrast.png",
-      "sha256": "abe4d616230988413718a7dd9cdbcfc69d480ec89fb5ee7e3a1fc2e22c4a713f",
-      "width": 640,
-      "height": 360,
+      "sha256": "e99c36aa761ef1185c3b6e6e626afb45ed9241f9d6463ec141eb6a54c90f56c5",
+      "width": 960,
+      "height": 540,
       "theme": "highcontrast",
       "state": "built-in-precedence-over-custom"
     }
