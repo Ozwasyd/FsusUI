@@ -11,6 +11,7 @@ import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transacti
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
 import type { MarkdownEditorSelection } from '../src/markdown-editor-transaction'
+import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
 
 const selection = (
   start = 4,
@@ -304,13 +305,16 @@ describe('explicit Paste as Markdown test contract', () => {
   })
 
   it('exposes Markdown, source diff, and removed/flattened/unsupported warnings', () => {
+    const scriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-raw-script-basic',
+    )
     const opened = open(anchor(), {
       explicit: true,
       html: [
         '<div>',
         '<u>flattened</u>',
         '<custom-element>unsupported</custom-element>',
-        '<script>removed()</script>',
+        scriptAttack,
         '</div>',
       ].join(''),
       plain: 'flattened unsupported',

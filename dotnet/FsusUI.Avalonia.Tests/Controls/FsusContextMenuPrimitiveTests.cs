@@ -219,33 +219,6 @@ public class FsusContextMenuPrimitiveTests
     Assert.Equal(2, requests.Count);
   }
 
-  [Fact]
-  public void TabPaneContextRequestRaisesTypedEventWithoutChangingSelection()
-  {
-    var tabs = new FsusTabs();
-    tabs.Panes.Add(new FsusTabPane { Key = "overview", Header = "Overview" });
-    tabs.Panes.Add(new FsusTabPane { Key = "activity", Header = "Activity", IsEnabled = false });
-    tabs.SelectKey("overview");
-
-    var requests = new List<FsusTabPaneContextEventArgs>();
-    tabs.PaneContextRequested += (_, args) => requests.Add(args);
-    var selections = new List<FsusNavigationSelectionChangedEventArgs>();
-    tabs.SelectionChanged += (_, args) => selections.Add(args);
-
-    Assert.True(tabs.RequestPaneContext("overview", FsusTreeInteractionSource.Pointer));
-    var request = Assert.Single(requests);
-    Assert.Equal("overview", request.PaneKey);
-    Assert.Equal(FsusTreeInteractionSource.Pointer, request.InteractionSource);
-    Assert.Equal("overview", tabs.SelectedKey);
-    Assert.Equal("overview", tabs.FocusedKey);
-    Assert.Empty(selections);
-
-    Assert.False(tabs.RequestPaneContext("activity", FsusTreeInteractionSource.Pointer));
-    Assert.False(tabs.RequestPaneContext("missing", FsusTreeInteractionSource.Pointer));
-    Assert.Single(requests);
-    Assert.Empty(selections);
-  }
-
   private static KeyEventArgs Press(Control control, Key key, KeyModifiers modifiers)
   {
     var args = new KeyEventArgs

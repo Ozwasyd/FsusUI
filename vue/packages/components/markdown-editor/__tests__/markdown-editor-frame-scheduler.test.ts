@@ -5,10 +5,11 @@ import MarkdownEditor from '../src/markdown-editor.vue'
 
 import type { MarkdownEditorFrameSchedulerMetrics } from '@element-plus/hooks'
 
-// The vitest rAF shim settles on a 16ms timer; waiting one interval lets a
-// full measure/mutate/post-paint frame run and report its metrics.
+// Wait for the browser/test rAF authority itself. The first frame can queue
+// a dependent viewport restore in its mutate phase; the second frame settles
+// that deferred task.
 const nextFrame = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 40))
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
   await nextTick()
 }
 
@@ -31,6 +32,7 @@ describe('MarkdownEditor frame scheduler (#640)', () => {
       props: { modelValue: '# heading\n\nparagraph\n' },
     })
     await nextFrame()
+    await nextFrame()
 
     const metrics = readFrameMetrics(wrapper)
     expect(metrics).not.toBeNull()
@@ -52,9 +54,9 @@ describe('MarkdownEditor frame scheduler (#640)', () => {
     // The plan (data contract) is applied synchronously; only the geometry
     // commit waits for the frame scheduler.
     expect(
-      wrapper.find('[data-markdown-layout-action]').attributes(
-        'data-markdown-layout-action',
-      ),
+      wrapper
+        .find('[data-markdown-layout-action]')
+        .attributes('data-markdown-layout-action'),
     ).toBeDefined()
     wrapper.unmount()
   })

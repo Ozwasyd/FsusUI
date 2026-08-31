@@ -412,10 +412,10 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
 
     var nonBackground = 0L;
     for (var y = 0; y < bitmap.PixelSize.Height; y++)
-    for (var x = 0; x < bitmap.PixelSize.Width; x++)
-    {
-      if (IsNonBackground(x, y)) nonBackground++;
-    }
+      for (var x = 0; x < bitmap.PixelSize.Width; x++)
+      {
+        if (IsNonBackground(x, y)) nonBackground++;
+      }
 
     var regionRatios = new List<double>(bounds.Count);
     var borderRatios = new List<double>(bounds.Count);
@@ -431,16 +431,16 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
       var regionNonBackground = 0L;
       var colors = new Dictionary<int, long>();
       for (var y = top; y <= bottom; y++)
-      for (var x = left; x <= right; x++)
-      {
-        regionCount++;
-        var offset = y * framebuffer.RowBytes + x * 4;
-        var colorKey = (pixels[offset] >> 3) |
-          ((pixels[offset + 1] >> 3) << 5) |
-          ((pixels[offset + 2] >> 3) << 10);
-        colors[colorKey] = colors.GetValueOrDefault(colorKey) + 1;
-        if (IsNonBackground(x, y)) regionNonBackground++;
-      }
+        for (var x = left; x <= right; x++)
+        {
+          regionCount++;
+          var offset = y * framebuffer.RowBytes + x * 4;
+          var colorKey = (pixels[offset] >> 3) |
+            ((pixels[offset + 1] >> 3) << 5) |
+            ((pixels[offset + 2] >> 3) << 10);
+          colors[colorKey] = colors.GetValueOrDefault(colorKey) + 1;
+          if (IsNonBackground(x, y)) regionNonBackground++;
+        }
 
       var borderCount = 0L;
       var borderNonBackground = 0L;

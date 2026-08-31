@@ -17,6 +17,16 @@ const option = (name, fallback) => {
   const index = process.argv.indexOf(name)
   return index === -1 ? fallback : process.argv[index + 1]
 }
+const positiveInteger = (name, value) => {
+  if (!/^[1-9]\d*$/u.test(value ?? ''))
+    throw new Error(`${name} must be a positive integer, received ${value}`)
+  return Number(value)
+}
+const maxCpuCount = positiveInteger(
+  '--max-cpu-count',
+  option('--max-cpu-count', process.env.FSUS_DOTNET_MAX_CPU_COUNT ?? '1'),
+)
+const maxCpuCountArgument = `--maxcpucount:${maxCpuCount}`
 const output = path.resolve(
   root,
   option('--output', `dotnet/artifacts/platform/${platform}/manifest.json`),
@@ -60,8 +70,15 @@ for (const file of fingerprintInputs) {
 fs.rmSync(path.dirname(output), { recursive: true, force: true })
 fs.mkdirSync(resultsRoot, { recursive: true })
 
-run(['restore', solution])
-run(['build', solution, '--no-restore', '--configuration', 'Release'])
+run(['restore', solution, '--disable-parallel', maxCpuCountArgument])
+run([
+  'build',
+  solution,
+  '--no-restore',
+  '--configuration',
+  'Release',
+  maxCpuCountArgument,
+])
 run([
   'test',
   solution,
@@ -72,6 +89,7 @@ run([
   'trx',
   '--results-directory',
   resultsRoot,
+  maxCpuCountArgument,
 ])
 run([
   'run',
@@ -128,6 +146,10 @@ const manifest = {
   dotnetRuntimes: runtimes,
   commitSha: gitSha,
   solution,
+  concurrency: {
+    maxCpuCount,
+    restoreDisableParallel: true,
+  },
   solutionFingerprint: fingerprint.digest('hex'),
   fingerprintInputs: fingerprintInputs.map((file) =>
     path.relative(root, file).split(path.sep).join('/'),

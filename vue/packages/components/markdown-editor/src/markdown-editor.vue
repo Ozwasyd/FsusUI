@@ -181,6 +181,7 @@
         @compositionstart="handleCompositionStart"
         @copy="handleCopy"
         @cut="handleCut"
+        @dragover.prevent
         @drop="handleDrop"
         @input="handleInput"
         @keydown="handleKeydown"
@@ -190,6 +191,127 @@
         @touchmove="handleLayoutTouch"
         @wheel="handleLayoutWheel"
       />
+
+      <input
+        ref="attachmentInputRef"
+        type="file"
+        multiple
+        :class="ns.e('attachment-picker')"
+        tabindex="-1"
+        aria-hidden="true"
+        @change="handleAttachmentPickerChange"
+      />
+
+      <ul
+        v-if="attachmentPresentations.length"
+        :class="ns.e('attachments')"
+        aria-label="Attachments"
+      >
+        <li
+          v-for="attachment in attachmentPresentations"
+          :key="attachment.itemId"
+          :class="ns.e('attachment')"
+        >
+          <span :class="ns.e('attachment-name')">{{ attachment.name }}</span>
+          <span
+            :class="ns.e('attachment-status')"
+            :aria-live="attachment.statusAriaLive"
+          >
+            {{ attachment.progressAriaText }}
+          </span>
+          <div :class="ns.e('attachment-actions')">
+            <button
+              v-for="action in attachment.actions"
+              :key="action.key"
+              type="button"
+              :disabled="action.disabled"
+              @click="runAttachmentAction(attachment.itemId, action.key)"
+            >
+              {{ action.label }}
+            </button>
+          </div>
+        </li>
+      </ul>
+
+      <form
+        v-if="activeImage"
+        :class="ns.e('media-properties')"
+        aria-label="Image properties"
+        @submit.prevent="applyImageProperties"
+      >
+        <label>
+          <span>Alternative text</span>
+          <input v-model="imageAltDraft" :disabled="editingBlocked" />
+        </label>
+        <label>
+          <span>Destination</span>
+          <input
+            v-model="imageDestinationDraft"
+            :aria-invalid="imagePropertyError ? 'true' : undefined"
+            :disabled="editingBlocked"
+          />
+        </label>
+        <label>
+          <span>Title</span>
+          <input v-model="imageTitleDraft" :disabled="editingBlocked" />
+        </label>
+        <label>
+          <span>Caption</span>
+          <input v-model="imageCaptionDraft" :disabled="editingBlocked" />
+        </label>
+        <p v-if="imagePropertyError" role="alert">
+          {{ imagePropertyError }}
+        </p>
+        <div :class="ns.e('media-actions')">
+          <button type="submit" :disabled="editingBlocked">Apply</button>
+          <button
+            type="button"
+            :disabled="editingBlocked"
+            @click="revealActiveImageSource"
+          >
+            Source
+          </button>
+          <button
+            type="button"
+            :disabled="!activeImageOpenAllowed"
+            @click="openActiveImage"
+          >
+            Open
+          </button>
+          <button type="button" @click="copyActiveFigure('exact')">
+            Copy source
+          </button>
+          <button
+            v-if="activeImage.figure"
+            type="button"
+            @click="copyActiveFigure('visible')"
+          >
+            Copy visible
+          </button>
+          <button
+            type="button"
+            :disabled="editingBlocked"
+            @click="openActiveImageReplacement"
+          >
+            Replace
+          </button>
+          <button
+            v-if="activeImage.figure"
+            type="button"
+            :disabled="editingBlocked"
+            @click="removeActiveCaption"
+          >
+            Remove caption
+          </button>
+          <button
+            type="button"
+            :disabled="editingBlocked"
+            @click="removeActiveImage"
+          >
+            Remove image
+          </button>
+        </div>
+      </form>
 
       <div
         v-if="liveDecorations.length"
@@ -402,6 +524,41 @@ import {
   resolveMarkdownEditorShortcut,
   runMarkdownEditorCommand,
 } from './markdown-editor'
+import {
+  captureMarkdownAttachmentInput,
+  createMarkdownAttachmentAtomicPresentation,
+  createMarkdownAttachmentCaptureSession,
+  type MarkdownAttachmentBatchIntent,
+  type MarkdownAttachmentProviderResult,
+  type MarkdownAttachmentSourceKind,
+} from './markdown-editor-attachment'
+import {
+  cancelMarkdownAttachmentJob,
+  planMarkdownAttachmentInsert,
+  planMarkdownAttachmentRemove,
+  planMarkdownAttachmentResolve,
+  progressMarkdownAttachmentJob,
+  rebaseMarkdownAttachmentJob,
+  retryMarkdownAttachmentJob,
+  type MarkdownAttachmentJob,
+} from './markdown-editor-attachment-lifecycle'
+import {
+  decomposeMarkdownImageNode,
+  planMarkdownImageAltEdit,
+  planMarkdownImageDestinationEdit,
+  planMarkdownImageRemove,
+  planMarkdownImageTitleEdit,
+  validateMarkdownPropertyUrl,
+} from './markdown-editor-link-image'
+import {
+  findMarkdownFigures,
+  formatMarkdownFigureExactCopy,
+  formatMarkdownFigureVisibleCopy,
+  planMarkdownCaptionEdit,
+  planMarkdownCaptionInsert,
+  planMarkdownCaptionRemove,
+  planMarkdownFigureDelete,
+} from './markdown-editor-caption'
 import { resolveMarkdownEditorChromeRegions } from './markdown-editor-chrome'
 import {
   deriveMarkdownEditorChange,
@@ -473,6 +630,8 @@ import {
 } from './markdown-editor-live-layout'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
+import { createMarkdownAnchorMap } from '../../../wasm/markdown-anchor-map'
+import { createMarkdownEditorProjection } from '../../../wasm/markdown-editor-projection'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -504,6 +663,12 @@ provideMarkdownEditorFrameScheduler(frameScheduler)
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const attachmentInputRef = ref<HTMLInputElement | null>(null)
+const attachmentReplaceRange = ref<{
+  readonly nodeId: string
+  readonly start: number
+  readonly end: number
+} | null>(null)
 const pasteAsMarkdownDialogRef = ref<HTMLElement | null>(null)
 const pasteAsMarkdownPrimaryActionRef = ref<HTMLButtonElement | null>(null)
 const pasteAsMarkdownSession = ref<MarkdownPasteAsMarkdownSession | null>(null)
@@ -555,6 +720,106 @@ const transactionStore = new MarkdownEditorTransactionStore(
   documentIdentity,
 )
 const editorValue = ref(transactionStore.value)
+const attachmentCaptureSession = createMarkdownAttachmentCaptureSession()
+const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
+const attachmentBatches = new Map<string, MarkdownAttachmentBatchIntent>()
+const attachmentItems = new Map<
+  string,
+  MarkdownAttachmentBatchIntent['items'][number]
+>()
+const attachmentPresentations = computed(() =>
+  attachmentJobs.value
+    .filter((job) => job.phase !== 'deleted')
+    .map((job) => {
+      const item = attachmentItems.get(job.itemId ?? job.id)
+      return createMarkdownAttachmentAtomicPresentation({
+        itemId: job.itemId ?? job.id,
+        name: item?.name ?? 'Attachment',
+        kind: item?.kind,
+        status: job.phase === 'idle' ? 'pending' : job.phase,
+        progress: job.progress,
+      })
+    }),
+)
+const selectionTick = ref(0)
+const activeImage = computed(() => {
+  void selectionTick.value
+  if (currentMode.value === 'preview') return null
+  const selection = transactionStore.selection
+  const projection = createMarkdownEditorProjection(editorValue.value)
+  const imageNode = projection.nodes
+    .filter(
+      (node) =>
+        node.kind === 'image' &&
+        selection.start >= node.rawRange.start &&
+        selection.end <= node.rawRange.end,
+    )
+    .sort(
+      (left, right) =>
+        left.rawRange.end -
+        left.rawRange.start -
+        (right.rawRange.end - right.rawRange.start),
+    )[0]
+  if (!imageNode) return null
+  const image = decomposeMarkdownImageNode(
+    editorValue.value,
+    imageNode.rawRange,
+  )
+  if (!image) return null
+  const figure =
+    findMarkdownFigures(editorValue.value).find(
+      (candidate) =>
+        candidate.mediaRange.start === imageNode.rawRange.start &&
+        candidate.mediaRange.end === imageNode.rawRange.end,
+    ) ?? null
+  return Object.freeze({
+    figure,
+    image,
+    nodeId: `image:${imageNode.rawRange.start}:${imageNode.rawRange.end}`,
+    range: imageNode.rawRange,
+  })
+})
+const imageAltDraft = ref('')
+const imageDestinationDraft = ref('')
+const imageTitleDraft = ref('')
+const imageCaptionDraft = ref('')
+const imagePropertyError = ref('')
+watch(
+  () => {
+    const active = activeImage.value
+    if (!active) return null
+    return [
+      active.nodeId,
+      active.image.alt.value,
+      active.image.destination.value,
+      active.image.title?.value ?? '',
+      active.figure?.text ?? '',
+    ].join('\u0000')
+  },
+  () => {
+    const active = activeImage.value
+    imageAltDraft.value = active?.image.alt.value ?? ''
+    imageDestinationDraft.value = active?.image.destination.value ?? ''
+    imageTitleDraft.value = active?.image.title?.value ?? ''
+    imageCaptionDraft.value = active?.figure?.text ?? ''
+    imagePropertyError.value = ''
+  },
+  { immediate: true },
+)
+const activeImageUrlValidation = computed(() => {
+  const active = activeImage.value
+  if (!active) return null
+  return validateMarkdownPropertyUrl(active.image.destination.value, {
+    documentEpoch: documentIdentity.epoch,
+    nodeId: active.nodeId,
+    revision: transactionStore.revision,
+    value: active.image.destination.value,
+    version: 1,
+  })
+})
+const activeImageOpenAllowed = computed(
+  () => activeImageUrlValidation.value?.open.allowed === true,
+)
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
     documentIdentity,
@@ -970,6 +1235,28 @@ const dispatchEditorOperation = (
   editorValue.value = result.value
   emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
 
+  if (result.accepted && result.value !== previousValue) {
+    const appliedChanges =
+      operation.kind === 'transaction'
+        ? operation.transaction.changes
+        : (() => {
+            const change = deriveMarkdownEditorChange(
+              previousValue,
+              result.value,
+            )
+            return change ? [change] : []
+          })()
+    const ownedItemId =
+      operation.kind === 'transaction'
+        ? operation.transaction.metadata?.attachmentItemId
+        : undefined
+    for (const job of attachmentJobs.value) {
+      if (job.itemId === ownedItemId || job.phase === 'deleted') continue
+      rebaseMarkdownAttachmentJob(job, appliedChanges)
+    }
+    triggerRef(attachmentJobs)
+  }
+
   if (
     result.accepted &&
     result.value !== previousValue &&
@@ -1043,7 +1330,95 @@ const captureSelection = (breakMerge = true) => {
       }),
     )
   }
+  selectionTick.value += 1
   return selection
+}
+
+const captureAttachmentFiles = (
+  sourceKind: MarkdownAttachmentSourceKind,
+  files: readonly File[],
+  selection: MarkdownEditorSelection,
+  eventFingerprint?: string,
+  nodeId: string | null = null,
+) => {
+  const captured = captureMarkdownAttachmentInput({
+    sourceKind,
+    documentIdentity,
+    revision: transactionStore.revision,
+    anchor: { range: selection, nodeId },
+    files: files.map((file) => ({
+      name: file.name,
+      mimeType: file.type,
+      byteLength: file.size,
+    })),
+    context: {
+      readonly: props.readonly,
+      disabled: inputDisabled.value,
+      mode: currentMode.value,
+      isComposing: isComposing.value,
+      currentRevision: transactionStore.revision,
+    },
+    eventFingerprint,
+    session: attachmentCaptureSession,
+  })
+  if (!captured.ok) return captured
+
+  const planned = planMarkdownAttachmentInsert(
+    transactionStore.value,
+    captured.batch.anchor,
+    captured.batch,
+  )
+  const dispatched = dispatchTransaction(planned.transaction)
+  if (!dispatched.accepted) return captured
+
+  attachmentBatches.set(captured.batch.batchId, captured.batch)
+  for (const item of captured.batch.items)
+    attachmentItems.set(item.itemId, item)
+  attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
+  emit('upload-image', captured.batch)
+  return captured
+}
+
+const resolveDropSelection = (
+  event: DragEvent,
+): MarkdownEditorSelection | null => {
+  const textarea = textareaRef.value
+  if (!textarea || typeof document === 'undefined') return null
+  const caretDocument = document as Document & {
+    caretPositionFromPoint?: (
+      x: number,
+      y: number,
+    ) => { readonly offset: number; readonly offsetNode: Node } | null
+    caretRangeFromPoint?: (x: number, y: number) => Range | null
+  }
+  const position = caretDocument.caretPositionFromPoint?.(
+    event.clientX,
+    event.clientY,
+  )
+  const range = position
+    ? null
+    : caretDocument.caretRangeFromPoint?.(event.clientX, event.clientY)
+  const offset =
+    position?.offsetNode === textarea
+      ? position.offset
+      : range?.startContainer === textarea
+        ? range.startOffset
+        : null
+  if (offset === null) return null
+
+  const bounded = Math.max(0, Math.min(transactionStore.value.length, offset))
+  const anchorMap = createMarkdownAnchorMap({
+    identity: documentIdentity,
+    source: transactionStore.value,
+  })
+  const mapped = anchorMap.visualAnchorToSourceSelection(
+    anchorMap.sourceRangeToVisual({ start: bounded, end: bounded }),
+  )
+  return Object.freeze({
+    direction: 'none' as const,
+    start: mapped.anchor,
+    end: mapped.focus,
+  })
 }
 
 const dispatchReplacement = (
@@ -1296,6 +1671,9 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   abortPendingCommands()
+  attachmentCaptureSession.clear()
+  attachmentBatches.clear()
+  attachmentItems.clear()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
   if (typeof window === 'undefined') return
 
@@ -1472,6 +1850,7 @@ const applyClipboardTransfer = (
   event: { preventDefault(): void; dataTransfer?: DataTransfer | null },
   origin: 'paste' | 'drop',
   data: DataTransfer | null | undefined,
+  attachmentSelection?: MarkdownEditorSelection | null,
 ) => {
   const transfer = markdownClipboardItemsFromDataTransfer(data ?? null)
   const hasTransfer = transfer.items.length > 0 || transfer.files.length > 0
@@ -1491,7 +1870,7 @@ const applyClipboardTransfer = (
     mode: currentMode.value,
     origin,
     revision: transactionStore.revision,
-    selection: captureSelection(),
+    selection: attachmentSelection ?? captureSelection(),
     source: transactionStore.value,
   })
 
@@ -1519,6 +1898,15 @@ const applyClipboardTransfer = (
       origin,
       revision: transactionStore.revision,
     })
+    if (plan.action === 'attachment-intent') {
+      if (origin === 'drop' && !attachmentSelection) return
+      captureAttachmentFiles(
+        origin,
+        Array.from(data?.files ?? []),
+        attachmentSelection ?? captureSelection(),
+        plan.identity,
+      )
+    }
     if (plan.transaction) dispatchTransaction(plan.transaction)
     return
   }
@@ -1531,7 +1919,13 @@ const handlePaste = (event: ClipboardEvent) => {
 }
 
 const handleDrop = (event: DragEvent) => {
-  applyClipboardTransfer(event, 'drop', event.dataTransfer)
+  event.preventDefault()
+  applyClipboardTransfer(
+    event,
+    'drop',
+    event.dataTransfer,
+    resolveDropSelection(event),
+  )
 }
 
 const handleCopy = (event: ClipboardEvent) => {
@@ -1899,7 +2293,87 @@ const emitSubmit = () => {
 
 const emitUploadImage = () => {
   if (editingBlocked.value || isComposing.value) return
-  emit('upload-image')
+  attachmentInputRef.value?.click()
+}
+
+const handleAttachmentPickerChange = (event: Event) => {
+  const input = event.currentTarget
+  if (!(input instanceof HTMLInputElement)) return
+  const files = Array.from(input.files ?? [])
+  if (files.length > 0) {
+    const replacement = attachmentReplaceRange.value
+    captureAttachmentFiles(
+      'pick',
+      files,
+      replacement
+        ? {
+            direction: 'none',
+            end: replacement.end,
+            start: replacement.start,
+          }
+        : captureSelection(),
+      `pick:${event.timeStamp}:${files.map((file) => `${file.name}:${file.size}:${file.lastModified}`).join('|')}`,
+      replacement?.nodeId ?? null,
+    )
+  }
+  attachmentReplaceRange.value = null
+  input.value = ''
+}
+
+const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
+  const job = attachmentJobs.value.find(
+    (candidate) => candidate.itemId === result.itemId,
+  )
+  if (!job) return false
+  if (result.status === 'progress') {
+    const ratio = result.ratio ?? 0
+    progressMarkdownAttachmentJob(job, ratio <= 1 ? ratio * 100 : ratio)
+    triggerRef(attachmentJobs)
+    return true
+  }
+
+  const planned = planMarkdownAttachmentResolve(
+    transactionStore.value,
+    job,
+    result,
+  )
+  triggerRef(attachmentJobs)
+  if (!planned.transaction) return planned.accepted
+  return dispatchTransaction({
+    ...planned.transaction,
+    metadata: Object.freeze({ attachmentItemId: job.itemId }),
+  }).accepted
+}
+
+const runAttachmentAction = (
+  itemId: string,
+  action: 'cancel' | 'retry' | 'remove',
+) => {
+  const job = attachmentJobs.value.find(
+    (candidate) => candidate.itemId === itemId,
+  )
+  if (!job) return
+  if (action === 'cancel') {
+    cancelMarkdownAttachmentJob(job)
+  } else if (action === 'retry') {
+    retryMarkdownAttachmentJob(job)
+    const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
+    const item = attachmentItems.get(itemId)
+    if (batch && item) {
+      emit(
+        'upload-image',
+        Object.freeze({ ...batch, items: Object.freeze([item]) }),
+      )
+    }
+  } else {
+    const planned = planMarkdownAttachmentRemove(transactionStore.value, job)
+    dispatchTransaction({
+      ...planned.transaction,
+      metadata: Object.freeze({ attachmentItemId: job.itemId }),
+    })
+  }
+  triggerRef(attachmentJobs)
+  applyLiveLayout('block-height-change')
 }
 
 const emitRenderEvent = (
@@ -2121,18 +2595,172 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-const dispatchTransaction = (transaction: MarkdownEditorTransaction) =>
-  dispatchEditorOperation({
+const dispatchTransaction = (transaction: MarkdownEditorTransaction) => {
+  const result = dispatchEditorOperation({
     kind: 'transaction',
     transaction,
   })
+  selectionTick.value += 1
+  return result
+}
+
+const applyImageProperties = () => {
+  const active = activeImage.value
+  if (!active || editingBlocked.value || isComposing.value) return
+  const source = transactionStore.value
+  const destinationValidation = validateMarkdownPropertyUrl(
+    imageDestinationDraft.value,
+    {
+      documentEpoch: documentIdentity.epoch,
+      nodeId: active.nodeId,
+      revision: transactionStore.revision,
+      value: imageDestinationDraft.value,
+      version: 1,
+    },
+  )
+  if (!destinationValidation.open.allowed) {
+    imagePropertyError.value = `Destination rejected: ${destinationValidation.state}`
+    return
+  }
+
+  const transactions: MarkdownEditorTransaction[] = []
+  if (imageAltDraft.value !== active.image.alt.value) {
+    transactions.push(
+      planMarkdownImageAltEdit(source, active.range, imageAltDraft.value),
+    )
+  }
+  if (imageDestinationDraft.value !== active.image.destination.value) {
+    transactions.push(
+      planMarkdownImageDestinationEdit(
+        source,
+        active.range,
+        imageDestinationDraft.value,
+      ),
+    )
+  }
+  if (imageTitleDraft.value !== (active.image.title?.value ?? '')) {
+    transactions.push(
+      planMarkdownImageTitleEdit(
+        source,
+        active.range,
+        imageTitleDraft.value || null,
+      ),
+    )
+  }
+  if (active.figure) {
+    if (imageCaptionDraft.value !== active.figure.text) {
+      transactions.push(
+        imageCaptionDraft.value
+          ? planMarkdownCaptionEdit(
+              source,
+              active.figure.captionNode,
+              imageCaptionDraft.value,
+            )
+          : planMarkdownCaptionRemove(source, active.figure.captionNode),
+      )
+    }
+  } else if (imageCaptionDraft.value) {
+    transactions.push(
+      planMarkdownCaptionInsert(source, active.range, imageCaptionDraft.value),
+    )
+  }
+
+  const changes = transactions
+    .flatMap((transaction) => transaction.changes)
+    .filter((change) => source.slice(change.from, change.to) !== change.insert)
+    .sort((left, right) => left.from - right.from || left.to - right.to)
+  if (!changes.length) {
+    imagePropertyError.value = ''
+    return
+  }
+  const result = dispatchTransaction({
+    changes: Object.freeze(changes),
+    history: 'separate',
+    origin: 'command',
+  })
+  imagePropertyError.value = result.accepted
+    ? ''
+    : `Image properties rejected: ${result.reason ?? 'invalid-change'}`
+}
+
+const revealActiveImageSource = () => {
+  const active = activeImage.value
+  if (!active) return
+  const range = active.figure?.captionRange ?? active.range
+  setMode('source')
+  transactionStore.setSelection(
+    { direction: 'none', end: range.end, start: range.start },
+    false,
+  )
+  selectionTick.value += 1
+  void restoreTextareaSelection(transactionStore.selection)
+}
+
+const openActiveImage = () => {
+  const validated = activeImageUrlValidation.value
+  if (!validated?.open.allowed || typeof window === 'undefined') return
+  window.open(
+    validated.open.href,
+    validated.open.target,
+    validated.open.rel ? 'noopener,noreferrer' : undefined,
+  )
+}
+
+const copyActiveFigure = async (mode: 'exact' | 'visible') => {
+  const active = activeImage.value
+  if (!active || typeof navigator === 'undefined') return
+  const source = transactionStore.value
+  const payload =
+    active.figure && mode === 'visible'
+      ? formatMarkdownFigureVisibleCopy(source, active.figure)
+      : active.figure
+        ? formatMarkdownFigureExactCopy(source, active.figure)
+        : source.slice(active.range.start, active.range.end)
+  await navigator.clipboard?.writeText(payload)
+}
+
+const openActiveImageReplacement = () => {
+  const active = activeImage.value
+  if (!active || editingBlocked.value || isComposing.value) return
+  attachmentReplaceRange.value = Object.freeze({
+    end: active.range.end,
+    nodeId: active.nodeId,
+    start: active.range.start,
+  })
+  attachmentInputRef.value?.click()
+}
+
+const removeActiveCaption = () => {
+  const active = activeImage.value
+  if (!active?.figure || editingBlocked.value || isComposing.value) return
+  dispatchTransaction(
+    planMarkdownCaptionRemove(
+      transactionStore.value,
+      active.figure.captionNode,
+    ),
+  )
+}
+
+const removeActiveImage = () => {
+  const active = activeImage.value
+  if (!active || editingBlocked.value || isComposing.value) return
+  dispatchTransaction(
+    active.figure
+      ? planMarkdownFigureDelete(transactionStore.value, active.figure)
+      : planMarkdownImageRemove(transactionStore.value, active.range),
+  )
+}
 
 function undo() {
-  return dispatchEditorOperation({ kind: 'undo' })
+  const result = dispatchEditorOperation({ kind: 'undo' })
+  selectionTick.value += 1
+  return result
 }
 
 function redo() {
-  return dispatchEditorOperation({ kind: 'redo' })
+  const result = dispatchEditorOperation({ kind: 'redo' })
+  selectionTick.value += 1
+  return result
 }
 
 const insertMarkdownAtCursor = (
@@ -2165,6 +2793,7 @@ const insertMarkdownAtCursor = (
 }
 
 defineExpose({
+  applyAttachmentResult,
   dispatchTransaction,
   insertMarkdownAtCursor,
   redo,

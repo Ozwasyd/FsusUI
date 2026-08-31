@@ -29,6 +29,11 @@ pane. Selection reconciliation is committed after each collection notification
 finishes, so a clear/add rebuild does not require a host-owned shadow collection
 or dispatcher workaround.
 
+For a host-owned strip-only layout, place `FsusTabs` in the host's horizontal
+scroll region, keep pane `Content` unset, and compose adjacent actions outside
+the control. Continue to populate `Panes`; replacing the internal source through
+inherited `Items` is not a supported strip-only adapter.
+
 ## Vue Contract Mapping
 
 Vue active keys, tab panes, menu item groups, breadcrumbs, page header actions,
