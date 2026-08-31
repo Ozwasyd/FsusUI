@@ -151,6 +151,7 @@ internal static class Program
         .AsTask()
         .GetAwaiter()
         .GetResult();
+      var webViewAdapterReady = ExerciseWebViewAdapter();
       var documents = new FsusDocumentTabs();
       documents.AddDocument(new FsusDocumentTab
       {
@@ -250,6 +251,7 @@ internal static class Program
               report.MarkdownProjectionProducerReady =
                 projectionCommit.Accepted &&
                 markdownEditor.CapabilityState == "aligned";
+              report.WebViewAdapterReady = webViewAdapterReady;
               report.ActivitySectionCount = activityShell.Sections.Count;
               report.DocumentCount = documents.Documents.Count;
               report.TitleBarPlatform = titleBar.EffectivePlatform.ToString();
@@ -264,7 +266,8 @@ internal static class Program
                 report.ActivitySectionCount == 1 &&
                 report.DocumentCount == 1 &&
                 report.CodeEditorReady &&
-                report.MarkdownProjectionProducerReady
+                report.MarkdownProjectionProducerReady &&
+                report.WebViewAdapterReady
                   ? 0
                   : 1;
               if (report.ExitCode != 0)
@@ -521,6 +524,95 @@ internal static class Program
     return control;
   }
 
+  private static bool ExerciseWebViewAdapter()
+  {
+    var backend = new AotWebViewBackend();
+    using var adapter = new FsusWebViewAdapter(backend);
+    var host = new FsusOverlayHost();
+    var menu = new FsusContextMenu
+    {
+      OverlaySize = new Size(240, 280),
+      ViewportBounds = new Rect(0, 0, 320, 480),
+    };
+    var invoker = new Button { Content = "Native AOT WebView" };
+    FsusWebViewContextMenuRequest? observed = null;
+    adapter.ContextMenuRequested += (_, args) => observed = args.Request;
+    var contextRequest = new FsusWebViewContextMenuRequest
+    {
+      Origin = FsusWebViewContextMenuOrigin.Keyboard,
+      ViewportPoint = new FsusWebViewViewportPoint(24, 48),
+      IsEditable = true,
+      HasSelection = true,
+      EditCapabilities = FsusWebViewEditCapabilities.Copy |
+        FsusWebViewEditCapabilities.RichCopy,
+      MisspelledWord = "teh",
+      SpellingSuggestions =
+      [
+        new FsusWebViewSpellingSuggestion("the", "Replace with the"),
+      ],
+      NativeMenuFallbackAvailable = true,
+    };
+    backend.RaiseContextMenu(contextRequest);
+    adapter.OpenContextMenu(host, menu, contextRequest, invoker);
+    var spellingComposed = menu.Items.OfType<FsusContextMenuItem>()
+      .Any(item => item.Key == "fsus-webview:replace:0" && Equals(item.Header, "Replace with the"));
+    var spellingChosen = menu.ChooseAsync("fsus-webview:replace:0")
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    var fallbackRequest = contextRequest with
+    {
+      SpellingSuggestions =
+      [
+        new FsusWebViewSpellingSuggestion(" ", "blank"),
+        new FsusWebViewSpellingSuggestion("", "empty"),
+      ],
+    };
+    adapter.OpenContextMenu(host, menu, fallbackRequest, invoker);
+    var fallbackComposed = menu.Items.OfType<FsusContextMenuItem>()
+      .Any(item => item.Key == "fsus-webview:native-menu") &&
+      !menu.Items.OfType<FsusContextMenuItem>()
+        .Any(item => item.Key.StartsWith("fsus-webview:replace:", StringComparison.Ordinal));
+    var fallbackChosen = menu.ChooseAsync("fsus-webview:native-menu")
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    var developerTools = adapter.OpenDeveloperToolsAsync()
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    using var destination = new MemoryStream();
+    var pdf = adapter.ExportPdfAsync(
+        new FsusWebViewPdfExportOptions
+        {
+          GenerateTaggedPdf = true,
+          GenerateDocumentOutline = true,
+          Theme = FsusWebViewPrintTheme.Dark,
+        },
+        destination)
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    return ReferenceEquals(observed, contextRequest) &&
+      spellingComposed &&
+      spellingChosen &&
+      fallbackComposed &&
+      fallbackChosen &&
+      developerTools.Status == FsusWebViewCommandStatus.Unsupported &&
+      backend.DeveloperToolsCalls == 0 &&
+      backend.ContextCommands is
+      [
+        { Command: FsusWebViewContextCommand.ReplaceWord, Replacement: "the" },
+        { Command: FsusWebViewContextCommand.UseNativeMenu },
+      ] &&
+      pdf.Status == FsusWebViewCommandStatus.Succeeded &&
+      pdf.TaggedPdfApplied &&
+      pdf.DocumentOutlineApplied &&
+      pdf.DestinationLeftOpen &&
+      destination.CanWrite &&
+      destination.Length == pdf.BytesWritten &&
+      pdf.Outline is [{ HeadingLevel: 1, Destination: "heading-aot" }];
+  }
   private static Color BrushColor(IResourceDictionary resources, string key) =>
     BrushColor((IBrush?)resources[key]);
 
@@ -680,6 +772,78 @@ internal sealed class AotProjectionProducer(
   }
 }
 
+internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
+{
+  public FsusWebViewCapabilities Capabilities { get; } = new()
+  {
+    Platform = FsusWebViewPlatform.Linux,
+    SpellingSuggestions = true,
+    ReplaceWord = true,
+    AddToDictionary = true,
+    NativeContextMenu = true,
+    DeveloperTools = false,
+    TaggedPdf = true,
+    DocumentOutline = true,
+  };
+
+  public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested;
+  public FsusWebViewContextCommandRequest? LastCommand { get; private set; }
+  public List<FsusWebViewContextCommandRequest> ContextCommands { get; } = [];
+  public int DeveloperToolsCalls { get; private set; }
+
+  public void RaiseContextMenu(FsusWebViewContextMenuRequest request) =>
+    ContextMenuRequested?.Invoke(
+      this,
+      new FsusWebViewContextMenuRequestedEventArgs(request));
+
+  public ValueTask<FsusWebViewCommandResult> ExecuteContextCommandAsync(
+    FsusWebViewContextCommandRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    LastCommand = request;
+    ContextCommands.Add(request);
+    return ValueTask.FromResult(new FsusWebViewCommandResult(
+      FsusWebViewCommandStatus.Succeeded));
+  }
+
+  public ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    DeveloperToolsCalls++;
+    return ValueTask.FromResult(new FsusWebViewCommandResult(
+      FsusWebViewCommandStatus.Succeeded));
+  }
+
+  public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
+    FsusWebViewPdfExportOptions options,
+    Stream destination,
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    var bytes = AotWebViewPdfDocument.Create();
+    await destination.WriteAsync(bytes, cancellationToken);
+    return new FsusWebViewPdfExportResult
+    {
+      Status = FsusWebViewCommandStatus.Succeeded,
+      TaggedPdfApplied = options.GenerateTaggedPdf,
+      DocumentOutlineApplied = options.GenerateDocumentOutline,
+      DestinationLeftOpen = destination.CanWrite,
+      BytesWritten = bytes.Length,
+      Outline =
+      [
+        new FsusWebViewDocumentOutlineNode
+        {
+          Title = "AOT",
+          HeadingLevel = 1,
+          Destination = "heading-aot",
+        },
+      ],
+    };
+  }
+}
+
 internal sealed class ThirdPartyTextAdapter(TextBox control) : IFsusFormFieldAdapter
 {
   public FsusFormFieldAdapterCapabilities Capabilities =>
@@ -753,6 +917,7 @@ internal sealed record SmokeReport
   public int CommandPaletteTreeCount { get; set; }
   public bool CodeEditorReady { get; set; }
   public bool MarkdownProjectionProducerReady { get; set; }
+  public bool WebViewAdapterReady { get; set; }
   public int ActivitySectionCount { get; set; }
   public int DocumentCount { get; set; }
   public string? TitleBarPlatform { get; set; }
