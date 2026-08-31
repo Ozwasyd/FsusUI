@@ -448,6 +448,13 @@ internal static class Program
   {
     var backend = new AotWebViewBackend();
     using var adapter = new FsusWebViewAdapter(backend);
+    var host = new FsusOverlayHost();
+    var menu = new FsusContextMenu
+    {
+      OverlaySize = new Size(240, 280),
+      ViewportBounds = new Rect(0, 0, 320, 480),
+    };
+    var invoker = new Button { Content = "Native AOT WebView" };
     FsusWebViewContextMenuRequest? observed = null;
     adapter.ContextMenuRequested += (_, args) => observed = args.Request;
     var contextRequest = new FsusWebViewContextMenuRequest
@@ -463,15 +470,30 @@ internal static class Program
       [
         new FsusWebViewSpellingSuggestion("the", "Replace with the"),
       ],
+      NativeMenuFallbackAvailable = true,
     };
     backend.RaiseContextMenu(contextRequest);
-    var command = adapter.ExecuteContextCommandAsync(
-        new FsusWebViewContextCommandRequest
-        {
-          Command = FsusWebViewContextCommand.ReplaceWord,
-          Replacement = "the",
-          ViewportPoint = contextRequest.ViewportPoint,
-        })
+    adapter.OpenContextMenu(host, menu, contextRequest, invoker);
+    var spellingComposed = menu.Items.OfType<FsusContextMenuItem>()
+      .Any(item => item.Key == "fsus-webview:replace:0" && Equals(item.Header, "Replace with the"));
+    var spellingChosen = menu.ChooseAsync("fsus-webview:replace:0")
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    var fallbackRequest = contextRequest with
+    {
+      SpellingSuggestions =
+      [
+        new FsusWebViewSpellingSuggestion(" ", "blank"),
+        new FsusWebViewSpellingSuggestion("", "empty"),
+      ],
+    };
+    adapter.OpenContextMenu(host, menu, fallbackRequest, invoker);
+    var fallbackComposed = menu.Items.OfType<FsusContextMenuItem>()
+      .Any(item => item.Key == "fsus-webview:native-menu") &&
+      !menu.Items.OfType<FsusContextMenuItem>()
+        .Any(item => item.Key.StartsWith("fsus-webview:replace:", StringComparison.Ordinal));
+    var fallbackChosen = menu.ChooseAsync("fsus-webview:native-menu")
       .AsTask()
       .GetAwaiter()
       .GetResult();
@@ -488,8 +510,15 @@ internal static class Program
       .GetAwaiter()
       .GetResult();
     return ReferenceEquals(observed, contextRequest) &&
-      command.Succeeded &&
-      backend.LastCommand?.Replacement == "the" &&
+      spellingComposed &&
+      spellingChosen &&
+      fallbackComposed &&
+      fallbackChosen &&
+      backend.ContextCommands is
+      [
+        { Command: FsusWebViewContextCommand.ReplaceWord, Replacement: "the" },
+        { Command: FsusWebViewContextCommand.UseNativeMenu },
+      ] &&
       pdf.Status == FsusWebViewCommandStatus.Succeeded &&
       pdf.TaggedPdfApplied &&
       pdf.DocumentOutlineApplied &&
@@ -656,6 +685,7 @@ internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
 
   public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested;
   public FsusWebViewContextCommandRequest? LastCommand { get; private set; }
+  public List<FsusWebViewContextCommandRequest> ContextCommands { get; } = [];
 
   public void RaiseContextMenu(FsusWebViewContextMenuRequest request) =>
     ContextMenuRequested?.Invoke(
@@ -668,6 +698,7 @@ internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
   {
     cancellationToken.ThrowIfCancellationRequested();
     LastCommand = request;
+    ContextCommands.Add(request);
     return ValueTask.FromResult(new FsusWebViewCommandResult(
       FsusWebViewCommandStatus.Succeeded));
   }
@@ -678,8 +709,7 @@ internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
     CancellationToken cancellationToken = default)
   {
     cancellationToken.ThrowIfCancellationRequested();
-    var bytes = System.Text.Encoding.ASCII.GetBytes(
-      "%PDF-1.7\n/StructTreeRoot\n/Outlines\n/Dest (heading-aot)\n%%EOF\n");
+    var bytes = AotWebViewPdfDocument.Create();
     await destination.WriteAsync(bytes, cancellationToken);
     return new FsusWebViewPdfExportResult
     {

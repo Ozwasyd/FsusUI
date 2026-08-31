@@ -10,7 +10,9 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
+using FsusUI.Avalonia.TestFixtures;
 using FsusUI.Avalonia.Themes;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.Json;
 
@@ -38,12 +40,14 @@ public class FsusWebViewAdapterHeadlessTests
         FsusWebViewContextMenuOrigin.Pointer),
       new Scenario("dark-zoom-equivalent-200", FsusThemeVariant.Dark, 450, 360, 200,
         FsusWebViewContextMenuOrigin.Keyboard),
+      new Scenario("light-native-fallback", FsusThemeVariant.Light, 900, 520, 100,
+        FsusWebViewContextMenuOrigin.Keyboard, true),
     })
     {
       var fixture = CreateFixture(scenario);
       fixture.Window.Show();
       Arrange(fixture.Root, scenario.Width, scenario.Height);
-      var request = CreateRequest(scenario.Origin);
+      var request = CreateRequest(scenario.Origin, scenario.NativeFallback);
       fixture.Adapter.OpenContextMenu(
         fixture.Host,
         fixture.Menu,
@@ -62,7 +66,9 @@ public class FsusWebViewAdapterHeadlessTests
       Arrange(fixture.Root, scenario.Width, scenario.Height);
 
       Assert.True(fixture.Menu.IsOpen);
-      Assert.Equal("fsus-webview:replace:0", fixture.Menu.FocusedKey);
+      Assert.Equal(
+        scenario.NativeFallback ? "fsus-webview:add-to-dictionary" : "fsus-webview:replace:0",
+        fixture.Menu.FocusedKey);
       Assert.Same(fixture.Invoker, fixture.Menu.Invoker);
       Assert.Equal(AutomationControlType.Menu,
         AutomationProperties.GetControlTypeOverride(fixture.Menu));
@@ -78,6 +84,10 @@ public class FsusWebViewAdapterHeadlessTests
       Assert.True(
         fixture.Menu.Bounds.Bottom <= scenario.Height,
         $"{scenario.Name}: menu bounds {fixture.Menu.Bounds} exceed height {scenario.Height}.");
+      Assert.Equal(
+        scenario.NativeFallback,
+        fixture.Menu.Items.OfType<FsusContextMenuItem>()
+          .Any(item => item.Key == "fsus-webview:native-menu"));
 
       var scale = scenario.Zoom / 100d;
       var fileName = $"webview-context-{scenario.Name}.png";
@@ -106,14 +116,22 @@ public class FsusWebViewAdapterHeadlessTests
         TaskCreationOptions.RunContinuationsAsynchronously);
       fixture.Adapter.ContextCommandCompleted +=
         (_, result) => completion.TrySetResult(result);
-      Assert.True(await fixture.Menu.HandleKeyAsync(Key.Down));
-      Assert.Equal("fsus-webview:replace:1", fixture.Menu.FocusedKey);
-      Assert.True(await fixture.Menu.HandleKeyAsync(Key.Enter));
+      Assert.True(RaiseKeyDown(
+        fixture.Menu,
+        scenario.NativeFallback ? Key.End : Key.Down));
+      Assert.Equal(
+        scenario.NativeFallback ? "fsus-webview:native-menu" : "fsus-webview:replace:1",
+        fixture.Menu.FocusedKey);
+      Assert.True(RaiseKeyDown(fixture.Menu, Key.Enter));
       var commandResult = await completion.Task.WaitAsync(TimeSpan.FromSeconds(2));
       Assert.True(commandResult.Succeeded);
       Assert.False(fixture.Menu.IsOpen);
-      Assert.Equal(FsusWebViewContextCommand.ReplaceWord, fixture.Backend.LastCommand?.Command);
-      Assert.Equal("tech", fixture.Backend.LastCommand?.Replacement);
+      Assert.Equal(
+        scenario.NativeFallback
+          ? FsusWebViewContextCommand.UseNativeMenu
+          : FsusWebViewContextCommand.ReplaceWord,
+        fixture.Backend.LastCommand?.Command);
+      Assert.Equal(scenario.NativeFallback ? null : "tech", fixture.Backend.LastCommand?.Replacement);
       Assert.Same(fixture.Invoker, fixture.Host.LastRestoredFocus);
 
       fixture.Adapter.OpenContextMenu(
@@ -121,7 +139,7 @@ public class FsusWebViewAdapterHeadlessTests
         fixture.Menu,
         request,
         fixture.Invoker);
-      Assert.True(await fixture.Menu.HandleKeyAsync(Key.Escape));
+      Assert.True(RaiseKeyDown(fixture.Menu, Key.Escape));
       Assert.False(fixture.Menu.IsOpen);
       Assert.Same(fixture.Invoker, fixture.Host.LastRestoredFocus);
       captures.Add(new
@@ -137,7 +155,9 @@ public class FsusWebViewAdapterHeadlessTests
         itemEvidence,
         keyboard = new
         {
-          arrowFocused = "fsus-webview:replace:1",
+          arrowFocused = scenario.NativeFallback
+            ? "fsus-webview:native-menu"
+            : "fsus-webview:replace:1",
           enterCommand = fixture.Backend.LastCommand?.Command.ToString(),
           enterReplacement = fixture.Backend.LastCommand?.Replacement,
           escapeClosed = !fixture.Menu.IsOpen,
@@ -146,6 +166,53 @@ public class FsusWebViewAdapterHeadlessTests
       });
       fixture.Adapter.Dispose();
       fixture.Window.Close();
+    }
+
+    var pdfCaptures = new List<object>();
+    foreach (var theme in new[] { FsusWebViewPrintTheme.Light, FsusWebViewPrintTheme.Dark })
+    {
+      var backend = new VisualBackend();
+      using var adapter = new FsusWebViewAdapter(backend);
+      var themeName = theme.ToString().ToLowerInvariant();
+      var pdfPath = Path.Combine(outputRoot, $"webview-print-{themeName}.pdf");
+      await using (var destination = File.Create(pdfPath))
+      {
+        var result = await adapter.ExportPdfAsync(
+          new FsusWebViewPdfExportOptions
+          {
+            GenerateTaggedPdf = true,
+            GenerateDocumentOutline = true,
+            Theme = theme,
+            PrintBackgrounds = true,
+          },
+          destination);
+        Assert.Equal(FsusWebViewCommandStatus.Succeeded, result.Status);
+        Assert.Equal(4, result.Outline.SelectMany(FlattenOutline).Count());
+      }
+
+      var pdfInfo = RunTool("pdfinfo", pdfPath);
+      Assert.Matches(@"(?m)^Pages:\s+2\s*$", pdfInfo);
+      var pdfInfoPath = Path.Combine(outputRoot, $"webview-print-{themeName}-pdfinfo.txt");
+      File.WriteAllText(pdfInfoPath, pdfInfo);
+      var textPath = Path.Combine(outputRoot, $"webview-print-{themeName}.txt");
+      RunTool("pdftotext", pdfPath, textPath);
+      var extractedText = File.ReadAllText(textPath);
+      Assert.Contains("Article", extractedText);
+      Assert.Contains("Methods", extractedText);
+      Assert.Contains("Inputs", extractedText);
+      Assert.Contains("Results", extractedText);
+      var renderPrefix = Path.Combine(outputRoot, $"webview-print-{themeName}");
+      RunTool("pdftoppm", "-png", "-r", "96", pdfPath, renderPrefix);
+      var renderedPages = new[] { $"{renderPrefix}-1.png", $"{renderPrefix}-2.png" };
+      Assert.All(renderedPages, path => Assert.True(File.Exists(path), path));
+      pdfCaptures.Add(new
+      {
+        theme = themeName,
+        pdf = EvidenceFile(repositoryRoot, pdfPath),
+        parser = EvidenceFile(repositoryRoot, pdfInfoPath),
+        text = EvidenceFile(repositoryRoot, textPath),
+        renderedPages = renderedPages.Select(path => EvidenceFile(repositoryRoot, path)).ToArray(),
+      });
     }
 
     var automationPath = Path.Combine(outputRoot, "automation-report.json");
@@ -160,7 +227,10 @@ public class FsusWebViewAdapterHeadlessTests
           menuRole = "Menu",
           itemRole = "MenuItem",
           pointerAndKeyboardOrigins = true,
+          routedKeyDownPipeline = true,
+          nativeFallbackWithUnusableSuggestions = true,
           escapeAndCloseRestoreInvokerFocus = true,
+          parsedAndRenderedLightAndDarkPdf = true,
         },
         new JsonSerializerOptions { WriteIndented = true }) + "\n");
 
@@ -172,13 +242,13 @@ public class FsusWebViewAdapterHeadlessTests
         {
           schemaVersion = 1,
           issues = new[] { 652, 672 },
-          candidateSha = Environment.GetEnvironmentVariable("FSUS_WEBVIEW_CANDIDATE_SHA")
-            ?? "working-tree-candidate",
+          candidateSha = RequireCandidateSha(),
           fixtureClass = "production",
           evidenceClass = "local-headless-skia-and-adapter-simulation",
           simulation =
             "The real FsusContextMenu, theme, overlay, focus and automation paths are rendered. Embedded-browser and PDF engines are deterministic adapters, not external engine execution.",
           captures,
+          pdfCaptures,
           automation = new
           {
             path = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, automationPath),
@@ -188,7 +258,8 @@ public class FsusWebViewAdapterHeadlessTests
         },
         new JsonSerializerOptions { WriteIndented = true }) + "\n");
 
-    Assert.Equal(4, captures.Count);
+    Assert.Equal(5, captures.Count);
+    Assert.Equal(2, pdfCaptures.Count);
     Assert.True(new FileInfo(manifestPath).Length > 1_000);
   }
 
@@ -258,7 +329,8 @@ public class FsusWebViewAdapterHeadlessTests
   }
 
   private static FsusWebViewContextMenuRequest CreateRequest(
-    FsusWebViewContextMenuOrigin origin) => new()
+    FsusWebViewContextMenuOrigin origin,
+    bool nativeFallback) => new()
     {
       Origin = origin,
       ViewportPoint = new FsusWebViewViewportPoint(190, 52),
@@ -271,13 +343,75 @@ public class FsusWebViewAdapterHeadlessTests
       FsusWebViewEditCapabilities.Paste |
       FsusWebViewEditCapabilities.RichEdit,
       MisspelledWord = "teh",
-      SpellingSuggestions =
-    [
-      new FsusWebViewSpellingSuggestion("the", "the"),
-      new FsusWebViewSpellingSuggestion("tech", "tech"),
-    ],
+      SpellingSuggestions = nativeFallback
+        ?
+        [
+          new FsusWebViewSpellingSuggestion(" ", "blank replacement"),
+          new FsusWebViewSpellingSuggestion("", "empty replacement"),
+        ]
+        :
+        [
+          new FsusWebViewSpellingSuggestion("the", "the"),
+          new FsusWebViewSpellingSuggestion("tech", "tech"),
+        ],
       NativeMenuFallbackAvailable = true,
     };
+
+  private static bool RaiseKeyDown(FsusContextMenu menu, Key key)
+  {
+    var args = new KeyEventArgs
+    {
+      RoutedEvent = InputElement.KeyDownEvent,
+      Source = menu,
+      Key = key,
+    };
+    menu.RaiseEvent(args);
+    return args.Handled;
+  }
+
+  private static string RequireCandidateSha()
+  {
+    var candidate = Environment.GetEnvironmentVariable("FSUS_WEBVIEW_CANDIDATE_SHA");
+    Assert.Matches("^[a-f0-9]{40}$", candidate ?? string.Empty);
+    return candidate!;
+  }
+
+  private static IEnumerable<FsusWebViewDocumentOutlineNode> FlattenOutline(
+    FsusWebViewDocumentOutlineNode node)
+  {
+    yield return node;
+    foreach (var child in node.Children.SelectMany(FlattenOutline))
+    {
+      yield return child;
+    }
+  }
+
+  private static object EvidenceFile(string repositoryRoot, string path) => new
+  {
+    path = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, path),
+    sha256 = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(path))),
+  };
+
+  private static string RunTool(string fileName, params string[] arguments)
+  {
+    var startInfo = new ProcessStartInfo(fileName)
+    {
+      RedirectStandardOutput = true,
+      RedirectStandardError = true,
+      UseShellExecute = false,
+    };
+    foreach (var argument in arguments)
+    {
+      startInfo.ArgumentList.Add(argument);
+    }
+    using var process = Process.Start(startInfo)
+      ?? throw new InvalidOperationException($"Could not start {fileName}.");
+    var stdout = process.StandardOutput.ReadToEnd();
+    var stderr = process.StandardError.ReadToEnd();
+    process.WaitForExit();
+    Assert.True(process.ExitCode == 0, $"{fileName} failed: {stderr}");
+    return stdout;
+  }
 
   private static void Arrange(Control root, double width, double height)
   {
@@ -345,15 +479,28 @@ public class FsusWebViewAdapterHeadlessTests
         FsusWebViewCommandStatus.Succeeded));
     }
 
-    public ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
+    public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
       FsusWebViewPdfExportOptions options,
       Stream destination,
-      CancellationToken cancellationToken = default) =>
-      ValueTask.FromResult(new FsusWebViewPdfExportResult
+      CancellationToken cancellationToken = default)
+    {
+      var bytes = TestWebViewPdfDocument.Create(
+        options.Theme == FsusWebViewPrintTheme.Dark,
+        options.GenerateTaggedPdf,
+        options.GenerateDocumentOutline);
+      await destination.WriteAsync(bytes, cancellationToken);
+      return new FsusWebViewPdfExportResult
       {
-        Status = FsusWebViewCommandStatus.Unsupported,
-        Detail = "Not used by rendered context-menu fixture.",
-      });
+        Status = FsusWebViewCommandStatus.Succeeded,
+        TaggedPdfApplied = options.GenerateTaggedPdf,
+        DocumentOutlineApplied = options.GenerateDocumentOutline,
+        DestinationLeftOpen = destination.CanWrite,
+        BytesWritten = bytes.Length,
+        Outline = options.GenerateDocumentOutline
+          ? TestWebViewPdfDocument.CreateOutline()
+          : Array.Empty<FsusWebViewDocumentOutlineNode>(),
+      };
+    }
   }
 
   private sealed record Scenario(
@@ -362,7 +509,8 @@ public class FsusWebViewAdapterHeadlessTests
     int Width,
     int Height,
     int Zoom,
-    FsusWebViewContextMenuOrigin Origin);
+    FsusWebViewContextMenuOrigin Origin,
+    bool NativeFallback = false);
 
   private sealed record Fixture(
     Window Window,

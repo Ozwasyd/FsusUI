@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
+using System.Text.RegularExpressions;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -578,8 +579,7 @@ public sealed class FsusWebViewAdapter : IDisposable
     var content = ReadWrittenPdf(destination, start.Value, bytesWritten);
     if (
       content is null ||
-      !content.StartsWith("%PDF-", StringComparison.Ordinal) ||
-      !content.Contains("%%EOF", StringComparison.Ordinal))
+      !HasStructurallyValidPdf(content))
     {
       return "The destination does not contain a complete PDF structure.";
     }
@@ -616,6 +616,114 @@ public sealed class FsusWebViewAdapter : IDisposable
     !string.IsNullOrWhiteSpace(node.Destination) &&
     node.Children.All((child) =>
       child.HeadingLevel > node.HeadingLevel && IsValidOutlineNode(child));
+
+  private static bool HasStructurallyValidPdf(string content)
+  {
+    if (!content.StartsWith("%PDF-", StringComparison.Ordinal))
+    {
+      return false;
+    }
+
+    var startXref = Regex.Match(
+      content,
+      @"startxref\s+(?<offset>\d+)\s+%%EOF\s*$",
+      RegexOptions.CultureInvariant);
+    if (
+      !startXref.Success ||
+      !int.TryParse(startXref.Groups["offset"].Value, out var xrefOffset) ||
+      xrefOffset < 0 ||
+      xrefOffset >= content.Length)
+    {
+      return false;
+    }
+
+    var xrefTarget = content.AsSpan(xrefOffset);
+    string? rootObjectNumber = null;
+    if (xrefTarget.StartsWith("xref", StringComparison.Ordinal))
+    {
+      var trailer = Regex.Match(
+        content[xrefOffset..],
+        @"trailer\s*<<(?<dictionary>[\s\S]*?)>>",
+        RegexOptions.CultureInvariant);
+      if (!trailer.Success)
+      {
+        return false;
+      }
+
+      rootObjectNumber = ReferencedObjectNumber(
+        trailer.Groups["dictionary"].Value,
+        "Root");
+    }
+    else
+    {
+      var xrefStream = Regex.Match(
+        content[xrefOffset..],
+        @"\A\s*(?<number>\d+)\s+0\s+obj\s*<<(?<dictionary>[\s\S]*?)/Type\s*/XRef[\s\S]*?>>",
+        RegexOptions.CultureInvariant);
+      if (!xrefStream.Success)
+      {
+        return false;
+      }
+
+      rootObjectNumber = ReferencedObjectNumber(
+        xrefStream.Groups["dictionary"].Value,
+        "Root");
+    }
+
+    if (rootObjectNumber is null ||
+      !TryReadObject(content, rootObjectNumber, out var catalog) ||
+      !Regex.IsMatch(catalog, @"/Type\s*/Catalog\b", RegexOptions.CultureInvariant))
+    {
+      return false;
+    }
+
+    var pagesObjectNumber = ReferencedObjectNumber(catalog, "Pages");
+    if (pagesObjectNumber is null ||
+      !TryReadObject(content, pagesObjectNumber, out var pages) ||
+      !Regex.IsMatch(pages, @"/Type\s*/Pages\b", RegexOptions.CultureInvariant))
+    {
+      return false;
+    }
+
+    var kids = Regex.Match(
+      pages,
+      @"/Kids\s*\[(?<kids>[^\]]+)\]",
+      RegexOptions.CultureInvariant);
+    if (!kids.Success)
+    {
+      return false;
+    }
+
+    var pageReference = Regex.Match(
+      kids.Groups["kids"].Value,
+      @"(?<number>\d+)\s+0\s+R",
+      RegexOptions.CultureInvariant);
+    return pageReference.Success &&
+      TryReadObject(content, pageReference.Groups["number"].Value, out var page) &&
+      Regex.IsMatch(page, @"/Type\s*/Page\b", RegexOptions.CultureInvariant);
+  }
+
+  private static string? ReferencedObjectNumber(string dictionary, string key)
+  {
+    var match = Regex.Match(
+      dictionary,
+      $@"/{Regex.Escape(key)}\s+(?<number>\d+)\s+0\s+R",
+      RegexOptions.CultureInvariant);
+    return match.Success ? match.Groups["number"].Value : null;
+  }
+
+  private static bool TryReadObject(
+    string content,
+    string objectNumber,
+    out string body)
+  {
+    var match = Regex.Match(
+      content,
+      $@"(?m)^\s*{Regex.Escape(objectNumber)}\s+0\s+obj\b(?<body>[\s\S]*?)\bendobj\b",
+      RegexOptions.CultureInvariant);
+    body = match.Success ? match.Groups["body"].Value : string.Empty;
+    return match.Success;
+  }
 
   private static IEnumerable<FsusWebViewDocumentOutlineNode> FlattenOutline(
     FsusWebViewDocumentOutlineNode node)

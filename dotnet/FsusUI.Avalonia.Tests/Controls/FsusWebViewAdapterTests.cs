@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
+using FsusUI.Avalonia.TestFixtures;
 using System.Text;
 
 namespace FsusUI.Avalonia.Tests.Controls;
@@ -228,11 +229,14 @@ public class FsusWebViewAdapterTests
     Assert.StartsWith("%PDF-1.7", pdf);
     Assert.Contains("/StructTreeRoot", pdf);
     Assert.Contains("/Outlines", pdf);
-    Assert.Contains("/S /H1 /Title (Article)", pdf);
-    Assert.Contains("/S /H2 /Title (Methods)", pdf);
-    Assert.Contains("/S /H3 /Title (Inputs)", pdf);
-    Assert.Contains("/Dest (heading-article) [1 /XYZ 72 72 0]", pdf);
-    Assert.Contains("/Dest (heading-results) [2 /XYZ 72 72 0]", pdf);
+    Assert.Contains("/S /H1", pdf);
+    Assert.Contains("/T (Article)", pdf);
+    Assert.Contains("/S /H2", pdf);
+    Assert.Contains("/T (Methods)", pdf);
+    Assert.Contains("/S /H3", pdf);
+    Assert.Contains("/T (Inputs)", pdf);
+    Assert.Contains("/Dest (heading-article)", pdf);
+    Assert.Contains("/Dest (heading-results)", pdf);
     Assert.Contains($"/PageBackground ({expectedPageBackground})", pdf);
     Assert.Contains($"/TextColor ({expectedTextColor})", pdf);
     Assert.Contains("/PrintBackgrounds true", pdf);
@@ -275,6 +279,29 @@ public class FsusWebViewAdapterTests
         cancellation.Token));
 
     Assert.Equal(0, backend.ExportCalls);
+    Assert.True(destination.CanWrite);
+  }
+
+  [Fact]
+  public async Task InFlightCancellationInterruptsBackendAndPreservesDestinationOwnership()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Windows))
+    {
+      PauseExportUntilCancelled = true,
+    };
+    using var adapter = new FsusWebViewAdapter(backend);
+    using var destination = new MemoryStream();
+    using var cancellation = new CancellationTokenSource();
+
+    var export = adapter.ExportPdfAsync(
+      new FsusWebViewPdfExportOptions(),
+      destination,
+      cancellation.Token).AsTask();
+    await backend.ExportStarted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+    cancellation.Cancel();
+
+    await Assert.ThrowsAnyAsync<OperationCanceledException>(() => export);
+    Assert.Equal(1, backend.ExportCalls);
     Assert.True(destination.CanWrite);
   }
 
@@ -359,6 +386,28 @@ public class FsusWebViewAdapterTests
     Assert.Contains("heading-results", result.Detail);
   }
 
+  [Fact]
+  public async Task BackendCannotClaimSuccessWithPdfMarkersButNoObjectGraph()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Windows))
+    {
+      WritePseudoPdf = true,
+    };
+    using var adapter = new FsusWebViewAdapter(backend);
+    using var destination = new MemoryStream();
+
+    var result = await adapter.ExportPdfAsync(
+      new FsusWebViewPdfExportOptions
+      {
+        GenerateTaggedPdf = true,
+        GenerateDocumentOutline = true,
+      },
+      destination);
+
+    Assert.Equal(FsusWebViewCommandStatus.InvalidBackendResult, result.Status);
+    Assert.Contains("complete PDF structure", result.Detail);
+  }
+
   private static FsusWebViewContextMenuRequest RichRequest(
     FsusWebViewContextMenuOrigin origin = FsusWebViewContextMenuOrigin.Pointer) => new()
     {
@@ -417,6 +466,10 @@ public class FsusWebViewAdapterTests
     public bool CloseDestination { get; init; }
     public bool SkipPdfWrite { get; init; }
     public bool OmitLastDestination { get; init; }
+    public bool WritePseudoPdf { get; init; }
+    public bool PauseExportUntilCancelled { get; init; }
+    public TaskCompletionSource ExportStarted { get; } = new(
+      TaskCreationOptions.RunContinuationsAsynchronously);
     public FakePrintRenderSnapshot? LastPrintRender { get; private set; }
 
     public void RaiseContextMenu(FsusWebViewContextMenuRequest request) =>
@@ -439,23 +492,23 @@ public class FsusWebViewAdapterTests
     {
       cancellationToken.ThrowIfCancellationRequested();
       ExportCalls++;
+      ExportStarted.TrySetResult();
+      if (PauseExportUntilCancelled)
+      {
+        await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+      }
       var outline = BuildOutline(PrintableHeadings);
       LastPrintRender = BuildPrintRender(options, PrintableHeadings);
-      var headingObjects = string.Join(
-        "\n",
-        LastPrintRender.HeadingRuns
-          .Where(heading => !OmitLastDestination || heading.Destination != "heading-results")
-          .Select(heading =>
-          $"/S /H{heading.HeadingLevel} /Title ({heading.Title}) " +
-          $"/Dest ({heading.Destination}) [{heading.Page} /XYZ 72 {heading.Top} 0]"));
-      var pdf = Encoding.ASCII.GetBytes(
-        "%PDF-1.7\n" +
-        "/StructTreeRoot << /Type /StructTreeRoot >>\n" +
-        "/Outlines << /First 1 0 R >>\n" +
-        $"/PageBackground ({LastPrintRender.PageBackground})\n" +
-        $"/TextColor ({LastPrintRender.TextColor})\n" +
-        $"/PrintBackgrounds {options.PrintBackgrounds.ToString().ToLowerInvariant()}\n" +
-        $"{headingObjects}\n%%EOF\n");
+      var pdf = WritePseudoPdf
+        ? Encoding.ASCII.GetBytes(
+          "%PDF-1.7\n/StructTreeRoot\n/Outlines\n" +
+          "/Dest (heading-article)\n/Dest (heading-methods)\n" +
+          "/Dest (heading-inputs)\n/Dest (heading-results)\n%%EOF\n")
+        : TestWebViewPdfDocument.Create(
+          options.Theme == FsusWebViewPrintTheme.Dark,
+          options.GenerateTaggedPdf,
+          options.GenerateDocumentOutline,
+          OmitLastDestination);
       if (!SkipPdfWrite)
       {
         await destination.WriteAsync(pdf, cancellationToken);
