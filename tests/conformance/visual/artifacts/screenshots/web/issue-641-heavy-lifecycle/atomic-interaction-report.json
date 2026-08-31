@@ -1,0 +1,39 @@
+{
+  "browser": "chromium",
+  "productionFixture": true,
+  "states": [
+    {
+      "kind": "code",
+      "focusedInSource": true,
+      "sourceSelectionEnd": 0,
+      "sourceSelectionStart": 0,
+      "escapedSelectionEnd": 41,
+      "escapedSelectionStart": 41,
+      "focusedAfterEscape": true,
+      "sourceLength": 41,
+      "sourceUnchanged": true
+    },
+    {
+      "kind": "mermaid",
+      "focusedInSource": true,
+      "sourceSelectionEnd": 0,
+      "sourceSelectionStart": 0,
+      "escapedSelectionEnd": 29,
+      "escapedSelectionStart": 29,
+      "focusedAfterEscape": true,
+      "sourceLength": 29,
+      "sourceUnchanged": true
+    },
+    {
+      "kind": "latex",
+      "focusedInSource": true,
+      "sourceSelectionEnd": 0,
+      "sourceSelectionStart": 0,
+      "escapedSelectionEnd": 11,
+      "escapedSelectionStart": 11,
+      "focusedAfterEscape": true,
+      "sourceLength": 11,
+      "sourceUnchanged": true
+    }
+  ]
+}

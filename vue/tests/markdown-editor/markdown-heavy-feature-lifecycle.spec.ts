@@ -1,3 +1,6 @@
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
@@ -625,6 +628,27 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
 test('renders the static heavy feature matrix across themes, widths, and zoom', async ({
   page,
 }, testInfo) => {
+  const artifactRoot =
+    process.env.FSUS_HEAVY_LIFECYCLE_EVIDENCE === '1' &&
+    testInfo.project.name === 'chromium'
+      ? resolve(
+          'tests/conformance/visual/artifacts/screenshots/web/issue-641-heavy-lifecycle',
+        )
+      : null
+  const renderedStates: Array<{
+    active: number
+    codeScrollLeft: number
+    codeScrollMax: number
+    documentOverflow: number
+    retainedResources: number
+    rendererOverflow: number
+    screenshot: string | null
+    screenshotScrollLeft: number | null
+    theme: 'dark' | 'light'
+    viewportWidth: number
+    zoomPercent: number
+  }> = []
+  if (artifactRoot) mkdirSync(artifactRoot, { recursive: true })
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto(
     '/?visual=basic&theme=light&performance=markdown-heavy-feature-lifecycle&size=100000',
@@ -665,7 +689,14 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
         const geometry = await renderer.evaluate((element) => {
           const code = element.querySelector<HTMLElement>('pre')
           if (code) code.scrollLeft = code.scrollWidth
+          const codeScrollLeft = code?.scrollLeft ?? 0
+          const codeScrollMax = code
+            ? Math.max(0, code.scrollWidth - code.clientWidth)
+            : 0
+          if (code) code.scrollLeft = 0
           return {
+            codeScrollLeft,
+            codeScrollMax,
             documentOverflow:
               document.documentElement.scrollWidth -
               document.documentElement.clientWidth,
@@ -674,23 +705,100 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
         })
         expect(geometry.documentOverflow).toBeLessThanOrEqual(1)
         expect(geometry.rendererOverflow).toBeGreaterThanOrEqual(0)
+        expect(geometry.codeScrollLeft).toBeGreaterThanOrEqual(
+          geometry.codeScrollMax - 1,
+        )
+        const metrics = await readMetrics(page)
+        const screenshotName =
+          zoom > 1
+            ? `${theme}-${width}-zoom-${Math.round(zoom * 100)}.png`
+            : null
+        const screenshotScrollLeft =
+          zoom > 1
+            ? await renderer.locator('pre').evaluate(
+                (element) =>
+                  new Promise<number>((resolveScrollLeft) => {
+                    element.scrollLeft = 0
+                    requestAnimationFrame(() =>
+                      resolveScrollLeft(element.scrollLeft),
+                    )
+                  }),
+              )
+            : null
+        if (screenshotScrollLeft !== null) {
+          expect(screenshotScrollLeft).toBeLessThanOrEqual(1)
+        }
+        renderedStates.push({
+          active: metrics?.active ?? -1,
+          codeScrollLeft: geometry.codeScrollLeft,
+          codeScrollMax: geometry.codeScrollMax,
+          documentOverflow: geometry.documentOverflow,
+          retainedResources: metrics?.retainedResources ?? -1,
+          rendererOverflow: geometry.rendererOverflow,
+          screenshot: screenshotName,
+          screenshotScrollLeft,
+          theme,
+          viewportWidth: width,
+          zoomPercent: Math.round(zoom * 100),
+        })
         if (zoom > 1) {
-          await testInfo.attach(
-            `heavy-feature-${theme}-${width}-zoom-${Math.round(zoom * 100)}-${testInfo.project.name}`,
-            {
-              body: await renderer.screenshot({ animations: 'disabled' }),
-              contentType: 'image/png',
-            },
-          )
+          if (artifactRoot && screenshotName) {
+            await renderer.screenshot({
+              animations: 'disabled',
+              path: resolve(artifactRoot, screenshotName),
+            })
+          } else {
+            await testInfo.attach(
+              `heavy-feature-${theme}-${width}-zoom-${Math.round(zoom * 100)}-${testInfo.project.name}`,
+              {
+                body: await renderer.screenshot({ animations: 'disabled' }),
+                contentType: 'image/png',
+              },
+            )
+          }
         }
       }
     }
+  }
+  if (artifactRoot) {
+    writeFileSync(
+      resolve(artifactRoot, 'render-manifest.json'),
+      `${JSON.stringify(
+        {
+          browser: testInfo.project.name,
+          productionFixture: true,
+          reducedMotion: 'reduce',
+          states: renderedStates,
+        },
+        null,
+        2,
+      )}\n`,
+    )
   }
 })
 
 test('preserves heavy atomic source entry, Escape, and focus return in the real editor', async ({
   page,
-}) => {
+}, testInfo) => {
+  const artifactRoot =
+    process.env.FSUS_HEAVY_LIFECYCLE_EVIDENCE === '1' &&
+    testInfo.project.name === 'chromium'
+      ? resolve(
+          'tests/conformance/visual/artifacts/screenshots/web/issue-641-heavy-lifecycle',
+        )
+      : null
+  const interactionStates: Array<{
+    escapedSelectionEnd: number
+    escapedSelectionStart: number
+    focusedAfterEscape: boolean
+    focusedInSource: boolean
+    kind: 'code' | 'latex' | 'mermaid'
+    sourceLength: number
+    sourceUnchanged: boolean
+    sourceSelectionEnd: number
+    sourceSelectionStart: number
+  }> = []
+  if (artifactRoot) mkdirSync(artifactRoot, { recursive: true })
   await page.goto(
     '/?audit=ui-states&markdownEditorTransaction=1&markdownLanguageTools=1',
     { waitUntil: 'domcontentloaded' },
@@ -742,6 +850,14 @@ test('preserves heavy atomic source entry, Escape, and focus return in the real 
     await expect(textarea).toBeFocused()
     await expect(textarea).toHaveJSProperty('selectionStart', 0)
     await expect(textarea).toHaveJSProperty('selectionEnd', 0)
+    const sourceEntryState = await textarea.evaluate((element) => {
+      const input = element as HTMLTextAreaElement
+      return {
+        focusedInSource: document.activeElement === input,
+        sourceSelectionEnd: input.selectionEnd,
+        sourceSelectionStart: input.selectionStart,
+      }
+    })
 
     await textarea.dispatchEvent('keydown', {
       bubbles: true,
@@ -758,6 +874,35 @@ test('preserves heavy atomic source entry, Escape, and focus return in the real 
       section.source.length,
     )
     await expect(textarea).toHaveValue(section.source)
+    const escapedState = await textarea.evaluate((element, expectedSource) => {
+      const input = element as HTMLTextAreaElement
+      return {
+        escapedSelectionEnd: input.selectionEnd,
+        escapedSelectionStart: input.selectionStart,
+        focusedAfterEscape: document.activeElement === input,
+        sourceLength: expectedSource.length,
+        sourceUnchanged: input.value === expectedSource,
+      }
+    }, section.source)
+    interactionStates.push({
+      kind: section.kind,
+      ...sourceEntryState,
+      ...escapedState,
+    })
+  }
+  if (artifactRoot) {
+    writeFileSync(
+      resolve(artifactRoot, 'atomic-interaction-report.json'),
+      `${JSON.stringify(
+        {
+          browser: testInfo.project.name,
+          productionFixture: true,
+          states: interactionStates,
+        },
+        null,
+        2,
+      )}\n`,
+    )
   }
 })
 
