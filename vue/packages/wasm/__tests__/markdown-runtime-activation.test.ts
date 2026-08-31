@@ -389,6 +389,47 @@ describe('markdown feature activation runtime', () => {
     expect(featureModuleMocks.shikiCodeToHtml).not.toHaveBeenCalled()
   })
 
+  it('mounts pre-rendered Mermaid and LaTeX through the shared zero-resource lifecycle', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    const root = document.createElement('article')
+    root.innerHTML = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-rendered="true"><svg role="img"></svg></figure>',
+      '<div class="markdown-renderer__latex" data-latex-rendered="mathml"><math></math></div>',
+    ].join('')
+    const occurrence: Record<MarkdownHeavyFeatureKind, number> = {
+      'code-highlight': 0,
+      latex: 0,
+      mermaid: 0,
+    }
+
+    const result = await activateMarkdownHeavyFeatures({
+      heavyLifecycle: lifecycle,
+      resolveHeavyFeatureIdentity: ({ kind }) => ({
+        config: 'material-only',
+        documentEpoch: 1,
+        documentKey: 'doc-a',
+        featureKind: kind,
+        gatewayVersion: 'gateway@2',
+        locale: 'locale-independent',
+        nodeId: `${kind}-${occurrence[kind]++}`,
+        rendererVersion: 'renderer@1',
+        revision: 1,
+        sourceIdentity: 'source-a',
+        theme: kind === 'latex' ? 'token-bound' : 'light',
+      }),
+      root,
+    })
+
+    expect(result).toEqual({ activated: [], errors: [] })
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 0,
+      retainedResources: 0,
+      staticNodes: 2,
+    })
+    expect(featureModuleMocks.mermaidRender).not.toHaveBeenCalled()
+    expect(featureModuleMocks.katexRenderToString).not.toHaveBeenCalled()
+  })
+
   it('records default adapter failures as activation errors', async () => {
     featureModuleMocks.mermaidRender.mockRejectedValueOnce(
       new Error('bad diagram'),

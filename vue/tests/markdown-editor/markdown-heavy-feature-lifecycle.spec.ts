@@ -92,6 +92,11 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
   await expect
     .poll(async () => (await readMetrics(page))?.cacheEntries ?? 0)
     .toBeGreaterThan(0)
+  await expect
+    .poll(async () =>
+      Object.keys((await readMetrics(page))?.identities ?? {}).sort(),
+    )
+    .toEqual(['code-highlight', 'latex', 'mermaid'])
 
   const initial = await readMetrics(page)
   expect(initial).toMatchObject({

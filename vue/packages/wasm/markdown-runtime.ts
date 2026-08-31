@@ -647,6 +647,10 @@ interface MarkdownHeavyFeatureLifecycle {
     readonly signal?: AbortSignal
     readonly teardown?: () => void
   }) => Promise<boolean>
+  mountStatic: (input: {
+    readonly element: HTMLElement
+    readonly identity: MarkdownHeavyFeatureIdentity
+  }) => boolean
 }
 
 export type MarkdownFeatureActivationTheme = 'dark' | 'light'
@@ -1558,6 +1562,21 @@ const activateHeavyFeature = async (input: {
   }
 }
 
+const mountPreRenderedHeavyFeature = (
+  element: HTMLElement,
+  context: MarkdownFeatureActivationContext,
+) => {
+  const identity = context.resolveHeavyFeatureIdentity?.({
+    element,
+    kind: context.kind,
+    source: '',
+    theme: context.theme,
+    tokens: context.resolveTokens(element),
+  })
+  if (!context.heavyLifecycle || !identity) return false
+  return context.heavyLifecycle.mountStatic({ element, identity })
+}
+
 const activateBuiltInFeature = async (
   element: HTMLElement,
   context: MarkdownFeatureActivationContext,
@@ -1570,6 +1589,7 @@ const activateBuiltInFeature = async (
       !element.querySelector('code')
     ) {
       applyNonceToFeatureStyles(element, context.cspNonce)
+      mountPreRenderedHeavyFeature(element, context)
       return false
     }
     const source = extractFeatureSource(element, [
@@ -1612,6 +1632,7 @@ const activateBuiltInFeature = async (
   if (kind === 'latex') {
     if (element.dataset.latexRendered && !element.querySelector('code')) {
       applyNonceToFeatureStyles(element, context.cspNonce)
+      mountPreRenderedHeavyFeature(element, context)
       return false
     }
     const source = extractFeatureSource(element, [
@@ -1658,6 +1679,7 @@ const activateBuiltInFeature = async (
   const pre = code.closest('pre') ?? code
   if (pre instanceof HTMLElement && pre.dataset.codeHighlighted === 'shiki') {
     applyNonceToFeatureStyles(pre, context.cspNonce)
+    mountPreRenderedHeavyFeature(pre, context)
     return false
   }
   const source = code.textContent ?? ''

@@ -72,6 +72,29 @@ describe('markdown heavy feature lifecycle', () => {
     })
   })
 
+  it('tracks already-rendered immutable visuals as zero-resource static nodes', () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    const root = document.createElement('article')
+    for (const kind of ['mermaid', 'latex'] as const) {
+      const element = document.createElement('div')
+      root.append(element)
+      expect(lifecycle.mountStatic({ element, identity: identity(kind) })).toBe(
+        true,
+      )
+    }
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 0,
+      retainedResources: 0,
+      staticNodes: 2,
+    })
+    lifecycle.unmountRoot(root)
+    expect(lifecycle.metrics()).toMatchObject({
+      retainedResources: 0,
+      staticNodes: 0,
+      unmountedNodes: 2,
+    })
+  })
+
   it('reuses immutable output without rerendering and still commits it', async () => {
     const lifecycle = createMarkdownHeavyFeatureLifecycle()
     const featureIdentity = identity('mermaid')

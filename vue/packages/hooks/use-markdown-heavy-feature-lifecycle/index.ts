@@ -80,6 +80,10 @@ export interface MarkdownHeavyFeatureLifecycle {
   activate: <T>(input: MarkdownHeavyFeatureActivation<T>) => Promise<boolean>
   dispose: () => void
   metrics: () => MarkdownHeavyFeatureLifecycleMetrics
+  mountStatic: (input: {
+    readonly element: HTMLElement
+    readonly identity: MarkdownHeavyFeatureIdentity
+  }) => boolean
   resetDocument: (documentKey: string, documentEpoch: number | string) => void
   unmountRoot: (root: ParentNode) => void
 }
@@ -382,6 +386,23 @@ export const createMarkdownHeavyFeatureLifecycle = (
     }
   }
 
+  const mountStatic: MarkdownHeavyFeatureLifecycle['mountStatic'] = (input) => {
+    if (disposed || !validIdentity(input.identity)) return false
+    const nodeKey = nodeKeyOf(input.identity)
+    const previous = nodes.get(nodeKey)
+    if (previous) teardownRecord(previous)
+    nodes.set(nodeKey, {
+      controller: null,
+      documentEpoch: input.identity.documentEpoch,
+      documentKey: input.identity.documentKey,
+      element: input.element,
+      identityKey: cacheKeyOf(input.identity),
+      resources: EMPTY_RESOURCES,
+      state: 'static-mounted',
+    })
+    return true
+  }
+
   const resetDocument = (
     documentKey: string,
     documentEpoch: number | string,
@@ -441,6 +462,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
     activate,
     dispose,
     metrics,
+    mountStatic,
     resetDocument,
     unmountRoot,
   })

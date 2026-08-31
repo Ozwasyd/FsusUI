@@ -27,6 +27,12 @@ version mismatch prevents a stale commit. The stable syntax projection supplies
 node identity; DOM paths, array indexes, source offsets, and body hashes are not
 cache authority.
 
+Mermaid and LaTeX output already materialized by the authorized Markdown render
+result enters the same authority directly as a zero-resource `static-mounted`
+node. Placeholder-driven Mermaid, KaTeX, and Shiki adapter work instead enters
+`active-work`, registers its real abort listeners and task, and releases both
+before becoming static. Neither path creates a resident per-node renderer.
+
 ## Cache budget
 
 The internal cache contract is versioned as
@@ -37,9 +43,11 @@ The internal cache contract is versioned as
 
 Least-recently-used entries are evicted until both limits hold. Node-local state
 never crosses document epochs, including when two documents have identical
-source. Material theme/config/version changes create distinct entries instead of
-clearing unrelated entries. Cache eviction does not mutate source, history, or
-selection.
+source. Only material inputs are keyed: Code and Mermaid consume their rendered
+theme, Mermaid consumes its resolved visual tokens, and LaTeX consumes only its
+error color token. Built-in output is locale-independent. Material changes
+create distinct entries instead of clearing unrelated entries. Cache eviction
+does not mutate source, history, or selection.
 
 ## Scheduling and observability
 
