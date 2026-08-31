@@ -18,7 +18,12 @@ export const MEMBER_STATUSES = [
   'missing',
   'web-only',
 ]
-export const GOVERNANCE_FIELDS = ['reason', 'owner', 'testPolicy', 'reviewPolicy']
+export const GOVERNANCE_FIELDS = [
+  'reason',
+  'owner',
+  'testPolicy',
+  'reviewPolicy',
+]
 export const MARKDOWN_EDITOR_MODES = ['source', 'live', 'split', 'preview']
 export const MARKDOWN_EDITOR_CAPABILITIES = [
   'supported',
@@ -39,6 +44,10 @@ const AVALONIA_MEMBER_BINDINGS = {
       },
     },
   },
+}
+
+const AVALONIA_COMPONENT_BINDINGS = {
+  ElVisuallyHidden: 'FsusUI.Avalonia.Controls.FsusVisualHidden',
 }
 
 export const VUE_BASELINE_PATH = 'spec/baselines/vue-current.json'
@@ -83,7 +92,10 @@ export const kebabName = (value) =>
 // narrow (single member), documented, and never hides a member gap: every
 // member that does not resolve to a real counterpart is explicitly registered.
 export const normalizeMemberName = (value) => {
-  let normalized = value.replace(/^Is(?=[A-Z])/, '').replace(/^Can(?=[A-Z])/, '').replace(/^Has(?=[A-Z])/, '')
+  let normalized = value
+    .replace(/^Is(?=[A-Z])/, '')
+    .replace(/^Can(?=[A-Z])/, '')
+    .replace(/^Has(?=[A-Z])/, '')
   normalized = normalized.replace(/Changed$/, '')
   return toKebab(normalized)
 }
@@ -120,7 +132,11 @@ export const categoriesFromClrType = (type) => {
   ) {
     return ['array']
   }
-  if (base === 'System.Action' || base === 'System.Func' || base === 'System.EventHandler') {
+  if (
+    base === 'System.Action' ||
+    base === 'System.Func' ||
+    base === 'System.EventHandler'
+  ) {
     return ['function']
   }
   return [base.split('.').pop() || 'unknown']
@@ -159,10 +175,17 @@ export const categoriesFromVueProp = (prop) => {
       .map((part) => {
         const normalized = normalizeVueSemanticType(part)
         if (normalized === 'string') return 'string'
-        if (normalized === 'boolean' || normalized === 'true' || normalized === 'false') return 'boolean'
+        if (
+          normalized === 'boolean' ||
+          normalized === 'true' ||
+          normalized === 'false'
+        )
+          return 'boolean'
         if (normalized === 'number') return 'number'
-        if (normalized.endsWith('[]') || normalized.startsWith('SingleOrRange')) return 'array'
-        if (normalized.includes('Component') || normalized.includes('VNode')) return 'component'
+        if (normalized.endsWith('[]') || normalized.startsWith('SingleOrRange'))
+          return 'array'
+        if (normalized.includes('Component') || normalized.includes('VNode'))
+          return 'component'
         return 'unknown'
       })
   }
@@ -170,17 +193,29 @@ export const categoriesFromVueProp = (prop) => {
 }
 
 const categoriesOverlap = (first, second) => {
-  const a = first.includes('unknown') ? first.filter((x) => x !== 'unknown') : first
-  const b = second.includes('unknown') ? second.filter((x) => x !== 'unknown') : second
+  const a = first.includes('unknown')
+    ? first.filter((x) => x !== 'unknown')
+    : first
+  const b = second.includes('unknown')
+    ? second.filter((x) => x !== 'unknown')
+    : second
   if (a.length === 0 || b.length === 0) return null // not comparable
   return a.some((value) => b.includes(value))
 }
 
-const comparableValues = (values) =>
-  [...new Set((values ?? []).filter((value) => value != null).map((value) => String(value).toLowerCase()))]
+const comparableValues = (values) => [
+  ...new Set(
+    (values ?? [])
+      .filter((value) => value != null)
+      .map((value) => String(value).toLowerCase()),
+  ),
+]
 
-const enumMemberNames = (enumMembers) =>
-  [...new Set((enumMembers ?? []).map((member) => String(member.name).toLowerCase()))]
+const enumMemberNames = (enumMembers) => [
+  ...new Set(
+    (enumMembers ?? []).map((member) => String(member.name).toLowerCase()),
+  ),
+]
 
 const literalDefaultValue = (webDefault) =>
   webDefault?.kind === 'literal' ? webDefault.value : undefined
@@ -189,7 +224,8 @@ const normalizeDefault = (value) => {
   if (typeof value === 'string') return value.toLowerCase()
   if (typeof value === 'number') return String(value)
   if (typeof value === 'boolean') return String(value)
-  if (typeof value === 'object' && value !== null) return String(value.value ?? value)
+  if (typeof value === 'object' && value !== null)
+    return String(value.value ?? value)
   return value == null ? undefined : String(value)
 }
 
@@ -289,7 +325,10 @@ export const compareMembers = ({ web, avalonia, kind }) => {
     if (webSignature && avaloniaSignature) {
       const signatureCompatible = categoriesOverlap(
         categoriesFromClrType(avaloniaSignature.returnType),
-        categoriesFromVueProp({ runtimeType: webSignature.returnType, semanticType: webSignature.returnType }),
+        categoriesFromVueProp({
+          runtimeType: webSignature.returnType,
+          semanticType: webSignature.returnType,
+        }),
       )
       if (signatureCompatible === false) {
         setDrift(
@@ -397,6 +436,8 @@ const avaloniaSemanticIndex = (baselines) => {
 }
 
 const findAvaloniaType = (componentName, typeIndex) => {
+  const explicitType = AVALONIA_COMPONENT_BINDINGS[componentName]
+  if (explicitType) return typeIndex.get(explicitType) ?? null
   const kebab = kebabName(componentName)
   for (const [fullName, type] of typeIndex) {
     const shortName = fullName.split('.').pop() ?? ''
@@ -425,11 +466,7 @@ const matchAvaloniaProperty = (webName, avaloniaType) => {
 const memberBinding = (componentName, kind, webName) =>
   AVALONIA_MEMBER_BINDINGS[componentName]?.[kind]?.[webName] ?? null
 
-const matchAvaloniaEvent = (
-  webName,
-  avaloniaType,
-  componentName,
-) => {
+const matchAvaloniaEvent = (webName, avaloniaType, componentName) => {
   const binding = memberBinding(componentName, 'outputs', webName)
   const normalized = normalizeMemberName(binding?.member ?? webName)
   for (const event of avaloniaType.events ?? []) {
@@ -448,10 +485,7 @@ const matchAvaloniaMethod = (webName, avaloniaType) => {
 }
 
 const matchAvaloniaContentProperty = (webName, avaloniaType) => {
-  const candidates = new Set([
-    toKebab(webName),
-    toKebab(`${webName}Content`),
-  ])
+  const candidates = new Set([toKebab(webName), toKebab(`${webName}Content`)])
   const properties = [
     ...(avaloniaType.avaloniaProperties ?? []),
     ...(avaloniaType.properties ?? []),
@@ -597,7 +631,12 @@ const outputMember = ({
   }
 }
 
-const operationMember = ({ contractKebab, exposed, avaloniaType, classification }) => {
+const operationMember = ({
+  contractKebab,
+  exposed,
+  avaloniaType,
+  classification,
+}) => {
   const web = {
     member: exposed.name,
     baseline: VUE_BASELINE_PATH,
@@ -665,13 +704,22 @@ const operationMember = ({ contractKebab, exposed, avaloniaType, classification 
   }
 }
 
-const contentRegionMember = ({ contractKebab, slot, avaloniaType, classification }) => {
+const contentRegionMember = ({
+  contractKebab,
+  slot,
+  avaloniaType,
+  classification,
+}) => {
   if (!avaloniaType) {
     return {
       name: slot.name,
       kind: 'contentRegion',
       scoped: Boolean(slot.scoped),
-      web: { member: slot.name, scoped: Boolean(slot.scoped), baseline: VUE_BASELINE_PATH },
+      web: {
+        member: slot.name,
+        scoped: Boolean(slot.scoped),
+        baseline: VUE_BASELINE_PATH,
+      },
       avalonia: null,
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
@@ -715,7 +763,11 @@ const contentRegionMember = ({ contractKebab, slot, avaloniaType, classification
     name: slot.name,
     kind: 'contentRegion',
     scoped: Boolean(slot.scoped),
-    web: { member: slot.name, scoped: Boolean(slot.scoped), baseline: VUE_BASELINE_PATH },
+    web: {
+      member: slot.name,
+      scoped: Boolean(slot.scoped),
+      baseline: VUE_BASELINE_PATH,
+    },
     avalonia,
     status,
     drift: emptyDrift(),
@@ -728,9 +780,12 @@ const deriveStates = ({ component, inputs, outputs }) => {
   const inputNames = new Set(inputs.map((input) => input.name))
   const outputNames = new Set(outputs.map((output) => output.name))
   const states = [{ name: 'default', kind: 'initial' }]
-  if (inputNames.has('disabled')) states.push({ name: 'disabled', kind: 'derived' })
-  if (inputNames.has('loading')) states.push({ name: 'loading', kind: 'derived' })
-  if (inputNames.has('readonly')) states.push({ name: 'readonly', kind: 'derived' })
+  if (inputNames.has('disabled'))
+    states.push({ name: 'disabled', kind: 'derived' })
+  if (inputNames.has('loading'))
+    states.push({ name: 'loading', kind: 'derived' })
+  if (inputNames.has('readonly'))
+    states.push({ name: 'readonly', kind: 'derived' })
   if (outputNames.has('open') || outputNames.has('visible')) {
     states.push({ name: 'open', kind: 'derived' })
     states.push({ name: 'closed', kind: 'derived' })
@@ -770,7 +825,12 @@ const deriveStates = ({ component, inputs, outputs }) => {
   return { machine: `fsus-${kebabName(component.name)}`, states, transitions }
 }
 
-const deriveRequirements = ({ inputs, outputs, operations, contentRegions }) => {
+const deriveRequirements = ({
+  inputs,
+  outputs,
+  operations,
+  contentRegions,
+}) => {
   const inputNames = new Set(inputs.map((input) => input.name))
   const hasInteractiveSurface =
     outputs.length > 0 || inputNames.has('disabled') || operations.length > 0
@@ -779,25 +839,35 @@ const deriveRequirements = ({ inputs, outputs, operations, contentRegions }) => 
   ]
   const pointer = []
   if (outputs.length > 0) {
-    pointer.push('Pointer/tap activation must raise the corresponding public output.')
+    pointer.push(
+      'Pointer/tap activation must raise the corresponding public output.',
+    )
   }
   if (inputNames.has('disabled')) {
     pointer.push('Disabled surfaces must not respond to pointer activation.')
   }
-  const focus = ['Focus entry must surface the same public focus state on both platforms.']
+  const focus = [
+    'Focus entry must surface the same public focus state on both platforms.',
+  ]
   if (inputNames.has('autofocus')) {
-    focus.push('autofocus input must map to initial focus on Web and equivalent Avalonia focus behavior.')
+    focus.push(
+      'autofocus input must map to initial focus on Web and equivalent Avalonia focus behavior.',
+    )
   }
   const a11y = []
   if (hasInteractiveSurface) {
     a11y.push('Interactive surfaces must expose an accessible name and role.')
   }
   if (contentRegions.length > 0) {
-    a11y.push('Content regions must preserve accessible text content semantics.')
+    a11y.push(
+      'Content regions must preserve accessible text content semantics.',
+    )
   }
   const motion = ['Honor user reduced-motion preference.']
   if (inputNames.has('loading')) {
-    motion.push('Loading transitions must not trap focus and must remain within the motion budget.')
+    motion.push(
+      'Loading transitions must not trap focus and must remain within the motion budget.',
+    )
   }
   const perf = [
     'Render and interaction budgets must match the component performance contract.',
@@ -813,7 +883,9 @@ const markdownEditorSection = () => ({
 })
 
 const contractCoverage = (members) => {
-  const counts = Object.fromEntries(MEMBER_STATUSES.map((status) => [status, 0]))
+  const counts = Object.fromEntries(
+    MEMBER_STATUSES.map((status) => [status, 0]),
+  )
   for (const member of members) counts[member.status] += 1
   const total = members.length
   const mapped = counts['aligned-candidate'] + counts['partial']
@@ -873,9 +945,18 @@ const contractForComponent = ({
     exportStatus = gate?.requiredStatus ?? 'partial'
   } else if (classification === 'web-only') {
     exportStatus = 'web-only'
-  } else if (inputs.some((input) => input.status === 'partial') || outputs.some((output) => output.status === 'partial') || operations.some((operation) => operation.status === 'partial')) {
+  } else if (
+    inputs.some((input) => input.status === 'partial') ||
+    outputs.some((output) => output.status === 'partial') ||
+    operations.some((operation) => operation.status === 'partial')
+  ) {
     exportStatus = 'partial'
-  } else if (inputs.some((input) => input.status === 'missing') || outputs.some((output) => output.status === 'missing') || operations.some((operation) => operation.status === 'missing') || contentRegions.some((region) => region.status === 'missing')) {
+  } else if (
+    inputs.some((input) => input.status === 'missing') ||
+    outputs.some((output) => output.status === 'missing') ||
+    operations.some((operation) => operation.status === 'missing') ||
+    contentRegions.some((region) => region.status === 'missing')
+  ) {
     exportStatus = 'missing'
   } else {
     exportStatus = 'aligned-candidate'
@@ -883,10 +964,24 @@ const contractForComponent = ({
 
   const members = [...inputs, ...outputs, ...operations, ...contentRegions]
   const avaloniaExtras = avaloniaType
-    ? extractAvaloniaExtras({ contractKebab, component, avaloniaType, inputs, outputs, operations, contentRegions })
+    ? extractAvaloniaExtras({
+        contractKebab,
+        component,
+        avaloniaType,
+        inputs,
+        outputs,
+        operations,
+        contentRegions,
+      })
     : []
   const states = deriveStates({ component, inputs, outputs })
-  const requirements = deriveRequirements({ component, inputs, outputs, operations, contentRegions })
+  const requirements = deriveRequirements({
+    component,
+    inputs,
+    outputs,
+    operations,
+    contentRegions,
+  })
 
   const contract = {
     id: `component-v2.${contractKebab}`,
@@ -898,15 +993,21 @@ const contractForComponent = ({
       module: component.module,
       classification,
       exportStatus,
+      exports: [component.name, ...(component.exportIdentity?.aliases ?? [])],
     },
     bindings: {
       web: {
         status: 'source',
         package: '@ozwasyd/element-plus',
         memberRef: memberRef('component'),
+        exports: [component.name, ...(component.exportIdentity?.aliases ?? [])],
       },
       avalonia: avaloniaType
-        ? { status: 'bound', package: 'FsusUI.Avalonia', type: avaloniaType.name }
+        ? {
+            status: 'bound',
+            package: 'FsusUI.Avalonia',
+            type: avaloniaType.name,
+          }
         : { status: 'unbound', package: null, type: null },
     },
     inputs,
@@ -917,7 +1018,10 @@ const contractForComponent = ({
     requirements,
     performanceBudget,
     platformDifferences: members
-      .filter((member) => member.status !== 'aligned-candidate' && member.status !== 'web-only')
+      .filter(
+        (member) =>
+          member.status !== 'aligned-candidate' && member.status !== 'web-only',
+      )
       .map((member) => ({
         member: member.name,
         kind: member.kind,
@@ -927,9 +1031,12 @@ const contractForComponent = ({
     avaloniaExtras,
     scenarioIds: [
       ...members.flatMap((member) => member.scenarioIds),
-      ...states.states.map((state) =>
-        `scenario.v2.${contractKebab}.state.${toKebab(state.name)}`),
-      ...requirements.keyboard.map(() => `scenario.v2.${contractKebab}.keyboard`),
+      ...states.states.map(
+        (state) => `scenario.v2.${contractKebab}.state.${toKebab(state.name)}`,
+      ),
+      ...requirements.keyboard.map(
+        () => `scenario.v2.${contractKebab}.keyboard`,
+      ),
       ...requirements.pointer.map(() => `scenario.v2.${contractKebab}.pointer`),
       ...requirements.focus.map(() => `scenario.v2.${contractKebab}.focus`),
       ...requirements.a11y.map(() => `scenario.v2.${contractKebab}.a11y`),
@@ -985,7 +1092,9 @@ const extractAvaloniaExtras = ({
   for (const property of avaloniaType.properties ?? []) addExtra(property)
   for (const event of avaloniaType.events ?? []) addExtra(event)
   for (const method of avaloniaType.methods ?? []) addExtra(method)
-  return extras.sort((first, second) => first.member.localeCompare(second.member))
+  return extras.sort((first, second) =>
+    first.member.localeCompare(second.member),
+  )
 }
 
 const avaloniaOnlyType = ({ type, packageId }) => ({
@@ -1010,12 +1119,19 @@ const avaloniaOnlyType = ({ type, packageId }) => ({
 export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
   const map = []
   for (const component of vueBaseline.components ?? []) {
+    if (component.exportIdentity?.role === 'alias') continue
     const avaloniaType = findAvaloniaType(component.name, typeIndex)
     if (!avaloniaType) continue
     map.push({
-      vue: { name: component.name, module: component.module },
+      vue: {
+        name: component.name,
+        module: component.module,
+        aliases: component.exportIdentity?.aliases ?? [],
+      },
       avalonia: { type: avaloniaType.name, packageId: avaloniaType.packageId },
-      basis: 'name-equality',
+      basis: AVALONIA_COMPONENT_BINDINGS[component.name]
+        ? 'explicit-component-binding'
+        : 'canonical-export-name-equality',
     })
   }
   return map.sort((first, second) =>
@@ -1040,15 +1156,13 @@ export const buildRegistry = ({
   const performanceBudgetByComponent = new Map(
     [...(v1Registry.contracts ?? []), ...(v1Registry.webOnlyDecisions ?? [])]
       .filter((contract) => contract.source?.kind === 'component')
-      .map((contract) => [
-        contract.source?.name,
-        contract.performanceBudget,
-      ]),
+      .map((contract) => [contract.source?.name, contract.performanceBudget]),
   )
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
   const contracts = []
   for (const component of vueBaseline.components ?? []) {
+    if (component.exportIdentity?.role === 'alias') continue
     const avaloniaType = findAvaloniaType(component.name, typeIndex)
     contracts.push(
       contractForComponent({
@@ -1061,12 +1175,29 @@ export const buildRegistry = ({
   }
   contracts.sort((first, second) => first.id.localeCompare(second.id))
 
+  const publicExportMap = (vueBaseline.components ?? [])
+    .map((component) => {
+      const canonical = component.exportIdentity?.canonical ?? component.name
+      return {
+        name: component.name,
+        module: component.module,
+        role: component.exportIdentity?.role ?? 'canonical',
+        canonical,
+        contractId: `component-v2.${toKebab(canonical)}`,
+      }
+    })
+    .sort((first, second) => first.name.localeCompare(second.name))
+
   const avaloniaOnlyTypes = []
   for (const type of typeIndex.values()) {
     if (mappedTypes.has(type.name)) continue
-    avaloniaOnlyTypes.push(avaloniaOnlyType({ type, packageId: type.packageId }))
+    avaloniaOnlyTypes.push(
+      avaloniaOnlyType({ type, packageId: type.packageId }),
+    )
   }
-  avaloniaOnlyTypes.sort((first, second) => first.type.localeCompare(second.type))
+  avaloniaOnlyTypes.sort((first, second) =>
+    first.type.localeCompare(second.type),
+  )
 
   const allMembers = contracts.flatMap((contract) => [
     ...contract.inputs,
@@ -1074,7 +1205,9 @@ export const buildRegistry = ({
     ...contract.operations,
     ...contract.contentRegions,
   ])
-  const coverage = Object.fromEntries(MEMBER_STATUSES.map((status) => [status, 0]))
+  const coverage = Object.fromEntries(
+    MEMBER_STATUSES.map((status) => [status, 0]),
+  )
   for (const member of allMembers) coverage[member.status] += 1
   coverage.total = allMembers.length
   coverage.mappedPercent =
@@ -1141,14 +1274,18 @@ export const buildRegistry = ({
         'kebab-case',
       ],
       statusDerivation: {
-        alignedCandidate: 'real member matched with no type/default/nullability/enum/payload drift',
-        partial: 'real member matched but semantic drift or non-comparable typing',
+        alignedCandidate:
+          'real member matched with no type/default/nullability/enum/payload drift',
+        partial:
+          'real member matched but semantic drift or non-comparable typing',
         missing: 'no real counterpart member on the other platform',
         webOnly: 'explicit web-only registration with governance',
       },
-      aligned: 'final aligned status is never hand-written; only aligned-candidate is derived',
+      aligned:
+        'final aligned status is never hand-written; only aligned-candidate is derived',
     },
     componentMap,
+    publicExportMap,
     contracts,
     avaloniaOnlyTypes,
     coverage,
@@ -1161,7 +1298,10 @@ const validateGovernance = (governance, context, errors) => {
     return
   }
   for (const field of GOVERNANCE_FIELDS) {
-    if (typeof governance[field] !== 'string' || governance[field].trim() === '') {
+    if (
+      typeof governance[field] !== 'string' ||
+      governance[field].trim() === ''
+    ) {
       errors.push(`${context} governance missing ${field}`)
     }
   }
@@ -1179,20 +1319,23 @@ const validateMember = (member, contractId, errors) => {
     validateGovernance(member.governance, context, errors)
   }
   if (member.status === 'aligned-candidate' && member.governance != null) {
-    errors.push(`${context} aligned-candidate must not carry an override governance`)
+    errors.push(
+      `${context} aligned-candidate must not carry an override governance`,
+    )
   }
   if (member.status === 'aligned-candidate') {
     for (const key of COMPARISON_KEY) {
       if (member.drift?.[key] != null) {
-        errors.push(`${context} claims aligned-candidate with ${key} drift: ${member.drift[key]}`)
+        errors.push(
+          `${context} claims aligned-candidate with ${key} drift: ${member.drift[key]}`,
+        )
       }
     }
   }
-  if (
-    member.status === 'aligned-candidate' &&
-    member.avalonia == null
-  ) {
-    errors.push(`${context} claims aligned-candidate without a real Avalonia member (auto counterpart)`)
+  if (member.status === 'aligned-candidate' && member.avalonia == null) {
+    errors.push(
+      `${context} claims aligned-candidate without a real Avalonia member (auto counterpart)`,
+    )
   }
 }
 
@@ -1217,11 +1360,15 @@ const validateMarkdownEditor = (contract, gate, errors) => {
     JSON.stringify(editor.capabilities ?? []) !==
     JSON.stringify(MARKDOWN_EDITOR_CAPABILITIES)
   ) {
-    errors.push(`${contract.id} MarkdownEditor capability set must be the six canonical values`)
+    errors.push(
+      `${contract.id} MarkdownEditor capability set must be the six canonical values`,
+    )
   }
   const serialized = JSON.stringify(editor)
   if (serialized.includes('"write"')) {
-    errors.push(`${contract.id} MarkdownEditor must not reference write anywhere`)
+    errors.push(
+      `${contract.id} MarkdownEditor must not reference write anywhere`,
+    )
   }
   if (gate?.blocked) {
     const required = gate.requiredStatus ?? 'partial'
@@ -1261,6 +1408,20 @@ export const validateContract = (contract, gate, errors) => {
     if (typeof contract[section] !== 'object' || contract[section] == null) {
       contractErrors.push(`${contract.id} ${section} must be an object`)
     }
+  }
+  if (
+    !Array.isArray(contract.component?.exports) ||
+    contract.component.exports.length === 0
+  ) {
+    contractErrors.push(`${contract.id} component.exports must be non-empty`)
+  }
+  if (
+    JSON.stringify(contract.bindings?.web?.exports ?? []) !==
+    JSON.stringify(contract.component?.exports ?? [])
+  ) {
+    contractErrors.push(
+      `${contract.id} web exports must match component exports`,
+    )
   }
   for (const field of ['renderMs', 'interactionMs']) {
     if (
@@ -1308,7 +1469,9 @@ export const validateContract = (contract, gate, errors) => {
     contractErrors.push(`${contract.id} missing required scenario ids`)
   }
   if (/"aligned"\s*:\s*true/.test(JSON.stringify(contract))) {
-    contractErrors.push(`${contract.id} must not hand-write final aligned: true`)
+    contractErrors.push(
+      `${contract.id} must not hand-write final aligned: true`,
+    )
   }
   validateMarkdownEditor(contract, gate, contractErrors)
   return contractErrors
@@ -1332,6 +1495,9 @@ export const validateRegistry = (registry, gate) => {
   if (!Array.isArray(registry.componentMap)) {
     errors.push('registry componentMap must be an array')
   }
+  if (!Array.isArray(registry.publicExportMap)) {
+    errors.push('registry publicExportMap must be an array')
+  }
   const contractIds = new Set()
   for (const contract of registry.contracts) {
     if (contractIds.has(contract.id)) {
@@ -1348,9 +1514,40 @@ export const validateRegistry = (registry, gate) => {
     }
   }
   for (const entry of registry.componentMap ?? []) {
-    if (entry.basis !== 'name-equality') {
+    if (
+      ![
+        'canonical-export-name-equality',
+        'explicit-component-binding',
+      ].includes(entry.basis)
+    ) {
       errors.push(
-        `componentMap ${entry.vue?.name ?? '<unknown>'} must use name-equality basis`,
+        `componentMap ${entry.vue?.name ?? '<unknown>'} must use canonical-export-name-equality basis`,
+      )
+    }
+  }
+  const exportNames = new Set()
+  const exportsByContract = new Map()
+  for (const entry of registry.publicExportMap ?? []) {
+    const context = `public export ${entry.name ?? '<unknown>'}`
+    if (exportNames.has(entry.name)) errors.push(`duplicate ${context}`)
+    exportNames.add(entry.name)
+    if (!['canonical', 'alias'].includes(entry.role)) {
+      errors.push(`${context} has invalid role ${entry.role}`)
+    }
+    if (!contractIds.has(entry.contractId)) {
+      errors.push(`${context} references missing contract ${entry.contractId}`)
+      continue
+    }
+    const names = exportsByContract.get(entry.contractId) ?? []
+    names.push(entry.name)
+    exportsByContract.set(entry.contractId, names)
+  }
+  for (const contract of registry.contracts) {
+    const mapped = (exportsByContract.get(contract.id) ?? []).sort()
+    const declared = [...(contract.component?.exports ?? [])].sort()
+    if (JSON.stringify(mapped) !== JSON.stringify(declared)) {
+      errors.push(
+        `${contract.id} public export map does not match component exports`,
       )
     }
   }
@@ -1400,7 +1597,9 @@ const main = () => {
   const output = stableJson(registry)
   if (checkMode) {
     if (!exists(registryPath)) {
-      console.error(`${CONTRACT_V2_REGISTRY_PATH} is missing; run pnpm run contract-v2:generate`)
+      console.error(
+        `${CONTRACT_V2_REGISTRY_PATH} is missing; run pnpm run contract-v2:generate`,
+      )
       process.exitCode = 1
       return
     }

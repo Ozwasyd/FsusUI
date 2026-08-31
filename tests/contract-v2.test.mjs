@@ -97,6 +97,40 @@ test('committed Contract V2 registry passes validation with the committed gate',
   assert.deepEqual(errors, [])
 })
 
+test('public compatibility aliases collapse into one source-owned contract', () => {
+  const aliases = committedRegistry.publicExportMap.filter(
+    (entry) => entry.role === 'alias',
+  )
+  assert.equal(aliases.length, 50)
+  assert.equal(committedRegistry.publicExportMap.length, 228)
+  assert.equal(committedRegistry.contracts.length, 178)
+
+  const collectionSummary = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-collection-summary',
+  )
+  assert.deepEqual(collectionSummary.component.exports, [
+    'ElCollectionSummary',
+    'FsusCollectionSummary',
+  ])
+  assert.equal(
+    committedRegistry.contracts.some(
+      (contract) => contract.id === 'component-v2.fsus-collection-summary',
+    ),
+    false,
+  )
+})
+
+test('public export map fails closed when an alias is removed', () => {
+  const mutated = clone(committedRegistry)
+  mutated.publicExportMap = mutated.publicExportMap.filter(
+    (entry) => entry.name !== 'FsusCollectionSummary',
+  )
+  assert.match(
+    validateRegistry(mutated, gate).join('\n'),
+    /component-v2\.el-collection-summary public export map does not match component exports/u,
+  )
+})
+
 test('content regions bind only to real Avalonia content properties', () => {
   const buttonGroup = committedRegistry.contracts.find(
     (contract) => contract.id === 'component-v2.el-button-group',
@@ -124,6 +158,59 @@ test('content regions bind only to real Avalonia content properties', () => {
       { name: 'icon', status: 'missing', member: null },
       { name: 'loading', status: 'missing', member: null },
     ],
+  )
+})
+
+test('container, button group, and visual hidden keep explicit truthful bindings', () => {
+  const expected = new Map([
+    [
+      'component-v2.el-container',
+      { content: 'Children', missingInput: 'direction' },
+    ],
+    ['component-v2.el-aside', { content: 'Content', missingInput: 'width' }],
+    ['component-v2.el-header', { content: 'Content', missingInput: 'height' }],
+    ['component-v2.el-footer', { content: 'Content', missingInput: 'height' }],
+    ['component-v2.el-main', { content: 'Content', missingInput: null }],
+    [
+      'component-v2.el-button-group',
+      { content: 'Children', missingInput: null },
+    ],
+    [
+      'component-v2.el-visually-hidden',
+      { content: 'Content', missingInput: 'style' },
+    ],
+  ])
+  for (const [id, expectation] of expected) {
+    const contract = committedRegistry.contracts.find(
+      (candidate) => candidate.id === id,
+    )
+    assert.ok(contract, `${id} missing`)
+    assert.equal(
+      contract.contentRegions[0]?.avalonia?.member,
+      expectation.content,
+    )
+    assert.equal(contract.contentRegions[0]?.status, 'aligned-candidate')
+    if (expectation.missingInput) {
+      assert.equal(
+        contract.inputs.find((input) => input.name === expectation.missingInput)
+          ?.status,
+        'missing',
+      )
+    }
+  }
+
+  assert.deepEqual(
+    committedRegistry.componentMap.find(
+      (entry) => entry.vue.name === 'ElVisuallyHidden',
+    ),
+    {
+      vue: { name: 'ElVisuallyHidden', module: 'visual-hidden', aliases: [] },
+      avalonia: {
+        type: 'FsusUI.Avalonia.Controls.FsusVisualHidden',
+        packageId: 'avalonia',
+      },
+      basis: 'explicit-component-binding',
+    },
   )
 })
 
@@ -171,11 +258,10 @@ test('resolved Vue emits and exposed signatures own Contract V2 members', () => 
     ],
   )
 
-  const unresolvedConstants = committedRegistry.contracts.flatMap(
-    (contract) =>
-      contract.outputs
-        .map((output) => output.name)
-        .filter((name) => /^\[.+\]$/u.test(name)),
+  const unresolvedConstants = committedRegistry.contracts.flatMap((contract) =>
+    contract.outputs
+      .map((output) => output.name)
+      .filter((name) => /^\[.+\]$/u.test(name)),
   )
   assert.deepEqual(unresolvedConstants, [])
 })

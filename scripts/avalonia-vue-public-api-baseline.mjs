@@ -608,6 +608,50 @@ const parseComponent = (root, moduleName, exportName, classification) => {
   }
 }
 
+const assignExportIdentities = (components, installedNames) => {
+  const installed = new Set(installedNames)
+  const bySource = new Map()
+  for (const component of components) {
+    const sourcePath = component.source?.path
+    if (!sourcePath) continue
+    const group = bySource.get(sourcePath) ?? []
+    group.push(component)
+    bySource.set(sourcePath, group)
+  }
+
+  for (const component of components) {
+    component.exportIdentity = {
+      role: 'canonical',
+      canonical: component.name,
+      aliases: [],
+    }
+  }
+  for (const group of bySource.values()) {
+    if (group.length < 2) continue
+    const canonical =
+      group.find((component) => installed.has(component.name)) ??
+      group.find((component) => component.name.startsWith('El')) ??
+      group[0]
+    const aliases = group
+      .filter((component) => component !== canonical)
+      .map((component) => component.name)
+      .sort()
+    canonical.exportIdentity = {
+      role: 'canonical',
+      canonical: canonical.name,
+      aliases,
+    }
+    for (const alias of group) {
+      if (alias === canonical) continue
+      alias.exportIdentity = {
+        role: 'alias',
+        canonical: canonical.name,
+        aliases: [],
+      }
+    }
+  }
+}
+
 const parseServicesAndDirectives = (
   root,
   componentModules,
@@ -699,6 +743,7 @@ export const buildArtifacts = (root, options = {}) => {
       throw new Error(`${name} is installable but has no component import`)
     }
   }
+  assignExportIdentities(components, componentImportInfo.installed)
 
   const plugins = parsePluginImports(root).map((plugin) => ({
     ...plugin,
@@ -929,6 +974,13 @@ const runFixtureAssertions = () => {
   const { baseline } = buildArtifacts(fixtureRoot, {
     commitShaOverride: 'fixture-sha',
   })
+  const assertExportIdentity = (component, expected) => {
+    if (JSON.stringify(component.exportIdentity) !== JSON.stringify(expected)) {
+      throw new Error(
+        `${component.name} export identity mismatch: ${JSON.stringify(component.exportIdentity)}`,
+      )
+    }
+  }
   const widget = baseline.components.find(
     (component) => component.name === 'ElFixtureWidget',
   )
@@ -942,6 +994,11 @@ const runFixtureAssertions = () => {
     (component) => component.name === 'ElFixtureTsxWidget',
   )
   if (!tsxWidget) throw new Error('fixture TSX widget missing from baseline')
+  const tsxAlias = baseline.components.find(
+    (component) => component.name === 'FsusFixtureTsxWidget',
+  )
+  if (!tsxAlias)
+    throw new Error('fixture TSX widget alias missing from baseline')
   if (
     optionsWidget.props.includes('emit') ||
     optionsWidget.emits.includes('emit')
@@ -952,10 +1009,20 @@ const runFixtureAssertions = () => {
   }
   if (
     tsxWidget.source?.path !==
-    'vue/packages/components/fixture-tsx-widget/src/fixture-tsx-widget.tsx'
+    'vue/packages/components/fixture-tsx-widget/src/fixture-tsx-surface.tsx'
   ) {
     throw new Error('fixture TSX widget source identity was not exact')
   }
+  assertExportIdentity(tsxWidget, {
+    role: 'canonical',
+    canonical: 'ElFixtureTsxWidget',
+    aliases: ['FsusFixtureTsxWidget'],
+  })
+  assertExportIdentity(tsxAlias, {
+    role: 'alias',
+    canonical: 'ElFixtureTsxWidget',
+    aliases: [],
+  })
   for (const prop of ['count', 'label']) {
     if (!tsxWidget.props.includes(prop)) {
       throw new Error(

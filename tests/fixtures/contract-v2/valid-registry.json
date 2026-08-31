@@ -18,7 +18,8 @@
         "name": "ElFixture",
         "module": "fixture",
         "classification": "portable",
-        "exportStatus": "partial"
+        "exportStatus": "partial",
+        "exports": ["ElFixture"]
       },
       "bindings": {
         "web": {
@@ -27,7 +28,8 @@
           "memberRef": {
             "baseline": "spec/baselines/vue-current.json",
             "kind": "component"
-          }
+          },
+          "exports": ["ElFixture"]
         },
         "avalonia": {
           "status": "bound",
@@ -160,7 +162,9 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           },
-          "scenarioIds": ["scenario.v2.el-fixture.avalonia-extra.accessible-name"]
+          "scenarioIds": [
+            "scenario.v2.el-fixture.avalonia-extra.accessible-name"
+          ]
         }
       ],
       "scenarioIds": [
@@ -196,7 +200,8 @@
         "name": "ElMarkdownEditor",
         "module": "markdown-editor",
         "classification": "native-adapter",
-        "exportStatus": "partial"
+        "exportStatus": "partial",
+        "exports": ["ElMarkdownEditor"]
       },
       "bindings": {
         "web": {
@@ -205,7 +210,8 @@
           "memberRef": {
             "baseline": "spec/baselines/vue-current.json",
             "kind": "component"
-          }
+          },
+          "exports": ["ElMarkdownEditor"]
         },
         "avalonia": {
           "status": "unbound",
@@ -291,7 +297,14 @@
       "avaloniaExtras": [],
       "markdownEditor": {
         "modes": ["source", "live", "split", "preview"],
-        "capabilities": ["supported", "unsupported-platform", "runtime-unavailable", "projection-failed", "feature-degraded", "fatal"],
+        "capabilities": [
+          "supported",
+          "unsupported-platform",
+          "runtime-unavailable",
+          "projection-failed",
+          "feature-degraded",
+          "fatal"
+        ],
         "writeAlias": false,
         "canonical": true
       },
@@ -329,7 +342,23 @@
         "type": "FsusUI.Avalonia.Controls.FsusFixture",
         "packageId": "avalonia"
       },
-      "basis": "name-equality"
+      "basis": "canonical-export-name-equality"
+    }
+  ],
+  "publicExportMap": [
+    {
+      "name": "ElFixture",
+      "module": "fixture",
+      "role": "canonical",
+      "canonical": "ElFixture",
+      "contractId": "component-v2.el-fixture"
+    },
+    {
+      "name": "ElMarkdownEditor",
+      "module": "markdown-editor",
+      "role": "canonical",
+      "canonical": "ElMarkdownEditor",
+      "contractId": "component-v2.el-markdown-editor"
     }
   ],
   "avaloniaOnlyTypes": [
@@ -339,7 +368,9 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 30,
-      "scenarioIds": ["scenario.v2.avalonia-only.fsus-anchored-overlay-surface"],
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-anchored-overlay-surface"
+      ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
         "owner": "FsusUI Core",

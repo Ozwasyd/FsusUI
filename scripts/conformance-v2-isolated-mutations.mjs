@@ -98,8 +98,8 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/vue-semantic-baseline.mjs',
-        '    `/src/${kebab}.tsx`,\n',
-        '    `/src/${kebab}.tsx.mutation`,\n',
+        "['defineComponent', 'defineOptions'].includes(node.callee.name)",
+        "['defineOptions'].includes(node.callee.name)",
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'fixture TSX widget source identity was not exact',

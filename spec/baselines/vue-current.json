@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "2cb7d1fbda843198ba263f09b04cb4b2d3edf3c4",
+    "commitSha": "2750a338b97586af7092757f3b2cfb2fe5ac468c",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
@@ -11,7 +11,7 @@
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "55fe4d4e3e4e1a5315dbf0b43cd3bcebeef261f145bf28935480601ab0454767"
+    "outputHash": "15883d5c50dd041df1d085635dc215569a81c24fc2bdb5f3c9c9affd167a44ee"
   },
   "summary": {
     "componentModules": 93,
@@ -658,6 +658,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "CommonPicker",
+        "aliases": []
       }
     },
     {
@@ -674,6 +679,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "DynamicSizeGrid",
+        "aliases": []
       }
     },
     {
@@ -690,6 +700,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "DynamicSizeList",
+        "aliases": []
       }
     },
     {
@@ -806,6 +821,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElAffix",
+        "aliases": []
       }
     },
     {
@@ -954,6 +974,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElAlert",
+        "aliases": []
       }
     },
     {
@@ -997,6 +1022,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElAside",
+        "aliases": []
       }
     },
     {
@@ -1458,6 +1488,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElAutocomplete",
+        "aliases": []
       }
     },
     {
@@ -1524,6 +1559,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElAutoResizer",
+        "aliases": []
       }
     },
     {
@@ -1654,6 +1694,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElAvatar",
+        "aliases": []
       }
     },
     {
@@ -1695,6 +1740,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElBacktop",
+        "aliases": []
       }
     },
     {
@@ -1794,6 +1844,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElBadge",
+        "aliases": []
       }
     },
     {
@@ -1862,6 +1917,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElBreadcrumb",
+        "aliases": []
       }
     },
     {
@@ -1930,6 +1990,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElBreadcrumbItem",
+        "aliases": []
       }
     },
     {
@@ -2267,6 +2332,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElButton",
+        "aliases": []
       }
     },
     {
@@ -2296,6 +2366,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElButtonGroup",
+        "aliases": []
       }
     },
     {
@@ -2434,6 +2509,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCalendar",
+        "aliases": []
       }
     },
     {
@@ -2551,6 +2631,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCard",
+        "aliases": []
       }
     },
     {
@@ -2770,6 +2855,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCarousel",
+        "aliases": []
       }
     },
     {
@@ -2826,6 +2916,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCarouselItem",
+        "aliases": []
       }
     },
     {
@@ -3217,22 +3312,80 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCascader",
+        "aliases": []
       }
     },
     {
       "name": "ElCascaderPanel",
       "module": "cascader-panel",
       "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
+      "source": {
+        "path": "vue/packages/components/cascader-panel/src/index.vue",
+        "hash": "b7de68d7a83fccfb990d90d0097f6121a008ff1e94c1603a446596f8820484d2"
+      },
+      "props": ["...CommonProps", "border", "renderLabel"],
+      "emits": ["close", "expand-change"],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
       "exposed": [],
       "semantic": {
-        "props": [],
-        "emits": [],
+        "props": [
+          {
+            "name": "border",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "renderLabel",
+            "runtimeType": "Function",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
+        "emits": [
+          {
+            "name": "close",
+            "payload": []
+          },
+          {
+            "name": "expand-change",
+            "payload": []
+          }
+        ],
         "exposed": [],
-        "slots": []
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCascaderPanel",
+        "aliases": []
       }
     },
     {
@@ -3470,6 +3623,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCheckbox",
+        "aliases": []
       }
     },
     {
@@ -3707,6 +3865,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCheckboxButton",
+        "aliases": []
       }
     },
     {
@@ -3894,6 +4057,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCheckboxGroup",
+        "aliases": []
       }
     },
     {
@@ -3960,6 +4128,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCheckTag",
+        "aliases": []
       }
     },
     {
@@ -4131,6 +4304,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCol",
+        "aliases": []
       }
     },
     {
@@ -4211,6 +4389,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCollapse",
+        "aliases": []
       }
     },
     {
@@ -4293,6 +4476,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCollapseItem",
+        "aliases": []
       }
     },
     {
@@ -4322,6 +4510,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCollapseTransition",
+        "aliases": []
       }
     },
     {
@@ -4465,6 +4658,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCollectionSummary",
+        "aliases": ["FsusCollectionSummary"]
       }
     },
     {
@@ -4569,6 +4767,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCollectionToolbar",
+        "aliases": ["FsusCollectionToolbar"]
       }
     },
     {
@@ -4826,6 +5029,11 @@
           }
         ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElColorPicker",
+        "aliases": []
       }
     },
     {
@@ -5006,6 +5214,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElConfigProvider",
+        "aliases": []
       }
     },
     {
@@ -5048,6 +5261,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElContainer",
+        "aliases": []
       }
     },
     {
@@ -5091,6 +5309,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElConversationContextBar",
+        "aliases": ["FsusConversationContextBar"]
       }
     },
     {
@@ -5160,6 +5383,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElConversationList",
+        "aliases": ["FsusConversationList"]
       }
     },
     {
@@ -5337,6 +5565,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElConversationListItem",
+        "aliases": ["FsusConversationListItem"]
       }
     },
     {
@@ -5502,6 +5735,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCopyableDetail",
+        "aliases": ["FsusCopyableDetail"]
       }
     },
     {
@@ -5628,6 +5866,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElCountdown",
+        "aliases": []
       }
     },
     {
@@ -5738,6 +5981,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDangerZone",
+        "aliases": ["FsusDangerZone"]
       }
     },
     {
@@ -5989,6 +6237,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDataList",
+        "aliases": ["FsusDataList"]
       }
     },
     {
@@ -6037,38 +6290,304 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDatePicker",
+        "aliases": []
       }
     },
     {
       "name": "ElDescriptions",
       "module": "descriptions",
       "classification": "portable",
-      "source": null,
-      "props": ["row"],
+      "source": {
+        "path": "vue/packages/components/descriptions/src/description.vue",
+        "hash": "830a7c6d408338655179bd87dd11403dbfd84d466acef61b9958d5e7f594344a"
+      },
+      "props": [
+        "border",
+        "column",
+        "direction",
+        "extra",
+        "responsive",
+        "scrollAriaLabel",
+        "size",
+        "title"
+      ],
       "emits": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "extra",
+          "scoped": false
+        },
+        {
+          "name": "title",
+          "scoped": false
+        }
+      ],
       "exposed": [],
       "semantic": {
-        "props": [],
+        "props": [
+          {
+            "name": "border",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "column",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 3
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "direction",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": ["horizontal", "vertical"],
+            "default": {
+              "kind": "literal",
+              "value": "horizontal"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "extra",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "responsive",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": ["auto", "stack", "scroll"],
+            "default": {
+              "kind": "literal",
+              "value": "auto"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "scrollAriaLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Scrollable descriptions"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "size",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "title",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
         "emits": [],
         "exposed": [],
-        "slots": []
+        "slots": [
+          {
+            "name": "extra",
+            "scoped": false
+          },
+          {
+            "name": "title",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDescriptions",
+        "aliases": []
       }
     },
     {
       "name": "ElDescriptionsItem",
       "module": "descriptions",
       "classification": "portable",
-      "source": null,
-      "props": [],
+      "source": {
+        "path": "vue/packages/components/descriptions/src/description-item.ts",
+        "hash": "82d6b98794bcc278b12e3ccfdd4537467e25b31b1aaad9700a1e0aa00908cc0d"
+      },
+      "props": [
+        "align",
+        "className",
+        "label",
+        "labelAlign",
+        "labelClassName",
+        "minWidth",
+        "span",
+        "width"
+      ],
       "emits": [],
       "slots": [],
       "exposed": [],
       "semantic": {
-        "props": [],
+        "props": [
+          {
+            "name": "align",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "left"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "className",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "label",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "labelAlign",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "labelClassName",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "minWidth",
+            "runtimeType": "Array",
+            "semanticType": "String | Number",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "span",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 1
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "width",
+            "runtimeType": "Array",
+            "semanticType": "String | Number",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDescriptionsItem",
+        "aliases": []
       }
     },
     {
@@ -6162,6 +6681,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDestructiveActionPanel",
+        "aliases": ["FsusDestructiveActionPanel"]
       }
     },
     {
@@ -6344,6 +6868,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDiagnosticsItem",
+        "aliases": ["FsusDiagnosticsItem"]
       }
     },
     {
@@ -6400,6 +6929,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDiagnosticsList",
+        "aliases": ["FsusDiagnosticsList"]
       }
     },
     {
@@ -6743,6 +7277,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDialog",
+        "aliases": []
       }
     },
     {
@@ -6854,6 +7393,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDistributionBarRow",
+        "aliases": ["FsusDistributionBarRow"]
       }
     },
     {
@@ -6910,6 +7454,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDistributionList",
+        "aliases": ["FsusDistributionList"]
       }
     },
     {
@@ -6979,6 +7528,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDivider",
+        "aliases": []
       }
     },
     {
@@ -7104,6 +7658,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDrawer",
+        "aliases": []
       }
     },
     {
@@ -7416,6 +7975,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDropdown",
+        "aliases": []
       }
     },
     {
@@ -7520,6 +8084,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDropdownItem",
+        "aliases": []
       }
     },
     {
@@ -7562,6 +8131,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElDropdownMenu",
+        "aliases": []
       }
     },
     {
@@ -7677,6 +8251,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElEmpty",
+        "aliases": []
       }
     },
     {
@@ -7762,6 +8341,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElEmptySelectionState",
+        "aliases": ["FsusEmptySelectionState"]
       }
     },
     {
@@ -7935,6 +8519,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElEmptyState",
+        "aliases": ["FsusEmptyState"]
       }
     },
     {
@@ -7999,6 +8588,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElFilterGroup",
+        "aliases": ["FsusFilterGroup"]
       }
     },
     {
@@ -8042,6 +8636,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElFooter",
+        "aliases": []
       }
     },
     {
@@ -8359,6 +8958,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElForm",
+        "aliases": []
       }
     },
     {
@@ -8603,6 +9207,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElFormItem",
+        "aliases": []
       }
     },
     {
@@ -8753,6 +9362,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElFormSection",
+        "aliases": ["FsusFormSection"]
       }
     },
     {
@@ -8796,6 +9410,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElHeader",
+        "aliases": []
       }
     },
     {
@@ -8863,6 +9482,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElIcon",
+        "aliases": []
       }
     },
     {
@@ -9156,6 +9780,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElImage",
+        "aliases": []
       }
     },
     {
@@ -9364,6 +9993,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElImageViewer",
+        "aliases": []
       }
     },
     {
@@ -9409,6 +10043,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElInboxEmptyState",
+        "aliases": ["FsusInboxEmptyState"]
       }
     },
     {
@@ -9446,6 +10085,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElInboxLayout",
+        "aliases": ["FsusInboxLayout"]
       }
     },
     {
@@ -9462,6 +10106,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElInfiniteScroll",
+        "aliases": []
       }
     },
     {
@@ -9517,6 +10166,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElInlineActions",
+        "aliases": ["FsusInlineActions"]
       }
     },
     {
@@ -10125,6 +10779,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElInput",
+        "aliases": []
       }
     },
     {
@@ -10456,6 +11115,11 @@
           }
         ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElInputNumber",
+        "aliases": []
       }
     },
     {
@@ -10499,6 +11163,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElKeyValueGrid",
+        "aliases": ["FsusKeyValueGrid"]
       }
     },
     {
@@ -10599,6 +11268,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElKeyValueItem",
+        "aliases": ["FsusKeyValueItem"]
       }
     },
     {
@@ -10642,6 +11316,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElKpiGroup",
+        "aliases": ["FsusKpiGroup"]
       }
     },
     {
@@ -10763,6 +11442,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElLink",
+        "aliases": []
       }
     },
     {
@@ -10793,6 +11477,11 @@
           }
         ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElLoading",
+        "aliases": []
       }
     },
     {
@@ -10809,6 +11498,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElLoadingDirective",
+        "aliases": []
       }
     },
     {
@@ -10825,6 +11519,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElLoadingService",
+        "aliases": []
       }
     },
     {
@@ -10975,6 +11674,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElLocalizationChallenge",
+        "aliases": ["FsusLocalizationChallenge"]
       }
     },
     {
@@ -11004,6 +11708,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMain",
+        "aliases": []
       }
     },
     {
@@ -11788,6 +12497,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMarkdownEditor",
+        "aliases": []
       }
     },
     {
@@ -11966,6 +12680,11 @@
           }
         ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMarkdownRenderer",
+        "aliases": []
       }
     },
     {
@@ -12266,6 +12985,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMenu",
+        "aliases": []
       }
     },
     {
@@ -12353,6 +13077,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMenuItem",
+        "aliases": []
       }
     },
     {
@@ -12390,6 +13119,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMenuItemGroup",
+        "aliases": []
       }
     },
     {
@@ -12624,22 +13358,208 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMessage",
+        "aliases": []
       }
     },
     {
       "name": "ElMessageBox",
       "module": "message-box",
       "classification": "platform-override",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
+      "source": {
+        "path": "vue/packages/components/message-box/src/index.vue",
+        "hash": "23912fc8fdfee0f6a44c534c5cca185ae2f466c5dd439d841103ba2c137ebf39"
+      },
+      "props": [
+        "boxType",
+        "buttonSize",
+        "closeOnClickModal",
+        "closeOnHashChange",
+        "closeOnPressEscape",
+        "container",
+        "draggable",
+        "lockScroll",
+        "modal",
+        "roundButton",
+        "showClose"
+      ],
+      "emits": ["action", "vanish"],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
       "exposed": [],
       "semantic": {
-        "props": [],
-        "emits": [],
+        "props": [
+          {
+            "name": "boxType",
+            "runtimeType": "String",
+            "semanticType": "PropType<MessageBoxType>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "buttonSize",
+            "runtimeType": "String",
+            "semanticType": "PropType<ComponentSize>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "closeOnClickModal",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "closeOnHashChange",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "closeOnPressEscape",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "container",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "body"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "draggable",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "lockScroll",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "modal",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "roundButton",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "showClose",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
+        "emits": [
+          {
+            "name": "action",
+            "payload": []
+          },
+          {
+            "name": "vanish",
+            "payload": []
+          }
+        ],
         "exposed": [],
-        "slots": []
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMessageBox",
+        "aliases": []
       }
     },
     {
@@ -12746,6 +13666,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMessageBubble",
+        "aliases": ["FsusMessageBubble"]
       }
     },
     {
@@ -12802,6 +13727,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMessageTimeline",
+        "aliases": ["FsusMessageTimeline"]
       }
     },
     {
@@ -12881,6 +13811,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMetadataItem",
+        "aliases": ["FsusMetadataItem"]
       }
     },
     {
@@ -12924,6 +13859,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMetadataRow",
+        "aliases": ["FsusMetadataRow"]
       }
     },
     {
@@ -13043,6 +13983,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMetricItem",
+        "aliases": ["FsusMetricItem"]
       }
     },
     {
@@ -13099,6 +14044,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMetricList",
+        "aliases": ["FsusMetricList"]
       }
     },
     {
@@ -13188,6 +14138,11 @@
         ],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElMicroInteractionChallenge",
+        "aliases": ["FsusMicroInteractionChallenge"]
       }
     },
     {
@@ -13429,6 +14384,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElNotification",
+        "aliases": []
       }
     },
     {
@@ -13507,6 +14467,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElOption",
+        "aliases": []
       }
     },
     {
@@ -13561,6 +14526,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElOptionGroup",
+        "aliases": []
       }
     },
     {
@@ -13643,6 +14613,11 @@
         ],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElOverlay",
+        "aliases": []
       }
     },
     {
@@ -13756,6 +14731,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPageHeader",
+        "aliases": []
       }
     },
     {
@@ -14145,6 +15125,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPagination",
+        "aliases": []
       }
     },
     {
@@ -14216,6 +15201,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPaginationBar",
+        "aliases": ["FsusPaginationBar"]
       }
     },
     {
@@ -14718,22 +15708,405 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPerceptionChallenge",
+        "aliases": ["FsusPerceptionChallenge"]
       }
     },
     {
       "name": "ElPerceptionCharacterChallenge",
       "module": "perception-challenge",
       "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
-      "exposed": [],
+      "source": {
+        "path": "vue/packages/components/perception-challenge/src/character-challenge.vue",
+        "hash": "fc3c471ba697294e1a73b500e8e5cab6b5f6eda6a4ca446955398f51b7dd6824"
+      },
+      "props": [
+        "...perceptionChallengeCommonProps",
+        "alternativeLabel",
+        "challengeId",
+        "disabledText",
+        "expiredText",
+        "inputLabel",
+        "loadingText",
+        "media",
+        "mediaAlt",
+        "modelValue",
+        "placeholder",
+        "rasterLabel",
+        "refreshLabel",
+        "reissueLabel",
+        "reissueText",
+        "retryLabel",
+        "retryableText",
+        "state",
+        "submitLabel",
+        "unavailableText",
+        "verifyingText"
+      ],
+      "emits": [
+        "alternative",
+        "refresh",
+        "reissue",
+        "retry",
+        "submit",
+        "update:modelValue"
+      ],
+      "slots": [
+        {
+          "name": "audio",
+          "scoped": true
+        },
+        {
+          "name": "raster",
+          "scoped": true
+        }
+      ],
+      "exposed": ["focus", "inputRef", "reset"],
       "semantic": {
-        "props": [],
-        "emits": [],
-        "exposed": [],
-        "slots": []
+        "props": [
+          {
+            "name": "alternativeLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Use audio instead"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "challengeId",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabledText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character challenge is disabled"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "expiredText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character challenge expired"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "inputLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character response"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "loadingText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Preparing challenge"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "media",
+            "runtimeType": "Object",
+            "semanticType": "PerceptionCharacterMedia | null",
+            "nullable": true,
+            "values": null,
+            "default": {
+              "kind": "null",
+              "value": null
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "mediaAlt",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character recognition challenge"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "modelValue",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "placeholder",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "rasterLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Use image instead"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "refreshLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Refresh challenge"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "reissueLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Get another challenge"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "reissueText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "A new challenge is required"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "retryableText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "The response was not accepted"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "retryLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Retry response"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "state",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "ready"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "submitLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Submit response"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "unavailableText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character challenge is unavailable"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "verifyingText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Checking response"
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
+        "emits": [
+          {
+            "name": "alternative",
+            "payload": [
+              {
+                "name": "mode",
+                "type": "PerceptionCharacterMode",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "refresh",
+            "payload": []
+          },
+          {
+            "name": "reissue",
+            "payload": []
+          },
+          {
+            "name": "retry",
+            "payload": []
+          },
+          {
+            "name": "submit",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "PerceptionCharacterSubmitPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "update:modelValue",
+            "payload": [
+              {
+                "name": "value",
+                "type": "string",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          }
+        ],
+        "exposed": [
+          {
+            "name": "focus",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "inputRef",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "reset",
+            "parameters": [],
+            "returnType": null
+          }
+        ],
+        "slots": [
+          {
+            "name": "audio",
+            "scoped": true
+          },
+          {
+            "name": "raster",
+            "scoped": true
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPerceptionCharacterChallenge",
+        "aliases": ["FsusPerceptionCharacterChallenge"]
       }
     },
     {
@@ -14951,6 +16324,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPopconfirm",
+        "aliases": []
       }
     },
     {
@@ -15329,6 +16707,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPopover",
+        "aliases": []
       }
     },
     {
@@ -15345,6 +16728,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPopoverDirective",
+        "aliases": []
       }
     },
     {
@@ -15388,29 +16776,65 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPopper",
+        "aliases": []
       }
     },
     {
       "name": "ElPopperArrow",
       "module": "popper",
       "classification": "web-only",
-      "source": null,
+      "source": {
+        "path": "vue/packages/components/popper/src/arrow.vue",
+        "hash": "79376f98a9ef530036220a54f809b0ecd524c6eb5ec274c9550bc1cd1940e041"
+      },
       "props": ["arrowOffset"],
       "emits": [],
       "slots": [],
-      "exposed": [],
+      "exposed": ["arrowRef"],
       "semantic": {
-        "props": [],
+        "props": [
+          {
+            "name": "arrowOffset",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 5
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
         "emits": [],
-        "exposed": [],
+        "exposed": [
+          {
+            "name": "arrowRef",
+            "parameters": [],
+            "returnType": null
+          }
+        ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPopperArrow",
+        "aliases": []
       }
     },
     {
       "name": "ElPopperContent",
       "module": "popper",
       "classification": "web-only",
-      "source": null,
+      "source": {
+        "path": "vue/packages/components/popper/src/content.vue",
+        "hash": "dd8fbf9c7a24ed693ef02d785b840c704fb7bc22aefaf52d6a96aca92cf6b8c3"
+      },
       "props": [
         "...popperCoreConfigProps",
         "ariaLabel",
@@ -15432,20 +16856,316 @@
         "zIndex"
       ],
       "emits": ["blur", "close", "focus", "mouseenter", "mouseleave"],
-      "slots": [],
-      "exposed": [],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
+      "exposed": [
+        "contentStyle",
+        "popperContentRef",
+        "popperInstanceRef",
+        "updatePopper"
+      ],
       "semantic": {
-        "props": [],
-        "emits": [],
-        "exposed": [],
-        "slots": []
+        "props": [
+          {
+            "name": "ariaLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "className",
+            "runtimeType": "Array",
+            "semanticType": "ClassType",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "effect",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "dark"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "enterable",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "focusOnShow",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "id",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "popperClass",
+            "runtimeType": "Array",
+            "semanticType": "ClassType",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "popperStyle",
+            "runtimeType": "Array",
+            "semanticType": "StyleValue",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "pure",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "referenceEl",
+            "runtimeType": "Object",
+            "semanticType": "HTMLElement",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "stopPopperMouseEvent",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "style",
+            "runtimeType": "Array",
+            "semanticType": "StyleValue",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "trapping",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "triggerTargetEl",
+            "runtimeType": "Object",
+            "semanticType": "HTMLElement",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "virtualTriggering",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "visible",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "zIndex",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
+        "emits": [
+          {
+            "name": "blur",
+            "payload": []
+          },
+          {
+            "name": "close",
+            "payload": []
+          },
+          {
+            "name": "focus",
+            "payload": []
+          },
+          {
+            "name": "mouseenter",
+            "payload": [
+              {
+                "name": "evt",
+                "type": "MouseEvent",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "mouseleave",
+            "payload": [
+              {
+                "name": "evt",
+                "type": "MouseEvent",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          }
+        ],
+        "exposed": [
+          {
+            "name": "contentStyle",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "popperContentRef",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "popperInstanceRef",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "updatePopper",
+            "parameters": [
+              {
+                "name": "shouldUpdateZIndex",
+                "type": null,
+                "optional": true,
+                "rest": false
+              }
+            ],
+            "returnType": null
+          }
+        ],
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPopperContent",
+        "aliases": []
       }
     },
     {
       "name": "ElPopperTrigger",
       "module": "popper",
       "classification": "web-only",
-      "source": null,
+      "source": {
+        "path": "vue/packages/components/popper/src/trigger.vue",
+        "hash": "c154992baceb6c64f530203d5bc7d2c8c2fcdcf9a1a54f610835a0f492fb9a21"
+      },
       "props": [
         "id",
         "onBlur",
@@ -15460,13 +17180,167 @@
         "virtualTriggering"
       ],
       "emits": [],
-      "slots": [],
-      "exposed": [],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
+      "exposed": ["triggerRef"],
       "semantic": {
-        "props": [],
+        "props": [
+          {
+            "name": "id",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "onBlur",
+            "runtimeType": "Function",
+            "semanticType": "(e: Event) => void",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "onClick",
+            "runtimeType": "Function",
+            "semanticType": "(e: Event) => void",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "onContextmenu",
+            "runtimeType": "Function",
+            "semanticType": "(e: Event) => void",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "onFocus",
+            "runtimeType": "Function",
+            "semanticType": "(e: Event) => void",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "onKeydown",
+            "runtimeType": "Function",
+            "semanticType": "(e: Event) => void",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "onMouseenter",
+            "runtimeType": "Function",
+            "semanticType": "(e: Event) => void",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "onMouseleave",
+            "runtimeType": "Function",
+            "semanticType": "(e: Event) => void",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "open",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "virtualRef",
+            "runtimeType": "Object",
+            "semanticType": "Measurable",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "virtualTriggering",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
         "emits": [],
-        "exposed": [],
-        "slots": []
+        "exposed": [
+          {
+            "name": "triggerRef",
+            "parameters": [],
+            "returnType": null
+          }
+        ],
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPopperTrigger",
+        "aliases": []
       }
     },
     {
@@ -15692,6 +17566,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElProgress",
+        "aliases": []
       }
     },
     {
@@ -16269,6 +18148,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElPublicShell",
+        "aliases": []
       }
     },
     {
@@ -16365,6 +18249,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElRadio",
+        "aliases": []
       }
     },
     {
@@ -16408,6 +18297,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElRadioButton",
+        "aliases": []
       }
     },
     {
@@ -16560,6 +18454,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElRadioGroup",
+        "aliases": []
       }
     },
     {
@@ -16920,6 +18819,11 @@
           }
         ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElRate",
+        "aliases": []
       }
     },
     {
@@ -17012,6 +18916,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElReplyComposerShell",
+        "aliases": ["FsusReplyComposerShell"]
       }
     },
     {
@@ -17081,6 +18990,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElResourceList",
+        "aliases": ["FsusResourceList"]
       }
     },
     {
@@ -17182,6 +19096,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElResourceListItem",
+        "aliases": ["FsusResourceListItem"]
       }
     },
     {
@@ -17318,6 +19237,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElResponsiveCollection",
+        "aliases": []
       }
     },
     {
@@ -17411,6 +19335,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElResult",
+        "aliases": []
       }
     },
     {
@@ -17487,6 +19416,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElRiskNotice",
+        "aliases": ["FsusRiskNotice"]
       }
     },
     {
@@ -17568,6 +19502,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElRow",
+        "aliases": []
       }
     },
     {
@@ -17894,6 +19833,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElScrollbar",
+        "aliases": []
       }
     },
     {
@@ -18004,6 +19948,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSectionHeader",
+        "aliases": ["FsusSectionHeader"]
       }
     },
     {
@@ -18085,6 +20034,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSectionNav",
+        "aliases": ["FsusSectionNav"]
       }
     },
     {
@@ -18151,6 +20105,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSectionNavLink",
+        "aliases": ["FsusSectionNavLink"]
       }
     },
     {
@@ -18277,6 +20236,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSegmentedControl",
+        "aliases": ["FsusSegmentedControl"]
       }
     },
     {
@@ -18896,22 +20860,634 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSelect",
+        "aliases": []
       }
     },
     {
       "name": "ElSelectV2",
       "module": "select-v2",
       "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
+      "source": {
+        "path": "vue/packages/components/select-v2/src/select.vue",
+        "hash": "a149a060f5169ac807749a717ef01bb2ed679b59642804a5c8182c38150c2079"
+      },
+      "props": [
+        "allowCreate",
+        "autocomplete",
+        "automaticDropdown",
+        "clearIcon",
+        "clearable",
+        "collapseTags",
+        "collapseTagsTooltip",
+        "defaultFirstOption",
+        "disabled",
+        "effect",
+        "estimatedOptionHeight",
+        "filterMethod",
+        "filterable",
+        "height",
+        "id",
+        "itemHeight",
+        "label",
+        "loading",
+        "loadingText",
+        "maxCollapseTags",
+        "modelValue",
+        "multiple",
+        "multipleLimit",
+        "name",
+        "noDataText",
+        "noMatchText",
+        "options",
+        "persistent",
+        "placeholder",
+        "placement",
+        "popperClass",
+        "popperOptions",
+        "props",
+        "remote",
+        "remoteMethod",
+        "reserveKeyword",
+        "scrollbarAlwaysOn",
+        "size",
+        "teleported",
+        "validateEvent",
+        "valueKey"
+      ],
+      "emits": ["blur", "clear", "focus", "remove-tag", "visible-change"],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        },
+        {
+          "name": "empty",
+          "scoped": false
+        },
+        {
+          "name": "prefix",
+          "scoped": false
+        }
+      ],
       "exposed": [],
       "semantic": {
-        "props": [],
-        "emits": [],
+        "props": [
+          {
+            "name": "allowCreate",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "autocomplete",
+            "runtimeType": "String",
+            "semanticType": "'none' | 'both' | 'list' | 'inline'",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "none"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "automaticDropdown",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "clearable",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "clearIcon",
+            "runtimeType": null,
+            "semanticType": "iconPropType",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "expression",
+              "sourceHash": "09b4ef8f823a3a5b930e020e8594d0f8f35d9d02bacb158b4ee93b8a55024ea6"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "collapseTags",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "collapseTagsTooltip",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "defaultFirstOption",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "effect",
+            "runtimeType": "String",
+            "semanticType": "'light' | 'dark' | string",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "light"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "estimatedOptionHeight",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "filterable",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "filterMethod",
+            "runtimeType": "Function",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "height",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 170
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "id",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "itemHeight",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 34
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "label",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "loading",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "loadingText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "maxCollapseTags",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 1
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "modelValue",
+            "runtimeType": "Array",
+            "semanticType": "any[] | string | number | boolean | Record<string, any> | any",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "multiple",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "multipleLimit",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 0
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "name",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "noDataText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "noMatchText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "options",
+            "runtimeType": "Array",
+            "semanticType": "OptionType[]",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false
+          },
+          {
+            "name": "persistent",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "placeholder",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "placement",
+            "runtimeType": "String",
+            "semanticType": "Placement",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "bottom-start"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "popperClass",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "popperOptions",
+            "runtimeType": "Object",
+            "semanticType": "Partial<Options>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "e2720d2ede398d5b6d011d141235f6631681f07c3fedccbac66a1a3b90f9ccf7"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "props",
+            "runtimeType": "Object",
+            "semanticType": "Props",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "970fe4bec7ac0ed0c7d932d427e1bead72e71d99799515ac19105a436e684d9c"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "remote",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "remoteMethod",
+            "runtimeType": "Function",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "reserveKeyword",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "scrollbarAlwaysOn",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "size",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "teleported",
+            "runtimeType": null,
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "validateEvent",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "valueKey",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "value"
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
+        "emits": [
+          {
+            "name": "blur",
+            "payload": []
+          },
+          {
+            "name": "clear",
+            "payload": []
+          },
+          {
+            "name": "focus",
+            "payload": []
+          },
+          {
+            "name": "remove-tag",
+            "payload": []
+          },
+          {
+            "name": "visible-change",
+            "payload": []
+          }
+        ],
         "exposed": [],
-        "slots": []
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          },
+          {
+            "name": "empty",
+            "scoped": false
+          },
+          {
+            "name": "prefix",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSelectV2",
+        "aliases": []
       }
     },
     {
@@ -19062,6 +21638,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSettingsSection",
+        "aliases": ["FsusSettingsSection"]
       }
     },
     {
@@ -19280,6 +21861,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSiteHeader",
+        "aliases": []
       }
     },
     {
@@ -19388,6 +21974,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSkeleton",
+        "aliases": []
       }
     },
     {
@@ -19431,6 +22022,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSkeletonItem",
+        "aliases": []
       }
     },
     {
@@ -19812,6 +22408,11 @@
           }
         ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSlider",
+        "aliases": []
       }
     },
     {
@@ -19969,6 +22570,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSpace",
+        "aliases": []
       }
     },
     {
@@ -20077,6 +22683,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSplitPane",
+        "aliases": ["FsusSplitPane"]
       }
     },
     {
@@ -20251,6 +22862,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElStatistic",
+        "aliases": []
       }
     },
     {
@@ -20378,34 +22994,143 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElStatusSummary",
+        "aliases": ["FsusStatusSummary"]
       }
     },
     {
       "name": "ElStep",
       "module": "steps",
       "classification": "portable",
-      "source": null,
-      "props": [
-        "active",
-        "clickable",
-        "description",
-        "direction",
-        "finishStatus",
-        "icon",
-        "processStatus",
-        "simple",
-        "space",
-        "status",
-        "title"
+      "source": {
+        "path": "vue/packages/components/steps/src/item.vue",
+        "hash": "5452f64b0b5c518d274ce3b9b944e97d21353afb198a8a45279f68c41d63ee2a"
+      },
+      "props": ["clickable", "description", "icon", "status", "title"],
+      "emits": ["click"],
+      "slots": [
+        {
+          "name": "description",
+          "scoped": false
+        },
+        {
+          "name": "icon",
+          "scoped": false
+        },
+        {
+          "name": "title",
+          "scoped": false
+        }
       ],
-      "emits": ["[CHANGE_EVENT]", "click"],
-      "slots": [],
       "exposed": [],
       "semantic": {
-        "props": [],
-        "emits": [],
+        "props": [
+          {
+            "name": "clickable",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "description",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "icon",
+            "runtimeType": null,
+            "semanticType": "iconPropType",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "status",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": ["", "wait", "process", "finish", "error", "success"],
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "title",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
+        "emits": [
+          {
+            "name": "click",
+            "payload": [
+              {
+                "name": "index",
+                "type": "number",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "status",
+                "type": "string",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          }
+        ],
         "exposed": [],
-        "slots": []
+        "slots": [
+          {
+            "name": "description",
+            "scoped": false
+          },
+          {
+            "name": "icon",
+            "scoped": false
+          },
+          {
+            "name": "title",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElStep",
+        "aliases": []
       }
     },
     {
@@ -20538,6 +23263,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSteps",
+        "aliases": []
       }
     },
     {
@@ -20742,6 +23472,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSubMenu",
+        "aliases": []
       }
     },
     {
@@ -21142,6 +23877,11 @@
           }
         ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElSwitch",
+        "aliases": []
       }
     },
     {
@@ -21405,22 +24145,156 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTable",
+        "aliases": []
       }
     },
     {
       "name": "ElTableColumn",
       "module": "table",
       "classification": "native-adapter",
-      "source": null,
-      "props": [],
+      "source": {
+        "path": "vue/packages/components/table/src/table-column/index.ts",
+        "hash": "d13a66335c008fd8d8e8fb83ef2fc3fcce5fdbc1994c5d30ad4546a3a5315adc"
+      },
+      "props": [
+        "context",
+        "fixed",
+        "highlight",
+        "rowClassName",
+        "rowStyle",
+        "store",
+        "stripe",
+        "tooltipEffect",
+        "tooltipOptions"
+      ],
       "emits": [],
       "slots": [],
       "exposed": [],
       "semantic": {
-        "props": [],
+        "props": [
+          {
+            "name": "context",
+            "runtimeType": "Object",
+            "semanticType": "PropType<TableBodyProps<DefaultRow>['context']>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "d3a63129b65aed00ae18632b426020bfea8d9a107477eacaad812cad7d5d804d"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "fixed",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "highlight",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "rowClassName",
+            "runtimeType": "Array",
+            "semanticType": "String | Function",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "rowStyle",
+            "runtimeType": "Array",
+            "semanticType": "Object | Function",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "store",
+            "runtimeType": "Object",
+            "semanticType": "PropType<TableBodyProps<DefaultRow>['store']>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false
+          },
+          {
+            "name": "stripe",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "tooltipEffect",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "tooltipOptions",
+            "runtimeType": "Object",
+            "semanticType": "PropType<TableBodyProps<DefaultRow>['tooltipOptions']>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTableColumn",
+        "aliases": []
       }
     },
     {
@@ -22049,6 +24923,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTableV2",
+        "aliases": ["TableV2"]
       }
     },
     {
@@ -22140,6 +25019,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTabPane",
+        "aliases": []
       }
     },
     {
@@ -22376,6 +25260,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTabs",
+        "aliases": []
       }
     },
     {
@@ -22539,6 +25428,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTag",
+        "aliases": []
       }
     },
     {
@@ -22637,6 +25531,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTaskPageHeader",
+        "aliases": ["FsusTaskPageHeader"]
       }
     },
     {
@@ -22730,6 +25629,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElText",
+        "aliases": []
       }
     },
     {
@@ -22831,6 +25735,11 @@
         ],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTextTaskChallenge",
+        "aliases": ["FsusTextTaskChallenge"]
       }
     },
     {
@@ -23003,6 +25912,11 @@
         ],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElThemeModeToggle",
+        "aliases": []
       }
     },
     {
@@ -23128,6 +26042,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElThreadPanel",
+        "aliases": ["FsusThreadPanel"]
       }
     },
     {
@@ -23156,6 +26075,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTimeline",
+        "aliases": []
       }
     },
     {
@@ -23306,6 +26230,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTimelineItem",
+        "aliases": []
       }
     },
     {
@@ -23344,6 +26273,11 @@
         ],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTimePicker",
+        "aliases": []
       }
     },
     {
@@ -23610,6 +26544,11 @@
           }
         ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTimeSelect",
+        "aliases": []
       }
     },
     {
@@ -23744,57 +26683,126 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTooltip",
+        "aliases": []
       }
     },
     {
       "name": "ElTooltipV2",
       "module": "tooltip-v2",
       "classification": "platform-override",
-      "source": null,
+      "source": {
+        "path": "vue/packages/components/tooltip-v2/src/tooltip.vue",
+        "hash": "2067ef12aad93f96272ef9c5293edff39544fb57dd8f6a54a14f825a2a422a7c"
+      },
       "props": [
         "...tooltipV2ArrowProps",
         "...tooltipV2ContentProps",
         "...tooltipV2RootProps",
         "...tooltipV2TriggerProps",
         "alwaysOn",
-        "ariaLabel",
-        "arrowPadding",
-        "contentClass",
-        "defaultOpen",
-        "delayDuration",
-        "effect",
         "fullTransition",
-        "height",
-        "nowrap",
-        "offset",
-        "onBlur",
-        "onClick",
-        "onFocus",
-        "onMouseDown",
-        "onMouseEnter",
-        "onMouseLeave",
-        "onOpenChange",
-        "onUpdate:open",
-        "open",
-        "placement",
-        "reference",
-        "showArrow",
-        "side",
-        "strategy",
-        "style",
         "teleported",
         "to",
-        "transitionProps",
-        "width"
+        "transitionProps"
       ],
       "emits": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        },
+        {
+          "name": "trigger",
+          "scoped": false
+        }
+      ],
       "exposed": [],
       "semantic": {
-        "props": [],
+        "props": [
+          {
+            "name": "alwaysOn",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "fullTransition",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "teleported",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "to",
+            "runtimeType": "String",
+            "semanticType": "TeleportProps['to']",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "body"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "transitionProps",
+            "runtimeType": "Object",
+            "semanticType": "TransitionProps | null",
+            "nullable": true,
+            "values": null,
+            "default": {
+              "kind": "null",
+              "value": null
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
         "emits": [],
         "exposed": [],
-        "slots": []
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          },
+          {
+            "name": "trigger",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTooltipV2",
+        "aliases": []
       }
     },
     {
@@ -24115,6 +27123,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTransfer",
+        "aliases": []
       }
     },
     {
@@ -24587,6 +27600,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTree",
+        "aliases": []
       }
     },
     {
@@ -24620,22 +27638,530 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTreeSelect",
+        "aliases": []
       }
     },
     {
       "name": "ElTreeV2",
       "module": "tree-v2",
       "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
+      "source": {
+        "path": "vue/packages/components/tree-v2/src/tree.vue",
+        "hash": "7389e5493ea919efedda310d44f4e970678ef97066c4a1e0ffcd1100c6c01780"
+      },
+      "props": [
+        "accordion",
+        "checkOnClickNode",
+        "checkStrictly",
+        "currentNodeKey",
+        "data",
+        "defaultCheckedKeys",
+        "defaultExpandedKeys",
+        "emptyText",
+        "expandOnClickNode",
+        "filterMethod",
+        "height",
+        "highlightCurrent",
+        "icon",
+        "indent",
+        "itemSize",
+        "perfMode",
+        "props",
+        "showCheckbox"
+      ],
+      "emits": [
+        "[CURRENT_CHANGE]",
+        "[NODE_CHECK]",
+        "[NODE_CHECK_CHANGE]",
+        "[NODE_CLICK]",
+        "[NODE_COLLAPSE]",
+        "[NODE_CONTEXTMENU]",
+        "[NODE_EXPAND]",
+        "check",
+        "check-change",
+        "current-change",
+        "node-click",
+        "node-collapse",
+        "node-contextmenu",
+        "node-expand"
+      ],
       "slots": [],
-      "exposed": [],
+      "exposed": [
+        "collapseNode",
+        "expandNode",
+        "filter",
+        "getCheckedKeys",
+        "getCheckedNodes",
+        "getCurrentKey",
+        "getCurrentNode",
+        "getHalfCheckedKeys",
+        "getHalfCheckedNodes",
+        "getNode",
+        "setChecked",
+        "setCheckedKeys",
+        "setCurrentKey",
+        "setData",
+        "setExpandedKeys",
+        "toggleCheckbox"
+      ],
       "semantic": {
-        "props": [],
-        "emits": [],
-        "exposed": [],
+        "props": [
+          {
+            "name": "accordion",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "checkOnClickNode",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "checkStrictly",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "currentNodeKey",
+            "runtimeType": "Array",
+            "semanticType": "TreeKey",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "data",
+            "runtimeType": "Array",
+            "semanticType": "TreeData",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "325c9e4a41b67f3fb810b33fbc9700ec433ba5e813a9aa8c207693373cafa08e"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "defaultCheckedKeys",
+            "runtimeType": "Array",
+            "semanticType": "TreeKey[]",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "325c9e4a41b67f3fb810b33fbc9700ec433ba5e813a9aa8c207693373cafa08e"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "defaultExpandedKeys",
+            "runtimeType": "Array",
+            "semanticType": "TreeKey[]",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "325c9e4a41b67f3fb810b33fbc9700ec433ba5e813a9aa8c207693373cafa08e"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "emptyText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "expandOnClickNode",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "filterMethod",
+            "runtimeType": "Function",
+            "semanticType": "FilterMethod",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "height",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 200
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "highlightCurrent",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "icon",
+            "runtimeType": null,
+            "semanticType": "iconPropType",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "indent",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 24
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "itemSize",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": 26
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "perfMode",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "props",
+            "runtimeType": "Object",
+            "semanticType": "TreeOptionProps",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "5ef03b3e07d9992efeab01de2b55c0ecc01e54f7bf03f5ecf31c7e128519fd0c"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "showCheckbox",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": false
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
+        "emits": [
+          {
+            "name": "check",
+            "payload": [
+              {
+                "name": "data",
+                "type": "TreeNodeData",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "checkedInfo",
+                "type": "CheckedInfo",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "check-change",
+            "payload": [
+              {
+                "name": "data",
+                "type": "TreeNodeData",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "checked",
+                "type": "boolean",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "current-change",
+            "payload": [
+              {
+                "name": "data",
+                "type": "TreeNodeData",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "node",
+                "type": "TreeNode",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "node-click",
+            "payload": [
+              {
+                "name": "data",
+                "type": "TreeNodeData",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "node",
+                "type": "TreeNode",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "e",
+                "type": "MouseEvent",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "node-collapse",
+            "payload": [
+              {
+                "name": "data",
+                "type": "TreeNodeData",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "node",
+                "type": "TreeNode",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "node-contextmenu",
+            "payload": [
+              {
+                "name": "event",
+                "type": "Event",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "data",
+                "type": "TreeNodeData",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "node",
+                "type": "TreeNode",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "node-expand",
+            "payload": [
+              {
+                "name": "data",
+                "type": "TreeNodeData",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "node",
+                "type": "TreeNode",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          }
+        ],
+        "exposed": [
+          {
+            "name": "collapseNode",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "expandNode",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "filter",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "getCheckedKeys",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "getCheckedNodes",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "getCurrentKey",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "getCurrentNode",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "getHalfCheckedKeys",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "getHalfCheckedNodes",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "getNode",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "setChecked",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "setCheckedKeys",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "setCurrentKey",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "setData",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "setExpandedKeys",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "toggleCheckbox",
+            "parameters": [],
+            "returnType": null
+          }
+        ],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTreeV2",
+        "aliases": []
       }
     },
     {
@@ -24811,6 +28337,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElTypedConfirmField",
+        "aliases": ["FsusTypedConfirmField"]
       }
     },
     {
@@ -25024,22 +28555,59 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElUpload",
+        "aliases": []
       }
     },
     {
       "name": "ElVisuallyHidden",
       "module": "visual-hidden",
       "classification": "portable",
-      "source": null,
+      "source": {
+        "path": "vue/packages/components/visual-hidden/src/visual-hidden.vue",
+        "hash": "eb2ee6e9019aeee9da59eeef7022801cdcd0d53598283a540a6da68c39699d22"
+      },
       "props": ["style"],
       "emits": [],
-      "slots": [],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
       "exposed": [],
       "semantic": {
-        "props": [],
+        "props": [
+          {
+            "name": "style",
+            "runtimeType": "Array",
+            "semanticType": "StyleValue",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "d3a63129b65aed00ae18632b426020bfea8d9a107477eacaad812cad7d5d804d"
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
         "emits": [],
         "exposed": [],
-        "slots": []
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElVisuallyHidden",
+        "aliases": []
       }
     },
     {
@@ -25192,6 +28760,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "ElWatermark",
+        "aliases": []
       }
     },
     {
@@ -25208,6 +28781,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "FixedSizeGrid",
+        "aliases": []
       }
     },
     {
@@ -25224,6 +28802,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "FixedSizeList",
+        "aliases": []
       }
     },
     {
@@ -25367,6 +28950,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElCollectionSummary",
+        "aliases": []
       }
     },
     {
@@ -25471,6 +29059,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElCollectionToolbar",
+        "aliases": []
       }
     },
     {
@@ -25514,6 +29107,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElConversationContextBar",
+        "aliases": []
       }
     },
     {
@@ -25583,6 +29181,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElConversationList",
+        "aliases": []
       }
     },
     {
@@ -25760,6 +29363,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElConversationListItem",
+        "aliases": []
       }
     },
     {
@@ -25925,6 +29533,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElCopyableDetail",
+        "aliases": []
       }
     },
     {
@@ -26035,6 +29648,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElDangerZone",
+        "aliases": []
       }
     },
     {
@@ -26286,6 +29904,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElDataList",
+        "aliases": []
       }
     },
     {
@@ -26379,6 +30002,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElDestructiveActionPanel",
+        "aliases": []
       }
     },
     {
@@ -26561,6 +30189,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElDiagnosticsItem",
+        "aliases": []
       }
     },
     {
@@ -26617,6 +30250,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElDiagnosticsList",
+        "aliases": []
       }
     },
     {
@@ -26728,6 +30366,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElDistributionBarRow",
+        "aliases": []
       }
     },
     {
@@ -26784,6 +30427,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElDistributionList",
+        "aliases": []
       }
     },
     {
@@ -26869,6 +30517,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElEmptySelectionState",
+        "aliases": []
       }
     },
     {
@@ -27042,6 +30695,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElEmptyState",
+        "aliases": []
       }
     },
     {
@@ -27106,6 +30764,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElFilterGroup",
+        "aliases": []
       }
     },
     {
@@ -27256,6 +30919,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElFormSection",
+        "aliases": []
       }
     },
     {
@@ -27301,6 +30969,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElInboxEmptyState",
+        "aliases": []
       }
     },
     {
@@ -27338,6 +31011,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElInboxLayout",
+        "aliases": []
       }
     },
     {
@@ -27393,6 +31071,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElInlineActions",
+        "aliases": []
       }
     },
     {
@@ -27436,6 +31119,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElKeyValueGrid",
+        "aliases": []
       }
     },
     {
@@ -27536,6 +31224,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElKeyValueItem",
+        "aliases": []
       }
     },
     {
@@ -27579,6 +31272,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElKpiGroup",
+        "aliases": []
       }
     },
     {
@@ -27729,6 +31427,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElLocalizationChallenge",
+        "aliases": []
       }
     },
     {
@@ -27835,6 +31538,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElMessageBubble",
+        "aliases": []
       }
     },
     {
@@ -27891,6 +31599,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElMessageTimeline",
+        "aliases": []
       }
     },
     {
@@ -27970,6 +31683,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElMetadataItem",
+        "aliases": []
       }
     },
     {
@@ -28013,6 +31731,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElMetadataRow",
+        "aliases": []
       }
     },
     {
@@ -28132,6 +31855,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElMetricItem",
+        "aliases": []
       }
     },
     {
@@ -28188,6 +31916,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElMetricList",
+        "aliases": []
       }
     },
     {
@@ -28277,6 +32010,11 @@
         ],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElMicroInteractionChallenge",
+        "aliases": []
       }
     },
     {
@@ -28348,6 +32086,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElPaginationBar",
+        "aliases": []
       }
     },
     {
@@ -28850,22 +32593,405 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElPerceptionChallenge",
+        "aliases": []
       }
     },
     {
       "name": "FsusPerceptionCharacterChallenge",
       "module": "perception-challenge",
       "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
-      "exposed": [],
+      "source": {
+        "path": "vue/packages/components/perception-challenge/src/character-challenge.vue",
+        "hash": "fc3c471ba697294e1a73b500e8e5cab6b5f6eda6a4ca446955398f51b7dd6824"
+      },
+      "props": [
+        "...perceptionChallengeCommonProps",
+        "alternativeLabel",
+        "challengeId",
+        "disabledText",
+        "expiredText",
+        "inputLabel",
+        "loadingText",
+        "media",
+        "mediaAlt",
+        "modelValue",
+        "placeholder",
+        "rasterLabel",
+        "refreshLabel",
+        "reissueLabel",
+        "reissueText",
+        "retryLabel",
+        "retryableText",
+        "state",
+        "submitLabel",
+        "unavailableText",
+        "verifyingText"
+      ],
+      "emits": [
+        "alternative",
+        "refresh",
+        "reissue",
+        "retry",
+        "submit",
+        "update:modelValue"
+      ],
+      "slots": [
+        {
+          "name": "audio",
+          "scoped": true
+        },
+        {
+          "name": "raster",
+          "scoped": true
+        }
+      ],
+      "exposed": ["focus", "inputRef", "reset"],
       "semantic": {
-        "props": [],
-        "emits": [],
-        "exposed": [],
-        "slots": []
+        "props": [
+          {
+            "name": "alternativeLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Use audio instead"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "challengeId",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabledText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character challenge is disabled"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "expiredText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character challenge expired"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "inputLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character response"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "loadingText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Preparing challenge"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "media",
+            "runtimeType": "Object",
+            "semanticType": "PerceptionCharacterMedia | null",
+            "nullable": true,
+            "values": null,
+            "default": {
+              "kind": "null",
+              "value": null
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "mediaAlt",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character recognition challenge"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "modelValue",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "placeholder",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "rasterLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Use image instead"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "refreshLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Refresh challenge"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "reissueLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Get another challenge"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "reissueText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "A new challenge is required"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "retryableText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "The response was not accepted"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "retryLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Retry response"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "state",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "ready"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "submitLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Submit response"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "unavailableText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Character challenge is unavailable"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "verifyingText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Checking response"
+            },
+            "required": false,
+            "readonly": false
+          }
+        ],
+        "emits": [
+          {
+            "name": "alternative",
+            "payload": [
+              {
+                "name": "mode",
+                "type": "PerceptionCharacterMode",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "refresh",
+            "payload": []
+          },
+          {
+            "name": "reissue",
+            "payload": []
+          },
+          {
+            "name": "retry",
+            "payload": []
+          },
+          {
+            "name": "submit",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "PerceptionCharacterSubmitPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "update:modelValue",
+            "payload": [
+              {
+                "name": "value",
+                "type": "string",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          }
+        ],
+        "exposed": [
+          {
+            "name": "focus",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "inputRef",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "reset",
+            "parameters": [],
+            "returnType": null
+          }
+        ],
+        "slots": [
+          {
+            "name": "audio",
+            "scoped": true
+          },
+          {
+            "name": "raster",
+            "scoped": true
+          }
+        ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElPerceptionCharacterChallenge",
+        "aliases": []
       }
     },
     {
@@ -28958,6 +33084,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElReplyComposerShell",
+        "aliases": []
       }
     },
     {
@@ -29027,6 +33158,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElResourceList",
+        "aliases": []
       }
     },
     {
@@ -29128,6 +33264,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElResourceListItem",
+        "aliases": []
       }
     },
     {
@@ -29204,6 +33345,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElRiskNotice",
+        "aliases": []
       }
     },
     {
@@ -29314,6 +33460,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElSectionHeader",
+        "aliases": []
       }
     },
     {
@@ -29395,6 +33546,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElSectionNav",
+        "aliases": []
       }
     },
     {
@@ -29461,6 +33617,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElSectionNavLink",
+        "aliases": []
       }
     },
     {
@@ -29587,6 +33748,11 @@
             "scoped": true
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElSegmentedControl",
+        "aliases": []
       }
     },
     {
@@ -29737,6 +33903,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElSettingsSection",
+        "aliases": []
       }
     },
     {
@@ -29845,6 +34016,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElSplitPane",
+        "aliases": []
       }
     },
     {
@@ -29972,6 +34148,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElStatusSummary",
+        "aliases": []
       }
     },
     {
@@ -30070,6 +34251,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElTaskPageHeader",
+        "aliases": []
       }
     },
     {
@@ -30171,6 +34357,11 @@
         ],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElTextTaskChallenge",
+        "aliases": []
       }
     },
     {
@@ -30296,6 +34487,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElThreadPanel",
+        "aliases": []
       }
     },
     {
@@ -30471,6 +34667,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElTypedConfirmField",
+        "aliases": []
       }
     },
     {
@@ -31099,6 +35300,11 @@
             "scoped": false
           }
         ]
+      },
+      "exportIdentity": {
+        "role": "alias",
+        "canonical": "ElTableV2",
+        "aliases": []
       }
     },
     {
@@ -31115,6 +35321,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "TableV2Alignment",
+        "aliases": []
       }
     },
     {
@@ -31131,6 +35342,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "TableV2FixedDir",
+        "aliases": []
       }
     },
     {
@@ -31147,6 +35363,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "TableV2Placeholder",
+        "aliases": []
       }
     },
     {
@@ -31163,6 +35384,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "TableV2SortOrder",
+        "aliases": []
       }
     },
     {
@@ -31179,6 +35405,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "TimePickPanel",
+        "aliases": []
       }
     },
     {
@@ -31195,6 +35426,11 @@
         "emits": [],
         "exposed": [],
         "slots": []
+      },
+      "exportIdentity": {
+        "role": "canonical",
+        "canonical": "vLoading",
+        "aliases": []
       }
     }
   ],

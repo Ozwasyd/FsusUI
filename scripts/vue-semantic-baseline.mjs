@@ -65,6 +65,86 @@ const parseSlotTags = (templateSource) => {
   return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name))
 }
 
+const declaredComponentNames = (source) => {
+  const scripts = []
+  if (source.relativePath.endsWith('.vue')) {
+    try {
+      const { descriptor } = parseSfc(source.content, {
+        filename: path.basename(source.relativePath),
+      })
+      if (descriptor.script?.content) scripts.push(descriptor.script.content)
+      if (descriptor.scriptSetup?.content) {
+        scripts.push(descriptor.scriptSetup.content)
+      }
+    } catch {
+      return []
+    }
+  } else {
+    scripts.push(source.content)
+  }
+
+  const names = new Set()
+  for (const script of scripts) {
+    let ast
+    try {
+      ast = babelParse(script, {
+        sourceType: 'module',
+        plugins: [
+          'typescript',
+          'jsx',
+          'decorators-legacy',
+          'importAttributes',
+          'topLevelAwait',
+        ],
+        errorRecovery: true,
+      })
+    } catch {
+      continue
+    }
+    const stringConstants = new Map()
+    for (const statement of ast.program.body) {
+      if (statement.type !== 'VariableDeclaration') continue
+      for (const declaration of statement.declarations || []) {
+        if (
+          declaration.id?.type === 'Identifier' &&
+          declaration.init?.type === 'StringLiteral'
+        ) {
+          stringConstants.set(declaration.id.name, declaration.init.value)
+        }
+      }
+    }
+    const nameFromOptions = (options) => {
+      if (options?.type !== 'ObjectExpression') return
+      const property = options.properties.find(
+        (candidate) =>
+          candidate.type === 'ObjectProperty' &&
+          !candidate.computed &&
+          candidate.key?.type === 'Identifier' &&
+          candidate.key.name === 'name',
+      )
+      if (property?.value?.type === 'StringLiteral') {
+        names.add(property.value.value)
+      } else if (property?.value?.type === 'Identifier') {
+        const value = stringConstants.get(property.value.name)
+        if (value) names.add(value)
+      }
+    }
+    walkNodes(ast.program.body, (node) => {
+      if (
+        node.type === 'CallExpression' &&
+        node.callee?.type === 'Identifier' &&
+        ['defineComponent', 'defineOptions'].includes(node.callee.name)
+      ) {
+        nameFromOptions(unwrapExpression(node.arguments?.[0]))
+      }
+      if (node.type === 'ExportDefaultDeclaration') {
+        nameFromOptions(unwrapExpression(node.declaration))
+      }
+    })
+  }
+  return [...names].sort()
+}
+
 class SemanticResolver {
   constructor(root, moduleSources) {
     this.root = root
@@ -1275,7 +1355,48 @@ export const loadModuleSources = (root, moduleName) => {
   return files.sort((a, b) => a.relativePath.localeCompare(b.relativePath))
 }
 
-export const sourceForComponent = (sources, exportName) => {
+const exportedAliasTarget = (sources, exportName) => {
+  const indexSource = sources.find((source) =>
+    source.relativePath.endsWith('/index.ts'),
+  )
+  if (!indexSource) return null
+  let ast
+  try {
+    ast = babelParse(indexSource.content, {
+      sourceType: 'module',
+      plugins: ['typescript', 'jsx', 'importAttributes'],
+      errorRecovery: true,
+    })
+  } catch {
+    return null
+  }
+  for (const statement of ast.program.body) {
+    if (
+      statement.type !== 'ExportNamedDeclaration' ||
+      statement.declaration?.type !== 'VariableDeclaration'
+    ) {
+      continue
+    }
+    const declaration = statement.declaration.declarations.find(
+      (candidate) =>
+        candidate.id?.type === 'Identifier' && candidate.id.name === exportName,
+    )
+    let value = unwrapExpression(declaration?.init)
+    if (value?.type === 'Identifier') return value.name
+    while (
+      value &&
+      ['MemberExpression', 'OptionalMemberExpression'].includes(value.type)
+    ) {
+      value = unwrapExpression(value.object)
+    }
+    if (value?.type === 'Identifier') return value.name
+  }
+  return null
+}
+
+export const sourceForComponent = (sources, exportName, seen = new Set()) => {
+  if (seen.has(exportName)) return null
+  seen.add(exportName)
   const toKebab = (value) =>
     value
       .replace(/^El/, '')
@@ -1300,6 +1421,12 @@ export const sourceForComponent = (sources, exportName) => {
       return exact
     }
   }
+  const declared = sources.filter((source) =>
+    declaredComponentNames(source).includes(exportName),
+  )
+  if (declared.length === 1) return declared[0]
+  const aliasTarget = exportedAliasTarget(sources, exportName)
+  if (aliasTarget) return sourceForComponent(sources, aliasTarget, seen)
   return null
 }
 
