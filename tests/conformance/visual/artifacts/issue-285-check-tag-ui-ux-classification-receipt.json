@@ -18,8 +18,8 @@
     "authorityDigest": "0301f8cf9dc78a13ad971ddb9058546ef3615b23a9a84187690342dd75061ea3",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "4fec918c19da212b45113e63ef4ff8f8399bd80b",
-  "candidateDigest": "6abb77c456c892311570c03f5bdf25539c97138505e3cc9e7ea0bc6ff23d8281",
+  "candidateSha": "9c16343d60bffd923f3dac2d8762f6e7676db055",
+  "candidateDigest": "f2dbb3bdde4304e0bbb45191260e4916c3c62c5aaed1d5cc467ba22d8a936275",
   "stateEvidenceMatrix": [
     { "state": "focused-unchecked-after-pointer-keyboard", "viewport": "87x24", "theme": "light", "evidenceDigest": "380508804f93e90e8c7604aa07dee78a92110bdb64395df4588bffefd3d2e070" },
     { "state": "focused-unchecked-after-pointer-keyboard", "viewport": "960x720", "theme": "light", "evidenceDigest": "eecf99d66b5c5aebc51db523287f08aa241216a1ee96a3dbd7ada9a70208e65c" }
@@ -34,8 +34,8 @@
     "Pixel equality between native renderers",
     "Adjacent component redesign"
   ],
-  "classificationEvidenceDigest": "314cdf08854cc30e1f41285c47be9cd482c12259bdddf5565725f6acafee31f7",
+  "classificationEvidenceDigest": "c22a8d988e00be9043e9d8e66fc3bcac3d56e962dca98a77a4ca7b3ec94a1246",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "ea1bb18a3dd7bc0e92e9054315626a894aba1d2eb507cb2c1fff7e4f7eb42fb9"
+  "receiptDigest": "84b855315460e59d364f7e2a503025534204a896b7123ec31f14be7932208d12"
 }
