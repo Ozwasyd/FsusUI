@@ -688,6 +688,79 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
   }
 })
 
+test('preserves heavy atomic source entry, Escape, and focus return in the real editor', async ({
+  page,
+}) => {
+  await page.goto(
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownLanguageTools=1',
+    { waitUntil: 'domcontentloaded' },
+  )
+  const fixture = page.getByTestId('markdown-editor-transaction-fixture')
+  const textarea = fixture.locator('.el-markdown-editor textarea')
+  const sections = [
+    Object.freeze({
+      kind: 'code',
+      source: '```typescript\nconst value: number = 1\n```',
+    }),
+    Object.freeze({
+      kind: 'mermaid',
+      source: '```mermaid\ngraph TD\nA-->B\n```',
+    }),
+    Object.freeze({ kind: 'latex', source: '$$x^2 = 4$$' }),
+  ] as const
+  await expect(fixture).toBeVisible()
+  const sourceTab = fixture.getByRole('tab', { name: '源码' })
+  const liveTab = fixture.getByRole('tab', { name: '实时' })
+  const body = fixture.locator('.el-markdown-editor__body')
+
+  for (const section of sections) {
+    await sourceTab.click()
+    await expect(sourceTab).toHaveAttribute('aria-selected', 'true')
+    await textarea.fill(section.source)
+    await liveTab.click()
+    await expect(liveTab).toHaveAttribute('aria-selected', 'true')
+    await expect(fixture.locator('[data-markdown-atomic-actions]')).toHaveCount(
+      1,
+    )
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        ),
+    )
+    await fixture
+      .getByRole('button', {
+        includeHidden: true,
+        name: `${section.kind} edit source`,
+      })
+      .click({ force: true })
+    await expect(body).toHaveAttribute(
+      'data-markdown-atomic-kind',
+      section.kind,
+    )
+    await expect(body).toHaveAttribute('data-markdown-atomic-status', 'current')
+    await expect(textarea).toBeFocused()
+    await expect(textarea).toHaveJSProperty('selectionStart', 0)
+    await expect(textarea).toHaveJSProperty('selectionEnd', 0)
+
+    await textarea.dispatchEvent('keydown', {
+      bubbles: true,
+      code: 'Escape',
+      key: 'Escape',
+    })
+    await expect(textarea).toBeFocused()
+    await expect(textarea).toHaveJSProperty(
+      'selectionStart',
+      section.source.length,
+    )
+    await expect(textarea).toHaveJSProperty(
+      'selectionEnd',
+      section.source.length,
+    )
+    await expect(textarea).toHaveValue(section.source)
+  }
+})
+
 test('aborts real pending adapter work on interaction exit and virtual unmount', async ({
   page,
 }) => {
