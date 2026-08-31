@@ -49,8 +49,12 @@ scheduler. Layout-sensitive commits continue to consume the single editor-owned
 
 The renderer exposes current test observability in
 `data-markdown-heavy-lifecycle`: active/static counts, activation/reuse/abort/
-teardown/eviction/stale totals, cache entries/bytes, and retained resources. This
-attribute is diagnostic evidence, not public component API or source authority.
+teardown/eviction/stale totals, cache entries/bytes, and independent retained
+task/listener/observer/runtime counts. A declared retained resource without one
+teardown hook fails closed; entering `static-mounted`, leaving the virtual
+window, aborting, switching documents, or disposing releases that hook exactly
+once. This attribute and the lifecycle implementation are internal diagnostic
+evidence, not public component or hooks API and not source authority.
 
 Security output still commits through the existing sanitizer/gateway on initial
 render and cache reuse. CSP, XSS, source reveal, caret/copy/delete, IME,

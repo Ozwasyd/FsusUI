@@ -93,6 +93,7 @@ import {
   renderMarkdownChunksWithRuntime,
   renderMarkdownResultWithRuntime,
 } from '@element-plus/wasm'
+import { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from '../../../wasm/markdown-feature-output-gateway'
 import { isFsusErr, toFsusError } from '@element-plus/utils'
 import {
   markdownRendererProps,
@@ -254,7 +255,11 @@ const recordHeavyLifecycleMetrics = () => {
     cacheEntries: metrics.cacheEntries,
     evictions: metrics.evictions,
     identity: lastHeavyLifecycleIdentityContext,
-    retainedResources: metrics.activeNodes,
+    retainedListeners: metrics.retainedListeners,
+    retainedObservers: metrics.retainedObservers,
+    retainedResources: metrics.retainedResources,
+    retainedRuntimes: metrics.retainedRuntimes,
+    retainedTasks: metrics.retainedTasks,
     reuses: metrics.reuses,
     stale: metrics.staleCommits,
     static: metrics.staticNodes,
@@ -873,7 +878,7 @@ const createHeavyFeatureIdentityResolver = (
       documentEpoch,
       documentKey,
       featureKind: input.kind,
-      gatewayVersion: 'markdown-feature-output-gateway@1',
+      gatewayVersion: MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION,
       locale,
       nodeId: node.blockIdentity,
       rendererVersion: result.rendererVersion,

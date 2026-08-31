@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createMarkdownHeavyFeatureLifecycle,
   evaluateMarkdownHeavyFeatureLifecycleMutations,
+  evaluateMarkdownHeavyFeatureSchedulerMutation,
   type MarkdownHeavyFeatureIdentity,
   type MarkdownHeavyFeatureKind,
 } from '../use-markdown-heavy-feature-lifecycle'
@@ -47,6 +48,7 @@ describe('markdown heavy feature lifecycle', () => {
       activeNodes: 0,
       cacheBytes: 0,
       cacheEntries: 0,
+      retainedResources: 0,
       staticNodes: 0,
     })
   })
@@ -136,6 +138,7 @@ describe('markdown heavy feature lifecycle', () => {
       signal: controller.signal,
     })
     controller.abort()
+    expect(lifecycle.metrics().activeNodes).toBe(0)
     resolve(Object.freeze({ payload: 'late' }))
     await pending
     expect(lifecycle.metrics()).toMatchObject({
@@ -156,10 +159,100 @@ describe('markdown heavy feature lifecycle', () => {
       render: async () => Object.freeze({ nested: { payload: 'mutable' } }),
     })
     expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 0,
       cacheBytes: 0,
       cacheEntries: 0,
       staleCommits: 1,
     })
+  })
+
+  it('releases feature resources before entering static-mounted', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    let releases = 0
+    let resolve!: (value: Readonly<{ payload: string }>) => void
+    const pending = lifecycle.activate<Readonly<{ payload: string }>>({
+      commit: () => undefined,
+      element: document.createElement('div'),
+      estimateBytes: (value) => value.payload.length * 2,
+      identity: identity('mermaid'),
+      render: () => new Promise((next) => (resolve = next)),
+      resources: { listeners: 1, observers: 1, runtimes: 1, tasks: 1 },
+      teardown: () => {
+        releases += 1
+      },
+    })
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 1,
+      retainedListeners: 1,
+      retainedObservers: 1,
+      retainedResources: 4,
+      retainedRuntimes: 1,
+      retainedTasks: 1,
+    })
+    resolve(Object.freeze({ payload: '<svg />' }))
+    await pending
+    expect(releases).toBe(1)
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 0,
+      retainedResources: 0,
+      staticNodes: 1,
+    })
+    lifecycle.dispose()
+    expect(releases).toBe(1)
+  })
+
+  it('tears down failed feature work instead of retaining it', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    let releases = 0
+    await expect(
+      lifecycle.activate({
+        commit: () => undefined,
+        element: document.createElement('div'),
+        estimateBytes: () => 0,
+        identity: identity('code-highlight'),
+        resources: { tasks: 1 },
+        render: async () => {
+          throw new Error('render failed')
+        },
+        teardown: () => {
+          releases += 1
+        },
+      }),
+    ).rejects.toThrow('render failed')
+    expect(releases).toBe(1)
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 0,
+      staticNodes: 0,
+      teardowns: 1,
+    })
+  })
+
+  it('fails closed when declared resources have no teardown', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    await expect(
+      lifecycle.activate({
+        commit: () => undefined,
+        element: document.createElement('div'),
+        estimateBytes: () => 0,
+        identity: identity('latex'),
+        render: async () => Object.freeze({ payload: 'x' }),
+        resources: { listeners: 1 },
+      }),
+    ).rejects.toThrow('markdown_heavy_feature_teardown_required')
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 0,
+      retainedResources: 0,
+    })
+  })
+
+  it('kills real feature-local RAF and interval scheduler mutations', () => {
+    const mutation = evaluateMarkdownHeavyFeatureSchedulerMutation()
+    expect(mutation.cleanAttempts).toEqual([])
+    expect(mutation.mutantAttempts).toEqual([
+      'feature-local-raf',
+      'feature-local-interval',
+    ])
+    expect(mutation.accepted).toBe(false)
   })
 
   it('does not collide when exact identity fields contain separators', async () => {

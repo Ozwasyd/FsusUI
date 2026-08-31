@@ -124,9 +124,9 @@ import {
   createFsusWorkerExecutor,
   FsusVirtualSizeIndex,
   getFsusRenderPipelineDiagnosticsSnapshot,
-  provideMarkdownHeavyFeatureDocumentContext,
   useFsusRenderScheduler,
 } from '@element-plus/hooks'
+import { provideMarkdownHeavyFeatureDocumentContext } from '../../hooks/use-markdown-heavy-feature-lifecycle'
 import { createWasmSortController } from '@element-plus/components/table/src/composables/use-wasm-sort'
 import {
   MARKDOWN_FEATURE_ACTIVATION_SCENARIO,

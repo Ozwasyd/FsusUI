@@ -44,10 +44,22 @@ export interface MarkdownHeavyFeatureLifecycleMetrics {
   readonly cacheEntries: number
   readonly evictions: number
   readonly reuses: number
+  readonly retainedListeners: number
+  readonly retainedObservers: number
+  readonly retainedResources: number
+  readonly retainedRuntimes: number
+  readonly retainedTasks: number
   readonly staleCommits: number
   readonly staticNodes: number
   readonly teardowns: number
   readonly unmountedNodes: number
+}
+
+export interface MarkdownHeavyFeatureResources {
+  readonly listeners: number
+  readonly observers: number
+  readonly runtimes: number
+  readonly tasks: number
 }
 
 export interface MarkdownHeavyFeatureActivation<T> {
@@ -59,6 +71,7 @@ export interface MarkdownHeavyFeatureActivation<T> {
   readonly estimateBytes: (value: T) => number
   readonly identity: MarkdownHeavyFeatureIdentity
   readonly render: (signal: AbortSignal) => Promise<T>
+  readonly resources?: Partial<MarkdownHeavyFeatureResources>
   readonly signal?: AbortSignal
   readonly teardown?: () => void
 }
@@ -89,6 +102,7 @@ interface NodeRecord {
   documentKey: string
   element: HTMLElement
   identityKey: string
+  resources: MarkdownHeavyFeatureResources
   state: Exclude<MarkdownHeavyFeatureState, 'unmounted'>
   teardown?: () => void
 }
@@ -124,6 +138,33 @@ const nodeKeyOf = (identity: MarkdownHeavyFeatureIdentity) =>
     identity.nodeId,
     identity.featureKind,
   ])
+
+const normalizeResourceCount = (value: number | undefined) =>
+  typeof value === 'number' && Number.isFinite(value)
+    ? Math.max(0, Math.floor(value))
+    : 0
+
+const normalizeResources = (
+  resources: Partial<MarkdownHeavyFeatureResources> | undefined,
+): MarkdownHeavyFeatureResources => ({
+  listeners: normalizeResourceCount(resources?.listeners),
+  observers: normalizeResourceCount(resources?.observers),
+  runtimes: normalizeResourceCount(resources?.runtimes),
+  tasks: normalizeResourceCount(resources?.tasks),
+})
+
+const totalResources = (resources: MarkdownHeavyFeatureResources) =>
+  resources.listeners +
+  resources.observers +
+  resources.runtimes +
+  resources.tasks
+
+const EMPTY_RESOURCES = Object.freeze({
+  listeners: 0,
+  observers: 0,
+  runtimes: 0,
+  tasks: 0,
+})
 
 const isDeeplyFrozen = (
   value: unknown,
@@ -162,10 +203,26 @@ export const createMarkdownHeavyFeatureLifecycle = (
   let activations = 0
   let evictions = 0
   let reuses = 0
+  let retainedListeners = 0
+  let retainedObservers = 0
+  let retainedRuntimes = 0
+  let retainedTasks = 0
   let staleCommits = 0
   let teardowns = 0
   let unmountedNodes = 0
   let disposed = false
+
+  const releaseActiveResource = (record: NodeRecord) => {
+    const resources = record.resources
+    retainedListeners -= resources.listeners
+    retainedObservers -= resources.observers
+    retainedRuntimes -= resources.runtimes
+    retainedTasks -= resources.tasks
+    record.resources = EMPTY_RESOURCES
+    const teardown = record.teardown
+    record.teardown = undefined
+    teardown?.()
+  }
 
   const teardownRecord = (record: NodeRecord) => {
     if (record.controller && !record.controller.signal.aborted) {
@@ -173,7 +230,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
       aborts += 1
     }
     record.controller = null
-    record.teardown?.()
+    releaseActiveResource(record)
     teardowns += 1
   }
 
@@ -192,6 +249,10 @@ export const createMarkdownHeavyFeatureLifecycle = (
 
   const activate = async <T>(input: MarkdownHeavyFeatureActivation<T>) => {
     if (disposed || !validIdentity(input.identity)) return false
+    const resources = normalizeResources(input.resources)
+    if (totalResources(resources) > 0 && !input.teardown) {
+      throw new Error('markdown_heavy_feature_teardown_required')
+    }
     const nodeKey = nodeKeyOf(input.identity)
     const identityKey = cacheKeyOf(input.identity)
     const previous = nodes.get(nodeKey)
@@ -207,18 +268,27 @@ export const createMarkdownHeavyFeatureLifecycle = (
       documentKey: input.identity.documentKey,
       element: input.element,
       identityKey,
+      resources,
       state: 'active-work',
       teardown: input.teardown,
     }
+    retainedListeners += resources.listeners
+    retainedObservers += resources.observers
+    retainedRuntimes += resources.runtimes
+    retainedTasks += resources.tasks
     nodes.set(nodeKey, record)
-    const abort = () => controller.abort()
-    input.signal?.addEventListener('abort', abort, { once: true })
-    if (input.signal?.aborted) controller.abort()
     const discardIfCurrent = () => {
       if (nodes.get(nodeKey) !== record) return
       teardownRecord(record)
       nodes.delete(nodeKey)
       unmountedNodes += 1
+    }
+    const abort = () => discardIfCurrent()
+    input.signal?.addEventListener('abort', abort, { once: true })
+    if (input.signal?.aborted) {
+      discardIfCurrent()
+      input.signal.removeEventListener('abort', abort)
+      return false
     }
 
     try {
@@ -235,6 +305,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
           return false
         }
         if (committed) record.element = committed
+        releaseActiveResource(record)
         record.controller = null
         record.state = 'static-mounted'
         reuses += 1
@@ -254,6 +325,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
         return false
       }
       if (!isDeeplyFrozen(value)) {
+        discardIfCurrent()
         staleCommits += 1
         return false
       }
@@ -264,6 +336,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
         return false
       }
       if (committed) current.element = committed
+      releaseActiveResource(current)
       current.controller = null
       current.state = 'static-mounted'
       const estimate = input.estimateBytes(value)
@@ -290,6 +363,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
         staleCommits += 1
         return false
       }
+      discardIfCurrent()
       throw error
     } finally {
       input.signal?.removeEventListener('abort', abort)
@@ -339,6 +413,15 @@ export const createMarkdownHeavyFeatureLifecycle = (
       cacheEntries: cache.size,
       evictions,
       reuses,
+      retainedListeners,
+      retainedObservers,
+      retainedResources:
+        retainedListeners +
+        retainedObservers +
+        retainedRuntimes +
+        retainedTasks,
+      retainedRuntimes,
+      retainedTasks,
       staleCommits,
       staticNodes,
       teardowns,
@@ -387,6 +470,65 @@ export type MarkdownHeavyFeatureLifecycleMutationKind =
   | 'stale-commit'
   | 'unbounded-cache'
 
+type MarkdownHeavyFeatureSchedulerAttempt =
+  | 'feature-local-interval'
+  | 'feature-local-raf'
+
+const captureMarkdownHeavyFeatureSchedulerAttempts = (run: () => void) => {
+  const target = globalThis as typeof globalThis &
+    Record<'requestAnimationFrame' | 'setInterval', unknown>
+  const descriptors = new Map<PropertyKey, PropertyDescriptor | undefined>()
+  const attempts: MarkdownHeavyFeatureSchedulerAttempt[] = []
+  const replace = (key: 'requestAnimationFrame' | 'setInterval', value: unknown) => {
+    descriptors.set(key, Object.getOwnPropertyDescriptor(target, key))
+    Object.defineProperty(target, key, {
+      configurable: true,
+      value,
+      writable: true,
+    })
+  }
+  const restore = () => {
+    for (const [key, descriptor] of descriptors) {
+      if (descriptor) Object.defineProperty(target, key, descriptor)
+      else delete target[key as 'requestAnimationFrame' | 'setInterval']
+    }
+  }
+
+  try {
+    replace('requestAnimationFrame', () => {
+      attempts.push('feature-local-raf')
+      return 1
+    })
+    replace('setInterval', () => {
+      attempts.push('feature-local-interval')
+      return 1
+    })
+    run()
+  } finally {
+    restore()
+  }
+  return Object.freeze([...attempts])
+}
+
+export const evaluateMarkdownHeavyFeatureSchedulerMutation = () => {
+  const cleanAttempts = captureMarkdownHeavyFeatureSchedulerAttempts(() => {
+    createMarkdownHeavyFeatureLifecycle().dispose()
+  })
+  const mutantAttempts = captureMarkdownHeavyFeatureSchedulerAttempts(() => {
+    requestAnimationFrame(() => undefined)
+    setInterval(() => undefined, 16)
+  })
+  return Object.freeze({
+    accepted:
+      cleanAttempts.length > 0 ||
+      mutantAttempts.length !== 2 ||
+      !mutantAttempts.includes('feature-local-raf') ||
+      !mutantAttempts.includes('feature-local-interval'),
+    cleanAttempts,
+    mutantAttempts,
+  })
+}
+
 export const evaluateMarkdownHeavyFeatureLifecycleMutations = async () => {
   const lifecycle = createMarkdownHeavyFeatureLifecycle({
     maxBytes: 32,
@@ -394,6 +536,7 @@ export const evaluateMarkdownHeavyFeatureLifecycleMutations = async () => {
   })
   const element = document.createElement('div')
   let resolveRender!: (value: Readonly<{ payload: string }>) => void
+  let resourceTeardowns = 0
   const identity = (
     epoch: number,
     nodeId: string,
@@ -415,10 +558,14 @@ export const evaluateMarkdownHeavyFeatureLifecycleMutations = async () => {
     element,
     estimateBytes: (value) => value.payload.length * 2,
     identity: identity(1, 'stale'),
+    resources: { runtimes: 1, tasks: 1 },
     render: () =>
       new Promise((resolve) => {
         resolveRender = resolve
       }),
+    teardown: () => {
+      resourceTeardowns += 1
+    },
   })
   lifecycle.unmountRoot(element)
   resolveRender(Object.freeze({ payload: 'stale' }))
@@ -451,11 +598,15 @@ export const evaluateMarkdownHeavyFeatureLifecycleMutations = async () => {
     })
   }
   const report = lifecycle.metrics()
+  const schedulerMutation = evaluateMarkdownHeavyFeatureSchedulerMutation()
   lifecycle.dispose()
   return Object.freeze({
     mutations: Object.freeze([
       {
-        accepted: report.activeNodes > 0,
+        accepted:
+          report.activeNodes > 0 ||
+          report.retainedResources > 0 ||
+          resourceTeardowns !== 1,
         kind: 'offscreen-resident-runtime' as const,
       },
       { accepted: report.cacheEntries > 1, kind: 'unbounded-cache' as const },
@@ -466,12 +617,11 @@ export const evaluateMarkdownHeavyFeatureLifecycleMutations = async () => {
         kind: 'cross-document-reuse' as const,
       },
       {
-        accepted: Object.keys(lifecycle).some((key) =>
-          /frame|interval|raf|scheduler/iu.test(key),
-        ),
+        accepted: schedulerMutation.accepted,
         kind: 'feature-local-scheduler' as const,
       },
     ]),
     report,
+    schedulerMutation,
   })
 }

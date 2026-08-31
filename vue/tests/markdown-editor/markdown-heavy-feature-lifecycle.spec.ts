@@ -159,6 +159,10 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
   await expect
     .poll(async () => (await readMetrics(page))?.identity?.config)
     .toContain('"codeHighlight":true')
+  await expect.poll(async () => (await readMetrics(page))?.active ?? -1).toBe(0)
+  await expect
+    .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
+    .toBe(0)
   const afterConfigRestore = (await readMetrics(page))!
   expect(afterConfigRestore.active).toBe(0)
   expect(afterConfigRestore.retainedResources).toBe(0)
