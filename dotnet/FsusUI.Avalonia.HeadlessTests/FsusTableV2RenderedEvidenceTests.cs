@@ -16,26 +16,31 @@ public class FsusTableV2RenderedEvidenceTests
   [AvaloniaFact]
   public void RendersPopulatedAndEmptyContentRegionsToPng()
   {
-    var headerTemplate = new FuncDataTemplate<FsusDataTableColumn>((column, _) =>
+    var headerTemplate = new FuncDataTemplate<FsusTableV2HeaderCellContext>((context, _) =>
       new Border
       {
         Padding = new Thickness(8, 6),
-        Background = new SolidColorBrush(Color.Parse("#F4F6F8")),
+        Background = new SolidColorBrush(Color.Parse(
+          context?.HeaderIndex == 0 ? "#EEF2F6" : "#F8F9FB")),
         BorderBrush = new SolidColorBrush(Color.Parse("#D5DCE5")),
         BorderThickness = new Thickness(0, 0, 1, 1),
         Child = new TextBlock
         {
-          Text = column?.Header ?? string.Empty,
+          Text = context is null
+            ? string.Empty
+            : context.HeaderIndex == 0
+              ? context.Column.Key switch
+                {
+                  "name" => "Contract fields",
+                  "status" => "Review state",
+                  _ => "Assignment",
+                }
+              : context.Column.Header,
           FontWeight = FontWeight.SemiBold,
         },
       });
-    var rowTemplate = new FuncDataTemplate<FsusDataTableRow>((_, _) =>
-      new Border
-      {
-        BorderBrush = new SolidColorBrush(Color.Parse("#E5E9EF")),
-        BorderThickness = new Thickness(0, 0, 0, 1),
-        IsHitTestVisible = false,
-      });
+    var rowTemplate = new FuncDataTemplate<FsusTableV2RowContext>((context, _) =>
+      CreateRowVisual(context));
     var footerTemplate = new FuncDataTemplate<object>((_, _) =>
       new Border
       {
@@ -124,7 +129,7 @@ public class FsusTableV2RenderedEvidenceTests
     bitmap.Render(surface);
     var artifactBytes = SaveOrVerifyArtifact(bitmap, outputPath);
 
-    Assert.Equal(3, table.HeaderContentPresenterCount);
+    Assert.Equal(6, table.HeaderContentPresenterCount);
     Assert.InRange(table.RowContentPresenterCount, 1, 8);
     Assert.True(table.IsFooterContentVisible);
     Assert.True(empty.IsEmptyContentVisible);
@@ -137,7 +142,9 @@ public class FsusTableV2RenderedEvidenceTests
   {
     var table = CreateTable();
     table.ViewportHeight = 180;
-    table.HeaderContent = new FuncDataTemplate<object>((_, _) =>
+    table.HeaderHeights.Clear();
+    table.HeaderHeights.Add(36);
+    table.HeaderContent = new FuncDataTemplate<FsusTableV2HeaderContext>((_, _) =>
       new Border
       {
         Padding = new Thickness(10, 7),
@@ -234,9 +241,20 @@ public class FsusTableV2RenderedEvidenceTests
       ViewportWidth = 440,
       ViewportHeight = 224,
       Overscan = 0,
+      CellTemplate = new FuncDataTemplate<object>((value, _) =>
+        new Border
+        {
+          Padding = new Thickness(8, 4),
+          Child = new TextBlock
+          {
+            Text = Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture),
+            VerticalAlignment = VerticalAlignment.Center,
+          },
+        }),
     };
     table.HeaderHeights.Clear();
-    table.HeaderHeights.Add(36);
+    table.HeaderHeights.Add(28);
+    table.HeaderHeights.Add(32);
     table.Columns.Add(new FsusDataTableColumn("name", "Name"));
     table.Columns.Add(new FsusDataTableColumn("status", "Status"));
     table.Columns.Add(new FsusDataTableColumn("owner", "Owner"));
@@ -267,6 +285,35 @@ public class FsusTableV2RenderedEvidenceTests
       {
         Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
       });
+  }
+
+  private static Control CreateRowVisual(FsusTableV2RowContext? context)
+  {
+    var grid = new Grid();
+    for (var column = 0; column < 3; column++)
+    {
+      grid.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(1, GridUnitType.Star)));
+      var text = new TextBlock
+      {
+        Margin = new Thickness(8, 4),
+        Text = context is not null && column < context.Cells.Count
+          ? Convert.ToString(
+              context.Cells[column],
+              System.Globalization.CultureInfo.InvariantCulture)
+          : string.Empty,
+        VerticalAlignment = VerticalAlignment.Center,
+      };
+      Grid.SetColumn(text, column);
+      grid.Children.Add(text);
+    }
+    return new Border
+    {
+      Background = Brushes.White,
+      BorderBrush = new SolidColorBrush(Color.Parse("#E5E9EF")),
+      BorderThickness = new Thickness(0, 0, 0, 1),
+      IsHitTestVisible = false,
+      Child = grid,
+    };
   }
 
   private static byte[] SaveOrVerifyArtifact(RenderTargetBitmap bitmap, string outputPath)
