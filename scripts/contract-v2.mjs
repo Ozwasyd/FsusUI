@@ -860,9 +860,16 @@ const deriveRequirements = ({
   const inputNames = new Set(inputs.map((input) => input.name))
   const hasInteractiveSurface =
     outputs.length > 0 || inputNames.has('disabled') || operations.length > 0
-  const keyboard = [
-    'All public operations must be keyboard reachable and activatable.',
-  ]
+  const keyboard = []
+  if (operations.length > 0) {
+    keyboard.push(
+      'All public operations must be keyboard reachable and activatable.',
+    )
+  } else if (hasInteractiveSurface) {
+    keyboard.push(
+      'Interactive activation must be keyboard reachable and activatable.',
+    )
+  }
   const pointer = []
   if (outputs.length > 0) {
     pointer.push(
@@ -872,9 +879,12 @@ const deriveRequirements = ({
   if (inputNames.has('disabled')) {
     pointer.push('Disabled surfaces must not respond to pointer activation.')
   }
-  const focus = [
-    'Focus entry must surface the same public focus state on both platforms.',
-  ]
+  const focus = []
+  if (hasInteractiveSurface || inputNames.has('autofocus')) {
+    focus.push(
+      'Focus entry must surface the same public focus state on both platforms.',
+    )
+  }
   if (inputNames.has('autofocus')) {
     focus.push(
       'autofocus input must map to initial focus on Web and equivalent Avalonia focus behavior.',
@@ -898,7 +908,23 @@ const deriveRequirements = ({
   const perf = [
     'Render and interaction budgets must match the component performance contract.',
   ]
-  return { keyboard, pointer, focus, a11y, motion, perf }
+  const requirements = { keyboard, pointer, focus, a11y, motion, perf }
+  const requirementApplicability = Object.fromEntries(
+    Object.entries(requirements).map(([kind, entries]) => [
+      kind,
+      entries.length > 0
+        ? { status: 'required' }
+        : {
+            status: 'not-applicable',
+            governance: defaultGovernance(
+              kind === 'keyboard' || kind === 'focus'
+                ? 'The shared contract exposes no public operation, activation output, disabled interaction, or autofocus input requiring direct keyboard activation or focus entry.'
+                : `The shared contract exposes no ${kind} behavior requiring cross-platform execution.`,
+            ),
+          },
+    ]),
+  )
+  return { requirements, requirementApplicability }
 }
 
 const markdownEditorSection = () => ({
@@ -1001,7 +1027,7 @@ const contractForComponent = ({
       })
     : []
   const states = deriveStates({ component, inputs, outputs })
-  const requirements = deriveRequirements({
+  const { requirements, requirementApplicability } = deriveRequirements({
     component,
     inputs,
     outputs,
@@ -1042,6 +1068,7 @@ const contractForComponent = ({
     contentRegions,
     states,
     requirements,
+    requirementApplicability,
     performanceBudget,
     platformDifferences: members
       .filter(
@@ -1500,9 +1527,51 @@ export const validateContract = (contract, gate, errors) => {
       contractErrors.push(`${contract.id} ${section} must be an array`)
     }
   }
-  for (const section of ['states', 'requirements', 'bindings']) {
+  for (const section of [
+    'states',
+    'requirements',
+    'requirementApplicability',
+    'bindings',
+  ]) {
     if (typeof contract[section] !== 'object' || contract[section] == null) {
       contractErrors.push(`${contract.id} ${section} must be an object`)
+    }
+  }
+  for (const kind of [
+    'keyboard',
+    'pointer',
+    'focus',
+    'a11y',
+    'motion',
+    'perf',
+  ]) {
+    const requirements = contract.requirements?.[kind]
+    if (!Array.isArray(requirements)) {
+      contractErrors.push(
+        `${contract.id} requirements.${kind} must be an array`,
+      )
+      continue
+    }
+    const applicability = contract.requirementApplicability?.[kind]
+    if (requirements.length > 0 && applicability?.status !== 'required') {
+      contractErrors.push(
+        `${contract.id} requirements.${kind} must be marked required`,
+      )
+    }
+    if (
+      requirements.length === 0 &&
+      applicability?.status !== 'not-applicable'
+    ) {
+      contractErrors.push(
+        `${contract.id} requirements.${kind} omission must be governed not-applicable`,
+      )
+    }
+    if (applicability?.status === 'not-applicable') {
+      validateGovernance(
+        applicability.governance,
+        `${contract.id} requirements.${kind} not-applicable`,
+        contractErrors,
+      )
     }
   }
   if (

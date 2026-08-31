@@ -265,6 +265,47 @@ test('container, button group, and visual hidden keep explicit truthful bindings
   )
 })
 
+test('passive layout contracts govern keyboard and focus as not applicable', () => {
+  for (const id of [
+    'component-v2.el-main',
+    'component-v2.el-space',
+    'component-v2.el-auto-resizer',
+  ]) {
+    const contract = committedRegistry.contracts.find(
+      (candidate) => candidate.id === id,
+    )
+    assert.deepEqual(contract.requirements.keyboard, [], id)
+    assert.deepEqual(contract.requirements.focus, [], id)
+    assert.equal(
+      contract.requirementApplicability.keyboard.status,
+      'not-applicable',
+      id,
+    )
+    assert.equal(
+      contract.requirementApplicability.focus.status,
+      'not-applicable',
+      id,
+    )
+    assert.equal(
+      contract.requirementApplicability.keyboard.governance.owner,
+      'FsusUI Core',
+      id,
+    )
+  }
+})
+
+test('not-applicable requirement fails closed without governance', () => {
+  const mutated = clone(committedRegistry)
+  const main = mutated.contracts.find(
+    (contract) => contract.id === 'component-v2.el-main',
+  )
+  delete main.requirementApplicability.keyboard.governance
+  assert.match(
+    validateRegistry(mutated, gate).join('\n'),
+    /component-v2\.el-main requirements\.keyboard not-applicable missing governance/u,
+  )
+})
+
 test('resolved Vue emits and exposed signatures own Contract V2 members', () => {
   const checkTag = committedRegistry.contracts.find(
     (contract) => contract.id === 'component-v2.el-check-tag',
