@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "0a994094a19c5cd6a2de6a30f2920278b250bc30",
+    "commitSha": "94f27160b1681ca6a34bef7b8ea81ec2e8c82c7e",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
-    "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
+    "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
     "inputTreeHash": "8b2fbc2da64efd27610c3641abeeebaef797b9460c536f81655d174eec167e62",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "ac9119afe3ff548d7538149b0f654fc19b9c584e4ae0f0d57bdfbd22241140d9"
+    "outputHash": "ca158c3113dff0337e597ffb66d825a7a4ce136290dda0026a7ee1be899aed97"
   },
   "summary": {
     "componentModules": 93,
@@ -20,7 +20,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 482,
+    "cssVariables": 486,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -32574,6 +32574,26 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css"
       ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-danger-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-info-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-success-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-warning-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
       "classification": "portable"
     },
     {
