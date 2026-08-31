@@ -63,6 +63,42 @@ const gate = (subcommand, args) => [
 
 const cases = [
   {
+    id: 'vue-semantic-tsx-discovery-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        'else if (/\\.(ts|tsx|vue)$/u.test(entry.name)) {',
+        'else if (/\\.(ts|vue)$/u.test(entry.name)) {',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'fixture TSX widget source identity was not exact',
+  },
+  {
+    id: 'vue-semantic-tsx-options-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        "node.callee.name === 'defineComponent'",
+        "node.callee.name === 'defineComponentMutation'",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'fixture TSX widget imported prop count was not extracted',
+  },
+  {
+    id: 'vue-semantic-component-source-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        '    `/src/${kebab}.tsx`,\n',
+        '    `/src/${kebab}.tsx.mutation`,\n',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'fixture TSX widget source identity was not exact',
+  },
+  {
     id: 'vue-prop-removed',
     file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
     inject: () =>
@@ -109,9 +145,16 @@ const cases = [
       ),
     command: [
       'pnpm',
-      ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', 'vue/packages/components/check-tag/__tests__/check-tag.test.tsx'],
+      [
+        'exec',
+        'vitest',
+        'run',
+        '--config',
+        'vue/vitest.config.ts',
+        'vue/packages/components/check-tag/__tests__/check-tag.test.tsx',
+      ],
     ],
-    expected: "to match object",
+    expected: 'to match object',
   },
   {
     id: 'check-tag-vue-keyboard-mutated',
@@ -124,7 +167,14 @@ const cases = [
       ),
     command: [
       'pnpm',
-      ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', 'vue/packages/components/check-tag/__tests__/check-tag.test.tsx'],
+      [
+        'exec',
+        'vitest',
+        'run',
+        '--config',
+        'vue/vitest.config.ts',
+        'vue/packages/components/check-tag/__tests__/check-tag.test.tsx',
+      ],
     ],
     expected: 'to deeply equal',
   },
@@ -137,7 +187,15 @@ const cases = [
         '      change.Property == ContentControl.ContentProperty)',
         '      change.Property == CheckedProperty)',
       ),
-    command: ['dotnet', ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--filter', 'FullyQualifiedName~FsusCheckTagTests']],
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj',
+        '--filter',
+        'FullyQualifiedName~FsusCheckTagTests',
+      ],
+    ],
     expected: 'Assert.Equal() Failure',
   },
   {
@@ -149,7 +207,15 @@ const cases = [
         'e.Key is not (Key.Enter or Key.Space)',
         'e.Key is not Key.Escape',
       ),
-    command: ['dotnet', ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--filter', 'FullyQualifiedName~FsusCheckTagTests']],
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj',
+        '--filter',
+        'FullyQualifiedName~FsusCheckTagTests',
+      ],
+    ],
     expected: 'Assert.Equal() Failure',
   },
   {
@@ -161,7 +227,15 @@ const cases = [
         'new FsusCheckTagValueChangedEventArgs(old, next)',
         'new FsusCheckTagValueChangedEventArgs(old, old)',
       ),
-    command: ['dotnet', ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--filter', 'FullyQualifiedName~FsusCheckTagTests']],
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj',
+        '--filter',
+        'FullyQualifiedName~FsusCheckTagTests',
+      ],
+    ],
     expected: 'Assert.Equal() Failure',
   },
   ...[
@@ -191,14 +265,34 @@ const cases = [
       id === 'check-tag-avalonia-default-focus-adorner-mutated'
         ? ['pnpm', ['run', 'conformance:v2:avalonia']]
         : id === 'check-tag-avalonia-focus-ring-mutated'
-          ? ['dotnet', ['test', 'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj', '--filter', 'FullyQualifiedName~FsusCheckTagHeadlessTests']]
-          : ['pnpm', ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', 'vue/packages/theme-chalk/__tests__/fsus-theme.test.ts', '-t', 'uses Scholarly Blue state tokens']],
+          ? [
+              'dotnet',
+              [
+                'test',
+                'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
+                '--filter',
+                'FullyQualifiedName~FsusCheckTagHeadlessTests',
+              ],
+            ]
+          : [
+              'pnpm',
+              [
+                'exec',
+                'vitest',
+                'run',
+                '--config',
+                'vue/vitest.config.ts',
+                'vue/packages/theme-chalk/__tests__/fsus-theme.test.ts',
+                '-t',
+                'uses Scholarly Blue state tokens',
+              ],
+            ],
     expected:
       id === 'check-tag-avalonia-default-focus-adorner-mutated'
         ? 'rendered focus ring pixels did not match'
         : id === 'check-tag-avalonia-focus-ring-mutated'
           ? 'Assert.Equal() Failure'
-        : 'expected',
+          : 'expected',
   })),
   ...[
     ['avalonia-property-removed', 'DocumentIdentityProperty'],
@@ -338,18 +432,71 @@ const cases = [
     expected,
   })),
   ...[
-    ['check-tag-evidence-pointer-mutated', (execution) => (execution.steps[2].observation.passed = false), 'steps[2] failed'],
-    ['check-tag-evidence-keyboard-mutated', (execution) => (execution.steps[6].observation.passed = false), 'steps[6] failed'],
-    ['check-tag-evidence-event-payload-mutated', (execution) => (execution.events[0].payload = false), 'web.events.payload mismatch'],
-    ['check-tag-evidence-role-mutated', (execution) => (execution.accessibility.node.role = 'button'), 'web.a11y.role mismatch'],
-    ['check-tag-evidence-name-mutated', (execution) => (execution.accessibility.node.name = 'Wrong name'), 'web.a11y.name mismatch'],
-    ['check-tag-evidence-checked-mutated', (execution) => (execution.state.checked = true), 'web.state.checked mismatch'],
-    ['check-tag-evidence-focus-mutated', (execution) => (execution.state.focus = null), 'web.state.focus mismatch'],
-    ['check-tag-evidence-motion-mutated', (execution) => (execution.state.motion.active = true), 'web.motion.active mismatch'],
-    ['check-tag-evidence-visual-mutated', (execution) => (execution.visual.observation.focusIndicatorVisible = false), 'visual rendered focused artifact missing'],
-    ['check-tag-evidence-performance-mutated', (execution) => (execution.performance.interactionMilliseconds = execution.performance.budget.interactionMs + 1), 'performance budget failed'],
-    ['check-tag-evidence-memory-mutated', (execution) => (execution.performance.memoryObservation.retainedPerItemStateCount = 1), 'performance budget failed'],
-    ['check-tag-evidence-retention-mutated', (execution) => (execution.performance.memoryObservation.detachedControlCollected = false), 'performance budget failed'],
+    [
+      'check-tag-evidence-pointer-mutated',
+      (execution) => (execution.steps[2].observation.passed = false),
+      'steps[2] failed',
+    ],
+    [
+      'check-tag-evidence-keyboard-mutated',
+      (execution) => (execution.steps[6].observation.passed = false),
+      'steps[6] failed',
+    ],
+    [
+      'check-tag-evidence-event-payload-mutated',
+      (execution) => (execution.events[0].payload = false),
+      'web.events.payload mismatch',
+    ],
+    [
+      'check-tag-evidence-role-mutated',
+      (execution) => (execution.accessibility.node.role = 'button'),
+      'web.a11y.role mismatch',
+    ],
+    [
+      'check-tag-evidence-name-mutated',
+      (execution) => (execution.accessibility.node.name = 'Wrong name'),
+      'web.a11y.name mismatch',
+    ],
+    [
+      'check-tag-evidence-checked-mutated',
+      (execution) => (execution.state.checked = true),
+      'web.state.checked mismatch',
+    ],
+    [
+      'check-tag-evidence-focus-mutated',
+      (execution) => (execution.state.focus = null),
+      'web.state.focus mismatch',
+    ],
+    [
+      'check-tag-evidence-motion-mutated',
+      (execution) => (execution.state.motion.active = true),
+      'web.motion.active mismatch',
+    ],
+    [
+      'check-tag-evidence-visual-mutated',
+      (execution) =>
+        (execution.visual.observation.focusIndicatorVisible = false),
+      'visual rendered focused artifact missing',
+    ],
+    [
+      'check-tag-evidence-performance-mutated',
+      (execution) =>
+        (execution.performance.interactionMilliseconds =
+          execution.performance.budget.interactionMs + 1),
+      'performance budget failed',
+    ],
+    [
+      'check-tag-evidence-memory-mutated',
+      (execution) =>
+        (execution.performance.memoryObservation.retainedPerItemStateCount = 1),
+      'performance budget failed',
+    ],
+    [
+      'check-tag-evidence-retention-mutated',
+      (execution) =>
+        (execution.performance.memoryObservation.detachedControlCollected = false),
+      'performance budget failed',
+    ],
     [
       'check-tag-evidence-checkpoint-mutated',
       (execution) => (execution.identity.checkpoint = 'wrong-checkpoint'),
@@ -358,7 +505,9 @@ const cases = [
     [
       'check-tag-evidence-coverage-mutated',
       (execution) =>
-        (execution.coverage.executions['scenario.v2.el-check-tag.pointer'].real = false),
+        (execution.coverage.executions[
+          'scenario.v2.el-check-tag.pointer'
+        ].real = false),
       'scenario.scenario.v2.el-check-tag.pointer metadata-only',
     ],
   ].map(([id, mutation, expected]) => ({

@@ -7,8 +7,19 @@ import { parse as parseSfc } from 'vue/compiler-sfc'
 const { parse: babelParse } = babelParser
 
 const RUNTIME_TYPE_NAMES = new Set([
-  'String', 'Number', 'Boolean', 'Array', 'Object', 'Function',
-  'Date', 'Symbol', 'BigInt', 'null', 'undefined', 'Promise', 'RegExp',
+  'String',
+  'Number',
+  'Boolean',
+  'Array',
+  'Object',
+  'Function',
+  'Date',
+  'Symbol',
+  'BigInt',
+  'null',
+  'undefined',
+  'Promise',
+  'RegExp',
 ])
 
 const walkNodes = (node, visit) => {
@@ -19,7 +30,8 @@ const walkNodes = (node, visit) => {
   }
   visit(node)
   for (const key of Object.keys(node)) {
-    if (key === 'loc' || key === 'start' || key === 'end' || key === 'tokens') continue
+    if (key === 'loc' || key === 'start' || key === 'end' || key === 'tokens')
+      continue
     const value = node[key]
     if (Array.isArray(value)) {
       for (const item of value) walkNodes(item, visit)
@@ -29,7 +41,8 @@ const walkNodes = (node, visit) => {
   }
 }
 
-const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex')
+const sha256 = (value) =>
+  crypto.createHash('sha256').update(value).digest('hex')
 
 const parseSlotTags = (templateSource) => {
   const slots = []
@@ -90,7 +103,13 @@ class SemanticResolver {
     try {
       ast = babelParse(content, {
         sourceType: 'module',
-        plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes', 'topLevelAwait'],
+        plugins: [
+          'typescript',
+          'jsx',
+          'decorators-legacy',
+          'importAttributes',
+          'topLevelAwait',
+        ],
         errorRecovery: true,
         allowReturnOutsideFunction: true,
       })
@@ -105,20 +124,33 @@ class SemanticResolver {
         for (const spec of node.specifiers || []) {
           if (spec.type === 'ImportSpecifier') {
             const local = spec.local.name
-            const imported = spec.imported.type === 'Identifier' ? spec.imported.name : spec.imported.value
+            const imported =
+              spec.imported.type === 'Identifier'
+                ? spec.imported.name
+                : spec.imported.value
             imports.set(local, { spec: node.source.value, imported })
-          } else if (spec.type === 'ImportDefaultSpecifier' || spec.type === 'ImportNamespaceSpecifier') {
-            imports.set(spec.local.name, { spec: node.source.value, imported: null })
+          } else if (
+            spec.type === 'ImportDefaultSpecifier' ||
+            spec.type === 'ImportNamespaceSpecifier'
+          ) {
+            imports.set(spec.local.name, {
+              spec: node.source.value,
+              imported: null,
+            })
           }
         }
       }
       if (node.type === 'ExportNamedDeclaration' && node.declaration) {
         if (node.declaration.type === 'VariableDeclaration') {
           for (const decl of node.declaration.declarations) {
-            if (decl.id.type === 'Identifier') consts.set(decl.id.name, decl.init)
+            if (decl.id.type === 'Identifier')
+              consts.set(decl.id.name, decl.init)
           }
         }
-        if (node.declaration.type === 'FunctionDeclaration' && node.declaration.id) {
+        if (
+          node.declaration.type === 'FunctionDeclaration' &&
+          node.declaration.id
+        ) {
           functions.set(node.declaration.id.name, node.declaration)
         }
       }
@@ -140,7 +172,9 @@ class SemanticResolver {
     if (this.vueFileCache.has(relPath)) return this.vueFileCache.get(relPath)
     let result = null
     try {
-      const { descriptor } = parseSfc(content, { filename: path.basename(relPath) })
+      const { descriptor } = parseSfc(content, {
+        filename: path.basename(relPath),
+      })
       const setup = descriptor.scriptSetup?.content
       const plain = descriptor.script?.content
       const scriptAst = setup ? null : plain || null
@@ -161,25 +195,38 @@ class SemanticResolver {
               if (spec.type === 'ImportSpecifier') {
                 imports.set(spec.local.name, {
                   spec: node.source.value,
-                  imported: spec.imported.type === 'Identifier' ? spec.imported.name : spec.imported.value,
+                  imported:
+                    spec.imported.type === 'Identifier'
+                      ? spec.imported.name
+                      : spec.imported.value,
                 })
-              } else if (spec.type === 'ImportDefaultSpecifier' || spec.type === 'ImportNamespaceSpecifier') {
-                imports.set(spec.local.name, { spec: node.source.value, imported: null })
+              } else if (
+                spec.type === 'ImportDefaultSpecifier' ||
+                spec.type === 'ImportNamespaceSpecifier'
+              ) {
+                imports.set(spec.local.name, {
+                  spec: node.source.value,
+                  imported: null,
+                })
               }
             }
           }
           if (node.type === 'VariableDeclaration') {
             for (const decl of node.declarations) {
-              if (decl.id.type === 'Identifier') consts.set(decl.id.name, decl.init)
+              if (decl.id.type === 'Identifier')
+                consts.set(decl.id.name, decl.init)
             }
           }
-          if (node.type === 'FunctionDeclaration' && node.id) functions.set(node.id.name, node)
+          if (node.type === 'FunctionDeclaration' && node.id)
+            functions.set(node.id.name, node)
         }
         walkNodes(statements, (node) => {
           if (
             node.type === 'CallExpression' &&
             node.callee?.type === 'Identifier' &&
-            ['defineProps', 'defineEmits', 'defineExpose'].includes(node.callee.name)
+            ['defineProps', 'defineEmits', 'defineExpose'].includes(
+              node.callee.name,
+            )
           ) {
             macroCalls.push(node)
           }
@@ -196,23 +243,42 @@ class SemanticResolver {
               if (spec.type === 'ImportSpecifier') {
                 imports.set(spec.local.name, {
                   spec: node.source.value,
-                  imported: spec.imported.type === 'Identifier' ? spec.imported.name : spec.imported.value,
+                  imported:
+                    spec.imported.type === 'Identifier'
+                      ? spec.imported.name
+                      : spec.imported.value,
                 })
-              } else if (spec.type === 'ImportDefaultSpecifier' || spec.type === 'ImportNamespaceSpecifier') {
-                imports.set(spec.local.name, { spec: node.source.value, imported: null })
+              } else if (
+                spec.type === 'ImportDefaultSpecifier' ||
+                spec.type === 'ImportNamespaceSpecifier'
+              ) {
+                imports.set(spec.local.name, {
+                  spec: node.source.value,
+                  imported: null,
+                })
               }
             }
           }
           if (node.type === 'VariableDeclaration') {
             for (const decl of node.declarations) {
-              if (decl.id.type === 'Identifier') consts.set(decl.id.name, decl.init)
+              if (decl.id.type === 'Identifier')
+                consts.set(decl.id.name, decl.init)
             }
           }
-          if (node.type === 'FunctionDeclaration' && node.id) functions.set(node.id.name, node)
+          if (node.type === 'FunctionDeclaration' && node.id)
+            functions.set(node.id.name, node)
         }
         macroCalls = []
       }
-      result = { content, consts, functions, imports, macroCalls, setup, scriptAst }
+      result = {
+        content,
+        consts,
+        functions,
+        imports,
+        macroCalls,
+        setup,
+        scriptAst,
+      }
     } catch {
       result = null
     }
@@ -225,9 +291,11 @@ class SemanticResolver {
     if (spec.startsWith('.')) {
       const candidates = [
         `${spec}.ts`,
+        `${spec}.tsx`,
         `${spec}.vue`,
         `${spec}.js`,
         `${spec}/index.ts`,
+        `${spec}/index.tsx`,
         `${spec}/index.js`,
       ]
       for (const candidate of candidates) {
@@ -242,6 +310,7 @@ class SemanticResolver {
       const candidates = [
         `vue/packages/components/${name}/index.ts`,
         `vue/packages/components/${name}.ts`,
+        `vue/packages/components/${name}.tsx`,
         `vue/packages/components/${name}/src/index.ts`,
       ]
       for (const candidate of candidates) {
@@ -265,9 +334,12 @@ class SemanticResolver {
   }
 
   findConstInRelPath(name, relPath) {
-    const module = relPath.endsWith('.vue') ? this.parseVueModule(relPath) : this.parseTsModule(relPath)
+    const module = relPath.endsWith('.vue')
+      ? this.parseVueModule(relPath)
+      : this.parseTsModule(relPath)
     if (!module) return null
-    if (module.consts.has(name)) return { node: module.consts.get(name), relPath }
+    if (module.consts.has(name))
+      return { node: module.consts.get(name), relPath }
     return null
   }
 
@@ -277,7 +349,9 @@ class SemanticResolver {
       if (searched.has(relPath)) return null
       searched.add(relPath)
       if (this.readSource(relPath) === null) return null
-      const module = relPath.endsWith('.vue') ? this.parseVueModule(relPath) : this.parseTsModule(relPath)
+      const module = relPath.endsWith('.vue')
+        ? this.parseVueModule(relPath)
+        : this.parseTsModule(relPath)
       if (!module) return null
       if (module.consts.has(name)) {
         return {
@@ -298,20 +372,34 @@ class SemanticResolver {
       const files = []
       const walk = (dir, isFile = false) => {
         if (isFile) {
-          if (dir.endsWith('.ts') && !dir.endsWith('.d.ts')) files.push(dir)
+          if (/\.tsx?$/u.test(dir) && !dir.endsWith('.d.ts')) files.push(dir)
           return
         }
         for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-          if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === 'bin' || entry.name === 'obj') continue
+          if (
+            entry.name === 'node_modules' ||
+            entry.name === 'dist' ||
+            entry.name === 'bin' ||
+            entry.name === 'obj'
+          )
+            continue
           const full = path.join(dir, entry.name)
           if (entry.isDirectory()) walk(full)
-          else if (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts') && !entry.name.endsWith('.test.ts')) files.push(full)
+          else if (
+            /\.tsx?$/u.test(entry.name) &&
+            !entry.name.endsWith('.d.ts') &&
+            !entry.name.endsWith('.test.ts')
+          )
+            files.push(full)
         }
       }
       walk(fullRoot, fs.statSync(fullRoot).isFile())
       for (const file of files) {
         const content = fs.readFileSync(file, 'utf8')
-        if (!new RegExp(`(?:export\\s+)?const\\s+${name}\\s*=`, 'u').test(content)) continue
+        if (
+          !new RegExp(`(?:export\\s+)?const\\s+${name}\\s*=`, 'u').test(content)
+        )
+          continue
         const rel = path.relative(this.root, file).split(path.sep).join('/')
         const hit = searchRel(rel)
         if (hit) {
@@ -374,27 +462,45 @@ const unwrapExpression = (node) => {
 
 const typeText = (node, source) => {
   if (!node) return null
-  if (node.type === 'TSTypeAnnotation') return source.slice(node.typeAnnotation.start, node.typeAnnotation.end)
+  if (node.type === 'TSTypeAnnotation')
+    return source.slice(node.typeAnnotation.start, node.typeAnnotation.end)
   return source.slice(node.start, node.end)
 }
 
 const literalToJson = (node, source) => {
   if (!node) return { kind: 'missing' }
-  if (node.type === 'StringLiteral') return { kind: 'literal', value: node.value }
-  if (node.type === 'NumericLiteral') return { kind: 'literal', value: node.value }
-  if (node.type === 'BooleanLiteral') return { kind: 'literal', value: node.value }
+  if (node.type === 'StringLiteral')
+    return { kind: 'literal', value: node.value }
+  if (node.type === 'NumericLiteral')
+    return { kind: 'literal', value: node.value }
+  if (node.type === 'BooleanLiteral')
+    return { kind: 'literal', value: node.value }
   if (node.type === 'NullLiteral') return { kind: 'null', value: null }
-  if (node.type === 'Identifier' && node.name === 'undefined') return { kind: 'undefined' }
-  if (node.type === 'ArrowFunctionExpression' || node.type === 'FunctionExpression') {
-    return { kind: 'function', sourceHash: sha256(source.slice(node.start, node.end)) }
+  if (node.type === 'Identifier' && node.name === 'undefined')
+    return { kind: 'undefined' }
+  if (
+    node.type === 'ArrowFunctionExpression' ||
+    node.type === 'FunctionExpression'
+  ) {
+    return {
+      kind: 'function',
+      sourceHash: sha256(source.slice(node.start, node.end)),
+    }
   }
   if (node.type === 'TemplateLiteral') {
     return { kind: 'literal', value: source.slice(node.start, node.end) }
   }
-  if (node.type === 'UnaryExpression' && node.operator === '-' && node.argument?.type === 'NumericLiteral') {
+  if (
+    node.type === 'UnaryExpression' &&
+    node.operator === '-' &&
+    node.argument?.type === 'NumericLiteral'
+  ) {
     return { kind: 'literal', value: -node.argument.value }
   }
-  return { kind: 'expression', sourceHash: sha256(source.slice(node.start, node.end)) }
+  return {
+    kind: 'expression',
+    sourceHash: sha256(source.slice(node.start, node.end)),
+  }
 }
 
 const arrayLiteralValues = (node, source) => {
@@ -407,7 +513,10 @@ const arrayLiteralValues = (node, source) => {
       else if (element.type === 'NumericLiteral') values.push(element.value)
       else if (element.type === 'BooleanLiteral') values.push(element.value)
       else if (element.type === 'NullLiteral') values.push(null)
-      else values.push(`<expr:${sha256(source.slice(element.start, element.end)).slice(0, 12)}>`)
+      else
+        values.push(
+          `<expr:${sha256(source.slice(element.start, element.end)).slice(0, 12)}>`,
+        )
     }
     return values
   }
@@ -415,11 +524,14 @@ const arrayLiteralValues = (node, source) => {
 }
 
 const extractTypeExpression = (typeNode, source) => {
-  if (!typeNode) return { runtimeType: null, semanticType: null, nullable: false }
+  if (!typeNode)
+    return { runtimeType: null, semanticType: null, nullable: false }
   if (typeNode.type === 'Identifier') {
     return {
       runtimeType: RUNTIME_TYPE_NAMES.has(typeNode.name) ? typeNode.name : null,
-      semanticType: RUNTIME_TYPE_NAMES.has(typeNode.name) ? null : typeNode.name,
+      semanticType: RUNTIME_TYPE_NAMES.has(typeNode.name)
+        ? null
+        : typeNode.name,
       nullable: false,
     }
   }
@@ -435,14 +547,18 @@ const extractTypeExpression = (typeNode, source) => {
   if (typeNode.type === 'TSTypeAssertion') {
     return extractTypeExpression(typeNode.expression, source)
   }
-  if (typeNode.type === 'CallExpression' && typeNode.callee?.type === 'Identifier') {
+  if (
+    typeNode.type === 'CallExpression' &&
+    typeNode.callee?.type === 'Identifier'
+  ) {
     const callee = typeNode.callee.name
     if (callee === 'definePropType') {
       const typeParam = typeNode.typeParameters?.params?.[0]
       const semantic = typeParam ? typeText(typeParam, source) : null
       const arg = typeNode.arguments?.[0]
       let runtimeType = null
-      if (arg?.type === 'Identifier') runtimeType = RUNTIME_TYPE_NAMES.has(arg.name) ? arg.name : arg.name
+      if (arg?.type === 'Identifier')
+        runtimeType = RUNTIME_TYPE_NAMES.has(arg.name) ? arg.name : arg.name
       if (arg?.type === 'ArrayExpression') runtimeType = 'Array'
       return {
         runtimeType,
@@ -456,11 +572,23 @@ const extractTypeExpression = (typeNode, source) => {
     const names = (typeNode.elements || []).map((el) =>
       el?.type === 'Identifier' ? el.name : null,
     )
-    return { runtimeType: 'Array', semanticType: names.filter(Boolean).join(' | '), nullable: false }
+    return {
+      runtimeType: 'Array',
+      semanticType: names.filter(Boolean).join(' | '),
+      nullable: false,
+    }
   }
-  if (typeNode.type === 'TSArrayType' || typeNode.type === 'TSUnionType' || typeNode.type === 'TSLiteralType') {
+  if (
+    typeNode.type === 'TSArrayType' ||
+    typeNode.type === 'TSUnionType' ||
+    typeNode.type === 'TSLiteralType'
+  ) {
     const semantic = typeText(typeNode, source)
-    return { runtimeType: null, semanticType: semantic, nullable: /\bnull\b|\bundefined\b/u.test(semantic || '') }
+    return {
+      runtimeType: null,
+      semanticType: semantic,
+      nullable: /\bnull\b|\bundefined\b/u.test(semantic || ''),
+    }
   }
   return { runtimeType: null, semanticType: null, nullable: false }
 }
@@ -476,13 +604,27 @@ class PropDescriptorParser {
     const result = []
     for (const property of objectNode.properties || []) {
       if (property.type === 'SpreadElement') {
-        const resolved = this.resolver.resolveIdentifier(property.argument?.name, this.fromRelPath)
+        const resolved = this.resolver.resolveIdentifier(
+          property.argument?.name,
+          this.fromRelPath,
+        )
         if (resolved?.node?.type === 'ObjectExpression') {
-          result.push(...this.parseBuildPropsObject(resolved.node))
+          const source = this.resolver.readSource(resolved.relPath) || ''
+          result.push(
+            ...new PropDescriptorParser(
+              this.resolver,
+              source,
+              resolved.relPath,
+            ).parseBuildPropsObject(resolved.node),
+          )
         }
         continue
       }
-      if (property.type !== 'ObjectProperty' && property.type !== 'ObjectMethod') continue
+      if (
+        property.type !== 'ObjectProperty' &&
+        property.type !== 'ObjectMethod'
+      )
+        continue
       const name = this.propertyName(property)
       if (!name) continue
       const descriptor = this.parsePropValue(property.value, name)
@@ -502,22 +644,57 @@ class PropDescriptorParser {
     valueNode = unwrapExpression(valueNode)
     if (valueNode.type === 'Identifier') {
       if (RUNTIME_TYPE_NAMES.has(valueNode.name)) {
-        return { name, runtimeType: valueNode.name, semanticType: null, nullable: false, values: null, default: { kind: 'missing' }, required: false, readonly: false }
+        return {
+          name,
+          runtimeType: valueNode.name,
+          semanticType: null,
+          nullable: false,
+          values: null,
+          default: { kind: 'missing' },
+          required: false,
+          readonly: false,
+        }
       }
-      const resolved = this.resolver.resolveIdentifier(valueNode.name, this.fromRelPath)
+      const resolved = this.resolver.resolveIdentifier(
+        valueNode.name,
+        this.fromRelPath,
+      )
       if (!resolved?.node) {
-        return { name, runtimeType: null, semanticType: valueNode.name, nullable: false, values: null, default: { kind: 'missing' }, required: false, readonly: false }
+        return {
+          name,
+          runtimeType: null,
+          semanticType: valueNode.name,
+          nullable: false,
+          values: null,
+          default: { kind: 'missing' },
+          required: false,
+          readonly: false,
+        }
       }
       const sub = this.parseFromNode(resolved.node, name, resolved.relPath)
       if (sub) return sub
-      return { name, runtimeType: null, semanticType: valueNode.name, nullable: false, values: null, default: { kind: 'missing' }, required: false, readonly: false }
+      return {
+        name,
+        runtimeType: null,
+        semanticType: valueNode.name,
+        nullable: false,
+        values: null,
+        default: { kind: 'missing' },
+        required: false,
+        readonly: false,
+      }
     }
     if (valueNode.type === 'ObjectExpression') {
       return this.parseDescriptorObject(valueNode, name)
     }
-    if (valueNode.type === 'CallExpression' && valueNode.callee?.type === 'Identifier' && valueNode.callee.name === 'buildProp') {
+    if (
+      valueNode.type === 'CallExpression' &&
+      valueNode.callee?.type === 'Identifier' &&
+      valueNode.callee.name === 'buildProp'
+    ) {
       const arg = unwrapExpression(valueNode.arguments?.[0])
-      if (arg?.type === 'ObjectExpression') return this.parseDescriptorObject(arg, name)
+      if (arg?.type === 'ObjectExpression')
+        return this.parseDescriptorObject(arg, name)
     }
     const typeInfo = extractTypeExpression(valueNode, this.source)
     return {
@@ -535,18 +712,44 @@ class PropDescriptorParser {
   parseFromNode(node, name, relPath) {
     node = unwrapExpression(node)
     if (node.type === 'ObjectExpression') {
-      const source = relPath === this.fromRelPath ? this.source : this.resolver.readSource(relPath) || ''
-      return new PropDescriptorParser(this.resolver, source, relPath).parseDescriptorObject(node, name)
+      const source =
+        relPath === this.fromRelPath
+          ? this.source
+          : this.resolver.readSource(relPath) || ''
+      return new PropDescriptorParser(
+        this.resolver,
+        source,
+        relPath,
+      ).parseDescriptorObject(node, name)
     }
-    if (node.type === 'CallExpression' && node.callee?.type === 'Identifier' && node.callee.name === 'buildProp') {
+    if (
+      node.type === 'CallExpression' &&
+      node.callee?.type === 'Identifier' &&
+      node.callee.name === 'buildProp'
+    ) {
       const arg = unwrapExpression(node.arguments?.[0])
       if (arg?.type === 'ObjectExpression') {
-        const source = relPath === this.fromRelPath ? this.source : this.resolver.readSource(relPath) || ''
-        return new PropDescriptorParser(this.resolver, source, relPath).parseDescriptorObject(arg, name)
+        const source =
+          relPath === this.fromRelPath
+            ? this.source
+            : this.resolver.readSource(relPath) || ''
+        return new PropDescriptorParser(
+          this.resolver,
+          source,
+          relPath,
+        ).parseDescriptorObject(arg, name)
       }
     }
-    if (node.type === 'CallExpression' && node.callee?.type === 'Identifier' && node.callee.name === 'definePropType') {
-      const typeInfo = extractTypeExpression(node, this.source)
+    if (
+      node.type === 'CallExpression' &&
+      node.callee?.type === 'Identifier' &&
+      node.callee.name === 'definePropType'
+    ) {
+      const source =
+        relPath === this.fromRelPath
+          ? this.source
+          : this.resolver.readSource(relPath) || ''
+      const typeInfo = extractTypeExpression(node, source)
       return {
         name,
         runtimeType: typeInfo.runtimeType,
@@ -571,9 +774,17 @@ class PropDescriptorParser {
     let readonly = false
     for (const property of objectNode.properties || []) {
       if (property.type === 'SpreadElement') {
-        const resolved = this.resolver.resolveIdentifier(property.argument?.name, this.fromRelPath)
+        const resolved = this.resolver.resolveIdentifier(
+          property.argument?.name,
+          this.fromRelPath,
+        )
         if (resolved?.node?.type === 'ObjectExpression') {
-          const merged = this.parseDescriptorObject(resolved.node, name)
+          const source = this.resolver.readSource(resolved.relPath) || ''
+          const merged = new PropDescriptorParser(
+            this.resolver,
+            source,
+            resolved.relPath,
+          ).parseDescriptorObject(resolved.node, name)
           if (merged) {
             runtimeType = merged.runtimeType
             semanticType = merged.semanticType
@@ -594,44 +805,75 @@ class PropDescriptorParser {
         semanticType = info.semanticType
         nullable = info.nullable
       } else if (key === 'values') {
-        if (property.value.type === 'ArrayExpression') values = arrayLiteralValues(property.value, this.source)
+        if (property.value.type === 'ArrayExpression')
+          values = arrayLiteralValues(property.value, this.source)
         else if (property.value.type === 'Identifier') {
-          const resolved = this.resolver.resolveIdentifier(property.value.name, this.fromRelPath)
-          if (resolved?.node?.type === 'ArrayExpression') values = arrayLiteralValues(resolved.node, this.resolver.readSource(resolved.relPath) || this.source)
+          const resolved = this.resolver.resolveIdentifier(
+            property.value.name,
+            this.fromRelPath,
+          )
+          if (resolved?.node?.type === 'ArrayExpression')
+            values = arrayLiteralValues(
+              resolved.node,
+              this.resolver.readSource(resolved.relPath) || this.source,
+            )
         }
       } else if (key === 'default') {
         defaultValue = literalToJson(property.value, this.source)
       } else if (key === 'required') {
-        required = property.value.type === 'BooleanLiteral' && property.value.value === true
+        required =
+          property.value.type === 'BooleanLiteral' &&
+          property.value.value === true
       } else if (key === 'readonly') {
-        readonly = property.value.type === 'BooleanLiteral' && property.value.value === true
+        readonly =
+          property.value.type === 'BooleanLiteral' &&
+          property.value.value === true
       }
     }
-    if (defaultValue.kind === 'literal' && defaultValue.value === null) nullable = true
+    if (defaultValue.kind === 'literal' && defaultValue.value === null)
+      nullable = true
     if (defaultValue.kind === 'null') nullable = true
-    return { name, runtimeType, semanticType, nullable, values, default: defaultValue, required, readonly }
+    return {
+      name,
+      runtimeType,
+      semanticType,
+      nullable,
+      values,
+      default: defaultValue,
+      required,
+      readonly,
+    }
   }
 }
 
 const payloadFromFunction = (fnNode, source) => {
-  if (!fnNode || fnNode.type !== 'ArrowFunctionExpression' && fnNode.type !== 'FunctionExpression' && fnNode.type !== 'FunctionDeclaration') return []
+  if (
+    !fnNode ||
+    (fnNode.type !== 'ArrowFunctionExpression' &&
+      fnNode.type !== 'FunctionExpression' &&
+      fnNode.type !== 'FunctionDeclaration')
+  )
+    return []
   return (fnNode.params || []).map((param) => {
     const result = { name: null, type: null, optional: false, rest: false }
     if (param.type === 'Identifier') {
       result.name = param.name
       result.optional = Boolean(param.optional)
-      if (param.typeAnnotation) result.type = typeText(param.typeAnnotation, source)
+      if (param.typeAnnotation)
+        result.type = typeText(param.typeAnnotation, source)
     } else if (param.type === 'AssignmentPattern') {
       result.optional = true
       if (param.left?.type === 'Identifier') {
         result.name = param.left.name
-        if (param.left.typeAnnotation) result.type = typeText(param.left.typeAnnotation, source)
+        if (param.left.typeAnnotation)
+          result.type = typeText(param.left.typeAnnotation, source)
       }
     } else if (param.type === 'RestElement') {
       result.rest = true
       if (param.argument?.type === 'Identifier') {
         result.name = param.argument.name
-        if (param.argument.typeAnnotation) result.type = typeText(param.argument.typeAnnotation, source)
+        if (param.argument.typeAnnotation)
+          result.type = typeText(param.argument.typeAnnotation, source)
       }
     }
     return result
@@ -640,7 +882,9 @@ const payloadFromFunction = (fnNode, source) => {
 
 const signatureFromFunction = (fnNode, source) => {
   const parameters = payloadFromFunction(fnNode, source)
-  const returnType = fnNode.returnType ? typeText(fnNode.returnType, source) : null
+  const returnType = fnNode.returnType
+    ? typeText(fnNode.returnType, source)
+    : null
   return { parameters, returnType }
 }
 
@@ -658,28 +902,46 @@ export const extractComponentSemantics = ({
   vueSource,
 }) => {
   const resolver = new SemanticResolver(root, moduleSources)
-  const vueRel = vueSource ? vueSource.relativePath : null
-  const vueModule = vueRel ? resolver.parseVueModule(vueRel) : null
+  const componentRel = vueSource ? vueSource.relativePath : null
+  const vueModule = componentRel?.endsWith('.vue')
+    ? resolver.parseVueModule(componentRel)
+    : null
+  const tsModule =
+    componentRel && !componentRel.endsWith('.vue')
+      ? resolver.parseTsModule(componentRel)
+      : null
 
   const props = []
   const emits = []
   const exposed = []
-  const slots = vueSource ? parseSlotTags(vueSource.content) : []
+  const slots = vueModule ? parseSlotTags(vueSource.content) : []
 
   const resolveCallArg = (argNode, fromRel) => {
     if (!argNode) return null
     const unwrapped = unwrapExpression(argNode)
-    if (unwrapped.type === 'ObjectExpression') return { object: unwrapped, source: resolver.readSource(fromRel) || '' }
-    if (unwrapped.type === 'ArrayExpression') return { array: unwrapped, source: resolver.readSource(fromRel) || '' }
+    if (unwrapped.type === 'ObjectExpression')
+      return { object: unwrapped, source: resolver.readSource(fromRel) || '' }
+    if (unwrapped.type === 'ArrayExpression')
+      return { array: unwrapped, source: resolver.readSource(fromRel) || '' }
     if (unwrapped.type === 'Identifier') {
       const resolved = resolver.resolveIdentifier(unwrapped.name, fromRel)
       if (!resolved?.node) return null
       const source = resolver.readSource(resolved.relPath) || ''
-      if (resolved.node.type === 'ObjectExpression') return { object: resolved.node, source }
-      if (resolved.node.type === 'ArrayExpression') return { array: resolved.node, source }
-      if (resolved.node.type === 'CallExpression' && resolved.node.callee?.type === 'Identifier' && resolved.node.callee.name === 'buildProps') {
+      if (resolved.node.type === 'ObjectExpression') {
+        return { object: resolved.node, source, relPath: resolved.relPath }
+      }
+      if (resolved.node.type === 'ArrayExpression') {
+        return { array: resolved.node, source, relPath: resolved.relPath }
+      }
+      if (
+        resolved.node.type === 'CallExpression' &&
+        resolved.node.callee?.type === 'Identifier' &&
+        resolved.node.callee.name === 'buildProps'
+      ) {
         const arg = unwrapExpression(resolved.node.arguments?.[0])
-        if (arg?.type === 'ObjectExpression') return { object: arg, source }
+        if (arg?.type === 'ObjectExpression') {
+          return { object: arg, source, relPath: resolved.relPath }
+        }
       }
     }
     return null
@@ -714,47 +976,210 @@ export const extractComponentSemantics = ({
       .filter((el) => el?.type === 'StringLiteral')
       .map((el) => ({ name: el.value, payload: [] }))
 
+  const collectExposeFromObject = (objectNode, source, fromRel) => {
+    if (!objectNode) return
+    for (const property of objectNode.properties || []) {
+      if (
+        property.type !== 'ObjectProperty' &&
+        property.type !== 'ObjectMethod'
+      )
+        continue
+      const name = keyText(property.key, source)
+      if (!name) continue
+      if (property.type === 'ObjectMethod') {
+        exposed.push({ name, ...signatureFromFunction(property, source) })
+        continue
+      }
+      const valueNode = property.value
+      if (valueNode.type === 'Identifier') {
+        const resolved = resolver.resolveIdentifier(valueNode.name, fromRel)
+        if (resolved?.functionNode) {
+          const resolvedSource =
+            resolved.source || resolver.readSource(resolved.relPath) || ''
+          exposed.push({
+            name,
+            ...signatureFromFunction(resolved.node, resolvedSource),
+          })
+        } else if (resolved?.node) {
+          const resolvedSource =
+            resolved.source || resolver.readSource(resolved.relPath) || ''
+          const fn = [
+            'ArrowFunctionExpression',
+            'FunctionExpression',
+            'FunctionDeclaration',
+          ].includes(resolved.node.type)
+            ? resolved.node
+            : null
+          exposed.push(
+            fn
+              ? { name, ...signatureFromFunction(fn, resolvedSource) }
+              : { name, parameters: [], returnType: null },
+          )
+        } else {
+          exposed.push({ name, parameters: [], returnType: null })
+        }
+      } else if (
+        valueNode.type === 'ArrowFunctionExpression' ||
+        valueNode.type === 'FunctionExpression'
+      ) {
+        exposed.push({ name, ...signatureFromFunction(valueNode, source) })
+      } else {
+        exposed.push({ name, parameters: [], returnType: null })
+      }
+    }
+  }
+
+  const slotMemberName = (node) => {
+    if (
+      !node ||
+      !['MemberExpression', 'OptionalMemberExpression'].includes(node.type)
+    )
+      return null
+    if (node.object?.type !== 'Identifier' || node.object.name !== 'slots')
+      return null
+    if (!node.computed && node.property?.type === 'Identifier')
+      return node.property.name
+    if (node.computed && node.property?.type === 'StringLiteral')
+      return node.property.value
+    return null
+  }
+
+  const collectSetupSlots = (setupNode) => {
+    const found = new Map()
+    walkNodes(setupNode, (node) => {
+      const direct = slotMemberName(node)
+      if (direct && !found.has(direct)) found.set(direct, false)
+      if (
+        node.type === 'CallExpression' ||
+        node.type === 'OptionalCallExpression'
+      ) {
+        const called = slotMemberName(node.callee)
+        if (called) found.set(called, true)
+      }
+    })
+    for (const [name, scoped] of found) {
+      const current = slots.find((slot) => slot.name === name)
+      if (current) current.scoped ||= scoped
+      else slots.push({ name, scoped })
+    }
+  }
+
+  const collectOptionsObject = (optionsNode, source, fromRel) => {
+    for (const property of optionsNode.properties || []) {
+      if (
+        property.type !== 'ObjectProperty' &&
+        property.type !== 'ObjectMethod'
+      )
+        continue
+      const name = keyText(property.key, source)
+      if (name === 'props' && property.type === 'ObjectProperty') {
+        const resolved = resolveCallArg(property.value, fromRel)
+        if (resolved?.object) {
+          props.push(
+            ...collectPropsFromObject(
+              resolved.object,
+              resolved.source,
+              resolved.relPath || fromRel,
+            ),
+          )
+        }
+      }
+      if (name === 'emits' && property.type === 'ObjectProperty') {
+        const resolved = resolveCallArg(property.value, fromRel)
+        if (resolved?.object) {
+          emits.push(
+            ...collectEmitsFromObject(
+              resolved.object,
+              resolved.source,
+              resolved.relPath || fromRel,
+            ),
+          )
+        }
+        if (resolved?.array)
+          emits.push(...collectEmitsFromArray(resolved.array))
+      }
+      if (name !== 'setup') continue
+      const setupNode =
+        property.type === 'ObjectMethod' ? property : property.value
+      if (
+        !setupNode ||
+        ![
+          'ObjectMethod',
+          'ArrowFunctionExpression',
+          'FunctionExpression',
+        ].includes(setupNode.type)
+      )
+        continue
+      collectSetupSlots(setupNode)
+      walkNodes(setupNode.body, (node) => {
+        if (
+          (node.type === 'CallExpression' ||
+            node.type === 'OptionalCallExpression') &&
+          node.callee?.type === 'Identifier' &&
+          node.callee.name === 'expose'
+        ) {
+          const resolved = resolveCallArg(node.arguments?.[0], fromRel)
+          if (resolved?.object) {
+            collectExposeFromObject(
+              resolved.object,
+              resolved.source,
+              resolved.relPath || fromRel,
+            )
+          }
+        }
+      })
+    }
+  }
+
+  const collectDefineComponentOptions = (ast, source, fromRel) => {
+    const defineComponentCalls = []
+    walkNodes(ast.program.body, (node) => {
+      if (
+        node.type === 'CallExpression' &&
+        node.callee?.type === 'Identifier' &&
+        node.callee.name === 'defineComponent'
+      ) {
+        const optionsNode = unwrapExpression(node.arguments?.[0])
+        if (optionsNode?.type === 'ObjectExpression')
+          defineComponentCalls.push(optionsNode)
+      }
+    })
+    for (const optionsNode of defineComponentCalls) {
+      collectOptionsObject(optionsNode, source, fromRel)
+    }
+  }
+
   if (vueModule) {
     for (const call of vueModule.macroCalls || []) {
       const macro = call.callee.name
       const arg = call.arguments?.[0]
-      const fromRel = vueRel
+      const fromRel = componentRel
       if (macro === 'defineProps') {
         const resolved = resolveCallArg(arg, fromRel)
-        if (resolved?.object) props.push(...collectPropsFromObject(resolved.object, resolved.source, fromRel))
+        if (resolved?.object) {
+          props.push(
+            ...collectPropsFromObject(
+              resolved.object,
+              resolved.source,
+              resolved.relPath || fromRel,
+            ),
+          )
+        }
       } else if (macro === 'defineEmits') {
         const resolved = resolveCallArg(arg, fromRel)
-        if (resolved?.object) emits.push(...collectEmitsFromObject(resolved.object, resolved.source, fromRel))
-        if (resolved?.array) emits.push(...collectEmitsFromArray(resolved.array))
-      } else if (macro === 'defineExpose' && arg?.type === 'ObjectExpression') {
-        for (const property of arg.properties || []) {
-          if (property.type !== 'ObjectProperty' && property.type !== 'ObjectMethod') continue
-          const name = keyText(property.key, vueModule.content)
-          if (!name) continue
-          if (property.type === 'ObjectMethod') {
-            exposed.push({ name, ...signatureFromFunction(property, vueModule.content) })
-            continue
-          }
-          const valueNode = property.value
-          if (valueNode.type === 'Identifier') {
-            const resolved = resolver.resolveIdentifier(valueNode.name, vueRel)
-            if (resolved?.functionNode) {
-              const source = resolved.source || resolver.readSource(resolved.relPath) || ''
-              exposed.push({ name, ...signatureFromFunction(resolved.node, source) })
-            } else if (resolved?.node) {
-              const source = resolved.source || resolver.readSource(resolved.relPath) || ''
-              const fn = resolved.node.type === 'ArrowFunctionExpression' || resolved.node.type === 'FunctionExpression' || resolved.node.type === 'FunctionDeclaration' ? resolved.node : null
-              if (fn) exposed.push({ name, ...signatureFromFunction(fn, source) })
-              else exposed.push({ name, parameters: [], returnType: null })
-            } else {
-              exposed.push({ name, parameters: [], returnType: null })
-            }
-          } else if (valueNode.type === 'ArrowFunctionExpression' || valueNode.type === 'FunctionExpression') {
-            exposed.push({ name, ...signatureFromFunction(valueNode, vueModule.setup || vueModule.scriptAst || vueModule.content) })
-          } else {
-            exposed.push({ name, parameters: [], returnType: null })
-          }
+        if (resolved?.object) {
+          emits.push(
+            ...collectEmitsFromObject(
+              resolved.object,
+              resolved.source,
+              resolved.relPath || fromRel,
+            ),
+          )
         }
+        if (resolved?.array)
+          emits.push(...collectEmitsFromArray(resolved.array))
+      } else if (macro === 'defineExpose' && arg?.type === 'ObjectExpression') {
+        collectExposeFromObject(arg, vueModule.content, componentRel)
       }
     }
   }
@@ -762,20 +1187,34 @@ export const extractComponentSemantics = ({
   // Options API fallback (rare) for props/emits defined in script, not script setup.
   if (vueModule && !vueModule.setup && vueModule.scriptAst) {
     const source = vueModule.scriptAst
-    const parsed = babelParse(source, { sourceType: 'module', plugins: ['typescript'], errorRecovery: true })
+    const parsed = babelParse(source, {
+      sourceType: 'module',
+      plugins: ['typescript'],
+      errorRecovery: true,
+    })
     const propsObjects = []
     const emitsObjects = []
     walkNodes(parsed.program.body, (node) => {
       if (node.type === 'ObjectProperty' && node.key?.type === 'Identifier') {
-        if (node.key.name === 'props' && node.value.type === 'ObjectExpression') propsObjects.push(node.value)
+        if (node.key.name === 'props' && node.value.type === 'ObjectExpression')
+          propsObjects.push(node.value)
         if (node.key.name === 'emits') {
-          if (node.value.type === 'ObjectExpression') emitsObjects.push(node.value)
-          if (node.value.type === 'ArrayExpression') emits.push(...collectEmitsFromArray(node.value))
+          if (node.value.type === 'ObjectExpression')
+            emitsObjects.push(node.value)
+          if (node.value.type === 'ArrayExpression')
+            emits.push(...collectEmitsFromArray(node.value))
         }
       }
     })
-    for (const object of propsObjects) props.push(...collectPropsFromObject(object, source, vueRel))
-    for (const object of emitsObjects) emits.push(...collectEmitsFromObject(object, source, vueRel))
+    for (const object of propsObjects)
+      props.push(...collectPropsFromObject(object, source, componentRel))
+    for (const object of emitsObjects)
+      emits.push(...collectEmitsFromObject(object, source, componentRel))
+    collectDefineComponentOptions(parsed, source, componentRel)
+  }
+
+  if (tsModule) {
+    collectDefineComponentOptions(tsModule.ast, tsModule.content, componentRel)
   }
 
   const uniqueBy = (items) => {
@@ -789,16 +1228,23 @@ export const extractComponentSemantics = ({
   const propsSorted = uniqueBy(props)
   const emitsSorted = uniqueBy(emits)
   const exposedSorted = uniqueBy(exposed)
+  const slotsSorted = uniqueBy(slots)
 
   return {
     semanticProps: propsSorted,
     semanticEmits: emitsSorted,
     semanticExposed: exposedSorted,
-    semanticSlots: slots,
+    semanticSlots: slotsSorted,
     legacyProps: propsSorted.map((p) => p.name),
     legacyEmits: emitsSorted.map((e) => e.name),
     legacyExposed: exposedSorted.map((e) => e.name),
-    legacySlots: slots,
+    legacySlots: slotsSorted,
+    componentSource: vueSource
+      ? {
+          path: vueSource.relativePath,
+          hash: sha256(vueSource.content),
+        }
+      : null,
   }
 }
 
@@ -808,10 +1254,15 @@ export const loadModuleSources = (root, moduleName) => {
   const files = []
   const walk = (dir) => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (entry.name === 'node_modules' || entry.name === 'dist' || entry.name === '__tests__') continue
+      if (
+        entry.name === 'node_modules' ||
+        entry.name === 'dist' ||
+        entry.name === '__tests__'
+      )
+        continue
       const full = path.join(dir, entry.name)
       if (entry.isDirectory()) walk(full)
-      else if (/\.(ts|vue)$/u.test(entry.name)) {
+      else if (/\.(ts|tsx|vue)$/u.test(entry.name)) {
         files.push({
           file: full,
           relativePath: path.relative(root, full).split(path.sep).join('/'),
@@ -833,11 +1284,23 @@ export const sourceForComponent = (sources, exportName) => {
       .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
       .toLowerCase()
   const kebab = toKebab(exportName)
-  const exact = sources.find((source) =>
-    source.relativePath.endsWith(`/src/${kebab}.vue`),
-  )
-  if (exact) return exact
-  return sources.find((source) => source.relativePath.endsWith('.vue'))
+  const suffixes = [
+    `/src/${kebab}.vue`,
+    `/src/${kebab}.tsx`,
+    `/src/components/${kebab}.tsx`,
+    `/src/${kebab}.ts`,
+  ]
+  for (const suffix of suffixes) {
+    const exact = sources.find((source) => source.relativePath.endsWith(suffix))
+    if (
+      exact &&
+      (exact.relativePath.endsWith('.vue') ||
+        /\bdefineComponent\s*\(/u.test(exact.content))
+    ) {
+      return exact
+    }
+  }
+  return null
 }
 
 export const enrichComponentWithSemantics = ({ root, component }) => {

@@ -4,7 +4,11 @@ import path from 'node:path'
 import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { extractComponentSemantics } from './vue-semantic-baseline.mjs'
+import {
+  extractComponentSemantics,
+  loadModuleSources,
+  sourceForComponent,
+} from './vue-semantic-baseline.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const defaultRoot = path.resolve(scriptDir, '..')
@@ -47,7 +51,8 @@ const hashFiles = (root, files) => {
   return hash.digest('hex')
 }
 
-const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex')
+const sha256 = (value) =>
+  crypto.createHash('sha256').update(value).digest('hex')
 
 const walkFiles = (dir, predicate = () => true) => {
   if (!exists(dir)) return []
@@ -311,7 +316,7 @@ const parseSlotTags = (vueSource) => {
 
 const parseDeprecatedApis = (root) => {
   const files = walkFiles(path.join(root, 'vue/packages/components'), (file) =>
-    /\.(ts|vue)$/.test(file),
+    /\.(ts|tsx|vue)$/.test(file),
   )
   const deprecated = []
   for (const file of files) {
@@ -494,25 +499,6 @@ const loadClassifications = (root) => {
   return parseJson(file)
 }
 
-const loadModuleSources = (root, moduleName) => {
-  const moduleRoot = path.join(root, 'vue/packages/components', moduleName)
-  const files = walkFiles(moduleRoot, (file) => /\.(ts|vue)$/.test(file))
-  return files.map((file) => ({
-    file,
-    relativePath: toPosix(path.relative(root, file)),
-    content: read(file),
-  }))
-}
-
-const sourceForComponent = (sources, exportName) => {
-  const kebab = toKebab(exportName)
-  const exact = sources.find((source) =>
-    source.relativePath.endsWith(`/src/${kebab}.vue`),
-  )
-  if (exact) return exact
-  return sources.find((source) => source.relativePath.endsWith('.vue'))
-}
-
 const collectPropsAndEmits = (sources, vueSource) => {
   const props = []
   const emits = []
@@ -579,28 +565,40 @@ const fallbackPropsAndEmits = (sources, exportName) => {
 const parseComponent = (root, moduleName, exportName, classification) => {
   const sources = loadModuleSources(root, moduleName)
   const vueSource = sourceForComponent(sources, exportName)
-  const fromVue = vueSource
+  const fromVue = vueSource?.relativePath.endsWith('.vue')
     ? collectPropsAndEmits(sources, vueSource.content)
     : { props: [], emits: [] }
-  const fallback =
-    fromVue.props.length || fromVue.emits.length
-      ? { props: [], emits: [] }
-      : fallbackPropsAndEmits(sources, exportName)
   const semantics = extractComponentSemantics({
     root,
     moduleSources: sources,
     vueSource,
     exportName,
   })
+  const fallback =
+    fromVue.props.length ||
+    fromVue.emits.length ||
+    semantics.legacyProps.length ||
+    semantics.legacyEmits.length
+      ? { props: [], emits: [] }
+      : fallbackPropsAndEmits(sources, exportName)
 
   return {
     name: exportName,
     module: moduleName,
     classification,
-    props: uniqueSorted([...fromVue.props, ...fallback.props]),
-    emits: uniqueSorted([...fromVue.emits, ...fallback.emits]),
-    slots: vueSource ? parseSlotTags(vueSource.content) : [],
-    exposed: vueSource ? parseDefineExpose(vueSource.content) : [],
+    source: semantics.componentSource,
+    props: uniqueSorted([
+      ...fromVue.props,
+      ...fallback.props,
+      ...semantics.legacyProps,
+    ]),
+    emits: uniqueSorted([
+      ...fromVue.emits,
+      ...fallback.emits,
+      ...semantics.legacyEmits,
+    ]),
+    slots: semantics.legacySlots,
+    exposed: semantics.legacyExposed,
     semantic: {
       props: semantics.semanticProps,
       emits: semantics.semanticEmits,
@@ -742,23 +740,49 @@ export const buildArtifacts = (root, options = {}) => {
   const compilerOptionsHash = sha256(
     stableJson({
       parser: ['@babel/parser'],
-      plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes', 'topLevelAwait'],
+      plugins: [
+        'typescript',
+        'jsx',
+        'decorators-legacy',
+        'importAttributes',
+        'topLevelAwait',
+      ],
       sfcCompiler: 'vue/compiler-sfc',
     }),
   )
   const dependencyVersionHash = sha256(
     stableJson({
-      vue: read(path.join(defaultRoot, 'node_modules/vue/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
-      '@vue/compiler-sfc': read(path.join(defaultRoot, 'node_modules/@vue/compiler-sfc/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
-      '@babel/parser': read(path.join(defaultRoot, 'node_modules/@babel/parser/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
-      typescript: read(path.join(defaultRoot, 'node_modules/typescript/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
+      vue: read(path.join(defaultRoot, 'node_modules/vue/package.json')).match(
+        /"version":\s*"([^"]+)"/,
+      )?.[1],
+      '@vue/compiler-sfc': read(
+        path.join(defaultRoot, 'node_modules/@vue/compiler-sfc/package.json'),
+      ).match(/"version":\s*"([^"]+)"/)?.[1],
+      '@babel/parser': read(
+        path.join(defaultRoot, 'node_modules/@babel/parser/package.json'),
+      ).match(/"version":\s*"([^"]+)"/)?.[1],
+      typescript: read(
+        path.join(defaultRoot, 'node_modules/typescript/package.json'),
+      ).match(/"version":\s*"([^"]+)"/)?.[1],
     }),
   )
   const inputTreeHash = hashFiles(root, [
-    ...walkFiles(path.join(root, 'vue/packages/components'), (file) => /\.(ts|vue|json)$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(path.join(root, 'vue/packages/hooks'), (file) => /\.ts$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(path.join(root, 'vue/packages/constants'), (file) => /\.ts$/.test(file)).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(path.join(root, 'vue/packages/utils'), (file) => /\.ts$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/components'),
+      (file) =>
+        /\.(ts|tsx|vue|json)$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/hooks'),
+      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(path.join(root, 'vue/packages/constants'), (file) =>
+      /\.ts$/.test(file),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/utils'),
+      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
     'vue/packages/components/motion.ts',
     'vue/packages/element-plus/package.json',
     'spec/baselines/vue-public-api-classifications.json',
@@ -914,6 +938,10 @@ const runFixtureAssertions = () => {
   )
   if (!optionsWidget)
     throw new Error('fixture options widget missing from baseline')
+  const tsxWidget = baseline.components.find(
+    (component) => component.name === 'ElFixtureTsxWidget',
+  )
+  if (!tsxWidget) throw new Error('fixture TSX widget missing from baseline')
   if (
     optionsWidget.props.includes('emit') ||
     optionsWidget.emits.includes('emit')
@@ -921,6 +949,28 @@ const runFixtureAssertions = () => {
     throw new Error(
       'Options API setup context was misclassified as a prop or emit',
     )
+  }
+  if (
+    tsxWidget.source?.path !==
+    'vue/packages/components/fixture-tsx-widget/src/fixture-tsx-widget.tsx'
+  ) {
+    throw new Error('fixture TSX widget source identity was not exact')
+  }
+  for (const prop of ['count', 'label']) {
+    if (!tsxWidget.props.includes(prop)) {
+      throw new Error(
+        `fixture TSX widget imported prop ${prop} was not extracted`,
+      )
+    }
+  }
+  if (!tsxWidget.emits.includes('submit')) {
+    throw new Error('fixture TSX widget emit submit was not extracted')
+  }
+  if (!tsxWidget.exposed.includes('focus')) {
+    throw new Error('fixture TSX widget exposed member focus was not extracted')
+  }
+  if (!tsxWidget.slots.some((slot) => slot.name === 'default' && slot.scoped)) {
+    throw new Error('fixture TSX widget scoped default slot was not extracted')
   }
   for (const prop of ['label', 'legacyMode', 'modelValue']) {
     if (!widget.props.includes(prop)) {
