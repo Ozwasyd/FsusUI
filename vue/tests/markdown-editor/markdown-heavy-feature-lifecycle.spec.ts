@@ -188,6 +188,12 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
         (await readMetrics(page))?.identities['code-highlight'] ?? null,
     )
     .toBeNull()
+  await expect
+    .poll(async () => (await readMetrics(page))?.identities.latex?.theme)
+    .toBe('token-bound')
+  await expect
+    .poll(async () => (await readMetrics(page))?.identities.mermaid?.theme)
+    .toBe('dark')
   const afterCodeDisable = (await readMetrics(page))!
   expect(afterCodeDisable.activations).toBe(beforeCodeDisable.activations)
   expect(afterCodeDisable.cacheEntries).toBe(beforeCodeDisable.cacheEntries)
