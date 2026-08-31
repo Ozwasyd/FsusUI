@@ -1042,7 +1042,6 @@ test('aborts real pending adapter work on interaction exits', async ({
   const fixture = page.locator(
     '[data-performance-scenario="markdown-heavy-feature-lifecycle"]',
   )
-  const renderer = page.locator('[data-markdown-renderer="wasm"]')
   const activeFrame = page.locator(
     'iframe[data-fsus-markdown-heavy-work="code-highlight"]',
   )
