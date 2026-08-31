@@ -339,6 +339,7 @@ const cases = [
     ['check-tag-evidence-visual-mutated', (execution) => (execution.visual.observation.focusIndicatorVisible = false), 'visual rendered focused artifact missing'],
     ['check-tag-evidence-performance-mutated', (execution) => (execution.performance.interactionMilliseconds = execution.performance.budget.interactionMs + 1), 'performance budget failed'],
     ['check-tag-evidence-memory-mutated', (execution) => (execution.performance.memoryObservation.retainedPerItemStateCount = 1), 'performance budget failed'],
+    ['check-tag-evidence-retention-mutated', (execution) => (execution.performance.memoryObservation.detachedControlCollected = false), 'performance budget failed'],
     ['check-tag-evidence-checkpoint-mutated', (execution) => (execution.identity.checkpoint = 'wrong-checkpoint'), 'steps[0].binding mismatch'],
     [
       'check-tag-evidence-coverage-mutated',

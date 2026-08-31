@@ -224,6 +224,7 @@ const main = async () => {
       viewport: { width: 1280, height: 1100 },
     })
     const page = context.pages()[0] ?? (await context.newPage())
+    const cdp = await page.context().newCDPSession(page)
     const fixtureUrl = `${baseUrl}/?interactionTrace=1`
     await page.goto(fixtureUrl, { waitUntil: 'domcontentloaded' })
     await page.getByTestId('interaction-trace-fixture').waitFor({
@@ -256,10 +257,18 @@ const main = async () => {
       () => document.activeElement?.tagName.toLowerCase() || null,
     )
     const checkTag = page.getByTestId('trace-check-tag')
+    await checkTag.evaluate((element) => {
+      window.__fsusDetachedCheckTag = new WeakRef(element)
+    })
     const checkTagRenderMilliseconds = await page.evaluate(() =>
       window.__fsusMeasureCheckTagMount(),
     )
     await checkTag.waitFor({ state: 'visible' })
+    await cdp.send('HeapProfiler.collectGarbage')
+    await cdp.send('HeapProfiler.collectGarbage')
+    const checkTagDetachedControlCollected = await page.evaluate(
+      () => window.__fsusDetachedCheckTag.deref() === undefined,
+    )
     const checkTagBounds = await checkTag.boundingBox()
     const checkTagInitialState = JSON.parse(
       (await page.getByTestId('interaction-trace-state').textContent()) ||
@@ -345,14 +354,18 @@ const main = async () => {
       pointerMilliseconds: Number(element.dataset.pointerElapsedMilliseconds),
     }))
     const checkTagMemoryObservation = await checkTag.evaluate(
-      (element, policy) => ({
-        policy,
+      (element, observation) => ({
+        policy: observation.policy,
         inputItemCount: 0,
         retainedPerItemStateCount: 0,
         bounded: true,
+        detachedControlCollected: observation.detachedControlCollected,
         actualDescendantElementCount: element.querySelectorAll('*').length,
       }),
-      checkTagPerformanceBudget.memory,
+      {
+        detachedControlCollected: checkTagDetachedControlCollected,
+        policy: checkTagPerformanceBudget.memory,
+      },
     )
     const checkTagMotion = await checkTag.evaluate((element) => ({
       mode: matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -370,7 +383,6 @@ const main = async () => {
     }))
     const checkTagScreenshotPath = join(options.out, 'check-tag-browser.png')
     await checkTag.screenshot({ path: checkTagScreenshotPath })
-    const cdp = await page.context().newCDPSession(page)
     const checkTagAccessibilityStartedAt = performance.now()
     const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
     const checkTagAccessibilityMilliseconds =

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Avalonia;
@@ -381,12 +382,20 @@ internal static class ConformanceV2Runner
     var checkTagFocusIndicatorVisible =
       checkTagFocusRing is not null &&
       checkTagFocusRing.BorderThickness != default;
+    var checkTagDetachedReference = CreateDetachedCheckTag(
+      (StackPanel)window.Content!);
+    window.UpdateLayout();
+    Dispatcher.UIThread.RunJobs();
+    GC.Collect();
+    GC.WaitForPendingFinalizers();
+    GC.Collect();
     var checkTagMemoryObservation = new
     {
       policy = checkTagMemoryBudget,
       inputItemCount = 0,
       retainedPerItemStateCount = 0,
       bounded = true,
+      detachedControlCollected = !checkTagDetachedReference.IsAlive,
       actualVisualDescendantCount = checkTag.GetVisualDescendants().Count(),
     };
     var checkTagScreenshotPath = Path.Combine(
@@ -824,6 +833,15 @@ internal static class ConformanceV2Runner
         sourceEntry = peer.GetName().Contains("edit-source", StringComparison.Ordinal),
       },
     }).ToArray() ?? [];
+  }
+
+  [MethodImpl(MethodImplOptions.NoInlining)]
+  private static WeakReference CreateDetachedCheckTag(StackPanel host)
+  {
+    var detached = new FsusCheckTag { Content = "Detached lifetime probe" };
+    host.Children.Add(detached);
+    host.Children.Remove(detached);
+    return new WeakReference(detached);
   }
 
   private static void RecordStep(

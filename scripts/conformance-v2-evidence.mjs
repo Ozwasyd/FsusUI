@@ -279,7 +279,8 @@ const validateContractExecution = (execution, platform, contractId) => {
       execution.performance.budget.memory ||
     execution.performance.memoryObservation?.inputItemCount !== 0 ||
     execution.performance.memoryObservation?.retainedPerItemStateCount !== 0 ||
-    execution.performance.memoryObservation?.bounded !== true
+    execution.performance.memoryObservation?.bounded !== true ||
+    execution.performance.memoryObservation?.detachedControlCollected !== true
   )
     fail(`${platform}.${contractId}.performance budget failed`)
   if (!execution.accessibility?.node)
