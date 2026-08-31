@@ -47,12 +47,20 @@ The edit commands are `Cut`, `Copy`, `Paste`, `RichCopy`, `CopyHtml`,
 `UseNativeMenu`. Backend implementations keep the corresponding DOM command or
 native API inside the backend boundary.
 
-## Spelling
+## Spelling and developer tools
 
 `FsusWebViewCapabilities` separately advertises spelling suggestions,
 replacement, dictionary insertion, and native-menu fallback. A backend must
 not populate a capability merely because its private implementation contains a
 similar hook.
+
+`OpenDeveloperToolsAsync` is a platform-neutral debug command. A debug backend
+advertises `DeveloperTools` only when it can open its tools through a supported
+public integration. Production and unsupported backends leave the capability
+false; the facade then returns an explicit `Unsupported` result without
+invoking the backend. Consumers must not use reflection or depend on private
+WebView2, WebKit, Chromium, or other engine implementation types to bypass that
+result.
 
 ## Tagged PDF and document outline
 
@@ -96,7 +104,8 @@ and is compatible with the package's Native AOT boundary.
 ## Verification boundary
 
 The repository provides deterministic adapter simulations for context-menu,
-spelling, Windows/Linux PDF, cancellation, stream ownership, semantic
+spelling, developer-tools support and production rejection, Windows/Linux PDF,
+cancellation, stream ownership, semantic
 `h1`-through-`h6` tag markers, and hierarchical clickable-outline results. Those simulations
 verify the public contract and fail-closed behavior; they are not evidence that
 an external WebView engine executed in the current environment.

@@ -169,6 +169,14 @@ public class FsusWebViewAdapterHeadlessTests
     }
 
     var pdfCaptures = new List<object>();
+    var productionBackend = new VisualBackend();
+    using (var productionAdapter = new FsusWebViewAdapter(productionBackend))
+    {
+      var developerTools = await productionAdapter.OpenDeveloperToolsAsync();
+      Assert.Equal(FsusWebViewCommandStatus.Unsupported, developerTools.Status);
+      Assert.Contains("production", developerTools.Detail, StringComparison.OrdinalIgnoreCase);
+      Assert.Equal(0, productionBackend.DeveloperToolsCalls);
+    }
     foreach (var theme in new[] { FsusWebViewPrintTheme.Light, FsusWebViewPrintTheme.Dark })
     {
       var backend = new VisualBackend();
@@ -229,6 +237,7 @@ public class FsusWebViewAdapterHeadlessTests
           pointerAndKeyboardOrigins = true,
           routedKeyDownPipeline = true,
           nativeFallbackWithUnusableSuggestions = true,
+          productionDeveloperToolsUnsupportedWithoutBackendDispatch = true,
           escapeAndCloseRestoreInvokerFocus = true,
           parsedAndRenderedLightAndDarkPdf = true,
         },
@@ -457,11 +466,14 @@ public class FsusWebViewAdapterHeadlessTests
       ReplaceWord = true,
       AddToDictionary = true,
       NativeContextMenu = true,
+      DeveloperTools = false,
       TaggedPdf = true,
       DocumentOutline = true,
     };
 
     public FsusWebViewContextCommandRequest? LastCommand { get; private set; }
+
+    public int DeveloperToolsCalls { get; private set; }
 
     public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested
     {
@@ -477,6 +489,15 @@ public class FsusWebViewAdapterHeadlessTests
       LastCommand = request;
       return ValueTask.FromResult(new FsusWebViewCommandResult(
         FsusWebViewCommandStatus.Succeeded));
+    }
+
+    public ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
+      CancellationToken cancellationToken = default)
+    {
+      cancellationToken.ThrowIfCancellationRequested();
+      DeveloperToolsCalls++;
+      return ValueTask.FromResult(FsusWebViewCommandResult.Unsupported(
+        "Developer tools are unavailable in the production visual backend."));
     }
 
     public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(

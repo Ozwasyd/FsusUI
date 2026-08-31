@@ -152,6 +152,65 @@ public class FsusWebViewAdapterTests
         .Header);
   }
 
+  [Fact]
+  public async Task ProductionBackendReturnsUnsupportedWithoutDeveloperToolsDispatch()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Linux) with
+    {
+      DeveloperTools = false,
+    });
+    using var adapter = new FsusWebViewAdapter(backend);
+
+    var result = await adapter.OpenDeveloperToolsAsync();
+
+    Assert.Equal(FsusWebViewCommandStatus.Unsupported, result.Status);
+    Assert.Contains("production", result.Detail, StringComparison.OrdinalIgnoreCase);
+    Assert.Equal(0, backend.DeveloperToolsCalls);
+  }
+
+  [Fact]
+  public async Task DebugCapableBackendOpensDeveloperToolsThroughTypedBoundary()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Windows));
+    using var adapter = new FsusWebViewAdapter(backend);
+
+    var result = await adapter.OpenDeveloperToolsAsync();
+
+    Assert.Equal(FsusWebViewCommandStatus.Succeeded, result.Status);
+    Assert.Equal(1, backend.DeveloperToolsCalls);
+  }
+
+  [Fact]
+  public async Task InFlightDeveloperToolsCancellationReachesBackend()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Windows))
+    {
+      PauseDeveloperToolsUntilCancelled = true,
+    };
+    using var adapter = new FsusWebViewAdapter(backend);
+    using var cancellation = new CancellationTokenSource();
+
+    var opening = adapter.OpenDeveloperToolsAsync(cancellation.Token).AsTask();
+    await backend.DeveloperToolsStarted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+    cancellation.Cancel();
+
+    await Assert.ThrowsAnyAsync<OperationCanceledException>(() => opening);
+    Assert.Equal(1, backend.DeveloperToolsCalls);
+  }
+
+  [Fact]
+  public async Task DisposedAdapterRejectsDeveloperToolsWithoutBackendDispatch()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Windows));
+    var adapter = new FsusWebViewAdapter(backend);
+    adapter.Dispose();
+
+    await Assert.ThrowsAsync<ObjectDisposedException>(async () =>
+      await adapter.OpenDeveloperToolsAsync());
+
+    Assert.Equal(0, backend.DeveloperToolsCalls);
+  }
+
   [Theory]
   [InlineData(
     FsusWebViewPlatform.Windows,
@@ -441,6 +500,7 @@ public class FsusWebViewAdapterTests
     ReplaceWord = true,
     AddToDictionary = true,
     NativeContextMenu = true,
+    DeveloperTools = true,
     TaggedPdf = true,
     DocumentOutline = true,
   };
@@ -461,13 +521,17 @@ public class FsusWebViewAdapterTests
     public FsusWebViewCapabilities Capabilities { get; } = capabilities;
     public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested;
     public List<FsusWebViewContextCommandRequest> ContextCommands { get; } = [];
+    public int DeveloperToolsCalls { get; private set; }
     public int ExportCalls { get; private set; }
     public bool ReturnIncompleteOutline { get; init; }
     public bool CloseDestination { get; init; }
     public bool SkipPdfWrite { get; init; }
     public bool OmitLastDestination { get; init; }
     public bool WritePseudoPdf { get; init; }
+    public bool PauseDeveloperToolsUntilCancelled { get; init; }
     public bool PauseExportUntilCancelled { get; init; }
+    public TaskCompletionSource DeveloperToolsStarted { get; } = new(
+      TaskCreationOptions.RunContinuationsAsynchronously);
     public TaskCompletionSource ExportStarted { get; } = new(
       TaskCreationOptions.RunContinuationsAsynchronously);
     public FakePrintRenderSnapshot? LastPrintRender { get; private set; }
@@ -483,6 +547,19 @@ public class FsusWebViewAdapterTests
       ContextCommands.Add(request);
       return ValueTask.FromResult(new FsusWebViewCommandResult(
         FsusWebViewCommandStatus.Succeeded));
+    }
+
+    public async ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
+      CancellationToken cancellationToken = default)
+    {
+      cancellationToken.ThrowIfCancellationRequested();
+      DeveloperToolsCalls++;
+      DeveloperToolsStarted.TrySetResult();
+      if (PauseDeveloperToolsUntilCancelled)
+      {
+        await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+      }
+      return new FsusWebViewCommandResult(FsusWebViewCommandStatus.Succeeded);
     }
 
     public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(

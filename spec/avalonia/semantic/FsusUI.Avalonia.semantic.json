@@ -29026,6 +29026,18 @@
               "optional": true
             }
           ]
+        },
+        {
+          "name": "OpenDeveloperToolsAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusWebViewCommandResult\u003E",
+          "parameters": [
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
         }
       ]
     },
@@ -29038,6 +29050,14 @@
       "properties": [
         {
           "name": "AddToDictionary",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DeveloperTools",
           "type": "System.Boolean",
           "nullable": false,
           "canRead": true,
@@ -30107,6 +30127,18 @@
               "type": "System.IO.Stream",
               "optional": false
             },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "OpenDeveloperToolsAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CFsusUI.Avalonia.Controls.FsusWebViewCommandResult\u003E",
+          "parameters": [
             {
               "name": "cancellationToken",
               "type": "System.Threading.CancellationToken",

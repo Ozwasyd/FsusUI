@@ -118,6 +118,7 @@ public sealed record FsusWebViewCapabilities
   public bool ReplaceWord { get; init; }
   public bool AddToDictionary { get; init; }
   public bool NativeContextMenu { get; init; }
+  public bool DeveloperTools { get; init; }
   public bool TaggedPdf { get; init; }
   public bool DocumentOutline { get; init; }
 }
@@ -172,6 +173,9 @@ public interface IFsusWebViewBackendAdapter
 
   ValueTask<FsusWebViewCommandResult> ExecuteContextCommandAsync(
     FsusWebViewContextCommandRequest request,
+    CancellationToken cancellationToken = default);
+
+  ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
     CancellationToken cancellationToken = default);
 
   ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
@@ -253,6 +257,20 @@ public sealed class FsusWebViewAdapter : IDisposable
     ObjectDisposedException.ThrowIf(disposed, this);
     ArgumentNullException.ThrowIfNull(request);
     return backend.ExecuteContextCommandAsync(request, cancellationToken);
+  }
+
+  public ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
+    CancellationToken cancellationToken = default)
+  {
+    ObjectDisposedException.ThrowIf(disposed, this);
+    cancellationToken.ThrowIfCancellationRequested();
+    if (!Capabilities.DeveloperTools)
+    {
+      return ValueTask.FromResult(FsusWebViewCommandResult.Unsupported(
+        "Developer tools are unavailable in this production or unsupported backend."));
+    }
+
+    return backend.OpenDeveloperToolsAsync(cancellationToken);
   }
 
   public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(

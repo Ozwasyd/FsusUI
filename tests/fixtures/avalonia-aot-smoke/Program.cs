@@ -577,6 +577,10 @@ internal static class Program
       .AsTask()
       .GetAwaiter()
       .GetResult();
+    var developerTools = adapter.OpenDeveloperToolsAsync()
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
     using var destination = new MemoryStream();
     var pdf = adapter.ExportPdfAsync(
         new FsusWebViewPdfExportOptions
@@ -594,6 +598,8 @@ internal static class Program
       spellingChosen &&
       fallbackComposed &&
       fallbackChosen &&
+      developerTools.Status == FsusWebViewCommandStatus.Unsupported &&
+      backend.DeveloperToolsCalls == 0 &&
       backend.ContextCommands is
       [
         { Command: FsusWebViewContextCommand.ReplaceWord, Replacement: "the" },
@@ -775,6 +781,7 @@ internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
     ReplaceWord = true,
     AddToDictionary = true,
     NativeContextMenu = true,
+    DeveloperTools = false,
     TaggedPdf = true,
     DocumentOutline = true,
   };
@@ -782,6 +789,7 @@ internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
   public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested;
   public FsusWebViewContextCommandRequest? LastCommand { get; private set; }
   public List<FsusWebViewContextCommandRequest> ContextCommands { get; } = [];
+  public int DeveloperToolsCalls { get; private set; }
 
   public void RaiseContextMenu(FsusWebViewContextMenuRequest request) =>
     ContextMenuRequested?.Invoke(
@@ -795,6 +803,15 @@ internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
     cancellationToken.ThrowIfCancellationRequested();
     LastCommand = request;
     ContextCommands.Add(request);
+    return ValueTask.FromResult(new FsusWebViewCommandResult(
+      FsusWebViewCommandStatus.Succeeded));
+  }
+
+  public ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    DeveloperToolsCalls++;
     return ValueTask.FromResult(new FsusWebViewCommandResult(
       FsusWebViewCommandStatus.Succeeded));
   }
