@@ -90,7 +90,7 @@ const cases = [
         "node.callee.name === 'defineComponentMutation'",
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
-    expected: 'fixture TSX widget imported prop count was not extracted',
+    expected: 'fixture TSX widget emit submit was not extracted',
   },
   {
     id: 'vue-semantic-component-source-mutated',
