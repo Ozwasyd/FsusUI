@@ -640,7 +640,8 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
 })
 
 test('renders the static heavy feature matrix across themes, widths, and zoom', async ({
-  page,
+  browser,
+  page: projectPage,
 }, testInfo) => {
   const artifactRoot =
     process.env.FSUS_HEAVY_LIFECYCLE_EVIDENCE === '1' &&
@@ -649,6 +650,18 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
           'tests/conformance/visual/artifacts/screenshots/web/issue-641-heavy-lifecycle',
         )
       : null
+  const evidenceContext = artifactRoot
+    ? await browser.newContext({
+        baseURL: testInfo.project.use.baseURL as string,
+        colorScheme: 'light',
+        deviceScaleFactor: 2,
+        locale: 'zh-CN',
+        reducedMotion: 'reduce',
+        timezoneId: 'Asia/Shanghai',
+        viewport: { height: 1100, width: 1280 },
+      })
+    : null
+  const page = evidenceContext ? await evidenceContext.newPage() : projectPage
   const renderedStates: Array<{
     active: number
     codeScrollLeft: number
@@ -827,6 +840,7 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
             await renderer.screenshot({
               animations: 'disabled',
               path: resolve(artifactRoot, screenshotName),
+              scale: 'css',
             })
           } else {
             await testInfo.attach(
@@ -847,8 +861,10 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
       `${JSON.stringify(
         {
           browser: testInfo.project.name,
+          deviceScaleFactor: evidenceContext ? 2 : 1,
           productionFixture: true,
           reducedMotion: 'reduce',
+          screenshotScale: evidenceContext ? 'css' : 'device',
           states: renderedStates,
         },
         null,
@@ -856,6 +872,7 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
       )}\n`,
     )
   }
+  await evidenceContext?.close()
 })
 
 test('preserves heavy atomic source entry, Escape, and focus return in the real editor', async ({
