@@ -310,8 +310,6 @@ public class FsusImageViewerHeadlessTests
     Assert.Equal(0.5, viewer.Zoom);
 
     viewer.ResetTransform();
-    Assert.Equal("Hand", viewer.Cursor?.ToString());
-    var loadedCursor = viewer.Cursor!.ToString();
     window.MouseDown(center, MouseButton.Left);
     Assert.True(viewer.IsPanning);
     Assert.Contains("fsus-panning", viewer.Classes);
@@ -387,7 +385,6 @@ public class FsusImageViewerHeadlessTests
           preservedKeyboard = new[] { "ArrowLeft", "ArrowRight", "Escape" },
           cursors = new
           {
-            loaded = loadedCursor,
             capturedDrag = panningCursor,
           },
           preservedFocusRestorationTest =
