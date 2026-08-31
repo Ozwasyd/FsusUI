@@ -31,9 +31,10 @@ assert(
 )
 assert(
   scripts['verify:full']?.includes('prepare:test-artifacts') &&
+    scripts['verify:full']?.includes('conformance:v2') &&
     scripts['verify:full']?.includes('_verify:parallel') &&
     scripts['verify:full']?.includes('build:demo'),
-  'verify:full must preserve the previous verify gate',
+  'verify:full must prepare artifacts, derive Contract V2 alignment, run the parallel quality gates, and build the demo',
 )
 assert(
   scripts['verify:release']?.includes('verify:full'),

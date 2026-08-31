@@ -7,6 +7,7 @@ import {
 } from '../markdown-embed-presentation'
 import { collectMarkdownEmbedNodes } from '../markdown-embed-directive'
 import type { MarkdownEmbedResult } from '../markdown-embed-provider'
+import { getMarkdownXssSourceAttackFragment } from '../../../tests/support/markdown-xss-corpus'
 
 const directiveOf = (target: string, mode: string) =>
   `::embed[target="${target}" mode="${mode}"]`
@@ -71,13 +72,17 @@ describe('markdown embed presentation contract', () => {
   it('never carries provider HTML and always routes content through the runtime', () => {
     const node = nodeOf(directiveOf('note', 'article'))
     const hostile = resolvedResult('note', 'article')
+    const hostileExcerpt = [
+      getMarkdownXssSourceAttackFragment('mxss-raw-img-onerror'),
+      getMarkdownXssSourceAttackFragment('mxss-raw-script-basic'),
+    ].join('')
     const presentation = resolveMarkdownEmbedPresentation(
       {
         kind: 'valid',
         node,
         result: {
           ...hostile,
-          excerpt: '<img src=x onerror=alert(1)><script>alert(2)</script>',
+          excerpt: hostileExcerpt,
           title: '<style>body{}</style>',
         },
       },
@@ -86,9 +91,7 @@ describe('markdown embed presentation contract', () => {
     expect(presentation.content.html).toBe(null)
     expect(presentation.content.renderVia).toBe('markdown-runtime')
     expect(presentation.content.editable).toBe(false)
-    expect(presentation.content.excerpt).toBe(
-      '<img src=x onerror=alert(1)><script>alert(2)</script>',
-    )
+    expect(presentation.content.excerpt).toBe(hostileExcerpt)
   })
 
   it('maps provider and local failure states to actionable presentations', () => {

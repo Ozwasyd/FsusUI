@@ -60,6 +60,7 @@
               VerticalAlignment="Top">
               <fsus:FsusButton
                 Name="PART_ActionButton"
+                Classes="fsus-inline-action"
                 Command="{TemplateBinding ActionCommand}"
                 Content="{TemplateBinding ActionLabel}" />
               <Button Name="PART_DismissButton" Padding="6,2" Background="Transparent" BorderThickness="0" Content="&#xD7;" />
