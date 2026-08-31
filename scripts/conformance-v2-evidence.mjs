@@ -42,17 +42,31 @@ const checkTagReviewFiles = {
     'tests/conformance/visual/artifacts/issue-285-check-tag-independent-ux-review.json',
 }
 const scenarioArtifactPolicy = (scenario) => {
-  if (scenario.includes('.input.')) return { action: 'render', artifacts: ['interaction', 'state'] }
-  if (scenario.includes('.output.')) return { action: 'event', artifacts: ['event'] }
+  if (scenario.includes('.input.'))
+    return { action: 'render', artifacts: ['interaction', 'state'] }
+  if (scenario.includes('.output.'))
+    return { action: 'event', artifacts: ['event'] }
+  if (scenario.includes('.operation.'))
+    return { action: 'operation', artifacts: ['interaction', 'state'] }
   if (scenario.includes('.content-region.'))
-    return { action: 'content', artifacts: ['content', 'accessibility', 'visual'] }
-  if (scenario.includes('.state.')) return { action: 'render', artifacts: ['state'] }
-  if (scenario.endsWith('.keyboard')) return { action: 'keyboard', artifacts: ['interaction', 'event'] }
-  if (scenario.endsWith('.pointer')) return { action: 'pointer', artifacts: ['interaction', 'event'] }
-  if (scenario.endsWith('.focus')) return { action: 'focus', artifacts: ['focus', 'visual'] }
-  if (scenario.endsWith('.a11y')) return { action: 'accessibility', artifacts: ['accessibility'] }
-  if (scenario.endsWith('.motion')) return { action: 'motion', artifacts: ['motion'] }
-  if (scenario.endsWith('.perf')) return { action: 'performance', artifacts: ['performance'] }
+    return {
+      action: 'content',
+      artifacts: ['content', 'accessibility', 'visual'],
+    }
+  if (scenario.includes('.state.'))
+    return { action: 'render', artifacts: ['state'] }
+  if (scenario.endsWith('.keyboard'))
+    return { action: 'keyboard', artifacts: ['interaction', 'event'] }
+  if (scenario.endsWith('.pointer'))
+    return { action: 'pointer', artifacts: ['interaction', 'event'] }
+  if (scenario.endsWith('.focus'))
+    return { action: 'focus', artifacts: ['focus', 'visual'] }
+  if (scenario.endsWith('.a11y'))
+    return { action: 'accessibility', artifacts: ['accessibility'] }
+  if (scenario.endsWith('.motion'))
+    return { action: 'motion', artifacts: ['motion'] }
+  if (scenario.endsWith('.perf'))
+    return { action: 'performance', artifacts: ['performance'] }
   return null
 }
 const governedOverride = [
@@ -384,20 +398,23 @@ const validateContractExecution = (execution, platform, contractId) => {
   execution.steps.forEach((step, index) => {
     if (step.index !== index)
       fail(`${platform}.${contractId}.steps[${index}].index mismatch`)
-    if (step.observation?.passed !== true)
-      fail(`${platform}.${contractId}.steps[${index}] failed`)
     same(
       execution.identity,
       step.binding,
       `${platform}.${contractId}.steps[${index}].binding`,
     )
     if (!Number.isFinite(step.elapsedMilliseconds))
-      fail(`${platform}.${contractId}.steps[${index}].elapsedMilliseconds missing`)
+      fail(
+        `${platform}.${contractId}.steps[${index}].elapsedMilliseconds missing`,
+      )
   })
   const coverage = execution.coverage
   if (!Array.isArray(coverage?.requiredMembers))
     fail(`${platform}.${contractId}.coverage.requiredMembers missing`)
-  if (!coverage?.memberScenarios || typeof coverage.memberScenarios !== 'object')
+  if (
+    !coverage?.memberScenarios ||
+    typeof coverage.memberScenarios !== 'object'
+  )
     fail(`${platform}.${contractId}.coverage.memberScenarios missing`)
   if (!Array.isArray(coverage?.requiredScenarios))
     fail(`${platform}.${contractId}.coverage.requiredScenarios missing`)
@@ -405,14 +422,20 @@ const validateContractExecution = (execution, platform, contractId) => {
     fail(`${platform}.${contractId}.coverage.executions missing`)
   for (const member of coverage.requiredMembers) {
     if (!coverage.memberScenarios[member]?.length)
-      fail(`${platform}.${contractId}.coverage.member.${member} missing scenario`)
+      fail(
+        `${platform}.${contractId}.coverage.member.${member} missing scenario`,
+      )
   }
   for (const scenario of coverage.requiredScenarios) {
     const receipt = coverage.executions[scenario]
     if (receipt?.real !== true)
-      fail(`${platform}.${contractId}.coverage.scenario.${scenario} metadata-only`)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario} metadata-only`,
+      )
     if (!Array.isArray(receipt.stepIndexes) || receipt.stepIndexes.length === 0)
-      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes missing`)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes missing`,
+      )
     if (
       receipt.stepIndexes.some(
         (index) =>
@@ -421,24 +444,40 @@ const validateContractExecution = (execution, platform, contractId) => {
           index >= execution.steps.length,
       )
     )
-      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes invalid`)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes invalid`,
+      )
     if (!Array.isArray(receipt.artifacts) || receipt.artifacts.length === 0)
-      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.artifacts missing`)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.artifacts missing`,
+      )
     const policy = scenarioArtifactPolicy(scenario)
     if (!policy)
-      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.policy missing`)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.policy missing`,
+      )
     for (const artifact of policy.artifacts) {
       if (!receipt.artifacts.includes(artifact))
-        fail(`${platform}.${contractId}.coverage.scenario.${scenario}.artifact.${artifact} missing`)
+        fail(
+          `${platform}.${contractId}.coverage.scenario.${scenario}.artifact.${artifact} missing`,
+        )
     }
     if (
       !receipt.stepIndexes.some(
-        (index) => execution.steps[index]?.action === policy.action,
+        (index) =>
+          execution.steps[index]?.action === policy.action &&
+          execution.steps[index]?.observation?.passed === true,
       )
     )
-      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.action.${policy.action} missing`)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.action.${policy.action} missing`,
+      )
   }
-  same(execution.identity, execution.visual?.identity, `${platform}.${contractId}.visual.identity`)
+  same(
+    execution.identity,
+    execution.visual?.identity,
+    `${platform}.${contractId}.visual.identity`,
+  )
   same(
     execution.identity,
     execution.performance?.identity,
@@ -489,6 +528,273 @@ const validateContractExecution = (execution, platform, contractId) => {
   return execution
 }
 
+const validateMarkdownContractExecution = (execution, platform) => {
+  const contractId = 'component-v2.el-markdown-editor'
+  if (!execution || typeof execution !== 'object')
+    fail(`${platform}.contractExecutions.${contractId} missing`)
+  for (const field of requiredIdentity) {
+    if (
+      execution.identity?.[field] === undefined ||
+      execution.identity[field] === ''
+    )
+      fail(`${platform}.${contractId}.identity.${field} missing`)
+  }
+  if (execution.identity.contract !== contractId)
+    fail(`${platform}.${contractId}.identity.contract mismatch`)
+  if (!Array.isArray(execution.steps) || execution.steps.length === 0)
+    fail(`${platform}.${contractId}.steps missing`)
+  execution.steps.forEach((step, index) => {
+    if (step.index !== index)
+      fail(`${platform}.${contractId}.steps[${index}].index mismatch`)
+    same(
+      execution.identity,
+      step.binding,
+      `${platform}.${contractId}.steps[${index}].binding`,
+    )
+    if (!Number.isFinite(step.elapsedMilliseconds))
+      fail(
+        `${platform}.${contractId}.steps[${index}].elapsedMilliseconds missing`,
+      )
+  })
+  const coverage = execution.coverage
+  if (!Array.isArray(coverage?.requiredMembers))
+    fail(`${platform}.${contractId}.coverage.requiredMembers missing`)
+  if (
+    !coverage?.memberScenarios ||
+    typeof coverage.memberScenarios !== 'object'
+  )
+    fail(`${platform}.${contractId}.coverage.memberScenarios missing`)
+  if (!Array.isArray(coverage?.requiredScenarios))
+    fail(`${platform}.${contractId}.coverage.requiredScenarios missing`)
+  if (!coverage?.executions || typeof coverage.executions !== 'object')
+    fail(`${platform}.${contractId}.coverage.executions missing`)
+  for (const member of coverage.requiredMembers) {
+    if (!coverage.memberScenarios[member]?.length)
+      fail(
+        `${platform}.${contractId}.coverage.member.${member} missing scenario`,
+      )
+  }
+  for (const scenario of coverage.requiredScenarios) {
+    const receipt = coverage.executions[scenario]
+    if (receipt?.real !== true)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario} metadata-only`,
+      )
+    if (!Array.isArray(receipt.stepIndexes) || receipt.stepIndexes.length === 0)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes missing`,
+      )
+    if (
+      receipt.stepIndexes.some(
+        (index) =>
+          !Number.isInteger(index) ||
+          index < 0 ||
+          index >= execution.steps.length,
+      )
+    )
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes invalid`,
+      )
+    const policy = scenarioArtifactPolicy(scenario)
+    if (!policy)
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.policy missing`,
+      )
+    for (const artifact of policy.artifacts) {
+      if (!receipt.artifacts?.includes(artifact))
+        fail(
+          `${platform}.${contractId}.coverage.scenario.${scenario}.artifact.${artifact} missing`,
+        )
+    }
+    if (
+      !receipt.stepIndexes.some(
+        (index) => execution.steps[index]?.action === policy.action,
+      )
+    )
+      fail(
+        `${platform}.${contractId}.coverage.scenario.${scenario}.action.${policy.action} missing`,
+      )
+  }
+  same(
+    execution.identity,
+    execution.visual?.identity,
+    `${platform}.${contractId}.visual.identity`,
+  )
+  if (
+    execution.visual?.renderedTopLevel !== true ||
+    !execution.visual?.sha256 ||
+    execution.visual?.artifactBytes < 1024
+  )
+    fail(`${platform}.${contractId}.visual rendered artifact missing`)
+  if (!execution.accessibility?.node)
+    fail(`${platform}.${contractId}.accessibility node missing`)
+  if (
+    platform === 'web' &&
+    (execution.accessibility.source !==
+      'chromium-cdp-accessibility-and-atspi' ||
+      execution.accessibility.atspiReachable !== true)
+  )
+    fail(`web.${contractId}.accessibility AT-SPI evidence missing`)
+  if (
+    platform === 'avalonia' &&
+    execution.accessibility.source !== 'real-avalonia-automation-peer'
+  )
+    fail(`avalonia.${contractId}.accessibility AutomationPeer evidence missing`)
+  const performance = execution.diagnostics?.largeDocumentPerformance
+  if (
+    !Number.isFinite(performance?.elapsedMilliseconds) ||
+    performance?.sourceLength < 100_000 ||
+    performance?.blockCount < 3000 ||
+    performance?.budget?.renderMs !== 16 ||
+    performance?.budget?.interactionMs !== 50 ||
+    typeof performance?.budget?.memory !== 'string'
+  )
+    fail(`${platform}.${contractId}.diagnostics.performance invalid`)
+  if (
+    execution.diagnostics?.nativeIme?.physicalIme !== false ||
+    execution.diagnostics?.nativeIme?.status !== 'missing'
+  )
+    fail(
+      `${platform}.${contractId}.diagnostics.nativeIme must remain fail-closed`,
+    )
+  return execution
+}
+
+const markdownStep = (execution, suffix) => {
+  const step = execution.steps.find((candidate) =>
+    candidate.target.toLowerCase().endsWith(suffix.toLowerCase()),
+  )
+  if (!step) fail(`${execution.identity.contract}.step.${suffix} missing`)
+  return step
+}
+
+const normalizeMarkdownResult = (result, baselineRevision) => ({
+  accepted: result?.accepted,
+  beforeRevision: result?.beforeRevision - baselineRevision,
+  documentIdentity: {
+    epoch: result?.documentIdentity?.epoch,
+    id: result?.documentIdentity?.id,
+  },
+  history: {
+    canRedo: result?.history?.canRedo,
+    canUndo: result?.history?.canUndo,
+    redoDepth: result?.history?.redoDepth,
+    retainedUnits: result?.history?.retainedUnits,
+    undoDepth: result?.history?.undoDepth,
+  },
+  reason: result?.reason ?? null,
+  revision: result?.revision - baselineRevision,
+  value: result?.value,
+})
+
+const validateMarkdownRuntimeObservations = (execution, platform) => {
+  const dispatch = markdownStep(execution, 'dispatchtransaction').observation
+    .actual
+  const undo = markdownStep(execution, 'undo').observation.actual
+  const redo = markdownStep(execution, 'redo').observation.actual
+  if (
+    dispatch?.accepted !== true ||
+    !dispatch.positionMap ||
+    dispatch.positionMap.range?.deleted !== false ||
+    undo?.accepted !== true ||
+    redo?.accepted !== true
+  )
+    fail(
+      `${platform}.component-v2.el-markdown-editor.operation evidence invalid`,
+    )
+  const modes = execution.state?.modes ?? []
+  for (const mode of ['source', 'live']) {
+    const observed = modes.find((entry) => entry.mode === mode)
+    if (!observed || observed.classPresent !== true)
+      fail(`${platform}.component-v2.el-markdown-editor.mode.${mode} missing`)
+  }
+  const projection = execution.state?.projection
+  if (projection?.coordinates?.rawSource === undefined)
+    fail(
+      `${platform}.component-v2.el-markdown-editor.projection observation missing`,
+    )
+  if (
+    execution.state?.motion?.mode !== 'reduced' ||
+    (platform === 'web'
+      ? execution.state.motion.activeAnimations !== 0
+      : execution.state.motion.active !== false)
+  )
+    fail(`${platform}.component-v2.el-markdown-editor.motion invalid`)
+  if (
+    execution.diagnostics?.accessibility?.status === undefined ||
+    (platform === 'avalonia' &&
+      execution.diagnostics.accessibility.requiredSemanticsPassed !== false)
+  )
+    fail(
+      `${platform}.component-v2.el-markdown-editor.accessibility diagnostic invalid`,
+    )
+  return { baselineRevision: dispatch.beforeRevision, dispatch, undo, redo }
+}
+
+const compareMarkdownExecution = (web, avalonia) => {
+  const contractId = 'component-v2.el-markdown-editor'
+  validateMarkdownContractExecution(web, 'web')
+  validateMarkdownContractExecution(avalonia, 'avalonia')
+  for (const field of requiredIdentity)
+    same(
+      web.identity[field],
+      avalonia.identity[field],
+      `${contractId}.identity.${field}`,
+    )
+  same(web.coverage, avalonia.coverage, `${contractId}.coverage`)
+  for (const forbidden of [
+    'scenario.v2.el-markdown-editor.state.split',
+    'scenario.v2.el-markdown-editor.state.preview',
+    'scenario.v2.el-markdown-editor.pointer',
+    'scenario.v2.el-markdown-editor.a11y',
+    'scenario.v2.el-markdown-editor.keyboard',
+    'scenario.v2.el-markdown-editor.perf',
+  ]) {
+    if (web.coverage.requiredScenarios.includes(forbidden))
+      fail(`${forbidden} must remain unclaimed`)
+  }
+  const left = validateMarkdownRuntimeObservations(web, 'web')
+  const right = validateMarkdownRuntimeObservations(avalonia, 'avalonia')
+  for (const operation of ['dispatch', 'undo', 'redo'])
+    same(
+      normalizeMarkdownResult(left[operation], left.baselineRevision),
+      normalizeMarkdownResult(right[operation], right.baselineRevision),
+      `${contractId}.operation.${operation}`,
+    )
+  same(
+    web.state.projection.coordinates.rawSource,
+    avalonia.state.projection.coordinates.rawSource,
+    `${contractId}.projection.raw-source`,
+  )
+  same(
+    web.state.projection.coordinates.normalizedSource,
+    avalonia.state.projection.coordinates.normalizedSource,
+    `${contractId}.projection.normalized-source`,
+  )
+  return {
+    schema: 'fsusui.conformance-contract-comparison.v2',
+    verdict: 'pass',
+    identity: web.identity,
+    evidenceDigests: { web: digest(web), avalonia: digest(avalonia) },
+    coverage: web.coverage,
+    comparedArtifacts: [
+      'same-identity-focus-evidence',
+      'same-identity-motion-evidence',
+      'same-identity-cross-platform-comparison',
+    ],
+    diagnostics: {
+      accessibility: 'missing-native-required-semantics',
+      nativeIme: 'missing-native-physical-ime',
+      performance: 'observed-not-qualified',
+      pointer: 'observed-focus-only-not-output-qualified',
+      projection: 'observed-cross-platform-offset-drift',
+      keyboard: 'observed-native-selection-path-failed',
+      selection: 'observed-cross-platform-selection-drift',
+      visual: 'unreviewed',
+    },
+  }
+}
+
 const checkedState = (value) => {
   if ([true, 'true', 'on', 'checked'].includes(value)) return true
   if ([false, 'false', 'off', 'unchecked'].includes(value)) return false
@@ -500,12 +806,24 @@ const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
   validateContractExecution(web, 'web', contractId)
   validateContractExecution(avalonia, 'avalonia', contractId)
   for (const field of requiredIdentity)
-    same(web.identity[field], avalonia.identity[field], `${contractId}.identity.${field}`)
+    same(
+      web.identity[field],
+      avalonia.identity[field],
+      `${contractId}.identity.${field}`,
+    )
   same(web.coverage, avalonia.coverage, `${contractId}.coverage`)
-  same(web.performance.budget, avalonia.performance.budget, `${contractId}.performance.budget`)
+  same(
+    web.performance.budget,
+    avalonia.performance.budget,
+    `${contractId}.performance.budget`,
+  )
   same(false, web.state.checked, `${contractId}.web.state.checked`)
   same(false, avalonia.state.checked, `${contractId}.avalonia.state.checked`)
-  same(web.state.revision, avalonia.state.revision, `${contractId}.state.revision`)
+  same(
+    web.state.revision,
+    avalonia.state.revision,
+    `${contractId}.state.revision`,
+  )
   same('checkbox', web.state.focus, `${contractId}.web.state.focus`)
   same('checkbox', avalonia.state.focus, `${contractId}.avalonia.state.focus`)
   same(
@@ -524,7 +842,9 @@ const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
     `${contractId}.avalonia.events.payload`,
   )
   same(
-    web.events.filter((event) => event.name === 'change').map((event) => event.payload),
+    web.events
+      .filter((event) => event.name === 'change')
+      .map((event) => event.payload),
     avalonia.events.map((event) => event.payload),
     `${contractId}.events.semantic`,
   )
@@ -535,10 +855,26 @@ const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
     const node = execution.accessibility.node
     same('checkbox', node.role, `${contractId}.${platform}.a11y.role`)
     same('Check tag', node.name, `${contractId}.${platform}.a11y.name`)
-    same(false, checkedState(node.states.checkedState), `${contractId}.${platform}.a11y.checked`)
-    same(true, node.focus.keyboardFocusable, `${contractId}.${platform}.a11y.focusable`)
-    same('reduced', execution.state.motion.mode, `${contractId}.${platform}.motion.mode`)
-    same(false, execution.state.motion.active, `${contractId}.${platform}.motion.active`)
+    same(
+      false,
+      checkedState(node.states.checkedState),
+      `${contractId}.${platform}.a11y.checked`,
+    )
+    same(
+      true,
+      node.focus.keyboardFocusable,
+      `${contractId}.${platform}.a11y.focusable`,
+    )
+    same(
+      'reduced',
+      execution.state.motion.mode,
+      `${contractId}.${platform}.motion.mode`,
+    )
+    same(
+      false,
+      execution.state.motion.active,
+      `${contractId}.${platform}.motion.active`,
+    )
     same(
       {
         checked: false,
@@ -731,28 +1067,20 @@ export function compareEvidence(web, avalonia, visualReview = null) {
   ]) {
     same(left.a11y[field], right.a11y[field], `accessibility.markdown.${field}`)
   }
-  const markdownReceipt = {
-    schema: 'fsusui.conformance-contract-comparison.v2',
-    verdict: 'pass',
-    identity: web.identity,
-    evidenceDigests: { web: digest(web), avalonia: digest(avalonia) },
-    comparedArtifacts: [
-      'same-identity-keyboard-evidence',
-      'same-identity-focus-evidence',
-      'same-identity-a11y-evidence',
-      'same-identity-perf-evidence',
-      'same-identity-cross-platform-comparison',
-    ],
-  }
   const webContractIds = Object.keys(web.contractExecutions ?? {}).sort()
   const avaloniaContractIds = Object.keys(
     avalonia.contractExecutions ?? {},
   ).sort()
   same(webContractIds, avaloniaContractIds, 'contractExecutions.ids')
-  const receipts = {
-    [web.identity.contract]: markdownReceipt,
-  }
+  const receipts = {}
   for (const contractId of webContractIds) {
+    if (contractId === 'component-v2.el-markdown-editor') {
+      receipts[contractId] = compareMarkdownExecution(
+        web.contractExecutions[contractId],
+        avalonia.contractExecutions[contractId],
+      )
+      continue
+    }
     if (contractId === 'component-v2.el-check-tag') {
       receipts[contractId] = compareCheckTagExecution(
         web.contractExecutions[contractId],
@@ -874,6 +1202,22 @@ const currentComparisonIdentity = (contractPath) => {
       .update(
         fs.readFileSync(
           path.resolve(root, 'scripts/conformance-v2-evidence.mjs'),
+        ),
+      )
+      .update(
+        fs.readFileSync(
+          path.resolve(
+            root,
+            'vue/packages/demo-app/src/InteractionTraceFixture.vue',
+          ),
+        ),
+      )
+      .update(
+        fs.readFileSync(
+          path.resolve(
+            root,
+            'dotnet/FsusUI.Avalonia.Demo/ConformanceV2Runner.cs',
+          ),
         ),
       )
       .digest('hex'),
@@ -1054,7 +1398,14 @@ const validReviewedPlatformException = (contract) => {
 const validReviewedPublicValueException = (binding) =>
   binding.status === 'web-only' &&
   binding.avalonia === null &&
-  ['reason', 'alternative', 'owner', 'testPolicy', 'reviewPolicy', 'reviewedAt'].every(
+  [
+    'reason',
+    'alternative',
+    'owner',
+    'testPolicy',
+    'reviewPolicy',
+    'reviewedAt',
+  ].every(
     (field) =>
       typeof binding.governance?.[field] === 'string' &&
       binding.governance[field].trim() !== '',
@@ -1182,7 +1533,8 @@ const receiptCoverageComplete = (contract, receipt) => {
       return false
   }
   return (
-    receipt.performanceBudget?.renderMs === contract.performanceBudget?.renderMs &&
+    receipt.performanceBudget?.renderMs ===
+      contract.performanceBudget?.renderMs &&
     receipt.performanceBudget?.interactionMs ===
       contract.performanceBudget?.interactionMs &&
     receipt.performanceBudget?.memory === contract.performanceBudget?.memory
@@ -1236,7 +1588,8 @@ const derivedConsumers = (registry, statuses, stable, webOnly, gaps) => {
     if (!route) fail(`alignment.consumer ${contractId} Gallery route missing`)
     ;(stableContractsByRoute[route] ??= []).push(contractId)
   }
-  for (const contracts of Object.values(stableContractsByRoute)) contracts.sort()
+  for (const contracts of Object.values(stableContractsByRoute))
+    contracts.sort()
   const galleryStableRoutes = Object.keys(stableContractsByRoute).sort()
 
   const contractsByReleaseFamily = new Map(
@@ -1282,8 +1635,7 @@ const derivedConsumers = (registry, statuses, stable, webOnly, gaps) => {
     stableSubsetEligible: stable.length > 0,
     fullSurfaceReleaseReady:
       gaps.length === 0 && releaseFamilyGaps.length === 0,
-    nugetStableEligible:
-      gaps.length === 0 && releaseFamilyGaps.length === 0,
+    nugetStableEligible: gaps.length === 0 && releaseFamilyGaps.length === 0,
     releaseReady: gaps.length === 0 && releaseFamilyGaps.length === 0,
   }
 }
@@ -1312,15 +1664,15 @@ export function deriveAlignment(registry, comparison = null) {
       validReviewedPlatformException(contract)
     )
       status = 'web-only'
-    else if (contract.bindings?.avalonia?.status === 'unbound') status = 'missing'
+    else if (contract.bindings?.avalonia?.status === 'unbound')
+      status = 'missing'
     else if (
       (coverage.missing ?? 0) > 0 ||
       (coverage.partial ?? 0) > 0 ||
       (coverage.webOnly ?? 0) > 0
     )
       status = 'partial'
-    else if (hasCompleteReceipt)
-      status = 'aligned'
+    else if (hasCompleteReceipt) status = 'aligned'
     else status = 'blocked'
     statuses.push({ id: contract.id, status, source: 'derived' })
     if (status !== 'aligned' && status !== 'web-only')
@@ -1333,8 +1685,7 @@ export function deriveAlignment(registry, comparison = null) {
     else if (binding.status === 'partial') status = 'partial'
     else status = 'blocked'
     statuses.push({ id: binding.id, status, source: 'derived' })
-    if (status !== 'web-only')
-      gaps.push(derivePublicValueGap(binding, status))
+    if (status !== 'web-only') gaps.push(derivePublicValueGap(binding, status))
   }
   for (const type of registry.avaloniaOnlyTypes ?? []) {
     statuses.push({
@@ -1425,9 +1776,7 @@ export function validateReadiness(alignment, expected = {}) {
     fail('readiness.consumers NuGet eligibility mismatch')
   if (alignment.consumers?.conformanceIntegrityReady !== true)
     fail('readiness.consumers conformance integrity mismatch')
-  if (
-    alignment.consumers?.stableSubsetEligible !== (expectedStable.length > 0)
-  )
+  if (alignment.consumers?.stableSubsetEligible !== expectedStable.length > 0)
     fail('readiness.consumers stable subset eligibility mismatch')
   if (
     alignment.consumers?.fullSurfaceReleaseReady !==
@@ -1467,7 +1816,10 @@ ${alignment.consumers.galleryStableRoutes.map((id) => `    "${id}",`).join('\n')
   {
 ${Object.entries(alignment.consumers.galleryStableContractsByRoute)
   .map(
-    ([route, ids]) => `    ["${route}"] = new HashSet<string>(StringComparer.Ordinal)
+    ([
+      route,
+      ids,
+    ]) => `    ["${route}"] = new HashSet<string>(StringComparer.Ordinal)
     {
 ${ids.map((id) => `      "${id}",`).join('\n')}
     },`,

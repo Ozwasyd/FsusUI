@@ -31,21 +31,24 @@ const atspiHelper = resolve(
 const defaultOut = resolve(repositoryRoot, '.tmp/native-screen-reader-evidence')
 const contractRegistry = JSON.parse(
   readFileSync(
-    resolve(
-      repositoryRoot,
-      'spec/components/contracts/v2/contract-v2.json',
-    ),
+    resolve(repositoryRoot, 'spec/components/contracts/v2/contract-v2.json'),
     'utf8',
   ),
 )
 const checkTagPerformanceBudget = contractRegistry.contracts.find(
   (contract) => contract.id === 'component-v2.el-check-tag',
 )?.performanceBudget
+const markdownPerformanceBudget = contractRegistry.contracts.find(
+  (contract) => contract.id === 'component-v2.el-markdown-editor',
+)?.performanceBudget
 if (
   !Number.isFinite(checkTagPerformanceBudget?.renderMs) ||
-  !Number.isFinite(checkTagPerformanceBudget?.interactionMs)
+  !Number.isFinite(checkTagPerformanceBudget?.interactionMs) ||
+  !Number.isFinite(markdownPerformanceBudget?.renderMs) ||
+  !Number.isFinite(markdownPerformanceBudget?.interactionMs) ||
+  typeof markdownPerformanceBudget?.memory !== 'string'
 )
-  throw new Error('CheckTag Contract V2 performance budget missing')
+  throw new Error('Contract V2 component performance budget missing')
 
 const sleep = (ms) => new Promise((resolveWait) => setTimeout(resolveWait, ms))
 const sha256File = (relativePath) =>
@@ -70,10 +73,38 @@ const runnerHash = crypto
       resolve(repositoryRoot, 'scripts/conformance-v2-evidence.mjs'),
     ),
   )
+  .update(
+    readFileSync(
+      resolve(
+        repositoryRoot,
+        'vue/packages/demo-app/src/InteractionTraceFixture.vue',
+      ),
+    ),
+  )
+  .update(
+    readFileSync(
+      resolve(
+        repositoryRoot,
+        'dotnet/FsusUI.Avalonia.Demo/ConformanceV2Runner.cs',
+      ),
+    ),
+  )
   .digest('hex')
 
 const cdpValue = (property) => property?.value?.value ?? property?.value ?? null
 const cdpBoolean = (property) => [true, 'true'].includes(cdpValue(property))
+const scenarioArtifacts = (scenario) => {
+  if (scenario.includes('.input.')) return ['interaction', 'state']
+  if (scenario.includes('.output.')) return ['event']
+  if (scenario.includes('.operation.')) return ['interaction', 'state']
+  if (scenario.includes('.state.')) return ['state']
+  if (scenario.endsWith('.keyboard')) return ['interaction', 'event']
+  if (scenario.endsWith('.pointer')) return ['interaction', 'event']
+  if (scenario.endsWith('.focus')) return ['focus', 'visual']
+  if (scenario.endsWith('.a11y')) return ['accessibility']
+  if (scenario.endsWith('.motion')) return ['motion']
+  throw new Error(`Markdown scenario artifact policy missing: ${scenario}`)
+}
 const normalizeCdpNode = (node, tabOrder) => {
   const properties = Object.fromEntries(
     (node.properties || []).map((property) => [property.name, property]),
@@ -258,6 +289,364 @@ const main = async () => {
     const undoFocus = await page.evaluate(
       () => document.activeElement?.tagName.toLowerCase() || null,
     )
+    const topLevelElapsedMilliseconds = performance.now() - interactionStart
+    const markdownContractSteps = []
+    const recordMarkdownStep = (
+      action,
+      target,
+      actual,
+      passed,
+      elapsedMilliseconds,
+      focusTarget = null,
+    ) => {
+      markdownContractSteps.push({
+        action,
+        elapsedMilliseconds,
+        focusTarget,
+        observation: { actual, passed },
+        target,
+      })
+    }
+    const markdownTextarea = editor.locator('textarea').first()
+    const markdownRichSource =
+      '\uFEFF# 标题\r\n\r\nalpha 😀 e\u0301 שלום\r\n\r\n![alt](image.png)\r\n'
+    const markdownDocumentA = { id: 'markdown-contract-document-a', epoch: 1 }
+    const markdownDocumentB = { id: 'markdown-contract-document-b', epoch: 2 }
+    let stepStartedAt = performance.now()
+    const markdownMounted = await page.evaluate(
+      ({ document, documentIdentity }) =>
+        window.__fsusMarkdownContract.set({
+          document,
+          documentIdentity,
+          locale: 'zh-CN',
+          mode: 'source',
+          profile: 'markdown',
+          readonly: false,
+        }),
+      { document: markdownRichSource, documentIdentity: markdownDocumentA },
+    )
+    recordMarkdownStep(
+      'render',
+      'ElMarkdownEditor.public-inputs',
+      markdownMounted,
+      markdownMounted.rendered.mounted === true &&
+        markdownMounted.document === markdownRichSource &&
+        markdownMounted.documentIdentity.id === markdownDocumentA.id &&
+        markdownMounted.documentIdentity.epoch === markdownDocumentA.epoch &&
+        markdownMounted.mode === 'source' &&
+        markdownMounted.profile === 'markdown' &&
+        markdownMounted.input.lang === 'zh-CN' &&
+        markdownMounted.input.readOnly === false,
+      performance.now() - stepStartedAt,
+    )
+
+    stepStartedAt = performance.now()
+    await markdownTextarea.click({ position: { x: 8, y: 8 } })
+    const markdownAfterPointer = await page.evaluate(() =>
+      window.__fsusMarkdownContract.read(),
+    )
+    recordMarkdownStep(
+      'pointer',
+      'ElMarkdownEditor.textarea',
+      markdownAfterPointer.input,
+      markdownAfterPointer.input.focused === true,
+      performance.now() - stepStartedAt,
+      'textarea',
+    )
+
+    stepStartedAt = performance.now()
+    await markdownTextarea.focus()
+    const markdownAfterFocus = await page.evaluate(() =>
+      window.__fsusMarkdownContract.read(),
+    )
+    recordMarkdownStep(
+      'focus',
+      'ElMarkdownEditor.textarea',
+      markdownAfterFocus.input,
+      markdownAfterFocus.input.focused === true,
+      performance.now() - stepStartedAt,
+      'textarea',
+    )
+
+    stepStartedAt = performance.now()
+    await markdownTextarea.press('End')
+    await markdownTextarea.press('Shift+ArrowLeft')
+    const markdownAfterKeyboard = await page.evaluate(() =>
+      window.__fsusMarkdownContract.read(),
+    )
+    recordMarkdownStep(
+      'keyboard',
+      'ElMarkdownEditor.textarea.selection',
+      markdownAfterKeyboard.input.selection,
+      markdownAfterKeyboard.input.focused === true &&
+        markdownAfterKeyboard.input.selection?.end -
+          markdownAfterKeyboard.input.selection?.start ===
+          1,
+      performance.now() - stepStartedAt,
+      'textarea',
+    )
+
+    stepStartedAt = performance.now()
+    const markdownDispatch = await page.evaluate(
+      ({ documentIdentity, sourceLength }) =>
+        window.__fsusMarkdownContract.dispatch({
+          changes: [
+            { from: 0, insert: '>', to: 0 },
+            { from: sourceLength, insert: ' exposed', to: sourceLength },
+          ],
+          documentIdentity,
+          history: 'separate',
+          metadata: { fixture: 'contract-v2-multiple-changes' },
+          origin: 'programmatic',
+          selection: {
+            direction: 'none',
+            end: sourceLength + 9,
+            start: sourceLength + 9,
+          },
+        }),
+      {
+        documentIdentity: markdownDocumentA,
+        sourceLength: markdownRichSource.length,
+      },
+    )
+    recordMarkdownStep(
+      'operation',
+      'ElMarkdownEditor.dispatchTransaction',
+      markdownDispatch.result,
+      markdownDispatch.result?.accepted === true &&
+        markdownDispatch.result.positionMap?.range?.deleted === false &&
+        markdownDispatch.result.documentIdentity.id === markdownDocumentA.id,
+      performance.now() - stepStartedAt,
+      'textarea',
+    )
+    const markdownEventState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    )
+    for (const [name, target] of [
+      ['markdown.transaction', 'ElMarkdownEditor.transaction'],
+      ['markdown.selection-change', 'ElMarkdownEditor.selection-change'],
+      ['markdown.history-change', 'ElMarkdownEditor.history-change'],
+    ]) {
+      const eventIndex = markdownEventState.eventNames.lastIndexOf(name)
+      recordMarkdownStep(
+        'event',
+        target,
+        { eventIndex, name },
+        eventIndex >= 0,
+        performance.now() - stepStartedAt,
+        'textarea',
+      )
+    }
+
+    stepStartedAt = performance.now()
+    const markdownUndo = await page.evaluate(() =>
+      window.__fsusMarkdownContract.undo(),
+    )
+    recordMarkdownStep(
+      'operation',
+      'ElMarkdownEditor.undo',
+      markdownUndo.result,
+      markdownUndo.result?.accepted === true &&
+        markdownUndo.result.value === markdownRichSource,
+      performance.now() - stepStartedAt,
+      'textarea',
+    )
+    stepStartedAt = performance.now()
+    const markdownRedo = await page.evaluate(() =>
+      window.__fsusMarkdownContract.redo(),
+    )
+    recordMarkdownStep(
+      'operation',
+      'ElMarkdownEditor.redo',
+      markdownRedo.result,
+      markdownRedo.result?.accepted === true &&
+        markdownRedo.result.value === `>${markdownRichSource} exposed`,
+      performance.now() - stepStartedAt,
+      'textarea',
+    )
+
+    stepStartedAt = performance.now()
+    const markdownIdentitySwitch = await page.evaluate(
+      ({ document, documentIdentity }) =>
+        window.__fsusMarkdownContract.set({ document, documentIdentity }),
+      { document: markdownRichSource, documentIdentity: markdownDocumentB },
+    )
+    recordMarkdownStep(
+      'render',
+      'ElMarkdownEditor.document-identity-switch',
+      markdownIdentitySwitch,
+      markdownIdentitySwitch.document === markdownRichSource &&
+        markdownIdentitySwitch.documentIdentity.id === markdownDocumentB.id &&
+        markdownIdentitySwitch.documentIdentity.epoch ===
+          markdownDocumentB.epoch &&
+        markdownIdentitySwitch.history.undoDepth === 0 &&
+        markdownIdentitySwitch.history.redoDepth === 0,
+      performance.now() - stepStartedAt,
+    )
+
+    const markdownModes = []
+    stepStartedAt = performance.now()
+    for (const mode of ['source', 'live', 'split', 'preview']) {
+      const mounted = await page.evaluate(
+        (nextMode) => window.__fsusMarkdownContract.set({ mode: nextMode }),
+        mode,
+      )
+      markdownModes.push({
+        classPresent: mounted.rendered.classNames.includes(
+          `el-markdown-editor--${mode}`,
+        ),
+        mode: mounted.mode,
+      })
+    }
+    recordMarkdownStep(
+      'render',
+      'ElMarkdownEditor.modes',
+      markdownModes,
+      markdownModes.every((entry) => entry.classPresent === true && entry.mode),
+      performance.now() - stepStartedAt,
+    )
+
+    stepStartedAt = performance.now()
+    const markdownNonDefaultInputs = await page.evaluate(() =>
+      window.__fsusMarkdownContract.set({
+        locale: 'ja-JP',
+        profile: 'prose',
+        readonly: true,
+      }),
+    )
+    recordMarkdownStep(
+      'render',
+      'ElMarkdownEditor.non-default-inputs',
+      markdownNonDefaultInputs,
+      markdownNonDefaultInputs.profile === 'prose' &&
+        markdownNonDefaultInputs.input.lang === 'ja-JP' &&
+        markdownNonDefaultInputs.input.readOnly === true &&
+        markdownNonDefaultInputs.rendered.classNames.includes(
+          'el-markdown-editor--profile-prose',
+        ),
+      performance.now() - stepStartedAt,
+    )
+    await page.evaluate(() =>
+      window.__fsusMarkdownContract.set({
+        locale: 'zh-CN',
+        profile: 'markdown',
+        readonly: false,
+      }),
+    )
+
+    stepStartedAt = performance.now()
+    const markdownProjection = await page.evaluate(() =>
+      window.__fsusMarkdownContract.projection(),
+    )
+    recordMarkdownStep(
+      'projection',
+      'ElMarkdownEditor.public-runtime-projection',
+      markdownProjection,
+      markdownProjection.documentIdentity.id === markdownDocumentB.id &&
+        markdownProjection.coordinates.rawSource === markdownRichSource &&
+        markdownProjection.coordinates.crlf?.roundTrip ===
+          markdownProjection.coordinates.crlf?.raw &&
+        markdownProjection.coordinates.emoji?.boundary?.start >= 0 &&
+        markdownProjection.nodes.length > 0,
+      performance.now() - stepStartedAt,
+    )
+
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    stepStartedAt = performance.now()
+    const markdownMotion = await editor.evaluate((element) => {
+      const durations = [element, ...element.querySelectorAll('*')].flatMap(
+        (node) =>
+          getComputedStyle(node)
+            .transitionDuration.split(',')
+            .map((value) => Number.parseFloat(value) * 1000)
+            .filter(Number.isFinite),
+      )
+      return {
+        activeAnimations: element
+          .getAnimations({ subtree: true })
+          .filter((animation) => animation.playState === 'running').length,
+        maxTransitionMilliseconds: Math.max(0, ...durations),
+        mode: matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'reduced'
+          : 'full',
+      }
+    })
+    recordMarkdownStep(
+      'motion',
+      'ElMarkdownEditor.reduced-motion',
+      markdownMotion,
+      markdownMotion.mode === 'reduced' &&
+        markdownMotion.activeAnimations === 0,
+      performance.now() - stepStartedAt,
+      'textarea',
+    )
+
+    const largeMarkdownSource = Array.from(
+      { length: 3000 },
+      (_, index) => `## Block ${index}\n\n${'content '.repeat(5)}\n\n`,
+    ).join('')
+    const markdownLargePerformance = await page.evaluate(
+      async ({ source, documentIdentity }) => {
+        const startedAt = performance.now()
+        const state = await window.__fsusMarkdownContract.set({
+          document: source,
+          documentIdentity,
+          mode: 'source',
+        })
+        const elapsedMilliseconds = performance.now() - startedAt
+        const root = document.querySelector(
+          '[data-testid="trace-markdown-editor"] .el-markdown-editor',
+        )
+        return {
+          descendantCount: root?.querySelectorAll('*').length ?? 0,
+          elapsedMilliseconds,
+          sourceLength: state.document.length,
+        }
+      },
+      {
+        source: largeMarkdownSource,
+        documentIdentity: { id: 'markdown-contract-performance', epoch: 1 },
+      },
+    )
+    const markdownPerformanceObservation = {
+      ...markdownLargePerformance,
+      blockCount: 3000,
+      budget: markdownPerformanceBudget,
+      passed:
+        markdownLargePerformance.sourceLength >= 100_000 &&
+        markdownLargePerformance.elapsedMilliseconds <=
+          markdownPerformanceBudget.renderMs,
+    }
+
+    await page.evaluate(
+      ({ document, documentIdentity }) =>
+        window.__fsusMarkdownContract.set({
+          document,
+          documentIdentity,
+          mode: 'source',
+          readonly: false,
+        }),
+      {
+        document: 'Trace start',
+        documentIdentity: {
+          id: 'markdown-editor-interaction-trace',
+          epoch: 348,
+        },
+      },
+    )
+    await markdownTextarea.focus()
+    const markdownFinalState = await page.evaluate(() =>
+      window.__fsusMarkdownContract.read(),
+    )
+    const markdownScreenshotPath = join(
+      options.out,
+      'markdown-editor-browser.png',
+    )
+    writeFileSync(
+      markdownScreenshotPath,
+      await captureDeterministicLocatorPng(editor),
+    )
     const checkTag = page.getByTestId('trace-check-tag')
     await checkTag.evaluate((element) => {
       window.__fsusDetachedCheckTag = new WeakRef(element)
@@ -350,9 +739,7 @@ const main = async () => {
         'null',
     ).checkTag
     const checkTagInteractionTiming = await checkTag.evaluate((element) => ({
-      keyboardMilliseconds: Number(
-        element.dataset.keyboardElapsedMilliseconds,
-      ),
+      keyboardMilliseconds: Number(element.dataset.keyboardElapsedMilliseconds),
       pointerMilliseconds: Number(element.dataset.pointerElapsedMilliseconds),
     }))
     const checkTagMemoryObservation = await checkTag.evaluate(
@@ -376,8 +763,7 @@ const main = async () => {
       transitionDurationMilliseconds:
         Number.parseFloat(getComputedStyle(element).transitionDuration) * 1000,
       active:
-        Number.parseFloat(getComputedStyle(element).transitionDuration) *
-          1000 >
+        Number.parseFloat(getComputedStyle(element).transitionDuration) * 1000 >
         1,
       focusIndicatorVisible:
         getComputedStyle(element).boxShadow !== 'none' &&
@@ -491,8 +877,8 @@ const main = async () => {
     )
 
     const textboxHit = (atspiJson.markdownEditableCount ?? 0) > 0
-    const checkTagAtspiHit = (atspiJson.checkboxes || []).some(
-      (node) => /^check tag$/i.test(node.name || ''),
+    const checkTagAtspiHit = (atspiJson.checkboxes || []).some((node) =>
+      /^check tag$/i.test(node.name || ''),
     )
     const noDocumentLive = !domProbe.live.some(
       (entry) => entry.tag === 'BODY' || entry.tag === 'SECTION',
@@ -535,6 +921,12 @@ const main = async () => {
       motion: 'full',
       runnerHash,
     }
+    const markdownIdentity = {
+      ...identity,
+      executionId: `conformance-v2-markdown-${candidateSha}`,
+      checkpoint: 'markdown-contract-matrix',
+      motion: 'reduced',
+    }
     const checkTagIdentity = {
       executionId: `conformance-v2-check-tag-${candidateSha}`,
       checkpoint: 'check-tag-after-pointer-keyboard',
@@ -572,10 +964,62 @@ const main = async () => {
         ['textbox', 'button', 'checkbox'].includes(cdpValue(node.role)),
       )
       .map((node, index) => normalizeCdpNode(node, index + 1))
-    const checkTagAccessibilityNode = normalizedAccessibilityNodes.find(
-      (node) => node.role === 'checkbox' && /^check tag$/i.test(node.name || ''),
+    const markdownAccessibilityNode = normalizedAccessibilityNodes.find(
+      (node) =>
+        node.role === 'textbox' &&
+        /^markdown editor source$/i.test(node.name || ''),
     )
-    const elapsedMilliseconds = performance.now() - interactionStart
+    recordMarkdownStep(
+      'accessibility',
+      'ElMarkdownEditor.chromium-cdp-and-atspi',
+      markdownAccessibilityNode,
+      markdownAccessibilityNode?.role === 'textbox' &&
+        /^markdown editor source$/i.test(
+          markdownAccessibilityNode.name || '',
+        ) &&
+        textboxHit &&
+        noDocumentLive,
+      checkTagAccessibilityMilliseconds,
+      'textarea',
+    )
+    const markdownBoundSteps = markdownContractSteps.map((step, index) => ({
+      ...step,
+      binding: markdownIdentity,
+      index,
+    }))
+    const markdownCoverageScenarios = [
+      'scenario.v2.el-markdown-editor.operation.dispatch-transaction',
+      'scenario.v2.el-markdown-editor.operation.redo',
+      'scenario.v2.el-markdown-editor.operation.undo',
+      'scenario.v2.el-markdown-editor.state.source',
+      'scenario.v2.el-markdown-editor.state.live',
+      'scenario.v2.el-markdown-editor.focus',
+      'scenario.v2.el-markdown-editor.motion',
+    ]
+    const markdownScenarioExecutions = Object.fromEntries(
+      [
+        ['scenario.v2.el-markdown-editor.operation.dispatch-transaction', [4]],
+        ['scenario.v2.el-markdown-editor.operation.redo', [9]],
+        ['scenario.v2.el-markdown-editor.operation.undo', [8]],
+        ['scenario.v2.el-markdown-editor.state.source', [11]],
+        ['scenario.v2.el-markdown-editor.state.live', [11]],
+        ['scenario.v2.el-markdown-editor.focus', [2]],
+        ['scenario.v2.el-markdown-editor.motion', [14]],
+      ].map(([scenario, stepIndexes]) => {
+        return [
+          scenario,
+          {
+            artifacts: scenarioArtifacts(scenario),
+            real: true,
+            stepIndexes,
+          },
+        ]
+      }),
+    )
+    const checkTagAccessibilityNode = normalizedAccessibilityNodes.find(
+      (node) =>
+        node.role === 'checkbox' && /^check tag$/i.test(node.name || ''),
+    )
     const focusTarget = await page.evaluate(() => {
       const active = document.activeElement
       return active?.tagName === 'BUTTON'
@@ -643,9 +1087,9 @@ const main = async () => {
       focusTarget,
       performance: {
         identity,
-        elapsedMilliseconds,
+        elapsedMilliseconds: topLevelElapsedMilliseconds,
         budgetMilliseconds: 2000,
-        passed: elapsedMilliseconds < 2000,
+        passed: topLevelElapsedMilliseconds < 2000,
       },
       visual: {
         identity,
@@ -666,6 +1110,70 @@ const main = async () => {
       },
       domProbe,
       contractExecutions: {
+        'component-v2.el-markdown-editor': {
+          identity: markdownIdentity,
+          steps: markdownBoundSteps,
+          events: (markdownEventState.events || []).filter((event) =>
+            event.name.startsWith('markdown.'),
+          ),
+          state: {
+            final: markdownFinalState,
+            identitySwitch: markdownIdentitySwitch,
+            modes: markdownModes,
+            motion: markdownMotion,
+            projection: markdownProjection,
+          },
+          accessibility: {
+            source: 'chromium-cdp-accessibility-and-atspi',
+            sameExecution: true,
+            atspiReachable: textboxHit,
+            documentLiveRegion: !noDocumentLive,
+            node: markdownAccessibilityNode,
+          },
+          coverage: {
+            requiredMembers: [
+              'operation.dispatchTransaction',
+              'operation.redo',
+              'operation.undo',
+            ],
+            memberScenarios: {
+              'operation.dispatchTransaction': [
+                'scenario.v2.el-markdown-editor.operation.dispatch-transaction',
+              ],
+              'operation.redo': [
+                'scenario.v2.el-markdown-editor.operation.redo',
+              ],
+              'operation.undo': [
+                'scenario.v2.el-markdown-editor.operation.undo',
+              ],
+            },
+            requiredScenarios: markdownCoverageScenarios,
+            executions: markdownScenarioExecutions,
+          },
+          diagnostics: {
+            accessibility: {
+              requiredSemanticsPassed:
+                markdownAccessibilityNode?.role === 'textbox' && textboxHit,
+              status: 'web-observed-native-counterpart-missing',
+            },
+            largeDocumentPerformance: markdownPerformanceObservation,
+            nativeIme: {
+              physicalIme: false,
+              reason:
+                'Native OS IME evidence is owned by the dedicated #341 dependency path.',
+              status: 'missing',
+            },
+          },
+          visual: {
+            identity: markdownIdentity,
+            artifact: 'markdown-editor-browser.png',
+            sha256: sha256File(
+              relative(repositoryRoot, markdownScreenshotPath),
+            ),
+            artifactBytes: statSync(markdownScreenshotPath).size,
+            renderedTopLevel: true,
+          },
+        },
         'component-v2.el-check-tag': {
           identity: checkTagIdentity,
           steps: [
@@ -758,8 +1266,7 @@ const main = async () => {
               observation: {
                 actual: {
                   focus: checkTagFocus,
-                  focusIndicatorVisible:
-                    checkTagMotion.focusIndicatorVisible,
+                  focusIndicatorVisible: checkTagMotion.focusIndicatorVisible,
                 },
                 passed:
                   checkTagFocus === 'checkbox' &&
@@ -949,7 +1456,9 @@ const main = async () => {
           visual: {
             identity: checkTagIdentity,
             artifact: 'check-tag-browser.png',
-            sha256: sha256File(relative(repositoryRoot, checkTagScreenshotPath)),
+            sha256: sha256File(
+              relative(repositoryRoot, checkTagScreenshotPath),
+            ),
             artifactBytes: statSync(checkTagScreenshotPath).size,
             renderedTopLevel: true,
             observation: {

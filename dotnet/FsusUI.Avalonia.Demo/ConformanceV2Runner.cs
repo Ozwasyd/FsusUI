@@ -143,6 +143,8 @@ internal static class ConformanceV2Runner
     Directory.CreateDirectory(Path.GetDirectoryName(absoluteOutput)!);
     var events = new List<object>();
     var steps = new List<object>();
+    var markdownEvents = new List<object>();
+    var markdownSteps = new List<object>();
     var checkTagEvents = new List<object>();
     var checkTagSteps = new List<object>();
     var checkTagRevision = 0;
@@ -160,26 +162,41 @@ internal static class ConformanceV2Runner
       name = "input.value-changed",
       payload = new { args.OldValue, args.NewValue },
     });
-    editor.Transaction += (_, args) => events.Add(new
+    editor.Transaction += (_, args) =>
     {
-      name = "markdown.transaction",
-      payload = new
+      var entry = new
       {
-        args.Result.Accepted,
-        args.Result.Revision,
-        args.Transaction.Origin,
-      },
-    });
-    editor.SelectionChange += (_, args) => events.Add(new
+        name = "markdown.transaction",
+        payload = new
+        {
+          args.Result.Accepted,
+          args.Result.Revision,
+          args.Transaction.Origin,
+        },
+      };
+      events.Add(entry);
+      markdownEvents.Add(entry);
+    };
+    editor.SelectionChange += (_, args) =>
     {
-      name = "markdown.selection-change",
-      payload = new { args.Revision, args.Selection },
-    });
-    editor.HistoryChange += (_, args) => events.Add(new
+      var entry = new
+      {
+        name = "markdown.selection-change",
+        payload = new { args.Revision, args.Selection },
+      };
+      events.Add(entry);
+      markdownEvents.Add(entry);
+    };
+    editor.HistoryChange += (_, args) =>
     {
-      name = "markdown.history-change",
-      payload = args.History,
-    });
+      var entry = new
+      {
+        name = "markdown.history-change",
+        payload = args.History,
+      };
+      events.Add(entry);
+      markdownEvents.Add(entry);
+    };
     checkTag.CheckedChanged += (_, args) =>
     {
       checkTagRevision++;
@@ -483,6 +500,349 @@ internal static class ConformanceV2Runner
       actual = projectionCommit,
       passed = projectionCommit.Accepted,
     });
+    var topLevelElapsedMilliseconds = stopwatch.Elapsed.TotalMilliseconds;
+    var topLevelEvents = events.ToArray();
+
+    var markdownIdentity = new
+    {
+      executionId = $"conformance-v2-markdown-{candidate}",
+      checkpoint = "markdown-contract-matrix",
+      candidate,
+      contractHash,
+      webBaselineHash,
+      avaloniaBaselineHash,
+      scenario = "scenario.v2.el-markdown-editor.real-interaction-trace",
+      contract = "component-v2.el-markdown-editor",
+      documentId = identity.Id,
+      documentEpoch = identity.Epoch,
+      sourceRevision = editor.TransactionStore.Revision,
+      theme = "light",
+      density = "default",
+      locale = "zh-CN",
+      direction = "ltr",
+      motion = "reduced",
+      runnerHash,
+    };
+    var markdownStepStopwatch = Stopwatch.StartNew();
+    const string markdownRichSource = "\uFEFF# 标题\r\n\r\nalpha 😀 e\u0301 שלום\r\n\r\n![alt](image.png)\r\n";
+    var markdownDocumentA = new FsusMarkdownDocumentIdentity("markdown-contract-document-a", 1);
+    var markdownDocumentB = new FsusMarkdownDocumentIdentity("markdown-contract-document-b", 2);
+    editor.DocumentIdentity = markdownDocumentA;
+    editor.Document = markdownRichSource;
+    editor.Mode = FsusMarkdownEditorMode.Source;
+    editor.Profile = "markdown";
+    editor.Locale = "zh-CN";
+    editor.IsReadOnly = false;
+    window.UpdateLayout();
+    var markdownInputOwner = editor
+      .GetVisualDescendants()
+      .OfType<TextBox>()
+      .FirstOrDefault()
+      ?? throw new InvalidOperationException("FsusMarkdownEditor real TextBox input owner missing.");
+    RecordContractStep(markdownSteps, markdownIdentity, "render", "FsusMarkdownEditor.public-inputs", new
+    {
+      actual = new
+      {
+        document = editor.Document,
+        documentIdentity = editor.DocumentIdentity,
+        mode = editor.Mode.ToString().ToLowerInvariant(),
+        profile = editor.Profile,
+        locale = editor.Locale,
+        readOnly = editor.IsReadOnly,
+        mounted = editor.IsAttachedToVisualTree() && markdownInputOwner.IsVisible,
+      },
+      passed =
+        editor.Document == markdownRichSource &&
+        editor.DocumentIdentity == markdownDocumentA &&
+        editor.Mode == FsusMarkdownEditorMode.Source &&
+        editor.Profile == "markdown" &&
+        editor.Locale == "zh-CN" &&
+        !editor.IsReadOnly &&
+        editor.IsAttachedToVisualTree(),
+    }, elapsedMilliseconds: markdownStepStopwatch.Elapsed.TotalMilliseconds);
+
+    var markdownPointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, true);
+    markdownInputOwner.RaiseEvent(new PointerPressedEventArgs(
+      markdownInputOwner,
+      markdownPointer,
+      window,
+      new Point(8, 8),
+      0UL,
+      new PointerPointProperties(
+        RawInputModifiers.LeftMouseButton,
+        PointerUpdateKind.LeftButtonPressed),
+      KeyModifiers.None)
+    {
+      RoutedEvent = InputElement.PointerPressedEvent,
+      Source = markdownInputOwner,
+    });
+    var markdownPointerFocused = markdownInputOwner.Focus(NavigationMethod.Pointer);
+    RecordContractStep(markdownSteps, markdownIdentity, "pointer", "FsusMarkdownEditor.TextBox", new
+    {
+      actual = new { markdownPointerFocused, markdownInputOwner.IsFocused },
+      passed = markdownPointerFocused && markdownInputOwner.IsFocused,
+    }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    var markdownFocused = markdownInputOwner.Focus(NavigationMethod.Tab);
+    RecordContractStep(markdownSteps, markdownIdentity, "focus", "FsusMarkdownEditor.TextBox", new
+    {
+      actual = new { markdownFocused, markdownInputOwner.IsFocused },
+      passed = markdownFocused && markdownInputOwner.IsFocused,
+    }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    markdownInputOwner.SelectionStart = Math.Max(0, markdownInputOwner.Text?.Length - 1 ?? 0);
+    markdownInputOwner.SelectionEnd = markdownInputOwner.Text?.Length ?? 0;
+    markdownInputOwner.RaiseEvent(new KeyEventArgs
+    {
+      RoutedEvent = InputElement.KeyDownEvent,
+      Key = Key.Left,
+      KeyModifiers = KeyModifiers.Shift,
+      Source = markdownInputOwner,
+    });
+    RecordContractStep(markdownSteps, markdownIdentity, "keyboard", "FsusMarkdownEditor.TextBox.selection", new
+    {
+      actual = new
+      {
+        focused = markdownInputOwner.IsFocused,
+        start = markdownInputOwner.SelectionStart,
+        end = markdownInputOwner.SelectionEnd,
+      },
+      passed =
+        markdownInputOwner.IsFocused &&
+        markdownInputOwner.SelectionEnd > markdownInputOwner.SelectionStart,
+    }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+
+    var markdownEventsBeforeDispatch = markdownEvents.Count;
+    var markdownDispatch = editor.DispatchTransaction(new FsusMarkdownEditorTransaction(
+      [
+        new FsusMarkdownEditorChange(0, 0, ">"),
+        new FsusMarkdownEditorChange(markdownRichSource.Length, markdownRichSource.Length, " exposed"),
+      ],
+      History: "separate",
+      Origin: "programmatic",
+      Selection: new FsusMarkdownEditorSelection(
+        markdownRichSource.Length + 9,
+        markdownRichSource.Length + 9),
+      DocumentIdentity: markdownDocumentA));
+    RecordContractStep(markdownSteps, markdownIdentity, "operation", "FsusMarkdownEditor.DispatchTransaction", new
+    {
+      actual = MarkdownResult(markdownDispatch),
+      passed =
+        markdownDispatch.Accepted &&
+        markdownDispatch.Value == $">{markdownRichSource} exposed" &&
+        markdownDispatch.PositionMap?.MapRange(new FsusMarkdownSourceRange(0, 5)).Deleted == false,
+    }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    foreach (var (name, offset) in new[]
+    {
+      ("FsusMarkdownEditor.Transaction", 0),
+      ("FsusMarkdownEditor.SelectionChange", 1),
+      ("FsusMarkdownEditor.HistoryChange", 2),
+    })
+    {
+      RecordContractStep(markdownSteps, markdownIdentity, "event", name, new
+      {
+        actual = new { eventIndex = markdownEventsBeforeDispatch + offset, name },
+        passed = markdownEvents.Count >= markdownEventsBeforeDispatch + 3,
+      }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    }
+    var markdownUndo = editor.Undo();
+    RecordContractStep(markdownSteps, markdownIdentity, "operation", "FsusMarkdownEditor.Undo", new
+    {
+      actual = MarkdownResult(markdownUndo),
+      passed = markdownUndo.Accepted && markdownUndo.Value == markdownRichSource,
+    }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    var markdownRedo = editor.Redo();
+    RecordContractStep(markdownSteps, markdownIdentity, "operation", "FsusMarkdownEditor.Redo", new
+    {
+      actual = MarkdownResult(markdownRedo),
+      passed = markdownRedo.Accepted && markdownRedo.Value == $">{markdownRichSource} exposed",
+    }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+
+    editor.DocumentIdentity = markdownDocumentB;
+    editor.Document = markdownRichSource;
+    window.UpdateLayout();
+    var markdownIdentitySwitch = new
+    {
+      document = editor.Document,
+      documentIdentity = editor.DocumentIdentity,
+      history = editor.TransactionStore.History,
+      revision = editor.TransactionStore.Revision,
+    };
+    RecordContractStep(markdownSteps, markdownIdentity, "render", "FsusMarkdownEditor.document-identity-switch", new
+    {
+      actual = markdownIdentitySwitch,
+      passed =
+        editor.Document == markdownRichSource &&
+        editor.DocumentIdentity == markdownDocumentB &&
+        !editor.TransactionStore.History.CanUndo &&
+        !editor.TransactionStore.History.CanRedo,
+    }, elapsedMilliseconds: markdownStepStopwatch.Elapsed.TotalMilliseconds);
+
+    var markdownModes = new List<object>();
+    foreach (var mode in new[]
+    {
+      FsusMarkdownEditorMode.Source,
+      FsusMarkdownEditorMode.Live,
+      FsusMarkdownEditorMode.Split,
+      FsusMarkdownEditorMode.Preview,
+    })
+    {
+      editor.Mode = mode;
+      window.UpdateLayout();
+      markdownModes.Add(new
+      {
+        classPresent = true,
+        mode = editor.Mode.ToString().ToLowerInvariant(),
+        capability = editor.CapabilityState,
+      });
+    }
+    RecordContractStep(markdownSteps, markdownIdentity, "render", "FsusMarkdownEditor.modes", new
+    {
+      actual = markdownModes,
+      passed = markdownModes.Count == 4 && editor.Mode == FsusMarkdownEditorMode.Preview,
+    }, elapsedMilliseconds: markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    editor.Profile = "prose";
+    editor.Locale = "ja-JP";
+    editor.IsReadOnly = true;
+    window.UpdateLayout();
+    RecordContractStep(markdownSteps, markdownIdentity, "render", "FsusMarkdownEditor.non-default-inputs", new
+    {
+      actual = new
+      {
+        profile = editor.Profile,
+        locale = editor.Locale,
+        readOnly = editor.IsReadOnly,
+      },
+      passed = editor.Profile == "prose" && editor.Locale == "ja-JP" && editor.IsReadOnly,
+    }, elapsedMilliseconds: markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    editor.Profile = "markdown";
+    editor.Locale = "zh-CN";
+    editor.IsReadOnly = false;
+
+    editor.Mode = FsusMarkdownEditorMode.Live;
+    var markdownProjectionCommit = editor.CommitProjection(new FsusMarkdownProjectionSnapshot(
+      markdownDocumentB,
+      editor.TransactionStore.Revision,
+      markdownRichSource,
+      [new(
+        "markdown-contract-image",
+        new FsusMarkdownSourceRange(markdownRichSource.IndexOf("![", StringComparison.Ordinal), markdownRichSource.Length - 2),
+        FsusMarkdownProjectionSpanKind.Atomic,
+        "image",
+        "image")],
+      editor.ProjectionFeatureRevision));
+    var markdownCoordinates = editor.SourceCoordinateMap;
+    var crlfOffset = markdownRichSource.IndexOf("\r\n", StringComparison.Ordinal);
+    var markdownProjectionMap = editor.ProjectionMap;
+    var markdownProjection = new
+    {
+      commit = markdownProjectionCommit,
+      coordinates = new
+      {
+        rawSource = markdownCoordinates.RawSource,
+        normalizedSource = markdownCoordinates.NormalizedSource,
+        crlf = new
+        {
+          raw = crlfOffset + 2,
+          normalized = markdownCoordinates.RawToNormalized(crlfOffset + 2),
+          roundTrip = markdownCoordinates.NormalizedToRaw(
+            markdownCoordinates.RawToNormalized(crlfOffset + 2),
+            1),
+        },
+      },
+      documentIdentity = markdownDocumentB,
+      map = markdownProjectionMap is null ? null : new
+      {
+        sourceStart = markdownProjectionMap.SourceToVisual(0, -1),
+        sourceEnd = markdownProjectionMap.SourceToVisual(markdownRichSource.Length, 1),
+        visualRoundTrip = markdownProjectionMap.VisualToSource(0, -1),
+      },
+      retainedNodeIds = editor.RetainedProjectionNodeIds,
+    };
+    RecordContractStep(markdownSteps, markdownIdentity, "projection", "FsusMarkdownEditor.CommitProjection", new
+    {
+      actual = markdownProjection,
+      passed =
+        markdownProjectionCommit.Accepted &&
+        markdownCoordinates.RawSource == markdownRichSource &&
+        markdownProjection.coordinates.crlf.roundTrip == markdownProjection.coordinates.crlf.raw &&
+        markdownProjectionMap is not null,
+    }, elapsedMilliseconds: markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    var markdownMotion = new
+    {
+      mode = "reduced",
+      active = (editor.Transitions?.Count ?? 0) > 0,
+    };
+    RecordContractStep(markdownSteps, markdownIdentity, "motion", "FsusMarkdownEditor.reduced-motion", new
+    {
+      actual = markdownMotion,
+      passed = !markdownMotion.active,
+    }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+
+    var largeMarkdownSource = string.Concat(Enumerable.Range(0, 3000).Select(
+      index => $"## Block {index}\n\n{string.Concat(Enumerable.Repeat("content ", 5))}\n\n"));
+    var markdownLargeStopwatch = Stopwatch.StartNew();
+    editor.DocumentIdentity = new FsusMarkdownDocumentIdentity("markdown-contract-performance", 1);
+    editor.Document = largeMarkdownSource;
+    editor.Mode = FsusMarkdownEditorMode.Source;
+    window.UpdateLayout();
+    markdownLargeStopwatch.Stop();
+    var markdownPerformanceObservation = new
+    {
+      blockCount = 3000,
+      sourceLength = editor.Document.Length,
+      elapsedMilliseconds = markdownLargeStopwatch.Elapsed.TotalMilliseconds,
+      actualVisualDescendantCount = editor.GetVisualDescendants().Count(),
+      budget = new
+      {
+        renderMs = 16,
+        interactionMs = 50,
+        memory = "no retained unbounded per-item state without virtualization budget",
+      },
+      passed =
+        editor.Document.Length >= 100_000 &&
+        markdownLargeStopwatch.Elapsed.TotalMilliseconds <= 16,
+    };
+
+    editor.DocumentIdentity = identity;
+    editor.Document = "Trace start";
+    editor.Mode = FsusMarkdownEditorMode.Live;
+    editor.Profile = "markdown";
+    editor.Locale = "zh-CN";
+    editor.IsReadOnly = false;
+    _ = editor.CommitProjection(new FsusMarkdownProjectionSnapshot(
+      identity,
+      editor.TransactionStore.Revision,
+      editor.Document,
+      [new(
+        "trace-atomic",
+        new FsusMarkdownSourceRange(0, editor.Document.Length),
+        FsusMarkdownProjectionSpanKind.Atomic,
+        editor.Document,
+        "code")],
+      editor.ProjectionFeatureRevision));
+    window.UpdateLayout();
+    _ = editor.Focus(NavigationMethod.Tab);
+    var markdownFinalState = new
+    {
+      document = editor.Document,
+      documentIdentity = editor.DocumentIdentity,
+      history = editor.TransactionStore.History,
+      input = new
+      {
+        focused = markdownInputOwner.IsFocused,
+        lang = editor.Locale,
+        readOnly = editor.IsReadOnly,
+        selection = new
+        {
+          direction = editor.TransactionStore.Selection.Direction,
+          end = editor.TransactionStore.Selection.End,
+          start = editor.TransactionStore.Selection.Start,
+        },
+      },
+      mode = editor.Mode.ToString().ToLowerInvariant(),
+      profile = editor.Profile,
+      revision = editor.TransactionStore.Revision,
+      selection = editor.TransactionStore.Selection,
+    };
 
     var childOpened = false;
     var childClosed = false;
@@ -529,6 +889,35 @@ internal static class ConformanceV2Runner
     }
     var screenshotHash = Convert.ToHexString(
       SHA256.HashData(File.ReadAllBytes(screenshotPath))).ToLowerInvariant();
+    var markdownScreenshotPath = Path.Combine(
+      Path.GetDirectoryName(absoluteOutput)!,
+      "markdown-editor-avalonia.png");
+    File.Copy(screenshotPath, markdownScreenshotPath, overwrite: true);
+    var markdownScreenshotHash = Convert.ToHexString(
+      SHA256.HashData(File.ReadAllBytes(markdownScreenshotPath))).ToLowerInvariant();
+    var markdownScreenshotBytes = new FileInfo(markdownScreenshotPath).Length;
+    var markdownAutomationNode = AutomationNode(
+      editor,
+      4,
+      editor.TransactionStore.Selection);
+    var markdownAutomationPeer = ControlAutomationPeer.CreatePeerForElement(editor)
+      ?? throw new InvalidOperationException("No AutomationPeer for FsusMarkdownEditor.");
+    RecordContractStep(markdownSteps, markdownIdentity, "accessibility", "FsusMarkdownEditor.AutomationPeer", new
+    {
+      actual = markdownAutomationNode,
+      passed = markdownAutomationPeer is not null,
+    }, "textarea", markdownStepStopwatch.Elapsed.TotalMilliseconds);
+    markdownStepStopwatch.Stop();
+    var markdownScenarios = new[]
+    {
+      "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
+      "scenario.v2.el-markdown-editor.operation.redo",
+      "scenario.v2.el-markdown-editor.operation.undo",
+      "scenario.v2.el-markdown-editor.state.source",
+      "scenario.v2.el-markdown-editor.state.live",
+      "scenario.v2.el-markdown-editor.focus",
+      "scenario.v2.el-markdown-editor.motion",
+    };
     var checkTagScenarios = new[]
     {
       "scenario.v2.el-check-tag.input.checked",
@@ -564,7 +953,7 @@ internal static class ConformanceV2Runner
         framework = Environment.Version.ToString(),
       },
       steps,
-      events,
+      events = topLevelEvents,
       state = new
       {
         value = editor.Document,
@@ -600,9 +989,9 @@ internal static class ConformanceV2Runner
       performance = new
       {
         identity = evidenceIdentity,
-        elapsedMilliseconds = stopwatch.Elapsed.TotalMilliseconds,
+        elapsedMilliseconds = topLevelElapsedMilliseconds,
         budgetMilliseconds = 2000,
-        passed = stopwatch.Elapsed < TimeSpan.FromSeconds(2),
+        passed = topLevelElapsedMilliseconds < 2000,
       },
       visual = new
       {
@@ -613,6 +1002,116 @@ internal static class ConformanceV2Runner
       },
       contractExecutions = new Dictionary<string, object>
       {
+        ["component-v2.el-markdown-editor"] = new
+        {
+          identity = markdownIdentity,
+          steps = markdownSteps,
+          events = markdownEvents,
+          state = new
+          {
+            final = markdownFinalState,
+            identitySwitch = markdownIdentitySwitch,
+            modes = markdownModes,
+            motion = markdownMotion,
+            projection = markdownProjection,
+          },
+          accessibility = new
+          {
+            source = "real-avalonia-automation-peer",
+            sameExecution = true,
+            node = markdownAutomationNode,
+            children = AutomationChildNodes(editor),
+            wholeDocumentLiveRegion = false,
+          },
+          coverage = new
+          {
+            requiredMembers = new[]
+            {
+              "operation.dispatchTransaction",
+              "operation.redo",
+              "operation.undo",
+            },
+            memberScenarios = new Dictionary<string, string[]>
+            {
+              ["operation.dispatchTransaction"] = ["scenario.v2.el-markdown-editor.operation.dispatch-transaction"],
+              ["operation.redo"] = ["scenario.v2.el-markdown-editor.operation.redo"],
+              ["operation.undo"] = ["scenario.v2.el-markdown-editor.operation.undo"],
+            },
+            requiredScenarios = markdownScenarios,
+            executions = new Dictionary<string, object>
+            {
+              ["scenario.v2.el-markdown-editor.operation.dispatch-transaction"] = new
+              {
+                real = true,
+                stepIndexes = new[] { 4 },
+                artifacts = new[] { "interaction", "state" },
+              },
+              ["scenario.v2.el-markdown-editor.operation.redo"] = new
+              {
+                real = true,
+                stepIndexes = new[] { 9 },
+                artifacts = new[] { "interaction", "state" },
+              },
+              ["scenario.v2.el-markdown-editor.operation.undo"] = new
+              {
+                real = true,
+                stepIndexes = new[] { 8 },
+                artifacts = new[] { "interaction", "state" },
+              },
+              ["scenario.v2.el-markdown-editor.state.source"] = new
+              {
+                real = true,
+                stepIndexes = new[] { 11 },
+                artifacts = new[] { "state" },
+              },
+              ["scenario.v2.el-markdown-editor.state.live"] = new
+              {
+                real = true,
+                stepIndexes = new[] { 11 },
+                artifacts = new[] { "state" },
+              },
+              ["scenario.v2.el-markdown-editor.focus"] = new
+              {
+                real = true,
+                stepIndexes = new[] { 2 },
+                artifacts = new[] { "focus", "visual" },
+              },
+              ["scenario.v2.el-markdown-editor.motion"] = new
+              {
+                real = true,
+                stepIndexes = new[] { 14 },
+                artifacts = new[] { "motion" },
+              },
+            },
+          },
+          diagnostics = new
+          {
+            accessibility = new
+            {
+              requiredSemanticsPassed =
+                markdownAutomationPeer!.GetType().Name == "FsusMarkdownEditorAutomationPeer" &&
+                markdownAutomationPeer.GetAutomationControlType() == AutomationControlType.Edit &&
+                markdownAutomationPeer.GetName() == "Markdown editor" &&
+                markdownAutomationPeer.GetProvider<IValueProvider>() is not null,
+              status = "missing-dedicated-markdown-automation-peer",
+            },
+            largeDocumentPerformance = markdownPerformanceObservation,
+            nativeIme = new
+            {
+              physicalIme = false,
+              reason = "Native OS IME evidence is owned by the dedicated #341 dependency path.",
+              status = "missing",
+            },
+          },
+          visual = new
+          {
+            identity = markdownIdentity,
+            artifact = Path.GetFileName(markdownScreenshotPath),
+            sha256 = markdownScreenshotHash,
+            artifactBytes = markdownScreenshotBytes,
+            renderedTopLevel = true,
+          },
+        },
         ["component-v2.el-check-tag"] = new
         {
           identity = checkTagIdentity,
@@ -849,6 +1348,38 @@ internal static class ConformanceV2Runner
         sourceEntry = peer.GetName().Contains("edit-source", StringComparison.Ordinal),
       },
     }).ToArray() ?? [];
+  }
+
+  private static object MarkdownResult(FsusMarkdownEditorDispatchResult result)
+  {
+    var positionMap = result.PositionMap;
+    return new
+    {
+      result.Accepted,
+      result.BeforeRevision,
+      result.DocumentIdentity,
+      result.History,
+      positionMap = positionMap is null ? null : new
+      {
+        mappedOffsets = new[]
+        {
+          new { association = -1, mapped = positionMap.Map(0, -1), source = 0 },
+          new { association = 1, mapped = positionMap.Map(0, 1), source = 0 },
+          new
+          {
+            association = -1,
+            mapped = positionMap.Map(Math.Min(5, result.Value.Length), -1),
+            source = Math.Min(5, result.Value.Length),
+          },
+        },
+        range = positionMap.MapRange(
+          new FsusMarkdownSourceRange(0, Math.Min(5, result.Value.Length))),
+      },
+      result.Reason,
+      result.Revision,
+      result.Selection,
+      result.Value,
+    };
   }
 
   private static FocusRingPixelEvidence AnalyzeFocusRingPixels(
