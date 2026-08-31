@@ -43,6 +43,55 @@ export const alignmentHash = (alignment) =>
     gaps: alignment.gaps,
   })
 
+export const deriveReleaseScopeFamilies = (registry) => {
+  const byContract = registry?.consumerBindings?.byContract
+  if (
+    !byContract ||
+    typeof byContract !== 'object' ||
+    Array.isArray(byContract)
+  ) {
+    throw new Error('Contract V2 consumer binding authority is missing')
+  }
+  const contractIds = new Set((registry.contracts ?? []).map(({ id }) => id))
+  const bindingIds = Object.keys(byContract)
+  if (
+    bindingIds.length !== contractIds.size ||
+    bindingIds.some((id) => !contractIds.has(id))
+  ) {
+    throw new Error('Contract V2 consumer binding authority is incomplete')
+  }
+  const families = bindingIds.map((id) => {
+    const family = byContract[id]?.releaseFamily
+    if (typeof family !== 'string' || family.length === 0) {
+      throw new Error(
+        `Contract V2 consumer binding ${id} releaseFamily missing`,
+      )
+    }
+    return family
+  })
+  return [...new Set(families)].sort()
+}
+
+export const readContractRegistry = (
+  relativePath = 'spec/components/contracts/v2/contract-v2.json',
+) => {
+  const registryPath = path.isAbsolute(relativePath)
+    ? relativePath
+    : path.join(root, relativePath)
+  const registry = JSON.parse(fs.readFileSync(registryPath, 'utf8'))
+  if (registry.schemaVersion !== 2) {
+    throw new Error('Contract V2 registry schema invalid')
+  }
+  const releaseScopeFamilies = deriveReleaseScopeFamilies(registry)
+  if (
+    JSON.stringify(registry.consumerBindings?.releaseScopeFamilies) !==
+    JSON.stringify(releaseScopeFamilies)
+  ) {
+    throw new Error('Contract V2 generated release scope projection is stale')
+  }
+  return { registry, releaseScopeFamilies }
+}
+
 export const readAlignment = (relativePath, expected) => {
   const alignmentPath = path.isAbsolute(relativePath)
     ? relativePath
@@ -74,4 +123,51 @@ export const readAlignment = (relativePath, expected) => {
     throw new Error('Contract V2 alignment artifact integrity hash is invalid')
   }
   return alignment
+}
+
+export const readStableConsumerAuthority = ({
+  registryPath = 'spec/components/contracts/v2/contract-v2.json',
+  alignmentPath = '.tmp/conformance-v2/alignment.json',
+  expected = currentIdentity(),
+} = {}) => {
+  const { registry, releaseScopeFamilies } = readContractRegistry(registryPath)
+  const alignment = readAlignment(alignmentPath, expected)
+  if (
+    JSON.stringify(alignment.consumers?.releaseScopeFamilies) !==
+    JSON.stringify(releaseScopeFamilies)
+  ) {
+    throw new Error(
+      'Contract V2 alignment release scope does not match consumer binding authority',
+    )
+  }
+  return { alignment, registry, releaseScopeFamilies }
+}
+
+export const evaluateStableRelease = (
+  alignment,
+  { diagnostic = false } = {},
+) => {
+  const missingReleaseFamilies = alignment.consumers?.releaseFamilyGaps ?? []
+  const alignmentGapCount = alignment.consumers?.alignmentGapCount
+  if (alignmentGapCount !== alignment.gaps.length) {
+    throw new Error(
+      'Avalonia stable readiness alignment gap diagnostic is inconsistent',
+    )
+  }
+  const releaseReady =
+    alignmentGapCount === 0 && missingReleaseFamilies.length === 0
+  if (
+    alignment.consumers?.nugetStableEligible !== releaseReady ||
+    alignment.consumers?.releaseReady !== releaseReady
+  ) {
+    throw new Error(
+      'Avalonia stable readiness consumers do not match derived alignment',
+    )
+  }
+  if (!releaseReady && !diagnostic) {
+    throw new Error(
+      `Avalonia stable readiness blocked by ${alignmentGapCount} alignment gaps and ${missingReleaseFamilies.length} missing release families`,
+    )
+  }
+  return { alignmentGapCount, missingReleaseFamilies, releaseReady }
 }

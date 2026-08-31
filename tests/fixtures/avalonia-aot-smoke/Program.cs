@@ -508,7 +508,6 @@ internal static class Program
       ["public-shell"] = new("public-shell", shell, () => AutomationProperties.GetName(shell) == "AOT public shell"),
       ["product-primitives"] = new("product-primitives", settingsHeader, () => AutomationProperties.GetName(settingsHeader) == "AOT settings"),
       ["perception-challenge"] = new("perception-challenge", challenge, () => AutomationProperties.GetName(challenge) == "AOT challenge"),
-      ["locale-formatting"] = new("locale-formatting", localeText, () => locale.CurrentLocale.Name == "zh-cn" && localeText.Text?.Contains("确定", StringComparison.Ordinal) == true),
     };
     var missing = options.ExpectedScenarios.Where(id => !stable.ContainsKey(id)).ToArray();
     if (missing.Length > 0)

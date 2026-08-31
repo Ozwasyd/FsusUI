@@ -73,6 +73,11 @@ mutate(
   'stale FsusUI global package cache',
 )
 mutate(
+  'scripts/test-avalonia-aot-smoke.mjs',
+  (text) => text.replace('const stableScenarios = stableFamilies()', "const stableScenarios = JSON.parse(readFileSync(path.join(root, 'spec/ci/avalonia-stable-readiness.json'), 'utf8')).releaseScopeFamilies"),
+  'manual stable scenario authority',
+)
+mutate(
   'tests/fixtures/avalonia-aot-smoke/NuGet.Config',
   (text) =>
     text.replace(
@@ -93,5 +98,5 @@ mutate(
 )
 
 console.log(
-  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, stale FsusUI global package cache, external network, runtime dependency, invariant globalization.',
+  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, stale FsusUI global package cache, manual stable scenario authority, external network, runtime dependency, invariant globalization.',
 )

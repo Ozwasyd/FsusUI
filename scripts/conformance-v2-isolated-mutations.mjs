@@ -203,6 +203,11 @@ const cases = [
       "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
       "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'button' },",
     ],
+    [
+      'consumer-binding-release-family-mutated',
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection-mutation', galleryRoute: 'selection' },",
+    ],
   ].map(([id, from, to]) => ({
     id,
     file: 'scripts/contract-v2.mjs',
@@ -213,6 +218,29 @@ const cases = [
         ? 'consumer bindings must bind every exact contract id once'
         : 'contract-v2.json drifted from generated output',
   })),
+  {
+    id: 'stable-readiness-second-scope-authority-mutated',
+    file: 'spec/ci/avalonia-stable-readiness.json',
+    inject: () =>
+      mutateJson('spec/ci/avalonia-stable-readiness.json', (value) => {
+        value.releaseScopeFamilies = ['selection']
+      }),
+    command: ['pnpm', ['run', 'check:avalonia-stable-readiness']],
+    expected:
+      'Avalonia stable readiness spec must not define a second release scope authority',
+  },
+  {
+    id: 'aot-manual-stable-authority-mutated',
+    file: 'scripts/test-avalonia-aot-smoke.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/test-avalonia-aot-smoke.mjs',
+        'const stableScenarios = stableFamilies()',
+        "const stableScenarios = JSON.parse(readFileSync(path.join(root, 'spec/ci/avalonia-stable-readiness.json'), 'utf8')).releaseScopeFamilies",
+      ),
+    command: ['pnpm', ['run', 'check:avalonia-aot-smoke']],
+    expected: 'the AOT runner must derive scenarios from the identity-bound alignment',
+  },
   {
     id: 'consumer-binding-unknown-contract-mutated',
     file: 'spec/components/contracts/v2/contract-v2.json',

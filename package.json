@@ -178,6 +178,7 @@
     "check:dotnet-matrix": "node ./scripts/with-node-heap.mjs node ./scripts/check-dotnet-matrix-policy.mjs",
     "check:avalonia-motion-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-motion-contract.mjs",
     "check:avalonia-stable-readiness": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-stable-readiness.mjs",
+    "check:avalonia-stable-readiness:diagnostic": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-stable-readiness.mjs --diagnostic",
     "check:avalonia-docs": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-docs.mjs",
     "check:render-performance-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-render-performance-contract.mjs",
     "avalonia:performance:generate": "node ./scripts/with-node-heap.mjs node ./scripts/avalonia-performance-budget.mjs generate",

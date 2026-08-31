@@ -18,7 +18,10 @@ import {
 import {
   alignmentHash as stableReadinessAlignmentHash,
   currentIdentity as stableReadinessCurrentIdentity,
+  deriveReleaseScopeFamilies,
+  evaluateStableRelease,
   readAlignment as stableReadinessReadAlignment,
+  readStableConsumerAuthority,
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -34,6 +37,74 @@ test('stable readiness hashes the exact Contract V2 bytes', () => {
     .digest('hex')
 
   assert.equal(stableReadinessCurrentIdentity().contractHash, expected)
+})
+
+test('stable consumers derive scope from exact contract bindings and fail closed on stale projections', () => {
+  const registry = {
+    schemaVersion: 2,
+    contracts: [{ id: 'component-v2.a' }, { id: 'component-v2.b' }],
+    consumerBindings: {
+      byContract: {
+        'component-v2.a': { releaseFamily: 'alpha', galleryRoute: 'alpha' },
+        'component-v2.b': { releaseFamily: 'beta', galleryRoute: 'beta' },
+      },
+      releaseScopeFamilies: ['alpha', 'beta'],
+    },
+  }
+  assert.deepEqual(deriveReleaseScopeFamilies(registry), ['alpha', 'beta'])
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'fsusui-authority-'))
+  const registryPath = path.join(temporary, 'registry.json')
+  const alignmentPath = path.join(temporary, 'alignment.json')
+  const expected = { candidate: 'a'.repeat(40), contractHash: 'b'.repeat(64) }
+  const alignment = {
+    schema: 'fsusui.alignment.v2',
+    identity: expected,
+    statuses: [],
+    stable: [],
+    gaps: [],
+    consumers: { releaseScopeFamilies: ['alpha', 'beta'] },
+  }
+  alignment.identity.alignmentHash = stableReadinessAlignmentHash(alignment)
+  fs.writeFileSync(registryPath, `${JSON.stringify(registry, null, 2)}\n`)
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(alignment, null, 2)}\n`)
+  assert.deepEqual(
+    readStableConsumerAuthority({ registryPath, alignmentPath, expected })
+      .releaseScopeFamilies,
+    ['alpha', 'beta'],
+  )
+  const staleAlignment = structuredClone(alignment)
+  staleAlignment.consumers.releaseScopeFamilies = ['alpha']
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(staleAlignment, null, 2)}\n`)
+  assert.throws(
+    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    /does not match consumer binding authority/u,
+  )
+  const staleRegistry = structuredClone(registry)
+  staleRegistry.consumerBindings.releaseScopeFamilies = ['alpha']
+  fs.writeFileSync(registryPath, `${JSON.stringify(staleRegistry, null, 2)}\n`)
+  assert.throws(
+    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    /generated release scope projection is stale/u,
+  )
+  fs.rmSync(temporary, { recursive: true, force: true })
+})
+
+test('stable release gate is hard by default and diagnostic only when explicit', () => {
+  const blocked = {
+    gaps: [{ id: 'component-v2.a' }],
+    consumers: {
+      alignmentGapCount: 1,
+      releaseFamilyGaps: ['alpha'],
+      nugetStableEligible: false,
+      releaseReady: false,
+    },
+  }
+  assert.throws(() => evaluateStableRelease(blocked), /readiness blocked/u)
+  assert.deepEqual(evaluateStableRelease(blocked, { diagnostic: true }), {
+    alignmentGapCount: 1,
+    missingReleaseFamilies: ['alpha'],
+    releaseReady: false,
+  })
 })
 
 test('evidence rejects headless and fixture-only paths', () => {

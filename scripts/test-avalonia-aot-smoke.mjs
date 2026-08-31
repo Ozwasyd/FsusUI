@@ -18,6 +18,7 @@ import {
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { spawn, spawnSync } from 'node:child_process'
+import { stableFamilies } from './avalonia-aot-native.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const fixture = path.join(root, 'tests/fixtures/avalonia-aot-smoke')
@@ -67,12 +68,7 @@ const packageVersion = readFileSync(
   path.join(root, 'dotnet/Directory.Build.props'),
   'utf8',
 ).match(/<Version>([^<]+)<\/Version>/u)?.[1]
-const stableScenarios = JSON.parse(
-  readFileSync(
-    path.join(root, 'spec/ci/avalonia-stable-readiness.json'),
-    'utf8',
-  ),
-).releaseScopeFamilies
+const stableScenarios = stableFamilies()
 
 assert.equal(dotnetInfo.status, 0, dotnetInfo.stderr)
 assert.ok(rid, 'dotnet --info did not report the current host RID')

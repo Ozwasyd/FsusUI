@@ -4,16 +4,17 @@ import { URL } from 'node:url'
 import {
   affectedDecision,
   aggregateLeaves,
-  stableFamilies,
   validateLeaf,
   validateReport,
   validateScenarioBindings,
   validateWorkflowContracts,
 } from '../scripts/avalonia-aot-native.mjs'
+import { readContractRegistry } from '../scripts/avalonia-stable-readiness-lib.mjs'
 import fs from 'node:fs'
 
 const commitSha = 'a'.repeat(40)
 const candidateSha256 = 'b'.repeat(64)
+const stableFamilies = () => readContractRegistry().releaseScopeFamilies
 const leaf = (overrides = {}) => ({
   schemaVersion: 'fsusui.avalonia-aot-leaf-manifest.v1',
   status: 'success',
@@ -39,11 +40,15 @@ test('stable registry owns the native scenario set', () => {
     new URL('../tests/fixtures/avalonia-aot-smoke/Program.cs', import.meta.url),
     'utf8',
   )
-  assert.deepEqual(validateScenarioBindings(source), stableFamilies())
+  assert.deepEqual(
+    validateScenarioBindings(source, stableFamilies()),
+    stableFamilies(),
+  )
   assert.throws(
     () =>
       validateScenarioBindings(
         source.replace('["tree"] =', '["tree-missing"] ='),
+        stableFamilies(),
       ),
     /binding mismatch/u,
   )
@@ -91,7 +96,11 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     ExitCode: 0,
   }
   assert.equal(
-    validateReport(report, { commitSha, candidateSha256, rid: 'linux-x64' }),
+    validateReport(
+      report,
+      { commitSha, candidateSha256, rid: 'linux-x64' },
+      stableFamilies(),
+    ),
     true,
   )
   assert.throws(
@@ -99,29 +108,49 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
       validateReport(
         { ...report, CandidateSha256: 'e'.repeat(64) },
         { candidateSha256 },
+        stableFamilies(),
       ),
     /candidate mismatch/u,
   )
   assert.throws(
-    () => validateReport({ ...report, Scenarios: report.Scenarios.slice(1) }),
+    () =>
+      validateReport(
+        { ...report, Scenarios: report.Scenarios.slice(1) },
+        undefined,
+        stableFamilies(),
+      ),
     /coverage/u,
   )
   assert.throws(
     () =>
-      validateReport({
-        ...report,
-        Scenarios: report.Scenarios.map((item, index) =>
-          index ? item : { ...item, Passed: false },
-        ),
-      }),
+      validateReport(
+        {
+          ...report,
+          Scenarios: report.Scenarios.map((item, index) =>
+            index ? item : { ...item, Passed: false },
+          ),
+        },
+        undefined,
+        stableFamilies(),
+      ),
     /failed/u,
   )
   assert.throws(
-    () => validateReport({ ...report, NativeLogErrorCount: 1 }),
+    () =>
+      validateReport(
+        { ...report, NativeLogErrorCount: 1 },
+        undefined,
+        stableFamilies(),
+      ),
     /native log/u,
   )
   assert.throws(
-    () => validateReport({ ...report, PartialCapabilities: [] }),
+    () =>
+      validateReport(
+        { ...report, PartialCapabilities: [] },
+        undefined,
+        stableFamilies(),
+      ),
     /MarkdownEditor as partial/u,
   )
 })

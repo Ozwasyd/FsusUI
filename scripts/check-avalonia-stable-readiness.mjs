@@ -3,7 +3,8 @@ import path from 'node:path'
 import process from 'node:process'
 import {
   currentIdentity,
-  readAlignment,
+  evaluateStableRelease,
+  readStableConsumerAuthority,
   root,
 } from './avalonia-stable-readiness-lib.mjs'
 
@@ -29,7 +30,7 @@ const validateStableEvidenceSections = (content, spec, label) => {
   }
 }
 
-const validateStableChecklistCoverage = (content, spec, label) => {
+const validateStableChecklistCoverage = (content, spec, releaseScopeFamilies, label) => {
   const normalized = content.toLowerCase()
   for (const issueNumber of spec.requiredStableIssueNumbers) {
     const issueToken = `#${issueNumber}`
@@ -43,7 +44,7 @@ const validateStableChecklistCoverage = (content, spec, label) => {
     }
   }
 
-  for (const family of spec.releaseScopeFamilies) {
+  for (const family of releaseScopeFamilies) {
     assertIncludes(normalized, `\`${family}\``, label)
     const familyLine = content
       .split('\n')
@@ -58,7 +59,7 @@ const validateStableChecklistCoverage = (content, spec, label) => {
   }
 }
 
-const validateStableEvidenceBundle = (spec) => {
+const validateStableEvidenceBundle = (spec, releaseScopeFamilies) => {
   const evidenceRoot = 'docs/releases/evidence/avalonia-stable'
   for (const file of spec.requiredStableEvidenceFiles) {
     const relativePath = `${evidenceRoot}/${file}`
@@ -74,6 +75,7 @@ const validateStableEvidenceBundle = (spec) => {
   validateStableChecklistCoverage(
     read(`${evidenceRoot}/stable-readiness-checklist.md`),
     spec,
+    releaseScopeFamilies,
     'avalonia stable checklist',
   )
 }
@@ -129,7 +131,7 @@ const validateWorkflowArtifacts = (reusableWorkflow, spec, label) => {
   }
 }
 
-const runFixtureChecks = (spec) => {
+const runFixtureChecks = (spec, releaseScopeFamilies) => {
   const invalidRelease = read(
     'tests/fixtures/avalonia-stable-readiness/invalid-release-notes.md',
   )
@@ -188,6 +190,7 @@ const runFixtureChecks = (spec) => {
     validateStableChecklistCoverage(
       invalidChecklist,
       spec,
+      releaseScopeFamilies,
       'invalid stable checklist',
     )
   } catch (error) {
@@ -202,37 +205,21 @@ const runFixtureChecks = (spec) => {
 
 try {
   const spec = readJson('spec/ci/avalonia-stable-readiness.json')
-  const alignment = readAlignment(
-    '.tmp/conformance-v2/alignment.json',
-    currentIdentity(),
-  )
-  const releaseScopeFamilies = alignment.consumers?.releaseScopeFamilies ?? []
-  if (
-    JSON.stringify(releaseScopeFamilies) !==
-    JSON.stringify([...spec.releaseScopeFamilies].sort())
-  ) {
+  if (Object.hasOwn(spec, 'releaseScopeFamilies')) {
     throw new Error(
-      'Avalonia stable readiness release scope does not match Contract V2 consumer authority',
+      'Avalonia stable readiness spec must not define a second release scope authority',
     )
   }
-  const missingReleaseFamilies = alignment.consumers?.releaseFamilyGaps ?? []
-  const alignmentGapCount = alignment.consumers?.alignmentGapCount
-  if (alignmentGapCount !== alignment.gaps.length) {
-    throw new Error(
-      'Avalonia stable readiness alignment gap diagnostic is inconsistent',
-    )
-  }
-  const derivedReleaseReady =
-    alignmentGapCount === 0 && missingReleaseFamilies.length === 0
-  if (
-    alignment.consumers?.nugetStableEligible !== derivedReleaseReady ||
-    alignment.consumers?.releaseReady !== derivedReleaseReady
-  ) {
-    throw new Error(
-      'Avalonia stable readiness consumers do not match derived alignment',
-    )
-  }
-  runFixtureChecks(spec)
+  const { alignment, releaseScopeFamilies } = readStableConsumerAuthority({
+    expected: currentIdentity(),
+  })
+  const diagnostic = process.argv.includes('--diagnostic')
+  const {
+    alignmentGapCount,
+    missingReleaseFamilies,
+    releaseReady: derivedReleaseReady,
+  } = evaluateStableRelease(alignment, { diagnostic })
+  runFixtureChecks(spec, releaseScopeFamilies)
 
   const packageJson = readJson('package.json')
   const scripts = packageJson.scripts ?? {}
@@ -261,11 +248,11 @@ try {
     spec,
     'avalonia stable release evidence',
   )
-  validateStableEvidenceBundle(spec)
+  validateStableEvidenceBundle(spec, releaseScopeFamilies)
   console.log(
     derivedReleaseReady
       ? 'Avalonia stable readiness check passed: release eligible.'
-      : `Avalonia stable readiness check passed: release blocked by ${alignmentGapCount} alignment gaps and ${missingReleaseFamilies.length} missing release families.`,
+      : `Avalonia stable readiness diagnostic: release blocked by ${alignmentGapCount} alignment gaps and ${missingReleaseFamilies.length} missing release families.`,
   )
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

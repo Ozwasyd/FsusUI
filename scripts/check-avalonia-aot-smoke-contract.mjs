@@ -64,6 +64,9 @@ requireMatch(
   /seedLocalFeed\(globalPackages,\s*\{\s*includeCandidatePackages:\s*false\s*\}\)/u,
   'the global cache must not seed stale FsusUI candidate packages',
 )
+requireMatch(runner, /import \{ stableFamilies \} from '\.\/avalonia-aot-native\.mjs'/u, 'the AOT runner must import the identity-bound stable family authority')
+requireMatch(runner, /const stableScenarios = stableFamilies\(\)/u, 'the AOT runner must derive scenarios from the identity-bound alignment')
+forbidMatch(runner, /avalonia-stable-readiness\.json/u, 'the AOT runner must not read a manual readiness membership list')
 requireMatch(
   runner,
   /candidatePackagePattern\s*=\s*\n?\s*\/\^fsusui\\\.avalonia/u,

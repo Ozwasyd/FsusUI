@@ -4,25 +4,32 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { readStableConsumerAuthority } from './avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const readJson = (file) =>
   JSON.parse(fs.readFileSync(path.resolve(root, file), 'utf8'))
 const nativeSpec = readJson('spec/ci/avalonia-aot-native.json')
-const stableSpec = readJson(nativeSpec.stableRegistry)
 const sha256 = (content) => createHash('sha256').update(content).digest('hex')
 const fullSha = /^[0-9a-f]{40}$/u
 const digest = /^[0-9a-f]{64}$/u
 
-export const stableFamilies = () => [...stableSpec.releaseScopeFamilies]
+export const stableFamilies = () => [
+  ...readStableConsumerAuthority({
+    registryPath: nativeSpec.contractRegistry,
+    alignmentPath: nativeSpec.alignmentArtifact,
+  }).releaseScopeFamilies,
+]
 
-export const validateScenarioBindings = (source) => {
+export const validateScenarioBindings = (
+  source,
+  required = stableFamilies(),
+) => {
   const bound = new Set(
     [...source.matchAll(/^\s*\["([a-z0-9-]+)"\]\s*=/gmu)].map(
       (match) => match[1],
     ),
   )
-  const required = stableFamilies()
   const missing = required.filter((family) => !bound.has(family))
   const unexpected = [...bound].filter((family) => !required.includes(family))
   if (missing.length || unexpected.length) {
@@ -47,7 +54,11 @@ export const validateScenarioBindings = (source) => {
   return required
 }
 
-export const validateReport = (report, expected) => {
+export const validateReport = (
+  report,
+  expected,
+  required = stableFamilies(),
+) => {
   for (const field of nativeSpec.requiredReportFields) {
     if (
       report[field] === undefined ||
@@ -72,7 +83,6 @@ export const validateReport = (report, expected) => {
   if (expected?.rid && report.Rid !== expected.rid)
     throw new Error('smoke report RID mismatch')
   const ids = report.Scenarios.map((item) => item.Id)
-  const required = stableFamilies()
   if (
     new Set(ids).size !== ids.length ||
     required.some((id) => !ids.includes(id))
