@@ -330,6 +330,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusImageLoader` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusImageLoadResult` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusImageStatus` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusImageViewerTransformChangedEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusInboxPane` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusInboxSplitPane` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusInputNumberValueChangedEventArgs` | `avalonia-extra` |
