@@ -210,7 +210,47 @@ export async function loadCurrentCheckTagVisualReview(web, avalonia) {
       digestFile(artifact.path),
       `check-tag.visual-review.${platform}.tracked-digest`,
     )
+    const matrix = acceptance.viewportStateMatrix?.find(
+      (entry) => entry.evidenceDigest === artifact.digest,
+    )
+    if (
+      !matrix ||
+      matrix.theme !== 'light' ||
+      matrix.state !== 'focused-unchecked-after-pointer-keyboard' ||
+      !matrix.inputModes?.includes('pointer') ||
+      !matrix.inputModes?.includes('keyboard') ||
+      !matrix.inputModes?.includes('reduced-motion')
+    )
+      fail(`check-tag.visual-review.${platform} state matrix mismatch`)
+    const independentArtifact = independent.inspectedRenderedArtifacts?.find(
+      (entry) => entry.platform === platform,
+    )
+    same(
+      artifact.digest,
+      independentArtifact?.digest,
+      `check-tag.visual-review.${platform}.independent-artifact`,
+    )
+    same(
+      false,
+      execution.visual.observation.checked,
+      `check-tag.visual-review.${platform}.checked`,
+    )
+    same(
+      true,
+      execution.visual.observation.focused,
+      `check-tag.visual-review.${platform}.focused`,
+    )
+    same(
+      'Check tag',
+      execution.visual.observation.content,
+      `check-tag.visual-review.${platform}.content`,
+    )
   }
+  if (
+    independent.governedCriteria?.length < 4 ||
+    independent.governedCriteria.some((entry) => entry.status !== 'accepted')
+  )
+    fail('check-tag.visual-review governed criteria incomplete')
   const review = {
     classificationReceiptDigest: classification.receiptDigest,
     acceptanceReceiptDigest: acceptance.receiptDigest,
