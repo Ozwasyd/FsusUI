@@ -1,4 +1,5 @@
 import path from 'path'
+import { existsSync } from 'node:fs'
 import {
   copyFile,
   mkdir,
@@ -142,6 +143,16 @@ const resolveBundledWorkspaceRuntimeSpecifier = (
 
 export const rewriteBuiltBundledWorkspaceDependencyReferences = async () => {
   const candidates = await collectPackageReferenceCandidates(epOutput)
+  const bundledWorkerRuntimePaths = {
+    dataPipeline: {
+      esm: 'es/components/_internal/data-pipeline.worker.mjs',
+      cjs: 'lib/components/_internal/data-pipeline.worker.js',
+    },
+    markdownRenderer: {
+      esm: 'es/components/markdown-renderer/src/markdown-renderer.worker.mjs',
+      cjs: 'lib/components/markdown-renderer/src/markdown-renderer.worker.js',
+    },
+  }
 
   await Promise.all(
     candidates.map(async (filePath) => {
@@ -169,6 +180,56 @@ export const rewriteBuiltBundledWorkspaceDependencyReferences = async () => {
 
       if (changed) {
         await writeFile(filePath, rewritten)
+      }
+
+      const isEsmBundle =
+        path.relative(epOutput, filePath).startsWith('dist') &&
+        filePath.endsWith('.mjs')
+      const isCjsBundle =
+        path.relative(epOutput, filePath).startsWith('dist') &&
+        (filePath.endsWith('.js') || filePath.endsWith('.cjs'))
+      if (isEsmBundle || isCjsBundle) {
+        const moduleKind = isEsmBundle ? 'esm' : 'cjs'
+        const markdownWorker =
+          bundledWorkerRuntimePaths.markdownRenderer[moduleKind]
+        const dataPipelineWorker =
+          bundledWorkerRuntimePaths.dataPipeline[moduleKind]
+        rewritten = rewritten
+          .replaceAll(
+            `"./markdown-renderer.worker.${isEsmBundle ? 'mjs' : 'js'}"`,
+            JSON.stringify(
+              path.relative(path.dirname(filePath), path.join(epOutput, markdownWorker)),
+            ),
+          )
+          .replaceAll(
+            `"./data-pipeline.worker.${isEsmBundle ? 'mjs' : 'js'}"`,
+            JSON.stringify(
+              path.relative(path.dirname(filePath), path.join(epOutput, dataPipelineWorker)),
+            ),
+          )
+      } else {
+        const workerPattern = /(['"])([^'"]*\.worker\.ts)\1/gu
+        rewritten = rewritten.replace(
+          workerPattern,
+          (_match, quote: string, specifier: string) => {
+            const extension = filePath.endsWith('.mjs') ? '.mjs' : '.js'
+            const runtimeSpecifier = specifier.replace(/\.ts$/u, extension)
+            const runtimePath = path.resolve(
+              path.dirname(filePath),
+              runtimeSpecifier,
+            )
+            if (!existsSync(runtimePath)) return `${quote}${specifier}${quote}`
+            return `${quote}${runtimeSpecifier}${quote}`
+          },
+        )
+      }
+      if (
+        isEsmBundle ||
+        isCjsBundle ||
+        /[.]worker[.]ts(?:['"]|$)/u.test(rewritten)
+      ) {
+        const previous = await readFile(filePath, 'utf8')
+        if (previous !== rewritten) await writeFile(filePath, rewritten)
       }
     }),
   )
