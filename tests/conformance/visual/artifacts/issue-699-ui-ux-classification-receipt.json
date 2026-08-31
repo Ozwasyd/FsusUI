@@ -22,13 +22,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "54a4a382952bd48bb4cbe3cf5f6cf0ff9e7639a2",
+    "revision": "b0e3fbcdcabfae3219f70bde1067f732576a5105",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "d245bd85637515fdd8d5ba5829d067dc08c56aef346e5046d8082c32ecc1713f",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "9d2aa4c372877b2873508c176c2f7aac3183c814",
-  "candidateDigest": "cd65d295135cdbbfc9a3c58870425bc93a1fe732abb91ab1e910024a30b9f4ca",
+  "candidateSha": "12ea96c31d642059d3e1cef8bff3340453fcbeb8",
+  "candidateDigest": "1c3a006dc1c62104d1cb5c345c0bf41faee10a4c194371d04807539d50c6ad9f",
   "stateEvidenceMatrix": [
     { "state": "default-loader-loaded-and-reset-transform", "viewport": "desktop", "theme": "both", "evidenceDigest": "7293401c9d2010e5fd06195feea0963ade4081898563fb67adbba627fa13796f" },
     { "state": "pointer-wheel-min-max-factor", "viewport": "desktop", "theme": "both", "evidenceDigest": "7293401c9d2010e5fd06195feea0963ade4081898563fb67adbba627fa13796f" },
@@ -56,5 +56,5 @@
   "classificationEvidenceDigest": "ccf26302f2bbec49dcdae124fa13e6823803800f6ae84c8e82b320dcd62b3de5",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "ecaa40a2b7d62098c3ee7f7006640830a1b2dce18b4b181870b2f3b071f6d37d"
+  "receiptDigest": "6d4067cd300f0e0383b1a124e53188222a15b29bc479a6b9d4e824f1303811eb"
 }
