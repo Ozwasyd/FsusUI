@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import crypto from 'node:crypto'
 import fs from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { spawnSync } from 'node:child_process'
@@ -12,7 +11,12 @@ const out = path.resolve(
   root,
   process.argv[2] ?? '.tmp/conformance-v2/isolated-mutations.json',
 )
-const checkout = fs.mkdtempSync(path.join(os.tmpdir(), 'fsusui-v2-mutations-'))
+const checkoutRoot = path.join(
+  root,
+  '.tmp/conformance-v2/isolated-worktrees',
+)
+fs.mkdirSync(checkoutRoot, { recursive: true })
+const checkout = fs.mkdtempSync(path.join(checkoutRoot, 'checkout-'))
 const sha256 = (value) =>
   crypto.createHash('sha256').update(value).digest('hex')
 const run = (command, args, cwd = checkout) =>
