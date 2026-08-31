@@ -113,26 +113,25 @@ internal static class Program
 
   private static string? FindContentProperty(Type type)
   {
-    try
+    foreach (var property in type.GetProperties(
+      BindingFlags.Public | BindingFlags.Instance))
     {
-      foreach (var attribute in type.GetCustomAttributes(true))
+      try
       {
-        var attributeType = attribute.GetType();
-        if (attributeType.FullName != "Avalonia.Metadata.ContentAttribute")
+        if (property
+          .GetCustomAttributes(true)
+          .Any(attribute =>
+            attribute.GetType().FullName ==
+            "Avalonia.Metadata.ContentAttribute"))
         {
-          continue;
-        }
-
-        var nameProperty = attributeType.GetProperty("Name");
-        if (nameProperty is not null)
-        {
-          return nameProperty.GetValue(attribute) as string;
+          return property.Name;
         }
       }
-    }
-    catch
-    {
-      // Attribute reflection must never fail baseline extraction.
+      catch
+      {
+        // One attribute must not prevent extraction of the remaining public
+        // properties. A missing result remains visible in Contract V2.
+      }
     }
 
     return null;

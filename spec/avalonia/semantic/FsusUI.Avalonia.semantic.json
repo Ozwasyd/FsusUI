@@ -65,6 +65,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -156,6 +157,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "MainContent",
       "properties": [
         {
           "name": "AccessibleName",
@@ -469,6 +471,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "CurrentOffset",
@@ -580,6 +583,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActionContent",
@@ -738,6 +742,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -1063,6 +1068,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusRegion",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1132,6 +1138,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -1173,6 +1180,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusSelect",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsLoading",
@@ -1384,6 +1392,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "FallbackText",
@@ -1474,6 +1483,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ScrollOffset",
@@ -1549,6 +1559,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -1632,6 +1643,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -1687,6 +1699,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Header",
@@ -1742,6 +1755,7 @@
       "baseType": "Avalonia.Controls.Button",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -1972,6 +1986,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Children",
       "properties": [
         {
           "name": "Size",
@@ -2049,6 +2064,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -2291,6 +2307,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActionContent",
@@ -2388,6 +2405,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -2465,6 +2483,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -2476,6 +2495,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -2675,6 +2695,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActivePathValues",
@@ -2817,6 +2838,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Checked",
@@ -2879,6 +2901,7 @@
       "baseType": "Avalonia.Controls.CheckBox",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -2970,6 +2993,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Checked",
@@ -3067,6 +3091,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Children",
       "properties": [
         {
           "name": "SelectedValues",
@@ -4233,6 +4258,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "EffectiveSpan",
@@ -4345,6 +4371,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Accordion",
@@ -4393,6 +4420,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Disabled",
@@ -4490,6 +4518,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -4617,6 +4646,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -5555,6 +5585,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Children",
       "properties": [
         {
           "name": "Gap",
@@ -5589,6 +5620,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -5798,6 +5830,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -5809,6 +5842,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusContextMenuEntry",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Accelerator",
@@ -5998,6 +6032,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusContextMenuEntry",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6154,6 +6189,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6165,6 +6201,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "FocusedKey",
@@ -6305,6 +6342,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsDisabled",
@@ -6356,6 +6394,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -6422,6 +6461,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Severity",
@@ -6442,6 +6482,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusTable",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "DisplayText",
@@ -7595,6 +7636,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -7811,6 +7853,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -7876,6 +7919,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "DisplayText",
@@ -7941,6 +7985,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActionLabel",
@@ -8026,6 +8071,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "FocusedKey",
@@ -8054,6 +8100,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusModalSurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsBodyScrollable",
@@ -8181,6 +8228,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "MaxValue",
@@ -8397,6 +8445,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusTabPane",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "CloseAccessibleName",
@@ -8654,6 +8703,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusTabs",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Items",
       "properties": [
         {
           "name": "CanScrollBackward",
@@ -8853,6 +8903,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusModalSurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Placement",
@@ -8909,6 +8960,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Accepts",
@@ -9298,6 +9350,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Menu",
@@ -9333,6 +9386,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Header",
@@ -9382,6 +9436,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "FocusedKey",
@@ -9443,6 +9498,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActionContent",
@@ -9564,6 +9620,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusRegion",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -9575,6 +9632,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Children",
       "properties": [
         {
           "name": "Fields",
@@ -10070,6 +10128,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AsyncValidator",
@@ -10500,6 +10559,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusRegion",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -10601,6 +10661,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusButton",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsDecorativeIcon",
@@ -10635,6 +10696,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -11006,6 +11068,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -11227,6 +11290,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11238,6 +11302,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "MobilePane",
@@ -11283,6 +11348,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11334,6 +11400,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11345,6 +11412,7 @@
       "baseType": "Avalonia.Controls.TextBox",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Text",
       "properties": [
         {
           "name": "AccessibleName",
@@ -11514,6 +11582,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusInput",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Text",
       "properties": [
         {
           "name": "Maximum",
@@ -11679,6 +11748,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Items",
@@ -11764,6 +11834,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Items",
@@ -11875,6 +11946,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusButton",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "NavigateUri",
@@ -12027,6 +12099,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsClosed",
@@ -12126,6 +12199,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "LastSubmittedPayload",
@@ -12170,6 +12244,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusRegion",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -14550,6 +14625,7 @@
       "baseType": "Avalonia.Controls.Menu",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Items",
       "properties": [
         {
           "name": "AccessibleName",
@@ -14643,6 +14719,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusMenuNode",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -14654,6 +14731,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusMenuNode",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Items",
@@ -14699,6 +14777,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Header",
@@ -14768,6 +14847,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusDialog",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "CancelText",
@@ -15174,6 +15254,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Bubbles",
@@ -15194,6 +15275,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Duration",
@@ -15348,6 +15430,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Items",
@@ -15368,6 +15451,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsInteractionEnabled",
@@ -15537,6 +15621,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "BeforeClose",
@@ -16390,6 +16475,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -16801,6 +16887,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActionCommand",
@@ -17088,6 +17175,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "GroupLabel",
@@ -17132,6 +17220,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsDisabled",
@@ -17196,6 +17285,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActionContent",
@@ -17321,6 +17411,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -17419,6 +17510,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "CurrentPage",
@@ -17484,6 +17576,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -17821,6 +17914,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActiveMode",
@@ -18472,6 +18566,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPopover",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "CancelText",
@@ -18553,6 +18648,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -18564,6 +18660,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -18744,6 +18841,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -19082,6 +19180,7 @@
       "baseType": "Avalonia.Controls.RadioButton",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -19158,6 +19257,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Children",
       "properties": [
         {
           "name": "SelectedValue",
@@ -19282,6 +19382,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -19466,6 +19567,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -19552,6 +19654,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsDisabled",
@@ -19624,6 +19727,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -19831,6 +19935,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActionContent",
@@ -19914,6 +20019,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Severity",
@@ -19959,6 +20065,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Children",
       "properties": [
         {
           "name": "Breakpoint",
@@ -20021,6 +20128,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -20147,6 +20255,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -20542,6 +20651,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusSelect",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -20694,6 +20804,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -20799,6 +20910,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusSettingsSection",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -20875,6 +20987,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Items",
@@ -20947,6 +21060,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "EmptyText",
@@ -20996,6 +21110,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Items",
@@ -21016,6 +21131,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21027,6 +21143,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "FocusedKey",
@@ -21076,6 +21193,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -21984,6 +22102,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -22100,6 +22219,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AnimationPolicy",
@@ -22174,6 +22294,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -22430,6 +22551,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Children",
       "properties": [
         {
           "name": "Align",
@@ -22493,6 +22615,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -22561,6 +22684,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Tone",
@@ -22614,6 +22738,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Description",
@@ -22724,6 +22849,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ActiveIndex",
@@ -22766,6 +22892,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusMenuNode",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsOpen",
@@ -22801,6 +22928,7 @@
       "baseType": "Avalonia.Controls.ToggleSwitch",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -22898,6 +23026,7 @@
       "baseType": "Avalonia.Controls.TabItem",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Key",
@@ -22961,6 +23090,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -22989,6 +23119,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -23504,6 +23635,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": true,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ColumnIndex",
@@ -23540,6 +23672,7 @@
       "baseType": "Avalonia.Controls.TabControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Items",
       "properties": [
         {
           "name": "AccessibleName",
@@ -23634,6 +23767,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IconContent",
@@ -23731,6 +23865,7 @@
       "baseType": "Avalonia.Controls.TextBlock",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Inlines",
       "properties": [
         {
           "name": "AccessibleName",
@@ -23897,6 +24032,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -24481,6 +24617,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "LastSubmittedPayload",
@@ -24553,6 +24690,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -24833,6 +24971,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusInput",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Text",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -24844,6 +24983,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Composer",
@@ -24900,6 +25040,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -25052,6 +25193,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -25266,6 +25408,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -25317,6 +25460,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "Status",
@@ -25403,6 +25547,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -25414,6 +25559,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -25665,6 +25811,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -26540,6 +26687,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -26704,6 +26852,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -26973,6 +27122,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusTree",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsVirtualized",
@@ -27157,6 +27307,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "IsConfirmed",
@@ -27198,6 +27349,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -27550,6 +27702,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -28207,6 +28360,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": true,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "ContainerId",
@@ -28409,6 +28563,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -28420,6 +28575,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
@@ -30099,6 +30255,7 @@
       "baseType": "Avalonia.Controls.TextBlock",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Inlines",
       "properties": [
         {
           "name": "Key",
@@ -30326,6 +30483,7 @@
       "baseType": "Avalonia.Controls.Panel",
       "isAbstract": false,
       "isSealed": true,
+      "contentProperty": "Children",
       "properties": [
         {
           "name": "BaseZIndex",

@@ -97,6 +97,36 @@ test('committed Contract V2 registry passes validation with the committed gate',
   assert.deepEqual(errors, [])
 })
 
+test('content regions bind only to real Avalonia content properties', () => {
+  const buttonGroup = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-button-group',
+  )
+  assert.deepEqual(
+    buttonGroup.contentRegions.map(({ name, status, avalonia }) => ({
+      name,
+      status,
+      member: avalonia?.member ?? null,
+    })),
+    [{ name: 'default', status: 'aligned-candidate', member: 'Children' }],
+  )
+
+  const button = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-button',
+  )
+  assert.deepEqual(
+    button.contentRegions.map(({ name, status, avalonia }) => ({
+      name,
+      status,
+      member: avalonia?.member ?? null,
+    })),
+    [
+      { name: 'default', status: 'aligned-candidate', member: 'Content' },
+      { name: 'icon', status: 'missing', member: null },
+      { name: 'loading', status: 'missing', member: null },
+    ],
+  )
+})
+
 for (const mutation of mutations) {
   test(`mutation fixture kills ${mutation.name}`, () => {
     const mutated = applyMutation(validRegistry, mutation)

@@ -19,7 +19,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-breadcrumb` | `partial` |
 | `component-v2.el-breadcrumb-item` | `partial` |
 | `component-v2.el-button` | `partial` |
-| `component-v2.el-button-group` | `partial` |
+| `component-v2.el-button-group` | `blocked` |
 | `component-v2.el-calendar` | `partial` |
 | `component-v2.el-card` | `partial` |
 | `component-v2.el-carousel` | `partial` |
@@ -58,8 +58,8 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-divider` | `partial` |
 | `component-v2.el-drawer` | `partial` |
 | `component-v2.el-dropdown` | `partial` |
-| `component-v2.el-dropdown-item` | `partial` |
-| `component-v2.el-dropdown-menu` | `partial` |
+| `component-v2.el-dropdown-item` | `blocked` |
+| `component-v2.el-dropdown-menu` | `blocked` |
 | `component-v2.el-empty` | `partial` |
 | `component-v2.el-empty-selection-state` | `missing` |
 | `component-v2.el-empty-state` | `missing` |
@@ -86,7 +86,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-loading-directive` | `missing` |
 | `component-v2.el-loading-service` | `blocked` |
 | `component-v2.el-localization-challenge` | `partial` |
-| `component-v2.el-main` | `partial` |
+| `component-v2.el-main` | `blocked` |
 | `component-v2.el-markdown-editor` | `partial` |
 | `component-v2.el-markdown-renderer` | `missing` |
 | `component-v2.el-menu` | `partial` |
@@ -148,7 +148,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-status-summary` | `partial` |
 | `component-v2.el-step` | `partial` |
 | `component-v2.el-steps` | `partial` |
-| `component-v2.el-sub-menu` | `partial` |
+| `component-v2.el-sub-menu` | `blocked` |
 | `component-v2.el-switch` | `partial` |
 | `component-v2.el-tab-pane` | `partial` |
 | `component-v2.el-table` | `partial` |

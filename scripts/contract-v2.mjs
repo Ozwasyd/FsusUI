@@ -398,6 +398,21 @@ const matchAvaloniaMethod = (webName, avaloniaType) => {
   return null
 }
 
+const matchAvaloniaContentProperty = (webName, avaloniaType) => {
+  const candidates = new Set([
+    toKebab(webName),
+    toKebab(`${webName}Content`),
+  ])
+  const properties = [
+    ...(avaloniaType.avaloniaProperties ?? []),
+    ...(avaloniaType.properties ?? []),
+  ]
+  return (
+    properties.find((property) => candidates.has(toKebab(property.name))) ??
+    null
+  )
+}
+
 const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
   if (!avaloniaType) {
     return {
@@ -599,9 +614,16 @@ const contentRegionMember = ({ contractKebab, slot, avaloniaType, classification
             ),
     }
   }
-  const avalonia = avaloniaType?.contentProperty
-    ? { member: avaloniaType.contentProperty, content: true }
-    : null
+  const namedContentProperty =
+    slot.name === 'default'
+      ? null
+      : matchAvaloniaContentProperty(slot.name, avaloniaType)
+  const avalonia =
+    slot.name === 'default' && avaloniaType?.contentProperty
+      ? { member: avaloniaType.contentProperty, content: true }
+      : namedContentProperty
+        ? { member: namedContentProperty.name, content: true }
+        : null
   let status
   let governance = null
   if (classification === 'web-only') {

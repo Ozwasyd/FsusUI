@@ -57,6 +57,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
       "properties": [
         {
           "name": "AccessibleName",
