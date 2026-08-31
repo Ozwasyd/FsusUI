@@ -22,6 +22,43 @@ Space toggles selection and Right/Left expand/collapse; programmatic
 or expansion events (`SelectionChanged` reports every state change). A stale
 lazy-load request reports `Canceled` and never emits a stale `Completed`.
 
+## Inline editing
+
+`StartRename(key, initialValue)` replaces a visible node label with an editor,
+focuses it, and selects the supplied name. `StartCreate(key, parentKey)` adds a
+transient empty editor at the root or directly below the supplied folder; a
+collapsed parent expands before the editor receives focus. The transient key
+must not already belong to a node.
+
+Enter raises one `InlineEditCommitRequested` event with
+`FsusTreeInlineEditKind`, the stable edit key, optional parent key, and entered
+text. The application owns persistence and node collection mutations. Set the
+event argument's `ValidationError` to keep the editor open, focused, invalid,
+and associated with accessible error help. A successful request only closes
+the editor; it does not rename or insert a node on the application's behalf.
+
+Escape, `CancelInlineEdit()`, and a pointer press outside the editor raise
+`InlineEditCanceled` with `FsusTreeInlineEditCancelReason`. Outside cancellation
+is handled before another node is activated. Selection, expansion, and the
+focused node key survive editing; `RefreshView()` and unrelated lazy loads keep
+the active editor text and focus.
+
+```csharp
+tree.InlineEditCommitRequested += (_, args) =>
+{
+  if (string.IsNullOrWhiteSpace(args.Text))
+  {
+    args.ValidationError = "A name is required.";
+    return;
+  }
+
+  SaveName(args.Kind, args.Key, args.ParentKey, args.Text);
+};
+
+tree.StartRename("readme", "README.md");
+tree.StartCreate("new-file-draft", parentKey: "src");
+```
+
 ## Context Menus
 
 Tree nodes and document tabs share the composable context-menu surface

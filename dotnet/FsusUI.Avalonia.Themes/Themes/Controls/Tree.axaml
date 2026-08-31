@@ -68,6 +68,11 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
   </Style>
 
+  <Style Selector="TextBlock.fsus-tree-inline-error">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeDangerBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
+  </Style>
+
   <Style Selector="fsus|FsusTreeV2.fsus-virtualized, fsus|FsusTreeTable.fsus-virtualized">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
   </Style>
