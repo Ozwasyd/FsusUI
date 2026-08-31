@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Avalonia;
@@ -11,6 +12,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -388,7 +390,7 @@ internal static class ConformanceV2Runner
       .GetVisualDescendants()
       .OfType<Border>()
       .FirstOrDefault(border => border.Name == "PART_FocusRing");
-    var checkTagFocusIndicatorVisible =
+    var checkTagFocusIndicatorGeometryVisible =
       checkTagFocusRing is not null &&
       checkTagFocusRing.BorderThickness != default;
     var checkTagDetachedReference = CreateDetachedCheckTag(
@@ -413,13 +415,17 @@ internal static class ConformanceV2Runner
     var checkTagPixelSize = new PixelSize(
       Math.Max(1, (int)Math.Ceiling(window.Bounds.Width)),
       Math.Max(1, (int)Math.Ceiling(window.Bounds.Height)));
+    FocusRingPixelEvidence checkTagFocusRingPixels;
     using (var bitmap = new RenderTargetBitmap(
       checkTagPixelSize,
       new Vector(96, 96)))
     {
       bitmap.Render(window);
+      checkTagFocusRingPixels = AnalyzeFocusRingPixels(bitmap, checkTag, window);
       bitmap.Save(checkTagScreenshotPath);
     }
+    var checkTagFocusIndicatorVisible =
+      checkTagFocusIndicatorGeometryVisible && checkTagFocusRingPixels.Passed;
     var checkTagScreenshotBytes = new FileInfo(checkTagScreenshotPath).Length;
     var checkTagScreenshotHash = Convert.ToHexString(
       SHA256.HashData(File.ReadAllBytes(checkTagScreenshotPath))).ToLowerInvariant();
@@ -745,6 +751,7 @@ internal static class ConformanceV2Runner
               content = checkTagSnapshotContent,
               focused = checkTagSnapshotFocused,
               focusIndicatorVisible = checkTagFocusIndicatorVisible,
+              focusRingPixels = checkTagFocusRingPixels,
               width = checkTagPixelSize.Width,
               height = checkTagPixelSize.Height,
             },
@@ -844,6 +851,84 @@ internal static class ConformanceV2Runner
     }).ToArray() ?? [];
   }
 
+  private static FocusRingPixelEvidence AnalyzeFocusRingPixels(
+    Bitmap bitmap,
+    Control control,
+    Visual relativeTo)
+  {
+    if (!control.TryFindResource(FsusThemeResourceKeys.FocusBrush, out var resource) ||
+        resource is not SolidColorBrush focusBrush)
+    {
+      throw new InvalidOperationException("CheckTag focus brush is not a solid theme brush.");
+    }
+
+    var origin = control.TranslatePoint(new Point(0, 0), relativeTo)
+      ?? throw new InvalidOperationException(
+        "CheckTag bounds could not be translated to the rendered window.");
+    var left = Math.Clamp((int)Math.Round(origin.X), 0, bitmap.PixelSize.Width - 1);
+    var top = Math.Clamp((int)Math.Round(origin.Y), 0, bitmap.PixelSize.Height - 1);
+    var right = Math.Clamp(
+      (int)Math.Round(origin.X + control.Bounds.Width) - 1,
+      left,
+      bitmap.PixelSize.Width - 1);
+    var bottom = Math.Clamp(
+      (int)Math.Round(origin.Y + control.Bounds.Height) - 1,
+      top,
+      bitmap.PixelSize.Height - 1);
+
+    using var buffer = new WriteableBitmap(
+      bitmap.PixelSize,
+      new Vector(96, 96),
+      global::Avalonia.Platform.PixelFormat.Bgra8888,
+      global::Avalonia.Platform.AlphaFormat.Premul);
+    using var framebuffer = buffer.Lock();
+    bitmap.CopyPixels(framebuffer);
+    var pixels = new byte[framebuffer.RowBytes * bitmap.PixelSize.Height];
+    Marshal.Copy(framebuffer.Address, pixels, 0, pixels.Length);
+
+    var focusMatches = 0;
+    var unexpectedDarkPixels = 0;
+    var sampledPixels = 0;
+    void Sample(int x, int y)
+    {
+      var offset = y * framebuffer.RowBytes + x * 4;
+      var blue = pixels[offset];
+      var green = pixels[offset + 1];
+      var red = pixels[offset + 2];
+      sampledPixels++;
+      var focusMatch =
+        Math.Abs(red - focusBrush.Color.R) <= 24 &&
+        Math.Abs(green - focusBrush.Color.G) <= 24 &&
+        Math.Abs(blue - focusBrush.Color.B) <= 24;
+      if (focusMatch) focusMatches++;
+      if (!focusMatch && red <= 48 && green <= 48 && blue <= 48)
+      {
+        unexpectedDarkPixels++;
+      }
+    }
+
+    const int cornerInset = 6;
+    for (var x = left + cornerInset; x <= right - cornerInset; x++)
+    {
+      Sample(x, top);
+      if (bottom != top) Sample(x, bottom);
+    }
+    for (var y = top + cornerInset; y <= bottom - cornerInset; y++)
+    {
+      Sample(left, y);
+      if (right != left) Sample(right, y);
+    }
+
+    var focusRatio = sampledPixels == 0 ? 0 : (double)focusMatches / sampledPixels;
+    return new FocusRingPixelEvidence(
+      $"#{focusBrush.Color.R:X2}{focusBrush.Color.G:X2}{focusBrush.Color.B:X2}",
+      sampledPixels,
+      focusMatches,
+      unexpectedDarkPixels,
+      focusRatio,
+      sampledPixels >= 24 && focusRatio >= 0.9 && unexpectedDarkPixels == 0);
+  }
+
   [MethodImpl(MethodImplOptions.NoInlining)]
   private static WeakReference CreateDetachedCheckTag(StackPanel host)
   {
@@ -907,6 +992,14 @@ internal static class ConformanceV2Runner
     var json = JsonSerializer.SerializeToElement(step, JsonOptions);
     return json.GetProperty("observation").GetProperty("passed").GetBoolean();
   }
+
+  private sealed record FocusRingPixelEvidence(
+    string ExpectedColor,
+    int SampledPixels,
+    int FocusMatches,
+    int UnexpectedDarkPixels,
+    double FocusRatio,
+    bool Passed);
 
   private static string? ReadArgument(string[] args, string name)
   {

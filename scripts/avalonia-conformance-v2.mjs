@@ -100,6 +100,16 @@ if (!Array.isArray(evidence.steps) || evidence.steps.length < 4) {
     'Avalonia evidence did not execute the required interaction steps',
   )
 }
+const checkTagVisual =
+  evidence.contractExecutions?.['component-v2.el-check-tag']?.visual
+if (
+  checkTagVisual?.observation?.focusIndicatorVisible !== true ||
+  checkTagVisual.observation?.focusRingPixels?.passed !== true
+) {
+  throw new Error(
+    'Avalonia CheckTag rendered focus ring pixels did not match the theme focus brush',
+  )
+}
 console.log(
   `[conformance-v2] avalonia real-window trace passed steps=${evidence.steps.length} candidate=${candidate}`,
 )

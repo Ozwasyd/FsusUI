@@ -188,12 +188,14 @@ const cases = [
     file,
     inject: () => mutateText(file, from, to),
     command:
-      id.startsWith('check-tag-avalonia-')
-        ? ['dotnet', ['test', 'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj', '--filter', 'FullyQualifiedName~FsusCheckTagHeadlessTests']]
-        : ['pnpm', ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', 'vue/packages/theme-chalk/__tests__/fsus-theme.test.ts', '-t', 'uses Scholarly Blue state tokens']],
+      id === 'check-tag-avalonia-default-focus-adorner-mutated'
+        ? ['pnpm', ['run', 'conformance:v2:avalonia']]
+        : id === 'check-tag-avalonia-focus-ring-mutated'
+          ? ['dotnet', ['test', 'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj', '--filter', 'FullyQualifiedName~FsusCheckTagHeadlessTests']]
+          : ['pnpm', ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', 'vue/packages/theme-chalk/__tests__/fsus-theme.test.ts', '-t', 'uses Scholarly Blue state tokens']],
     expected:
       id === 'check-tag-avalonia-default-focus-adorner-mutated'
-        ? 'Assert.Null() Failure'
+        ? 'rendered focus ring pixels did not match'
         : id === 'check-tag-avalonia-focus-ring-mutated'
           ? 'Assert.Equal() Failure'
         : 'expected',
