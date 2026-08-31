@@ -27,14 +27,14 @@
     "authorityDigest": "d245bd85637515fdd8d5ba5829d067dc08c56aef346e5046d8082c32ecc1713f",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "af46795862b8ca3e89f1a2f059592859a09e8189",
-  "candidateDigest": "b9e4db3138f5bc5db9a439660be45f24aa47f2b4ca20bd8bfd77dce9569c824e",
+  "candidateSha": "9d2aa4c372877b2873508c176c2f7aac3183c814",
+  "candidateDigest": "cd65d295135cdbbfc9a3c58870425bc93a1fe732abb91ab1e910024a30b9f4ca",
   "stateEvidenceMatrix": [
-    { "state": "default-loader-loaded-and-reset-transform", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
-    { "state": "pointer-wheel-min-max-factor", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
-    { "state": "primary-drag-capture-cancel-cursor", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
-    { "state": "source-switch-reset-and-preserve", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
-    { "state": "keyboard-navigation-dismiss-focus-and-accessibility", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
+    { "state": "default-loader-loaded-and-reset-transform", "viewport": "desktop", "theme": "both", "evidenceDigest": "7293401c9d2010e5fd06195feea0963ade4081898563fb67adbba627fa13796f" },
+    { "state": "pointer-wheel-min-max-factor", "viewport": "desktop", "theme": "both", "evidenceDigest": "7293401c9d2010e5fd06195feea0963ade4081898563fb67adbba627fa13796f" },
+    { "state": "primary-drag-capture-cancel-cursor", "viewport": "desktop", "theme": "both", "evidenceDigest": "7293401c9d2010e5fd06195feea0963ade4081898563fb67adbba627fa13796f" },
+    { "state": "source-switch-reset-and-preserve", "viewport": "desktop", "theme": "both", "evidenceDigest": "7293401c9d2010e5fd06195feea0963ade4081898563fb67adbba627fa13796f" },
+    { "state": "keyboard-navigation-dismiss-focus-and-accessibility", "viewport": "desktop", "theme": "both", "evidenceDigest": "7293401c9d2010e5fd06195feea0963ade4081898563fb67adbba627fa13796f" },
     { "state": "viewport-clip-dpi-zoom", "viewport": "desktop-dpi-matrix", "theme": "both", "evidenceDigest": "a68955e8602bef96f7f2d606dbf80b0b5edf3304927a7401c130a3c75e9cfedc" }
   ],
   "inScope": [
@@ -56,5 +56,5 @@
   "classificationEvidenceDigest": "ccf26302f2bbec49dcdae124fa13e6823803800f6ae84c8e82b320dcd62b3de5",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "26d5b79f287e0b687a9ce1f4572f0dc1b7a2083f9cb62e234470813d5bd95b7f"
+  "receiptDigest": "ecaa40a2b7d62098c3ee7f7006640830a1b2dce18b4b181870b2f3b071f6d37d"
 }
