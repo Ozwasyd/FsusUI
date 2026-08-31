@@ -534,6 +534,84 @@ test('container, button group, and visual hidden keep explicit truthful bindings
   )
 })
 
+test('explicit divergent names and canonical records bind real native surfaces', () => {
+  const expected = new Map([
+    ['component-v2.dynamic-size-grid', 'FsusUI.Avalonia.Controls.FsusTableV2'],
+    [
+      'component-v2.dynamic-size-list',
+      'FsusUI.Avalonia.Controls.FsusVirtualList',
+    ],
+    [
+      'component-v2.el-conversation-list-item',
+      'FsusUI.Avalonia.Controls.FsusConversationListItem',
+    ],
+    [
+      'component-v2.el-diagnostics-item',
+      'FsusUI.Avalonia.Controls.FsusDiagnosticsItem',
+    ],
+    ['component-v2.el-empty-state', 'FsusUI.Avalonia.Controls.FsusEmpty'],
+    [
+      'component-v2.el-markdown-renderer',
+      'FsusUI.Avalonia.Controls.FsusTextViewer',
+    ],
+    [
+      'component-v2.el-metadata-item',
+      'FsusUI.Avalonia.Controls.FsusSettingsMetadataItem',
+    ],
+    [
+      'component-v2.el-table-column',
+      'FsusUI.Avalonia.Controls.FsusDataTableColumn',
+    ],
+    [
+      'component-v2.fixed-size-grid',
+      'FsusUI.Avalonia.Controls.FsusTableV2',
+    ],
+  ])
+  for (const [id, nativeType] of expected) {
+    const contract = committedRegistry.contracts.find(
+      (candidate) => candidate.id === id,
+    )
+    assert.equal(contract.bindings.avalonia.status, 'bound', id)
+    assert.equal(contract.bindings.avalonia.type, nativeType, id)
+    assert.notEqual(contract.component.exportStatus, 'aligned-candidate', id)
+  }
+})
+
+test('zero-denominator and rejected candidate surfaces stay fail-closed', () => {
+  for (const id of [
+    'component-v2.dynamic-size-grid',
+    'component-v2.dynamic-size-list',
+    'component-v2.fixed-size-grid',
+    'component-v2.fixed-size-list',
+  ]) {
+    const contract = committedRegistry.contracts.find(
+      (candidate) => candidate.id === id,
+    )
+    assert.equal(contract.coverage.total, 0, id)
+    assert.equal(contract.component.exportStatus, 'partial', id)
+  }
+
+  for (const id of [
+    'component-v2.common-picker',
+    'component-v2.el-empty-selection-state',
+    'component-v2.el-task-page-header',
+    'component-v2.time-pick-panel',
+  ]) {
+    const contract = committedRegistry.contracts.find(
+      (candidate) => candidate.id === id,
+    )
+    assert.equal(contract.bindings.avalonia.status, 'unbound', id)
+    assert.equal(contract.component.exportStatus, 'missing', id)
+  }
+  const taskHeader = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-task-page-header',
+  )
+  assert.notEqual(
+    taskHeader.bindings.avalonia.type,
+    'FsusUI.Avalonia.Controls.FsusPageHeader',
+  )
+})
+
 test('passive layout contracts govern keyboard and focus as not applicable', () => {
   for (const id of [
     'component-v2.el-main',

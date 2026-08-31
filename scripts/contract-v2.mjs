@@ -287,7 +287,22 @@ const CONTENT_REGION_BINDINGS = {
 }
 
 const AVALONIA_COMPONENT_BINDINGS = {
+  DynamicSizeGrid: 'FsusUI.Avalonia.Controls.FsusTableV2',
+  DynamicSizeList: 'FsusUI.Avalonia.Controls.FsusVirtualList',
+  ElEmptyState: 'FsusUI.Avalonia.Controls.FsusEmpty',
+  ElFormSection: 'FsusUI.Avalonia.Controls.FsusSettingsFormSection',
+  ElMarkdownRenderer: 'FsusUI.Avalonia.Controls.FsusTextViewer',
+  ElMetadataItem: 'FsusUI.Avalonia.Controls.FsusSettingsMetadataItem',
+  ElMetadataRow: 'FsusUI.Avalonia.Controls.FsusSettingsMetadataRow',
+  ElRadioButton: 'FsusUI.Avalonia.Controls.FsusRadio',
+  ElResourceList: 'FsusUI.Avalonia.Controls.FsusSettingsResourceList',
+  ElSectionHeader: 'FsusUI.Avalonia.Controls.FsusSettingsSectionHeader',
+  ElSectionNavLink: 'FsusUI.Avalonia.Controls.FsusSettingsNavItem',
+  ElTableColumn: 'FsusUI.Avalonia.Controls.FsusDataTableColumn',
+  ElTooltipV2: 'FsusUI.Avalonia.Controls.FsusTooltip',
   ElVisuallyHidden: 'FsusUI.Avalonia.Controls.FsusVisualHidden',
+  FixedSizeGrid: 'FsusUI.Avalonia.Controls.FsusTableV2',
+  FixedSizeList: 'FsusUI.Avalonia.Controls.FsusVirtualList',
 }
 
 const PUBLIC_VALUE_BINDINGS = {
@@ -755,7 +770,10 @@ const findAvaloniaType = (componentName, typeIndex) => {
   const kebab = kebabName(componentName)
   for (const [fullName, type] of typeIndex) {
     const shortName = fullName.split('.').pop() ?? ''
-    if (kebabName(shortName) === kebab && type.kind === 'class') {
+    if (
+      kebabName(shortName) === kebab &&
+      ['class', 'record'].includes(type.kind)
+    ) {
       return type
     }
   }
@@ -1355,6 +1373,13 @@ const contractForComponent = ({
     exportStatus = gate?.requiredStatus ?? 'partial'
   } else if (classification === 'web-only') {
     exportStatus = 'web-only'
+  } else if (!avaloniaType) {
+    exportStatus = 'missing'
+  } else if (
+    inputs.length + outputs.length + operations.length + contentRegions.length ===
+    0
+  ) {
+    exportStatus = 'partial'
   } else if (
     inputs.some((input) => input.status === 'partial') ||
     outputs.some((output) => output.status === 'partial') ||
