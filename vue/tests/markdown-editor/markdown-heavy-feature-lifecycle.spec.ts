@@ -1146,23 +1146,21 @@ test('aborts real pending adapter work on virtual unmount', async ({
       { timeout: 60_000 },
     )
     .toBe(0)
-  await expect
-    .poll(
-      async () =>
-        (await readMetrics(page))?.unmounted ??
-        restoredPendingSnapshot.metrics!.unmounted,
-    )
-    .toBeGreaterThan(restoredPendingSnapshot.metrics!.unmounted)
-  await expect
-    .poll(async () => (await readMetrics(page))?.aborts ?? baseline.aborts)
-    .toBeGreaterThan(baseline.aborts)
-  await expect
-    .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
-    .toBe(0)
-  expect((await readMetrics(page))?.identity?.documentKey).toBe(
+  const afterVirtualUnmount = (await readMetrics(page))!
+  expect(afterVirtualUnmount.unmounted).toBeGreaterThan(
+    restoredPendingSnapshot.metrics!.unmounted,
+  )
+  expect(afterVirtualUnmount.aborts).toBeGreaterThan(baseline.aborts)
+  expect(afterVirtualUnmount.active).toBe(0)
+  expect(afterVirtualUnmount.retainedListeners).toBe(0)
+  expect(afterVirtualUnmount.retainedObservers).toBe(0)
+  expect(afterVirtualUnmount.retainedResources).toBe(0)
+  expect(afterVirtualUnmount.retainedRuntimes).toBe(0)
+  expect(afterVirtualUnmount.retainedTasks).toBe(0)
+  expect(afterVirtualUnmount.identity?.documentKey).toBe(
     restoredPendingInput.documentKey,
   )
-  expect((await readMetrics(page))?.identity?.revision).toBe(
+  expect(afterVirtualUnmount.identity?.revision).toBe(
     `heavy-lifecycle-${restoredPendingInput.revision}`,
   )
 
