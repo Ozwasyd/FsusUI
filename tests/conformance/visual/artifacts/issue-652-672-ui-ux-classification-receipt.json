@@ -24,13 +24,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "54a4a382952bd48bb4cbe3cf5f6cf0ff9e7639a2",
+    "revision": "b0e3fbcdcabfae3219f70bde1067f732576a5105",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "5f535d8cc894f4a796251044fd68b3c4d5c12edb10f53e809356d80e7ddd65f8",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "84ea058468879a85703f37b8580ffc2986dffde7",
-  "candidateDigest": "4bfc99fd96e420b8b1af7e6faa20017ab1af3a631431100f69b48f45e8aa1b99",
+  "candidateSha": "900f6cdf37feb8040ce72ecabd2ae0dac649668a",
+  "candidateDigest": "a5bed126047ecc67ec90c48c3d1bfb6929dbcad0fb64c674ef8322a064727f1e",
   "stateEvidenceMatrix": [
     { "state": "context-menu-pointer-keyboard-spelling-native-fallback-focus-accessibility", "viewport": "desktop and narrow desktop", "theme": "both", "evidenceDigest": "f34822c4302c32d625283d452b5e4e1d20c5d3a3be5ccc0b668234dba4943a3a" },
     { "state": "tagged-pdf-hierarchical-outline-capability-cancellation-stream", "viewport": "Windows and Linux adapter simulation", "theme": "both", "evidenceDigest": "d79ca4bbfa5deeafb9bccd28e33731890f77c4ee7d45ed8ff0b0821f67dd77d8" }
@@ -51,5 +51,5 @@
   "classificationEvidenceDigest": "73879b3662cb34140cba1907729cfa02dfa392e976bea64d13995e63717f260b",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "ef74d1e94e132a8064b31aa72c75484dc847ca0603a657a7d6b85c5b8ad1abeb"
+  "receiptDigest": "e6fc64a784da6e4947384fe934778368e9ded8610f422438b6106460369a3467"
 }
