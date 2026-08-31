@@ -141,6 +141,42 @@ test('alignment is derived and readiness excludes partial contracts', () => {
   ])
 })
 
+test('web-only contracts remain explicit without becoming Avalonia gaps', () => {
+  const registry = {
+    contracts: [
+      {
+        id: 'web-only-bound',
+        component: { exportStatus: 'web-only' },
+        bindings: { avalonia: { status: 'bound' } },
+        coverage: { missing: 0, partial: 0, webOnly: 1 },
+      },
+      {
+        id: 'web-only-unbound',
+        component: { exportStatus: 'web-only' },
+        bindings: { avalonia: { status: 'unbound' } },
+        coverage: { missing: 0, partial: 0, webOnly: 1 },
+      },
+    ],
+  }
+  const alignment = deriveAlignment(registry)
+  assert.deepEqual(
+    alignment.statuses.map(({ id, status }) => ({ id, status })),
+    [
+      { id: 'web-only-bound', status: 'web-only' },
+      { id: 'web-only-unbound', status: 'web-only' },
+    ],
+  )
+  assert.deepEqual(alignment.stable, [])
+  assert.deepEqual(alignment.webOnly, [
+    'web-only-bound',
+    'web-only-unbound',
+  ])
+  assert.deepEqual(alignment.gaps, [])
+  assert.equal(alignment.consumers.nugetStableEligible, true)
+  assert.equal(alignment.consumers.releaseReady, true)
+  validateReadiness(alignment)
+})
+
 test('T762-01 stable readiness rejects missing, stale, and tampered alignment', () => {
   const expected = stableReadinessCurrentIdentity()
   const valid = JSON.parse(

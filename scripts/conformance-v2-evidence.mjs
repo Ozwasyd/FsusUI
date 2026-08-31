@@ -480,7 +480,8 @@ export function deriveAlignment(registry, comparison = null) {
   for (const contract of registry.contracts ?? []) {
     const coverage = contract.coverage ?? {}
     let status
-    if (contract.bindings?.avalonia?.status === 'unbound') status = 'missing'
+    if (contract.component?.exportStatus === 'web-only') status = 'web-only'
+    else if (contract.bindings?.avalonia?.status === 'unbound') status = 'missing'
     else if ((coverage.missing ?? 0) > 0 || (coverage.partial ?? 0) > 0)
       status = 'partial'
     else if (
@@ -490,7 +491,8 @@ export function deriveAlignment(registry, comparison = null) {
       status = 'aligned'
     else status = 'blocked'
     statuses.push({ id: contract.id, status, source: 'derived' })
-    if (status !== 'aligned') gaps.push(deriveGap(contract, status, comparison))
+    if (status !== 'aligned' && status !== 'web-only')
+      gaps.push(deriveGap(contract, status, comparison))
   }
   for (const type of registry.avaloniaOnlyTypes ?? []) {
     statuses.push({
@@ -502,16 +504,21 @@ export function deriveAlignment(registry, comparison = null) {
   const stable = statuses
     .filter((entry) => entry.status === 'aligned')
     .map((entry) => entry.id)
+  const webOnly = statuses
+    .filter((entry) => entry.status === 'web-only')
+    .map((entry) => entry.id)
   return {
     schema: 'fsusui.alignment.v2',
     statuses,
     stable,
+    webOnly,
     gaps,
     consumers: {
       galleryStableFamilies: stable.map((id) =>
         id.replace(/^component-v2\.el-/, ''),
       ),
       docsSupportContractIds: stable,
+      webOnlyContractIds: webOnly,
       nugetStableEligible: gaps.length === 0,
       releaseReady: gaps.length === 0,
     },
@@ -532,7 +539,11 @@ export function validateReadiness(alignment, expected = {}) {
   const expectedStable = alignment.statuses
     .filter((entry) => entry.status === 'aligned')
     .map((entry) => entry.id)
+  const expectedWebOnly = alignment.statuses
+    .filter((entry) => entry.status === 'web-only')
+    .map((entry) => entry.id)
   same(alignment.stable, expectedStable, 'readiness.stable.derived')
+  same(alignment.webOnly, expectedWebOnly, 'readiness.webOnly.derived')
   same(
     alignment.consumers,
     {
@@ -540,6 +551,7 @@ export function validateReadiness(alignment, expected = {}) {
         id.replace(/^component-v2\.el-/, ''),
       ),
       docsSupportContractIds: expectedStable,
+      webOnlyContractIds: expectedWebOnly,
       nugetStableEligible: alignment.gaps.length === 0,
       releaseReady: alignment.gaps.length === 0,
     },
