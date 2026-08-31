@@ -304,7 +304,7 @@ public class FsusWebViewAdapterHeadlessTests
     root.Children.Add(host);
     var menu = new FsusContextMenu
     {
-      OverlaySize = new Size(280, 280),
+      OverlaySize = new Size(280, scenario.NativeFallback ? 440 : 280),
       ViewportBounds = new Rect(0, 0, scenario.Width, scenario.Height),
     };
     var window = new Window
