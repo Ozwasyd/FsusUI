@@ -4,6 +4,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import {
+  currentIdentity,
+  readStableConsumerAuthority,
+} from './avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const nugetRoot = path.join(root, 'dotnet/artifacts/nuget')
@@ -14,6 +18,10 @@ const run = (command, args) =>
 fs.rmSync(nugetRoot, { recursive: true, force: true })
 fs.rmSync(path.dirname(manifestPath), { recursive: true, force: true })
 fs.mkdirSync(nugetRoot, { recursive: true })
+
+const { alignment } = readStableConsumerAuthority({
+  expected: currentIdentity(),
+})
 
 run('dotnet', ['restore', 'dotnet/FsusUI.Avalonia.slnx'])
 run('dotnet', [
@@ -67,6 +75,13 @@ const manifest = {
       encoding: 'utf8',
     }).trim(),
   candidateSha256: candidateHash.digest('hex'),
+  contractV2Alignment: {
+    candidate: alignment.identity.candidate,
+    contractHash: alignment.identity.contractHash,
+    alignmentHash: alignment.identity.alignmentHash,
+    stableContractIds: alignment.stable,
+    governedGapCount: alignment.gaps.length,
+  },
   packages,
 }
 fs.mkdirSync(path.dirname(manifestPath), { recursive: true })

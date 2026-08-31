@@ -283,3 +283,11 @@ export const requireNugetStableRelease = (alignment) => {
   }
   return release
 }
+
+export const validateNugetPackageAlignment = (
+  alignment,
+  { stablePublication = false } = {},
+) =>
+  stablePublication
+    ? requireNugetStableRelease(alignment)
+    : evaluateStableRelease(alignment)

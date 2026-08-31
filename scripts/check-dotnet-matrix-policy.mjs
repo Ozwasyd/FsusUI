@@ -92,6 +92,12 @@ const validate = (source) => {
     'dotnet-package must run the package verifier once',
   )
   assert(
+    packageJob.includes('pnpm run conformance:v2') &&
+      packageJob.indexOf('pnpm run conformance:v2') <
+        packageJob.indexOf('node scripts/dotnet-package-verify.mjs'),
+    'dotnet-package must produce exact Contract V2 alignment before packaging',
+  )
+  assert(
     packageJob.includes('dotnet-nuget-candidate'),
     'dotnet-package must upload one named candidate artifact',
   )
@@ -159,6 +165,14 @@ for (const [name, fragment] of [
 }
 if (!scripts['governance:check']?.includes('check:dotnet-matrix')) {
   failures.push('governance:check must include check:dotnet-matrix')
+}
+if (!scripts['dotnet:stable-package']?.includes('--stable-publication')) {
+  failures.push('dotnet:stable-package must require explicit stable publication')
+}
+if (scripts['dotnet:package:verify']?.includes('--stable-publication')) {
+  failures.push(
+    'dotnet:package:verify must validate the governed aligned subset without requesting publication',
+  )
 }
 for (const fragment of [
   'FSUS_DOTNET_MAX_CPU_COUNT',

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import {
   currentIdentity,
   readStableConsumerAuthority,
-  requireNugetStableRelease,
+  validateNugetPackageAlignment,
 } from './avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -468,7 +468,7 @@ const writeBaselines = () => {
   }
 }
 
-const check = () => {
+export const check = ({ stablePublication = false } = {}) => {
   const failures = []
   const record = (label, fn) => {
     try {
@@ -484,7 +484,7 @@ const check = () => {
     const { alignment } = readStableConsumerAuthority({
       expected: currentIdentity(),
     })
-    requireNugetStableRelease(alignment)
+    validateNugetPackageAlignment(alignment, { stablePublication })
   })
 
   record('fixtures', runFixtureChecks)
@@ -521,14 +521,18 @@ const check = () => {
     throw new Error(failures.map((failure) => `- ${failure}`).join('\n'))
   }
 
-  console.log('Avalonia stable NuGet package gate passed.')
+  console.log(
+    stablePublication
+      ? 'Avalonia stable NuGet publication gate passed.'
+      : 'Avalonia NuGet package integrity gate passed.',
+  )
 }
 
 try {
   if (process.argv.includes('--write-baselines')) {
     writeBaselines()
   } else {
-    check()
+    check({ stablePublication: process.argv.includes('--stable-publication') })
   }
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

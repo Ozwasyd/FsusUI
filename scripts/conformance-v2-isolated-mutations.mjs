@@ -261,6 +261,43 @@ const cases = [
     expected: 'Missing expected exception',
   },
   {
+    id: 'nuget-ordinary-package-hard-block-mutated',
+    file: 'scripts/avalonia-stable-readiness-lib.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/avalonia-stable-readiness-lib.mjs',
+        '{ stablePublication = false } = {},',
+        '{ stablePublication = true } = {},',
+      ),
+    command: ['node', ['--test', 'tests/conformance-v2-evidence.test.mjs']],
+    expected: 'NuGet stable candidate blocked by derived alignment gaps',
+  },
+  {
+    id: 'nuget-stable-publication-flag-removed-mutated',
+    file: 'package.json',
+    inject: () =>
+      mutateJson('package.json', (value) => {
+        value.scripts['dotnet:stable-package'] = value.scripts[
+          'dotnet:stable-package'
+        ].replace(' --stable-publication', '')
+      }),
+    command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
+    expected: 'dotnet:stable-package must require explicit stable publication',
+  },
+  {
+    id: 'nuget-package-alignment-producer-removed-mutated',
+    file: '.github/workflows/_quality.yml',
+    inject: () =>
+      mutateText(
+        '.github/workflows/_quality.yml',
+        '          xvfb-run -a pnpm run conformance:v2\n',
+        '',
+      ),
+    command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
+    expected:
+      'dotnet-package must produce exact Contract V2 alignment before packaging',
+  },
+  {
     id: 'nuget-publish-block-mutated',
     file: 'scripts/avalonia-stable-readiness-lib.mjs',
     inject: () =>

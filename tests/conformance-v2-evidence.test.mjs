@@ -24,6 +24,7 @@ import {
   readAlignment as stableReadinessReadAlignment,
   readStableConsumerAuthority,
   requireNugetStableRelease,
+  validateNugetPackageAlignment,
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -139,8 +140,17 @@ test('stable readiness accepts governed product gaps but rejects leakage and for
     missingReleaseFamilies: blocked.consumers.releaseFamilyGaps,
     releaseReady: false,
   })
+  assert.deepEqual(validateNugetPackageAlignment(blocked), {
+    alignmentGapCount: 1,
+    missingReleaseFamilies: blocked.consumers.releaseFamilyGaps,
+    releaseReady: false,
+  })
   assert.throws(
     () => requireNugetStableRelease(blocked),
+    /NuGet stable candidate blocked/u,
+  )
+  assert.throws(
+    () => validateNugetPackageAlignment(blocked, { stablePublication: true }),
     /NuGet stable candidate blocked/u,
   )
   assert.throws(
@@ -175,6 +185,27 @@ test('stable readiness accepts governed product gaps but rejects leakage and for
         },
       }),
     /do not match derived alignment/u,
+  )
+
+  const ready = {
+    statuses: [
+      { id: 'component-v2.aligned', status: 'aligned', source: 'derived' },
+    ],
+    stable: ['component-v2.aligned'],
+    gaps: [],
+    consumers: {
+      alignmentGapCount: 0,
+      releaseFamilyGaps: [],
+      conformanceIntegrityReady: true,
+      stableSubsetEligible: true,
+      fullSurfaceReleaseReady: true,
+      nugetStableEligible: true,
+      releaseReady: true,
+    },
+  }
+  assert.deepEqual(
+    validateNugetPackageAlignment(ready, { stablePublication: true }),
+    { alignmentGapCount: 0, missingReleaseFamilies: [], releaseReady: true },
   )
 })
 

@@ -50,6 +50,19 @@ if (packageManifest.commitSha !== [...commits][0])
   throw new Error(
     'Package and platform manifests do not describe the same commit.',
   )
+if (
+  packageManifest.contractV2Alignment?.candidate !== packageManifest.commitSha ||
+  !/^[0-9a-f]{64}$/u.test(
+    packageManifest.contractV2Alignment?.contractHash ?? '',
+  ) ||
+  !/^[0-9a-f]{64}$/u.test(
+    packageManifest.contractV2Alignment?.alignmentHash ?? '',
+  ) ||
+  !Array.isArray(packageManifest.contractV2Alignment?.stableContractIds) ||
+  !Number.isInteger(packageManifest.contractV2Alignment?.governedGapCount)
+) {
+  throw new Error('Package manifest Contract V2 alignment binding is invalid.')
+}
 const packageRoot = path.join(evidenceRoot, 'package', 'nuget')
 const aggregate = createHash('sha256')
 for (const candidate of packageManifest.packages) {

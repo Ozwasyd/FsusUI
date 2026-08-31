@@ -198,7 +198,7 @@
     "dotnet:pack": "dotnet pack dotnet/FsusUI.Avalonia.slnx --no-build --configuration Release -o dotnet/artifacts/nuget",
     "dotnet:metadata": "node ./scripts/with-node-heap.mjs node ./scripts/check-nuget-metadata.mjs",
     "dotnet:package-smoke": "node ./scripts/with-node-heap.mjs node ./scripts/check-nuget-package-smoke.mjs",
-    "dotnet:stable-package": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-nuget-stable.mjs",
+    "dotnet:stable-package": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-nuget-stable.mjs --stable-publication",
     "dotnet:matrix:plan": "node ./scripts/with-node-heap.mjs node ./scripts/dotnet-matrix-plan.mjs",
     "dotnet:platform:verify": "node ./scripts/with-node-heap.mjs node ./scripts/dotnet-platform-verify.mjs",
     "dotnet:package:verify": "node ./scripts/with-node-heap.mjs node ./scripts/dotnet-package-verify.mjs",
