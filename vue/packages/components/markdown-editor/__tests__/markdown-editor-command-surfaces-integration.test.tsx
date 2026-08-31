@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
+import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 import type { MarkdownEditorCommand } from '../src/markdown-editor'
 
@@ -301,7 +302,9 @@ describe('Markdown editor command surface integration', () => {
     await flushPromises()
 
     const surface = wrapper.get('.el-markdown-editor__property-surface')
-    await surface.findAll('input')[1]!.setValue('javascript:alert(1)')
+    await surface
+      .findAll('input')[1]!
+      .setValue(getMarkdownXssSourceUrl('mxss-url-javascript-link'))
     await surface.trigger('submit')
     await flushPromises()
 
