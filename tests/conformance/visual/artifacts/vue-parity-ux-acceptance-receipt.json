@@ -1,8 +1,8 @@
 {
  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
  "classificationReceiptDigest": "94d12e74cd8778235230557d91aabb1e96c38365a4b2085461b12d5b9a639287",
- "candidateSha": "625bc386cbbddd2fce56148f90e15ef317f24fd1",
- "candidateDigest": "e0a9892cc92f42203e870e2aeba11520884577999dc40c92f2d42495dad21a90",
+ "candidateSha": "a8815dd15d7f15b3d003742dcead20c2b5ee19fa",
+ "candidateDigest": "137eb693d21c07d983e88577f885361b9f0e748b10863063d487cc6c935e5f04",
  "verificationClass": "ux-path",
  "requiredSkillDigests": [
   "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -72,5 +72,5 @@
   }
  ],
  "status": "accepted",
- "receiptDigest": "483e8f7de1fbbbad5d0eadcfcf6ea2b1a8191152106e80d71f9d7a566c0fc083"
+ "receiptDigest": "5ace7d885c6f7e8376422e40517b6ef4ae70083ab7aa341c4edbf32aad94358a"
 }
