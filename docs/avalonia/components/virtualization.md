@@ -14,6 +14,9 @@ list is first realized before its final mounted width is known.
 `FsusInfiniteScroll` is a non-rendering behavior helper that observes an owned
 or ancestor `ScrollViewer` and raises `Loaded` when scrolling reaches the
 configured bottom distance.
+`FsusAutoResizer` observes its arranged viewport, exposes it through `Viewport`,
+invokes `OnResize`, and preserves an axis when `DisableWidth` or `DisableHeight`
+is set.
 
 ## Realization and recycling
 

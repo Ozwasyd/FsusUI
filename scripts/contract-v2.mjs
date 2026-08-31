@@ -296,7 +296,13 @@ export const compareMembers = ({ web, avalonia, kind }) => {
   if (kind === 'input') {
     const webNullable = Boolean(web.nullable)
     const avaloniaNullable = avalonia?.nullable
-    if (avaloniaNullable != null && webNullable !== Boolean(avaloniaNullable)) {
+    const optionalAbsenceMatchesNullable =
+      web.required === false && webNullable === false && avaloniaNullable === true
+    if (
+      avaloniaNullable != null &&
+      webNullable !== Boolean(avaloniaNullable) &&
+      !optionalAbsenceMatchesNullable
+    ) {
       setDrift(
         drift,
         'nullability',

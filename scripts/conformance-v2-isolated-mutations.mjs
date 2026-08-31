@@ -141,6 +141,76 @@ const cases = [
     expected: 'Avalonia Vue public API baseline is stale',
   },
   {
+    id: 'contract-optional-nullability-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        'web.required === false && webNullable === false && avaloniaNullable === true',
+        'web.required === true && webNullable === false && avaloniaNullable === true',
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
+    id: 'auto-resizer-web-disabled-width-mutated',
+    file: 'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
+        'if (!props.disableWidth) width$.value = width - left - right',
+        'width$.value = width - left - right',
+      ),
+    command: [
+      'pnpm',
+      [
+        'exec',
+        'vitest',
+        'run',
+        '--config',
+        'vue/vitest.config.ts',
+        'vue/packages/components/table-v2/__tests__/auto-resizer.test.tsx',
+      ],
+    ],
+    expected: "to be '0x180'",
+  },
+  ...[
+    [
+      'auto-resizer-avalonia-disabled-width-mutated',
+      'DisableWidth ? Viewport.Width : viewport.Width',
+      'viewport.Width',
+    ],
+    [
+      'auto-resizer-avalonia-callback-mutated',
+      '    OnResize(next);\n',
+      '',
+    ],
+    [
+      'auto-resizer-avalonia-arrange-mutated',
+      '    Resize(finalSize);',
+      '    _ = finalSize;',
+    ],
+  ].map(([id, from, to]) => ({
+    id,
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs',
+        from,
+        to,
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
+        '--filter',
+        'FullyQualifiedName~AutoResizerObservesArrangedViewportAndHonorsDisabledAxes',
+      ],
+    ],
+    expected: 'Assert.',
+  })),
+  {
     id: 'vue-prop-removed',
     file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
     inject: () =>

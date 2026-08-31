@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "16d373ec7c7618689d2571b71de0891ef5179237b308641533dfbe8f313bf562",
+      "hash": "9443071e04d4dcf2a62129670585778626d442946076dc7c9aa0721754eb9e1a",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "56cb9aa68fdfe355150d1deb9b3f8097a7386d37c86ccda5b49bac8cda64af72",
+      "hash": "a8b3fd44b50bf7d9b86783ff7f357f0b86467be6ba42fc7d06daf8225dd105f0",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -4418,7 +4418,7 @@
         "name": "ElAlert",
         "module": "alert",
         "classification": "portable",
-        "exportStatus": "partial",
+        "exportStatus": "missing",
         "exports": [
           "ElAlert"
         ]
@@ -4547,11 +4547,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -4559,12 +4559,7 @@
           "scenarioIds": [
             "scenario.v2.el-alert.input.description"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "effect",
@@ -4670,11 +4665,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -4682,12 +4677,7 @@
           "scenarioIds": [
             "scenario.v2.el-alert.input.title"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "type",
@@ -4904,17 +4894,6 @@
           }
         },
         {
-          "member": "description",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "effect",
           "kind": "input",
           "status": "missing",
@@ -4931,17 +4910,6 @@
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "title",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5085,8 +5053,8 @@
       ],
       "coverage": {
         "total": 10,
-        "alignedCandidate": 2,
-        "partial": 2,
+        "alignedCandidate": 4,
+        "partial": 0,
         "missing": 6,
         "webOnly": 0,
         "mappedPercent": 40
@@ -5303,7 +5271,7 @@
         "name": "ElAutoResizer",
         "module": "table-v2",
         "classification": "native-adapter",
-        "exportStatus": "missing",
+        "exportStatus": "aligned-candidate",
         "exports": [
           "ElAutoResizer"
         ]
@@ -5345,8 +5313,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "DisableHeight",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -5358,12 +5333,7 @@
           "scenarioIds": [
             "scenario.v2.el-auto-resizer.input.disable-height"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "disableWidth",
@@ -5383,8 +5353,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "DisableWidth",
+            "categories": [
+              "boolean"
+            ],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -5396,12 +5373,7 @@
           "scenarioIds": [
             "scenario.v2.el-auto-resizer.input.disable-width"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "onResize",
@@ -5421,8 +5393,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "OnResize",
+            "categories": [
+              "function"
+            ],
+            "type": "System.Action<Avalonia.Size>",
+            "nullable": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -5434,12 +5413,7 @@
           "scenarioIds": [
             "scenario.v2.el-auto-resizer.input.on-resize"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "outputs": [],
@@ -5540,41 +5514,7 @@
         "interactionMs": 50,
         "memory": "no retained unbounded per-item state without virtualization budget"
       },
-      "platformDifferences": [
-        {
-          "member": "disableHeight",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "disableWidth",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "onResize",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        }
-      ],
+      "platformDifferences": [],
       "avaloniaExtras": [
         {
           "member": "AccessibleName",
@@ -5628,11 +5568,11 @@
       ],
       "coverage": {
         "total": 4,
-        "alignedCandidate": 1,
+        "alignedCandidate": 4,
         "partial": 0,
-        "missing": 3,
+        "missing": 0,
         "webOnly": 0,
-        "mappedPercent": 25
+        "mappedPercent": 100
       }
     },
     {
@@ -18156,7 +18096,7 @@
           "drift": {
             "type": "web array vs avalonia string",
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -20784,7 +20724,7 @@
         "name": "ElCollapseItem",
         "module": "collapse",
         "classification": "native-adapter",
-        "exportStatus": "partial",
+        "exportStatus": "missing",
         "exports": [
           "ElCollapseItem"
         ]
@@ -20914,11 +20854,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -20926,12 +20866,7 @@
           "scenarioIds": [
             "scenario.v2.el-collapse-item.input.title"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "outputs": [],
@@ -21103,17 +21038,6 @@
           }
         },
         {
-          "member": "title",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "isActive",
           "kind": "operation",
           "status": "missing",
@@ -21172,8 +21096,8 @@
       ],
       "coverage": {
         "total": 6,
-        "alignedCandidate": 3,
-        "partial": 1,
+        "alignedCandidate": 4,
+        "partial": 0,
         "missing": 2,
         "webOnly": 0,
         "mappedPercent": 66.7
@@ -26167,11 +26091,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -26179,12 +26103,7 @@
           "scenarioIds": [
             "scenario.v2.el-copyable-detail.input.label"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "monospace",
@@ -26535,17 +26454,6 @@
           }
         },
         {
-          "member": "label",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "monospace",
           "kind": "input",
           "status": "missing",
@@ -26666,8 +26574,8 @@
       ],
       "coverage": {
         "total": 12,
-        "alignedCandidate": 2,
-        "partial": 2,
+        "alignedCandidate": 3,
+        "partial": 1,
         "missing": 8,
         "webOnly": 0,
         "mappedPercent": 33.3
@@ -29926,7 +29834,7 @@
         "name": "ElDescriptionsItem",
         "module": "descriptions",
         "classification": "portable",
-        "exportStatus": "partial",
+        "exportStatus": "missing",
         "exports": [
           "ElDescriptionsItem"
         ]
@@ -30055,11 +29963,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -30067,12 +29975,7 @@
           "scenarioIds": [
             "scenario.v2.el-descriptions-item.input.label"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "labelAlign",
@@ -30368,17 +30271,6 @@
           }
         },
         {
-          "member": "label",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "labelAlign",
           "kind": "input",
           "status": "missing",
@@ -30477,8 +30369,8 @@
       ],
       "coverage": {
         "total": 8,
-        "alignedCandidate": 0,
-        "partial": 1,
+        "alignedCandidate": 1,
+        "partial": 0,
         "missing": 7,
         "webOnly": 0,
         "mappedPercent": 12.5
@@ -37400,7 +37292,7 @@
         "name": "ElEmpty",
         "module": "empty",
         "classification": "portable",
-        "exportStatus": "partial",
+        "exportStatus": "missing",
         "exports": [
           "ElEmpty"
         ]
@@ -37451,11 +37343,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -37463,12 +37355,7 @@
           "scenarioIds": [
             "scenario.v2.el-empty.input.description"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "descriptionLayout",
@@ -37781,17 +37668,6 @@
       },
       "platformDifferences": [
         {
-          "member": "description",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "descriptionLayout",
           "kind": "input",
           "status": "missing",
@@ -37904,8 +37780,8 @@
       ],
       "coverage": {
         "total": 8,
-        "alignedCandidate": 2,
-        "partial": 1,
+        "alignedCandidate": 3,
+        "partial": 0,
         "missing": 5,
         "webOnly": 0,
         "mappedPercent": 37.5
@@ -41027,11 +40903,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -41039,12 +40915,7 @@
           "scenarioIds": [
             "scenario.v2.el-form-item.input.label"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "labelWidth",
@@ -41272,7 +41143,7 @@
           "drift": {
             "type": "web string vs avalonia FsusComponentSize",
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -41709,17 +41580,6 @@
           }
         },
         {
-          "member": "label",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "labelWidth",
           "kind": "input",
           "status": "missing",
@@ -42056,8 +41916,8 @@
       ],
       "coverage": {
         "total": 20,
-        "alignedCandidate": 5,
-        "partial": 3,
+        "alignedCandidate": 6,
+        "partial": 2,
         "missing": 12,
         "webOnly": 0,
         "mappedPercent": 40
@@ -54059,7 +53919,7 @@
           "drift": {
             "type": "web object vs avalonia FsusMarkdownDocumentIdentity",
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -64430,7 +64290,7 @@
           "drift": {
             "type": "web array vs avalonia string",
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -64671,11 +64531,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -64683,12 +64543,7 @@
           "scenarioIds": [
             "scenario.v2.el-notification.input.title"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "type",
@@ -65081,17 +64936,6 @@
           }
         },
         {
-          "member": "title",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "type",
           "kind": "input",
           "status": "partial",
@@ -65283,8 +65127,8 @@
       ],
       "coverage": {
         "total": 18,
-        "alignedCandidate": 1,
-        "partial": 4,
+        "alignedCandidate": 2,
+        "partial": 3,
         "missing": 13,
         "webOnly": 0,
         "mappedPercent": 27.8
@@ -65431,7 +65275,7 @@
           "drift": {
             "type": "web array vs avalonia string",
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -65673,7 +65517,7 @@
         "name": "ElOptionGroup",
         "module": "select",
         "classification": "native-adapter",
-        "exportStatus": "partial",
+        "exportStatus": "aligned-candidate",
         "exports": [
           "ElOptionGroup"
         ]
@@ -65763,11 +65607,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -65775,12 +65619,7 @@
           "scenarioIds": [
             "scenario.v2.el-option-group.input.label"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "outputs": [],
@@ -65880,19 +65719,7 @@
         "interactionMs": 50,
         "memory": "no retained unbounded per-item state without virtualization budget"
       },
-      "platformDifferences": [
-        {
-          "member": "label",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        }
-      ],
+      "platformDifferences": [],
       "avaloniaExtras": [
         {
           "member": "Options",
@@ -65924,8 +65751,8 @@
       ],
       "coverage": {
         "total": 3,
-        "alignedCandidate": 2,
-        "partial": 1,
+        "alignedCandidate": 3,
+        "partial": 0,
         "missing": 0,
         "webOnly": 0,
         "mappedPercent": 100
@@ -66304,7 +66131,7 @@
         "name": "ElPageHeader",
         "module": "page-header",
         "classification": "portable",
-        "exportStatus": "partial",
+        "exportStatus": "missing",
         "exports": [
           "ElPageHeader"
         ]
@@ -66432,11 +66259,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -66444,12 +66271,7 @@
           "scenarioIds": [
             "scenario.v2.el-page-header.input.title"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "outputs": [
@@ -66732,17 +66554,6 @@
           }
         },
         {
-          "member": "title",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "back",
           "kind": "output",
           "status": "missing",
@@ -66852,8 +66663,8 @@
       ],
       "coverage": {
         "total": 10,
-        "alignedCandidate": 4,
-        "partial": 1,
+        "alignedCandidate": 5,
+        "partial": 0,
         "missing": 5,
         "webOnly": 0,
         "mappedPercent": 50
@@ -69652,11 +69463,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -69664,12 +69475,7 @@
           "scenarioIds": [
             "scenario.v2.el-perception-challenge.input.retry-label"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "state",
@@ -70538,17 +70344,6 @@
           }
         },
         {
-          "member": "retryLabel",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "state",
           "kind": "input",
           "status": "partial",
@@ -70961,8 +70756,8 @@
       ],
       "coverage": {
         "total": 40,
-        "alignedCandidate": 1,
-        "partial": 3,
+        "alignedCandidate": 2,
+        "partial": 2,
         "missing": 36,
         "webOnly": 0,
         "mappedPercent": 10
@@ -78577,11 +78372,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -78589,12 +78384,7 @@
           "scenarioIds": [
             "scenario.v2.el-public-shell.input.active-nav"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "activeNavMotion",
@@ -78672,11 +78462,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -78684,12 +78474,7 @@
           "scenarioIds": [
             "scenario.v2.el-public-shell.input.auth-href"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "authLabel",
@@ -78718,11 +78503,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -78730,12 +78515,7 @@
           "scenarioIds": [
             "scenario.v2.el-public-shell.input.auth-label"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "brand",
@@ -78764,11 +78544,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -78776,12 +78556,7 @@
           "scenarioIds": [
             "scenario.v2.el-public-shell.input.brand"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "brandHref",
@@ -78810,11 +78585,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -78822,12 +78597,7 @@
           "scenarioIds": [
             "scenario.v2.el-public-shell.input.brand-href"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "contentFlow",
@@ -80303,62 +80073,7 @@
       },
       "platformDifferences": [
         {
-          "member": "activeNav",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "activeNavMotion",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "authHref",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "authLabel",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "brand",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "brandHref",
           "kind": "input",
           "status": "partial",
           "governance": {
@@ -80967,8 +80682,8 @@
       ],
       "coverage": {
         "total": 45,
-        "alignedCandidate": 3,
-        "partial": 6,
+        "alignedCandidate": 8,
+        "partial": 1,
         "missing": 36,
         "webOnly": 0,
         "mappedPercent": 20
@@ -85111,11 +84826,11 @@
             "type": "System.Boolean?",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -85123,12 +84838,7 @@
           "scenarioIds": [
             "scenario.v2.el-responsive-collection.input.compact"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "compactQuery",
@@ -85196,11 +84906,11 @@
             "type": "System.Collections.ObjectModel.Collection<FsusUI.Avalonia.Controls.FsusResponsiveCollectionItem>",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -85208,12 +84918,7 @@
           "scenarioIds": [
             "scenario.v2.el-responsive-collection.input.items"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "renderStrategy",
@@ -85500,33 +85205,11 @@
           }
         },
         {
-          "member": "compact",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "compactQuery",
           "kind": "input",
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "items",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -85723,8 +85406,8 @@
       ],
       "coverage": {
         "total": 10,
-        "alignedCandidate": 0,
-        "partial": 3,
+        "alignedCandidate": 2,
+        "partial": 1,
         "missing": 7,
         "webOnly": 0,
         "mappedPercent": 30
@@ -85739,7 +85422,7 @@
         "name": "ElResult",
         "module": "result",
         "classification": "portable",
-        "exportStatus": "partial",
+        "exportStatus": "missing",
         "exports": [
           "ElResult"
         ]
@@ -85873,11 +85556,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -85885,12 +85568,7 @@
           "scenarioIds": [
             "scenario.v2.el-result.input.title"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "outputs": [],
@@ -86100,17 +85778,6 @@
           }
         },
         {
-          "member": "title",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "extra",
           "kind": "contentRegion",
           "status": "missing",
@@ -86189,8 +85856,8 @@
       ],
       "coverage": {
         "total": 7,
-        "alignedCandidate": 2,
-        "partial": 1,
+        "alignedCandidate": 3,
+        "partial": 0,
         "missing": 4,
         "webOnly": 0,
         "mappedPercent": 42.9
@@ -98302,7 +97969,7 @@
           "drift": {
             "type": "web object vs avalonia array",
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -100814,11 +100481,11 @@
             "type": "System.Func<System.Decimal, System.String>",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -100826,12 +100493,7 @@
           "scenarioIds": [
             "scenario.v2.el-statistic.input.formatter"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "groupSeparator",
@@ -100937,11 +100599,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -100949,12 +100611,7 @@
           "scenarioIds": [
             "scenario.v2.el-statistic.input.prefix"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "suffix",
@@ -100982,11 +100639,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -100994,12 +100651,7 @@
           "scenarioIds": [
             "scenario.v2.el-statistic.input.suffix"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "title",
@@ -101027,11 +100679,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -101039,12 +100691,7 @@
           "scenarioIds": [
             "scenario.v2.el-statistic.input.title"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "value",
@@ -101321,17 +100968,6 @@
           }
         },
         {
-          "member": "formatter",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "groupSeparator",
           "kind": "input",
           "status": "missing",
@@ -101348,39 +100984,6 @@
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "prefix",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "suffix",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "title",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -101472,8 +101075,8 @@
       ],
       "coverage": {
         "total": 13,
-        "alignedCandidate": 3,
-        "partial": 5,
+        "alignedCandidate": 7,
+        "partial": 1,
         "missing": 5,
         "webOnly": 0,
         "mappedPercent": 61.5
@@ -102169,11 +101772,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -102181,12 +101784,7 @@
           "scenarioIds": [
             "scenario.v2.el-step.input.description"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "icon",
@@ -102264,7 +101862,7 @@
           "drift": {
             "type": "web string vs avalonia FsusStepStatus",
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -102306,11 +101904,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -102318,12 +101916,7 @@
           "scenarioIds": [
             "scenario.v2.el-step.input.title"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         }
       ],
       "outputs": [
@@ -102523,17 +102116,6 @@
           }
         },
         {
-          "member": "description",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "icon",
           "kind": "input",
           "status": "missing",
@@ -102546,17 +102128,6 @@
         },
         {
           "member": "status",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "title",
           "kind": "input",
           "status": "partial",
           "governance": {
@@ -102614,8 +102185,8 @@
       ],
       "coverage": {
         "total": 9,
-        "alignedCandidate": 3,
-        "partial": 3,
+        "alignedCandidate": 5,
+        "partial": 1,
         "missing": 3,
         "webOnly": 0,
         "mappedPercent": 66.7
@@ -114598,7 +114169,7 @@
           "drift": {
             "type": "web object vs avalonia FsusThemeModeToggleLabels",
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -116458,11 +116029,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -116470,12 +116041,7 @@
           "scenarioIds": [
             "scenario.v2.el-time-select.input.format"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "maxTime",
@@ -117150,17 +116716,6 @@
           }
         },
         {
-          "member": "format",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "maxTime",
           "kind": "input",
           "status": "missing",
@@ -117506,8 +117061,8 @@
       ],
       "coverage": {
         "total": 22,
-        "alignedCandidate": 1,
-        "partial": 5,
+        "alignedCandidate": 2,
+        "partial": 4,
         "missing": 16,
         "webOnly": 0,
         "mappedPercent": 27.3
@@ -117711,7 +117266,7 @@
         "name": "ElTimelineItem",
         "module": "timeline",
         "classification": "portable",
-        "exportStatus": "partial",
+        "exportStatus": "missing",
         "exports": [
           "ElTimelineItem"
         ]
@@ -118001,11 +117556,11 @@
             "type": "System.String",
             "nullable": true
           },
-          "status": "partial",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
-            "nullability": "web nullable=false vs avalonia nullable=true",
+            "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
             "enumValues": null
@@ -118013,12 +117568,7 @@
           "scenarioIds": [
             "scenario.v2.el-timeline-item.input.timestamp"
           ],
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "type",
@@ -118261,17 +117811,6 @@
           }
         },
         {
-          "member": "timestamp",
-          "kind": "input",
-          "status": "partial",
-          "governance": {
-            "reason": "Real member exists on both sides but semantic drift was detected.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "type",
           "kind": "input",
           "status": "missing",
@@ -118327,8 +117866,8 @@
       ],
       "coverage": {
         "total": 10,
-        "alignedCandidate": 1,
-        "partial": 1,
+        "alignedCandidate": 2,
+        "partial": 0,
         "missing": 8,
         "webOnly": 0,
         "mappedPercent": 20
@@ -134861,11 +134400,11 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 170,
-    "partial": 77,
-    "missing": 1711,
+    "aligned-candidate": 200,
+    "partial": 50,
+    "missing": 1708,
     "web-only": 45,
     "total": 2003,
-    "mappedPercent": 12.3
+    "mappedPercent": 12.5
   }
 }

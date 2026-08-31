@@ -655,18 +655,32 @@ public class FsusAutoResizer : ContentControl
   }
 
   public string? AccessibleName { get; set; }
+  public bool DisableHeight { get; set; }
+  public bool DisableWidth { get; set; }
+  public Action<Size> OnResize { get; set; } = static _ => { };
   public Size Viewport { get; set; }
 
   public bool Resize(Size viewport)
   {
-    if (Viewport == viewport)
+    var next = new Size(
+      DisableWidth ? Viewport.Width : viewport.Width,
+      DisableHeight ? Viewport.Height : viewport.Height);
+    if (Viewport == next)
     {
       return false;
     }
 
-    Viewport = viewport;
+    Viewport = next;
     SyncState();
+    OnResize(next);
     return true;
+  }
+
+  protected override Size ArrangeOverride(Size finalSize)
+  {
+    var arranged = base.ArrangeOverride(finalSize);
+    Resize(finalSize);
+    return arranged;
   }
 
   private void SyncState()

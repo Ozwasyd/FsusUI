@@ -1149,6 +1149,30 @@
           "isStatic": false
         },
         {
+          "name": "DisableHeight",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DisableWidth",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "OnResize",
+          "type": "System.Action\u003CAvalonia.Size\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "Viewport",
           "type": "Avalonia.Size",
           "nullable": false,

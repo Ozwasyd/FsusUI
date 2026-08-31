@@ -4,6 +4,7 @@ import path from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
 import {
+  compareMembers,
   validateRegistry,
   MARKDOWN_EDITOR_GATE_PATH,
   CONTRACT_V2_REGISTRY_PATH,
@@ -25,6 +26,31 @@ const committedRegistry = JSON.parse(
 )
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
+
+test('optional Vue absence matches nullable Avalonia inputs', () => {
+  const optional = compareMembers({
+    kind: 'input',
+    web: {
+      categories: ['function'],
+      nullable: false,
+      required: false,
+    },
+    avalonia: { categories: ['function'], nullable: true },
+  })
+  assert.equal(optional.compatible, true)
+
+  const required = compareMembers({
+    kind: 'input',
+    web: {
+      categories: ['function'],
+      nullable: false,
+      required: true,
+    },
+    avalonia: { categories: ['function'], nullable: true },
+  })
+  assert.equal(required.compatible, false)
+  assert.match(required.drift.nullability, /web nullable=false/u)
+})
 
 const replaceAtPath = (value, pointer, replacement) => {
   const segments = pointer

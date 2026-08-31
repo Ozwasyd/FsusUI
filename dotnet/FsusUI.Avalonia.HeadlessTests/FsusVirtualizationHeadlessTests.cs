@@ -192,6 +192,31 @@ public class FsusVirtualizationHeadlessTests
   }
 
   [AvaloniaFact]
+  public void AutoResizerObservesArrangedViewportAndHonorsDisabledAxes()
+  {
+    var observations = new List<Size>();
+    var resizer = new FsusAutoResizer
+    {
+      OnResize = observations.Add,
+    };
+
+    resizer.Measure(new Size(320, 180));
+    resizer.Arrange(new Rect(0, 0, 320, 180));
+
+    Assert.Equal(new Size(320, 180), resizer.Viewport);
+    Assert.Equal(new Size(320, 180), Assert.Single(observations));
+
+    resizer.DisableWidth = true;
+    Assert.True(resizer.Resize(new Size(640, 240)));
+    Assert.Equal(new Size(320, 240), resizer.Viewport);
+    Assert.Equal(new Size(320, 240), observations[^1]);
+
+    resizer.DisableHeight = true;
+    Assert.False(resizer.Resize(new Size(800, 500)));
+    Assert.Equal(2, observations.Count);
+  }
+
+  [AvaloniaFact]
   public void AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget()
   {
     var resizer = new FsusAutoResizer
