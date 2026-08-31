@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
@@ -457,6 +458,50 @@ public class FsusVirtualizationHeadlessTests
     Assert.Equal(sorted, table.SortBy);
     Assert.Equal(sorted, table.SortState);
     Assert.False(table.SortColumn("missing", FsusSortDirection.Descending));
+  }
+
+  [AvaloniaFact]
+  public void TableV2RendersBoundedContentRegions()
+  {
+    var template = new FuncDataTemplate<object>((_, _) => new TextBlock());
+    var table = new FsusTableV2
+    {
+      RowHeight = 24,
+      ColumnWidth = 100,
+      ViewportWidth = 200,
+      ViewportHeight = 48,
+      Overscan = 0,
+      HeaderCellContent = template,
+      RowContent = template,
+      FooterContent = template,
+      FooterHeight = 24,
+      OverlayContent = template,
+    };
+    table.Columns.Add(new FsusDataTableColumn("name", "Name"));
+    table.Columns.Add(new FsusDataTableColumn("score", "Score"));
+    for (var row = 0; row < 20; row++)
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{row}", new Dictionary<string, object?>
+      {
+        ["name"] = $"Row {row}",
+        ["score"] = row,
+      }));
+    }
+
+    table.RefreshLayout();
+
+    Assert.Equal(2, table.HeaderContentPresenterCount);
+    Assert.Equal(2, table.RowContentPresenterCount);
+    Assert.True(table.IsFooterContentVisible);
+    Assert.True(table.IsOverlayContentVisible);
+    Assert.False(table.IsEmptyContentVisible);
+
+    var empty = new FsusTableV2
+    {
+      EmptyContent = template,
+    };
+    empty.RefreshLayout();
+    Assert.True(empty.IsEmptyContentVisible);
   }
 
   [AvaloniaFact]

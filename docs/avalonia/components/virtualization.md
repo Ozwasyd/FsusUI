@@ -46,6 +46,10 @@ expanded-row changes update `ExpandedRowKeys` before invoking
 `ViewportHeight`, and `ViewportMaxHeight`; those values size the owned
 `ScrollViewer` and its realized window. `SortColumn` orders typed row values,
 updates `SortBy`/`SortState`, and then invokes `OnColumnSort`.
+`HeaderContent`, `HeaderCellContent`, `RowContent`, `EmptyContent`,
+`FooterContent`, and `OverlayContent` are mounted in bounded presenters around
+the owned scroll surface. Row presenters are limited to the realized window;
+`HeaderHeights` and `FooterHeight` reserve their corresponding regions.
 
 Measurement corrections before the active anchor adjust the scroll offset so
 the same logical item remains visually stable. `NotifyItemsInserted` preserves

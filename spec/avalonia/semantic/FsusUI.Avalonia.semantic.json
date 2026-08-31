@@ -23386,6 +23386,14 @@
           "isStatic": false
         },
         {
+          "name": "EmptyContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "EstimatedRowHeight",
           "type": "System.Double?",
           "nullable": true,
@@ -23442,6 +23450,22 @@
           "isStatic": false
         },
         {
+          "name": "FooterContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "FooterHeight",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "FrozenColumnCount",
           "type": "System.Int32",
           "nullable": false,
@@ -23455,6 +23479,62 @@
           "nullable": false,
           "canRead": true,
           "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderCellContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderContentPresenterCount",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderHeights",
+          "type": "System.Collections.ObjectModel.Collection\u003CSystem.Double\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsEmptyContentVisible",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsFooterContentVisible",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsOverlayContentVisible",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
           "isStatic": false
         },
         {
@@ -23532,6 +23612,14 @@
         {
           "name": "OnScroll",
           "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2ScrollPosition\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "OverlayContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -23623,6 +23711,22 @@
           "nullable": false,
           "canRead": true,
           "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RowContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RowContentPresenterCount",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
           "isStatic": false
         },
         {

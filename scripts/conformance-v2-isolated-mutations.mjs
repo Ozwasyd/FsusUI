@@ -213,6 +213,18 @@ const cases = [
     expected: 'contract-v2.json drifted from generated output',
   },
   {
+    id: 'table-v2-header-height-binding-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        "headerHeight: { member: 'HeaderHeights' },",
+        "headerHeight: { member: 'HeaderHeightMissing' },",
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
     id: 'table-v2-sort-object-category-mutated',
     file: 'scripts/contract-v2.mjs',
     inject: () =>
@@ -350,6 +362,24 @@ const cases = [
       'OnColumnSort?.Invoke(SortBy);',
       '_ = SortBy;',
       'TableV2SortsTypedRowsAndReportsColumnSort',
+    ],
+    [
+      'table-v2-header-region-mutated',
+      'headerCellHost.Children.Add(presenter);',
+      '_ = presenter;',
+      'TableV2RendersBoundedContentRegions',
+    ],
+    [
+      'table-v2-row-region-bounds-mutated',
+      'foreach (var rowIndex in realizedRows)',
+      'foreach (var rowIndex in Enumerable.Range(0, rowCount))',
+      'TableV2RendersBoundedContentRegions',
+    ],
+    [
+      'table-v2-empty-region-mutated',
+      'emptyHost.IsVisible = rowCount == 0 && EmptyContent is not null;',
+      'emptyHost.IsVisible = false;',
+      'TableV2RendersBoundedContentRegions',
     ],
   ].map(([id, from, to, test]) => ({
     id,

@@ -1,0 +1,193 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Templates;
+using Avalonia.Headless.XUnit;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
+using FsusUI.Avalonia.Controls;
+using FsusUI.Avalonia.Themes;
+
+namespace FsusUI.Avalonia.HeadlessTests;
+
+public class FsusTableV2RenderedEvidenceTests
+{
+  [AvaloniaFact]
+  public void RendersPopulatedAndEmptyContentRegionsToPng()
+  {
+    var headerTemplate = new FuncDataTemplate<FsusDataTableColumn>((column, _) =>
+      new Border
+      {
+        Padding = new Thickness(8, 6),
+        Background = new SolidColorBrush(Color.Parse("#F4F6F8")),
+        BorderBrush = new SolidColorBrush(Color.Parse("#D5DCE5")),
+        BorderThickness = new Thickness(0, 0, 1, 1),
+        Child = new TextBlock
+        {
+          Text = column?.Header ?? string.Empty,
+          FontWeight = FontWeight.SemiBold,
+        },
+      });
+    var rowTemplate = new FuncDataTemplate<FsusDataTableRow>((_, _) =>
+      new Border
+      {
+        BorderBrush = new SolidColorBrush(Color.Parse("#E5E9EF")),
+        BorderThickness = new Thickness(0, 0, 0, 1),
+        IsHitTestVisible = false,
+      });
+    var footerTemplate = new FuncDataTemplate<object>((_, _) =>
+      new Border
+      {
+        Padding = new Thickness(8, 5),
+        Background = new SolidColorBrush(Color.Parse("#F8F9FB")),
+        Child = new TextBlock { Text = "20 rows" },
+      });
+    var emptyTemplate = new FuncDataTemplate<object>((_, _) =>
+      new Border
+      {
+        Padding = new Thickness(12),
+        Child = new TextBlock
+        {
+          Text = "No rows",
+          HorizontalAlignment = HorizontalAlignment.Center,
+        },
+      });
+
+    var table = CreateTable();
+    table.HeaderCellContent = headerTemplate;
+    table.RowContent = rowTemplate;
+    table.FooterContent = footerTemplate;
+    table.FooterHeight = 32;
+    table.RefreshLayout();
+
+    var empty = new FsusTableV2
+    {
+      AccessibleName = "Empty review table",
+      ViewportWidth = 440,
+      ViewportHeight = 96,
+      EmptyContent = emptyTemplate,
+    };
+    empty.HeaderHeights.Clear();
+    empty.RefreshLayout();
+
+    var stack = new StackPanel
+    {
+      Margin = new Thickness(24),
+      Spacing = 20,
+      Children =
+      {
+        new TextBlock
+        {
+          Text = "Table V2 content regions",
+          FontSize = 18,
+          FontWeight = FontWeight.SemiBold,
+        },
+        table,
+        empty,
+      },
+    };
+    var surface = new Border
+    {
+      Width = 488,
+      Height = 540,
+      Background = Brushes.White,
+      Child = stack,
+    };
+    var window = new Window
+    {
+      Width = 488,
+      Height = 540,
+      Content = surface,
+      ShowInTaskbar = false,
+    };
+    AttachTheme(window);
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+    window.Measure(new Size(488, 540));
+    window.Arrange(new Rect(0, 0, 488, 540));
+    surface.Measure(new Size(488, 540));
+    surface.Arrange(new Rect(0, 0, 488, 540));
+    Dispatcher.UIThread.RunJobs();
+
+    var repositoryRoot = FindRepositoryRoot();
+    var outputDirectory = Path.Combine(
+      repositoryRoot,
+      "tests",
+      "conformance",
+      "visual",
+      "artifacts",
+      "issue-285-table-v2");
+    Directory.CreateDirectory(outputDirectory);
+    var outputPath = Path.Combine(outputDirectory, "table-v2-content-regions-light.png");
+    using var bitmap = new RenderTargetBitmap(new PixelSize(488, 540), new Vector(96, 96));
+    bitmap.Render(surface);
+    using (var stream = File.Create(outputPath))
+    {
+      bitmap.Save(stream);
+    }
+
+    Assert.Equal(3, table.HeaderContentPresenterCount);
+    Assert.InRange(table.RowContentPresenterCount, 1, 8);
+    Assert.True(table.IsFooterContentVisible);
+    Assert.True(empty.IsEmptyContentVisible);
+    Assert.True(new FileInfo(outputPath).Length > 4_000);
+    window.Close();
+  }
+
+  private static FsusTableV2 CreateTable()
+  {
+    var table = new FsusTableV2
+    {
+      AccessibleName = "Review table",
+      RowHeight = 28,
+      ColumnWidth = 146,
+      ViewportWidth = 440,
+      ViewportHeight = 220,
+      Overscan = 0,
+    };
+    table.HeaderHeights.Clear();
+    table.HeaderHeights.Add(36);
+    table.Columns.Add(new FsusDataTableColumn("name", "Name"));
+    table.Columns.Add(new FsusDataTableColumn("status", "Status"));
+    table.Columns.Add(new FsusDataTableColumn("owner", "Owner"));
+    for (var row = 1; row <= 20; row++)
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{row}", new Dictionary<string, object?>
+      {
+        ["name"] = $"Contract {row}",
+        ["status"] = row % 2 == 0 ? "Aligned" : "Review",
+        ["owner"] = "FsusUI",
+      }));
+    }
+    return table;
+  }
+
+  private static void AttachTheme(Window window)
+  {
+    var resources = new ResourceDictionary();
+    new FsusThemeManager().Apply(resources, new FsusThemeOptions
+    {
+      Variant = FsusThemeVariant.Light,
+      MotionMode = FsusMotionMode.Reduced,
+    });
+    window.Resources.MergedDictionaries.Add(resources);
+    window.Styles.Add(
+      new global::Avalonia.Markup.Xaml.Styling.StyleInclude(
+        new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
+      {
+        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
+      });
+  }
+
+  private static string FindRepositoryRoot()
+  {
+    var current = new DirectoryInfo(AppContext.BaseDirectory);
+    while (current is not null && !File.Exists(Path.Combine(current.FullName, "pnpm-workspace.yaml")))
+    {
+      current = current.Parent;
+    }
+    return current?.FullName
+      ?? throw new InvalidOperationException("Unable to locate repository root.");
+  }
+}

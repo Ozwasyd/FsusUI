@@ -39,6 +39,7 @@ const AVALONIA_MEMBER_BINDINGS = {
     inputs: {
       cache: { member: 'Overscan' },
       height: { member: 'ViewportHeight' },
+      headerHeight: { member: 'HeaderHeights' },
       maxHeight: { member: 'ViewportMaxHeight' },
       width: { member: 'ViewportWidth' },
     },
