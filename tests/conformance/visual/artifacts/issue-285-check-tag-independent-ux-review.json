@@ -1,19 +1,19 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "a4cf59e7017f237f8549703a44516c96bd3d7aef",
+  "candidateSha": "e419066cb7470fcb330eabfffabaec1f95c5a73f",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-a4cf59e7017f237f8549703a44516c96bd3d7aef",
+    "executionId": "conformance-v2-check-tag-e419066cb7470fcb330eabfffabaec1f95c5a73f",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "7abc5f7c6e526cae6fd1f98ec4f8f7b4b1c1463bc0db4848e7ad103d09bf946a",
-    "webBaselineHash": "4832864259e23de6e04b1d12e85d6f5142a2d8de3057773d47bfc48bd0ff618f",
+    "contractHash": "4e1e907f7db5eb4e043ee093613ddf8dd525d2ffd47e2b6bd7a4401fe1efe361",
+    "webBaselineHash": "d95825aa119c142c0409db14db4731c527d22d53c1961edddc737b42cc4631da",
     "avaloniaBaselineHash": "9ab83ab32d4a3784b3470f78a52df55646b90382f5e6eea23fd298b964d25441",
-    "runnerHash": "cf54c07bb273c8507f52aa5c85932b984814f78960eeabcb74c3444ac0f19ca3"
+    "runnerHash": "aafd49ec76d8c90e060df9684c07f9a33b8da42cb8a857499d9fa1b1d64c0df7"
   },
   "viewportStateMatrix": [
     {
