@@ -334,6 +334,14 @@ const avaloniaEventRef = (event) => ({
   argsType: event.argsType,
 })
 
+const webEventRef = (emit) => ({
+  member: emit.name,
+  baseline: VUE_BASELINE_PATH,
+  payload: emit.payload ?? [],
+  payloadType:
+    emit.payload?.length === 1 ? (emit.payload[0].type ?? null) : null,
+})
+
 const avaloniaMethodRef = (method) => ({
   member: method.name,
   signature: {
@@ -474,15 +482,16 @@ const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
 }
 
 const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => {
+  const web = webEventRef(emit)
   if (!avaloniaType) {
     return {
-      name: emit,
+      name: emit.name,
       kind: 'output',
-      web: { member: emit, baseline: VUE_BASELINE_PATH },
+      web,
       avalonia: null,
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
-      scenarioIds: [scenarioId(contractKebab, 'output', emit)],
+      scenarioIds: [scenarioId(contractKebab, 'output', emit.name)],
       governance:
         classification === 'web-only'
           ? defaultGovernance(
@@ -493,7 +502,7 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
             ),
     }
   }
-  const avalonia = matchAvaloniaEvent(emit, avaloniaType)
+  const avalonia = matchAvaloniaEvent(emit.name, avaloniaType)
   let status
   let governance = null
   let drift = emptyDrift()
@@ -509,7 +518,7 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
     )
   } else {
     const comparison = compareMembers({
-      web: { categories: ['unknown'], payloadType: null },
+      web: { ...web, categories: ['unknown'] },
       avalonia: avaloniaEventRef(avalonia),
       kind: 'output',
     })
@@ -522,27 +531,35 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
     }
   }
   return {
-    name: emit,
+    name: emit.name,
     kind: 'output',
-    web: { member: emit, baseline: VUE_BASELINE_PATH },
+    web,
     avalonia: avalonia ? avaloniaEventRef(avalonia) : null,
     status,
     drift,
-    scenarioIds: [scenarioId(contractKebab, 'output', emit)],
+    scenarioIds: [scenarioId(contractKebab, 'output', emit.name)],
     governance,
   }
 }
 
 const operationMember = ({ contractKebab, exposed, avaloniaType, classification }) => {
+  const web = {
+    member: exposed.name,
+    baseline: VUE_BASELINE_PATH,
+    signature: {
+      returnType: exposed.returnType ?? null,
+      parameters: exposed.parameters ?? [],
+    },
+  }
   if (!avaloniaType) {
     return {
-      name: exposed,
+      name: exposed.name,
       kind: 'operation',
-      web: { member: exposed, baseline: VUE_BASELINE_PATH },
+      web,
       avalonia: null,
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
-      scenarioIds: [scenarioId(contractKebab, 'operation', exposed)],
+      scenarioIds: [scenarioId(contractKebab, 'operation', exposed.name)],
       governance:
         classification === 'web-only'
           ? defaultGovernance(
@@ -553,7 +570,7 @@ const operationMember = ({ contractKebab, exposed, avaloniaType, classification 
             ),
     }
   }
-  const avalonia = matchAvaloniaMethod(exposed, avaloniaType)
+  const avalonia = matchAvaloniaMethod(exposed.name, avaloniaType)
   let status
   let governance = null
   let drift = emptyDrift()
@@ -569,7 +586,7 @@ const operationMember = ({ contractKebab, exposed, avaloniaType, classification 
     )
   } else {
     const comparison = compareMembers({
-      web: { categories: ['unknown'], signature: null },
+      web: { categories: ['unknown'], signature: web.signature },
       avalonia: avaloniaMethodRef(avalonia),
       kind: 'operation',
     })
@@ -582,13 +599,13 @@ const operationMember = ({ contractKebab, exposed, avaloniaType, classification 
     }
   }
   return {
-    name: exposed,
+    name: exposed.name,
     kind: 'operation',
-    web: { member: exposed, baseline: VUE_BASELINE_PATH },
+    web,
     avalonia: avalonia ? avaloniaMethodRef(avalonia) : null,
     status,
     drift,
-    scenarioIds: [scenarioId(contractKebab, 'operation', exposed)],
+    scenarioIds: [scenarioId(contractKebab, 'operation', exposed.name)],
     governance,
   }
 }
@@ -763,10 +780,20 @@ const contractForComponent = ({ component, avaloniaType, gate }) => {
   const inputs = (component.semantic?.props ?? []).map((prop) =>
     inputMember({ contractKebab, prop, avaloniaType, classification }),
   )
-  const outputs = (component.emits ?? []).map((emit) =>
+  const semanticEmits =
+    component.semantic?.emits ??
+    (component.emits ?? []).map((name) => ({ name, payload: [] }))
+  const semanticExposed =
+    component.semantic?.exposed ??
+    (component.exposed ?? []).map((name) => ({
+      name,
+      parameters: [],
+      returnType: null,
+    }))
+  const outputs = semanticEmits.map((emit) =>
     outputMember({ contractKebab, emit, avaloniaType, classification }),
   )
-  const operations = (component.exposed ?? []).map((exposed) =>
+  const operations = semanticExposed.map((exposed) =>
     operationMember({ contractKebab, exposed, avaloniaType, classification }),
   )
   const contentRegions = (component.slots ?? []).map((slot) =>

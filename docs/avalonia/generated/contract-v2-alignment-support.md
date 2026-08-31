@@ -58,7 +58,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-divider` | `partial` |
 | `component-v2.el-drawer` | `partial` |
 | `component-v2.el-dropdown` | `partial` |
-| `component-v2.el-dropdown-item` | `blocked` |
+| `component-v2.el-dropdown-item` | `partial` |
 | `component-v2.el-dropdown-menu` | `blocked` |
 | `component-v2.el-empty` | `partial` |
 | `component-v2.el-empty-selection-state` | `missing` |
@@ -89,7 +89,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-main` | `blocked` |
 | `component-v2.el-markdown-editor` | `partial` |
 | `component-v2.el-markdown-renderer` | `missing` |
-| `component-v2.el-menu` | `partial` |
+| `component-v2.el-menu` | `blocked` |
 | `component-v2.el-menu-item` | `partial` |
 | `component-v2.el-menu-item-group` | `partial` |
 | `component-v2.el-message` | `missing` |

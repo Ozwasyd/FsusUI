@@ -127,6 +127,47 @@ test('content regions bind only to real Avalonia content properties', () => {
   )
 })
 
+test('resolved Vue emits and exposed signatures own Contract V2 members', () => {
+  const checkTag = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-check-tag',
+  )
+  assert.deepEqual(
+    checkTag.outputs.map(({ name, web }) => ({ name, payload: web.payload })),
+    [
+      {
+        name: 'change',
+        payload: [
+          {
+            name: 'value',
+            type: 'boolean',
+            optional: false,
+            rest: false,
+          },
+        ],
+      },
+      {
+        name: 'update:checked',
+        payload: [
+          {
+            name: 'value',
+            type: 'boolean',
+            optional: false,
+            rest: false,
+          },
+        ],
+      },
+    ],
+  )
+
+  const unresolvedConstants = committedRegistry.contracts.flatMap(
+    (contract) =>
+      contract.outputs
+        .map((output) => output.name)
+        .filter((name) => /^\[.+\]$/u.test(name)),
+  )
+  assert.deepEqual(unresolvedConstants, [])
+})
+
 for (const mutation of mutations) {
   test(`mutation fixture kills ${mutation.name}`, () => {
     const mutated = applyMutation(validRegistry, mutation)
