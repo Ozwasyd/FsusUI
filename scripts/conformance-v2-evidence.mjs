@@ -28,6 +28,20 @@ const requiredIdentity = [
   'runnerHash',
 ]
 const validatedComparisons = new WeakSet()
+const scenarioArtifactPolicy = (scenario) => {
+  if (scenario.includes('.input.')) return { action: 'render', artifacts: ['interaction', 'state'] }
+  if (scenario.includes('.output.')) return { action: 'event', artifacts: ['event'] }
+  if (scenario.includes('.content-region.'))
+    return { action: 'content', artifacts: ['content', 'accessibility', 'visual'] }
+  if (scenario.includes('.state.')) return { action: 'render', artifacts: ['state'] }
+  if (scenario.endsWith('.keyboard')) return { action: 'keyboard', artifacts: ['interaction', 'event'] }
+  if (scenario.endsWith('.pointer')) return { action: 'pointer', artifacts: ['interaction', 'event'] }
+  if (scenario.endsWith('.focus')) return { action: 'focus', artifacts: ['focus', 'visual'] }
+  if (scenario.endsWith('.a11y')) return { action: 'accessibility', artifacts: ['accessibility'] }
+  if (scenario.endsWith('.motion')) return { action: 'motion', artifacts: ['motion'] }
+  if (scenario.endsWith('.perf')) return { action: 'performance', artifacts: ['performance'] }
+  return null
+}
 const governedOverride = [
   'field',
   'reason',
@@ -221,6 +235,19 @@ const validateContractExecution = (execution, platform, contractId) => {
       fail(`${platform}.${contractId}.coverage.scenario.${scenario}.stepIndexes invalid`)
     if (!Array.isArray(receipt.artifacts) || receipt.artifacts.length === 0)
       fail(`${platform}.${contractId}.coverage.scenario.${scenario}.artifacts missing`)
+    const policy = scenarioArtifactPolicy(scenario)
+    if (!policy)
+      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.policy missing`)
+    for (const artifact of policy.artifacts) {
+      if (!receipt.artifacts.includes(artifact))
+        fail(`${platform}.${contractId}.coverage.scenario.${scenario}.artifact.${artifact} missing`)
+    }
+    if (
+      !receipt.stepIndexes.some(
+        (index) => execution.steps[index]?.action === policy.action,
+      )
+    )
+      fail(`${platform}.${contractId}.coverage.scenario.${scenario}.action.${policy.action} missing`)
   }
   same(execution.identity, execution.visual?.identity, `${platform}.${contractId}.visual.identity`)
   same(
@@ -231,15 +258,28 @@ const validateContractExecution = (execution, platform, contractId) => {
   if (
     execution.visual?.renderedTopLevel !== true ||
     !execution.visual?.sha256 ||
+    execution.visual?.artifactBytes < 1024 ||
+    execution.visual?.observation?.width <= 0 ||
+    execution.visual?.observation?.height <= 0 ||
     execution.visual?.observation?.focusIndicatorVisible !== true
   )
     fail(`${platform}.${contractId}.visual rendered focused artifact missing`)
   if (
     execution.performance?.passed !== true ||
-    !Number.isFinite(execution.performance?.elapsedMilliseconds) ||
-    !Number.isFinite(execution.performance?.budgetMilliseconds) ||
-    execution.performance.elapsedMilliseconds >
-      execution.performance.budgetMilliseconds
+    !Number.isFinite(execution.performance?.renderMilliseconds) ||
+    !Number.isFinite(execution.performance?.interactionMilliseconds) ||
+    !Number.isFinite(execution.performance?.budget?.renderMs) ||
+    !Number.isFinite(execution.performance?.budget?.interactionMs) ||
+    execution.performance.renderMilliseconds >
+      execution.performance.budget.renderMs ||
+    execution.performance.interactionMilliseconds >
+      execution.performance.budget.interactionMs ||
+    typeof execution.performance.budget.memory !== 'string' ||
+    execution.performance.memoryObservation?.policy !==
+      execution.performance.budget.memory ||
+    execution.performance.memoryObservation?.inputItemCount !== 0 ||
+    execution.performance.memoryObservation?.retainedPerItemStateCount !== 0 ||
+    execution.performance.memoryObservation?.bounded !== true
   )
     fail(`${platform}.${contractId}.performance budget failed`)
   if (!execution.accessibility?.node)
@@ -272,6 +312,7 @@ const compareCheckTagExecution = (web, avalonia) => {
   for (const field of requiredIdentity)
     same(web.identity[field], avalonia.identity[field], `${contractId}.identity.${field}`)
   same(web.coverage, avalonia.coverage, `${contractId}.coverage`)
+  same(web.performance.budget, avalonia.performance.budget, `${contractId}.performance.budget`)
   same(false, web.state.checked, `${contractId}.web.state.checked`)
   same(false, avalonia.state.checked, `${contractId}.avalonia.state.checked`)
   same(web.state.revision, avalonia.state.revision, `${contractId}.state.revision`)
@@ -331,6 +372,7 @@ const compareCheckTagExecution = (web, avalonia) => {
     identity: web.identity,
     evidenceDigests: { web: digest(web), avalonia: digest(avalonia) },
     coverage: web.coverage,
+    performanceBudget: web.performance.budget,
     comparedArtifacts: [
       'required-member-coverage',
       'same-identity-keyboard-evidence',
@@ -339,6 +381,7 @@ const compareCheckTagExecution = (web, avalonia) => {
       'same-identity-a11y-evidence',
       'same-identity-motion-evidence',
       'same-identity-perf-evidence',
+      'same-identity-visual-evidence',
       'same-identity-cross-platform-comparison',
     ],
   }
@@ -699,6 +742,11 @@ const evidenceArtifactsFor = (contract) => {
     if ((requirements ?? []).length > 0)
       artifacts.add(`same-identity-${kind}-evidence`)
   }
+  if (
+    (contract.contentRegions ?? []).length > 0 ||
+    (contract.requirements?.focus ?? []).length > 0
+  )
+    artifacts.add('same-identity-visual-evidence')
   artifacts.add('same-identity-cross-platform-comparison')
   return [...artifacts]
 }
@@ -819,23 +867,86 @@ const validateReceiptForContract = (contract, receipt) => {
   const expectedMembers = contractMembers(contract)
     .map((member) => `${toCoverageKind(member.kind)}.${member.name}`)
     .sort()
-  if (expectedMembers.length > 0) {
-    same(
-      expectedScenarios,
-      [...(receipt.coverage?.requiredScenarios ?? [])].sort(),
-      `alignment.receipt.${contract.id}.coverage.requiredScenarios`,
-    )
-    same(
-      expectedMembers,
-      [...(receipt.coverage?.requiredMembers ?? [])].sort(),
-      `alignment.receipt.${contract.id}.coverage.requiredMembers`,
-    )
-    for (const member of expectedMembers) {
-      if (!receipt.coverage?.memberScenarios?.[member]?.length)
-        fail(`alignment.receipt.${contract.id}.coverage.member.${member} missing`)
-    }
+  const claimedScenarios = [
+    ...(receipt.coverage?.requiredScenarios ?? []),
+  ].sort()
+  const claimedMembers = [...(receipt.coverage?.requiredMembers ?? [])].sort()
+  for (const scenario of claimedScenarios) {
+    if (!expectedScenarios.includes(scenario))
+      fail(`alignment.receipt.${contract.id}.coverage.scenario.${scenario} unexpected`)
   }
+  for (const member of claimedMembers) {
+    if (!expectedMembers.includes(member))
+      fail(`alignment.receipt.${contract.id}.coverage.member.${member} unexpected`)
+  }
+  for (const member of claimedMembers) {
+      const [kind, ...nameParts] = member.split('.')
+      const name = nameParts.join('.')
+      const contractMember = contractMembers(contract).find(
+        (candidate) =>
+          toCoverageKind(candidate.kind) === kind && candidate.name === name,
+      )
+      const expectedMemberScenarios = [
+        ...new Set(contractMember?.scenarioIds ?? []),
+      ].sort()
+      for (const scenario of receipt.coverage?.memberScenarios?.[member] ?? []) {
+        if (!expectedMemberScenarios.includes(scenario))
+          fail(`alignment.receipt.${contract.id}.coverage.member.${member}.scenario.${scenario} unexpected`)
+      }
+    }
+  if (receipt.performanceBudget)
+    same(
+      {
+        renderMs: contract.performanceBudget?.renderMs,
+        interactionMs: contract.performanceBudget?.interactionMs,
+        memory: contract.performanceBudget?.memory,
+      },
+      receipt.performanceBudget,
+      `alignment.receipt.${contract.id}.performanceBudget`,
+    )
   return receipt
+}
+
+const receiptCoverageComplete = (contract, receipt) => {
+  if (!receipt) return false
+  const expectedScenarios = [...new Set(contract.scenarioIds ?? [])].sort()
+  const expectedMembers = contractMembers(contract)
+    .map((member) => `${toCoverageKind(member.kind)}.${member.name}`)
+    .sort()
+  const claimedScenarios = [
+    ...(receipt.coverage?.requiredScenarios ?? []),
+  ].sort()
+  const claimedMembers = [...(receipt.coverage?.requiredMembers ?? [])].sort()
+  if (
+    JSON.stringify(expectedScenarios) !== JSON.stringify(claimedScenarios) ||
+    JSON.stringify(expectedMembers) !== JSON.stringify(claimedMembers)
+  )
+    return false
+  for (const member of expectedMembers) {
+    const [kind, ...nameParts] = member.split('.')
+    const name = nameParts.join('.')
+    const contractMember = contractMembers(contract).find(
+      (candidate) =>
+        toCoverageKind(candidate.kind) === kind && candidate.name === name,
+    )
+    const expectedMemberScenarios = [
+      ...new Set(contractMember?.scenarioIds ?? []),
+    ].sort()
+    const claimedMemberScenarios = [
+      ...(receipt.coverage?.memberScenarios?.[member] ?? []),
+    ].sort()
+    if (
+      JSON.stringify(expectedMemberScenarios) !==
+      JSON.stringify(claimedMemberScenarios)
+    )
+      return false
+  }
+  return (
+    receipt.performanceBudget?.renderMs === contract.performanceBudget?.renderMs &&
+    receipt.performanceBudget?.interactionMs ===
+      contract.performanceBudget?.interactionMs &&
+    receipt.performanceBudget?.memory === contract.performanceBudget?.memory
+  )
 }
 
 const toCoverageKind = (kind) =>
@@ -855,6 +966,7 @@ export function deriveAlignment(registry, comparison = null) {
     const requiredEvidence = evidenceArtifactsFor(contract)
     const hasCompleteReceipt =
       receipt &&
+      receiptCoverageComplete(contract, receipt) &&
       requiredEvidence.every((artifact) =>
         receipt.comparedArtifacts?.includes(artifact),
       )

@@ -51,6 +51,8 @@ export const MARKDOWN_EDITOR_GATE_PATH =
   'spec/components/contracts/v2/markdown-editor-gate.json'
 export const CONTRACT_V2_REGISTRY_PATH =
   'spec/components/contracts/v2/contract-v2.json'
+export const CONTRACT_V1_REGISTRY_PATH =
+  'spec/components/contracts/v1/vue-public-contracts.json'
 
 const read = (file) => fs.readFileSync(file, 'utf8')
 const exists = (file) => fs.existsSync(file)
@@ -825,7 +827,12 @@ const contractCoverage = (members) => {
   }
 }
 
-const contractForComponent = ({ component, avaloniaType, gate }) => {
+const contractForComponent = ({
+  component,
+  avaloniaType,
+  gate,
+  performanceBudget,
+}) => {
   // Keep the full export name in the stable id so distinct public exports such
   // as ElCollectionSummary and FsusCollectionSummary never collide.
   const contractKebab = toKebab(component.name)
@@ -908,6 +915,7 @@ const contractForComponent = ({ component, avaloniaType, gate }) => {
     contentRegions,
     states,
     requirements,
+    performanceBudget,
     platformDifferences: members
       .filter((member) => member.status !== 'aligned-candidate' && member.status !== 'web-only')
       .map((member) => ({
@@ -1017,6 +1025,7 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
 
 export const buildRegistry = ({
   vueBaseline,
+  v1Registry,
   avaloniaBaseline,
   avaloniaThemesBaseline,
   avaloniaIconsBaseline,
@@ -1028,13 +1037,26 @@ export const buildRegistry = ({
     avaloniaIcons: avaloniaIconsBaseline,
   }
   const typeIndex = avaloniaSemanticIndex(baselines)
+  const performanceBudgetByComponent = new Map(
+    [...(v1Registry.contracts ?? []), ...(v1Registry.webOnlyDecisions ?? [])]
+      .filter((contract) => contract.source?.kind === 'component')
+      .map((contract) => [
+        contract.source?.name,
+        contract.performanceBudget,
+      ]),
+  )
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
   const contracts = []
   for (const component of vueBaseline.components ?? []) {
     const avaloniaType = findAvaloniaType(component.name, typeIndex)
     contracts.push(
-      contractForComponent({ component, avaloniaType, gate }),
+      contractForComponent({
+        component,
+        avaloniaType,
+        gate,
+        performanceBudget: performanceBudgetByComponent.get(component.name),
+      }),
     )
   }
   contracts.sort((first, second) => first.id.localeCompare(second.id))
@@ -1101,6 +1123,10 @@ export const buildRegistry = ({
       markdownEditorGate: {
         path: MARKDOWN_EDITOR_GATE_PATH,
         hash: sha256(read(path.join(root, MARKDOWN_EDITOR_GATE_PATH))),
+      },
+      v1ContractRegistry: {
+        path: CONTRACT_V1_REGISTRY_PATH,
+        hash: sha256(read(path.join(root, CONTRACT_V1_REGISTRY_PATH))),
       },
     },
     rules: {
@@ -1236,6 +1262,15 @@ export const validateContract = (contract, gate, errors) => {
       contractErrors.push(`${contract.id} ${section} must be an object`)
     }
   }
+  for (const field of ['renderMs', 'interactionMs']) {
+    if (
+      !Number.isFinite(contract.performanceBudget?.[field]) ||
+      contract.performanceBudget[field] <= 0
+    )
+      contractErrors.push(`${contract.id} performanceBudget.${field} invalid`)
+  }
+  if (!contract.performanceBudget?.memory)
+    contractErrors.push(`${contract.id} performanceBudget.memory missing`)
   const members = [
     ...(contract.inputs ?? []),
     ...(contract.outputs ?? []),
@@ -1335,6 +1370,7 @@ const main = () => {
   }
 
   const vueBaseline = parseJson(path.join(root, VUE_BASELINE_PATH))
+  const v1Registry = parseJson(path.join(root, CONTRACT_V1_REGISTRY_PATH))
   const avaloniaBaseline = parseJson(
     path.join(root, AVALONIA_SEMANTIC_PATHS.avalonia),
   )
@@ -1347,6 +1383,7 @@ const main = () => {
   const gate = parseJson(gatePath)
   const registry = buildRegistry({
     vueBaseline,
+    v1Registry,
     avaloniaBaseline,
     avaloniaThemesBaseline,
     avaloniaIconsBaseline,

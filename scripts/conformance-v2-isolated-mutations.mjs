@@ -98,6 +98,104 @@ const cases = [
     command: [process.execPath, ['scripts/conformance-v2-vue-public-gate.mjs']],
     expected: 'Vue public exposed drift',
   },
+  {
+    id: 'check-tag-vue-role-mutated',
+    file: 'vue/packages/components/check-tag/src/check-tag.vue',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/check-tag/src/check-tag.vue',
+        'role="checkbox"',
+        'role="button"',
+      ),
+    command: [
+      'pnpm',
+      ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', 'vue/packages/components/check-tag/__tests__/check-tag.test.tsx'],
+    ],
+    expected: "to match object",
+  },
+  {
+    id: 'check-tag-vue-keyboard-mutated',
+    file: 'vue/packages/components/check-tag/src/check-tag.vue',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/check-tag/src/check-tag.vue',
+        '@keydown.space.prevent="handleChange"',
+        '',
+      ),
+    command: [
+      'pnpm',
+      ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', 'vue/packages/components/check-tag/__tests__/check-tag.test.tsx'],
+    ],
+    expected: 'to deeply equal',
+  },
+  {
+    id: 'check-tag-avalonia-name-mutated',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+        '      change.Property == ContentControl.ContentProperty)',
+        '      change.Property == CheckedProperty)',
+      ),
+    command: [
+      'dotnet',
+      ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--no-restore', '--filter', 'FullyQualifiedName~FsusCheckTagTests'],
+    ],
+    expected: 'Assert.Equal() Failure',
+  },
+  {
+    id: 'check-tag-avalonia-keyboard-mutated',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+        'e.Key is not (Key.Enter or Key.Space)',
+        'e.Key is not Key.Escape',
+      ),
+    command: [
+      'dotnet',
+      ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--no-restore', '--filter', 'FullyQualifiedName~FsusCheckTagTests'],
+    ],
+    expected: 'Assert.Equal() Failure',
+  },
+  {
+    id: 'check-tag-avalonia-event-payload-mutated',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+        'new FsusCheckTagValueChangedEventArgs(old, next)',
+        'new FsusCheckTagValueChangedEventArgs(old, old)',
+      ),
+    command: [
+      'dotnet',
+      ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--no-restore', '--filter', 'FullyQualifiedName~FsusCheckTagTests'],
+    ],
+    expected: 'Assert.Equal() Failure',
+  },
+  ...[
+    [
+      'check-tag-avalonia-focus-ring-mutated',
+      'dotnet/FsusUI.Avalonia.Themes/Themes/Controls/CheckTag.axaml',
+      'BorderThickness" Value="2"',
+      'BorderThickness" Value="0"',
+    ],
+    [
+      'check-tag-web-motion-mutated',
+      'vue/packages/theme-chalk/src/check-tag.scss',
+      'transition-duration: 1ms',
+      'transition-duration: 200ms',
+    ],
+  ].map(([id, file, from, to]) => ({
+    id,
+    file,
+    inject: () => mutateText(file, from, to),
+    command: [
+      'dotnet',
+      ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--no-restore', '--filter', 'FullyQualifiedName~FsusCheckTagTests'],
+    ],
+    expected: 'Assert.Contains() Failure',
+  })),
   ...[
     ['avalonia-property-removed', 'DocumentIdentityProperty'],
     [
@@ -225,6 +323,42 @@ const cases = [
     file: '.tmp/conformance-v2/web-a11y/manifest.json',
     inject: () =>
       mutateJson('.tmp/conformance-v2/web-a11y/manifest.json', mutation),
+    command: gate('compare', [
+      '--web',
+      '.tmp/conformance-v2/web-a11y/manifest.json',
+      '--avalonia',
+      '.tmp/conformance-v2/avalonia.json',
+      '--out',
+      '.tmp/conformance-v2/mutated-comparison.json',
+    ]),
+    expected,
+  })),
+  ...[
+    ['check-tag-evidence-pointer-mutated', (execution) => (execution.steps[2].observation.passed = false), 'steps[2] failed'],
+    ['check-tag-evidence-keyboard-mutated', (execution) => (execution.steps[6].observation.passed = false), 'steps[6] failed'],
+    ['check-tag-evidence-event-payload-mutated', (execution) => (execution.events[0].payload = false), 'web.events.payload mismatch'],
+    ['check-tag-evidence-role-mutated', (execution) => (execution.accessibility.node.role = 'button'), 'web.a11y.role mismatch'],
+    ['check-tag-evidence-name-mutated', (execution) => (execution.accessibility.node.name = 'Wrong name'), 'web.a11y.name mismatch'],
+    ['check-tag-evidence-checked-mutated', (execution) => (execution.state.checked = true), 'web.state.checked mismatch'],
+    ['check-tag-evidence-focus-mutated', (execution) => (execution.state.focus = null), 'web.state.focus mismatch'],
+    ['check-tag-evidence-motion-mutated', (execution) => (execution.state.motion.active = true), 'web.motion.active mismatch'],
+    ['check-tag-evidence-visual-mutated', (execution) => (execution.visual.observation.focusIndicatorVisible = false), 'visual rendered focused artifact missing'],
+    ['check-tag-evidence-performance-mutated', (execution) => (execution.performance.interactionMilliseconds = execution.performance.budget.interactionMs + 1), 'performance budget failed'],
+    ['check-tag-evidence-memory-mutated', (execution) => (execution.performance.memoryObservation.retainedPerItemStateCount = 1), 'performance budget failed'],
+    ['check-tag-evidence-checkpoint-mutated', (execution) => (execution.identity.checkpoint = 'wrong-checkpoint'), 'steps[0].binding mismatch'],
+    [
+      'check-tag-evidence-coverage-mutated',
+      (execution) =>
+        (execution.coverage.executions['scenario.v2.el-check-tag.pointer'].real = false),
+      'scenario.scenario.v2.el-check-tag.pointer metadata-only',
+    ],
+  ].map(([id, mutation, expected]) => ({
+    id,
+    file: '.tmp/conformance-v2/web-a11y/manifest.json',
+    inject: () =>
+      mutateJson('.tmp/conformance-v2/web-a11y/manifest.json', (value) =>
+        mutation(value.contractExecutions['component-v2.el-check-tag']),
+      ),
     command: gate('compare', [
       '--web',
       '.tmp/conformance-v2/web-a11y/manifest.json',

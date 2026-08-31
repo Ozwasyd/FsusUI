@@ -121,6 +121,7 @@ def main():
             trees.append({'app': accessible_name(app), 'error': str(exc)})
 
     textboxes = []
+    checkboxes = []
     live_regions = []
     articles = []
     for tree in trees:
@@ -130,6 +131,8 @@ def main():
             if role in {'text', 'entry', 'password text', 'document text', 'paragraph'}:
                 if 'markdown' in name.lower() or role in {'text', 'entry', 'document text'}:
                     textboxes.append(node)
+            if role in {'check box', 'checkbox'}:
+                checkboxes.append(node)
             if 'live' in json.dumps(node.get('attributes') or {}).lower() or 'aria-live' in json.dumps(node).lower():
                 live_regions.append(node)
             if role == 'article':
@@ -145,10 +148,12 @@ def main():
         'apps': [tree.get('app') for tree in trees],
         'textboxCount': len(textboxes),
         'markdownEditableCount': len(named_markdown_editables),
+        'checkboxCount': len(checkboxes),
         'articleCount': len(articles),
         'liveRegionCount': len(live_regions),
         'textboxes': textboxes[:20],
         'markdownEditables': named_markdown_editables[:20],
+        'checkboxes': checkboxes[:20],
         'liveRegions': live_regions[:20],
         'trees': trees,
     }

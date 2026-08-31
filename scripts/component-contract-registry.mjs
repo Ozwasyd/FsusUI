@@ -320,6 +320,7 @@ const webOnlyDecisionForEntry = (entry, kind) => ({
     'This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.',
   alternative:
     'Document an Avalonia-native contract in a future minor registry version before implementation.',
+  performanceBudget: performanceBudget(entry.classification),
 })
 
 const buildRegistry = (baseline) => {

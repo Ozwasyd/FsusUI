@@ -31,6 +31,10 @@
     "markdownEditorGate": {
       "path": "spec/components/contracts/v2/markdown-editor-gate.json",
       "hash": "a23cbd4d25c6d19bcce03ff2c314764833eb34f66f2e21bd18e544d182952838"
+    },
+    "v1ContractRegistry": {
+      "path": "spec/components/contracts/v1/vue-public-contracts.json",
+      "hash": "5b33e7cad92f9e73bc6ba9f3a187014cc907d660d0fe70144abcb08e8ea667c8"
     }
   },
   "rules": {
@@ -3573,6 +3577,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "arrowControl",
@@ -4230,6 +4239,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -4303,6 +4317,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -4708,6 +4727,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -5336,6 +5360,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "closable",
@@ -5674,6 +5703,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "width",
@@ -5762,6 +5796,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [
@@ -7299,6 +7338,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "clearable",
@@ -8454,6 +8498,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "alt",
@@ -8725,6 +8774,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -9161,6 +9215,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "hidden",
@@ -9500,6 +9559,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabel",
@@ -9812,6 +9876,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -11018,6 +11087,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "autofocus",
@@ -11507,6 +11581,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [
@@ -12012,6 +12091,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -12694,6 +12778,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -13555,6 +13644,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "arrow",
@@ -13992,6 +14086,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -15189,6 +15288,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "beforeFilter",
@@ -15967,6 +16071,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "border",
@@ -16402,6 +16511,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -17143,6 +17257,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -18134,6 +18253,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "border",
@@ -18907,6 +19031,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "disabled",
@@ -19608,6 +19737,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "lg",
@@ -20121,6 +20255,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "modelValue",
@@ -20516,6 +20655,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "name",
@@ -20692,6 +20836,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -21130,6 +21279,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -21600,6 +21754,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -22558,6 +22717,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "colorFormat",
@@ -22998,6 +23162,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -23140,6 +23309,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -23326,6 +23500,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -23563,6 +23742,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -24210,6 +24394,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -24909,6 +25098,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "copiedLabel",
@@ -25502,6 +25696,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "format",
@@ -26074,6 +26273,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -26877,6 +27081,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "activeKey",
@@ -27385,6 +27594,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -28153,6 +28367,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "direction",
@@ -28760,6 +28979,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "border",
@@ -29230,6 +29454,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -29883,6 +30112,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "defaultOpen",
@@ -30235,6 +30469,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -31433,6 +31672,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "appendTo",
@@ -32175,6 +32419,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -32455,6 +32704,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -32741,6 +32995,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "borderStyle",
@@ -32995,6 +33254,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -33272,6 +33536,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -33561,6 +33830,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "click",
@@ -33745,6 +34019,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [
@@ -34188,6 +34467,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "description",
@@ -34585,6 +34869,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -35193,6 +35482,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "actionVariant",
@@ -35565,6 +35859,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -35758,6 +36057,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -36688,6 +36992,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -37839,6 +38148,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "error",
@@ -38674,6 +38988,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabelledby",
@@ -38952,6 +39271,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "height",
@@ -39195,6 +39519,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -40253,6 +40582,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -41329,6 +41663,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "closeOnPressEscape",
@@ -41979,6 +42318,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "actions",
@@ -42152,6 +42496,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "detail",
@@ -42265,6 +42614,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [
@@ -42500,6 +42854,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -44492,6 +44851,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "autocomplete",
@@ -46237,6 +46601,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "controls",
@@ -46769,6 +47138,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -47126,6 +47500,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "fallback",
@@ -47355,6 +47734,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -47771,6 +48155,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "disabled",
@@ -47963,6 +48352,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -48037,6 +48431,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -48110,6 +48509,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [
@@ -48604,6 +49008,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "gridHeight",
@@ -48871,6 +49280,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -51279,6 +51693,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "actionOverflowKeys",
@@ -52732,6 +53151,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "allowLatex",
@@ -52982,6 +53406,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [
         {
@@ -53209,6 +53638,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "title",
@@ -53356,6 +53790,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -54125,6 +54564,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -54940,6 +55384,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "boxType",
@@ -55543,6 +55992,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "author",
@@ -55823,6 +56277,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -56125,6 +56584,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "fallback",
@@ -56332,6 +56796,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -56748,6 +57217,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -57040,6 +57514,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -57352,6 +57831,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -58262,6 +58746,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "customClass",
@@ -58862,6 +59351,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "created",
@@ -59122,6 +59616,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "label",
@@ -59228,6 +59727,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -59629,6 +60133,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "content",
@@ -59874,6 +60383,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -60256,6 +60770,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -61886,6 +62405,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -63748,6 +64272,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "alternativeLabel",
@@ -64978,6 +65507,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -66462,6 +66996,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -68040,6 +68579,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "autoClose",
@@ -68564,6 +69108,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -68714,6 +69263,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -68866,6 +69420,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -69016,6 +69575,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -69681,6 +70245,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -71677,6 +72246,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "activeNav",
@@ -72629,6 +73203,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "border",
@@ -72905,6 +73484,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -73402,6 +73986,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -74673,6 +75262,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "clearable",
@@ -75334,6 +75928,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -75624,6 +76223,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -76014,6 +76618,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -76558,6 +77167,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -77105,6 +77719,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "icon",
@@ -77459,6 +78078,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "role",
@@ -77783,6 +78407,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -78871,6 +79500,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "always",
@@ -79603,6 +80237,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "danger",
@@ -79963,6 +80602,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabel",
@@ -80258,6 +80902,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -80686,6 +81335,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -82733,6 +83387,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "allowCreate",
@@ -84002,6 +84661,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "height",
@@ -84514,6 +85178,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -85320,6 +85989,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabel",
@@ -85948,6 +86622,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "animated",
@@ -86201,6 +86880,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -87406,6 +88090,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "debounce",
@@ -87894,6 +88583,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [
         {
@@ -88276,6 +88970,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -88936,6 +89635,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "decimalSeparator",
@@ -89514,6 +90218,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -90062,6 +90771,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "clickable",
@@ -90555,6 +91269,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "active",
@@ -90787,6 +91506,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [
@@ -92025,6 +92749,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "activeActionIcon",
@@ -92717,6 +93446,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -93515,6 +94249,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "cell-click",
@@ -94027,6 +94766,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "column",
@@ -94149,6 +94893,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [
@@ -94837,6 +95586,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "tabs",
@@ -95479,6 +96233,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "closable",
@@ -96017,6 +96776,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -96410,6 +97174,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "lineClamp",
@@ -96796,6 +97565,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -97435,6 +98209,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "cspSafe",
@@ -98062,6 +98841,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -100058,6 +100842,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "arrowControl",
@@ -101713,6 +102502,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "clearIcon",
@@ -102579,6 +103373,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "color",
@@ -103206,6 +104005,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -103927,6 +104731,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "showArrow",
@@ -104187,6 +104996,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -105161,6 +105975,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -107305,6 +108124,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "accordion",
@@ -108383,6 +109207,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "cacheData",
@@ -109088,6 +109917,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -109908,6 +110742,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -110798,6 +111637,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "beforeRemove",
@@ -111296,6 +112140,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "style",
@@ -111789,6 +112638,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "content",
@@ -112029,6 +112883,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -112102,6 +112961,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -112538,6 +113402,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -113009,6 +113878,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabel",
@@ -113251,6 +114125,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -113487,6 +114366,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -114134,6 +115018,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -114833,6 +115722,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "copiedLabel",
@@ -115344,6 +116238,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -116147,6 +117046,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "activeKey",
@@ -116651,6 +117555,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -117304,6 +118213,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "defaultOpen",
@@ -117656,6 +118570,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -118071,6 +118990,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -118351,6 +119275,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -118687,6 +119616,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -119295,6 +120229,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "actionVariant",
@@ -119666,6 +120605,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -120181,6 +121125,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabelledby",
@@ -120479,6 +121428,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "actions",
@@ -120651,6 +121605,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -120874,6 +121833,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabel",
@@ -121044,6 +122008,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -121402,6 +122371,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "fallback",
@@ -121631,6 +122605,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -122113,6 +123092,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -122628,6 +123612,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "author",
@@ -122908,6 +123897,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -123210,6 +124204,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "fallback",
@@ -123417,6 +124416,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -123833,6 +124837,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -124125,6 +125134,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -124437,6 +125451,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -124804,6 +125823,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -126434,6 +127458,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -128296,6 +129325,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "alternativeLabel",
@@ -129204,6 +130238,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -129494,6 +130533,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -129885,6 +130929,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -130232,6 +131281,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -130657,6 +131711,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "danger",
@@ -131017,6 +132076,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabel",
@@ -131312,6 +132376,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -131740,6 +132809,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -132303,6 +133377,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "ariaLabelledby",
@@ -132769,6 +133848,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -133281,6 +134365,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -133724,6 +134813,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "density",
@@ -134117,6 +135211,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -134657,6 +135756,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
         {
@@ -135335,6 +136439,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "description",
@@ -135598,6 +136707,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [
@@ -136181,6 +137295,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -136254,6 +137373,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -136329,6 +137453,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [],
       "avaloniaExtras": [],
       "scenarioIds": [
@@ -136402,6 +137531,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],
@@ -138247,6 +139381,11 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "platformDifferences": [
         {
           "member": "arrowControl",
@@ -138903,6 +140042,11 @@
         "perf": [
           "Render and interaction budgets must match the component performance contract."
         ]
+      },
+      "performanceBudget": {
+        "renderMs": 12,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [],
       "avaloniaExtras": [],

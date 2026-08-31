@@ -77,6 +77,25 @@ test('derive comparison validation rejects stale identity and tampered evidence'
 
   validateCurrentComparison(comparison, web, avalonia, expected)
 
+  const registry = JSON.parse(
+    fs.readFileSync(
+      path.join(root, 'spec/components/contracts/v2/contract-v2.json'),
+      'utf8',
+    ),
+  )
+  const alignment = deriveAlignment(registry, comparison)
+  assert.notEqual(
+    alignment.statuses.find(
+      (entry) => entry.id === 'component-v2.el-markdown-editor',
+    )?.status,
+    'aligned',
+  )
+  assert.ok(
+    alignment.gaps.some(
+      (gap) => gap.contract === 'component-v2.el-markdown-editor',
+    ),
+  )
+
   assert.throws(
     () =>
       validateCurrentComparison(

@@ -40,4 +40,24 @@ describe('CheckTag.vue', () => {
 
     expect((wrapper.vm as any).checked).toBe(false)
   })
+
+  test('exposes checkbox semantics and supports keyboard activation', async () => {
+    const wrapper = mount(CheckTag, {
+      props: { checked: false },
+      slots: { default: AXIOM },
+    })
+    const tag = wrapper.find('.el-check-tag')
+
+    expect(tag.attributes()).toMatchObject({
+      'aria-checked': 'false',
+      role: 'checkbox',
+      tabindex: '0',
+    })
+
+    await tag.trigger('keydown', { key: 'Enter' })
+    await tag.trigger('keydown', { key: ' ' })
+
+    expect(wrapper.emitted('change')).toEqual([[true], [true]])
+    expect(wrapper.emitted('update:checked')).toEqual([[true], [true]])
+  })
 })

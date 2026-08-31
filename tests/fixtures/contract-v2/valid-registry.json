@@ -9,6 +9,11 @@
       "version": "2.0.0",
       "releaseClassification": "preview",
       "owner": "FsusUI Core",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "component": {
         "name": "ElFixture",
         "module": "fixture",
@@ -182,6 +187,11 @@
       "version": "2.0.0",
       "releaseClassification": "preview",
       "owner": "FsusUI Core",
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      },
       "component": {
         "name": "ElMarkdownEditor",
         "module": "markdown-editor",

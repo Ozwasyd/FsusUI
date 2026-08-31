@@ -1,5 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Input;
 
@@ -28,7 +30,9 @@ public class FsusCheckTag : ContentControl
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-check-tag");
     SyncClasses();
-    Cursor = new Cursor(StandardCursorType.Hand);
+    Focusable = true;
+    IsTabStop = true;
+    SyncAutomation();
   }
 
   public event EventHandler<FsusCheckTagValueChangedEventArgs>? CheckedChanged;
@@ -47,12 +51,20 @@ public class FsusCheckTag : ContentControl
       return;
     }
 
-    var old = Checked;
-    var next = !old;
-    SetCurrentValue(CheckedProperty, next);
-    CheckedChanged?.Invoke(
-      this,
-      new FsusCheckTagValueChangedEventArgs(old, next));
+    ToggleChecked();
+    e.Handled = true;
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (e.Key is not (Key.Enter or Key.Space))
+    {
+      return;
+    }
+
+    ToggleChecked();
+    e.Handled = true;
   }
 
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -61,6 +73,11 @@ public class FsusCheckTag : ContentControl
     if (change.Property == CheckedProperty)
     {
       SyncClasses();
+    }
+    if (
+      change.Property == CheckedProperty ||
+      change.Property == ContentControl.ContentProperty)
+    {
       SyncAutomation();
     }
   }
@@ -73,7 +90,32 @@ public class FsusCheckTag : ContentControl
 
   private void SyncAutomation()
   {
-    AutomationProperties.SetName(this, "CheckTag");
+    AutomationProperties.SetName(
+      this,
+      FsusComponentClasses.ResolveName(null, Content ?? "CheckTag"));
     AutomationProperties.SetHelpText(this, Checked ? "Checked" : "Unchecked");
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.CheckBox);
+  }
+
+  private void ToggleChecked()
+  {
+    var old = Checked;
+    var next = !old;
+    SetCurrentValue(CheckedProperty, next);
+    CheckedChanged?.Invoke(
+      this,
+      new FsusCheckTagValueChangedEventArgs(old, next));
+  }
+
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new CheckTagAutomationPeer(this);
+
+  private sealed class CheckTagAutomationPeer(FsusCheckTag owner)
+    : ControlAutomationPeer(owner), IToggleProvider
+  {
+    public ToggleState ToggleState =>
+      owner.Checked ? ToggleState.On : ToggleState.Off;
+
+    public void Toggle() => owner.ToggleChecked();
   }
 }

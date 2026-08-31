@@ -29099,7 +29099,12 @@
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper",
@@ -29112,7 +29117,12 @@
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-arrow",
@@ -29125,7 +29135,12 @@
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-content",
@@ -29138,7 +29153,12 @@
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-trigger",
@@ -29151,7 +29171,12 @@
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     }
   ]
 }

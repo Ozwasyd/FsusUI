@@ -25,6 +25,24 @@ const candidate = spawnSync('git', ['rev-parse', 'HEAD'], {
   cwd: root,
   encoding: 'utf8',
 }).stdout.trim()
+const contractRegistry = JSON.parse(
+  read('spec/components/contracts/v2/contract-v2.json'),
+)
+const checkTagContract = contractRegistry.contracts.find(
+  (contract) => contract.id === 'component-v2.el-check-tag',
+)
+const checkTagBudget = checkTagContract?.performanceBudget?.interactionMs
+const checkTagRenderBudget = checkTagContract?.performanceBudget?.renderMs
+const checkTagMemoryBudget = checkTagContract?.performanceBudget?.memory
+if (
+  !Number.isFinite(checkTagBudget) ||
+  checkTagBudget <= 0 ||
+  !Number.isFinite(checkTagRenderBudget) ||
+  checkTagRenderBudget <= 0 ||
+  typeof checkTagMemoryBudget !== 'string' ||
+  !checkTagMemoryBudget
+)
+  throw new Error('CheckTag Contract V2 performance budget missing')
 
 if (!process.env.DISPLAY && process.platform === 'linux') {
   throw new Error(
@@ -53,6 +71,12 @@ const result = spawnSync(
     hash('spec/avalonia/semantic/FsusUI.Avalonia.semantic.json'),
     '--runner-hash',
     runnerHash,
+    '--check-tag-budget',
+    String(checkTagBudget),
+    '--check-tag-render-budget',
+    String(checkTagRenderBudget),
+    '--check-tag-memory-budget',
+    checkTagMemoryBudget,
   ],
   { cwd: root, encoding: 'utf8', env: process.env },
 )

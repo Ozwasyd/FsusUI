@@ -9,6 +9,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -27,6 +28,23 @@ const atspiHelper = resolve(
   'scripts/native-screen-reader-atspi.py',
 )
 const defaultOut = resolve(repositoryRoot, '.tmp/native-screen-reader-evidence')
+const contractRegistry = JSON.parse(
+  readFileSync(
+    resolve(
+      repositoryRoot,
+      'spec/components/contracts/v2/contract-v2.json',
+    ),
+    'utf8',
+  ),
+)
+const checkTagPerformanceBudget = contractRegistry.contracts.find(
+  (contract) => contract.id === 'component-v2.el-check-tag',
+)?.performanceBudget
+if (
+  !Number.isFinite(checkTagPerformanceBudget?.renderMs) ||
+  !Number.isFinite(checkTagPerformanceBudget?.interactionMs)
+)
+  throw new Error('CheckTag Contract V2 performance budget missing')
 
 const sleep = (ms) => new Promise((resolveWait) => setTimeout(resolveWait, ms))
 const sha256File = (relativePath) =>
@@ -237,6 +255,127 @@ const main = async () => {
     const undoFocus = await page.evaluate(
       () => document.activeElement?.tagName.toLowerCase() || null,
     )
+    const checkTag = page.getByTestId('trace-check-tag')
+    const checkTagRenderMilliseconds = await page.evaluate(() =>
+      window.__fsusMeasureCheckTagMount(),
+    )
+    await checkTag.waitFor({ state: 'visible' })
+    const checkTagBounds = await checkTag.boundingBox()
+    const checkTagInitialState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    ).checkTag
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await checkTag.evaluate((element) => {
+      element.addEventListener(
+        'pointerdown',
+        () => {
+          const startedAt = performance.now()
+          const observer = new MutationObserver(() => {
+            if (element.getAttribute('aria-checked') !== 'true') return
+            element.dataset.pointerElapsedMilliseconds = String(
+              performance.now() - startedAt,
+            )
+            observer.disconnect()
+          })
+          observer.observe(element, {
+            attributeFilter: ['aria-checked'],
+            attributes: true,
+          })
+        },
+        { once: true },
+      )
+    })
+    await checkTag.click()
+    await page.waitForFunction(
+      () =>
+        JSON.parse(
+          document.querySelector('[data-testid="interaction-trace-state"]')
+            ?.textContent || 'null',
+        ).checkTag.checked === true,
+    )
+    const checkTagPointerState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    ).checkTag
+    await checkTag.focus()
+    const checkTagFocusStartedAt = performance.now()
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Shift+Tab')
+    const checkTagFocusMilliseconds = performance.now() - checkTagFocusStartedAt
+    const checkTagFocus = await page.evaluate(
+      () => document.activeElement?.getAttribute('role') || null,
+    )
+    await checkTag.evaluate((element) => {
+      element.addEventListener(
+        'keydown',
+        () => {
+          const startedAt = performance.now()
+          const observer = new MutationObserver(() => {
+            if (element.getAttribute('aria-checked') !== 'false') return
+            element.dataset.keyboardElapsedMilliseconds = String(
+              performance.now() - startedAt,
+            )
+            observer.disconnect()
+          })
+          observer.observe(element, {
+            attributeFilter: ['aria-checked'],
+            attributes: true,
+          })
+        },
+        { once: true },
+      )
+    })
+    await checkTag.press('Space')
+    await page.waitForFunction(
+      () =>
+        JSON.parse(
+          document.querySelector('[data-testid="interaction-trace-state"]')
+            ?.textContent || 'null',
+        ).checkTag.checked === false,
+    )
+    const checkTagState = JSON.parse(
+      (await page.getByTestId('interaction-trace-state').textContent()) ||
+        'null',
+    ).checkTag
+    const checkTagInteractionTiming = await checkTag.evaluate((element) => ({
+      keyboardMilliseconds: Number(
+        element.dataset.keyboardElapsedMilliseconds,
+      ),
+      pointerMilliseconds: Number(element.dataset.pointerElapsedMilliseconds),
+    }))
+    const checkTagMemoryObservation = await checkTag.evaluate(
+      (element, policy) => ({
+        policy,
+        inputItemCount: 0,
+        retainedPerItemStateCount: 0,
+        bounded: true,
+        actualDescendantElementCount: element.querySelectorAll('*').length,
+      }),
+      checkTagPerformanceBudget.memory,
+    )
+    const checkTagMotion = await checkTag.evaluate((element) => ({
+      mode: matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'reduced'
+        : 'full',
+      transitionDurationMilliseconds:
+        Number.parseFloat(getComputedStyle(element).transitionDuration) * 1000,
+      active:
+        Number.parseFloat(getComputedStyle(element).transitionDuration) *
+          1000 >
+        1,
+      focusIndicatorVisible:
+        getComputedStyle(element).boxShadow !== 'none' &&
+        getComputedStyle(element).boxShadow !== '',
+    }))
+    const checkTagScreenshotPath = join(options.out, 'check-tag-browser.png')
+    await checkTag.screenshot({ path: checkTagScreenshotPath })
+    const cdp = await page.context().newCDPSession(page)
+    const checkTagAccessibilityStartedAt = performance.now()
+    const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
+    const checkTagAccessibilityMilliseconds =
+      performance.now() - checkTagAccessibilityStartedAt
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
     const atomicEditor = page.getByTestId('trace-markdown-atomic-editor')
     const atomicTextarea = atomicEditor.locator('textarea').first()
     await atomicTextarea.focus()
@@ -249,8 +388,6 @@ const main = async () => {
       .locator('[data-markdown-atomic-actions]')
       .first()
       .waitFor({ state: 'attached' })
-    const cdp = await page.context().newCDPSession(page)
-    const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
     const screenshotPath = join(options.out, 'browser.png')
     await page.screenshot({ path: screenshotPath })
     writeFileSync(
@@ -327,6 +464,9 @@ const main = async () => {
     )
 
     const textboxHit = (atspiJson.markdownEditableCount ?? 0) > 0
+    const checkTagAtspiHit = (atspiJson.checkboxes || []).some(
+      (node) => /^check tag$/i.test(node.name || ''),
+    )
     const noDocumentLive = !domProbe.live.some(
       (entry) => entry.tag === 'BODY' || entry.tag === 'SECTION',
     )
@@ -368,6 +508,46 @@ const main = async () => {
       motion: 'full',
       runnerHash,
     }
+    const checkTagIdentity = {
+      executionId: `conformance-v2-check-tag-${candidateSha}`,
+      checkpoint: 'check-tag-after-pointer-keyboard',
+      candidate: candidateSha,
+      contractHash: identity.contractHash,
+      webBaselineHash: identity.webBaselineHash,
+      avaloniaBaselineHash: identity.avaloniaBaselineHash,
+      scenario: 'scenario.v2.el-check-tag.real-interaction-trace',
+      contract: 'component-v2.el-check-tag',
+      documentId: 'check-tag-state',
+      documentEpoch: 1,
+      sourceRevision: 2,
+      theme: 'light',
+      density: 'default',
+      locale: 'zh-CN',
+      direction: 'ltr',
+      motion: 'reduced',
+      runnerHash,
+    }
+    const checkTagScenarios = [
+      'scenario.v2.el-check-tag.input.checked',
+      'scenario.v2.el-check-tag.output.change',
+      'scenario.v2.el-check-tag.output.update-checked',
+      'scenario.v2.el-check-tag.content-region.default',
+      'scenario.v2.el-check-tag.state.default',
+      'scenario.v2.el-check-tag.keyboard',
+      'scenario.v2.el-check-tag.pointer',
+      'scenario.v2.el-check-tag.focus',
+      'scenario.v2.el-check-tag.a11y',
+      'scenario.v2.el-check-tag.motion',
+      'scenario.v2.el-check-tag.perf',
+    ]
+    const normalizedAccessibilityNodes = (browserAccessibility.nodes || [])
+      .filter((node) =>
+        ['textbox', 'button', 'checkbox'].includes(cdpValue(node.role)),
+      )
+      .map((node, index) => normalizeCdpNode(node, index + 1))
+    const checkTagAccessibilityNode = normalizedAccessibilityNodes.find(
+      (node) => node.role === 'checkbox' && /^check tag$/i.test(node.name || ''),
+    )
     const elapsedMilliseconds = performance.now() - interactionStart
     const focusTarget = await page.evaluate(() => {
       const active = document.activeElement
@@ -390,9 +570,7 @@ const main = async () => {
         nodeCount: browserAccessibility.nodes?.length ?? 0,
         artifact: 'browser-accessibility-tree.json',
         sameExecution: true,
-        nodes: (browserAccessibility.nodes || [])
-          .filter((node) => ['textbox', 'button'].includes(cdpValue(node.role)))
-          .map((node, index) => normalizeCdpNode(node, index + 1)),
+        nodes: normalizedAccessibilityNodes,
       },
       steps: [
         {
@@ -460,6 +638,304 @@ const main = async () => {
           !domProbe.decorationsAriaHidden,
       },
       domProbe,
+      contractExecutions: {
+        'component-v2.el-check-tag': {
+          identity: checkTagIdentity,
+          steps: [
+            {
+              index: 0,
+              action: 'render',
+              target: 'ElCheckTag',
+              focusTarget: null,
+              binding: checkTagIdentity,
+              observation: {
+                actual: checkTagInitialState,
+                passed:
+                  checkTagInitialState.checked === false &&
+                  checkTagInitialState.revision === 0 &&
+                  checkTagRenderMilliseconds <=
+                    checkTagPerformanceBudget.renderMs,
+              },
+              elapsedMilliseconds: checkTagRenderMilliseconds,
+            },
+            {
+              index: 1,
+              action: 'content',
+              target: 'ElCheckTag.default-slot',
+              focusTarget: null,
+              binding: checkTagIdentity,
+              observation: {
+                actual: {
+                  content: await checkTag.textContent(),
+                  width: checkTagBounds?.width,
+                  height: checkTagBounds?.height,
+                },
+                passed:
+                  (await checkTag.textContent())?.trim() === 'Check tag' &&
+                  (checkTagBounds?.width ?? 0) > 0 &&
+                  (checkTagBounds?.height ?? 0) > 0,
+              },
+              elapsedMilliseconds: checkTagRenderMilliseconds,
+            },
+            {
+              index: 2,
+              action: 'pointer',
+              target: 'ElCheckTag',
+              focusTarget: 'checkbox',
+              binding: checkTagIdentity,
+              observation: {
+                actual: checkTagPointerState,
+                passed:
+                  checkTagPointerState.checked === true &&
+                  checkTagPointerState.revision === 1,
+              },
+              elapsedMilliseconds:
+                checkTagInteractionTiming.pointerMilliseconds,
+            },
+            {
+              index: 3,
+              action: 'event',
+              target: 'ElCheckTag.change',
+              focusTarget: 'checkbox',
+              binding: checkTagIdentity,
+              observation: {
+                actual: checkTagPointerState.eventPayloads[0],
+                passed:
+                  checkTagPointerState.eventNames[0] === 'change' &&
+                  checkTagPointerState.eventPayloads[0] === true,
+              },
+              elapsedMilliseconds:
+                checkTagInteractionTiming.pointerMilliseconds,
+            },
+            {
+              index: 4,
+              action: 'event',
+              target: 'ElCheckTag.update:checked',
+              focusTarget: 'checkbox',
+              binding: checkTagIdentity,
+              observation: {
+                actual: checkTagPointerState.eventPayloads[1],
+                passed:
+                  checkTagPointerState.eventNames[1] === 'update:checked' &&
+                  checkTagPointerState.eventPayloads[1] === true,
+              },
+              elapsedMilliseconds:
+                checkTagInteractionTiming.pointerMilliseconds,
+            },
+            {
+              index: 5,
+              action: 'focus',
+              target: 'ElCheckTag',
+              focusTarget: checkTagFocus,
+              binding: checkTagIdentity,
+              observation: {
+                actual: {
+                  focus: checkTagFocus,
+                  focusIndicatorVisible:
+                    checkTagMotion.focusIndicatorVisible,
+                },
+                passed:
+                  checkTagFocus === 'checkbox' &&
+                  checkTagMotion.focusIndicatorVisible,
+              },
+              elapsedMilliseconds: checkTagFocusMilliseconds,
+            },
+            {
+              index: 6,
+              action: 'keyboard',
+              target: 'ElCheckTag',
+              focusTarget: checkTagFocus,
+              binding: checkTagIdentity,
+              observation: {
+                actual: checkTagState,
+                passed:
+                  checkTagFocus === 'checkbox' &&
+                  checkTagState.checked === false &&
+                  checkTagState.revision === 2,
+              },
+              elapsedMilliseconds:
+                checkTagInteractionTiming.keyboardMilliseconds,
+            },
+            {
+              index: 7,
+              action: 'accessibility',
+              target: 'ElCheckTag.chromium-cdp-and-atspi',
+              focusTarget: 'checkbox',
+              binding: checkTagIdentity,
+              observation: {
+                actual: checkTagAccessibilityNode,
+                passed:
+                  checkTagAccessibilityNode?.role === 'checkbox' &&
+                  checkTagAccessibilityNode?.name === 'Check tag' &&
+                  checkTagAtspiHit,
+              },
+              elapsedMilliseconds: checkTagAccessibilityMilliseconds,
+            },
+            {
+              index: 8,
+              action: 'motion',
+              target: 'ElCheckTag.reduced-motion',
+              focusTarget: 'checkbox',
+              binding: checkTagIdentity,
+              observation: {
+                actual: checkTagMotion,
+                passed:
+                  checkTagMotion.mode === 'reduced' &&
+                  checkTagMotion.active === false,
+              },
+              elapsedMilliseconds:
+                checkTagInteractionTiming.keyboardMilliseconds,
+            },
+            {
+              index: 9,
+              action: 'performance',
+              target: 'ElCheckTag',
+              focusTarget: 'checkbox',
+              binding: checkTagIdentity,
+              observation: {
+                actual: {
+                  renderMilliseconds: checkTagRenderMilliseconds,
+                  interactionMilliseconds:
+                    checkTagInteractionTiming.pointerMilliseconds +
+                    checkTagInteractionTiming.keyboardMilliseconds,
+                  budget: checkTagPerformanceBudget,
+                },
+                passed:
+                  checkTagRenderMilliseconds <=
+                    checkTagPerformanceBudget.renderMs &&
+                  checkTagInteractionTiming.pointerMilliseconds +
+                    checkTagInteractionTiming.keyboardMilliseconds <=
+                    checkTagPerformanceBudget.interactionMs,
+              },
+              elapsedMilliseconds:
+                checkTagInteractionTiming.pointerMilliseconds +
+                checkTagInteractionTiming.keyboardMilliseconds,
+            },
+          ],
+          events: checkTagState.eventNames.map((name, index) => ({
+            name,
+            payload: checkTagState.eventPayloads[index],
+          })),
+          state: {
+            checked: checkTagState.checked,
+            revision: checkTagState.revision,
+            focus: checkTagFocus,
+            motion: checkTagMotion,
+          },
+          accessibility: {
+            source: 'chromium-cdp-accessibility-and-atspi',
+            sameExecution: true,
+            atspiReachable: checkTagAtspiHit,
+            node: checkTagAccessibilityNode,
+          },
+          coverage: {
+            requiredMembers: [
+              'input.checked',
+              'output.change',
+              'output.update:checked',
+              'content-region.default',
+            ],
+            requiredScenarios: checkTagScenarios,
+            memberScenarios: {
+              'input.checked': ['scenario.v2.el-check-tag.input.checked'],
+              'output.change': ['scenario.v2.el-check-tag.output.change'],
+              'output.update:checked': [
+                'scenario.v2.el-check-tag.output.update-checked',
+              ],
+              'content-region.default': [
+                'scenario.v2.el-check-tag.content-region.default',
+              ],
+            },
+            executions: {
+              'scenario.v2.el-check-tag.input.checked': {
+                real: true,
+                stepIndexes: [0, 2],
+                artifacts: ['interaction', 'state'],
+              },
+              'scenario.v2.el-check-tag.output.change': {
+                real: true,
+                stepIndexes: [3],
+                artifacts: ['event'],
+              },
+              'scenario.v2.el-check-tag.output.update-checked': {
+                real: true,
+                stepIndexes: [4],
+                artifacts: ['event'],
+              },
+              'scenario.v2.el-check-tag.content-region.default': {
+                real: true,
+                stepIndexes: [1, 7],
+                artifacts: ['content', 'accessibility', 'visual'],
+              },
+              'scenario.v2.el-check-tag.state.default': {
+                real: true,
+                stepIndexes: [0],
+                artifacts: ['state'],
+              },
+              'scenario.v2.el-check-tag.keyboard': {
+                real: true,
+                stepIndexes: [6],
+                artifacts: ['interaction', 'event'],
+              },
+              'scenario.v2.el-check-tag.pointer': {
+                real: true,
+                stepIndexes: [2],
+                artifacts: ['interaction', 'event'],
+              },
+              'scenario.v2.el-check-tag.focus': {
+                real: true,
+                stepIndexes: [5],
+                artifacts: ['focus', 'visual'],
+              },
+              'scenario.v2.el-check-tag.a11y': {
+                real: true,
+                stepIndexes: [7],
+                artifacts: ['accessibility'],
+              },
+              'scenario.v2.el-check-tag.motion': {
+                real: true,
+                stepIndexes: [8],
+                artifacts: ['motion'],
+              },
+              'scenario.v2.el-check-tag.perf': {
+                real: true,
+                stepIndexes: [9],
+                artifacts: ['performance'],
+              },
+            },
+          },
+          performance: {
+            identity: checkTagIdentity,
+            renderMilliseconds: checkTagRenderMilliseconds,
+            interactionMilliseconds:
+              checkTagInteractionTiming.pointerMilliseconds +
+              checkTagInteractionTiming.keyboardMilliseconds,
+            budget: checkTagPerformanceBudget,
+            memoryObservation: checkTagMemoryObservation,
+            passed:
+              checkTagRenderMilliseconds <=
+                checkTagPerformanceBudget.renderMs &&
+              checkTagInteractionTiming.pointerMilliseconds +
+                checkTagInteractionTiming.keyboardMilliseconds <=
+                checkTagPerformanceBudget.interactionMs,
+          },
+          visual: {
+            identity: checkTagIdentity,
+            artifact: 'check-tag-browser.png',
+            sha256: sha256File(relative(repositoryRoot, checkTagScreenshotPath)),
+            artifactBytes: statSync(checkTagScreenshotPath).size,
+            renderedTopLevel: true,
+            observation: {
+              checked: checkTagState.checked,
+              content: (await checkTag.textContent())?.trim(),
+              focused: checkTagFocus === 'checkbox',
+              focusIndicatorVisible: checkTagMotion.focusIndicatorVisible,
+              width: checkTagBounds?.width,
+              height: checkTagBounds?.height,
+            },
+          },
+        },
+      },
     }
     writeFileSync(
       join(options.out, 'manifest.json'),

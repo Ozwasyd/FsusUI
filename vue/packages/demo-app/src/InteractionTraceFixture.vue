@@ -33,6 +33,18 @@
       </el-dialog>
     </section>
 
+    <section aria-label="CheckTag trace interactions">
+      <el-check-tag
+        v-if="checkTagVisible"
+        :checked="checkTagChecked"
+        data-testid="trace-check-tag"
+        @change="recordCheckTagEvent('change', $event)"
+        @update:checked="updateCheckTag"
+      >
+        Check tag
+      </el-check-tag>
+    </section>
+
     <section aria-label="Markdown editor trace interactions">
       <div data-testid="trace-markdown-editor">
         <el-markdown-editor
@@ -88,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { resolveMarkdownLiveCapability } from '../../element-plus'
 
 import type {
@@ -108,6 +120,9 @@ interface TraceEvent {
 const events = ref<TraceEvent[]>([])
 const inputValue = ref('')
 const dialogOpen = ref(false)
+const checkTagChecked = ref(false)
+const checkTagRevision = ref(0)
+const checkTagVisible = ref(true)
 const markdownEditor = ref<MarkdownEditorInstance>()
 const markdownValue = ref('Trace start')
 const markdownAtomicValue = ref('```\natomic\n```\n')
@@ -132,6 +147,29 @@ const markdownAtomicIdentity: MarkdownEditorDocumentIdentity = Object.freeze({
 const recordEvent = (name: string, payload?: unknown) => {
   events.value.push(payload === undefined ? { name } : { name, payload })
 }
+
+const recordCheckTagEvent = (name: string, checked: boolean) => {
+  recordEvent(`check-tag.${name}`, checked)
+}
+
+const updateCheckTag = (checked: boolean) => {
+  checkTagChecked.value = checked
+  checkTagRevision.value += 1
+  recordCheckTagEvent('update:checked', checked)
+}
+
+const measureCheckTagMount = async () => {
+  checkTagVisible.value = false
+  await nextTick()
+  const startedAt = performance.now()
+  checkTagVisible.value = true
+  await nextTick()
+  return performance.now() - startedAt
+}
+
+;(window as Window & {
+  __fsusMeasureCheckTagMount?: () => Promise<number>
+}).__fsusMeasureCheckTagMount = measureCheckTagMount
 
 const recordMarkdownHistory = (history: MarkdownEditorHistoryState) => {
   markdownHistory.value = history
@@ -203,6 +241,16 @@ const publicState = computed(() => ({
   },
   dialog: {
     open: dialogOpen.value,
+  },
+  checkTag: {
+    checked: checkTagChecked.value,
+    eventNames: events.value
+      .filter((event) => event.name.startsWith('check-tag.'))
+      .map((event) => event.name.replace('check-tag.', '')),
+    eventPayloads: events.value
+      .filter((event) => event.name.startsWith('check-tag.'))
+      .map((event) => event.payload),
+    revision: checkTagRevision.value,
   },
   markdown: {
     capability: markdownCapability.value,
