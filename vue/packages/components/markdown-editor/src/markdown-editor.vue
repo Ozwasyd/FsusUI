@@ -174,6 +174,8 @@
         :rows="minRows"
         :tabindex="liveSurface.inputVisible ? undefined : -1"
         :value="editorValue"
+        :spellcheck="languageCapability.spellcheck"
+        :lang="languageCapability.lang || undefined"
         @beforeinput="handleBeforeInput"
         @blur="handleBlur"
         @click="handlePointerReveal"
@@ -606,8 +608,13 @@ import {
   type MarkdownPasteAsMarkdownChoice,
   type MarkdownPasteAsMarkdownSession,
 } from './markdown-editor-paste-markdown'
+import { resolveMarkdownLanguageToolCapability } from './markdown-editor-language-tools'
+import {
+  bindMarkdownWebLanguageTools,
+  type MarkdownWebLanguageController,
+} from './markdown-editor-language-web'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
-import { createMarkdownLiveSurface } from './markdown-editor-live-surface'
+import { resolveMarkdownLiveSurface } from './markdown-editor-live-surface'
 import {
   resolveMarkdownLiveSyntaxReveal,
   type MarkdownLiveRevealIntent,
@@ -631,8 +638,12 @@ import {
 } from './markdown-editor-live-layout'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
-import { createMarkdownAnchorMap } from '../../../wasm/markdown-anchor-map'
-import { createMarkdownEditorProjection } from '../../../wasm/markdown-editor-projection'
+import {
+  createMarkdownAnchorMap,
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+  type MarkdownStableProjection,
+} from '../../../wasm/markdown-runtime'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -664,6 +675,10 @@ provideMarkdownEditorFrameScheduler(frameScheduler)
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+let languageToolsController: MarkdownWebLanguageController | null = null
+let languageToolsRevision = -1
+let languageToolsSource = ''
+let languageToolsConfigKey = ''
 const attachmentInputRef = ref<HTMLInputElement | null>(null)
 const attachmentReplaceRange = ref<{
   readonly nodeId: string
@@ -726,6 +741,56 @@ provideMarkdownHeavyFeatureDocumentContext({
   revision: () => transactionStore.revision,
 })
 const editorValue = ref(transactionStore.value)
+let previousEditorProjection: MarkdownStableProjection | undefined
+let previousEditorProjectionSource = ''
+const editorProjection = computed(() => {
+  const source = editorValue.value
+  try {
+    const change = previousEditorProjection
+      ? deriveMarkdownEditorChange(previousEditorProjectionSource, source)
+      : undefined
+    const projection = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      documentIdentity,
+      previousEditorProjection,
+      change ?? undefined,
+    )
+    previousEditorProjection = projection
+    previousEditorProjectionSource = source
+    return projection
+  } catch {
+    return undefined
+  }
+})
+const editorAnchorMap = computed(() => {
+  const projection = editorProjection.value
+  if (!projection) return undefined
+  try {
+    const syntax = projection.nodes.flatMap((node) => [
+      {
+        atomic: node.presentation === 'live-atomic',
+        id: node.id,
+        projectionId: node.id,
+        range: node.rawRange,
+      },
+      ...node.rawMarkerRanges.map((range, index) => ({
+        hidden: true,
+        id: `${node.id}:marker:${index}`,
+        parentId: node.id,
+        projectionId: node.id,
+        range,
+      })),
+    ])
+    return createMarkdownAnchorMap({
+      identity: documentIdentity,
+      projection,
+      source: editorValue.value,
+      syntax,
+    })
+  } catch {
+    return undefined
+  }
+})
 const attachmentCaptureSession = createMarkdownAttachmentCaptureSession()
 const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
 const attachmentBatches = new Map<string, MarkdownAttachmentBatchIntent>()
@@ -827,9 +892,11 @@ const activeImageOpenAllowed = computed(
   () => activeImageUrlValidation.value?.open.allowed === true,
 )
 const liveSurface = computed(() =>
-  createMarkdownLiveSurface({
+  resolveMarkdownLiveSurface({
     documentIdentity,
     mode: currentMode.value,
+    projection: editorProjection.value,
+    projectionError: !editorProjection.value,
     revision: transactionStore.revision,
     source: editorValue.value,
   }),
@@ -842,6 +909,49 @@ const liveReveal = ref(
     source: editorValue.value,
   }),
 )
+const languageCapability = computed(() =>
+  resolveMarkdownLanguageToolCapability({
+    lang: props.lang,
+    nativeWritingTools: props.nativeWritingTools,
+    spellcheck: props.spellcheck,
+  }),
+)
+const languageToolsConfig = () => ({
+  lang: props.lang,
+  nativeWritingTools: props.nativeWritingTools,
+  spellcheck: props.spellcheck,
+})
+const syncLanguageToolsState = () => {
+  const controller = languageToolsController
+  if (!controller) return null
+  const config = languageToolsConfig()
+  const configKey = JSON.stringify(config)
+  if (
+    languageToolsRevision !== transactionStore.revision ||
+    languageToolsSource !== transactionStore.value ||
+    languageToolsConfigKey !== configKey
+  ) {
+    controller.updateState({
+      anchorMap: editorAnchorMap.value,
+      config,
+      projection: editorProjection.value,
+      projectionRevision: transactionStore.revision,
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    })
+    languageToolsRevision = transactionStore.revision
+    languageToolsSource = transactionStore.value
+    languageToolsConfigKey = configKey
+  }
+  controller.switchMode(currentMode.value)
+  return controller.updateContext({
+    disabled: inputDisabled.value,
+    isComposing: nativeMachine.composing,
+    mode: currentMode.value,
+    readonly: props.readonly,
+    selection: transactionStore.selection,
+  })
+}
 const isComposing = ref(false)
 const pasteAsMarkdownGate = computed<
   'composition' | 'readonly' | 'disabled' | 'loading' | 'previewOnly' | null
@@ -1272,6 +1382,7 @@ const dispatchEditorOperation = (
     emit(CHANGE_EVENT, result.value)
     refreshLiveWindow('input')
   }
+  if (result.accepted) syncLanguageToolsState()
   if (
     result.accepted &&
     (result.selection.start !== previousSelection.start ||
@@ -1450,7 +1561,13 @@ watch(
   ([mode, defaultMode]) => {
     transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
+    syncLanguageToolsState()
   },
+)
+
+watch(
+  [() => props.lang, () => props.nativeWritingTools, () => props.spellcheck],
+  () => syncLanguageToolsState(),
 )
 
 watch(
@@ -1668,6 +1785,23 @@ const updateVisualViewportHeight = () => {
 }
 
 onMounted(() => {
+  const textarea = textareaRef.value
+  if (textarea) {
+    languageToolsController = bindMarkdownWebLanguageTools(textarea, {
+      anchorMap: editorAnchorMap.value,
+      config: languageToolsConfig(),
+      documentIdentity,
+      mode: currentMode.value,
+      projection: editorProjection.value,
+      projectionRevision: transactionStore.revision,
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    })
+    languageToolsRevision = transactionStore.revision
+    languageToolsSource = transactionStore.value
+    languageToolsConfigKey = JSON.stringify(languageToolsConfig())
+    syncLanguageToolsState()
+  }
   refreshLiveWindow('initial')
   updateVisualViewportHeight()
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
@@ -1676,6 +1810,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  languageToolsController = null
   abortPendingCommands()
   attachmentCaptureSession.clear()
   attachmentBatches.clear()
@@ -1695,6 +1830,23 @@ onBeforeUnmount(() => {
 })
 
 const handleBeforeInput = (event: InputEvent) => {
+  syncLanguageToolsState()
+  if (event.inputType === 'insertReplacementText' && languageToolsController) {
+    const replacement = languageToolsController.handleBeforeInput(event)
+    if (replacement.handled && replacement.transaction) {
+      dispatchTransaction(replacement.transaction)
+      beforeInputSnapshot = undefined
+      pendingClipboardIdentity = undefined
+      pendingInputOrigin = undefined
+      return
+    }
+    if (replacement.handled) {
+      beforeInputSnapshot = undefined
+      pendingClipboardIdentity = undefined
+      pendingInputOrigin = undefined
+      return
+    }
+  }
   const plan = nativeMachine.apply({
     clipboardIdentity: pendingClipboardIdentity,
     data: event.data,
@@ -2004,6 +2156,7 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  syncLanguageToolsState()
   if (currentMode.value === 'live') {
     const selection = transactionStore.selection
     if (selection.start !== selection.end) {

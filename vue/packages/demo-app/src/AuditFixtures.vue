@@ -197,7 +197,7 @@
         :interaction-profile="markdownEditorInteractionProfile"
         :min-rows="6"
         :show-actions="false"
-        :show-mode-switcher="true"
+        :show-mode-switcher="markdownLanguageToolsFixture"
         data-markdown-input-authority="transaction-store"
         @history-change="markdownTransactionHistory = $event"
         @selection-change="markdownTransactionSelection = $event"
@@ -2004,6 +2004,10 @@ const markdownEditorTransactionFixture =
   new URLSearchParams(window.location.search).get(
     'markdownEditorTransaction',
   ) === '1'
+const markdownLanguageToolsFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownLanguageTools') ===
+    '1'
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'

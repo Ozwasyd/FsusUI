@@ -270,6 +270,35 @@ non-composition input 可继续编辑。窗口外仍会拒绝 `isComposing` 或
 `insertCompositionText` 标记的孤立旧 payload；迟到 `compositionend` 后的即时
 commit 也不会越过当前受控值。
 
+## Web language tools
+
+Source 与 Live 的同一个 textarea 会绑定 browser spellcheck、autocorrect、dictation、
+context-menu correction 与 text replacement capability。`spellcheck` 接受 `auto`、
+`enabled`、`disabled` 或相应 boolean；`lang` 提供 optional BCP-47 hint，
+`nativeWritingTools` 接受 `auto` 或 `disabled`。这些属性只配置 browser capability，
+不建立第二份 document 或拼写引擎。
+
+`insertReplacementText` 必须先建立绑定当前 document identity、revision 与 selection
+的 language-tool session，再把明确 raw UTF-16 range 转成一个 `history: 'separate'`
+transaction。每次 editor revision 或 source 更新都会刷新 Web adapter 的当前状态；
+旧 session 不会被重用或猜测 rebase。composition-active、readonly、disabled、preview
+以及 stale document/revision/selection 会 fail closed。code、URL、hidden marker 与
+atomic context 的 suppression 是局部 capability，切换 Source/Live 不会通过全局关闭
+spellcheck 规避映射。
+
+raw range、hidden marker、nested syntax、atomic node 与 visual point 均消费
+`@ozwasyd/element-plus/markdown-runtime` 的稳定 projection 与 anchor map；language
+tool adapter 不解析 Markdown，也不把 raw offset 当作 visual offset。map、projection
+或 source 不属于当前 document/revision 时 replacement 会 fail closed。
+
+Playwright Chromium、Firefox 与 WebKit 测试覆盖 production fixture 中的 replacement
+event routing、revision/session refresh、Source/Live 切换、composition interlock、
+touch 与 accessibility semantics。dictation、writing-tools、context-menu、screen-reader
+和 IME 的自动化均为可重复的本地事件/输入模拟；它验证 editor 内部
+session/selection/transaction/map 语义，但不等同于 native OS spellchecker、真实
+context menu、语音服务、辅助技术或 OS IME 设备证据。完整 native host/device matrix
+归独立验收，不由这些模拟替代。
+
 ## Events
 
 | 事件名             | 说明                                                               |
@@ -305,6 +334,9 @@ commit 也不会越过当前受控值。
 | preview-csp-nonce | preview renderer 的 CSP nonce                | `string \| null`                             | `null`   |
 | preview-features  | preview renderer 的 feature activation 开关  | `MarkdownFeatureActivationFeatureOptions`    | —        |
 | min-rows          | 编辑区最小行数                               | `number`                                     | `12`     |
+| spellcheck        | Browser spellcheck capability                | `'auto' \| 'enabled' \| 'disabled' \| boolean` | `auto`   |
+| lang              | Optional BCP-47 language hint                 | `string`                                     | —        |
+| native-writing-tools | Browser native writing-tools capability     | `'auto' \| 'disabled'`                       | `auto`   |
 
 ## Migration
 
