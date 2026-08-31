@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "82c56bf19a07d55f246ec3709f35ff498e145e5cb80ab08fe5db9f86705f5dea",
-  "candidateSha": "bc3bd6d5f73e5d8bce0e76356e8a71d731c316f9",
-  "candidateDigest": "9ee40129e1e4541676378853a47a5d84d345762557cb4ec7dd4665dd2e22f85c",
+  "classificationReceiptDigest": "a9b6458f9ca1e8fe04e5aee7eb7889c5dacd2c3081b43567020c6b88b9d36c75",
+  "candidateSha": "dd69cff8ea632491619dfcd077c6e1d6b919d85a",
+  "candidateDigest": "88b196ce936df624833ad0a8e459393eb4fe914312ef6a10935d17de53cb77f4",
   "verificationClass": "ux-system",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -20,66 +20,61 @@
     "2f8f9071f47aa6e233f0a5dd7f7a1afb549a099882e48c46a3b1880f73b987c9",
     "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1"
   ],
-  "activeBaselineIdentityDigest": "61b2f27b01700d8aeac197e3157c01a4895ce8699346e1f1b561023f8c8038f0",
+  "activeBaselineIdentityDigest": "f8da3be29e90bc818b382a22d74626359a172ebe257d548cd92e35292dacf567",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "b7b90f88472d6b8fd8335a5d447f8db9fcc2c025b513b1cb67d1e601d40a5e1f",
+  "independenceEvidenceDigest": "8daa7e88e3992dc9f4808cc19bda113a0673a8168447ff7215a4720da0966839",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
     {
-      "viewport": "desktop-640x360",
+      "viewport": "desktop-960x540",
       "state": "built-in-light",
       "theme": "light",
       "inputModes": [
-        "pointer",
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "7550b74eeb660cfc1b3357ac5065c1b82cefe1e45549fc9cd409c50fc05cba2c"
+      "evidenceDigest": "2778ac74e1b4705a6db0f8f79a63ca6d6ac210ef8ee9b8cf1677dc85c6ded49f"
     },
     {
-      "viewport": "desktop-640x360",
+      "viewport": "desktop-960x540",
       "state": "built-in-dark",
       "theme": "dark",
       "inputModes": [
-        "pointer",
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "f28322f2aa9bb0e69033637e7ba25a64cec17b19ce9b549982ec8ccde3f97e0e"
+      "evidenceDigest": "677bf7ea53ab2d0b841cc85b31d42ffaa4ae430de54ca539c9d5dadcc4029909"
     },
     {
-      "viewport": "desktop-640x360",
+      "viewport": "desktop-960x540",
       "state": "complete-custom-palette",
       "theme": "light",
       "inputModes": [
-        "pointer",
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "907456032b786b54b9b5042ae1181667f16c9cadef64967249c99d766084222e"
+      "evidenceDigest": "974d75c45c8051a5c2157058b8bc7ce52fb0b54e09d5e6d5a41e69f1aec4330b"
     },
     {
-      "viewport": "desktop-640x360",
+      "viewport": "desktop-960x540",
       "state": "partial-custom-with-dark-fallback",
       "theme": "dark",
       "inputModes": [
-        "pointer",
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "a6ca9990de9b9c844e3d3ed8d0d7e4b58ff5961051ce650f6feb9f76c7504193"
+      "evidenceDigest": "1ba0b68807a5ca6820940f49a9cfba8bcde7550355c7a1900811755362cb77c1"
     },
     {
-      "viewport": "desktop-640x360",
+      "viewport": "desktop-960x540",
       "state": "built-in-high-contrast-precedence",
-      "theme": "dark",
+      "theme": "highcontrast",
       "inputModes": [
-        "pointer",
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "abe4d616230988413718a7dd9cdbcfc69d480ec89fb5ee7e3a1fc2e22c4a713f"
+      "evidenceDigest": "e8d59809dc3ada3131cd0c87768e84a013f60368674748db0177e0e8d87d09cb"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -87,7 +82,7 @@
       "id": "light-built-in-fallback",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-light.png",
-      "digest": "7550b74eeb660cfc1b3357ac5065c1b82cefe1e45549fc9cd409c50fc05cba2c",
+      "digest": "2778ac74e1b4705a6db0f8f79a63ca6d6ac210ef8ee9b8cf1677dc85c6ded49f",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -95,7 +90,7 @@
       "id": "dark-built-in-fallback",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-dark.png",
-      "digest": "f28322f2aa9bb0e69033637e7ba25a64cec17b19ce9b549982ec8ccde3f97e0e",
+      "digest": "677bf7ea53ab2d0b841cc85b31d42ffaa4ae430de54ca539c9d5dadcc4029909",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -103,7 +98,7 @@
       "id": "complete-custom-palette",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-custom.png",
-      "digest": "907456032b786b54b9b5042ae1181667f16c9cadef64967249c99d766084222e",
+      "digest": "974d75c45c8051a5c2157058b8bc7ce52fb0b54e09d5e6d5a41e69f1aec4330b",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -111,7 +106,7 @@
       "id": "partial-dark-fallback",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-partial-dark.png",
-      "digest": "a6ca9990de9b9c844e3d3ed8d0d7e4b58ff5961051ce650f6feb9f76c7504193",
+      "digest": "1ba0b68807a5ca6820940f49a9cfba8bcde7550355c7a1900811755362cb77c1",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -119,12 +114,12 @@
       "id": "high-contrast-fallback",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-highcontrast.png",
-      "digest": "abe4d616230988413718a7dd9cdbcfc69d480ec89fb5ee7e3a1fc2e22c4a713f",
+      "digest": "e8d59809dc3ada3131cd0c87768e84a013f60368674748db0177e0e8d87d09cb",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "e6c40f0ffeead69648a56c5d57aabcf3e26976191ee4357fa8c6d2c9572a9b5d"
+  "receiptDigest": "3345c58e0bd7c011225429e680e9a83624f552e63b50bcfda352eaebe152ecc1"
 }
