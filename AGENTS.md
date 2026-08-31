@@ -50,7 +50,7 @@ Write in English. The authoritative [`docs/index.md`](docs/index.md) and [`docs/
 
 Common gates: `pnpm run lint`, `typecheck`, `test`, `build`, `verify`, `verify:strict`, `verify:release`, `verify:pr-fast`, `governance:check`, `check:fsusui-design-conformance`, `check:documentation-architecture`, `test:consumer-install`, `dotnet:verify`.
 
-Git and delivery: prefer `gh` for GitHub operations (PR and issue workflows). Work on an issue-scoped branch and open a PR that completes the impact and release-note checklist; verify checks and the exact head before merging. After merging, delete the branch on both origin and locally. After an issue is completed, comment the evidence (exact test command and captured output) on the issue. When GitHub Actions is unavailable, only local equivalent CI all-green plus recorded commands and results justify a merge; never describe a missing remote check as passing.
+Git and delivery: prefer `gh` for GitHub operations (PR and issue workflows). Work on an issue-scoped branch (issues on the same dependency chain may be combined into a single branch) and open a PR that completes the impact and release-note checklist; verify checks and the exact head before merging. After merging, delete the branch on both origin and locally. After an issue is completed, comment the evidence (exact test command and captured output) on each resolved issue. When GitHub Actions is unavailable, only local equivalent CI all-green plus recorded commands and results justify a merge; never describe a missing remote check as passing.
 
 ## When to edit this file
 

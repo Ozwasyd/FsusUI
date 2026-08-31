@@ -294,6 +294,72 @@ describe('Markdown feature output gateway', () => {
     ).toBeNull()
   })
 
+  it('creates a private Trusted Types policy and fail-closes without mutating the target when CSP denies it', () => {
+    const ownerWindow = window as Window & { trustedTypes?: unknown }
+    const originalTrustedTypes = ownerWindow.trustedTypes
+    const policyName = 'fsusui-markdown-feature'
+    const rootId = 'fsus-markdown-mermaid-tt-unit'
+    const validOutput = {
+      kind: 'mermaid' as const,
+      payload: `<svg id="${rootId}" xmlns="http://www.w3.org/2000/svg" class="flowchart"><text>ok</text></svg>`,
+      rootId,
+    }
+
+    const restoreTrustedTypes = () => {
+      if (originalTrustedTypes === undefined) {
+        delete ownerWindow.trustedTypes
+        return
+      }
+      Object.defineProperty(ownerWindow, 'trustedTypes', {
+        configurable: true,
+        value: originalTrustedTypes,
+      })
+    }
+
+    try {
+      Object.defineProperty(ownerWindow, 'trustedTypes', {
+        configurable: true,
+        value: {
+          createPolicy() {
+            throw new TypeError('policy denied')
+          },
+        },
+      })
+      const deniedTarget = document.createElement('figure')
+      deniedTarget.append(document.createTextNode('unchanged-before-commit'))
+      expect(() =>
+        commitMarkdownFeatureOutput(deniedTarget, validOutput),
+      ).toThrow('markdown_feature_trusted_types_policy_unavailable')
+      expect(deniedTarget.textContent).toBe('unchanged-before-commit')
+      expect(deniedTarget.querySelector('svg')).toBeNull()
+
+      const calls: Array<{ callbacks: string[]; name: string }> = []
+      Object.defineProperty(ownerWindow, 'trustedTypes', {
+        configurable: true,
+        value: {
+          createPolicy(
+            name: string,
+            rules: Readonly<{ createHTML: (input: string) => string }>,
+          ) {
+            calls.push({ callbacks: Object.keys(rules).sort(), name })
+            return {
+              createHTML: (input: string) => rules.createHTML(input),
+            }
+          },
+        },
+      })
+      const allowedTarget = document.createElement('figure')
+      commitMarkdownFeatureOutput(allowedTarget, validOutput)
+      commitMarkdownFeatureOutput(allowedTarget, validOutput)
+      expect(calls).toEqual([
+        { callbacks: ['createHTML'], name: policyName },
+      ])
+      expect(allowedTarget.querySelector('svg')?.id).toBe(rootId)
+    } finally {
+      restoreTrustedTypes()
+    }
+  })
+
   it('rejects extra roots and kind-specific root shape violations', () => {
     const codeTarget = document.createElement('pre')
     expect(() =>

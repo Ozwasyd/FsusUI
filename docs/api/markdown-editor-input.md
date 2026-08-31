@@ -79,6 +79,13 @@ This command does not change normal paste MIME priority and does not redefine
 the existing sanitizer, converter, attachment provider, or upload-I/O
 boundaries.
 
+The isolated importer measures clipboard size as UTF-8 bytes and fails closed
+against its node, depth, table-cell, image, and elapsed-time budgets. URL
+attributes are decoded before scheme classification, so encoded active schemes
+cannot cross the sanitizer boundary. Budget rejection, cancellation, and active
+content removal remain typed conversion losses; they never trigger a browser
+rich-paste fallback, remote conversion, or consumer-local importer.
+
 `planMarkdownMermaidPreview` is the #384 Mermaid preview contract. Requests
 reuse the #382 identity. Valid diagrams preview through the unique feature
 gateway. Invalid, large, abort, and stale results stay local and source-only.

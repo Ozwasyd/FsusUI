@@ -14,6 +14,7 @@ const FIXED_SUITE_IDS = Object.freeze([
   'dom-layout',
   'geometry-smoke',
   'markdown-editor-interaction',
+  'web-interaction-conformance',
   'visual-boundary-audit',
   'visual-runtime-reuse',
 ])
@@ -95,7 +96,11 @@ const loadProjectContract = (repositoryRoot, relativePath) => {
  * Pure-data project contract is the authority for config project cells.
  * Config files must declare the same project names (structural presence).
  */
-const collectConfigSources = (repositoryRoot, configRelative, seen = new Set()) => {
+const collectConfigSources = (
+  repositoryRoot,
+  configRelative,
+  seen = new Set(),
+) => {
   const absolute = resolve(repositoryRoot, configRelative)
   if (seen.has(absolute) || !existsSync(absolute)) return []
   seen.add(absolute)
@@ -175,7 +180,7 @@ export function validatePlaywrightSuiteRegistry(
   }
   if (suiteIds.length !== FIXED_SUITE_IDS.length) {
     fail(
-      `playwright suite registry must contain exactly the seven fixed suites, found ${suiteIds.length}`,
+      `playwright suite registry must contain exactly the eight fixed suites, found ${suiteIds.length}`,
     )
   }
   if (new Set(suiteIds).size !== suiteIds.length) {
@@ -344,15 +349,16 @@ export function validatePlaywrightSuiteRegistry(
     (suite) => suite.id === 'visual-runtime-reuse',
   )
   if (!reuse || reuse.countsTowardProductBrowserCoverage !== false) {
-    fail(
-      'visual-runtime-reuse must not count toward product browser coverage',
-    )
+    fail('visual-runtime-reuse must not count toward product browser coverage')
   }
 
   return true
 }
 
-export function planPlaywrightSuites(group, registry = loadPlaywrightSuiteRegistry()) {
+export function planPlaywrightSuites(
+  group,
+  registry = loadPlaywrightSuiteRegistry(),
+) {
   if (!PROFILE_NAMES.includes(group)) {
     fail(
       `unknown group ${JSON.stringify(group)}; expected one of ${PROFILE_NAMES.join(', ')}`,

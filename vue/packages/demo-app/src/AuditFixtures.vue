@@ -194,6 +194,7 @@
           markdownPasteGate === 'preview-only' ? 'preview' : 'source'
         "
         :disabled="markdownPasteGate === 'disabled'"
+        :interaction-profile="markdownEditorInteractionProfile"
         :min-rows="6"
         :show-actions="false"
         :show-mode-switcher="markdownLanguageToolsFixture"
@@ -201,6 +202,7 @@
         @history-change="markdownTransactionHistory = $event"
         @selection-change="markdownTransactionSelection = $event"
         @transaction="recordMarkdownTransaction"
+        @upload-image="recordMarkdownAttachmentBatch"
       />
       <div aria-label="Markdown transaction controls">
         <button
@@ -259,6 +261,29 @@
         >
           Load 100k document
         </button>
+        <button
+          type="button"
+          data-testid="markdown-attachment-progress"
+          :disabled="!markdownAttachmentBatch"
+          @click="progressMarkdownAttachmentFixture"
+        >
+          Attachment progress
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-attachment-resolve"
+          :disabled="!markdownAttachmentBatch"
+          @click="resolveMarkdownAttachmentFixture"
+        >
+          Resolve attachment
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-load-figure"
+          @click="loadMarkdownFigureFixture"
+        >
+          Load image figure
+        </button>
       </div>
       <output data-testid="markdown-editor-value">
         {{ markdownTransactionValue.length }}
@@ -274,6 +299,9 @@
       </output>
       <output data-testid="markdown-editor-selection">
         {{ JSON.stringify(markdownTransactionSelection) }}
+      </output>
+      <output data-testid="markdown-attachment-batch">
+        {{ JSON.stringify(markdownAttachmentBatchSnapshot) }}
       </output>
     </section>
 
@@ -1840,6 +1868,7 @@ import {
   ElTypedConfirmField,
 } from '../../element-plus'
 import type {
+  MarkdownAttachmentBatchIntent,
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryState,
   MarkdownEditorInstance,
@@ -1982,6 +2011,13 @@ const markdownLanguageToolsFixture =
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownEditorInteractionProfile =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get(
+    'markdownEditorInteractionProfile',
+  ) === 'keyboard'
+    ? ('keyboard' as const)
+    : undefined
 const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
@@ -2034,6 +2070,27 @@ const markdownLastTransaction = ref<MarkdownEditorTransactionEvent | null>(null)
 const markdownTransactionSelection = ref<MarkdownEditorSelectionEvent | null>(
   null,
 )
+const markdownAttachmentBatch = ref<MarkdownAttachmentBatchIntent | null>(null)
+const markdownAttachmentBatchSnapshot = computed(() => {
+  const batch = markdownAttachmentBatch.value
+  if (!batch) return null
+  return {
+    anchor: batch.anchor,
+    batchId: batch.batchId,
+    items: batch.items.map(
+      ({ byteLength, itemId, kind, mimeType, name, order }) => ({
+        byteLength,
+        itemId,
+        kind,
+        mimeType,
+        name,
+        order,
+      }),
+    ),
+    revision: batch.revision,
+    sourceKind: batch.sourceKind,
+  }
+})
 const markdownTransactionRevision = computed(
   () => markdownLastTransaction.value?.revision ?? 0,
 )
@@ -2041,6 +2098,49 @@ let markdownPlaceholderRevision: number | undefined
 
 const recordMarkdownTransaction = (event: MarkdownEditorTransactionEvent) => {
   markdownLastTransaction.value = event
+}
+
+const recordMarkdownAttachmentBatch = (
+  batch: MarkdownAttachmentBatchIntent,
+) => {
+  markdownAttachmentBatch.value = batch
+}
+
+const progressMarkdownAttachmentFixture = () => {
+  const batch = markdownAttachmentBatch.value
+  const item = batch?.items[0]
+  if (!batch || !item) return
+  markdownTransactionEditor.value?.applyAttachmentResult({
+    batchId: batch.batchId,
+    itemId: item.itemId,
+    ratio: 0.5,
+    status: 'progress',
+  })
+}
+
+const resolveMarkdownAttachmentFixture = () => {
+  const batch = markdownAttachmentBatch.value
+  const item = batch?.items[0]
+  if (!batch || !item) return
+  markdownTransactionEditor.value?.applyAttachmentResult({
+    batchId: batch.batchId,
+    documentIdentity: batch.documentIdentity,
+    itemId: item.itemId,
+    payload: {
+      alt: 'Resolved attachment',
+      href: '/fixtures/resolved-attachment.png',
+      markdownKind: 'image',
+      mimeType: item.mimeType,
+      name: item.name,
+    },
+    revision: batch.revision,
+    status: 'resolved',
+  })
+}
+
+const loadMarkdownFigureFixture = () => {
+  markdownTransactionValue.value =
+    '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]'
 }
 
 const insertMarkdownFixture = () => {

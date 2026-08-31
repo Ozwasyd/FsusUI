@@ -1,5 +1,6 @@
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using System.Runtime.CompilerServices;
@@ -9,9 +10,10 @@ namespace FsusUI.Avalonia.Tests.Controls;
 public class FsusValuePickerPrimitiveTests
 {
   [Fact]
-  public async Task SliderClampsStepsSupportsMarksKeyboardPointerAndDisabledState()
+  public async Task SliderClampsSnapsCommitsKeyboardAndExposesRangeAutomation()
   {
     var changes = new List<double>();
+    var commits = new List<(double OldValue, double NewValue)>();
     var slider = new KeyboardSlider
     {
       AccessibleName = "Volume",
@@ -24,6 +26,7 @@ public class FsusValuePickerPrimitiveTests
     slider.Marks.Add(new FsusSliderMark(50, "Half"));
     slider.Marks.Add(new FsusSliderMark(100, "Full"));
     slider.ValueChanged += (_, args) => changes.Add(args.NewValue);
+    slider.ValueCommitted += (_, args) => commits.Add((args.OldValue, args.NewValue));
 
     slider.SetValue(103);
 
@@ -35,13 +38,39 @@ public class FsusValuePickerPrimitiveTests
     Assert.True(await slider.PressAsync(Key.Left));
 
     Assert.Equal(95, slider.Value);
+    Assert.Equal((100d, 95d), commits[^1]);
+
+    Assert.True(await slider.PressAsync(Key.Home));
+    Assert.Equal(0, slider.Value);
+    Assert.True(await slider.PressAsync(Key.End));
+    Assert.Equal(100, slider.Value);
+    Assert.True(await slider.PressAsync(Key.PageDown));
+    Assert.Equal(50, slider.Value);
+    Assert.True(await slider.PressAsync(Key.PageUp));
+    Assert.Equal(100, slider.Value);
+    Assert.True(await slider.PressAsync(Key.Down));
+    Assert.Equal(95, slider.Value);
+    Assert.True(await slider.PressAsync(Key.Up));
+    Assert.Equal(100, slider.Value);
 
     Assert.True(slider.DragToRatio(0.25));
 
     Assert.Equal(25, slider.Value);
     Assert.Equal(AutomationControlType.Slider, AutomationProperties.GetControlTypeOverride(slider));
     Assert.Equal("Volume", AutomationProperties.GetName(slider));
-    Assert.Equal("25 / 100", AutomationProperties.GetItemStatus(slider));
+    Assert.Equal("25", AutomationProperties.GetItemStatus(slider));
+
+    var peer = ControlAutomationPeer.CreatePeerForElement(slider);
+    var range = Assert.IsAssignableFrom<IRangeValueProvider>(peer);
+    Assert.Equal(0, range.Minimum);
+    Assert.Equal(100, range.Maximum);
+    Assert.Equal(25, range.Value);
+    Assert.Equal(5, range.SmallChange);
+    Assert.Equal(50, range.LargeChange);
+    Assert.False(range.IsReadOnly);
+
+    slider.AccessibleValueText = "25 percent";
+    Assert.Equal("25 percent", AutomationProperties.GetItemStatus(slider));
 
     slider.IsDisabled = true;
 
@@ -49,6 +78,39 @@ public class FsusValuePickerPrimitiveTests
     Assert.False(slider.DragToRatio(0.75));
     Assert.Equal(25, slider.Value);
     Assert.Contains("fsus-disabled", slider.Classes);
+    Assert.True(range.IsReadOnly);
+    range.SetValue(75);
+    Assert.Equal(25, slider.Value);
+  }
+
+  [Fact]
+  public async Task SliderSupportsReversedBoundsForSnappingRatioAndKeyboardDirection()
+  {
+    var slider = new KeyboardSlider
+    {
+      Min = 100,
+      Max = 0,
+      Step = 10,
+      Value = 76,
+    };
+
+    Assert.Equal(80, slider.Value);
+    Assert.True(slider.DragToRatio(0.25));
+    Assert.Equal(70, slider.Value);
+
+    Assert.True(await slider.PressAsync(Key.Right));
+    Assert.Equal(60, slider.Value);
+    Assert.True(await slider.PressAsync(Key.Left));
+    Assert.Equal(70, slider.Value);
+    Assert.True(await slider.PressAsync(Key.Home));
+    Assert.Equal(100, slider.Value);
+    Assert.True(await slider.PressAsync(Key.End));
+    Assert.Equal(0, slider.Value);
+
+    var range = Assert.IsAssignableFrom<IRangeValueProvider>(
+      ControlAutomationPeer.CreatePeerForElement(slider));
+    Assert.Equal(0, range.Minimum);
+    Assert.Equal(100, range.Maximum);
   }
 
   [Fact]

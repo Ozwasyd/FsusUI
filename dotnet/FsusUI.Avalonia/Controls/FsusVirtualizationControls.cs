@@ -176,6 +176,7 @@ public class FsusVirtualList : ContentControl
   public IReadOnlyList<FsusRealizedVirtualItem> RealizedItems => realizedItems;
   public IReadOnlyList<FsusVirtualListItem> LoadedItems => loadedItems;
   public IReadOnlyCollection<FsusVirtualListItemContainer> RealizedContainers => realizedContainers.Values;
+  internal Action<FsusVirtualListItemContainer, int>? ContainerPrepared { get; set; }
   public string DisplayText =>
     State switch
     {
@@ -245,6 +246,7 @@ public class FsusVirtualList : ContentControl
       var offset = ResolveOffset(index);
       var container = realizedContainers[index];
       container.Bind(item, ItemTemplate, size);
+      ContainerPrepared?.Invoke(container, index);
       Canvas.SetTop(container, offset);
       Canvas.SetLeft(container, 0d);
       realizedItems.Add(new FsusRealizedVirtualItem(
@@ -280,6 +282,15 @@ public class FsusVirtualList : ContentControl
   {
     ScrollOffset = Math.Min(Math.Max(0d, offset), Math.Max(0d, ResolveTotalSize() - ViewportSize));
     RefreshWindow();
+  }
+
+  protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+  {
+    base.OnPropertyChanged(change);
+    if (change.Property == BoundsProperty && Bounds.Width > 0)
+    {
+      SyncRealizedWidth();
+    }
   }
 
   public void SetMeasuredSize(int index, double size)
@@ -566,9 +577,21 @@ public class FsusVirtualList : ContentControl
     }
   }
 
+  private void SyncRealizedWidth()
+  {
+    var width = Math.Max(1d, Bounds.Width);
+    itemHost.MinWidth = width;
+    foreach (var container in realizedContainers.Values)
+    {
+      container.Width = width;
+    }
+  }
+
   private static async Task CommitOnUiThreadAsync(Action action)
   {
-    if (Dispatcher.UIThread.CheckAccess())
+    if (
+      Application.Current?.ApplicationLifetime is null ||
+      Dispatcher.UIThread.CheckAccess())
     {
       action();
       return;

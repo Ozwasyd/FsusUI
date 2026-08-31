@@ -48,7 +48,7 @@ assert(
 assert(
   scripts['verify:release']?.includes('package:candidate:build') &&
     scripts['verify:release']?.includes('package:candidate:verify') &&
-    scripts['verify:release']?.includes('test:consumer-install'),
+    scripts['verify:release']?.includes('test:consumer-matrix'),
   'verify:release must build, verify, and consume one immutable candidate',
 )
 assert(buildPackageJob, '_quality.yml must define build-package job')
@@ -72,7 +72,14 @@ for (const fragment of [
   'name: fsusui-npm-candidate',
   'Verify immutable npm candidate and package smoke',
   'package:candidate:verify',
-  'pnpm test:consumer-install -- .npm-candidate/fsusui-npm-candidate.tgz',
+  'scripts/consumer-matrix-impact.mjs',
+  'pnpm test:consumer-matrix:fixtures',
+  'pnpm test:consumer-matrix --',
+  '--candidate .npm-candidate/fsusui-npm-candidate.tgz',
+  '--output .consumer-matrix/receipts',
+  'name: consumer-matrix-${{ inputs.group }}',
+  'consumer-matrix=.consumer-matrix',
+  'no-package-impact',
   'needs.build-package.outputs.candidate-digest',
 ]) {
   assert(
@@ -90,6 +97,10 @@ for (const forbidden of [
     `consumer-install must consume the package artifact instead of running ${forbidden}`,
   )
 }
+assert(
+  !consumerInstallJob.includes('continue-on-error'),
+  'consumer-install required matrix must not continue on error',
+)
 for (const fragment of [
   'name: fsusui-npm-candidate',
   'package:candidate:verify',

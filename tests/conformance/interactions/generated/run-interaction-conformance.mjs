@@ -5,20 +5,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const directory = path.dirname(fileURLToPath(import.meta.url))
-const root = path.resolve(directory, '../../../..')
 const traces = JSON.parse(
   fs.readFileSync(path.join(directory, 'normalized-traces.json'), 'utf8'),
-)
-const webSpec = fs.readFileSync(
-  path.join(directory, 'web.generated.spec.ts'),
-  'utf8',
-)
-const avaloniaTests = fs.readFileSync(
-  path.join(
-    root,
-    'dotnet/FsusUI.Avalonia.HeadlessTests/Generated/InteractionConformanceTests.cs',
-  ),
-  'utf8',
 )
 
 assert.ok(traces.scenarios.length > 0, 'scenarios must not be empty')
@@ -32,16 +20,6 @@ for (const scenario of traces.scenarios) {
     `${scenario.id} assert step`,
   )
   assert.ok(scenario.expectations.length > 0, `${scenario.id} expectations`)
-  if (scenario.platform === 'shared' || scenario.platform === 'web') {
-    assert.ok(
-      webSpec.includes(scenario.id),
-      `${scenario.id} web generated test`,
-    )
-  }
-  if (scenario.platform === 'shared' || scenario.platform === 'avalonia') {
-    assert.ok(
-      avaloniaTests.includes(scenario.id),
-      `${scenario.id} avalonia generated test`,
-    )
-  }
 }
+
+assert.equal(traces.coveragePolicy, 'planning-only-not-executable-coverage')

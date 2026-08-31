@@ -120,6 +120,13 @@
           "Avalonia": "[12.0.4, )"
         }
       },
+      "fsusui.avalonia.icons": {
+        "type": "Project",
+        "dependencies": {
+          "Avalonia": "[12.0.4, )",
+          "FsusUI.Avalonia": "[0.0.0-preview.0, )"
+        }
+      },
       "fsusui.avalonia.themes": {
         "type": "Project",
         "dependencies": {

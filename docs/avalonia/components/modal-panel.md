@@ -6,7 +6,19 @@ Component ID: `modal-panel`
 
 Use `FsusDialog`, `FsusDrawer`, `FsusMessageBox`, `FsusMessageBoxService`,
 and `FsusOverlayHost` for modal surfaces, close policy, focus containment, and
-message-box flows.
+message-box flows. For long forms, enable `IsBodyScrollable` on `FsusDialog` to
+provide a scrollable content area with fixed title and action footer, bounded by
+the owner or overlay viewport and, when set, `MaxBodyHeight`. The opt-in mode
+supports `PageUp`/`PageDown` and scrolls newly focused body controls into view;
+the default dialog composition remains unchanged.
+
+When the legacy `Content` is not assigned, `FsusDialog` renders its semantic
+slots from the public properties: `Title`, `BodyContent`, `FooterContent`, and
+the optional `ConfirmContent`/`CancelContent` each map to a template slot and
+collapse when unset. Assigning `Content` keeps the legacy self-composed
+presentation and suppresses the semantic template. `OpenDialog` centers the
+surface in the overlay viewport, and every modal entry renders a scrim behind
+the content.
 
 ## Vue Contract Mapping
 
@@ -32,6 +44,13 @@ var dialog = new FsusDialog
 {
   Title = "Discard changes",
   Content = "Unsaved edits will be lost.",
+};
+
+var semanticDialog = new FsusDialog
+{
+  Title = "Delete file",
+  BodyContent = new TextBlock { Text = "This cannot be undone." },
+  ConfirmContent = new FsusButton { Content = "Delete" },
 };
 ```
 

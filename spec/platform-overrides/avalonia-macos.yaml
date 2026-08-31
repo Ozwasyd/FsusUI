@@ -13,3 +13,31 @@ overrides:
     owner: fsusui-core
     reviewAfter: 2026-09-01
     linkedIssues: [18, 24, 25]
+  - id: avalonia-macos-shortcut-display-001
+    area: interaction
+    component: input
+    platform: avalonia-macos
+    status: accepted
+    reason: macOS uses Command and Option labels for the same platform-neutral shortcut semantics represented as Ctrl and Alt on Windows and Linux.
+    affectedContracts: [component.el-input]
+    visualThreshold: low
+    behaviorExpectation: Captured key identity, modifier order, stable serialization, cancellation, clearing, collision detection, and accessible status remain equivalent across platforms.
+    allowedDeviation: low
+    testPolicy: headless-interaction-and-local-platform-simulation
+    owner: fsusui-core
+    reviewAfter: 2026-11-01
+    linkedIssues: [648]
+  - id: avalonia-macos-native-menu-role-001
+    area: interaction
+    component: menu
+    platform: avalonia-macos
+    status: accepted
+    reason: macOS application and Dock menus require platform roles and placement that do not appear in Windows or Linux menu bars.
+    affectedContracts: [component.el-menu]
+    visualThreshold: low
+    behaviorExpectation: The neutral command model retains command identity, enabled and checked state, shortcut updates, application roles, Services assignment, Dock routing, and deterministic degradation on other platforms.
+    allowedDeviation: low
+    testPolicy: local-platform-role-simulation-and-native-menu-contract
+    owner: fsusui-core
+    reviewAfter: 2026-11-01
+    linkedIssues: [649, 688]

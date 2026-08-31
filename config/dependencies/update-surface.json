@@ -63,6 +63,7 @@
       "packageName": "actions/checkout",
       "manager": "github-actions",
       "files": [
+        ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml",
@@ -79,6 +80,7 @@
       "packageName": "actions/download-artifact",
       "manager": "github-actions",
       "files": [
+        ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml"
@@ -93,6 +95,7 @@
       "packageName": "actions/setup-dotnet",
       "manager": "github-actions",
       "files": [
+        ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/quality.yml"
       ],
@@ -123,6 +126,7 @@
       "manager": "github-actions",
       "files": [
         ".github/actions/readiness-manifest/action.yml",
+        ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/quality.yml"
@@ -2072,7 +2076,7 @@
     }
   ],
   "governance": {
-    "automerge": false,
+    "automerge": true,
     "majorEnabled": true,
     "minorEnabled": true,
     "patchEnabled": true,

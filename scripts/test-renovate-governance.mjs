@@ -58,11 +58,32 @@ const mutations = [
     expected: /disabled update surface forbidden/u,
   },
   {
-    name: 'automerge',
+    name: 'disabled automerge',
     mutate(next) {
-      next.renovate.automerge = true
+      next.renovate.automerge = false
     },
     expected: /automerge/u,
+  },
+  {
+    name: 'direct push automerge',
+    mutate(next) {
+      next.renovate.automergeType = 'branch'
+    },
+    expected: /automergeType|direct-push/u,
+  },
+  {
+    name: 'non-platform automerge',
+    mutate(next) {
+      next.renovate.platformAutomerge = false
+    },
+    expected: /platformAutomerge|platform automerge/u,
+  },
+  {
+    name: 'lockfile automerge disabled',
+    mutate(next) {
+      next.renovate.lockFileMaintenance.automerge = false
+    },
+    expected: /automerge|lockFileMaintenance/u,
   },
   {
     name: 'stale generated inventory',

@@ -341,6 +341,47 @@ internal sealed class ComboBoxFieldAdapter(ComboBox control) : FsusBuiltInFieldA
   }
 }
 
+[FsusFormFieldAdapterFor(typeof(FsusAutocomplete))]
+internal sealed class FsusAutocompleteFieldAdapter(FsusAutocomplete control) : FsusBuiltInFieldAdapter<FsusAutocomplete>(control)
+{
+  public override FsusFormFieldAdapterCapabilities Capabilities =>
+    FsusFormFieldAdapterCapabilities.ReadValue |
+    FsusFormFieldAdapterCapabilities.WriteValue |
+    FsusFormFieldAdapterCapabilities.ResetValue |
+    FsusFormFieldAdapterCapabilities.ApplySize;
+
+  public override FsusFormFieldReadResult ReadValue() =>
+    FsusFormFieldReadResult.Success(Control.SelectedValue ?? Control.Text);
+
+  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
+    TryResetValue(value);
+
+  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
+  {
+    if (initialValue is string stringValue && Control.SelectValue(stringValue))
+    {
+      Control.SelectedValue = stringValue;
+    }
+    else if (initialValue is not null && Control.SelectValue(initialValue))
+    {
+      Control.SelectedValue = initialValue;
+    }
+    else
+    {
+      Control.SelectedValue = initialValue;
+      Control.Text = initialValue?.ToString() ?? string.Empty;
+    }
+
+    return Success;
+  }
+
+  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
+  {
+    Control.Size = size;
+    return Success;
+  }
+}
+
 [FsusFormFieldAdapterFor(typeof(FsusDatePicker))]
 internal sealed class FsusDatePickerFieldAdapter(FsusDatePicker control) : FsusBuiltInFieldAdapter<FsusDatePicker>(control)
 {

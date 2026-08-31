@@ -24,11 +24,14 @@ import {
 } from '../src/markdown-editor-surfaces'
 import { resolveMarkdownSelectionToolbarPlacement } from '../src/markdown-editor-selection-toolbar'
 import { createWritingAidsController } from '../src/markdown-editor-writing-aids'
+import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
 
 const context = (revision = 1): MarkdownEditorCommandContext => ({
   dispatch: {
     dispatch: () => ({
       accepted: true,
+      beforeRevision: Math.max(0, revision - 1),
+      documentIdentity: { epoch: 1, id: 'doc' },
       history: {
         canRedo: false,
         canUndo: false,
@@ -82,7 +85,12 @@ describe('markdown follow-on contracts', () => {
   })
 
   it('converts sanitized HTML to markdown with a loss report', () => {
-    const result = convertSanitizedHtmlToMarkdown('<h1>Title</h1><script>x()</script><p>Hi</p>')
+    const scriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-raw-script-basic',
+    )
+    const result = convertSanitizedHtmlToMarkdown(
+      `<h1>Title</h1>${scriptAttack}<p>Hi</p>`,
+    )
     expect(result.markdown).toContain('# Title')
     expect(result.markdown).toContain('Hi')
     expect(result.markdown).not.toContain('script')

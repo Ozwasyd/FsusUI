@@ -20,7 +20,7 @@ Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenanc
 - `pnpm verify:full`：完整本地质量门，等价于历史 `pnpm verify` 行为，包含 `prepare:test-artifacts`、`_verify:parallel` 和 `build:demo`。
 - `pnpm verify:stable`：显式本地开发者入口，执行 token/icon、interaction、visual、a11y、performance、conformance、governance 与 .NET 验证。
 - `pnpm verify:nightly`：显式本地开发者入口，执行 full、coverage、visual、.NET 与 performance 验证。
-- `pnpm verify:release`：显式本地发布候选入口，执行完整检查和唯一 npm candidate/consumer-install 链路。
+- `pnpm verify:release`：显式本地发布候选入口，执行完整检查和唯一 npm candidate/consumer-matrix 链路。
 
 CI 中的 `stable-readiness`、`nightly-readiness`、`release-readiness` 不调用
 上述 `verify:*`。它们只聚合当前 workflow run 的结构化 leaf manifests，
@@ -102,11 +102,16 @@ full quality 的 `build-package` 只构建一次，并产出 `fsusui-npm-candida
 工件：`fsusui-npm-candidate.tgz`、SHA-256 sidecar 和 candidate manifest。
 manifest 把 candidate digest 绑定到 commit、package name/version、dist-tag、
 canonical package.json、Node/pnpm/npm、lockfile 与 build input fingerprint。
-`consumer-install` 先执行 `package:candidate:verify`，再从同一个 tarball 解包执行
-package smoke，并直接冷安装同一个 tarball；三处日志引用同一个 digest。
+`consumer-install` 先执行 `package:candidate:verify`，再从同一个 tarball 运行
+`npm-latest`、`pnpm-latest` 与 `npm-peer-floor` 的真实冷安装、typecheck、SSR、
+正式 exports、Vite production build、worker/Wasm/lazy chunk 与 bundle budget 检查。
+三个 profile receipt 和 matrix summary 作为 `consumer-matrix` CI artifact 上传，
+并必须引用同一个 digest。纯文档 PR 只能凭含完整 changed-path 列表与 digest 的
+`no-package-impact:documentation-only` plan 跳过；main、nightly 与 release 没有
+base diff 时保守运行。
 
 `verify:release` 使用同样的本地链路：`package:candidate:build` →
-`package:candidate:verify` → fixture → consumer install，不依赖 Actions artifact
+`package:candidate:verify` → negative fixtures → consumer matrix，不依赖 Actions artifact
 服务或 npm 权限。需要独立可复现性重建时，将 B 输出到另一个目录，再运行
 `pnpm package:candidate:compare <A.tgz> <B.tgz>`；比较通过也不会替换已经测试的 A。
 

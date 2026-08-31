@@ -6,10 +6,20 @@ export const MARKDOWN_HTML_IMPORT_BUDGET = Object.freeze({
   maxNodes: 20_000,
   maxDepth: 24,
   maxAttributes: 32,
+  maxTableCells: 10_000,
+  maxImages: 1_000,
   maxMs: 50,
 })
 
-export type MarkdownHtmlImportBudget = typeof MARKDOWN_HTML_IMPORT_BUDGET
+export interface MarkdownHtmlImportBudget {
+  readonly maxBytes: number
+  readonly maxNodes: number
+  readonly maxDepth: number
+  readonly maxAttributes: number
+  readonly maxTableCells: number
+  readonly maxImages: number
+  readonly maxMs: number
+}
 
 export interface MarkdownHtmlImportSnapshot {
   readonly html?: string
@@ -19,7 +29,10 @@ export interface MarkdownHtmlImportSnapshot {
   readonly explicit: boolean
 }
 
-export type MarkdownHtmlImportFindingKind = 'removed' | 'blocked' | 'unsupported'
+export type MarkdownHtmlImportFindingKind =
+  | 'removed'
+  | 'blocked'
+  | 'unsupported'
 
 export interface MarkdownHtmlImportFinding {
   readonly kind: MarkdownHtmlImportFindingKind
@@ -47,6 +60,8 @@ export type MarkdownHtmlImportReject =
   | 'budget-bytes'
   | 'budget-nodes'
   | 'budget-depth'
+  | 'budget-table-cells'
+  | 'budget-images'
   | 'budget-time'
   | 'cancelled'
   | 'empty'
@@ -56,6 +71,8 @@ export interface MarkdownHtmlImportStats {
   readonly nodes: number
   readonly depth: number
   readonly attributes: number
+  readonly tableCells: number
+  readonly images: number
   readonly ms: number
 }
 
@@ -143,12 +160,40 @@ const ALLOWED_TAGS = new Set([
   'figcaption',
 ])
 
-const ALLOWED_ATTR = new Set(['href', 'src', 'alt', 'title', 'colspan', 'rowspan', 'start'])
+const ALLOWED_ATTR = new Set([
+  'href',
+  'src',
+  'alt',
+  'title',
+  'colspan',
+  'rowspan',
+  'start',
+])
 
 const isControlChar = (code: number) =>
-  code <= 8 || code === 11 || code === 12 || (code >= 14 && code <= 31) || code === 127
+  code <= 8 ||
+  code === 11 ||
+  code === 12 ||
+  (code >= 14 && code <= 31) ||
+  code === 127
 
-const DANGEROUS_SCHEME = /^(?:javascript|vbscript|data:text\/html|data:image\/svg)/i
+const DANGEROUS_SCHEME =
+  /^(?:javascript|vbscript|data:text\/html|data:image\/svg)/i
+
+const decodeUrlCharacterReferences = (value: string) =>
+  value.replace(
+    /&(#x?[0-9a-f]+|colon|tab|newline);/gi,
+    (whole, body: string) => {
+      const normalized = body.toLowerCase()
+      if (normalized === 'colon') return ':'
+      if (normalized === 'tab') return '\t'
+      if (normalized === 'newline') return '\n'
+      const hex = normalized.startsWith('#x')
+      const digits = normalized.slice(hex ? 2 : 1)
+      const code = Number.parseInt(digits, hex ? 16 : 10)
+      return Number.isFinite(code) ? String.fromCodePoint(code) : whole
+    },
+  )
 
 type OpenElement = {
   tag: string
@@ -160,7 +205,8 @@ const finding = (
   kind: MarkdownHtmlImportFindingKind,
   code: string,
   detail?: string,
-): MarkdownHtmlImportFinding => Object.freeze({ kind, code, ...(detail ? { detail } : {}) })
+): MarkdownHtmlImportFinding =>
+  Object.freeze({ kind, code, ...(detail ? { detail } : {}) })
 
 const stripControl = (value: string, findings: MarkdownHtmlImportFinding[]) => {
   let cleaned = ''
@@ -179,10 +225,19 @@ const stripControl = (value: string, findings: MarkdownHtmlImportFinding[]) => {
 }
 
 const isSafeUrl = (value: string) => {
-  const trimmed = value.trim()
+  const trimmed = decodeUrlCharacterReferences(value).trim()
+  const schemeProbe = [...trimmed]
+    .filter((char) => {
+      const code = char.charCodeAt(0)
+      return code > 32 && code !== 127
+    })
+    .join('')
   if (trimmed.length === 0) return false
-  if (DANGEROUS_SCHEME.test(trimmed)) return false
-  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed) && !/^(https?:|mailto:)/i.test(trimmed)) {
+  if (DANGEROUS_SCHEME.test(schemeProbe)) return false
+  if (
+    /^[a-z][a-z0-9+.-]*:/i.test(schemeProbe) &&
+    !/^(https?:|mailto:)/i.test(schemeProbe)
+  ) {
     return false
   }
   return !/url\s*\(/i.test(trimmed)
@@ -195,7 +250,8 @@ const parseAttrs = (
   stats: { attributes: number },
 ) => {
   const attrs: Record<string, string> = {}
-  const attrRe = /([a-z_:][\w:.-]*)(?:\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+)))?/gi
+  const attrRe =
+    /([a-z_:][\w:.-]*)(?:\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+)))?/gi
   let match: RegExpExecArray | null
   let seen = 0
   while ((match = attrRe.exec(raw))) {
@@ -206,12 +262,32 @@ const parseAttrs = (
       break
     }
     const name = match[1]!.toLowerCase()
-    const value = stripControl(match[3] ?? match[4] ?? match[5] ?? '', findings)
-    if (name === 'srcdoc' || name.startsWith('on') || name === 'xmlns' || name === 'xlink:href') {
+    const rawValue = stripControl(
+      match[3] ?? match[4] ?? match[5] ?? '',
+      findings,
+    )
+    const value =
+      name === 'href' || name === 'src'
+        ? decodeUrlCharacterReferences(rawValue)
+        : rawValue
+    if (
+      name === 'srcdoc' ||
+      name.startsWith('on') ||
+      name === 'xmlns' ||
+      name === 'xlink:href'
+    ) {
       findings.push(finding('blocked', `attr:${name}`))
       continue
     }
-    if (name === 'style' || /url\s*\(/i.test(value) || /expression\s*\(/i.test(value)) {
+    if (name === 'style') {
+      findings.push(
+        /url\s*\(/i.test(value) || /expression\s*\(/i.test(value)
+          ? finding('blocked', 'css-url')
+          : finding('removed', 'attr:style'),
+      )
+      continue
+    }
+    if (/url\s*\(/i.test(value) || /expression\s*\(/i.test(value)) {
       findings.push(finding('blocked', 'css-url'))
       continue
     }
@@ -230,15 +306,25 @@ const parseAttrs = (
 
 const skipUntil = (html: string, from: number, endTag: string) => {
   const close = new RegExp(`</${endTag}\\s*>`, 'i')
-  close.lastIndex = from
-  const match = close.exec(html)
-  return match ? match.index + match[0].length : html.length
+  const match = close.exec(html.slice(from))
+  return match ? from + match.index + match[0].length : html.length
 }
+
+const utf8Bytes = (value: string | undefined) =>
+  value ? new TextEncoder().encode(value).byteLength : 0
 
 const serializeNode = (node: MarkdownHtmlImportNode): string => {
   if (node.type === 'text') {
-    return node.value.replace(/[&<>"']/g, (char) =>
-      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] ?? char,
+    return node.value.replace(
+      /[&<>"']/g,
+      (char) =>
+        ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;',
+        })[char] ?? char,
     )
   }
   const attrs = Object.entries(node.attrs)
@@ -267,9 +353,14 @@ export const importMarkdownClipboardSnapshot = (
       nodes,
       depth: maxDepth,
       attributes,
+      tableCells,
+      images,
       ms: (options.now ?? Date.now)() - started,
     })
-  const fail = (code: MarkdownHtmlImportReject, extra: MarkdownHtmlImportFinding[] = []): MarkdownHtmlImportOutcome =>
+  const fail = (
+    code: MarkdownHtmlImportReject,
+    extra: MarkdownHtmlImportFinding[] = [],
+  ): MarkdownHtmlImportOutcome =>
     Object.freeze({
       ok: false,
       code,
@@ -281,13 +372,21 @@ export const importMarkdownClipboardSnapshot = (
   let nodes = 0
   let maxDepth = 1
   let attributes = 0
+  let tableCells = 0
+  let images = 0
   const html = snapshot.html ?? ''
-  const bytes = (snapshot.html?.length ?? 0) + (snapshot.plain?.length ?? 0) + (snapshot.markdown?.length ?? 0)
+  const bytes =
+    utf8Bytes(snapshot.html) +
+    utf8Bytes(snapshot.plain) +
+    utf8Bytes(snapshot.markdown)
 
-  if (!snapshot.explicit) return fail('not-explicit', [finding('blocked', 'auto-rich-paste')])
-  if (options.task?.cancelled || options.signal?.aborted) return fail('cancelled')
+  if (!snapshot.explicit)
+    return fail('not-explicit', [finding('blocked', 'auto-rich-paste')])
+  if (options.task?.cancelled || options.signal?.aborted)
+    return fail('cancelled')
   if (bytes > budget.maxBytes) return fail('budget-bytes')
-  if (html.length === 0 && !snapshot.plain && !snapshot.markdown) return fail('empty')
+  if (html.length === 0 && !snapshot.plain && !snapshot.markdown)
+    return fail('empty')
 
   const root: OpenElement = { tag: '#root', attrs: {}, children: [] }
   const stack: OpenElement[] = [root]
@@ -295,11 +394,10 @@ export const importMarkdownClipboardSnapshot = (
   const source = html.replace(/<!--[\s\S]*?-->/g, '')
 
   while (index < source.length) {
-    if (options.task?.cancelled || options.signal?.aborted) return fail('cancelled')
+    if (options.task?.cancelled || options.signal?.aborted)
+      return fail('cancelled')
     const elapsed = (options.now ?? Date.now)() - started
     if (elapsed > budget.maxMs) return fail('budget-time')
-    if (nodes > budget.maxNodes) return fail('budget-nodes')
-
     if (source.startsWith('<!', index) || source.startsWith('<?', index)) {
       const end = source.indexOf('>', index)
       index = end === -1 ? source.length : end + 1
@@ -314,6 +412,7 @@ export const importMarkdownClipboardSnapshot = (
       const value = stripControl(raw, findings)
       if (value.length > 0) {
         nodes += 1
+        if (nodes > budget.maxNodes) return fail('budget-nodes')
         stack[stack.length - 1]!.children.push({ type: 'text', value })
       }
       continue
@@ -325,6 +424,7 @@ export const importMarkdownClipboardSnapshot = (
       : /^<([a-z][\w:-]*)\b([^>]*?)(\/?)>/i.exec(source.slice(index))
     if (!tagMatch) {
       nodes += 1
+      if (nodes > budget.maxNodes) return fail('budget-nodes')
       stack[stack.length - 1]!.children.push({ type: 'text', value: '<' })
       index += 1
       continue
@@ -351,10 +451,20 @@ export const importMarkdownClipboardSnapshot = (
       continue
     }
 
+    if (tag === 'td' || tag === 'th') {
+      tableCells += 1
+      if (tableCells > budget.maxTableCells) return fail('budget-table-cells')
+    }
+    if (tag === 'img') {
+      images += 1
+      if (images > budget.maxImages) return fail('budget-images')
+    }
+
     const depth = stack.length
     if (depth > budget.maxDepth) return fail('budget-depth')
     maxDepth = Math.max(maxDepth, depth)
     nodes += 1
+    if (nodes > budget.maxNodes) return fail('budget-nodes')
 
     const attrStats = { attributes }
     const attrs = parseAttrs(tagMatch[2] ?? '', findings, budget, attrStats)
@@ -379,7 +489,11 @@ export const importMarkdownClipboardSnapshot = (
 
   if (snapshot.plain && root.children.length === 0) {
     nodes += 1
-    root.children.push({ type: 'text', value: stripControl(snapshot.plain, findings) })
+    if (nodes > budget.maxNodes) return fail('budget-nodes')
+    root.children.push({
+      type: 'text',
+      value: stripControl(snapshot.plain, findings),
+    })
   }
 
   return Object.freeze({
@@ -401,7 +515,9 @@ export interface MarkdownHtmlImportResult {
   readonly findings?: readonly MarkdownHtmlImportFinding[]
 }
 
-export const sanitizeMarkdownHtmlImport = (html: string): MarkdownHtmlImportResult => {
+export const sanitizeMarkdownHtmlImport = (
+  html: string,
+): MarkdownHtmlImportResult => {
   const outcome = importMarkdownClipboardSnapshot({ html, explicit: true })
   if (outcome.ok === false) {
     return Object.freeze({
@@ -430,18 +546,23 @@ export type MarkdownHtmlImportMutationKind =
 export const evaluateMarkdownHtmlImportMutations = (html: string) => {
   const authority = importMarkdownClipboardSnapshot({ html, explicit: true })
   const implicit = importMarkdownClipboardSnapshot({ html, explicit: false })
-  const serialized = authority.ok ? authority.tree.nodes.map(serializeNode).join('') : ''
+  const serialized = authority.ok
+    ? authority.tree.nodes.map(serializeNode).join('')
+    : ''
   return Object.freeze({
     authority,
     mutations: Object.freeze([
       Object.freeze({
         kind: 'live-dom-insertion' as const,
-        equivalent: typeof document !== 'undefined' && serialized.includes('innerHTML'),
+        equivalent:
+          typeof document !== 'undefined' && serialized.includes('innerHTML'),
         accepted: false,
       }),
       Object.freeze({
         kind: 'network-load' as const,
-        equivalent: /https?:\/\//i.test(serialized) && /<(script|iframe|link|img)/i.test(serialized) &&
+        equivalent:
+          /https?:\/\//i.test(serialized) &&
+          /<(script|iframe|link|img)/i.test(serialized) &&
           Boolean((authority as { fetched?: boolean }).fetched),
         accepted: false,
       }),

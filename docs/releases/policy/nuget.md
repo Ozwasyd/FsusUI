@@ -57,11 +57,14 @@ pnpm run dotnet:package:verify
 
 `pnpm run dotnet:platform:verify` restores the solution, builds Avalonia projects,
 runs tests and startup smoke for the current platform, and emits its platform
-manifest. `pnpm run dotnet:package:verify` independently restores/builds and then
-packs the unique canonical NuGet candidate, validates metadata and contents,
-runs the packed-consumer and stable-package contracts, and records its aggregate
-SHA-256. Token, icon, conformance, governance, and a11y contracts remain in the
-single static-quality lane.
+manifest. It uses a safe single-worker default for restore, build, and test
+orchestration; set `FSUS_DOTNET_MAX_CPU_COUNT` or pass `--max-cpu-count` with a
+positive integer only when the execution environment has been sized for the
+headless render workload. `pnpm run dotnet:package:verify` independently
+restores/builds and then packs the unique canonical NuGet candidate, validates
+metadata and contents, runs the packed-consumer and stable-package contracts,
+and records its aggregate SHA-256. Token, icon, conformance, governance, and
+a11y contracts remain in the single static-quality lane.
 
 Linux, Windows, and macOS CI coverage is required for platform
 restore/build/test/smoke. Pack and package validation run once on canonical

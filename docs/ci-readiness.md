@@ -30,6 +30,13 @@ does not match, and an npm candidate producer/consumer digest mismatch. A failed
 or cancelled job therefore cannot be replaced by an artifact from an earlier
 run.
 
+The Playwright readiness owners are derived from
+`spec/ci/playwright-owners.json`. The `playwright-conformance` owner contributes
+one required receipt for each Chromium, Firefox, and WebKit cell. Its manifests
+also bind the Contract V2, Vue baseline, normalized scenario registry, runner,
+browser revision, interaction-trace identity and digest, scenario/action
+cardinality, and the native IME evidence references tracked by #319 and #320.
+
 The planning and fixture checks are local, deterministic, and require neither
 the GitHub API nor the Actions artifact service:
 

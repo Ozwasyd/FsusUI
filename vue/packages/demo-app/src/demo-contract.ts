@@ -116,6 +116,12 @@ export const resolveDemoRoot = async (
   const themeMode = normalizeThemeMode(searchParams.get('theme'), 'system')
   const visualMode = searchParams.get('visual') || ''
 
+  if (searchParams.get('interactionTrace') === '1') {
+    const { default: InteractionTraceFixture } =
+      await import('./InteractionTraceFixture.vue')
+    return { component: InteractionTraceFixture, themeMode }
+  }
+
   if (visualMode === 'view-transitions') {
     const { default: ViewTransitionSection } =
       await import('./sections/ViewTransitionSection.vue')
@@ -151,6 +157,26 @@ export const resolveDemoRoot = async (
         state: searchParams.get('state') || 'focus',
       },
     }
+  }
+
+  if (searchParams.get('collapse') === '1') {
+    const { default: CollapseFixture } = await import('./CollapseFixture.vue')
+    return { component: CollapseFixture, themeMode }
+  }
+
+  if (searchParams.get('checktag') === '1') {
+    const { default: CheckTagFixture } = await import('./CheckTagFixture.vue')
+    return { component: CheckTagFixture, themeMode }
+  }
+
+  if (searchParams.get('avatar') === '1') {
+    const { default: AvatarFixture } = await import('./AvatarFixture.vue')
+    return { component: AvatarFixture, themeMode }
+  }
+
+  if (searchParams.get('checkboxbutton') === '1') {
+    const { default: CheckboxButtonFixture } = await import('./CheckboxButtonFixture.vue')
+    return { component: CheckboxButtonFixture, themeMode }
   }
 
   const { default: App } = await import('./App.vue')

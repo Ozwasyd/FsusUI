@@ -7,6 +7,31 @@
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
   </Style>
 
+  <Style Selector="fsus|FsusTabs">
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <StackPanel Orientation="Horizontal" />
+      </ItemsPanelTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid RowDefinitions="Auto,*">
+          <ItemsPresenter
+            Name="PART_ItemsPresenter"
+            ItemsPanel="{TemplateBinding ItemsPanel}" />
+          <ContentPresenter
+            Name="PART_SelectedContentHost"
+            Grid.Row="1"
+            Margin="{DynamicResource FsusSpace2}"
+            Content="{TemplateBinding SelectedContent}"
+            ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
   <Style Selector="TabItem, fsus|FsusTabPane">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
@@ -20,6 +45,25 @@
           Duration="{DynamicResource FsusMotionDurationEffective}"
           Easing="{DynamicResource FsusMotionEasingEffective}" />
       </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusTabPane">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          MinHeight="{TemplateBinding MinHeight}"
+          Padding="{TemplateBinding Padding}"
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}">
+          <ContentPresenter
+            Content="{TemplateBinding Header}"
+            ContentTemplate="{TemplateBinding HeaderTemplate}"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center" />
+        </Border>
+      </ControlTemplate>
     </Setter>
   </Style>
 
