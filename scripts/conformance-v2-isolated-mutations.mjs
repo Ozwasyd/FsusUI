@@ -182,8 +182,8 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/contract-v2.mjs',
-        'web.required === false && webNullable === false && avaloniaNullable === true',
-        'web.required === true && webNullable === false && avaloniaNullable === true',
+        '      web.required === false &&\n',
+        '      web.required === true &&\n',
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
