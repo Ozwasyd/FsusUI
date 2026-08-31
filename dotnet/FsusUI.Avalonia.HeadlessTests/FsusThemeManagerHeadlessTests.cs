@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Demo;
 using FsusUI.Avalonia.Icons;
@@ -104,8 +105,8 @@ public class FsusThemeManagerHeadlessTests
 
     var cases = new[]
     {
-      ("light", FsusThemeOptions.Default, "#FFFFFF", "#F8FAFC", "#111827"),
-      ("dark", FsusThemeOptions.Default with { Variant = FsusThemeVariant.Dark }, "#1B2433", "#1F2937", "#F0F0F4"),
+      ("light", FsusThemeOptions.Default, "#FFFFFF", "#FFFFFF", "#FFFFFF", "#F8FAFC", "#111827", "#6B7280", "#D9DEE8", "#111827"),
+      ("dark", FsusThemeOptions.Default with { Variant = FsusThemeVariant.Dark }, "#121214", "#171F2C", "#1B2433", "#1F2937", "#F0F0F4", "#B6C0CF", "#394657", "#F0F0F4"),
       ("custom", FsusThemeOptions.Default with
       {
         Palette = new FsusThemePaletteOptions
@@ -118,7 +119,7 @@ public class FsusThemeManagerHeadlessTests
           Border = Brush("#BE123C"),
           Icon = Brush("#0369A1"),
         },
-      }, "#E0F2FE", "#DCFCE7", "#0369A1"),
+      }, "#FFF4D6", "#E0F2FE", "#E0F2FE", "#DCFCE7", "#312E81", "#6D28D9", "#BE123C", "#0369A1"),
       ("partial-dark", FsusThemeOptions.Default with
       {
         Variant = FsusThemeVariant.Dark,
@@ -127,7 +128,7 @@ public class FsusThemeManagerHeadlessTests
           Surface = Brush("#14342B"),
           Icon = Brush("#FBBF24"),
         },
-      }, "#14342B", "#1F2937", "#FBBF24"),
+      }, "#121214", "#14342B", "#14342B", "#1F2937", "#F0F0F4", "#B6C0CF", "#394657", "#FBBF24"),
       ("highcontrast", FsusThemeOptions.Default with
       {
         HighContrast = true,
@@ -137,19 +138,34 @@ public class FsusThemeManagerHeadlessTests
           SurfaceRaised = Brush("#DCFCE7"),
           Icon = Brush("#FBBF24"),
         },
-      }, "#000000", "#111827", "#FFFFFF"),
+      }, "#000000", "#000000", "#000000", "#111827", "#FFFFFF", "#FDE68A", "#FFFFFF", "#FFFFFF"),
     };
 
     try
     {
-      foreach (var (name, options, expectedSurface, expectedRaised, expectedIcon) in cases)
+      foreach (var (
+        name,
+        options,
+        expectedBackground,
+        expectedSurface,
+        expectedAliasSurface,
+        expectedRaised,
+        expectedText,
+        expectedMutedText,
+        expectedBorder,
+        expectedIcon) in cases)
       {
         manager.Apply(application, options);
         RenderPalette(
           application,
           Path.Combine(outputRoot, $"issue-708-theme-{name}.png"),
+          expectedBackground,
           expectedSurface,
+          expectedAliasSurface,
           expectedRaised,
+          expectedText,
+          expectedMutedText,
+          expectedBorder,
           expectedIcon);
       }
     }
@@ -162,40 +178,43 @@ public class FsusThemeManagerHeadlessTests
   private static void RenderPalette(
     Application application,
     string output,
+    string expectedBackground,
     string expectedSurface,
+    string expectedAliasSurface,
     string expectedRaised,
+    string expectedText,
+    string expectedMutedText,
+    string expectedBorder,
     string expectedIcon)
   {
-    var window = new Window { Width = 640, Height = 360, ShowInTaskbar = false };
+    const int width = 960;
+    const int height = 540;
+    var window = new Window { Width = width, Height = height, ShowInTaskbar = false };
     window.Resources.MergedDictionaries.Add(new ResourceInclude(
       new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
     {
       Source = new Uri("avares://FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml"),
     });
-    var root = BindBrush(application, FsusThemeResourceKeys.BackgroundBrush);
-    root.Width = 640;
-    root.Height = 360;
-    root.Padding = new Thickness(20);
 
     var textEditor = new FsusTextEditor
     {
       AccessibleName = "Native text editor",
       MinHeight = 0,
-      Height = 76,
+      Height = 108,
       Text = "Surface override reaches the native editor",
       Content = new FsusText { Text = "Text editor" },
     };
     var markdownEditor = new FsusMarkdownEditor
     {
       MinHeight = 0,
-      Height = 76,
+      Height = 108,
       Document = "# Markdown editor",
     };
     var tree = new FsusTree
     {
       AccessibleName = "Workspace tree",
       MinHeight = 0,
-      Height = 76,
+      Height = 160,
     };
     tree.Nodes.Add(new FsusTreeNode("docs", "docs"));
     tree.RefreshView();
@@ -220,7 +239,7 @@ public class FsusThemeManagerHeadlessTests
       AccessibleName = "Read-only raised editor",
       IsReadOnly = true,
       MinHeight = 0,
-      Height = 76,
+      Height = 64,
       Text = "Raised surface fallback",
       Content = new FsusText { Text = "Read-only raised surface" },
     };
@@ -231,6 +250,7 @@ public class FsusThemeManagerHeadlessTests
       Width = 40,
       Height = 40,
     };
+    var mutedText = new FsusText { Text = "Fallback", Classes = { "fsus-text-muted" } };
     var iconRow = new StackPanel
     {
       Orientation = global::Avalonia.Layout.Orientation.Horizontal,
@@ -240,47 +260,119 @@ public class FsusThemeManagerHeadlessTests
       {
         icon,
         new FsusText { Text = "Icon / muted text" },
-        new FsusText { Text = "Fallback", Classes = { "fsus-text-muted" } },
+        mutedText,
       },
     };
 
     var grid = new Grid
     {
       ColumnDefinitions = new ColumnDefinitions("*,*"),
-      RowDefinitions = new RowDefinitions("82,82,82"),
+      RowDefinitions = new RowDefinitions("116,72,72"),
       ColumnSpacing = 12,
       RowSpacing = 8,
+      Margin = new Thickness(16),
     };
     AddGridChild(grid, textEditor, 0, 0);
     AddGridChild(grid, markdownEditor, 0, 1);
-    AddGridChild(grid, tree, 1, 0);
     AddGridChild(grid, select, 1, 1);
     AddGridChild(grid, raisedEditor, 2, 0);
     AddGridChild(grid, iconRow, 2, 1);
 
-    var shell = new FsusPublicShell
+    var tabs = new FsusDocumentTabs { AccessibleName = "Open Markdown documents" };
+    tabs.AddDocument(new FsusDocumentTab
     {
-      AccessibleName = "Palette shell",
-      Width = 600,
-      Height = 320,
+      Key = "palette",
+      Header = "theme-palette.md",
+      IsDirty = true,
       Content = grid,
+    });
+    tabs.SelectKey("palette");
+
+    var shell = new FsusActivityRailShell
+    {
+      AccessibleName = "Markdown editor workspace",
+      PaneWidth = 220,
+      DefaultPaneWidth = 220,
+      MinPaneWidth = 180,
+      MaxPaneWidth = 320,
+      MainContent = tabs,
     };
-    root.Child = shell;
+    shell.Sections.Add(new FsusActivityRailSection
+    {
+      Key = "explorer",
+      Header = "Explorer",
+      Icon = new FsusIcon
+      {
+        AccessibleName = "Explorer",
+        IconKey = FsusIconKeys.Folder,
+      },
+      Content = tree,
+    });
+    if (shell.SelectedKey == "explorer")
+    {
+      shell.ShowPane();
+    }
+    else
+    {
+      shell.ActivateKey("explorer");
+    }
+
+    var titleBar = new FsusNativeTitleBar
+    {
+      AccessibleName = "Markdown workspace title bar",
+      DocumentTitle = "theme-palette.md",
+      DocumentPath = "/workspace/docs/theme-palette.md",
+      Status = "Saved locally",
+      Platform = FsusDesktopPlatform.Linux,
+    };
+    var root = new Grid
+    {
+      RowDefinitions = new RowDefinitions("Auto,*"),
+      Width = width,
+      Height = height,
+    };
+    AddGridChild(root, titleBar, 0, 0);
+    AddGridChild(root, shell, 1, 0);
     window.Content = root;
     window.Show();
     Dispatcher.UIThread.RunJobs();
-    window.Measure(new Size(640, 360));
-    window.Arrange(new Rect(0, 0, 640, 360));
+    window.Measure(new Size(width, height));
+    window.Arrange(new Rect(0, 0, width, height));
+    root.Measure(new Size(width, height));
+    root.Arrange(new Rect(0, 0, width, height));
+    Dispatcher.UIThread.RunJobs();
 
-    AssertControlBrush(shell.Background, expectedSurface);
-    AssertControlBrush(textEditor.Background, expectedSurface);
-    AssertControlBrush(markdownEditor.Background, expectedSurface);
-    AssertControlBrush(tree.Background, expectedSurface);
-    AssertControlBrush(select.Background, expectedSurface);
+    var activityRail = shell.GetVisualDescendants()
+      .OfType<Border>()
+      .Single(control => control.Classes.Contains("fsus-activity-rail"));
+    var contextualPane = shell.GetVisualDescendants()
+      .OfType<Border>()
+      .Single(control => control.Classes.Contains("fsus-contextual-pane"));
+    var titlePath = titleBar.GetVisualDescendants()
+      .OfType<TextBlock>()
+      .Single(control => control.Classes.Contains("fsus-title-bar-path"));
+
+    AssertControlBrush(shell.Background, expectedBackground);
+    AssertControlBrush(shell.Foreground, expectedText);
+    AssertControlBrush(tabs.Background, expectedBackground);
+    AssertControlBrush(tabs.Foreground, expectedText);
+    AssertControlBrush(activityRail.Background, expectedRaised);
+    AssertControlBrush(contextualPane.Background, expectedSurface);
+    AssertControlBrush(titleBar.Background, expectedRaised);
+    AssertControlBrush(titleBar.Foreground, expectedText);
+    AssertControlBrush(titleBar.BorderBrush, expectedBorder);
+    AssertControlBrush(titlePath.Foreground, expectedMutedText);
+    AssertControlBrush(textEditor.Background, expectedAliasSurface);
+    AssertControlBrush(textEditor.Foreground, expectedText);
+    AssertControlBrush(markdownEditor.Background, expectedAliasSurface);
+    AssertControlBrush(tree.Background, expectedAliasSurface);
+    AssertControlBrush(select.Background, expectedAliasSurface);
+    AssertControlBrush(select.BorderBrush, expectedBorder);
     AssertControlBrush(raisedEditor.Background, expectedRaised);
+    AssertControlBrush(mutedText.Foreground, expectedMutedText);
     AssertControlBrush(icon.Fill, expectedIcon);
 
-    using var bitmap = new RenderTargetBitmap(new PixelSize(640, 360), new Vector(96, 96));
+    using var bitmap = new RenderTargetBitmap(new PixelSize(width, height), new Vector(96, 96));
     bitmap.Render(root);
     using (var stream = File.Create(output))
     {

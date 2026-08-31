@@ -1,5 +1,5 @@
 ---
-'FsusUI.Avalonia.Themes': patch
+'FsusUI.Avalonia.Themes': minor
 ---
 
 Add nullable runtime brush overrides for the complete shell surface, text, border, and icon palette with per-field light/dark fallbacks and high-contrast precedence.
