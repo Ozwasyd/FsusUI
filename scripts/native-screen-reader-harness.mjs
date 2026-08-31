@@ -19,6 +19,7 @@ import { createServer } from 'node:net'
 import crypto from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
+import { captureDeterministicLocatorPng } from './deterministic-render-evidence.mjs'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const demoAppDirectory = resolve(repositoryRoot, 'vue/packages/demo-app')
@@ -230,6 +231,7 @@ const main = async () => {
     await page.getByTestId('interaction-trace-fixture').waitFor({
       timeout: 20_000,
     })
+    await page.evaluate(() => document.fonts.ready)
     const interactionStart = performance.now()
     const editor = page.getByTestId('trace-markdown-editor')
     await editor.locator('textarea').first().focus()
@@ -385,7 +387,10 @@ const main = async () => {
     const checkTagVisualBounds = await checkTag.boundingBox()
     if (!checkTagVisualBounds)
       throw new Error('CheckTag visual bounds are unavailable')
-    await checkTag.screenshot({ path: checkTagScreenshotPath })
+    writeFileSync(
+      checkTagScreenshotPath,
+      await captureDeterministicLocatorPng(checkTag),
+    )
     const checkTagAccessibilityStartedAt = performance.now()
     const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
     const checkTagAccessibilityMilliseconds =
