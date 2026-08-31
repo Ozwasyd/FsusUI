@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
 using System.Runtime.CompilerServices;
 
@@ -502,6 +503,85 @@ public class FsusVirtualizationHeadlessTests
     };
     empty.RefreshLayout();
     Assert.True(empty.IsEmptyContentVisible);
+  }
+
+  [AvaloniaFact]
+  public void TableV2ContentRegionsReceiveScopedPayloads()
+  {
+    var headerCells = new List<FsusTableV2HeaderCellContext>();
+    FsusTableV2RowContext? row = null;
+    var table = new FsusTableV2
+    {
+      ColumnWidth = 100,
+      ViewportWidth = 200,
+      ViewportHeight = 48,
+      Overscan = 0,
+      HeaderCellContent = new FuncDataTemplate<FsusTableV2HeaderCellContext>((context, _) =>
+      {
+        headerCells.Add(context);
+        return new TextBlock();
+      }),
+      RowContent = new FuncDataTemplate<FsusTableV2RowContext>((context, _) =>
+      {
+        row ??= context;
+        return new TextBlock();
+      }),
+    };
+    table.HeaderHeights.Add(24);
+    table.HeaderHeights.Add(36);
+    table.Columns.Add(new FsusDataTableColumn("name", "Name"));
+    table.Columns.Add(new FsusDataTableColumn("score", "Score"));
+    table.Data.Add(FsusDataTableRow.From("row-0", new Dictionary<string, object?>
+    {
+      ["name"] = "Contract",
+      ["score"] = 7,
+    }));
+
+    table.RefreshLayout();
+    var window = new Window { Width = 240, Height = 160, Content = table };
+    window.Show();
+    window.Measure(new Size(240, 160));
+    window.Arrange(new Rect(0, 0, 240, 160));
+    Dispatcher.UIThread.RunJobs();
+
+    var headerCell = headerCells[0];
+    Assert.Equal("name", headerCell.Column.Key);
+    Assert.Equal(0, headerCell.ColumnIndex);
+    Assert.Equal(0, headerCell.HeaderIndex);
+    Assert.Equal(2, headerCell.Columns.Count);
+    Assert.Equal(100d, headerCell.Style["width"]);
+    Assert.Equal(24d, headerCell.Style["height"]);
+    Assert.Contains(headerCells, context =>
+      context.HeaderIndex == 1 &&
+      Equals(context.Style["top"], 24d) &&
+      Equals(context.Style["height"], 36d));
+    Assert.NotNull(row);
+    Assert.Equal(["Contract", 7], row.Cells);
+    Assert.Equal("row-0", row.RowData.Key);
+    Assert.Equal(0, row.RowIndex);
+    Assert.Equal(0, row.Depth);
+    Assert.False(row.IsScrolling);
+    Assert.Equal(2, row.Columns.Count);
+    Assert.Equal(200d, row.Style["width"]);
+
+    var headers = new List<FsusTableV2HeaderContext>();
+    table.HeaderCellContent = null;
+    table.HeaderContent = new FuncDataTemplate<FsusTableV2HeaderContext>((context, _) =>
+    {
+      headers.Add(context);
+      return new TextBlock();
+    });
+    table.RefreshLayout();
+    window.Measure(new Size(240, 160));
+    window.Arrange(new Rect(0, 0, 240, 160));
+    Dispatcher.UIThread.RunJobs();
+
+    var header = headers[0];
+    Assert.Equal(["Name", "Score"], header.Cells);
+    Assert.Equal(2, header.Columns.Count);
+    Assert.Equal(0, header.HeaderIndex);
+    Assert.Contains(headers, context => context.HeaderIndex == 1);
+    window.Close();
   }
 
   [AvaloniaFact]

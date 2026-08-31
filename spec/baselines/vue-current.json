@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "fe4c432368cfc1c2bfb0dac0258c673569978b3e",
+    "commitSha": "27e1f054e44607dfd3955823c2e9ac57d796fcb8",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
@@ -11,7 +11,7 @@
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "e05e8036e77b1bcc3718651b1280d07f3c63b340d3d2d3ee0e6d688a087b6c85"
+    "outputHash": "e100f4292b6965cfbde32fce67f2c9a6644e57396a171e10b27d1900985eade7"
   },
   "summary": {
     "componentModules": 93,
@@ -1510,7 +1510,8 @@
       "slots": [
         {
           "name": "default",
-          "scoped": true
+          "scoped": true,
+          "payload": ["height", "width"]
         }
       ],
       "exposed": [],
@@ -1558,7 +1559,8 @@
         "slots": [
           {
             "name": "default",
-            "scoped": true
+            "scoped": true,
+            "payload": ["height", "width"]
           }
         ]
       },
@@ -2034,7 +2036,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         },
         {
           "name": "icon",
@@ -2336,7 +2338,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           },
           {
             "name": "icon",
@@ -2367,7 +2369,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         }
       ],
       "exposed": [],
@@ -2378,7 +2380,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           }
         ]
       },
@@ -2691,7 +2693,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         }
       ],
       "exposed": ["next", "prev", "setActiveItem"],
@@ -2880,7 +2882,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           }
         ]
       },
@@ -2903,7 +2905,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         }
       ],
       "exposed": [],
@@ -2941,7 +2943,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           }
         ]
       },
@@ -8741,7 +8743,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         }
       ],
       "exposed": [
@@ -9024,7 +9026,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           }
         ]
       },
@@ -9059,7 +9061,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         },
         {
           "name": "error",
@@ -9265,7 +9267,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           },
           {
             "name": "error",
@@ -13074,11 +13076,11 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         },
         {
           "name": "title",
-          "scoped": false
+          "scoped": true
         }
       ],
       "exposed": [],
@@ -13139,11 +13141,11 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           },
           {
             "name": "title",
-            "scoped": false
+            "scoped": true
           }
         ]
       },
@@ -13166,11 +13168,11 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         },
         {
           "name": "title",
-          "scoped": false
+          "scoped": true
         }
       ],
       "exposed": [],
@@ -13181,11 +13183,11 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           },
           {
             "name": "title",
-            "scoped": false
+            "scoped": true
           }
         ]
       },
@@ -14499,7 +14501,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         }
       ],
       "exposed": [],
@@ -14559,7 +14561,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           }
         ]
       },
@@ -14582,7 +14584,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         }
       ],
       "exposed": [],
@@ -14618,7 +14620,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           }
         ]
       },
@@ -20400,7 +20402,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         },
         {
           "name": "empty",
@@ -20945,7 +20947,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           },
           {
             "name": "empty",
@@ -21026,11 +21028,13 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true,
+          "payloadType": "OptionItemProps",
+          "payload": ["disabled", "index", "item"]
         },
         {
           "name": "empty",
-          "scoped": false
+          "scoped": true
         },
         {
           "name": "prefix",
@@ -21577,11 +21581,13 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true,
+            "payloadType": "OptionItemProps",
+            "payload": ["disabled", "index", "item"]
           },
           {
             "name": "empty",
-            "scoped": false
+            "scoped": true
           },
           {
             "name": "prefix",
@@ -24036,7 +24042,7 @@
         },
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         },
         {
           "name": "empty",
@@ -24243,7 +24249,7 @@
           },
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           },
           {
             "name": "empty",
@@ -24456,7 +24462,19 @@
       "slots": [
         {
           "name": "cell",
-          "scoped": true
+          "scoped": true,
+          "payloadType": "TableV2RowCellRenderParam",
+          "payload": [
+            "column",
+            "columnIndex",
+            "columns",
+            "depth",
+            "expandIconProps",
+            "isScrolling",
+            "rowData",
+            "rowIndex",
+            "style"
+          ]
         },
         {
           "name": "empty",
@@ -24468,11 +24486,20 @@
         },
         {
           "name": "header",
-          "scoped": false
+          "scoped": true,
+          "payload": ["cells", "columns", "headerIndex"]
         },
         {
           "name": "header-cell",
-          "scoped": true
+          "scoped": true,
+          "payloadType": "TableV2HeaderRowCellRendererParams",
+          "payload": [
+            "column",
+            "columnIndex",
+            "columns",
+            "headerIndex",
+            "style"
+          ]
         },
         {
           "name": "overlay",
@@ -24480,7 +24507,16 @@
         },
         {
           "name": "row",
-          "scoped": false
+          "scoped": true,
+          "payload": [
+            "cells",
+            "columns",
+            "depth",
+            "isScrolling",
+            "rowData",
+            "rowIndex",
+            "style"
+          ]
         }
       ],
       "exposed": ["scrollTo", "scrollToLeft", "scrollToRow", "scrollToTop"],
@@ -25005,7 +25041,19 @@
         "slots": [
           {
             "name": "cell",
-            "scoped": true
+            "scoped": true,
+            "payloadType": "TableV2RowCellRenderParam",
+            "payload": [
+              "column",
+              "columnIndex",
+              "columns",
+              "depth",
+              "expandIconProps",
+              "isScrolling",
+              "rowData",
+              "rowIndex",
+              "style"
+            ]
           },
           {
             "name": "empty",
@@ -25017,11 +25065,20 @@
           },
           {
             "name": "header",
-            "scoped": false
+            "scoped": true,
+            "payload": ["cells", "columns", "headerIndex"]
           },
           {
             "name": "header-cell",
-            "scoped": true
+            "scoped": true,
+            "payloadType": "TableV2HeaderRowCellRendererParams",
+            "payload": [
+              "column",
+              "columnIndex",
+              "columns",
+              "headerIndex",
+              "style"
+            ]
           },
           {
             "name": "overlay",
@@ -25029,7 +25086,16 @@
           },
           {
             "name": "row",
-            "scoped": false
+            "scoped": true,
+            "payload": [
+              "cells",
+              "columns",
+              "depth",
+              "isScrolling",
+              "rowData",
+              "rowIndex",
+              "style"
+            ]
           }
         ]
       },
@@ -26848,7 +26914,7 @@
       "slots": [
         {
           "name": "default",
-          "scoped": false
+          "scoped": true
         },
         {
           "name": "trigger",
@@ -26926,7 +26992,7 @@
         "slots": [
           {
             "name": "default",
-            "scoped": false
+            "scoped": true
           },
           {
             "name": "trigger",
@@ -34863,7 +34929,19 @@
       "slots": [
         {
           "name": "cell",
-          "scoped": true
+          "scoped": true,
+          "payloadType": "TableV2RowCellRenderParam",
+          "payload": [
+            "column",
+            "columnIndex",
+            "columns",
+            "depth",
+            "expandIconProps",
+            "isScrolling",
+            "rowData",
+            "rowIndex",
+            "style"
+          ]
         },
         {
           "name": "empty",
@@ -34875,11 +34953,20 @@
         },
         {
           "name": "header",
-          "scoped": false
+          "scoped": true,
+          "payload": ["cells", "columns", "headerIndex"]
         },
         {
           "name": "header-cell",
-          "scoped": true
+          "scoped": true,
+          "payloadType": "TableV2HeaderRowCellRendererParams",
+          "payload": [
+            "column",
+            "columnIndex",
+            "columns",
+            "headerIndex",
+            "style"
+          ]
         },
         {
           "name": "overlay",
@@ -34887,7 +34974,16 @@
         },
         {
           "name": "row",
-          "scoped": false
+          "scoped": true,
+          "payload": [
+            "cells",
+            "columns",
+            "depth",
+            "isScrolling",
+            "rowData",
+            "rowIndex",
+            "style"
+          ]
         }
       ],
       "exposed": ["scrollTo", "scrollToLeft", "scrollToRow", "scrollToTop"],
@@ -35412,7 +35508,19 @@
         "slots": [
           {
             "name": "cell",
-            "scoped": true
+            "scoped": true,
+            "payloadType": "TableV2RowCellRenderParam",
+            "payload": [
+              "column",
+              "columnIndex",
+              "columns",
+              "depth",
+              "expandIconProps",
+              "isScrolling",
+              "rowData",
+              "rowIndex",
+              "style"
+            ]
           },
           {
             "name": "empty",
@@ -35424,11 +35532,20 @@
           },
           {
             "name": "header",
-            "scoped": false
+            "scoped": true,
+            "payload": ["cells", "columns", "headerIndex"]
           },
           {
             "name": "header-cell",
-            "scoped": true
+            "scoped": true,
+            "payloadType": "TableV2HeaderRowCellRendererParams",
+            "payload": [
+              "column",
+              "columnIndex",
+              "columns",
+              "headerIndex",
+              "style"
+            ]
           },
           {
             "name": "overlay",
@@ -35436,7 +35553,16 @@
           },
           {
             "name": "row",
-            "scoped": false
+            "scoped": true,
+            "payload": [
+              "cells",
+              "columns",
+              "depth",
+              "isScrolling",
+              "rowData",
+              "rowIndex",
+              "style"
+            ]
           }
         ]
       },

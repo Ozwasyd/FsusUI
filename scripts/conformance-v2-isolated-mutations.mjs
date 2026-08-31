@@ -201,6 +201,18 @@ const cases = [
     expected: 'FsusUI.Avalonia.semantic.json drifted',
   },
   {
+    id: 'avalonia-semantic-default-mutated',
+    file: 'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+        '            "GetDefaultValue",',
+        '            "GetDefaultValueMutation",',
+      ),
+    command: ['pnpm', ['run', 'avalonia:semantic:check']],
+    expected: 'FsusUI.Avalonia.semantic.json drifted',
+  },
+  {
     id: 'table-v2-input-binding-mutated',
     file: 'scripts/contract-v2.mjs',
     inject: () =>
@@ -218,11 +230,35 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/contract-v2.mjs',
-        "headerHeight: { member: 'HeaderHeights' },",
-        "headerHeight: { member: 'HeaderHeightMissing' },",
+        "        member: 'HeaderHeight',",
+        "        member: 'HeaderHeightMissing',",
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
+  },
+  {
+    id: 'table-v2-header-height-alternate-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        "        alternateMembers: ['HeaderHeights'],",
+        '        alternateMembers: [],',
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
+    id: 'vue-semantic-scoped-payload-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        '        slot.payload = payload\n',
+        '        slot.payload = []\n',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
   },
   {
     id: 'table-v2-sort-object-category-mutated',
@@ -368,6 +404,18 @@ const cases = [
       'headerCellHost.Children.Add(presenter);',
       '_ = presenter;',
       'TableV2RendersBoundedContentRegions',
+    ],
+    [
+      'table-v2-header-index-mutated',
+      'new FsusTableV2HeaderContext(headerCells, Columns, headerIndex)',
+      'new FsusTableV2HeaderContext(headerCells, Columns, 0)',
+      'TableV2ContentRegionsReceiveScopedPayloads',
+    ],
+    [
+      'table-v2-header-array-mutated',
+      'var headerHeights = (HeaderHeights.Count > 0 ? HeaderHeights : [HeaderHeight])',
+      'var headerHeights = new[] { HeaderHeight }',
+      'TableV2ContentRegionsReceiveScopedPayloads',
     ],
     [
       'table-v2-row-region-bounds-mutated',

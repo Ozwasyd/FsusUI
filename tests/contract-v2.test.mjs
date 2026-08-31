@@ -52,6 +52,21 @@ test('optional Vue absence matches nullable Avalonia inputs', () => {
   assert.match(required.drift.nullability, /web nullable=false/u)
 })
 
+test('Vue literal defaults fail closed when native default evidence is missing', () => {
+  const comparison = compareMembers({
+    kind: 'input',
+    web: {
+      categories: ['number'],
+      nullable: false,
+      required: false,
+      default: { kind: 'literal', value: 50 },
+    },
+    avalonia: { categories: ['number'], nullable: false },
+  })
+  assert.equal(comparison.compatible, false)
+  assert.match(comparison.drift.default, /avalonia default missing/u)
+})
+
 test('Avalonia semantic nullability preserves non-null Table V2 collections', () => {
   const table = committedRegistry.contracts.find(
     (contract) => contract.id === 'component-v2.el-table-v2',
@@ -107,6 +122,60 @@ test('Table V2 explicit input bindings reference real native members', () => {
     const input = table.inputs.find((member) => member.name === name)
     assert.equal(input.avalonia?.member, counterpart)
     assert.equal(input.status, 'aligned-candidate')
+  }
+})
+
+test('Table V2 header height binds scalar and array paths with the exact default', () => {
+  const table = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-table-v2',
+  )
+  const headerHeight = table.inputs.find(
+    (member) => member.name === 'headerHeight',
+  )
+  assert.deepEqual(headerHeight.web.categories, ['number', 'array'])
+  assert.equal(headerHeight.web.default.value, 50)
+  assert.equal(headerHeight.avalonia.member, 'HeaderHeight')
+  assert.equal(headerHeight.avalonia.defaultValue, 50)
+  assert.deepEqual(headerHeight.avalonia.alternateMembers, [
+    {
+      member: 'HeaderHeights',
+      categories: ['array'],
+      type: 'System.Collections.ObjectModel.Collection<System.Double>',
+      nullable: false,
+    },
+  ])
+  assert.equal(headerHeight.status, 'aligned-candidate')
+})
+
+test('Table V2 scoped regions bind exact extracted and native payloads', () => {
+  const table = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-table-v2',
+  )
+  const expected = new Map([
+    ['header', ['cells', 'columns', 'headerIndex']],
+    [
+      'header-cell',
+      ['column', 'columnIndex', 'columns', 'headerIndex', 'style'],
+    ],
+    [
+      'row',
+      [
+        'cells',
+        'columns',
+        'depth',
+        'isScrolling',
+        'rowData',
+        'rowIndex',
+        'style',
+      ],
+    ],
+  ])
+  for (const [name, payload] of expected) {
+    const region = table.contentRegions.find((member) => member.name === name)
+    assert.equal(region.scoped, true)
+    assert.deepEqual([...region.web.extractedPayload].sort(), payload)
+    assert.deepEqual([...region.avalonia.payload].sort(), payload)
+    assert.equal(region.status, 'aligned-candidate')
   }
 })
 

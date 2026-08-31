@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -189,10 +190,20 @@ internal static class Program
         var fieldValue = field.GetValue(null);
         if (fieldValue is not null)
         {
-          var defaultValueProperty = fieldValue.GetType().GetProperty("DefaultValue");
-          if (defaultValueProperty is not null)
+          var getDefaultValue = fieldValue.GetType().GetMethod(
+            "GetDefaultValue",
+            [typeof(Type)]);
+          if (getDefaultValue is not null)
           {
-            defaultValue = EncodeDefault(defaultValueProperty.GetValue(fieldValue));
+            defaultValue = EncodeDefault(getDefaultValue.Invoke(fieldValue, [type]));
+          }
+          else
+          {
+            var defaultValueProperty = fieldValue.GetType().GetProperty("DefaultValue");
+            if (defaultValueProperty is not null)
+            {
+              defaultValue = EncodeDefault(defaultValueProperty.GetValue(fieldValue));
+            }
           }
         }
       }
@@ -306,6 +317,16 @@ internal static class Program
     if (valueType.IsEnum)
     {
       return value.ToString();
+    }
+
+    if (value is double doubleValue && !double.IsFinite(doubleValue))
+    {
+      return $"System.Double:{doubleValue.ToString(CultureInfo.InvariantCulture)}";
+    }
+
+    if (value is float floatValue && !float.IsFinite(floatValue))
+    {
+      return $"System.Single:{floatValue.ToString(CultureInfo.InvariantCulture)}";
     }
 
     if (value is string or bool or byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal)

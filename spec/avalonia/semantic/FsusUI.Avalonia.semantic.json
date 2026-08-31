@@ -127,7 +127,8 @@
           "name": "Header",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "Icon",
@@ -139,13 +140,15 @@
           "name": "IsSelected",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Key",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [],
@@ -261,31 +264,36 @@
           "name": "AccessibleName",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Desktop activity rail"
         },
         {
           "name": "ActivityRailWidth",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 52
         },
         {
           "name": "DefaultPaneWidth",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 280
         },
         {
           "name": "IsPaneOpen",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "KeyboardResizeStep",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 8
         },
         {
           "name": "MainContent",
@@ -297,25 +305,29 @@
           "name": "MaxPaneWidth",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 480
         },
         {
           "name": "MinPaneWidth",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 220
         },
         {
           "name": "PaneWidth",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 280
         },
         {
           "name": "SelectedKey",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [
@@ -519,7 +531,8 @@
           "name": "Offset",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         },
         {
           "name": "ScrollTarget",
@@ -531,7 +544,8 @@
           "name": "Threshold",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         }
       ],
       "events": [
@@ -665,13 +679,15 @@
           "name": "IsDismissed",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsDismissible",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Title",
@@ -683,7 +699,8 @@
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Info"
         }
       ],
       "events": [
@@ -868,19 +885,22 @@
           "name": "AnchorBounds",
           "kind": "styled",
           "type": "Avalonia.Rect",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Avalonia.Rect:0, 0, 0, 0"
         },
         {
           "name": "IsDisabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Offset",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 8
         },
         {
           "name": "OverlayContent",
@@ -892,19 +912,22 @@
           "name": "OverlaySize",
           "kind": "styled",
           "type": "Avalonia.Size",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Avalonia.Size:240, 160"
         },
         {
           "name": "Placement",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusAnchoredPlacement",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "BottomStart"
         },
         {
           "name": "ReducedMotion",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Title",
@@ -916,13 +939,15 @@
           "name": "TriggerMode",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusAnchoredTriggerMode",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Click"
         },
         {
           "name": "ViewportBounds",
           "kind": "styled",
           "type": "Avalonia.Rect",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Avalonia.Rect:0, 0, 1920, 1080"
         }
       ],
       "events": [],
@@ -1462,13 +1487,15 @@
           "name": "Shape",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusAvatarShape",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Circle"
         },
         {
           "name": "Size",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 40
         },
         {
           "name": "Source",
@@ -1545,7 +1572,8 @@
           "name": "VisibilityHeight",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 200
         }
       ],
       "events": [
@@ -1643,19 +1671,22 @@
           "name": "IsDot",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Max",
           "kind": "styled",
           "type": "System.Int32",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 99
         },
         {
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Primary"
         }
       ],
       "events": [],
@@ -1761,13 +1792,15 @@
           "name": "IsCurrent",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Key",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [],
@@ -1931,67 +1964,78 @@
           "name": "IconPlacement",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusButtonIconPlacement",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "None"
         },
         {
           "name": "IsCircle",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsInlineAction",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsLink",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsLoading",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsPlain",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsRound",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsTextButton",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "MotionHooksEnabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         },
         {
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Default"
         }
       ],
       "events": [
@@ -2034,13 +2078,15 @@
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         },
         {
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Default"
         }
       ],
       "events": [],
@@ -2405,7 +2451,8 @@
           "name": "IsSelected",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Title",
@@ -2417,7 +2464,8 @@
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Default"
         }
       ],
       "events": [],
@@ -2878,7 +2926,8 @@
           "name": "Checked",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         }
       ],
       "events": [
@@ -2979,7 +3028,8 @@
           "name": "IsLoading",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "ItemValue",
@@ -2991,7 +3041,8 @@
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [
@@ -3049,13 +3100,15 @@
           "name": "Checked",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Disabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Label",
@@ -3139,13 +3192,15 @@
           "name": "SelectedValues",
           "kind": "styled",
           "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "System.Object[]:System.Object[]"
         },
         {
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [
@@ -3478,31 +3533,36 @@
           "name": "IsReadOnly",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "ShowLineNumbers",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "TabWidth",
           "kind": "styled",
           "type": "System.Int32",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 4
         },
         {
           "name": "Text",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "WordWrap",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         }
       ],
       "events": [
@@ -4358,7 +4418,8 @@
           "name": "Order",
           "kind": "styled",
           "type": "System.Int32",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         },
         {
           "name": "SmSpan",
@@ -4370,7 +4431,8 @@
           "name": "Span",
           "kind": "styled",
           "type": "System.Int32",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 24
         }
       ],
       "events": [],
@@ -4419,13 +4481,15 @@
           "name": "Accordion",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "ActiveNames",
           "kind": "styled",
           "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "System.Object[]:System.Object[]"
         }
       ],
       "events": [
@@ -4484,13 +4548,15 @@
           "name": "Disabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsActive",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "ItemKey",
@@ -4502,7 +4568,8 @@
           "name": "Title",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [],
@@ -4862,19 +4929,22 @@
           "name": "AccessibleName",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Command palette"
         },
         {
           "name": "BackLabel",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Back"
         },
         {
           "name": "BusyText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Running command"
         },
         {
           "name": "CommandTree",
@@ -4886,13 +4956,15 @@
           "name": "EmptyText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "No commands found"
         },
         {
           "name": "FailureText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Command failed"
         },
         {
           "name": "Providers",
@@ -4904,25 +4976,29 @@
           "name": "Query",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "SearchAccessibleName",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Search commands"
         },
         {
           "name": "SearchPlaceholder",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Search commands"
         },
         {
           "name": "SearchingText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Searching commands"
         }
       ],
       "events": [
@@ -5625,7 +5701,8 @@
           "name": "Gap",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusLayoutGap",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [],
@@ -5932,13 +6009,15 @@
           "name": "IsDangerous",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Key",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [],
@@ -8148,13 +8227,15 @@
           "name": "IsBodyScrollable",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "MaxBodyHeight",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "System.Double:Infinity"
         }
       ],
       "events": [],
@@ -8507,13 +8588,15 @@
           "name": "IsClosable",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "IsDirty",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         }
       ],
       "events": [],
@@ -8791,7 +8874,8 @@
           "name": "HeaderScrollStep",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 120
         }
       ],
       "events": [
@@ -8943,7 +9027,8 @@
           "name": "Placement",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusDrawerPlacement",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Right"
         }
       ],
       "events": [],
@@ -9164,7 +9249,8 @@
           "name": "AllowMultiple",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "BrowseCommand",
@@ -9194,7 +9280,8 @@
           "name": "HasFilterError",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "HelpContent",
@@ -9224,31 +9311,36 @@
           "name": "IsBrowseEnabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "IsDisabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsDragOver",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsError",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsLoading",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "PathValidationPredicate",
@@ -9260,7 +9352,8 @@
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         },
         {
           "name": "ValidationPredicate",
@@ -9448,7 +9541,8 @@
           "name": "Key",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [],
@@ -9704,19 +9798,22 @@
           "name": "LabelPosition",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusFormLabelPosition",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Right"
         },
         {
           "name": "ScrollToError",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [
@@ -10294,37 +10391,43 @@
           "name": "ErrorText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "FieldName",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "HelpText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "InlineMessage",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsRequired",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Label",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "LabelPosition",
@@ -10336,7 +10439,8 @@
           "name": "ShowMessage",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "Size",
@@ -10348,7 +10452,8 @@
           "name": "ValidationState",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusFormValidationState",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "None"
         },
         {
           "name": "Validator",
@@ -10654,19 +10759,22 @@
           "name": "IsDecorative",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "MotionHooksEnabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [],
@@ -10701,7 +10809,8 @@
           "name": "IsDecorativeIcon",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         }
       ],
       "events": [],
@@ -11610,13 +11719,15 @@
           "name": "IsClearable",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsInvalid",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "PrefixContent",
@@ -11628,7 +11739,8 @@
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         },
         {
           "name": "SuffixContent",
@@ -11762,13 +11874,15 @@
           "name": "ShowSpinControls",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "Step",
           "kind": "styled",
           "type": "System.Decimal",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 1
         },
         {
           "name": "Value",
@@ -12154,25 +12268,29 @@
           "name": "IsActive",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsIndeterminate",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "ReducedMotion",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Value",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         }
       ],
       "events": [],
@@ -12579,19 +12697,22 @@
           "name": "CapabilityState",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "partial"
         },
         {
           "name": "Chrome",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorChrome",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Framed"
         },
         {
           "name": "Document",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "DocumentIdentity",
@@ -12603,7 +12724,8 @@
           "name": "IsReadOnly",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Locale",
@@ -12615,31 +12737,36 @@
           "name": "Mode",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorMode",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Source"
         },
         {
           "name": "Profile",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "markdown"
         },
         {
           "name": "ProjectionFeatureRevision",
           "kind": "styled",
           "type": "System.Int64",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         },
         {
           "name": "ScrollContentFloor",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         },
         {
           "name": "StatusDensity",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorStatusDensity",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Minimal"
         }
       ],
       "events": [
@@ -15174,7 +15301,8 @@
           "name": "IsCollapsed",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         }
       ],
       "events": [
@@ -15316,13 +15444,15 @@
           "name": "IsSelected",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Key",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [],
@@ -15374,13 +15504,15 @@
           "name": "CancelText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Cancel"
         },
         {
           "name": "ConfirmText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "OK"
         },
         {
           "name": "Message",
@@ -16264,19 +16396,22 @@
           "name": "CloseOnEscape",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "CloseOnPointerOutside",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "ClosePolicy",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusModalClosePolicy",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Any"
         },
         {
           "name": "ConfirmContent",
@@ -16294,19 +16429,22 @@
           "name": "IsDangerous",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsLoading",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsModal",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "Title",
@@ -17098,25 +17236,29 @@
           "name": "AccessibleName",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Window title bar"
         },
         {
           "name": "CanClose",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "CanMaximize",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "CanMinimize",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "DocumentPath",
@@ -17128,7 +17270,8 @@
           "name": "DocumentTitle",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "IsFullScreen",
@@ -17152,7 +17295,8 @@
           "name": "Platform",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusDesktopPlatform",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Auto"
         },
         {
           "name": "Status",
@@ -17170,13 +17314,15 @@
           "name": "UseExtendedClientArea",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "WindowControlsVisible",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         }
       ],
       "events": [
@@ -17474,13 +17620,15 @@
           "name": "Message",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "Title",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [
@@ -19085,19 +19233,22 @@
           "name": "CancelText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Cancel"
         },
         {
           "name": "ConfirmText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "OK"
         },
         {
           "name": "IsDangerous",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         }
       ],
       "events": [
@@ -19298,13 +19449,15 @@
           "name": "ProgressText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "0%"
         },
         {
           "name": "ShowText",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "Text",
@@ -19316,7 +19469,8 @@
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Primary"
         }
       ],
       "events": [],
@@ -19713,7 +19867,8 @@
           "name": "IsLoading",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "ItemValue",
@@ -19725,7 +19880,8 @@
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [],
@@ -19774,7 +19930,8 @@
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [
@@ -20494,7 +20651,8 @@
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Info"
         }
       ],
       "events": [],
@@ -20584,13 +20742,15 @@
           "name": "Breakpoint",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusLayoutBreakpoint",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         },
         {
           "name": "Gap",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusLayoutGap",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [],
@@ -20661,19 +20821,22 @@
           "name": "KeyboardScrollStep",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 40
         },
         {
           "name": "PointerScrollStep",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 16
         },
         {
           "name": "ScrollOffset",
           "kind": "styled",
           "type": "Avalonia.Vector",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Avalonia.Vector:0, 0"
         }
       ],
       "events": [
@@ -21367,7 +21530,8 @@
           "name": "Header",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "Icon",
@@ -21379,13 +21543,15 @@
           "name": "IsSelected",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Key",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [],
@@ -21840,7 +22006,8 @@
           "name": "AccessibleName",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Settings shell"
         },
         {
           "name": "ActionsSlot",
@@ -21852,19 +22019,22 @@
           "name": "IsNarrow",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "NarrowBreakpointWidth",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 700
         },
         {
           "name": "NarrowRailWidth",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 160
         },
         {
           "name": "RailFooter",
@@ -21882,13 +22052,15 @@
           "name": "RailWidth",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 220
         },
         {
           "name": "ScrollResetBehavior",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusSettingsScrollResetBehavior",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Reset"
         },
         {
           "name": "SearchSlot",
@@ -21900,7 +22072,8 @@
           "name": "SelectedKey",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [
@@ -22358,7 +22531,8 @@
           "name": "AllowBareKeys",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "CancelRecordingCommand",
@@ -22376,7 +22550,8 @@
           "name": "DisplayText",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         },
         {
           "name": "ExistingShortcuts",
@@ -22388,31 +22563,36 @@
           "name": "IsClearable",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": true
         },
         {
           "name": "IsInvalid",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsRecording",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Placeholder",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": "Record shortcut"
         },
         {
           "name": "Platform",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusShortcutPlatform",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Auto"
         },
         {
           "name": "ReservedShortcuts",
@@ -22424,7 +22604,8 @@
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         },
         {
           "name": "StartRecordingCommand",
@@ -22436,7 +22617,8 @@
           "name": "Status",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusShortcutValidationStatus",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Valid"
         },
         {
           "name": "StatusMessage",
@@ -22738,13 +22920,15 @@
           "name": "AnimationPolicy",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusSkeletonAnimationPolicy",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Enabled"
         },
         {
           "name": "LineCount",
           "kind": "styled",
           "type": "System.Int32",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 1
         }
       ],
       "events": [],
@@ -22881,37 +23065,43 @@
           "name": "IsDisabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Max",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 100
         },
         {
           "name": "Min",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         },
         {
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         },
         {
           "name": "Step",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 1
         },
         {
           "name": "Value",
           "kind": "styled",
           "type": "System.Double",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         }
       ],
       "events": [
@@ -23078,19 +23268,22 @@
           "name": "Align",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusLayoutAlignment",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Start"
         },
         {
           "name": "Gap",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusLayoutGap",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Sm"
         },
         {
           "name": "IsWrapEnabled",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         }
       ],
       "events": [],
@@ -23360,7 +23553,8 @@
           "name": "ActiveIndex",
           "kind": "styled",
           "type": "System.Int32",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": 0
         }
       ],
       "events": [],
@@ -23403,7 +23597,8 @@
           "name": "IsOpen",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         }
       ],
       "events": [],
@@ -23453,13 +23648,15 @@
           "name": "IsLoading",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Size",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Md"
         }
       ],
       "events": [
@@ -23529,7 +23726,8 @@
           "name": "Key",
           "kind": "styled",
           "type": "System.String",
-          "nullable": true
+          "nullable": true,
+          "defaultValue": ""
         }
       ],
       "events": [],
@@ -23865,40 +24063,16 @@
           "isStatic": false
         },
         {
-          "name": "HeaderContentPresenterCount",
-          "type": "System.Int32",
+          "name": "HeaderHeight",
+          "type": "System.Double",
           "nullable": false,
           "canRead": true,
-          "canWrite": false,
+          "canWrite": true,
           "isStatic": false
         },
         {
           "name": "HeaderHeights",
           "type": "System.Collections.ObjectModel.Collection\u003CSystem.Double\u003E",
-          "nullable": false,
-          "canRead": true,
-          "canWrite": false,
-          "isStatic": false
-        },
-        {
-          "name": "IsEmptyContentVisible",
-          "type": "System.Boolean",
-          "nullable": false,
-          "canRead": true,
-          "canWrite": false,
-          "isStatic": false
-        },
-        {
-          "name": "IsFooterContentVisible",
-          "type": "System.Boolean",
-          "nullable": false,
-          "canRead": true,
-          "canWrite": false,
-          "isStatic": false
-        },
-        {
-          "name": "IsOverlayContentVisible",
-          "type": "System.Boolean",
           "nullable": false,
           "canRead": true,
           "canWrite": false,
@@ -24089,14 +24263,6 @@
           "isStatic": false
         },
         {
-          "name": "RowContentPresenterCount",
-          "type": "System.Int32",
-          "nullable": false,
-          "canRead": true,
-          "canWrite": false,
-          "isStatic": false
-        },
-        {
           "name": "RowCount",
           "type": "System.Int32",
           "nullable": false,
@@ -24185,7 +24351,22 @@
           "isStatic": false
         }
       ],
-      "avaloniaProperties": [],
+      "avaloniaProperties": [
+        {
+          "name": "HeaderHeight",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false,
+          "defaultValue": 50
+        },
+        {
+          "name": "Overscan",
+          "kind": "styled",
+          "type": "System.Int32",
+          "nullable": false,
+          "defaultValue": 2
+        }
+      ],
       "events": [],
       "methods": [
         {
@@ -24566,6 +24747,279 @@
       "avaloniaProperties": [],
       "events": [],
       "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2HeaderCellContext",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Column",
+          "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ColumnIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Columns",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusDataTableColumn\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Style",
+          "type": "System.Collections.Generic.IReadOnlyDictionary\u003CSystem.String, System.Object\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2HeaderCellContext",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Columns",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[FsusUI.Avalonia.Controls.FsusDataTableColumn, FsusUI.Avalonia, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Column",
+              "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn\u0026",
+              "optional": false
+            },
+            {
+              "name": "ColumnIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "HeaderIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "Style",
+              "type": "System.Collections.Generic.IReadOnlyDictionary\u00602[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2HeaderContext",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Cells",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Columns",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusDataTableColumn\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HeaderIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2HeaderContext",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Cells",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Columns",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[FsusUI.Avalonia.Controls.FsusDataTableColumn, FsusUI.Avalonia, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "HeaderIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2RowContext",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Cells",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Columns",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusDataTableColumn\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Depth",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsScrolling",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RowData",
+          "type": "FsusUI.Avalonia.Controls.FsusDataTableRow",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RowIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Style",
+          "type": "System.Collections.Generic.IReadOnlyDictionary\u003CSystem.String, System.Object\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2RowContext",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Cells",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Style",
+              "type": "System.Collections.Generic.IReadOnlyDictionary\u00602[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Columns",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[FsusUI.Avalonia.Controls.FsusDataTableColumn, FsusUI.Avalonia, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Depth",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "RowData",
+              "type": "FsusUI.Avalonia.Controls.FsusDataTableRow\u0026",
+              "optional": false
+            },
+            {
+              "name": "RowIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsScrolling",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "FsusUI.Avalonia.Controls.FsusTableV2RowExpansion",
@@ -24956,25 +25410,29 @@
           "name": "IsRemovable",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsRemoved",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "IsSelected",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusComponentVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Default"
         }
       ],
       "events": [
@@ -25038,13 +25496,15 @@
           "name": "IsTruncated",
           "kind": "styled",
           "type": "System.Boolean",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": false
         },
         {
           "name": "Variant",
           "kind": "styled",
           "type": "FsusUI.Avalonia.Controls.FsusTextVariant",
-          "nullable": false
+          "nullable": false,
+          "defaultValue": "Body"
         }
       ],
       "events": [],

@@ -1333,6 +1333,152 @@ export const extractComponentSemantics = ({
     collectDefineComponentOptions(tsModule.ast, tsModule.content, componentRel)
   }
 
+  // A public TSX component can forward a slot into a renderer that invokes it
+  // with the real scoped payload. Follow those calls across the component
+  // module instead of treating a root-level `slots.row` reference as unscoped.
+  const slotByName = new Map(slots.map((slot) => [slot.name, slot]))
+  const typePayloadByName = new Map()
+  for (const moduleSource of moduleSources.filter((source) =>
+    /\.tsx?$/u.test(source.relativePath),
+  )) {
+    let parsed
+    try {
+      parsed = babelParse(moduleSource.content, {
+        sourceType: 'module',
+        plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes'],
+        errorRecovery: true,
+      })
+    } catch {
+      continue
+    }
+    for (const statement of parsed.program.body) {
+      const declaration =
+        statement.type === 'ExportNamedDeclaration'
+          ? statement.declaration
+          : statement
+      if (
+        declaration?.type !== 'TSTypeAliasDeclaration' ||
+        declaration.typeAnnotation?.type !== 'TSTypeLiteral'
+      )
+        continue
+      const payload = declaration.typeAnnotation.members
+        .map((member) => keyText(member.key, moduleSource.content))
+        .filter(Boolean)
+        .sort()
+      typePayloadByName.set(declaration.id.name, payload)
+    }
+  }
+  for (const moduleSource of moduleSources) {
+    const content = moduleSource.relativePath.endsWith('.vue')
+      ? resolver.parseVueModule(moduleSource.relativePath)?.scriptContent
+      : moduleSource.content
+    if (!content) continue
+    let parsed
+    try {
+      parsed = babelParse(content, {
+        sourceType: 'module',
+        plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes'],
+        errorRecovery: true,
+      })
+    } catch {
+      continue
+    }
+    walkNodes(parsed.program.body, (node) => {
+      if (
+        node.type !== 'CallExpression' &&
+        node.type !== 'OptionalCallExpression'
+      )
+        return
+      const callee = node.callee
+      if (
+        !callee ||
+        !['MemberExpression', 'OptionalMemberExpression'].includes(
+          callee.type,
+        ) ||
+        callee.object?.type !== 'Identifier' ||
+        callee.object.name !== 'slots'
+      )
+        return
+      const name =
+        !callee.computed && callee.property?.type === 'Identifier'
+          ? callee.property.name
+          : callee.computed && callee.property?.type === 'StringLiteral'
+            ? callee.property.value
+            : null
+      const slot = name ? slotByName.get(name) : null
+      if (!slot) return
+      slot.scoped = true
+      const argument = unwrapExpression(node.arguments?.[0])
+      if (argument?.type !== 'ObjectExpression') return
+      const payload = new Set(slot.payload ?? [])
+      for (const property of argument.properties ?? []) {
+        if (
+          property.type !== 'ObjectProperty' &&
+          property.type !== 'ObjectMethod'
+        )
+          continue
+        const payloadName = keyText(property.key, content)
+        if (payloadName) payload.add(payloadName)
+      }
+      slot.payload = [...payload].sort()
+    })
+    walkNodes(parsed.program.body, (node) => {
+      if (
+        ![
+          'ArrowFunctionExpression',
+          'FunctionExpression',
+          'FunctionDeclaration',
+          'ObjectMethod',
+        ].includes(node.type)
+      )
+        return
+      const typedParameters = new Map()
+      for (const parameter of node.params ?? []) {
+        if (parameter.type !== 'Identifier' || !parameter.typeAnnotation)
+          continue
+        typedParameters.set(
+          parameter.name,
+          typeText(parameter.typeAnnotation, content),
+        )
+      }
+      if (typedParameters.size === 0) return
+      walkNodes(node.body, (candidate) => {
+        if (
+          candidate.type !== 'CallExpression' &&
+          candidate.type !== 'OptionalCallExpression'
+        )
+          return
+        const callee = candidate.callee
+        if (
+          !callee ||
+          !['MemberExpression', 'OptionalMemberExpression'].includes(
+            callee.type,
+          ) ||
+          callee.object?.type !== 'Identifier' ||
+          callee.object.name !== 'slots'
+        )
+          return
+        const name =
+          !callee.computed && callee.property?.type === 'Identifier'
+            ? callee.property.name
+            : callee.computed && callee.property?.type === 'StringLiteral'
+              ? callee.property.value
+              : null
+        const argument = unwrapExpression(candidate.arguments?.[0])
+        const typeName =
+          argument?.type === 'Identifier'
+            ? typedParameters.get(argument.name)
+            : null
+        const payload = typeName ? typePayloadByName.get(typeName) : null
+        const slot = name ? slotByName.get(name) : null
+        if (!slot || !payload) return
+        slot.scoped = true
+        slot.payloadType = typeName
+        slot.payload = payload
+      })
+    })
+  }
+
   const uniqueBy = (items) => {
     const map = new Map()
     for (const item of items) {

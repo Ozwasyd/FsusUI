@@ -39,7 +39,10 @@ const AVALONIA_MEMBER_BINDINGS = {
     inputs: {
       cache: { member: 'Overscan' },
       height: { member: 'ViewportHeight' },
-      headerHeight: { member: 'HeaderHeights' },
+      headerHeight: {
+        member: 'HeaderHeight',
+        alternateMembers: ['HeaderHeights'],
+      },
       maxHeight: { member: 'ViewportMaxHeight' },
       width: { member: 'ViewportWidth' },
     },
@@ -51,6 +54,37 @@ const AVALONIA_MEMBER_BINDINGS = {
         member: 'CheckedChanged',
         payloadMember: 'NewChecked',
       },
+    },
+  },
+}
+
+const CONTENT_REGION_BINDINGS = {
+  ElTableV2: {
+    header: {
+      member: 'HeaderContent',
+      contextType: 'FsusUI.Avalonia.Controls.FsusTableV2HeaderContext',
+      webPayloadType: 'TableV2HeaderRowRendererParams',
+      payload: ['cells', 'columns', 'headerIndex'],
+    },
+    'header-cell': {
+      member: 'HeaderCellContent',
+      contextType: 'FsusUI.Avalonia.Controls.FsusTableV2HeaderCellContext',
+      webPayloadType: 'TableV2HeaderRowCellRendererParams',
+      payload: ['columns', 'column', 'columnIndex', 'headerIndex', 'style'],
+    },
+    row: {
+      member: 'RowContent',
+      contextType: 'FsusUI.Avalonia.Controls.FsusTableV2RowContext',
+      webPayloadType: 'TableV2RowRendererParams',
+      payload: [
+        'cells',
+        'style',
+        'columns',
+        'depth',
+        'rowData',
+        'rowIndex',
+        'isScrolling',
+      ],
     },
   },
 }
@@ -202,12 +236,9 @@ const normalizeVueSemanticType = (value) =>
     .replace(/\s*\|\s*undefined$/, '')
 
 export const categoriesFromVueProp = (prop) => {
-  if (prop?.runtimeType && VUE_RUNTIME_TO_CATEGORY[prop.runtimeType]) {
-    return [VUE_RUNTIME_TO_CATEGORY[prop.runtimeType]]
-  }
   const semanticType = normalizeVueSemanticType(prop?.semanticType)
   if (semanticType) {
-    return semanticType
+    const categories = semanticType
       .split('|')
       .map((part) => part.trim())
       .filter(Boolean)
@@ -227,6 +258,12 @@ export const categoriesFromVueProp = (prop) => {
           return 'component'
         return 'unknown'
       })
+    if (categories.some((category) => category !== 'unknown')) {
+      return [...new Set(categories)]
+    }
+  }
+  if (prop?.runtimeType && VUE_RUNTIME_TO_CATEGORY[prop.runtimeType]) {
+    return [VUE_RUNTIME_TO_CATEGORY[prop.runtimeType]]
   }
   return ['unknown']
 }
@@ -240,6 +277,15 @@ const categoriesOverlap = (first, second) => {
     : second
   if (a.length === 0 || b.length === 0) return null // not comparable
   return a.some((value) => b.includes(value))
+}
+
+const categoriesCovered = (webCategories, avaloniaCategories) => {
+  const web = webCategories.filter((category) => category !== 'unknown')
+  const avalonia = avaloniaCategories.filter(
+    (category) => category !== 'unknown',
+  )
+  if (web.length === 0 || avalonia.length === 0) return null
+  return web.every((category) => avalonia.includes(category))
 }
 
 const comparableValues = (values) => [
@@ -292,7 +338,10 @@ export const compareMembers = ({ web, avalonia, kind }) => {
 
   const webCategories = web.categories ?? ['unknown']
   const avaloniaCategories = avalonia?.categories ?? ['unknown']
-  const typeCompatibility = categoriesOverlap(webCategories, avaloniaCategories)
+  const typeCompatibility =
+    kind === 'input'
+      ? categoriesCovered(webCategories, avaloniaCategories)
+      : categoriesOverlap(webCategories, avaloniaCategories)
   if (typeCompatibility === false) {
     setDrift(
       drift,
@@ -324,8 +373,16 @@ export const compareMembers = ({ web, avalonia, kind }) => {
 
     const webLiteral = literalDefaultValue(web.default)
     const avaloniaDefault = avalonia?.defaultValue
-    if (webLiteral !== undefined && avaloniaDefault !== undefined) {
-      if (normalizeDefault(webLiteral) !== normalizeDefault(avaloniaDefault)) {
+    if (webLiteral !== undefined) {
+      if (avaloniaDefault === undefined) {
+        setDrift(
+          drift,
+          'default',
+          `web default=${JSON.stringify(webLiteral)} vs avalonia default missing`,
+        )
+      } else if (
+        normalizeDefault(webLiteral) !== normalizeDefault(avaloniaDefault)
+      ) {
         setDrift(
           drift,
           'default',
@@ -419,9 +476,22 @@ const webPropRef = (prop) => ({
   readonly: Boolean(prop.readonly),
 })
 
-const avaloniaPropRef = (property) => ({
+const avaloniaPropRef = (property, alternateProperties = []) => ({
   member: property.name,
-  categories: categoriesFromClrType(property.type),
+  alternateMembers: alternateProperties.map((alternate) => ({
+    member: alternate.name,
+    categories: categoriesFromClrType(alternate.type),
+    type: alternate.type,
+    nullable: Boolean(alternate.nullable),
+  })),
+  categories: [
+    ...new Set([
+      ...categoriesFromClrType(property.type),
+      ...alternateProperties.flatMap((alternate) =>
+        categoriesFromClrType(alternate.type),
+      ),
+    ]),
+  ],
   type: property.type,
   nullable: Boolean(property.nullable),
   defaultValue: property.defaultValue ?? undefined,
@@ -571,6 +641,17 @@ const inputMember = ({
     }
   }
   const avalonia = matchAvaloniaProperty(prop.name, avaloniaType, componentName)
+  const binding = memberBinding(componentName, 'inputs', prop.name)
+  const nativeProperties = [
+    ...(avaloniaType.avaloniaProperties ?? []),
+    ...(avaloniaType.properties ?? []),
+  ]
+  const alternateProperties = (binding?.alternateMembers ?? [])
+    .map((name) => nativeProperties.find((property) => property.name === name))
+    .filter(Boolean)
+  const nativeReference = avalonia
+    ? avaloniaPropRef(avalonia, alternateProperties)
+    : null
   let status
   let governance = null
   let drift = emptyDrift()
@@ -587,7 +668,7 @@ const inputMember = ({
   } else {
     const comparison = compareMembers({
       web: webPropRef(prop),
-      avalonia: avaloniaPropRef(avalonia),
+      avalonia: nativeReference,
       kind: 'input',
     })
     drift = comparison.drift
@@ -602,7 +683,7 @@ const inputMember = ({
     name: prop.name,
     kind: 'input',
     web: webPropRef(prop),
-    avalonia: avalonia ? avaloniaPropRef(avalonia) : null,
+    avalonia: nativeReference,
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'input', prop.name)],
@@ -759,9 +840,11 @@ const operationMember = ({
 }
 
 const contentRegionMember = ({
+  componentName,
   contractKebab,
   slot,
   avaloniaType,
+  typeIndex,
   classification,
 }) => {
   if (!avaloniaType) {
@@ -788,10 +871,13 @@ const contentRegionMember = ({
             ),
     }
   }
+  const binding = CONTENT_REGION_BINDINGS[componentName]?.[slot.name] ?? null
   const namedContentProperty =
     slot.name === 'default'
       ? null
-      : matchAvaloniaContentProperty(slot.name, avaloniaType)
+      : binding?.member
+        ? matchAvaloniaProperty(binding.member, avaloniaType, componentName)
+        : matchAvaloniaContentProperty(slot.name, avaloniaType)
   const avalonia =
     slot.name === 'default' && avaloniaType?.contentProperty
       ? { member: avaloniaType.contentProperty, content: true }
@@ -812,6 +898,29 @@ const contentRegionMember = ({
     )
   } else {
     status = 'aligned-candidate'
+    if (binding) {
+      const contextType = typeIndex.get(binding.contextType)
+      const nativePayload = [
+        ...(contextType?.avaloniaProperties ?? []),
+        ...(contextType?.properties ?? []),
+      ]
+        .map((property) => property.name)
+        .filter((name, index, all) => all.indexOf(name) === index)
+      const expected = binding.payload.map(toKebab).sort()
+      const actual = nativePayload.map(toKebab).sort()
+      const extracted = (slot.payload ?? []).map(toKebab).sort()
+      if (
+        !slot.scoped ||
+        !contextType ||
+        JSON.stringify(expected) !== JSON.stringify(extracted) ||
+        JSON.stringify(expected) !== JSON.stringify(actual)
+      ) {
+        status = 'partial'
+        governance = defaultGovernance(
+          'A real native content region exists, but the extracted Web scoped payload and native context do not match exactly.',
+        )
+      }
+    }
   }
   return {
     name: slot.name,
@@ -820,9 +929,18 @@ const contentRegionMember = ({
     web: {
       member: slot.name,
       scoped: Boolean(slot.scoped),
+      payloadType: binding?.webPayloadType ?? null,
+      payload: binding?.payload ?? slot.payload ?? [],
+      extractedPayload: slot.payload ?? [],
       baseline: VUE_BASELINE_PATH,
     },
-    avalonia,
+    avalonia: avalonia
+      ? {
+          ...avalonia,
+          contextType: binding?.contextType ?? null,
+          payload: binding?.payload ?? [],
+        }
+      : null,
     status,
     drift: emptyDrift(),
     scenarioIds: [scenarioId(contractKebab, 'content-region', slot.name)],
@@ -982,6 +1100,7 @@ const contractCoverage = (members) => {
 const contractForComponent = ({
   component,
   avaloniaType,
+  typeIndex,
   gate,
   performanceBudget,
 }) => {
@@ -1021,7 +1140,14 @@ const contractForComponent = ({
     operationMember({ contractKebab, exposed, avaloniaType, classification }),
   )
   const contentRegions = (component.slots ?? []).map((slot) =>
-    contentRegionMember({ contractKebab, slot, avaloniaType, classification }),
+    contentRegionMember({
+      componentName: component.name,
+      contractKebab,
+      slot,
+      avaloniaType,
+      typeIndex,
+      classification,
+    }),
   )
 
   const isMarkdownEditor = component.name === 'ElMarkdownEditor'
@@ -1328,6 +1454,7 @@ export const buildRegistry = ({
       contractForComponent({
         component,
         avaloniaType,
+        typeIndex,
         gate,
         performanceBudget: performanceBudgetByComponent.get(component.name),
       }),

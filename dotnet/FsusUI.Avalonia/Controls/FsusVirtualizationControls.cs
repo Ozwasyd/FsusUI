@@ -83,6 +83,27 @@ public sealed record FsusTableV2RowExpansion(FsusDataTableRow Row, bool Expanded
 
 public sealed record FsusTableV2Sort(string Key, FsusSortDirection Order);
 
+public sealed record FsusTableV2HeaderContext(
+  IReadOnlyList<object?> Cells,
+  IReadOnlyList<FsusDataTableColumn> Columns,
+  int HeaderIndex);
+
+public sealed record FsusTableV2HeaderCellContext(
+  IReadOnlyList<FsusDataTableColumn> Columns,
+  FsusDataTableColumn Column,
+  int ColumnIndex,
+  int HeaderIndex,
+  IReadOnlyDictionary<string, object?> Style);
+
+public sealed record FsusTableV2RowContext(
+  IReadOnlyList<object?> Cells,
+  IReadOnlyDictionary<string, object?> Style,
+  IReadOnlyList<FsusDataTableColumn> Columns,
+  int Depth,
+  FsusDataTableRow RowData,
+  int RowIndex,
+  bool IsScrolling);
+
 public delegate ValueTask<IReadOnlyList<FsusVirtualListItem>> FsusVirtualListSourceProvider(
   FsusVirtualWindow window,
   CancellationToken cancellationToken);
@@ -708,6 +729,11 @@ public class FsusAutoResizer : ContentControl
 
 public class FsusTableV2 : ContentControl
 {
+  public static readonly StyledProperty<double> HeaderHeightProperty =
+    AvaloniaProperty.Register<FsusTableV2, double>(nameof(HeaderHeight), 50d);
+  public static readonly StyledProperty<int> OverscanProperty =
+    AvaloniaProperty.Register<FsusTableV2, int>(nameof(Overscan), 2);
+
   private readonly Dictionary<(int Row, int Column), FsusTableV2CellContainer> realizedCells = [];
   private readonly Dictionary<int, double> rowMeasurementCache = [];
   private readonly Queue<int> rowMeasurementOrder = [];
@@ -718,7 +744,7 @@ public class FsusTableV2 : ContentControl
   private readonly Canvas rowContentHost = new();
   private readonly ContentControl emptyHost = new();
   private readonly ContentControl footerHost = new();
-  private readonly ContentControl headerHost = new();
+  private readonly Canvas headerHost = new();
   private readonly ContentControl overlayHost = new();
   private readonly Grid bodyViewport = new();
   private readonly Grid scrollContent = new();
@@ -787,7 +813,12 @@ public class FsusTableV2 : ContentControl
   public Collection<FsusDataTableRow> FixedData { get; } = [];
   public Collection<string> DefaultExpandedRowKeys { get; } = [];
   public Collection<string> ExpandedRowKeys { get; } = [];
-  public Collection<double> HeaderHeights { get; } = [50d];
+  public double HeaderHeight
+  {
+    get => GetValue(HeaderHeightProperty);
+    set => SetValue(HeaderHeightProperty, value);
+  }
+  public Collection<double> HeaderHeights { get; } = [];
   public string RowKey { get; set; } = "id";
   public string? ExpandColumnKey { get; set; }
   public int RowCount { get; set; }
@@ -799,7 +830,11 @@ public class FsusTableV2 : ContentControl
   public double RowHeight { get; set; } = 32d;
   public double? EstimatedRowHeight { get; set; }
   public double ColumnWidth { get; set; } = 120d;
-  public int Overscan { get; set; } = 2;
+  public int Overscan
+  {
+    get => GetValue(OverscanProperty);
+    set => SetValue(OverscanProperty, value);
+  }
   public int FrozenRowCount { get; set; }
   public int FrozenColumnCount { get; set; }
   public int ContainerPoolLimit { get; set; } = 1536;
@@ -851,12 +886,12 @@ public class FsusTableV2 : ContentControl
   public int CreatedCellCount { get; private set; }
   public int DiscardedCellCount { get; private set; }
   public int CellPoolCount => cellPool.Count;
-  public int HeaderContentPresenterCount =>
-    headerCellHost.Children.Count + (headerHost.IsVisible ? 1 : 0);
-  public int RowContentPresenterCount => rowContentHost.Children.Count;
-  public bool IsEmptyContentVisible => emptyHost.IsVisible;
-  public bool IsFooterContentVisible => footerHost.IsVisible;
-  public bool IsOverlayContentVisible => overlayHost.IsVisible;
+  internal int HeaderContentPresenterCount =>
+    headerCellHost.Children.Count + headerHost.Children.Count;
+  internal int RowContentPresenterCount => rowContentHost.Children.Count;
+  internal bool IsEmptyContentVisible => emptyHost.IsVisible;
+  internal bool IsFooterContentVisible => footerHost.IsVisible;
+  internal bool IsOverlayContentVisible => overlayHost.IsVisible;
   public int RetainedRowMeasurementCount => rowMeasurementCache.Count;
   public int AutomationUpdateCount { get; private set; }
   public bool LastBackgroundCanceled { get; private set; }
@@ -1256,28 +1291,70 @@ public class FsusTableV2 : ContentControl
     int columnCount,
     IReadOnlyList<int> realizedRows)
   {
-    var headerHeight = HeaderHeights.Sum(value => Math.Max(0d, value));
+    var headerHeights = (HeaderHeights.Count > 0 ? HeaderHeights : [HeaderHeight])
+      .Select(value => Math.Max(0d, value))
+      .ToArray();
+    var headerHeight = headerHeights.Sum();
+    var headerCells = Columns
+      .Select(column => column.RenderHeader())
+      .ToArray();
+    headerHost.Children.Clear();
     headerHost.Height = headerHeight;
-    headerHost.Content = Columns;
-    headerHost.ContentTemplate = HeaderContent;
+    headerHost.Width = Math.Max(0, columnCount) * Math.Max(1d, ColumnWidth);
     headerHost.IsVisible = HeaderContent is not null && headerHeight > 0;
+    if (HeaderContent is not null)
+    {
+      var top = 0d;
+      for (var headerIndex = 0; headerIndex < headerHeights.Length; headerIndex++)
+      {
+        var rowHeight = headerHeights[headerIndex];
+        var presenter = new ContentControl
+        {
+          Content = new FsusTableV2HeaderContext(headerCells, Columns, headerIndex),
+          ContentTemplate = HeaderContent,
+          Width = headerHost.Width,
+          Height = rowHeight,
+        };
+        Canvas.SetTop(presenter, top);
+        headerHost.Children.Add(presenter);
+        top += rowHeight;
+      }
+    }
 
     headerCellHost.Children.Clear();
     headerCellHost.Height = headerHeight;
     headerCellHost.Width = Math.Max(0, columnCount) * Math.Max(1d, ColumnWidth);
     if (HeaderContent is null && HeaderCellContent is not null && headerHeight > 0)
     {
-      for (var columnIndex = 0; columnIndex < Columns.Count; columnIndex++)
+      var top = 0d;
+      for (var headerIndex = 0; headerIndex < headerHeights.Length; headerIndex++)
       {
-        var presenter = new ContentControl
+        var rowHeight = headerHeights[headerIndex];
+        for (var columnIndex = 0; columnIndex < Columns.Count; columnIndex++)
         {
-          Content = Columns[columnIndex],
-          ContentTemplate = HeaderCellContent,
-          Width = Math.Max(1d, ColumnWidth),
-          Height = headerHeight,
-        };
-        Canvas.SetLeft(presenter, columnIndex * Math.Max(1d, ColumnWidth));
-        headerCellHost.Children.Add(presenter);
+          var presenter = new ContentControl
+          {
+            Content = new FsusTableV2HeaderCellContext(
+              Columns,
+              Columns[columnIndex],
+              columnIndex,
+              headerIndex,
+              new Dictionary<string, object?>
+              {
+                ["left"] = columnIndex * Math.Max(1d, ColumnWidth),
+                ["top"] = top,
+                ["width"] = Math.Max(1d, ColumnWidth),
+                ["height"] = rowHeight,
+              }),
+            ContentTemplate = HeaderCellContent,
+            Width = Math.Max(1d, ColumnWidth),
+            Height = rowHeight,
+          };
+          Canvas.SetLeft(presenter, columnIndex * Math.Max(1d, ColumnWidth));
+          Canvas.SetTop(presenter, top);
+          headerCellHost.Children.Add(presenter);
+        }
+        top += rowHeight;
       }
     }
 
@@ -1292,7 +1369,23 @@ public class FsusTableV2 : ContentControl
         if (row is null) continue;
         var presenter = new ContentControl
         {
-          Content = row,
+          Content = new FsusTableV2RowContext(
+            Columns.Select(column => ResolveCellContent(
+              row,
+              column,
+              rowIndex,
+              Columns.IndexOf(column))).ToArray(),
+            new Dictionary<string, object?>
+            {
+              ["top"] = ResolveRowOffset(rowIndex),
+              ["height"] = ResolveRowHeight(rowIndex),
+              ["width"] = cellHost.Width,
+            },
+            Columns,
+            0,
+            row,
+            rowIndex,
+            false),
           ContentTemplate = RowContent,
           Width = cellHost.Width,
           Height = ResolveRowHeight(rowIndex),

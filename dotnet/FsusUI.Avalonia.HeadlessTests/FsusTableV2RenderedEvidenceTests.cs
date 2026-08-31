@@ -68,7 +68,7 @@ public class FsusTableV2RenderedEvidenceTests
       ViewportHeight = 96,
       EmptyContent = emptyTemplate,
     };
-    empty.HeaderHeights.Clear();
+    empty.HeaderHeight = 0;
     empty.RefreshLayout();
 
     var stack = new StackPanel
@@ -122,16 +122,13 @@ public class FsusTableV2RenderedEvidenceTests
     var outputPath = Path.Combine(outputDirectory, "table-v2-content-regions-light.png");
     using var bitmap = new RenderTargetBitmap(new PixelSize(488, 540), new Vector(96, 96));
     bitmap.Render(surface);
-    using (var stream = File.Create(outputPath))
-    {
-      bitmap.Save(stream);
-    }
+    var artifactBytes = SaveOrVerifyArtifact(bitmap, outputPath);
 
     Assert.Equal(3, table.HeaderContentPresenterCount);
     Assert.InRange(table.RowContentPresenterCount, 1, 8);
     Assert.True(table.IsFooterContentVisible);
     Assert.True(empty.IsEmptyContentVisible);
-    Assert.True(new FileInfo(outputPath).Length > 4_000);
+    Assert.True(artifactBytes.Length > 4_000);
     window.Close();
   }
 
@@ -219,14 +216,11 @@ public class FsusTableV2RenderedEvidenceTests
     var outputPath = Path.Combine(outputDirectory, "table-v2-whole-header-overlay-light.png");
     using var bitmap = new RenderTargetBitmap(new PixelSize(488, 320), new Vector(96, 96));
     bitmap.Render(surface);
-    using (var stream = File.Create(outputPath))
-    {
-      bitmap.Save(stream);
-    }
+    var artifactBytes = SaveOrVerifyArtifact(bitmap, outputPath);
 
     Assert.Equal(1, table.HeaderContentPresenterCount);
     Assert.True(table.IsOverlayContentVisible);
-    Assert.True(new FileInfo(outputPath).Length > 4_000);
+    Assert.True(artifactBytes.Length > 4_000);
     window.Close();
   }
 
@@ -238,7 +232,7 @@ public class FsusTableV2RenderedEvidenceTests
       RowHeight = 28,
       ColumnWidth = 146,
       ViewportWidth = 440,
-      ViewportHeight = 220,
+      ViewportHeight = 224,
       Overscan = 0,
     };
     table.HeaderHeights.Clear();
@@ -273,6 +267,22 @@ public class FsusTableV2RenderedEvidenceTests
       {
         Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
       });
+  }
+
+  private static byte[] SaveOrVerifyArtifact(RenderTargetBitmap bitmap, string outputPath)
+  {
+    using var stream = new MemoryStream();
+    bitmap.Save(stream);
+    var bytes = stream.ToArray();
+    if (Environment.GetEnvironmentVariable("FSUSUI_UPDATE_VISUAL_ARTIFACTS") == "1")
+    {
+      File.WriteAllBytes(outputPath, bytes);
+      return bytes;
+    }
+
+    Assert.True(File.Exists(outputPath), $"sealed artifact missing: {outputPath}");
+    Assert.Equal(File.ReadAllBytes(outputPath), bytes);
+    return bytes;
   }
 
   private static string FindRepositoryRoot()
