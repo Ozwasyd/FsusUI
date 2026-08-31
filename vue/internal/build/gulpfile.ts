@@ -178,8 +178,35 @@ export const rewriteBuiltBundledWorkspaceDependencyReferences = async () => {
         })
       }
 
-      if (changed) {
-        await writeFile(filePath, rewritten)
+      const relativeOutputPath = path.relative(epOutput, filePath)
+      const isEsmModule = relativeOutputPath.startsWith('es/')
+      const isCjsModule = relativeOutputPath.startsWith('lib/')
+      if (isEsmModule || isCjsModule) {
+        const extension = isEsmModule ? '.mjs' : '.js'
+        for (const workerName of [
+          'markdown-parser',
+          'markdown-renderer',
+          'data-pipeline',
+        ]) {
+          const next = rewritten
+            .replace(
+              new RegExp(`(['"])(\\./)?${workerName}\\.worker\\.ts\\1`, 'gu'),
+              (_match, quote: string) =>
+                `${quote}./${workerName}.worker${extension}${quote}`,
+            )
+            .replace(
+              new RegExp(
+                `(['"])components/.*?/${workerName}\\.worker\\.js\\1`,
+                'gu',
+              ),
+              (_match, quote: string) =>
+                `${quote}./${workerName}.worker.js${quote}`,
+            )
+          if (next !== rewritten) {
+            rewritten = next
+            changed = true
+          }
+        }
       }
 
       const isEsmBundle =
@@ -195,17 +222,25 @@ export const rewriteBuiltBundledWorkspaceDependencyReferences = async () => {
         const dataPipelineWorker =
           bundledWorkerRuntimePaths.dataPipeline[moduleKind]
         rewritten = rewritten
-          .replaceAll(
-            `"./markdown-renderer.worker.${isEsmBundle ? 'mjs' : 'js'}"`,
-            JSON.stringify(
-              path.relative(path.dirname(filePath), path.join(epOutput, markdownWorker)),
-            ),
+          .replace(
+            /(['"])\.\/markdown-renderer\.worker\.ts\1/gu,
+            (_match, quote: string) =>
+              `${quote}${toModuleSpecifier(
+                path.relative(
+                  path.dirname(filePath),
+                  path.join(epOutput, markdownWorker),
+                ),
+              )}${quote}`,
           )
-          .replaceAll(
-            `"./data-pipeline.worker.${isEsmBundle ? 'mjs' : 'js'}"`,
-            JSON.stringify(
-              path.relative(path.dirname(filePath), path.join(epOutput, dataPipelineWorker)),
-            ),
+          .replace(
+            /(['"])\.\/data-pipeline\.worker\.ts\1/gu,
+            (_match, quote: string) =>
+              `${quote}${toModuleSpecifier(
+                path.relative(
+                  path.dirname(filePath),
+                  path.join(epOutput, dataPipelineWorker),
+                ),
+              )}${quote}`,
           )
       } else {
         const workerPattern = /(['"])([^'"]*\.worker\.ts)\1/gu
@@ -226,6 +261,7 @@ export const rewriteBuiltBundledWorkspaceDependencyReferences = async () => {
       if (
         isEsmBundle ||
         isCjsBundle ||
+        changed ||
         /[.]worker[.]ts(?:['"]|$)/u.test(rewritten)
       ) {
         const previous = await readFile(filePath, 'utf8')
