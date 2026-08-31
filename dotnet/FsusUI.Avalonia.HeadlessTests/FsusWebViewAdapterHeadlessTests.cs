@@ -4,6 +4,7 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -18,7 +19,7 @@ namespace FsusUI.Avalonia.HeadlessTests;
 public class FsusWebViewAdapterHeadlessTests
 {
   [AvaloniaFact]
-  public void ProductionContextMenuFixtureRendersThemeViewportZoomAndAutomationMatrix()
+  public async Task ProductionContextMenuFixtureRendersThemeViewportZoomAndAutomationMatrix()
   {
     EnsureFullTheme();
     var repositoryRoot = FindRepositoryRoot();
@@ -101,7 +102,27 @@ public class FsusWebViewAdapterHeadlessTests
           bounds = item.Bounds,
         })
         .ToArray();
-      Assert.True(fixture.Menu.CloseAsync().AsTask().GetAwaiter().GetResult());
+      var completion = new TaskCompletionSource<FsusWebViewCommandResult>(
+        TaskCreationOptions.RunContinuationsAsynchronously);
+      fixture.Adapter.ContextCommandCompleted +=
+        (_, result) => completion.TrySetResult(result);
+      Assert.True(await fixture.Menu.HandleKeyAsync(Key.Down));
+      Assert.Equal("fsus-webview:replace:1", fixture.Menu.FocusedKey);
+      Assert.True(await fixture.Menu.HandleKeyAsync(Key.Enter));
+      var commandResult = await completion.Task.WaitAsync(TimeSpan.FromSeconds(2));
+      Assert.True(commandResult.Succeeded);
+      Assert.False(fixture.Menu.IsOpen);
+      Assert.Equal(FsusWebViewContextCommand.ReplaceWord, fixture.Backend.LastCommand?.Command);
+      Assert.Equal("tech", fixture.Backend.LastCommand?.Replacement);
+      Assert.Same(fixture.Invoker, fixture.Host.LastRestoredFocus);
+
+      fixture.Adapter.OpenContextMenu(
+        fixture.Host,
+        fixture.Menu,
+        request,
+        fixture.Invoker);
+      Assert.True(await fixture.Menu.HandleKeyAsync(Key.Escape));
+      Assert.False(fixture.Menu.IsOpen);
       Assert.Same(fixture.Invoker, fixture.Host.LastRestoredFocus);
       captures.Add(new
       {
@@ -114,6 +135,13 @@ public class FsusWebViewAdapterHeadlessTests
         sha256 = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
         menuBounds = fixture.Menu.Bounds,
         itemEvidence,
+        keyboard = new
+        {
+          arrowFocused = "fsus-webview:replace:1",
+          enterCommand = fixture.Backend.LastCommand?.Command.ToString(),
+          enterReplacement = fixture.Backend.LastCommand?.Replacement,
+          escapeClosed = !fixture.Menu.IsOpen,
+        },
         focusRestored = ReferenceEquals(fixture.Invoker, fixture.Host.LastRestoredFocus),
       });
       fixture.Adapter.Dispose();
@@ -218,13 +246,15 @@ public class FsusWebViewAdapterHeadlessTests
         ? global::Avalonia.Styling.ThemeVariant.Dark
         : global::Avalonia.Styling.ThemeVariant.Light,
     };
+    var backend = new VisualBackend();
     return new Fixture(
       window,
       root,
       host,
       menu,
       invoker,
-      new FsusWebViewAdapter(new VisualBackend()));
+      new FsusWebViewAdapter(backend),
+      backend);
   }
 
   private static FsusWebViewContextMenuRequest CreateRequest(
@@ -297,6 +327,8 @@ public class FsusWebViewAdapterHeadlessTests
       DocumentOutline = true,
     };
 
+    public FsusWebViewContextCommandRequest? LastCommand { get; private set; }
+
     public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested
     {
       add { }
@@ -305,13 +337,13 @@ public class FsusWebViewAdapterHeadlessTests
 
     public ValueTask<FsusWebViewCommandResult> ExecuteContextCommandAsync(
       FsusWebViewContextCommandRequest request,
-      CancellationToken cancellationToken = default) =>
-      ValueTask.FromResult(new FsusWebViewCommandResult(
+      CancellationToken cancellationToken = default)
+    {
+      cancellationToken.ThrowIfCancellationRequested();
+      LastCommand = request;
+      return ValueTask.FromResult(new FsusWebViewCommandResult(
         FsusWebViewCommandStatus.Succeeded));
-
-    public ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
-      CancellationToken cancellationToken = default) =>
-      ValueTask.FromResult(FsusWebViewCommandResult.Unsupported("Not used by fixture."));
+    }
 
     public ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
       FsusWebViewPdfExportOptions options,
@@ -338,5 +370,6 @@ public class FsusWebViewAdapterHeadlessTests
     FsusOverlayHost Host,
     FsusContextMenu Menu,
     Button Invoker,
-    FsusWebViewAdapter Adapter);
+    FsusWebViewAdapter Adapter,
+    VisualBackend Backend);
 }

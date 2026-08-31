@@ -91,30 +91,92 @@ public class FsusWebViewAdapterTests
       (item) => item.Key == "fsus-webview:native-menu" && item.IsEnabled);
   }
 
-  [Fact]
-  public async Task DeveloperToolsReturnsExplicitUnsupportedWithoutCallingBackend()
+  [Theory]
+  [InlineData("teh", "", " ")]
+  [InlineData(" ", "the", "tech")]
+  public void UnusableSuggestionDataOffersNativeMenuEscapeHatch(
+    string misspelledWord,
+    string firstReplacement,
+    string secondReplacement)
   {
-    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Linux) with
-    {
-      DeveloperTools = false,
-    });
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Windows));
     using var adapter = new FsusWebViewAdapter(backend);
+    var menu = new FsusContextMenu();
+    var request = RichRequest() with
+    {
+      MisspelledWord = misspelledWord,
+      SpellingSuggestions =
+      [
+        new FsusWebViewSpellingSuggestion(firstReplacement, "first"),
+        new FsusWebViewSpellingSuggestion(secondReplacement, "second"),
+      ],
+    };
 
-    var result = await adapter.OpenDeveloperToolsAsync();
+    adapter.OpenContextMenu(
+      new FsusOverlayHost(),
+      menu,
+      request,
+      new Button { Content = "Editor" });
 
-    Assert.Equal(FsusWebViewCommandStatus.Unsupported, result.Status);
-    Assert.Contains("unavailable", result.Detail, StringComparison.OrdinalIgnoreCase);
-    Assert.Equal(0, backend.DeveloperToolsCalls);
+    Assert.DoesNotContain(menu.Items.OfType<FsusContextMenuItem>(),
+      item => item.Key.Contains("replace", StringComparison.Ordinal));
+    Assert.Contains(menu.Items.OfType<FsusContextMenuItem>(),
+      item => item.Key == "fsus-webview:native-menu" && item.IsEnabled);
+  }
+
+  [Fact]
+  public void BlankSuggestionAccessibleNameFallsBackToReplacement()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Linux));
+    using var adapter = new FsusWebViewAdapter(backend);
+    var menu = new FsusContextMenu();
+    var request = RichRequest() with
+    {
+      SpellingSuggestions =
+      [
+        new FsusWebViewSpellingSuggestion("the", " "),
+      ],
+    };
+
+    adapter.OpenContextMenu(
+      new FsusOverlayHost(),
+      menu,
+      request,
+      new Button { Content = "Editor" });
+
+    Assert.Equal(
+      "the",
+      menu.Items.OfType<FsusContextMenuItem>()
+        .Single(item => item.Key.StartsWith("fsus-webview:replace:", StringComparison.Ordinal))
+        .Header);
   }
 
   [Theory]
-  [InlineData(FsusWebViewPlatform.Windows, FsusWebViewPrintTheme.Light)]
-  [InlineData(FsusWebViewPlatform.Windows, FsusWebViewPrintTheme.Dark)]
-  [InlineData(FsusWebViewPlatform.Linux, FsusWebViewPrintTheme.Light)]
-  [InlineData(FsusWebViewPlatform.Linux, FsusWebViewPrintTheme.Dark)]
+  [InlineData(
+    FsusWebViewPlatform.Windows,
+    FsusWebViewPrintTheme.Light,
+    "#FFFFFF",
+    "#0F0F11")]
+  [InlineData(
+    FsusWebViewPlatform.Windows,
+    FsusWebViewPrintTheme.Dark,
+    "#121214",
+    "#F0F0F4")]
+  [InlineData(
+    FsusWebViewPlatform.Linux,
+    FsusWebViewPrintTheme.Light,
+    "#FFFFFF",
+    "#0F0F11")]
+  [InlineData(
+    FsusWebViewPlatform.Linux,
+    FsusWebViewPrintTheme.Dark,
+    "#121214",
+    "#F0F0F4")]
   public async Task TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(
     FsusWebViewPlatform platform,
-    FsusWebViewPrintTheme theme)
+    FsusWebViewPrintTheme theme,
+    string expectedPageBackground,
+    string expectedTextColor)
   {
     var backend = new FakeBackend(FullCapabilities(platform));
     using var adapter = new FsusWebViewAdapter(backend);
@@ -135,13 +197,45 @@ public class FsusWebViewAdapterTests
     Assert.True(destination.CanWrite);
     Assert.Equal(destination.Length, result.BytesWritten);
     Assert.Equal("Article", Assert.Single(result.Outline).Title);
-    Assert.Equal("Methods", Assert.Single(result.Outline[0].Children).Title);
+    Assert.Equal(2, result.Outline[0].Children.Count);
+    Assert.Equal("Methods", result.Outline[0].Children[0].Title);
+    Assert.Equal(
+      "Inputs",
+      Assert.Single(result.Outline[0].Children[0].Children).Title);
+    Assert.Equal("Results", result.Outline[0].Children[1].Title);
+    Assert.All(
+      result.Outline.SelectMany(FlattenOutline),
+      node => Assert.StartsWith("heading-", node.Destination));
+    var printRender = Assert.IsType<FakePrintRenderSnapshot>(backend.LastPrintRender);
+    Assert.Equal(expectedPageBackground, printRender.PageBackground);
+    Assert.Equal(expectedTextColor, printRender.TextColor);
+    Assert.True(printRender.PrintBackgrounds);
+    Assert.Collection(
+      printRender.HeadingRuns,
+      heading =>
+      {
+        Assert.Equal(("Article", 1, "heading-article", 1, 72, 24),
+          (heading.Title, heading.HeadingLevel, heading.Destination,
+            heading.Page, heading.Top, heading.FontSize));
+      },
+      heading => Assert.Equal(("Methods", 2, 1, 168, 22),
+        (heading.Title, heading.HeadingLevel, heading.Page, heading.Top, heading.FontSize)),
+      heading => Assert.Equal(("Inputs", 3, 1, 264, 20),
+        (heading.Title, heading.HeadingLevel, heading.Page, heading.Top, heading.FontSize)),
+      heading => Assert.Equal(("Results", 2, 2, 72, 22),
+        (heading.Title, heading.HeadingLevel, heading.Page, heading.Top, heading.FontSize)));
     var pdf = Encoding.ASCII.GetString(destination.ToArray());
     Assert.StartsWith("%PDF-1.7", pdf);
     Assert.Contains("/StructTreeRoot", pdf);
     Assert.Contains("/Outlines", pdf);
-    Assert.Contains("/Dest (heading-article)", pdf);
-    Assert.Contains($"% Platform={platform}; Theme={theme}", pdf);
+    Assert.Contains("/S /H1 /Title (Article)", pdf);
+    Assert.Contains("/S /H2 /Title (Methods)", pdf);
+    Assert.Contains("/S /H3 /Title (Inputs)", pdf);
+    Assert.Contains("/Dest (heading-article) [1 /XYZ 72 72 0]", pdf);
+    Assert.Contains("/Dest (heading-results) [2 /XYZ 72 72 0]", pdf);
+    Assert.Contains($"/PageBackground ({expectedPageBackground})", pdf);
+    Assert.Contains($"/TextColor ({expectedTextColor})", pdf);
+    Assert.Contains("/PrintBackgrounds true", pdf);
   }
 
   [Fact]
@@ -218,8 +312,51 @@ public class FsusWebViewAdapterTests
       destination);
 
     Assert.Equal(FsusWebViewCommandStatus.InvalidBackendResult, result.Status);
-    Assert.False(result.DestinationLeftOpen);
-    Assert.Contains("closed", result.Detail);
+    Assert.True(result.DestinationLeftOpen);
+    Assert.True(destination.CanWrite);
+    Assert.Contains("attempted to close", result.Detail);
+  }
+
+  [Fact]
+  public async Task BackendCannotClaimSuccessWithoutWritingPdfBytes()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Windows))
+    {
+      SkipPdfWrite = true,
+    };
+    using var adapter = new FsusWebViewAdapter(backend);
+    using var destination = new MemoryStream();
+
+    var result = await adapter.ExportPdfAsync(
+      new FsusWebViewPdfExportOptions(),
+      destination);
+
+    Assert.Equal(FsusWebViewCommandStatus.InvalidBackendResult, result.Status);
+    Assert.Equal(0, result.BytesWritten);
+    Assert.Equal(0, destination.Length);
+    Assert.Contains("non-empty PDF write", result.Detail);
+  }
+
+  [Fact]
+  public async Task BackendCannotClaimPdfStructureOrMissingOutlineDestination()
+  {
+    var backend = new FakeBackend(FullCapabilities(FsusWebViewPlatform.Linux))
+    {
+      OmitLastDestination = true,
+    };
+    using var adapter = new FsusWebViewAdapter(backend);
+    using var destination = new MemoryStream();
+
+    var result = await adapter.ExportPdfAsync(
+      new FsusWebViewPdfExportOptions
+      {
+        GenerateTaggedPdf = true,
+        GenerateDocumentOutline = true,
+      },
+      destination);
+
+    Assert.Equal(FsusWebViewCommandStatus.InvalidBackendResult, result.Status);
+    Assert.Contains("heading-results", result.Detail);
   }
 
   private static FsusWebViewContextMenuRequest RichRequest(
@@ -255,10 +392,19 @@ public class FsusWebViewAdapterTests
     ReplaceWord = true,
     AddToDictionary = true,
     NativeContextMenu = true,
-    DeveloperTools = true,
     TaggedPdf = true,
     DocumentOutline = true,
   };
+
+  private static IEnumerable<FsusWebViewDocumentOutlineNode> FlattenOutline(
+    FsusWebViewDocumentOutlineNode node)
+  {
+    yield return node;
+    foreach (var child in node.Children.SelectMany(FlattenOutline))
+    {
+      yield return child;
+    }
+  }
 
   private sealed class FakeBackend(FsusWebViewCapabilities capabilities)
     : IFsusWebViewBackendAdapter
@@ -266,10 +412,12 @@ public class FsusWebViewAdapterTests
     public FsusWebViewCapabilities Capabilities { get; } = capabilities;
     public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested;
     public List<FsusWebViewContextCommandRequest> ContextCommands { get; } = [];
-    public int DeveloperToolsCalls { get; private set; }
     public int ExportCalls { get; private set; }
     public bool ReturnIncompleteOutline { get; init; }
     public bool CloseDestination { get; init; }
+    public bool SkipPdfWrite { get; init; }
+    public bool OmitLastDestination { get; init; }
+    public FakePrintRenderSnapshot? LastPrintRender { get; private set; }
 
     public void RaiseContextMenu(FsusWebViewContextMenuRequest request) =>
       ContextMenuRequested?.Invoke(this, new FsusWebViewContextMenuRequestedEventArgs(request));
@@ -284,15 +432,6 @@ public class FsusWebViewAdapterTests
         FsusWebViewCommandStatus.Succeeded));
     }
 
-    public ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
-      CancellationToken cancellationToken = default)
-    {
-      cancellationToken.ThrowIfCancellationRequested();
-      DeveloperToolsCalls++;
-      return ValueTask.FromResult(new FsusWebViewCommandResult(
-        FsusWebViewCommandStatus.Succeeded));
-    }
-
     public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
       FsusWebViewPdfExportOptions options,
       Stream destination,
@@ -300,13 +439,27 @@ public class FsusWebViewAdapterTests
     {
       cancellationToken.ThrowIfCancellationRequested();
       ExportCalls++;
+      var outline = BuildOutline(PrintableHeadings);
+      LastPrintRender = BuildPrintRender(options, PrintableHeadings);
+      var headingObjects = string.Join(
+        "\n",
+        LastPrintRender.HeadingRuns
+          .Where(heading => !OmitLastDestination || heading.Destination != "heading-results")
+          .Select(heading =>
+          $"/S /H{heading.HeadingLevel} /Title ({heading.Title}) " +
+          $"/Dest ({heading.Destination}) [{heading.Page} /XYZ 72 {heading.Top} 0]"));
       var pdf = Encoding.ASCII.GetBytes(
-        $"%PDF-1.7\n% Platform={Capabilities.Platform}; Theme={options.Theme}\n" +
+        "%PDF-1.7\n" +
         "/StructTreeRoot << /Type /StructTreeRoot >>\n" +
         "/Outlines << /First 1 0 R >>\n" +
-        "/Title (Article) /Dest (heading-article)\n" +
-        "/Title (Methods) /Dest (heading-methods)\n%%EOF\n");
-      await destination.WriteAsync(pdf, cancellationToken);
+        $"/PageBackground ({LastPrintRender.PageBackground})\n" +
+        $"/TextColor ({LastPrintRender.TextColor})\n" +
+        $"/PrintBackgrounds {options.PrintBackgrounds.ToString().ToLowerInvariant()}\n" +
+        $"{headingObjects}\n%%EOF\n");
+      if (!SkipPdfWrite)
+      {
+        await destination.WriteAsync(pdf, cancellationToken);
+      }
       if (CloseDestination)
       {
         destination.Dispose();
@@ -317,28 +470,118 @@ public class FsusWebViewAdapterTests
         TaggedPdfApplied = options.GenerateTaggedPdf,
         DocumentOutlineApplied = options.GenerateDocumentOutline,
         DestinationLeftOpen = true,
-        BytesWritten = pdf.Length,
+        BytesWritten = SkipPdfWrite ? 0 : pdf.Length,
         Outline = ReturnIncompleteOutline
           ? Array.Empty<FsusWebViewDocumentOutlineNode>()
-          :
-          [
-            new FsusWebViewDocumentOutlineNode
-            {
-              Title = "Article",
-              HeadingLevel = 1,
-              Destination = "heading-article",
-              Children =
-              [
-                new FsusWebViewDocumentOutlineNode
-                {
-                  Title = "Methods",
-                  HeadingLevel = 2,
-                  Destination = "heading-methods",
-                },
-              ],
-            },
-          ],
+          : options.GenerateDocumentOutline
+            ? outline
+            : Array.Empty<FsusWebViewDocumentOutlineNode>(),
       };
     }
+
+    private static readonly IReadOnlyList<FakeSemanticHeading> PrintableHeadings =
+    [
+      new("h1", "Article", "heading-article"),
+      new("h2", "Methods", "heading-methods"),
+      new("h3", "Inputs", "heading-inputs"),
+      new("h2", "Results", "heading-results"),
+    ];
+
+    private static IReadOnlyList<FsusWebViewDocumentOutlineNode> BuildOutline(
+      IReadOnlyList<FakeSemanticHeading> headings)
+    {
+      var roots = new List<FakeOutlineBuilder>();
+      var ancestors = new Stack<FakeOutlineBuilder>();
+      foreach (var heading in headings)
+      {
+        var level = int.Parse(heading.Tag.AsSpan(1));
+        while (ancestors.TryPeek(out var ancestor) && ancestor.HeadingLevel >= level)
+        {
+          ancestors.Pop();
+        }
+
+        var builder = new FakeOutlineBuilder(
+          heading.Title,
+          level,
+          heading.Destination);
+        if (ancestors.TryPeek(out var parent))
+        {
+          parent.Children.Add(builder);
+        }
+        else
+        {
+          roots.Add(builder);
+        }
+        ancestors.Push(builder);
+      }
+
+      return roots.Select(builder => builder.ToNode()).ToArray();
+    }
+
+    private static FakePrintRenderSnapshot BuildPrintRender(
+      FsusWebViewPdfExportOptions options,
+      IReadOnlyList<FakeSemanticHeading> headings)
+    {
+      var pageBackground = options.Theme == FsusWebViewPrintTheme.Dark
+        ? "#121214"
+        : "#FFFFFF";
+      var textColor = options.Theme == FsusWebViewPrintTheme.Dark
+        ? "#F0F0F4"
+        : "#0F0F11";
+      var runs = headings.Select((heading, index) =>
+      {
+        var level = int.Parse(heading.Tag.AsSpan(1));
+        return new FakePrintedHeading(
+          heading.Title,
+          level,
+          heading.Destination,
+          (index / 3) + 1,
+          72 + ((index % 3) * 96),
+          Math.Max(14, 26 - (level * 2)));
+      }).ToArray();
+      return new FakePrintRenderSnapshot(
+        pageBackground,
+        textColor,
+        options.PrintBackgrounds,
+        runs);
+    }
+  }
+
+  private sealed record FakeSemanticHeading(
+    string Tag,
+    string Title,
+    string Destination);
+
+  private sealed record FakePrintedHeading(
+    string Title,
+    int HeadingLevel,
+    string Destination,
+    int Page,
+    int Top,
+    int FontSize);
+
+  private sealed record FakePrintRenderSnapshot(
+    string PageBackground,
+    string TextColor,
+    bool PrintBackgrounds,
+    IReadOnlyList<FakePrintedHeading> HeadingRuns);
+
+  private sealed class FakeOutlineBuilder(
+    string title,
+    int headingLevel,
+    string destination)
+  {
+    public string Title { get; } = title;
+    public int HeadingLevel { get; } = headingLevel;
+    public string Destination { get; } = destination;
+    public List<FakeOutlineBuilder> Children { get; } = [];
+
+    public FsusWebViewDocumentOutlineNode ToNode() => new()
+    {
+      Title = Title,
+      HeadingLevel = HeadingLevel,
+      Destination = Destination,
+      Children = Children.Select(child => child.ToNode()).ToArray(),
+    };
   }
 }

@@ -117,7 +117,6 @@ public sealed record FsusWebViewCapabilities
   public bool ReplaceWord { get; init; }
   public bool AddToDictionary { get; init; }
   public bool NativeContextMenu { get; init; }
-  public bool DeveloperTools { get; init; }
   public bool TaggedPdf { get; init; }
   public bool DocumentOutline { get; init; }
 }
@@ -172,9 +171,6 @@ public interface IFsusWebViewBackendAdapter
 
   ValueTask<FsusWebViewCommandResult> ExecuteContextCommandAsync(
     FsusWebViewContextCommandRequest request,
-    CancellationToken cancellationToken = default);
-
-  ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
     CancellationToken cancellationToken = default);
 
   ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
@@ -258,19 +254,6 @@ public sealed class FsusWebViewAdapter : IDisposable
     return backend.ExecuteContextCommandAsync(request, cancellationToken);
   }
 
-  public ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
-    CancellationToken cancellationToken = default)
-  {
-    ObjectDisposedException.ThrowIf(disposed, this);
-    if (!Capabilities.DeveloperTools)
-    {
-      return ValueTask.FromResult(FsusWebViewCommandResult.Unsupported(
-        "Developer tools are unavailable in this backend or build."));
-    }
-
-    return backend.OpenDeveloperToolsAsync(cancellationToken);
-  }
-
   public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
     FsusWebViewPdfExportOptions options,
     Stream destination,
@@ -296,26 +279,37 @@ public sealed class FsusWebViewAdapter : IDisposable
 
     cancellationToken.ThrowIfCancellationRequested();
     var start = destination.CanSeek ? destination.Position : (long?)null;
-    var result = await backend.ExportPdfAsync(options, destination, cancellationToken);
+    var startLength = destination.CanSeek ? destination.Length : (long?)null;
+    using var proof = new PdfProofStream(destination);
+    var result = await backend.ExportPdfAsync(options, proof, cancellationToken);
     cancellationToken.ThrowIfCancellationRequested();
     var destinationLeftOpen = IsStreamWritable(destination);
-    if (!destinationLeftOpen || !IsValidPdfResult(options, result))
+    var bytesWritten = BytesWritten(destination, start, proof.BytesWritten);
+    var invalidDetail = InvalidPdfResultDetail(
+      options,
+      result,
+      destination,
+      start,
+      startLength,
+      proof,
+      bytesWritten);
+    if (!destinationLeftOpen || invalidDetail is not null)
     {
       return result with
       {
         Status = FsusWebViewCommandStatus.InvalidBackendResult,
         DestinationLeftOpen = destinationLeftOpen,
-        BytesWritten = BytesWritten(destination, start, result.BytesWritten),
+        BytesWritten = bytesWritten,
         Detail = destinationLeftOpen
-          ? "The backend did not prove the requested tagged-PDF or clickable outline result."
-          : "The backend closed the caller-owned PDF destination stream.",
+          ? invalidDetail
+          : "The caller-owned PDF destination stream is no longer writable.",
       };
     }
 
     return result with
     {
       DestinationLeftOpen = true,
-      BytesWritten = BytesWritten(destination, start, result.BytesWritten),
+      BytesWritten = bytesWritten,
     };
   }
 
@@ -358,7 +352,9 @@ public sealed class FsusWebViewAdapter : IDisposable
       AddAction(
         menu,
         $"replace:{menuCommands.Count}",
-        suggestion.AccessibleName,
+        string.IsNullOrWhiteSpace(suggestion.AccessibleName)
+          ? suggestion.Replacement
+          : suggestion.AccessibleName,
         new FsusWebViewContextCommandRequest
         {
           Command = FsusWebViewContextCommand.ReplaceWord,
@@ -432,7 +428,9 @@ public sealed class FsusWebViewAdapter : IDisposable
   {
     var suggestionDataUnavailable =
       !Capabilities.SpellingSuggestions ||
-      request.SpellingSuggestions.Count == 0;
+      string.IsNullOrWhiteSpace(request.MisspelledWord) ||
+      !request.SpellingSuggestions.Any(
+        suggestion => !string.IsNullOrWhiteSpace(suggestion.Replacement));
     if (
       !suggestionDataUnavailable ||
       !request.NativeMenuFallbackAvailable ||
@@ -525,24 +523,91 @@ public sealed class FsusWebViewAdapter : IDisposable
     Detail = detail,
   };
 
-  private static bool IsValidPdfResult(
+  private static string? InvalidPdfResultDetail(
     FsusWebViewPdfExportOptions options,
-    FsusWebViewPdfExportResult result)
+    FsusWebViewPdfExportResult result,
+    Stream destination,
+    long? start,
+    long? startLength,
+    PdfProofStream proof,
+    long bytesWritten)
   {
     if (result.Status != FsusWebViewCommandStatus.Succeeded)
     {
-      return true;
+      return null;
+    }
+
+    if (proof.DisposeAttempted)
+    {
+      return "The backend attempted to close the caller-owned PDF destination stream.";
+    }
+
+    if (
+      result.BytesWritten <= 0 ||
+      proof.BytesWritten <= 0 ||
+      bytesWritten <= 0 ||
+      result.BytesWritten != proof.BytesWritten)
+    {
+      return "The backend did not prove a non-empty PDF write.";
+    }
+
+    if (
+      !start.HasValue ||
+      !startLength.HasValue ||
+      !destination.CanSeek ||
+      !destination.CanRead ||
+      destination.Length <= startLength.Value)
+    {
+      return "The destination did not expose readable, seekable PDF growth for verification.";
     }
 
     if (options.GenerateTaggedPdf && !result.TaggedPdfApplied)
     {
-      return false;
+      return "The backend did not prove the requested tagged-PDF result.";
     }
 
-    return !options.GenerateDocumentOutline ||
-      result.DocumentOutlineApplied &&
-      result.Outline.Count > 0 &&
-      result.Outline.All(IsValidOutlineNode);
+    if (
+      options.GenerateDocumentOutline &&
+      (!result.DocumentOutlineApplied ||
+        result.Outline.Count == 0 ||
+        !result.Outline.All(IsValidOutlineNode)))
+    {
+      return "The backend did not prove the requested clickable outline result.";
+    }
+
+    var content = ReadWrittenPdf(destination, start.Value, bytesWritten);
+    if (
+      content is null ||
+      !content.StartsWith("%PDF-", StringComparison.Ordinal) ||
+      !content.Contains("%%EOF", StringComparison.Ordinal))
+    {
+      return "The destination does not contain a complete PDF structure.";
+    }
+
+    if (
+      options.GenerateTaggedPdf &&
+      !content.Contains("/StructTreeRoot", StringComparison.Ordinal))
+    {
+      return "The PDF structure does not contain the requested tag tree.";
+    }
+
+    if (options.GenerateDocumentOutline)
+    {
+      if (!content.Contains("/Outlines", StringComparison.Ordinal))
+      {
+        return "The PDF structure does not contain the requested outline tree.";
+      }
+
+      foreach (var node in result.Outline.SelectMany(FlattenOutline))
+      {
+        if (!content.Contains($"/Dest ({node.Destination})", StringComparison.Ordinal))
+        {
+          return $"The PDF structure is missing outline destination '{node.Destination}'.";
+        }
+      }
+    }
+
+    return null;
   }
 
   private static bool IsValidOutlineNode(FsusWebViewDocumentOutlineNode node) =>
@@ -551,6 +616,46 @@ public sealed class FsusWebViewAdapter : IDisposable
     !string.IsNullOrWhiteSpace(node.Destination) &&
     node.Children.All((child) =>
       child.HeadingLevel > node.HeadingLevel && IsValidOutlineNode(child));
+
+  private static IEnumerable<FsusWebViewDocumentOutlineNode> FlattenOutline(
+    FsusWebViewDocumentOutlineNode node)
+  {
+    yield return node;
+    foreach (var child in node.Children.SelectMany(FlattenOutline))
+    {
+      yield return child;
+    }
+  }
+
+  private static string? ReadWrittenPdf(Stream destination, long start, long count)
+  {
+    if (count > int.MaxValue)
+    {
+      return null;
+    }
+
+    var position = destination.Position;
+    try
+    {
+      destination.Position = start;
+      var buffer = new byte[(int)count];
+      var offset = 0;
+      while (offset < buffer.Length)
+      {
+        var read = destination.Read(buffer, offset, buffer.Length - offset);
+        if (read == 0)
+        {
+          return null;
+        }
+        offset += read;
+      }
+      return System.Text.Encoding.ASCII.GetString(buffer);
+    }
+    finally
+    {
+      destination.Position = position;
+    }
+  }
 
   private static bool IsStreamWritable(Stream destination)
   {
@@ -575,6 +680,75 @@ public sealed class FsusWebViewAdapter : IDisposable
     catch (ObjectDisposedException)
     {
       return Math.Max(0, reported);
+    }
+  }
+
+  private sealed class PdfProofStream(Stream destination) : Stream
+  {
+    public long BytesWritten { get; private set; }
+    public bool DisposeAttempted { get; private set; }
+
+    public override bool CanRead => destination.CanRead;
+    public override bool CanSeek => destination.CanSeek;
+    public override bool CanWrite => destination.CanWrite;
+    public override long Length => destination.Length;
+    public override long Position
+    {
+      get => destination.Position;
+      set => destination.Position = value;
+    }
+
+    public override void Flush() => destination.Flush();
+    public override Task FlushAsync(CancellationToken cancellationToken) =>
+      destination.FlushAsync(cancellationToken);
+    public override int Read(byte[] buffer, int offset, int count) =>
+      destination.Read(buffer, offset, count);
+    public override long Seek(long offset, SeekOrigin origin) =>
+      destination.Seek(offset, origin);
+    public override void SetLength(long value) => destination.SetLength(value);
+
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+      destination.Write(buffer, offset, count);
+      BytesWritten += count;
+    }
+
+    public override void Write(ReadOnlySpan<byte> buffer)
+    {
+      destination.Write(buffer);
+      BytesWritten += buffer.Length;
+    }
+
+    public override async ValueTask WriteAsync(
+      ReadOnlyMemory<byte> buffer,
+      CancellationToken cancellationToken = default)
+    {
+      await destination.WriteAsync(buffer, cancellationToken);
+      BytesWritten += buffer.Length;
+    }
+
+    public override async Task WriteAsync(
+      byte[] buffer,
+      int offset,
+      int count,
+      CancellationToken cancellationToken)
+    {
+      await destination.WriteAsync(buffer.AsMemory(offset, count), cancellationToken);
+      BytesWritten += count;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+      if (disposing)
+      {
+        DisposeAttempted = true;
+      }
+    }
+
+    public override ValueTask DisposeAsync()
+    {
+      DisposeAttempted = true;
+      return ValueTask.CompletedTask;
     }
   }
 }

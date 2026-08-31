@@ -151,6 +151,7 @@ internal static class Program
         .AsTask()
         .GetAwaiter()
         .GetResult();
+      var webViewAdapterReady = ExerciseWebViewAdapter();
       var documents = new FsusDocumentTabs();
       documents.AddDocument(new FsusDocumentTab
       {
@@ -245,6 +246,7 @@ internal static class Program
               report.MarkdownProjectionProducerReady =
                 projectionCommit.Accepted &&
                 markdownEditor.CapabilityState == "aligned";
+              report.WebViewAdapterReady = webViewAdapterReady;
               report.ActivitySectionCount = activityShell.Sections.Count;
               report.DocumentCount = documents.Documents.Count;
               report.TitleBarPlatform = titleBar.EffectivePlatform.ToString();
@@ -259,7 +261,8 @@ internal static class Program
                 report.ActivitySectionCount == 1 &&
                 report.DocumentCount == 1 &&
                 report.CodeEditorReady &&
-                report.MarkdownProjectionProducerReady
+                report.MarkdownProjectionProducerReady &&
+                report.WebViewAdapterReady
                   ? 0
                   : 1;
               if (report.ExitCode != 0)
@@ -441,6 +444,61 @@ internal static class Program
     return control;
   }
 
+  private static bool ExerciseWebViewAdapter()
+  {
+    var backend = new AotWebViewBackend();
+    using var adapter = new FsusWebViewAdapter(backend);
+    FsusWebViewContextMenuRequest? observed = null;
+    adapter.ContextMenuRequested += (_, args) => observed = args.Request;
+    var contextRequest = new FsusWebViewContextMenuRequest
+    {
+      Origin = FsusWebViewContextMenuOrigin.Keyboard,
+      ViewportPoint = new FsusWebViewViewportPoint(24, 48),
+      IsEditable = true,
+      HasSelection = true,
+      EditCapabilities = FsusWebViewEditCapabilities.Copy |
+        FsusWebViewEditCapabilities.RichCopy,
+      MisspelledWord = "teh",
+      SpellingSuggestions =
+      [
+        new FsusWebViewSpellingSuggestion("the", "Replace with the"),
+      ],
+    };
+    backend.RaiseContextMenu(contextRequest);
+    var command = adapter.ExecuteContextCommandAsync(
+        new FsusWebViewContextCommandRequest
+        {
+          Command = FsusWebViewContextCommand.ReplaceWord,
+          Replacement = "the",
+          ViewportPoint = contextRequest.ViewportPoint,
+        })
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    using var destination = new MemoryStream();
+    var pdf = adapter.ExportPdfAsync(
+        new FsusWebViewPdfExportOptions
+        {
+          GenerateTaggedPdf = true,
+          GenerateDocumentOutline = true,
+          Theme = FsusWebViewPrintTheme.Dark,
+        },
+        destination)
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    return ReferenceEquals(observed, contextRequest) &&
+      command.Succeeded &&
+      backend.LastCommand?.Replacement == "the" &&
+      pdf.Status == FsusWebViewCommandStatus.Succeeded &&
+      pdf.TaggedPdfApplied &&
+      pdf.DocumentOutlineApplied &&
+      pdf.DestinationLeftOpen &&
+      destination.CanWrite &&
+      destination.Length == pdf.BytesWritten &&
+      pdf.Outline is [{ HeadingLevel: 1, Destination: "heading-aot" }];
+  }
+
   private static int Fail(string kind, Exception error)
   {
     report.ExitCode = 1;
@@ -583,6 +641,66 @@ internal sealed class AotProjectionProducer(
   }
 }
 
+internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
+{
+  public FsusWebViewCapabilities Capabilities { get; } = new()
+  {
+    Platform = FsusWebViewPlatform.Linux,
+    SpellingSuggestions = true,
+    ReplaceWord = true,
+    AddToDictionary = true,
+    NativeContextMenu = true,
+    TaggedPdf = true,
+    DocumentOutline = true,
+  };
+
+  public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested;
+  public FsusWebViewContextCommandRequest? LastCommand { get; private set; }
+
+  public void RaiseContextMenu(FsusWebViewContextMenuRequest request) =>
+    ContextMenuRequested?.Invoke(
+      this,
+      new FsusWebViewContextMenuRequestedEventArgs(request));
+
+  public ValueTask<FsusWebViewCommandResult> ExecuteContextCommandAsync(
+    FsusWebViewContextCommandRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    LastCommand = request;
+    return ValueTask.FromResult(new FsusWebViewCommandResult(
+      FsusWebViewCommandStatus.Succeeded));
+  }
+
+  public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
+    FsusWebViewPdfExportOptions options,
+    Stream destination,
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    var bytes = System.Text.Encoding.ASCII.GetBytes(
+      "%PDF-1.7\n/StructTreeRoot\n/Outlines\n/Dest (heading-aot)\n%%EOF\n");
+    await destination.WriteAsync(bytes, cancellationToken);
+    return new FsusWebViewPdfExportResult
+    {
+      Status = FsusWebViewCommandStatus.Succeeded,
+      TaggedPdfApplied = options.GenerateTaggedPdf,
+      DocumentOutlineApplied = options.GenerateDocumentOutline,
+      DestinationLeftOpen = destination.CanWrite,
+      BytesWritten = bytes.Length,
+      Outline =
+      [
+        new FsusWebViewDocumentOutlineNode
+        {
+          Title = "AOT",
+          HeadingLevel = 1,
+          Destination = "heading-aot",
+        },
+      ],
+    };
+  }
+}
+
 internal sealed class ThirdPartyTextAdapter(TextBox control) : IFsusFormFieldAdapter
 {
   public FsusFormFieldAdapterCapabilities Capabilities =>
@@ -656,6 +774,7 @@ internal sealed record SmokeReport
   public int CommandPaletteTreeCount { get; set; }
   public bool CodeEditorReady { get; set; }
   public bool MarkdownProjectionProducerReady { get; set; }
+  public bool WebViewAdapterReady { get; set; }
   public int ActivitySectionCount { get; set; }
   public int DocumentCount { get; set; }
   public string? TitleBarPlatform { get; set; }

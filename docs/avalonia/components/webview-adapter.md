@@ -47,17 +47,12 @@ The edit commands are `Cut`, `Copy`, `Paste`, `RichCopy`, `CopyHtml`,
 `UseNativeMenu`. Backend implementations keep the corresponding DOM command or
 native API inside the backend boundary.
 
-## Spelling and developer tools
+## Spelling
 
 `FsusWebViewCapabilities` separately advertises spelling suggestions,
 replacement, dictionary insertion, and native-menu fallback. A backend must
 not populate a capability merely because its private implementation contains a
 similar hook.
-
-`OpenDeveloperToolsAsync` is platform neutral and intended for debug tooling.
-When `DeveloperTools` is false, the facade returns an explicit `Unsupported`
-result without invoking the backend. Consumers must not use reflection or
-depend on private backend types to bypass that result.
 
 ## Tagged PDF and document outline
 
@@ -71,8 +66,11 @@ Successful outline export must return a non-empty tree of
 `FsusWebViewDocumentOutlineNode` values. Every node has an `h1`-through-`h6`
 level and a non-empty clickable destination, and every child has a deeper
 heading level than its parent. A backend that reports success without proving
-the requested tagged-PDF or outline result is converted to
-`InvalidBackendResult` rather than silently accepted.
+positive bytes written, stream growth, the requested PDF structures, and every
+returned outline destination is converted to `InvalidBackendResult` rather
+than silently accepted. A successful proof therefore requires a readable,
+seekable destination; a writable-only stream remains caller-owned but cannot
+prove the exported structure and fails closed.
 
 The destination stream always remains caller-owned and open. Cancellation is
 observed before backend dispatch and after backend completion. `Theme` carries
@@ -98,7 +96,7 @@ and is compatible with the package's Native AOT boundary.
 ## Verification boundary
 
 The repository provides deterministic adapter simulations for context-menu,
-spelling, developer-tools, Windows/Linux PDF, cancellation, stream ownership,
-tag markers, and hierarchical clickable-outline results. Those simulations
+spelling, Windows/Linux PDF, cancellation, stream ownership, semantic
+`h1`-through-`h6` tag markers, and hierarchical clickable-outline results. Those simulations
 verify the public contract and fail-closed behavior; they are not evidence that
 an external WebView engine executed in the current environment.
