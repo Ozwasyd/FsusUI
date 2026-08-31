@@ -95,7 +95,10 @@ import {
   stabilizeMarkdownEditorProjection,
 } from '@element-plus/wasm'
 import { activateMarkdownHeavyFeatures } from '../../../wasm/markdown-heavy-feature-activation'
-import { createMarkdownHeavyFeatureIsolatedRender } from '../../../wasm/markdown-heavy-feature-isolated-client'
+import {
+  createMarkdownHeavyFeatureIsolatedRender,
+  scheduleMarkdownHeavyFeatureFrameContinue,
+} from '../../../wasm/markdown-heavy-feature-isolated-client'
 import { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from '../../../wasm/markdown-feature-output-gateway'
 import { deriveMarkdownEditorChange } from '../../../wasm/markdown-syntax-identity'
 import { isFsusErr, toFsusError } from '@element-plus/utils'
@@ -1049,11 +1052,13 @@ const activateRenderedFeatures = async (
     const handle = createMarkdownHeavyFeatureIsolatedRender(
       request,
       props.trustedScriptUrlFactory,
-      (key, run) =>
-        frameScheduler.schedule({
+      (key, run, drop) =>
+        scheduleMarkdownHeavyFeatureFrameContinue(
+          frameScheduler,
           key,
-          mutate: run,
-        }),
+          run,
+          drop,
+        ),
     )
     return Object.freeze({
       ...handle,

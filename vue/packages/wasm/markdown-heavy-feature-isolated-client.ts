@@ -18,7 +18,54 @@ export type MarkdownHeavyFeatureTrustedScriptUrlFactory = (
 export type MarkdownHeavyFeatureFrameContinueScheduler = (
   key: string,
   run: () => void,
-) => boolean
+  drop: () => void,
+) => (() => void) | null
+
+interface MarkdownHeavyFeatureFrameSchedulerTask {
+  readonly key: string
+  readonly mutate?: () => void
+  readonly postPaint?: () => void
+}
+
+interface MarkdownHeavyFeatureFrameSchedulerAuthority {
+  readonly cancel: (key: string) => void
+  readonly schedule: (task: MarkdownHeavyFeatureFrameSchedulerTask) => boolean
+}
+
+export const scheduleMarkdownHeavyFeatureFrameContinue = (
+  scheduler: MarkdownHeavyFeatureFrameSchedulerAuthority,
+  key: string,
+  run: () => void,
+  drop: () => void,
+) => {
+  const gateKey = `${key}:gate`
+  const dispatchKey = `${key}:dispatch`
+  let cancelled = false
+  const cancel = () => {
+    if (cancelled) return
+    cancelled = true
+    scheduler.cancel(gateKey)
+    scheduler.cancel(dispatchKey)
+  }
+  const accepted = scheduler.schedule({
+    key: gateKey,
+    postPaint: () => {
+      if (cancelled) return
+      if (
+        !scheduler.schedule({
+          key: dispatchKey,
+          mutate: () => {
+            if (!cancelled) run()
+          },
+        })
+      ) {
+        cancel()
+        drop()
+      }
+    },
+  })
+  return accepted ? cancel : null
+}
 
 const createCapability = () => {
   const cryptoApi = globalThis.crypto
@@ -55,11 +102,16 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
   }
   const capability = createCapability()
   let active = true
+  let cancelScheduledContinue: (() => void) | null = null
   let port: MessagePort | null = null
   let script: HTMLScriptElement | null = null
   const iframe = document.createElement('iframe')
   iframe.setAttribute('aria-hidden', 'true')
   iframe.setAttribute('tabindex', '-1')
+  iframe.dataset.fsusMarkdownHeavyPending = validatedRequest.kind
+  if (validatedRequest.lifecycleKey) {
+    iframe.dataset.fsusMarkdownHeavyNode = validatedRequest.lifecycleKey
+  }
   iframe.style.display = 'none'
   document.body.append(iframe)
 
@@ -72,6 +124,8 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
 
   const removeReadyListener = () => window.removeEventListener('message', ready)
   const cleanup = () => {
+    cancelScheduledContinue?.()
+    cancelScheduledContinue = null
     removeReadyListener()
     if (script) script.onerror = null
     script = null
@@ -111,9 +165,6 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
       }
       if (message.data.type === 'started') {
         iframe.dataset.fsusMarkdownHeavyWork = validatedRequest.kind
-        if (validatedRequest.lifecycleKey) {
-          iframe.dataset.fsusMarkdownHeavyNode = validatedRequest.lifecycleKey
-        }
         const continueRender = () => {
           if (!active) return
           port?.postMessage({
@@ -122,15 +173,14 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
             type: 'continue',
           })
         }
-        if (
-          scheduleContinue &&
-          !scheduleContinue(
+        if (scheduleContinue) {
+          cancelScheduledContinue = scheduleContinue(
             `markdown-heavy-frame-continue:${validatedRequest.lifecycleKey ?? capability}`,
             continueRender,
+            teardown,
           )
-        ) {
-          teardown()
-        } else if (!scheduleContinue) {
+          if (!cancelScheduledContinue) teardown()
+        } else {
           continueRender()
         }
         return

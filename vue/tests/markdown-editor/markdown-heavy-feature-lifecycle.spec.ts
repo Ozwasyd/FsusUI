@@ -84,8 +84,10 @@ type HeavyLifecycleAbortProbe = () => Promise<{
 }>
 
 const readMetrics = async (page: Page) =>
-  page.locator('[data-markdown-renderer="wasm"]').evaluate((element) => {
-    const encoded = (element as HTMLElement).dataset.markdownHeavyLifecycle
+  page.evaluate(() => {
+    const encoded = document.querySelector<HTMLElement>(
+      '[data-markdown-renderer="wasm"]',
+    )?.dataset.markdownHeavyLifecycle
     return encoded ? (JSON.parse(encoded) as LifecycleMetrics) : null
   })
 
@@ -178,16 +180,20 @@ const runAtCodeAdapterStarted = (
   page: Page,
   start: Parameters<HeavyLifecycleTransition>[0],
   action: CodeAdapterStartedAction,
+  phase: 'pending' | 'started' = 'started',
 ) =>
   page.evaluate(
-    async ({ action: nextAction, start: startInput }) => {
+    async ({ action: nextAction, phase: targetPhase, start: startInput }) => {
       const fixture = window.__FSUSUI_PERFORMANCE_FIXTURE__ as
         | { markdownHeavyLifecycleTransition?: HeavyLifecycleTransition }
         | undefined
       if (!fixture?.markdownHeavyLifecycleTransition) {
         throw new Error('markdown_heavy_lifecycle_transition_unavailable')
       }
-      const selector = 'iframe[data-fsus-markdown-heavy-work="code-highlight"]'
+      const selector =
+        targetPhase === 'pending'
+          ? 'iframe[data-fsus-markdown-heavy-pending="code-highlight"]'
+          : 'iframe[data-fsus-markdown-heavy-work="code-highlight"]'
       const readFrameCount = () => document.querySelectorAll(selector).length
       const readStartedSnapshot = (count: number) => {
         const renderer = document.querySelector<HTMLElement>(
@@ -276,7 +282,7 @@ const runAtCodeAdapterStarted = (
       }
       return snapshot
     },
-    { action, start },
+    { action, phase, start },
   )
 
 test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
@@ -906,7 +912,7 @@ test('preserves heavy atomic source entry, Escape, and focus return in the real 
   }
 })
 
-test('aborts real pending adapter work on interaction exit and virtual unmount', async ({
+test('aborts real pending adapter work on interaction exits', async ({
   page,
 }) => {
   await page.goto(
@@ -1026,9 +1032,38 @@ test('aborts real pending adapter work on interaction exit and virtual unmount',
   await expect
     .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
     .toBe(0)
+  await expect(activeFrame).toHaveCount(0)
+})
+
+test('aborts real pending adapter work on virtual unmount', async ({
+  page,
+}) => {
+  await page.goto(
+    '/?visual=basic&theme=light&performance=markdown-heavy-feature-lifecycle&size=100000',
+    { waitUntil: 'domcontentloaded' },
+  )
+  const fixture = page.locator(
+    '[data-performance-scenario="markdown-heavy-feature-lifecycle"]',
+  )
+  const renderer = page.locator('[data-markdown-renderer="wasm"]')
+  const activeFrame = page.locator(
+    'iframe[data-fsus-markdown-heavy-work="code-highlight"]',
+  )
+  await expect(fixture).toHaveAttribute('data-performance-ready', 'true')
+  await expect
+    .poll(async () => (await readMetrics(page))?.cacheEntries ?? 0, {
+      timeout: 60_000,
+    })
+    .toBeGreaterThan(0)
+  await expect.poll(async () => (await readMetrics(page))?.active ?? -1).toBe(0)
+  const baseline = (await readMetrics(page))!
 
   const restoredPendingInput = {
-    ...pendingInput,
+    codeHighlight: true,
+    documentEpoch: 1,
+    documentKey: 'heavy-document-a',
+    latex: false,
+    mermaid: false,
     revision: 4,
     sourcePrefix: [
       '```csharp',
@@ -1044,6 +1079,7 @@ test('aborts real pending adapter work on interaction exit and virtual unmount',
     page,
     restoredPendingInput,
     { kind: 'scroll-bottom' },
+    'pending',
   )
   expect(restoredPendingSnapshot.count).toBeGreaterThan(0)
   expect(restoredPendingSnapshot.fullVirtualIndexReady).toBe(true)
@@ -1052,7 +1088,7 @@ test('aborts real pending adapter work on interaction exit and virtual unmount',
   expect(restoredPendingSnapshot.sourceUnitKey).not.toBe('')
   expect(restoredPendingSnapshot.metrics?.retainedTasks).toBeGreaterThan(0)
   expect(restoredPendingSnapshot.metrics!.activations).toBeGreaterThan(
-    afterInteractionExit.activations,
+    baseline.activations,
   )
   expect(restoredPendingSnapshot.nodeKeys.length).toBeGreaterThan(0)
 
@@ -1118,11 +1154,8 @@ test('aborts real pending adapter work on interaction exit and virtual unmount',
     )
     .toBeGreaterThan(restoredPendingSnapshot.metrics!.unmounted)
   await expect
-    .poll(
-      async () =>
-        (await readMetrics(page))?.aborts ?? afterInteractionExit.aborts,
-    )
-    .toBeGreaterThan(afterInteractionExit.aborts)
+    .poll(async () => (await readMetrics(page))?.aborts ?? baseline.aborts)
+    .toBeGreaterThan(baseline.aborts)
   await expect
     .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
     .toBe(0)
@@ -1132,7 +1165,6 @@ test('aborts real pending adapter work on interaction exit and virtual unmount',
   expect((await readMetrics(page))?.identity?.revision).toBe(
     `heavy-lifecycle-${restoredPendingInput.revision}`,
   )
-  await expect(renderer).not.toContainText('staleLifecycleMarker_0')
 
   await transition(page, {
     codeHighlight: true,
