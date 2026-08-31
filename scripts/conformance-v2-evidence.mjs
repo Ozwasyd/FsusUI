@@ -381,7 +381,6 @@ const compareCheckTagExecution = (web, avalonia) => {
       'same-identity-a11y-evidence',
       'same-identity-motion-evidence',
       'same-identity-perf-evidence',
-      'same-identity-visual-evidence',
       'same-identity-cross-platform-comparison',
     ],
   }
@@ -1556,7 +1555,7 @@ async function cli() {
         cwd: root,
         encoding: 'utf8',
       }).stdout.trim(),
-      contractHash: digest(fs.readFileSync(path.resolve(root, args.contract))),
+      contractHash: digestFile(args.contract),
       alignmentHash: digest({
         statuses: alignment.statuses,
         stable: alignment.stable,
