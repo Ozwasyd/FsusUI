@@ -494,14 +494,22 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     sourcePrefix: `Stable prefix inserted before repeated technical nodes.\n\n${repeatedCodePrefix}`,
     theme: 'light',
   })
+  let afterSourceRevision: LifecycleMetrics | undefined
   await expect
-    .poll(async () => (await readMetrics(page))?.identity?.revision)
-    .toBe('heavy-lifecycle-3')
-  const afterSourceRevision = (await readMetrics(page))!
-  expect(
-    afterSourceRevision.projectionNodeIds['code-highlight']!.slice(0, 2),
-  ).toEqual(repeatedCodeNodeIds.slice(0, 2))
-  await expect.poll(async () => (await readMetrics(page))?.active ?? -1).toBe(0)
+    .poll(async () => {
+      const snapshot = await readMetrics(page)
+      if (
+        snapshot?.identity?.revision !== 'heavy-lifecycle-3' ||
+        snapshot.active !== 0 ||
+        snapshot.retainedResources !== 0
+      ) {
+        return null
+      }
+      afterSourceRevision = snapshot
+      return snapshot.projectionNodeIds['code-highlight']?.slice(0, 2) ?? null
+    })
+    .toEqual(repeatedCodeNodeIds.slice(0, 2))
+  expect(afterSourceRevision).toBeDefined()
 
   const beforeIdentitySwitches = (await readMetrics(page))!
   await transition(page, {
@@ -520,7 +528,7 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     revision: 'heavy-lifecycle-3',
   })
   expect(afterDocumentSwitch.identity!.nodeId).not.toBe(
-    afterSourceRevision.identity!.nodeId,
+    afterSourceRevision!.identity!.nodeId,
   )
 
   await transition(page, {
