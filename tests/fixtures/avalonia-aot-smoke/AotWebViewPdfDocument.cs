@@ -17,7 +17,7 @@ internal static class AotWebViewPdfDocument
     objects[8] = "<< /Type /StructElem /S /H1 /P 7 0 R /Pg 3 0 R /K 0 /T (AOT) /Title (AOT) /Parent 6 0 R /Dest (heading-aot) >>";
     objects[9] = "<< /Names [(heading-aot) [3 0 R /XYZ 72 720 0]] >>";
 
-    var builder = new StringBuilder("%PDF-1.7\n%PDF-AOT\n");
+    var builder = new StringBuilder("%PDF-1.7\n%\0PDF-BINARY-AOT\n");
     var offsets = new int[objects.Length];
     for (var index = 1; index < objects.Length; index++)
     {

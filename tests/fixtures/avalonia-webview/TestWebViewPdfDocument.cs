@@ -82,7 +82,7 @@ internal static class TestWebViewPdfDocument
     objects[18] = StreamObject(pageTwo);
     objects[19] = $"<< /Producer (FsusUI deterministic WebView backend simulation) /PageBackground ({(dark ? "#121214" : "#FFFFFF")}) /TextColor ({(dark ? "#F0F0F4" : "#0F0F11")}) /PrintBackgrounds true >>";
 
-    var builder = new StringBuilder("%PDF-1.7\n%\xE2\xE3\xCF\xD3\n");
+    var builder = new StringBuilder("%PDF-1.7\n%\0PDF-BINARY\n");
     var offsets = new int[objects.Length];
     for (var index = 1; index < objects.Length; index++)
     {
