@@ -12,7 +12,7 @@
   "captures": [
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-light.png",
-      "sha256": "f4e3ea473f3bbf3122ca29840c9e275351ee0b5d6bbb60c68e150bb73fc6c60b",
+      "sha256": "7550b74eeb660cfc1b3357ac5065c1b82cefe1e45549fc9cd409c50fc05cba2c",
       "width": 640,
       "height": 360,
       "theme": "light",
@@ -20,7 +20,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-dark.png",
-      "sha256": "b5a4211f9e3ec779ed45d4075fdcd99b1228faac845d3715c2da98300fce3b23",
+      "sha256": "f28322f2aa9bb0e69033637e7ba25a64cec17b19ce9b549982ec8ccde3f97e0e",
       "width": 640,
       "height": 360,
       "theme": "dark",
@@ -28,7 +28,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-custom.png",
-      "sha256": "7597d3b9d7d7ab84b2a870ed74c3a1996df28b2c4cf43b341fabbf89261ca10a",
+      "sha256": "907456032b786b54b9b5042ae1181667f16c9cadef64967249c99d766084222e",
       "width": 640,
       "height": 360,
       "theme": "light",
@@ -36,7 +36,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-partial-dark.png",
-      "sha256": "a9b6b207f9b97399fc26e01aad7e06f437094492b9296183a0d0b5ad51ad00c6",
+      "sha256": "a6ca9990de9b9c844e3d3ed8d0d7e4b58ff5961051ce650f6feb9f76c7504193",
       "width": 640,
       "height": 360,
       "theme": "dark",
@@ -44,11 +44,11 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-highcontrast.png",
-      "sha256": "2ce289f4613c0e9dbc2fd7be14ba7fa6bf6bd122af24f96b1130f954d5808fc0",
+      "sha256": "abe4d616230988413718a7dd9cdbcfc69d480ec89fb5ee7e3a1fc2e22c4a713f",
       "width": 640,
       "height": 360,
       "theme": "highcontrast",
-      "state": "built-in-fallback"
+      "state": "built-in-precedence-over-custom"
     }
   ]
 }

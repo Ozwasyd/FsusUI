@@ -198,7 +198,6 @@ public class FsusThemeManagerHeadlessTests
       Height = 76,
     };
     tree.Nodes.Add(new FsusTreeNode("docs", "docs"));
-    tree.Nodes.Add(new FsusTreeNode("theme", "theme-palette.md"));
     tree.RefreshView();
 
     var select = new FsusSelect
