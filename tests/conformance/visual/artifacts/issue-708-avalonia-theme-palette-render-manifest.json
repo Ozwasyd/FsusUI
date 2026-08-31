@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "issue": 708,
+  "generatedBy": "FsusThemeManagerHeadlessTests.RealHeadlessSkiaRendersPaletteFallbackMatrix",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "productionFixture": true,
+    "inputModes": ["keyboard"],
+    "motionMode": "reduced",
+    "limitations": "Local deterministic headless rendering; no physical display or operating-system assistive technology is claimed."
+  },
+  "captures": [
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-light.png",
+      "sha256": "2778ac74e1b4705a6db0f8f79a63ca6d6ac210ef8ee9b8cf1677dc85c6ded49f",
+      "width": 960,
+      "height": 540,
+      "theme": "light",
+      "state": "built-in-fallback"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-dark.png",
+      "sha256": "677bf7ea53ab2d0b841cc85b31d42ffaa4ae430de54ca539c9d5dadcc4029909",
+      "width": 960,
+      "height": 540,
+      "theme": "dark",
+      "state": "built-in-fallback"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-custom.png",
+      "sha256": "974d75c45c8051a5c2157058b8bc7ce52fb0b54e09d5e6d5a41e69f1aec4330b",
+      "width": 960,
+      "height": 540,
+      "theme": "light",
+      "state": "complete-custom-palette"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-partial-dark.png",
+      "sha256": "1ba0b68807a5ca6820940f49a9cfba8bcde7550355c7a1900811755362cb77c1",
+      "width": 960,
+      "height": 540,
+      "theme": "dark",
+      "state": "partial-custom-with-dark-fallback"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-highcontrast.png",
+      "sha256": "e8d59809dc3ada3131cd0c87768e84a013f60368674748db0177e0e8d87d09cb",
+      "width": 960,
+      "height": 540,
+      "theme": "highcontrast",
+      "state": "built-in-precedence-over-custom"
+    }
+  ]
+}
