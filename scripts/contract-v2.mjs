@@ -35,6 +35,14 @@ export const MARKDOWN_EDITOR_CAPABILITIES = [
 ]
 
 const AVALONIA_MEMBER_BINDINGS = {
+  ElTableV2: {
+    inputs: {
+      cache: { member: 'Overscan' },
+      height: { member: 'ViewportHeight' },
+      maxHeight: { member: 'ViewportMaxHeight' },
+      width: { member: 'ViewportWidth' },
+    },
+  },
   ElCheckTag: {
     outputs: {
       change: { member: 'CheckedChanged', payloadMember: 'NewChecked' },
@@ -297,7 +305,9 @@ export const compareMembers = ({ web, avalonia, kind }) => {
     const webNullable = Boolean(web.nullable)
     const avaloniaNullable = avalonia?.nullable
     const optionalAbsenceMatchesNullable =
-      web.required === false && webNullable === false && avaloniaNullable === true
+      web.required === false &&
+      webNullable === false &&
+      avaloniaNullable === true
     if (
       avaloniaNullable != null &&
       webNullable !== Boolean(avaloniaNullable) &&
@@ -483,8 +493,9 @@ const findAvaloniaType = (componentName, typeIndex) => {
   return null
 }
 
-const matchAvaloniaProperty = (webName, avaloniaType) => {
-  const normalized = normalizeMemberName(webName)
+const matchAvaloniaProperty = (webName, avaloniaType, componentName) => {
+  const binding = memberBinding(componentName, 'inputs', webName)
+  const normalized = normalizeMemberName(binding?.member ?? webName)
   const properties = [
     ...(avaloniaType.avaloniaProperties ?? []),
     ...(avaloniaType.properties ?? []),
@@ -531,7 +542,13 @@ const matchAvaloniaContentProperty = (webName, avaloniaType) => {
   )
 }
 
-const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
+const inputMember = ({
+  componentName,
+  contractKebab,
+  prop,
+  avaloniaType,
+  classification,
+}) => {
   if (!avaloniaType) {
     return {
       name: prop.name,
@@ -551,7 +568,7 @@ const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
             ),
     }
   }
-  const avalonia = matchAvaloniaProperty(prop.name, avaloniaType)
+  const avalonia = matchAvaloniaProperty(prop.name, avaloniaType, componentName)
   let status
   let governance = null
   let drift = emptyDrift()
@@ -971,7 +988,13 @@ const contractForComponent = ({
   const contractKebab = toKebab(component.name)
   const classification = component.classification ?? 'portable'
   const inputs = (component.semantic?.props ?? []).map((prop) =>
-    inputMember({ contractKebab, prop, avaloniaType, classification }),
+    inputMember({
+      componentName: component.name,
+      contractKebab,
+      prop,
+      avaloniaType,
+      classification,
+    }),
   )
   const semanticEmits =
     component.semantic?.emits ??

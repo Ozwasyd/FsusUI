@@ -23650,6 +23650,30 @@
           "isStatic": false
         },
         {
+          "name": "ViewportHeight",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ViewportMaxHeight",
+          "type": "System.Double?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ViewportWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "VirtualizationBudget",
           "type": "FsusUI.Avalonia.Controls.FsusTableV2Budget",
           "nullable": false,

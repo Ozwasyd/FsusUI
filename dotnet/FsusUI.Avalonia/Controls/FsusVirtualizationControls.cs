@@ -741,6 +741,8 @@ public class FsusTableV2 : ContentControl
       if (scrollViewer.Viewport.Width > 0 && scrollViewer.Viewport.Height > 0)
       {
         viewport = scrollViewer.Viewport;
+        ViewportWidth = viewport.Width;
+        ViewportHeight = viewport.Height;
       }
       EnsureRowSizeIndex();
       realizedRowStartIndex = ResolveRowStart(scrollViewer.Offset.Y);
@@ -762,6 +764,9 @@ public class FsusTableV2 : ContentControl
   public string? ExpandColumnKey { get; set; }
   public int RowCount { get; set; }
   public int ColumnCount { get; set; }
+  public double ViewportWidth { get; set; } = 960d;
+  public double ViewportHeight { get; set; } = 480d;
+  public double? ViewportMaxHeight { get; set; }
   public double RowHeight { get; set; } = 32d;
   public double? EstimatedRowHeight { get; set; }
   public double ColumnWidth { get; set; } = 120d;
@@ -825,6 +830,8 @@ public class FsusTableV2 : ContentControl
     viewport = resizer.Viewport.Width <= 0 || resizer.Viewport.Height <= 0
       ? viewport
       : resizer.Viewport;
+    ViewportWidth = viewport.Width;
+    ViewportHeight = viewport.Height;
     scrollViewer.Width = viewport.Width;
     scrollViewer.Height = viewport.Height;
   }
@@ -833,6 +840,11 @@ public class FsusTableV2 : ContentControl
 
   private void RefreshLayout(bool updateScrollViewer)
   {
+    viewport = new Size(
+      Math.Max(1d, ViewportWidth),
+      Math.Max(1d, Math.Min(ViewportHeight, ViewportMaxHeight ?? double.PositiveInfinity)));
+    scrollViewer.Width = viewport.Width;
+    scrollViewer.Height = viewport.Height;
     var rowCount = EffectiveRowCount;
     var columnCount = EffectiveColumnCount;
     EnsureRowSizeIndex();

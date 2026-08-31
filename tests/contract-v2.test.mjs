@@ -93,6 +93,23 @@ test('Vue semantic extraction resolves imported runtime constants', () => {
   assert.equal(input.status, 'aligned-candidate')
 })
 
+test('Table V2 explicit input bindings reference real native members', () => {
+  const table = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-table-v2',
+  )
+  const expected = new Map([
+    ['cache', 'Overscan'],
+    ['height', 'ViewportHeight'],
+    ['maxHeight', 'ViewportMaxHeight'],
+    ['width', 'ViewportWidth'],
+  ])
+  for (const [name, counterpart] of expected) {
+    const input = table.inputs.find((member) => member.name === name)
+    assert.equal(input.avalonia?.member, counterpart)
+    assert.equal(input.status, 'aligned-candidate')
+  }
+})
+
 const replaceAtPath = (value, pointer, replacement) => {
   const segments = pointer
     .split('/')

@@ -201,6 +201,18 @@ const cases = [
     expected: 'FsusUI.Avalonia.semantic.json drifted',
   },
   {
+    id: 'table-v2-input-binding-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        "height: { member: 'ViewportHeight' },",
+        "height: { member: 'ViewportMissing' },",
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
     id: 'auto-resizer-web-disabled-width-mutated',
     file: 'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
     inject: () =>
@@ -308,6 +320,12 @@ const cases = [
       'OnExpandedRowsChange?.Invoke(ExpandedRowKeys.ToArray());',
       '_ = ExpandedRowKeys.Count;',
       'TableV2UsesFixedDataGetterAndExpandedRowCallbacks',
+    ],
+    [
+      'table-v2-viewport-max-height-mutated',
+      'Math.Min(ViewportHeight, ViewportMaxHeight ?? double.PositiveInfinity)',
+      'ViewportHeight',
+      'TableV2MapsViewportGeometryAndCacheToRealLayout',
     ],
   ].map(([id, from, to, test]) => ({
     id,

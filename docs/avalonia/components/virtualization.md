@@ -41,7 +41,10 @@ index and the realized row offsets. `OnRowsRendered`, `OnScroll`, and
 `OnEndReached` report the actual realization and scrolling path. `FixedData`
 rows remain realized, `DataGetter` receives the typed cell context, and
 expanded-row changes update `ExpandedRowKeys` before invoking
-`OnRowExpand`/`OnExpandedRowsChange`.
+`OnRowExpand`/`OnExpandedRowsChange`. The Vue `cache`, `width`, `height`, and
+`maxHeight` inputs bind explicitly to `Overscan`, `ViewportWidth`,
+`ViewportHeight`, and `ViewportMaxHeight`; those values size the owned
+`ScrollViewer` and its realized window.
 
 Measurement corrections before the active anchor adjust the scroll offset so
 the same logical item remains visually stable. `NotifyItemsInserted` preserves

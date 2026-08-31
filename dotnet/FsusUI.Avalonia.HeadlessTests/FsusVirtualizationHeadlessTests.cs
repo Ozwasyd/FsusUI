@@ -405,6 +405,33 @@ public class FsusVirtualizationHeadlessTests
   }
 
   [AvaloniaFact]
+  public void TableV2MapsViewportGeometryAndCacheToRealLayout()
+  {
+    var table = new FsusTableV2
+    {
+      RowCount = 100,
+      ColumnCount = 10,
+      RowHeight = 24,
+      ColumnWidth = 100,
+      ViewportWidth = 220,
+      ViewportHeight = 72,
+      ViewportMaxHeight = 48,
+      Overscan = 0,
+    };
+
+    table.RefreshLayout();
+
+    Assert.Equal(2, table.RealizedRowCount);
+    Assert.Equal(3, table.RealizedColumnCount);
+    Assert.Equal(220, table.ScrollHost.Width);
+    Assert.Equal(48, table.ScrollHost.Height);
+
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(300, 96) });
+    Assert.Equal(300, table.ViewportWidth);
+    Assert.Equal(96, table.ViewportHeight);
+  }
+
+  [AvaloniaFact]
   public async Task TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults()
   {
     var table = new KeyboardTableV2
