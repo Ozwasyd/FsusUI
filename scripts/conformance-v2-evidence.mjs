@@ -1192,6 +1192,94 @@ const receiptCoverageComplete = (contract, receipt) => {
 const toCoverageKind = (kind) =>
   kind === 'contentRegion' ? 'content-region' : kind
 
+const derivedConsumers = (registry, statuses, stable, webOnly, gaps) => {
+  const byContract = registry.consumerBindings?.byContract
+  const releaseScopeFamilies = registry.consumerBindings?.releaseScopeFamilies
+  const componentStatuses = statuses.filter((entry) =>
+    entry.id.startsWith('component-v2.'),
+  )
+  if (componentStatuses.length === 0 && !byContract) {
+    return {
+      galleryStableContractIds: [],
+      galleryStableRoutes: [],
+      galleryStableContractsByRoute: {},
+      docsSupportContractIds: stable,
+      webOnlyContractIds: webOnly,
+      releaseScopeFamilies: [],
+      releaseStableFamilies: [],
+      releaseFamilyGaps: [],
+      alignmentGapCount: gaps.length,
+      nugetStableEligible: gaps.length === 0,
+      releaseReady: gaps.length === 0,
+    }
+  }
+  if (
+    !byContract ||
+    typeof byContract !== 'object' ||
+    !Array.isArray(releaseScopeFamilies)
+  )
+    fail('alignment.consumer bindings missing')
+  const statusByContract = new Map(
+    componentStatuses.map((entry) => [entry.id, entry.status]),
+  )
+  const contractIds = [...statusByContract.keys()].sort()
+  const bindingIds = Object.keys(byContract).sort()
+  same(bindingIds, contractIds, 'alignment.consumer bindings exact contracts')
+
+  const stableContractsByRoute = {}
+  for (const contractId of stable) {
+    if (!contractId.startsWith('component-v2.')) continue
+    const route = byContract[contractId]?.galleryRoute
+    if (!route) fail(`alignment.consumer ${contractId} Gallery route missing`)
+    ;(stableContractsByRoute[route] ??= []).push(contractId)
+  }
+  for (const contracts of Object.values(stableContractsByRoute)) contracts.sort()
+  const galleryStableRoutes = Object.keys(stableContractsByRoute).sort()
+
+  const contractsByReleaseFamily = new Map(
+    releaseScopeFamilies.map((family) => [family, []]),
+  )
+  for (const contractId of contractIds) {
+    const binding = byContract[contractId]
+    if (!binding?.releaseFamily || !binding?.galleryRoute)
+      fail(`alignment.consumer ${contractId} binding incomplete`)
+    const contracts = contractsByReleaseFamily.get(binding.releaseFamily)
+    if (!contracts)
+      fail(
+        `alignment.consumer ${contractId} unknown release family ${binding.releaseFamily}`,
+      )
+    contracts.push(contractId)
+  }
+  const releaseFamilyGaps = []
+  const releaseStableFamilies = []
+  for (const family of [...releaseScopeFamilies].sort()) {
+    const contracts = (contractsByReleaseFamily.get(family) ?? []).sort()
+    if (contracts.length === 0)
+      fail(`alignment.consumer release family ${family} has no contracts`)
+    const blockingContracts = contracts.filter(
+      (contractId) =>
+        !['aligned', 'web-only'].includes(statusByContract.get(contractId)),
+    )
+    if (blockingContracts.length === 0) releaseStableFamilies.push(family)
+    else releaseFamilyGaps.push({ family, blockingContracts })
+  }
+  return {
+    galleryStableContractIds: stable.filter((id) =>
+      id.startsWith('component-v2.'),
+    ),
+    galleryStableRoutes,
+    galleryStableContractsByRoute: stableContractsByRoute,
+    docsSupportContractIds: stable,
+    webOnlyContractIds: webOnly,
+    releaseScopeFamilies: [...releaseScopeFamilies].sort(),
+    releaseStableFamilies,
+    releaseFamilyGaps,
+    alignmentGapCount: gaps.length,
+    nugetStableEligible: gaps.length === 0,
+    releaseReady: gaps.length === 0 && releaseFamilyGaps.length === 0,
+  }
+}
+
 export function deriveAlignment(registry, comparison = null) {
   if (comparison && !validatedComparisons.has(comparison))
     fail('alignment.comparison receipt was not current-validated')
@@ -1253,21 +1341,14 @@ export function deriveAlignment(registry, comparison = null) {
   const webOnly = statuses
     .filter((entry) => entry.status === 'web-only')
     .map((entry) => entry.id)
+  const consumers = derivedConsumers(registry, statuses, stable, webOnly, gaps)
   return {
     schema: 'fsusui.alignment.v2',
     statuses,
     stable,
     webOnly,
     gaps,
-    consumers: {
-      galleryStableFamilies: stable.map((id) =>
-        id.replace(/^component-v2\.el-/, ''),
-      ),
-      docsSupportContractIds: stable,
-      webOnlyContractIds: webOnly,
-      nugetStableEligible: gaps.length === 0,
-      releaseReady: gaps.length === 0,
-    },
+    consumers,
   }
 }
 
@@ -1290,19 +1371,46 @@ export function validateReadiness(alignment, expected = {}) {
     .map((entry) => entry.id)
   same(alignment.stable, expectedStable, 'readiness.stable.derived')
   same(alignment.webOnly, expectedWebOnly, 'readiness.webOnly.derived')
+  if (alignment.consumers?.alignmentGapCount !== alignment.gaps.length)
+    fail('readiness.consumers alignment gap diagnostic mismatch')
   same(
-    alignment.consumers,
-    {
-      galleryStableFamilies: expectedStable.map((id) =>
-        id.replace(/^component-v2\.el-/, ''),
-      ),
-      docsSupportContractIds: expectedStable,
-      webOnlyContractIds: expectedWebOnly,
-      nugetStableEligible: alignment.gaps.length === 0,
-      releaseReady: alignment.gaps.length === 0,
-    },
-    'readiness.consumers.derived',
+    alignment.consumers?.docsSupportContractIds,
+    expectedStable,
+    'readiness.consumers.docs.derived',
   )
+  same(
+    alignment.consumers?.webOnlyContractIds,
+    expectedWebOnly,
+    'readiness.consumers.webOnly.derived',
+  )
+  const routedStable = Object.values(
+    alignment.consumers?.galleryStableContractsByRoute ?? {},
+  )
+    .flat()
+    .sort()
+  same(
+    routedStable,
+    expectedStable.filter((id) => id.startsWith('component-v2.')).sort(),
+    'readiness.consumers.gallery contracts derived',
+  )
+  same(
+    alignment.consumers?.galleryStableRoutes,
+    Object.keys(
+      alignment.consumers?.galleryStableContractsByRoute ?? {},
+    ).sort(),
+    'readiness.consumers.gallery routes derived',
+  )
+  if (
+    alignment.consumers?.nugetStableEligible !==
+    (alignment.gaps.length === 0)
+  )
+    fail('readiness.consumers NuGet eligibility mismatch')
+  if (
+    alignment.consumers?.releaseReady !==
+    (alignment.gaps.length === 0 &&
+      alignment.consumers?.releaseFamilyGaps?.length === 0)
+  )
+    fail('readiness.consumers release eligibility mismatch')
   for (const field of ['candidate', 'contractHash', 'alignmentHash']) {
     if (
       expected[field] !== undefined &&
@@ -1318,9 +1426,27 @@ namespace FsusUI.Avalonia.Demo.Gallery;
 
 internal static class FsusGeneratedAlignment
 {
-  public static IReadOnlySet<string> StableFamilies { get; } = new HashSet<string>(StringComparer.Ordinal)
+  public static IReadOnlySet<string> StableContractIds { get; } = new HashSet<string>(StringComparer.Ordinal)
   {
-${alignment.consumers.galleryStableFamilies.map((id) => `    "${id}",`).join('\n')}
+${alignment.consumers.galleryStableContractIds.map((id) => `    "${id}",`).join('\n')}
+  };
+
+  public static IReadOnlySet<string> StableRoutes { get; } = new HashSet<string>(StringComparer.Ordinal)
+  {
+${alignment.consumers.galleryStableRoutes.map((id) => `    "${id}",`).join('\n')}
+  };
+
+  public static IReadOnlyDictionary<string, IReadOnlySet<string>> StableContractsByRoute { get; } =
+    new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal)
+  {
+${Object.entries(alignment.consumers.galleryStableContractsByRoute)
+  .map(
+    ([route, ids]) => `    ["${route}"] = new HashSet<string>(StringComparer.Ordinal)
+    {
+${ids.map((id) => `      "${id}",`).join('\n')}
+    },`,
+  )
+  .join('\n')}
   };
 }
 `

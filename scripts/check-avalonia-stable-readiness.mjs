@@ -43,7 +43,7 @@ const validateStableChecklistCoverage = (content, spec, label) => {
     }
   }
 
-  for (const family of spec.requiredStableComponentFamilies) {
+  for (const family of spec.releaseScopeFamilies) {
     assertIncludes(normalized, `\`${family}\``, label)
     const familyLine = content
       .split('\n')
@@ -206,11 +206,24 @@ try {
     '.tmp/conformance-v2/alignment.json',
     currentIdentity(),
   )
-  const derivedFamilies = alignment.consumers?.galleryStableFamilies ?? []
-  const missingStableFamilies = spec.requiredStableComponentFamilies.filter(
-    (family) => !derivedFamilies.includes(family),
-  )
-  const derivedReleaseReady = missingStableFamilies.length === 0
+  const releaseScopeFamilies = alignment.consumers?.releaseScopeFamilies ?? []
+  if (
+    JSON.stringify(releaseScopeFamilies) !==
+    JSON.stringify([...spec.releaseScopeFamilies].sort())
+  ) {
+    throw new Error(
+      'Avalonia stable readiness release scope does not match Contract V2 consumer authority',
+    )
+  }
+  const missingReleaseFamilies = alignment.consumers?.releaseFamilyGaps ?? []
+  const alignmentGapCount = alignment.consumers?.alignmentGapCount
+  if (alignmentGapCount !== alignment.gaps.length) {
+    throw new Error(
+      'Avalonia stable readiness alignment gap diagnostic is inconsistent',
+    )
+  }
+  const derivedReleaseReady =
+    alignmentGapCount === 0 && missingReleaseFamilies.length === 0
   if (
     alignment.consumers?.nugetStableEligible !== derivedReleaseReady ||
     alignment.consumers?.releaseReady !== derivedReleaseReady
@@ -250,9 +263,9 @@ try {
   )
   validateStableEvidenceBundle(spec)
   console.log(
-    missingStableFamilies.length === 0
+    derivedReleaseReady
       ? 'Avalonia stable readiness check passed: release eligible.'
-      : `Avalonia stable readiness check passed: release blocked by ${missingStableFamilies.length} derived alignment gaps.`,
+      : `Avalonia stable readiness check passed: release blocked by ${alignmentGapCount} alignment gaps and ${missingReleaseFamilies.length} missing release families.`,
   )
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

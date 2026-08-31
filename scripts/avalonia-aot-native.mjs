@@ -14,9 +14,7 @@ const sha256 = (content) => createHash('sha256').update(content).digest('hex')
 const fullSha = /^[0-9a-f]{40}$/u
 const digest = /^[0-9a-f]{64}$/u
 
-export const stableFamilies = () => [
-  ...stableSpec.requiredStableComponentFamilies,
-]
+export const stableFamilies = () => [...stableSpec.releaseScopeFamilies]
 
 export const validateScenarioBindings = (source) => {
   const bound = new Set(

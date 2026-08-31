@@ -250,6 +250,57 @@ test('committed Contract V2 registry passes validation with the committed gate',
   assert.deepEqual(errors, [])
 })
 
+test('consumer routing binds every exact production contract once', () => {
+  const contractIds = committedRegistry.contracts
+    .map((contract) => contract.id)
+    .sort()
+  const bindingIds = Object.keys(
+    committedRegistry.consumerBindings.byContract,
+  ).sort()
+  assert.deepEqual(bindingIds, contractIds)
+  assert.deepEqual(
+    committedRegistry.consumerBindings.byContract['component-v2.el-check-tag'],
+    { releaseFamily: 'selection', galleryRoute: 'selection' },
+  )
+})
+
+test('consumer routing mutations fail closed', () => {
+  const deleted = clone(committedRegistry)
+  delete deleted.consumerBindings.byContract['component-v2.el-check-tag']
+  assert.match(
+    validateRegistry(deleted, gate).join('\n'),
+    /bind every exact contract id once/u,
+  )
+
+  const wrongRoute = clone(committedRegistry)
+  wrongRoute.consumerBindings.byContract[
+    'component-v2.el-check-tag'
+  ].galleryRoute = 'button'
+  assert.match(
+    validateRegistry(wrongRoute, gate).join('\n'),
+    /component-v2\.el-check-tag consumer binding drifted/u,
+  )
+
+  const unknownRoute = clone(committedRegistry)
+  unknownRoute.consumerBindings.byContract[
+    'component-v2.el-check-tag'
+  ].galleryRoute = 'unknown-route'
+  assert.match(
+    validateRegistry(unknownRoute, gate).join('\n'),
+    /component-v2\.el-check-tag consumer binding drifted|unknown Gallery route/u,
+  )
+
+  const unknownContract = clone(committedRegistry)
+  unknownContract.consumerBindings.byContract['component-v2.el-unknown'] = {
+    releaseFamily: 'selection',
+    galleryRoute: 'selection',
+  }
+  assert.match(
+    validateRegistry(unknownContract, gate).join('\n'),
+    /bind every exact contract id once/u,
+  )
+})
+
 test('public compatibility aliases collapse into one source-owned contract', () => {
   const aliases = committedRegistry.publicExportMap.filter(
     (entry) => entry.role === 'alias',

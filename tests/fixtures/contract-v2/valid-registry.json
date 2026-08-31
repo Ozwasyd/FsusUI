@@ -3,6 +3,20 @@
   "registryVersion": "2.0.0",
   "releaseClassification": "preview",
   "owner": "FsusUI Core",
+  "consumerBindings": {
+    "byContract": {
+      "component-v2.el-fixture": {
+        "releaseFamily": "display",
+        "galleryRoute": "display"
+      },
+      "component-v2.el-markdown-editor": {
+        "releaseFamily": "text-editor",
+        "galleryRoute": "markdown-editor"
+      }
+    },
+    "releaseScopeFamilies": ["display", "text-editor"],
+    "galleryRoutes": ["display", "markdown-editor"]
+  },
   "contracts": [
     {
       "id": "component-v2.el-fixture",

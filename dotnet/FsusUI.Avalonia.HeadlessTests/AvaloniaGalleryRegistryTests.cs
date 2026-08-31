@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Automation;
 using Avalonia.LogicalTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Demo.Gallery;
@@ -26,10 +27,21 @@ public class AvaloniaGalleryRegistryTests
   ];
 
   [Fact]
-  public void StableGalleryRegistryContainsOnlyGeneratedAlignedFamilies()
+  public void StableGalleryRegistryUsesExactGeneratedContractRouteBindings()
   {
-    var routes = FsusAvaloniaGalleryRegistry.StableRoutes;
-    Assert.Empty(routes);
+    var route = Assert.Single(FsusAvaloniaGalleryRegistry.StableRoutes);
+    Assert.Equal("selection", route.ComponentId);
+    Assert.Equal(
+      ["component-v2.el-check-tag"],
+      route.StableContractIds.Order(StringComparer.Ordinal));
+
+    var page = route.CreatePage();
+    var checkTag = Assert.Single(
+      page.GetLogicalDescendants().OfType<FsusCheckTag>());
+    Assert.Equal("Check tag", checkTag.Content);
+    Assert.Equal("Check tag", AutomationProperties.GetName(checkTag));
+    Assert.Empty(page.GetLogicalDescendants().OfType<FsusButton>());
+    Assert.Empty(page.GetLogicalDescendants().OfType<FsusInput>());
   }
 
   [Fact]

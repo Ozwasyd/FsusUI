@@ -192,6 +192,77 @@ const cases = [
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
   },
+  ...[
+    [
+      'consumer-binding-deleted',
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },\n",
+      '',
+    ],
+    [
+      'consumer-binding-route-mutated',
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'button' },",
+    ],
+  ].map(([id, from, to]) => ({
+    id,
+    file: 'scripts/contract-v2.mjs',
+    inject: () => mutateText('scripts/contract-v2.mjs', from, to),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected:
+      id === 'consumer-binding-deleted'
+        ? 'consumer bindings must bind every exact contract id once'
+        : 'contract-v2.json drifted from generated output',
+  })),
+  {
+    id: 'consumer-binding-unknown-contract-mutated',
+    file: 'spec/components/contracts/v2/contract-v2.json',
+    inject: () =>
+      mutateJson(
+        'spec/components/contracts/v2/contract-v2.json',
+        (value) => {
+          value.consumerBindings.byContract['component-v2.el-unknown'] = {
+            releaseFamily: 'selection',
+            galleryRoute: 'selection',
+          }
+        },
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  ...[
+    [
+      'gallery-aligned-contract-not-instantiated',
+      'case "component-v2.el-check-tag":',
+      'case "component-v2.el-check-tag-missing":',
+      'Stable contract component-v2.el-check-tag has no exact Gallery implementation',
+    ],
+    [
+      'gallery-aligned-contract-fallback-mutated',
+      'panel.Children.Add(new FsusCheckTag',
+      'panel.Children.Add(new FsusButton',
+      'Assert.Single() Failure',
+    ],
+  ].map(([id, from, to, expected]) => ({
+    id,
+    file:
+      'dotnet/FsusUI.Avalonia.Demo/Gallery/FsusAvaloniaGalleryRegistry.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia.Demo/Gallery/FsusAvaloniaGalleryRegistry.cs',
+        from,
+        to,
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
+        '--filter',
+        'FullyQualifiedName~StableGalleryRegistryUsesExactGeneratedContractRouteBindings',
+      ],
+    ],
+    expected,
+  })),
   {
     id: 'avalonia-semantic-nullability-mutated',
     file: 'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',

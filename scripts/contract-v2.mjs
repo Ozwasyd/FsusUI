@@ -34,6 +34,203 @@ export const MARKDOWN_EDITOR_CAPABILITIES = [
   'fatal',
 ]
 
+// Explicit consumer routing authority. Contract alignment remains derived; this
+// map only binds each exact Contract V2 id to its release family and Gallery
+// route. Name stripping, prefix guessing, and module fallbacks are forbidden.
+// prettier-ignore
+export const CONTRACT_V2_CONSUMER_BINDINGS = {
+  'component-v2.common-picker': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.dynamic-size-grid': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.dynamic-size-list': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.el-affix': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-alert': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-aside': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-auto-resizer': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.el-autocomplete': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-avatar': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-backtop': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-badge': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-breadcrumb': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-breadcrumb-item': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-button': { releaseFamily: 'button', galleryRoute: 'button' },
+  'component-v2.el-button-group': { releaseFamily: 'button', galleryRoute: 'button' },
+  'component-v2.el-calendar': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.el-card': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-carousel': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.el-carousel-item': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.el-cascader': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-cascader-panel': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-checkbox': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-checkbox-button': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-checkbox-group': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-col': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-collapse': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-collapse-item': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-collapse-transition': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-collection-summary': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-collection-toolbar': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-color-picker': { releaseFamily: 'value-picker', galleryRoute: 'value-picker' },
+  'component-v2.el-config-provider': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-container': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-conversation-context-bar': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-conversation-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-conversation-list-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-copyable-detail': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-countdown': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-danger-zone': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-data-list': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-date-picker': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.el-descriptions': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-descriptions-item': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-destructive-action-panel': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-diagnostics-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-diagnostics-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-dialog': { releaseFamily: 'modal-panel', galleryRoute: 'modal-panel' },
+  'component-v2.el-distribution-bar-row': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-distribution-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-divider': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-drawer': { releaseFamily: 'modal-panel', galleryRoute: 'modal-panel' },
+  'component-v2.el-dropdown': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-dropdown-item': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-dropdown-menu': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-empty': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-empty-selection-state': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-empty-state': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-filter-group': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-footer': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-form': { releaseFamily: 'form', galleryRoute: 'form' },
+  'component-v2.el-form-item': { releaseFamily: 'form', galleryRoute: 'form' },
+  'component-v2.el-form-section': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-header': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-icon': { releaseFamily: 'icon-text', galleryRoute: 'icon-text' },
+  'component-v2.el-image': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.el-image-viewer': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.el-inbox-empty-state': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-inbox-layout': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-infinite-scroll': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.el-inline-actions': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-input': { releaseFamily: 'input', galleryRoute: 'input' },
+  'component-v2.el-input-number': { releaseFamily: 'input', galleryRoute: 'input' },
+  'component-v2.el-key-value-grid': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-key-value-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-kpi-group': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-link': { releaseFamily: 'icon-text', galleryRoute: 'icon-text' },
+  'component-v2.el-loading': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-loading-directive': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-loading-service': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-localization-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-main': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-markdown-editor': { releaseFamily: 'text-editor', galleryRoute: 'markdown-editor' },
+  'component-v2.el-markdown-renderer': { releaseFamily: 'text-viewer', galleryRoute: 'text-viewer' },
+  'component-v2.el-menu': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-menu-item': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-menu-item-group': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-message': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-message-box': { releaseFamily: 'modal-panel', galleryRoute: 'modal-panel' },
+  'component-v2.el-message-bubble': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-message-timeline': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-metadata-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-metadata-row': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-metric-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-metric-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-micro-interaction-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-notification': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-option': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-option-group': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-overlay': { releaseFamily: 'modal-panel', galleryRoute: 'modal-panel' },
+  'component-v2.el-page-header': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-pagination': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-pagination-bar': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-perception-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-perception-character-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-popconfirm': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popover': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popover-directive': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popper': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popper-arrow': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popper-content': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popper-trigger': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-progress': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-public-shell': { releaseFamily: 'public-shell', galleryRoute: 'public-shell' },
+  'component-v2.el-radio': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-radio-button': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-radio-group': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-rate': { releaseFamily: 'value-picker', galleryRoute: 'value-picker' },
+  'component-v2.el-reply-composer-shell': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-resource-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-resource-list-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-responsive-collection': { releaseFamily: 'public-shell', galleryRoute: 'public-shell' },
+  'component-v2.el-result': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-risk-notice': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-row': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-scrollbar': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-section-header': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-section-nav': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-section-nav-link': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-segmented-control': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-select': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-select-v2': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-settings-section': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-site-header': { releaseFamily: 'public-shell', galleryRoute: 'public-shell' },
+  'component-v2.el-skeleton': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-skeleton-item': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-slider': { releaseFamily: 'value-picker', galleryRoute: 'value-picker' },
+  'component-v2.el-space': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-split-pane': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-statistic': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-status-summary': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-step': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-steps': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-sub-menu': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-switch': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-tab-pane': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-table': { releaseFamily: 'data-table', galleryRoute: 'data-table' },
+  'component-v2.el-table-column': { releaseFamily: 'data-table', galleryRoute: 'data-table' },
+  'component-v2.el-table-v2': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.el-tabs': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-tag': { releaseFamily: 'icon-text', galleryRoute: 'icon-text' },
+  'component-v2.el-task-page-header': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-text': { releaseFamily: 'icon-text', galleryRoute: 'icon-text' },
+  'component-v2.el-text-task-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-theme-mode-toggle': { releaseFamily: 'public-shell', galleryRoute: 'public-shell' },
+  'component-v2.el-thread-panel': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-time-picker': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.el-time-select': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.el-timeline': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-timeline-item': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-tooltip': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-tooltip-v2': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-transfer': { releaseFamily: 'upload-transfer', galleryRoute: 'upload-transfer' },
+  'component-v2.el-tree': { releaseFamily: 'tree', galleryRoute: 'tree' },
+  'component-v2.el-tree-select': { releaseFamily: 'tree', galleryRoute: 'tree' },
+  'component-v2.el-tree-v2': { releaseFamily: 'tree', galleryRoute: 'tree' },
+  'component-v2.el-typed-confirm-field': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-upload': { releaseFamily: 'upload-transfer', galleryRoute: 'upload-transfer' },
+  'component-v2.el-visually-hidden': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-watermark': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.fixed-size-grid': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.fixed-size-list': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.time-pick-panel': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.v-loading': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+}
+
+export const CONTRACT_V2_RELEASE_SCOPE_FAMILIES = [
+  ...new Set(
+    Object.values(CONTRACT_V2_CONSUMER_BINDINGS).map(
+      (binding) => binding.releaseFamily,
+    ),
+  ),
+].sort()
+
+export const CONTRACT_V2_GALLERY_ROUTES = [
+  ...new Set(
+    Object.values(CONTRACT_V2_CONSUMER_BINDINGS).map(
+      (binding) => binding.galleryRoute,
+    ),
+  ),
+].sort()
+
 const AVALONIA_MEMBER_BINDINGS = {
   ElTableV2: {
     inputs: {
@@ -1573,6 +1770,11 @@ export const buildRegistry = ({
     },
     componentMap,
     publicExportMap,
+    consumerBindings: {
+      byContract: CONTRACT_V2_CONSUMER_BINDINGS,
+      releaseScopeFamilies: CONTRACT_V2_RELEASE_SCOPE_FAMILIES,
+      galleryRoutes: CONTRACT_V2_GALLERY_ROUTES,
+    },
     publicValueBindings,
     contracts,
     avaloniaOnlyTypes,
@@ -1828,6 +2030,25 @@ export const validateRegistry = (registry, gate) => {
   if (!Array.isArray(registry.publicExportMap)) {
     errors.push('registry publicExportMap must be an array')
   }
+  const consumerBindings = registry.consumerBindings
+  if (
+    !consumerBindings ||
+    typeof consumerBindings !== 'object' ||
+    Array.isArray(consumerBindings) ||
+    !consumerBindings.byContract ||
+    typeof consumerBindings.byContract !== 'object' ||
+    Array.isArray(consumerBindings.byContract)
+  ) {
+    errors.push('registry consumerBindings.byContract must be an object')
+  }
+  if (!Array.isArray(consumerBindings?.releaseScopeFamilies)) {
+    errors.push(
+      'registry consumerBindings.releaseScopeFamilies must be an array',
+    )
+  }
+  if (!Array.isArray(consumerBindings?.galleryRoutes)) {
+    errors.push('registry consumerBindings.galleryRoutes must be an array')
+  }
   if (!Array.isArray(registry.publicValueBindings)) {
     errors.push('registry publicValueBindings must be an array')
   }
@@ -1838,6 +2059,68 @@ export const validateRegistry = (registry, gate) => {
     }
     contractIds.add(contract.id)
     validateContract(contract, gate, errors)
+  }
+  const expectedConsumerIds = Object.keys(CONTRACT_V2_CONSUMER_BINDINGS).sort()
+  const actualConsumerIds = Object.keys(
+    consumerBindings?.byContract ?? {},
+  ).sort()
+  const sortedContractIds = [...contractIds].sort()
+  if (JSON.stringify(actualConsumerIds) !== JSON.stringify(sortedContractIds)) {
+    errors.push(
+      'consumer bindings must bind every exact contract id once with no unknown contracts',
+    )
+  }
+  const usesProductionAuthority =
+    JSON.stringify(sortedContractIds) === JSON.stringify(expectedConsumerIds)
+  if (
+    usesProductionAuthority &&
+    JSON.stringify(actualConsumerIds) !== JSON.stringify(expectedConsumerIds)
+  ) {
+    errors.push(
+      'consumer bindings drifted from the explicit generator authority',
+    )
+  }
+  const allowedReleaseFamilies = new Set(
+    consumerBindings?.releaseScopeFamilies ?? [],
+  )
+  const allowedGalleryRoutes = new Set(consumerBindings?.galleryRoutes ?? [])
+  for (const contractId of actualConsumerIds) {
+    const binding = consumerBindings.byContract[contractId]
+    const expected = CONTRACT_V2_CONSUMER_BINDINGS[contractId]
+    if (
+      usesProductionAuthority &&
+      JSON.stringify(binding) !== JSON.stringify(expected)
+    ) {
+      errors.push(
+        `${contractId} consumer binding drifted from generator authority`,
+      )
+      continue
+    }
+    if (!allowedReleaseFamilies.has(binding.releaseFamily)) {
+      errors.push(
+        `${contractId} references unknown release family ${binding.releaseFamily}`,
+      )
+    }
+    if (!allowedGalleryRoutes.has(binding.galleryRoute)) {
+      errors.push(
+        `${contractId} references unknown Gallery route ${binding.galleryRoute}`,
+      )
+    }
+  }
+  if (
+    usesProductionAuthority &&
+    JSON.stringify(
+      [...(consumerBindings?.releaseScopeFamilies ?? [])].sort(),
+    ) !== JSON.stringify(CONTRACT_V2_RELEASE_SCOPE_FAMILIES)
+  ) {
+    errors.push('consumer release scope drifted from generator authority')
+  }
+  if (
+    usesProductionAuthority &&
+    JSON.stringify([...(consumerBindings?.galleryRoutes ?? [])].sort()) !==
+      JSON.stringify(CONTRACT_V2_GALLERY_ROUTES)
+  ) {
+    errors.push('consumer Gallery routes drifted from generator authority')
   }
   for (const entry of registry.avaloniaOnlyTypes ?? []) {
     const context = `avalonia-only type ${entry.type ?? '<unknown>'}`

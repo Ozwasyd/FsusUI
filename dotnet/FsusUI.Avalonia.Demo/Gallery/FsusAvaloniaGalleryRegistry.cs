@@ -16,6 +16,7 @@ public sealed record FsusGalleryRoute(
   string Route,
   string ComponentId,
   string Title,
+  IReadOnlySet<string> StableContractIds,
   IReadOnlyList<string> StateCoverage,
   IReadOnlyList<FsusGalleryScreenshotScenario> ScreenshotScenarios,
   Func<Control> CreatePage);
@@ -73,17 +74,24 @@ public static class FsusAvaloniaGalleryRegistry
 
   public static IReadOnlyList<FsusGalleryRoute> StableRoutes { get; } =
     AllRoutes
-      .Where(route => FsusGeneratedAlignment.StableFamilies.Contains(route.ComponentId))
+      .Where(route => FsusGeneratedAlignment.StableRoutes.Contains(route.ComponentId))
       .ToArray();
 
-  private static FsusGalleryRoute Entry(string componentId, string title) =>
-    new(
+  private static FsusGalleryRoute Entry(string componentId, string title)
+  {
+    var stableContractIds =
+      FsusGeneratedAlignment.StableContractsByRoute.TryGetValue(componentId, out var contracts)
+        ? contracts
+        : new HashSet<string>(StringComparer.Ordinal);
+    return new(
       $"/stable/{componentId}",
       componentId,
       title,
+      stableContractIds,
       RequiredStateCoverage,
       BuildScreenshotScenarios(),
-      () => BuildGalleryPage(componentId, title));
+      () => BuildGalleryPage(componentId, title, stableContractIds));
+  }
 
   private static IReadOnlyList<FsusGalleryScreenshotScenario> BuildScreenshotScenarios()
   {
@@ -98,7 +106,10 @@ public static class FsusAvaloniaGalleryRegistry
     return scenarios;
   }
 
-  private static Control BuildGalleryPage(string componentId, string title)
+  private static Control BuildGalleryPage(
+    string componentId,
+    string title,
+    IReadOnlySet<string> stableContractIds)
   {
     var panel = new StackPanel
     {
@@ -117,8 +128,36 @@ public static class FsusAvaloniaGalleryRegistry
       TextWrapping = global::Avalonia.Media.TextWrapping.Wrap,
     });
 
-    AddRepresentativeControls(panel, componentId);
+    if (stableContractIds.Count > 0)
+    {
+      AddStableContractControls(panel, stableContractIds);
+    }
+    else
+    {
+      AddRepresentativeControls(panel, componentId);
+    }
     return panel;
+  }
+
+  private static void AddStableContractControls(
+    StackPanel panel,
+    IReadOnlySet<string> stableContractIds)
+  {
+    foreach (var contractId in stableContractIds.Order(StringComparer.Ordinal))
+    {
+      switch (contractId)
+      {
+        case "component-v2.el-check-tag":
+          panel.Children.Add(new FsusCheckTag
+          {
+            Content = "Check tag",
+          });
+          break;
+        default:
+          throw new InvalidOperationException(
+            $"Stable contract {contractId} has no exact Gallery implementation.");
+      }
+    }
   }
 
   private static void AddRepresentativeControls(StackPanel panel, string componentId)

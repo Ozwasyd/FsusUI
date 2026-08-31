@@ -72,7 +72,7 @@ const stableScenarios = JSON.parse(
     path.join(root, 'spec/ci/avalonia-stable-readiness.json'),
     'utf8',
   ),
-).requiredStableComponentFamilies
+).releaseScopeFamilies
 
 assert.equal(dotnetInfo.status, 0, dotnetInfo.stderr)
 assert.ok(rid, 'dotnet --info did not report the current host RID')
@@ -273,9 +273,7 @@ if (suppliedCandidateRoot) {
 
 const candidatePackages = readdirSync(feed)
   .filter(
-    (name) =>
-      candidatePackagePattern.test(name) &&
-      !name.endsWith('.snupkg'),
+    (name) => candidatePackagePattern.test(name) && !name.endsWith('.snupkg'),
   )
   .sort()
   .map((name) => {
