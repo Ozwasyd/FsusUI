@@ -60,6 +60,12 @@ const gate = (subcommand, args) => [
   process.execPath,
   ['scripts/conformance-v2-evidence.mjs', subcommand, ...args],
 ]
+const requestedCaseIds = new Set(
+  (process.env.FSUSUI_MUTATION_CASES ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean),
+)
 
 const cases = [
   {
@@ -628,6 +634,15 @@ const cases = [
   },
 ]
 
+const selectedCases = requestedCaseIds.size
+  ? cases.filter((entry) => requestedCaseIds.has(entry.id))
+  : cases
+if (selectedCases.length !== (requestedCaseIds.size || cases.length)) {
+  const selectedIds = new Set(selectedCases.map((entry) => entry.id))
+  const missing = [...requestedCaseIds].filter((id) => !selectedIds.has(id))
+  throw new Error(`unknown mutation cases: ${missing.join(', ')}`)
+}
+
 try {
   const clone = spawnSync(
     'git',
@@ -642,7 +657,7 @@ try {
     path.join(checkout, 'node_modules'),
   )
   const results = []
-  for (const entry of cases) {
+  for (const entry of selectedCases) {
     reset()
     entry.inject()
     const diff = run('git', ['diff', '--no-ext-diff', '--', entry.file])
@@ -664,6 +679,7 @@ try {
   const receipt = {
     schema: 'fsusui.conformance-isolated-mutations.v2',
     checkout: { kind: 'git-shared-clone', source: root },
+    selection: requestedCaseIds.size ? [...requestedCaseIds].sort() : 'all',
     positiveCandidate: run('git', ['rev-parse', 'HEAD']).stdout.trim(),
     verdict: survivors.length === 0 ? 'pass' : 'fail',
     results,
