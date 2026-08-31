@@ -75,6 +75,11 @@ test('derive comparison validation rejects stale identity and tampered evidence'
   const comparison = compareEvidence(web, avalonia)
   const expected = { ...comparison.identity }
 
+  assert.throws(
+    () => compareEvidence(web, avalonia, {}),
+    /visual-review was not current-validated/,
+  )
+
   validateCurrentComparison(comparison, web, avalonia, expected)
 
   const registry = JSON.parse(
@@ -114,12 +119,7 @@ test('derive comparison validation rejects stale identity and tampered evidence'
   tamperedWeb.publicState.markdown.value = 'tampered after comparison'
   assert.throws(
     () =>
-      validateCurrentComparison(
-        comparison,
-        tamperedWeb,
-        avalonia,
-        expected,
-      ),
+      validateCurrentComparison(comparison, tamperedWeb, avalonia, expected),
     /comparison\.evidenceDigests\.web mismatch/,
   )
 
@@ -262,10 +262,7 @@ test('web-only contracts remain explicit without becoming Avalonia gaps', () => 
     ],
   )
   assert.deepEqual(alignment.stable, [])
-  assert.deepEqual(alignment.webOnly, [
-    'web-only-bound',
-    'web-only-unbound',
-  ])
+  assert.deepEqual(alignment.webOnly, ['web-only-bound', 'web-only-unbound'])
   assert.deepEqual(alignment.gaps, [])
   assert.equal(alignment.consumers.nugetStableEligible, true)
   assert.equal(alignment.consumers.releaseReady, true)

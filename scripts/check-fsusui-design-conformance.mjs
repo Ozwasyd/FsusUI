@@ -327,31 +327,22 @@ export const buildValidFsusUIContractBundle = async (assetsInput) => {
   uxAcceptanceReceipt.requiredSkillDigests =
     classificationReceipt.requiredSkillDigests
   uxAcceptanceReceipt.authorityDigests = authorityDigests(classificationReceipt)
-  uxAcceptanceReceipt.activeBaselineIdentityDigest =
-    baselineIdentityDigest(classificationReceipt)
+  uxAcceptanceReceipt.activeBaselineIdentityDigest = baselineIdentityDigest(
+    classificationReceipt,
+  )
   uxAcceptanceReceipt.domainPolicyDigest = assets.policyDigest
 
   return {
     classificationReceipt,
     adjudicationClassificationReceipt,
-    adjudicationReceipt: sealReceipt(
-      adjudicationReceipt,
-      'adjudicationDigest',
-    ),
-    uxAcceptanceReceipt: sealReceipt(
-      uxAcceptanceReceipt,
-      'receiptDigest',
-    ),
+    adjudicationReceipt: sealReceipt(adjudicationReceipt, 'adjudicationDigest'),
+    uxAcceptanceReceipt: sealReceipt(uxAcceptanceReceipt, 'receiptDigest'),
   }
 }
 
 const validateClassificationReceipt = (receipt, assets, compiled) => {
   assertSchema('classification', receipt, compiled)
-  assertReceiptDigest(
-    receipt,
-    'receiptDigest',
-    'classification-receipt-digest',
-  )
+  assertReceiptDigest(receipt, 'receiptDigest', 'classification-receipt-digest')
   if (
     !receipt.requiredSkillDigests.includes(
       receipt.activeBaselineIdentity.skillDigest,
@@ -378,8 +369,7 @@ const validateAdjudicationReceipt = (
     'adjudication-receipt-digest',
   )
   if (
-    classification.uiDecisionClass !==
-      assets.policy.systemDesignDisputeClass ||
+    classification.uiDecisionClass !== assets.policy.systemDesignDisputeClass ||
     receipt.classificationReceiptDigest !== classification.receiptDigest ||
     receipt.ownerRepository !== classification.ownerRepository ||
     !sameValues(
@@ -405,11 +395,7 @@ const validateUxAcceptanceReceipt = (
   compiled,
 ) => {
   assertSchema('uxAcceptance', receipt, compiled)
-  assertReceiptDigest(
-    receipt,
-    'receiptDigest',
-    'ux-acceptance-receipt-digest',
-  )
+  assertReceiptDigest(receipt, 'receiptDigest', 'ux-acceptance-receipt-digest')
   if (
     receipt.classificationReceiptDigest !== classification.receiptDigest ||
     receipt.verificationClass !== classification.verificationClass ||
@@ -429,17 +415,36 @@ const validateUxAcceptanceReceipt = (
   return receipt
 }
 
+export const validateFsusUIReceiptPair = async (
+  classificationReceipt,
+  uxAcceptanceReceipt,
+  assetsInput,
+) => {
+  const assets = assetsInput ?? (await loadFsusUIDesignConformanceAssets())
+  assertSourceBindings(assets)
+  assertPolicyContract(assets.policy)
+  const compiled = compileSchemas(assets.schemas)
+  const classification = validateClassificationReceipt(
+    classificationReceipt,
+    assets,
+    compiled,
+  )
+  validateUxAcceptanceReceipt(
+    uxAcceptanceReceipt,
+    classification,
+    assets,
+    compiled,
+  )
+  return { classificationReceipt, uxAcceptanceReceipt }
+}
+
 export const validateFsusUIContractBundle = async (bundle, assetsInput) => {
   const assets = assetsInput ?? (await loadFsusUIDesignConformanceAssets())
   assertSourceBindings(assets)
   assertPolicyContract(assets.policy)
 
   const compiled = compileSchemas(assets.schemas)
-  validateClassificationReceipt(
-    bundle.classificationReceipt,
-    assets,
-    compiled,
-  )
+  validateClassificationReceipt(bundle.classificationReceipt, assets, compiled)
   validateClassificationReceipt(
     bundle.adjudicationClassificationReceipt,
     assets,
