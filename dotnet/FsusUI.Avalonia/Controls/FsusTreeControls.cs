@@ -4,6 +4,8 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FsusUI.Avalonia.Overlay;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -95,6 +97,61 @@ public enum FsusTreeLazyLoadState
   Failed,
 }
 
+public enum FsusTreeInlineEditKind
+{
+  Rename,
+  Create,
+}
+
+public enum FsusTreeInlineEditCancelReason
+{
+  Programmatic,
+  Escape,
+  PointerOutside,
+}
+
+public sealed class FsusTreeInlineEditState(
+  FsusTreeInlineEditKind kind,
+  string key,
+  string? parentKey,
+  string text)
+{
+  public FsusTreeInlineEditKind Kind { get; } = kind;
+  public string Key { get; } = key;
+  public string? ParentKey { get; } = parentKey;
+  public string Text { get; internal set; } = text;
+  public string? ValidationError { get; internal set; }
+  internal string PreviousFocusedKey { get; set; } = string.Empty;
+  internal bool SelectAllOnFocus { get; set; } = kind == FsusTreeInlineEditKind.Rename;
+}
+
+public sealed class FsusTreeInlineEditCommitEventArgs(
+  FsusTreeInlineEditKind kind,
+  string key,
+  string? parentKey,
+  string text) : EventArgs
+{
+  public FsusTreeInlineEditKind Kind { get; } = kind;
+  public string Key { get; } = key;
+  public string? ParentKey { get; } = parentKey;
+  public string Text { get; } = text;
+  public string? ValidationError { get; set; }
+}
+
+public sealed class FsusTreeInlineEditCanceledEventArgs(
+  FsusTreeInlineEditKind kind,
+  string key,
+  string? parentKey,
+  string text,
+  FsusTreeInlineEditCancelReason reason) : EventArgs
+{
+  public FsusTreeInlineEditKind Kind { get; } = kind;
+  public string Key { get; } = key;
+  public string? ParentKey { get; } = parentKey;
+  public string Text { get; } = text;
+  public FsusTreeInlineEditCancelReason Reason { get; } = reason;
+}
+
 public sealed class FsusTreeNodeActivatedEventArgs(
   string key,
   FsusTreeInteractionSource source) : EventArgs
@@ -156,6 +213,8 @@ public class FsusTree : ContentControl
   private readonly Dictionary<string, FsusTreeLazyLoadState> lazyLoadStates = new(StringComparer.Ordinal);
   private readonly StackPanel rowsPanel = new();
   private CancellationTokenSource? loadCancellation;
+  private TextBox? inlineEditor;
+  private TopLevel? inlineEditTopLevel;
   private int loadVersion;
 
   public FsusTree()
@@ -179,11 +238,14 @@ public class FsusTree : ContentControl
   public IReadOnlySet<string> ExpandedKeys => expandedKeys;
   public IReadOnlySet<string> SelectedKeys => selectedKeys;
   public IReadOnlySet<string> CheckedKeys => checkedKeys;
+  public FsusTreeInlineEditState? ActiveInlineEdit { get; private set; }
 
   public event EventHandler<FsusTreeNodeActivatedEventArgs>? NodeActivated;
   public event EventHandler<FsusTreeSelectionChangedEventArgs>? SelectionChanged;
   public event EventHandler<FsusTreeExpansionChangedEventArgs>? ExpansionChanged;
   public event EventHandler<FsusTreeLazyLoadEventArgs>? LazyLoadStateChanged;
+  public event EventHandler<FsusTreeInlineEditCommitEventArgs>? InlineEditCommitRequested;
+  public event EventHandler<FsusTreeInlineEditCanceledEventArgs>? InlineEditCanceled;
 
   public static readonly RoutedEvent<FsusTreeNodeContextEventArgs> NodeContextRequestedEvent =
     RoutedEvent.Register<FsusTree, FsusTreeNodeContextEventArgs>(
@@ -208,7 +270,10 @@ public class FsusTree : ContentControl
       AddFilteredNodes(Nodes, 1);
     }
 
-    if (flattenedNodes.Count > 0 && !flattenedNodes.Any(node => node.Node.Key == FocusedKey))
+    if (
+      flattenedNodes.Count > 0 &&
+      !flattenedNodes.Any(node => node.Node.Key == FocusedKey) &&
+      ActiveInlineEdit?.Key != FocusedKey)
     {
       FocusedKey = flattenedNodes[0].Node.Key;
     }
@@ -333,6 +398,99 @@ public class FsusTree : ContentControl
   {
     return RequestNodeContext(key, source, anchorBounds: null);
   }
+
+  public bool StartRename(string key, string initialValue)
+  {
+    var node = FindNode(key);
+    if (
+      ActiveInlineEdit is not null ||
+      node is null ||
+      node.IsDisabled ||
+      string.IsNullOrEmpty(key))
+    {
+      return false;
+    }
+
+    ActiveInlineEdit = new FsusTreeInlineEditState(
+      FsusTreeInlineEditKind.Rename,
+      key,
+      parentKey: null,
+      initialValue)
+    {
+      PreviousFocusedKey = FocusedKey,
+    };
+    FocusedKey = key;
+    RefreshRows();
+    SyncState();
+    AttachInlineEditPointerGuard();
+    return true;
+  }
+
+  public bool StartCreate(string key, string? parentKey = null)
+  {
+    if (
+      ActiveInlineEdit is not null ||
+      string.IsNullOrEmpty(key) ||
+      FindNode(key) is not null ||
+      (parentKey is not null && FindNode(parentKey) is not { IsDisabled: false }))
+    {
+      return false;
+    }
+
+    var previousFocusedKey = FocusedKey;
+    if (parentKey is not null)
+    {
+      expandedKeys.Add(parentKey);
+    }
+
+    ActiveInlineEdit = new FsusTreeInlineEditState(
+      FsusTreeInlineEditKind.Create,
+      key,
+      parentKey,
+      string.Empty)
+    {
+      PreviousFocusedKey = previousFocusedKey,
+    };
+    FocusedKey = key;
+    RefreshView();
+    AttachInlineEditPointerGuard();
+    return true;
+  }
+
+  public bool CommitInlineEdit()
+  {
+    var edit = ActiveInlineEdit;
+    if (edit is null)
+    {
+      return false;
+    }
+
+    var args = new FsusTreeInlineEditCommitEventArgs(
+      edit.Kind,
+      edit.Key,
+      edit.ParentKey,
+      edit.Text);
+    InlineEditCommitRequested?.Invoke(this, args);
+    if (!string.IsNullOrWhiteSpace(args.ValidationError))
+    {
+      edit.ValidationError = args.ValidationError;
+      edit.SelectAllOnFocus = false;
+      RefreshRows();
+      SyncState();
+      return false;
+    }
+
+    ActiveInlineEdit = null;
+    DetachInlineEditPointerGuard();
+    FocusedKey = FindNode(edit.Key) is not null
+      ? edit.Key
+      : ResolveInlineEditReturnFocus(edit);
+    RefreshView();
+    return true;
+  }
+
+  public bool CancelInlineEdit() =>
+    CancelInlineEdit(FsusTreeInlineEditCancelReason.Programmatic);
 
   private bool RequestNodeContext(
     string key,
@@ -507,6 +665,18 @@ public class FsusTree : ContentControl
     e.Handled = HandleKeyAsync(e.Key).GetAwaiter().GetResult();
   }
 
+  protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToVisualTree(e);
+    AttachInlineEditPointerGuard();
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    DetachInlineEditPointerGuard();
+    base.OnDetachedFromVisualTree(e);
+  }
+
   private Rect ResolveNodeAnchorBounds(string key) =>
     NodeAnchorBoundsResolver?.Invoke(key) ??
     (renderedRows.TryGetValue(key, out var row)
@@ -546,6 +716,15 @@ public class FsusTree : ContentControl
       ? GestureCollapse(key, source)
       : GestureExpand(key, source);
 
+  private bool IsExpandable(FsusTreeNode node) =>
+    node.Children.Count > 0 ||
+    node.HasLazyChildren ||
+    ActiveInlineEdit is
+    {
+      Kind: FsusTreeInlineEditKind.Create,
+      ParentKey: var parentKey,
+    } && parentKey == node.Key;
+
   private void RefreshRows()
   {
     renderedRows.Clear();
@@ -553,16 +732,11 @@ public class FsusTree : ContentControl
     foreach (var view in flattenedNodes)
     {
       var node = view.Node;
-      var expandable = node.Children.Count > 0 || node.HasLazyChildren;
+      var expandable = IsExpandable(node);
       var statePrefix = expandable
         ? expandedKeys.Contains(node.Key) ? "▾" : "▸"
         : " ";
-      var label = new TextBlock
-      {
-        Text = $"{statePrefix} {node.Label}",
-        VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
-        TextTrimming = global::Avalonia.Media.TextTrimming.CharacterEllipsis,
-      };
+      var label = BuildNodeContent(view, statePrefix);
       var row = new Border
       {
         Child = label,
@@ -604,6 +778,260 @@ public class FsusTree : ContentControl
       row.PointerPressed += (_, e) => HandleRowPointerPressed(view, row, e);
       renderedRows[node.Key] = row;
       rowsPanel.Children.Add(row);
+
+      if (
+        ActiveInlineEdit is
+        {
+          Kind: FsusTreeInlineEditKind.Create,
+          ParentKey: var parentKey,
+        } && parentKey == node.Key)
+      {
+        rowsPanel.Children.Add(BuildTransientInlineEditRow(view.Level + 1));
+      }
+    }
+
+    if (ActiveInlineEdit is { Kind: FsusTreeInlineEditKind.Create, ParentKey: null })
+    {
+      rowsPanel.Children.Add(BuildTransientInlineEditRow(1));
+    }
+  }
+
+  private Control BuildNodeContent(FsusTreeNodeView view, string statePrefix)
+  {
+    if (
+      ActiveInlineEdit is
+      {
+        Kind: FsusTreeInlineEditKind.Rename,
+        Key: var editKey,
+      } && editKey == view.Node.Key)
+    {
+      return BuildInlineEditContent(view.Node.Label);
+    }
+
+    return new TextBlock
+    {
+      Text = $"{statePrefix} {view.Node.Label}",
+      VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+      TextTrimming = global::Avalonia.Media.TextTrimming.CharacterEllipsis,
+    };
+  }
+
+  private Border BuildTransientInlineEditRow(int level)
+  {
+    var edit = ActiveInlineEdit!;
+    var row = new Border
+    {
+      Child = BuildInlineEditContent("New item"),
+      MinHeight = global::FsusUI.Avalonia.FsusTokens.DensityControlDefaultYDouble,
+      Padding = global::FsusUI.Avalonia.FsusTokens.Space2Thickness,
+      Margin = new Thickness(
+        Math.Max(0, level - 1) *
+        global::FsusUI.Avalonia.FsusTokens.Space5Thickness.Left,
+        0,
+        0,
+        0),
+      Focusable = false,
+    };
+    FsusComponentClasses.SetBaseClasses(row, "fsus-tree-row");
+    FsusComponentClasses.Ensure(row, "fsus-focused", true);
+    FsusComponentClasses.Ensure(row, "fsus-tree-inline-create", true);
+    AutomationProperties.SetAutomationId(row, $"fsus-tree-node-{edit.Key}");
+    AutomationProperties.SetName(row, "New item");
+    AutomationProperties.SetControlTypeOverride(row, AutomationControlType.TreeItem);
+    AutomationProperties.SetLiveSetting(row, AutomationLiveSetting.Polite);
+    AutomationProperties.SetItemStatus(
+      row,
+      string.IsNullOrWhiteSpace(edit.ValidationError)
+        ? $"editing create, level {level.ToString(CultureInfo.InvariantCulture)}"
+        : $"editing create, invalid, level {level.ToString(CultureInfo.InvariantCulture)}");
+    renderedRows[edit.Key] = row;
+    return row;
+  }
+
+  private Control BuildInlineEditContent(string accessibleTargetName)
+  {
+    var edit = ActiveInlineEdit!;
+    var editor = new TextBox
+    {
+      Text = edit.Text,
+      HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch,
+    };
+    FsusComponentClasses.Ensure(editor, "fsus-tree-inline-editor", true);
+    FsusComponentClasses.Ensure(
+      editor,
+      "fsus-invalid",
+      !string.IsNullOrWhiteSpace(edit.ValidationError));
+    AutomationProperties.SetAutomationId(editor, $"fsus-tree-inline-editor-{edit.Key}");
+    AutomationProperties.SetName(
+      editor,
+      edit.Kind == FsusTreeInlineEditKind.Rename
+        ? $"Rename {accessibleTargetName}"
+        : "New item name");
+    AutomationProperties.SetHelpText(editor, edit.ValidationError ?? string.Empty);
+    AutomationProperties.SetItemStatus(
+      editor,
+      string.IsNullOrWhiteSpace(edit.ValidationError)
+        ? $"editing {edit.Kind.ToString().ToLowerInvariant()}"
+        : $"editing {edit.Kind.ToString().ToLowerInvariant()}, invalid");
+    editor.PropertyChanged += (_, args) =>
+    {
+      if (
+        args.Property == TextBox.TextProperty &&
+        ReferenceEquals(ActiveInlineEdit, edit) &&
+        ReferenceEquals(inlineEditor, editor))
+      {
+        edit.Text = editor.Text ?? string.Empty;
+        if (edit.ValidationError is not null)
+        {
+          edit.ValidationError = null;
+          FsusComponentClasses.Ensure(editor, "fsus-invalid", false);
+          AutomationProperties.SetHelpText(editor, string.Empty);
+          AutomationProperties.SetItemStatus(
+            editor,
+            $"editing {edit.Kind.ToString().ToLowerInvariant()}");
+        }
+      }
+    };
+    editor.KeyDown += (_, e) =>
+    {
+      if (e.Handled)
+      {
+        return;
+      }
+
+      if (e.Key == Key.Enter)
+      {
+        CommitInlineEdit();
+        e.Handled = true;
+      }
+      else if (e.Key == Key.Escape)
+      {
+        CancelInlineEdit(FsusTreeInlineEditCancelReason.Escape);
+        e.Handled = true;
+      }
+    };
+    inlineEditor = editor;
+    FocusInlineEditor(editor, edit);
+
+    if (string.IsNullOrWhiteSpace(edit.ValidationError))
+    {
+      return editor;
+    }
+
+    var error = new TextBlock
+    {
+      Text = edit.ValidationError,
+      TextWrapping = global::Avalonia.Media.TextWrapping.Wrap,
+    };
+    FsusComponentClasses.SetBaseClasses(error, "fsus-tree-inline-error");
+    return new StackPanel
+    {
+      Spacing = global::FsusUI.Avalonia.FsusTokens.Space1Thickness.Left,
+      Children = { editor, error },
+    };
+  }
+
+  private void FocusInlineEditor(
+    TextBox editor,
+    FsusTreeInlineEditState edit)
+  {
+    Dispatcher.UIThread.Post(() =>
+    {
+      if (!ReferenceEquals(ActiveInlineEdit, edit) || !ReferenceEquals(inlineEditor, editor))
+      {
+        return;
+      }
+
+      editor.Focus();
+      if (edit.SelectAllOnFocus)
+      {
+        editor.SelectAll();
+        edit.SelectAllOnFocus = false;
+      }
+      else
+      {
+        editor.CaretIndex = editor.Text?.Length ?? 0;
+      }
+    });
+  }
+
+  private bool CancelInlineEdit(FsusTreeInlineEditCancelReason reason)
+  {
+    var edit = ActiveInlineEdit;
+    if (edit is null)
+    {
+      return false;
+    }
+
+    ActiveInlineEdit = null;
+    DetachInlineEditPointerGuard();
+    FocusedKey = ResolveInlineEditReturnFocus(edit);
+    RefreshView();
+    InlineEditCanceled?.Invoke(this, new FsusTreeInlineEditCanceledEventArgs(
+      edit.Kind,
+      edit.Key,
+      edit.ParentKey,
+      edit.Text,
+      reason));
+    return true;
+  }
+
+  private string ResolveInlineEditReturnFocus(FsusTreeInlineEditState edit)
+  {
+    if (FindNode(edit.PreviousFocusedKey) is not null)
+    {
+      return edit.PreviousFocusedKey;
+    }
+
+    if (edit.ParentKey is not null && FindNode(edit.ParentKey) is not null)
+    {
+      return edit.ParentKey;
+    }
+
+    return flattenedNodes.FirstOrDefault()?.Node.Key ?? string.Empty;
+  }
+
+  private void AttachInlineEditPointerGuard()
+  {
+    if (
+      ActiveInlineEdit is null ||
+      inlineEditTopLevel is not null ||
+      TopLevel.GetTopLevel(this) is not { } topLevel)
+    {
+      return;
+    }
+
+    inlineEditTopLevel = topLevel;
+    topLevel.AddHandler(
+      InputElement.PointerPressedEvent,
+      OnTopLevelPointerPressed,
+      RoutingStrategies.Tunnel,
+      handledEventsToo: true);
+  }
+
+  private void DetachInlineEditPointerGuard()
+  {
+    inlineEditTopLevel?.RemoveHandler(
+      InputElement.PointerPressedEvent,
+      OnTopLevelPointerPressed);
+    inlineEditTopLevel = null;
+    inlineEditor = null;
+  }
+
+  private void OnTopLevelPointerPressed(object? sender, PointerPressedEventArgs e)
+  {
+    if (
+      ActiveInlineEdit is null ||
+      inlineEditor is null ||
+      e.Source is Visual source &&
+      (ReferenceEquals(source, inlineEditor) || inlineEditor.IsVisualAncestorOf(source)))
+    {
+      return;
+    }
+
+    if (CancelInlineEdit(FsusTreeInlineEditCancelReason.PointerOutside))
+    {
+      e.Handled = true;
     }
   }
 
@@ -643,7 +1071,7 @@ public class FsusTree : ContentControl
     }
 
     Focus();
-    var expandable = view.Node.Children.Count > 0 || view.Node.HasLazyChildren;
+    var expandable = IsExpandable(view.Node);
     if (
       expandable &&
       point.Position.X <= global::FsusUI.Avalonia.FsusTokens.Space6Thickness.Left)

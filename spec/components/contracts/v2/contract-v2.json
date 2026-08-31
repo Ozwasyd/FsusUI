@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "a428153b228dc3fd59be64682427b7cbdae518706eef8ec241210e8a12c7094e",
+      "hash": "a839a80694486acac2db2b1790ddc9e7f195377aecc4173925af31945e9d3189",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -104136,6 +104136,32 @@
           ]
         },
         {
+          "member": "ActiveInlineEdit",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tree.avalonia-extra.active-inline-edit"
+          ]
+        },
+        {
+          "member": "CancelInlineEdit",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tree.avalonia-extra.cancel-inline-edit"
+          ]
+        },
+        {
           "member": "Checkable",
           "kind": "avalonia-extra",
           "governance": {
@@ -104185,6 +104211,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-tree.avalonia-extra.collapse"
+          ]
+        },
+        {
+          "member": "CommitInlineEdit",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tree.avalonia-extra.commit-inline-edit"
           ]
         },
         {
@@ -104289,6 +104328,32 @@
           },
           "scenarioIds": [
             "scenario.v2.el-tree.avalonia-extra.get-node-state"
+          ]
+        },
+        {
+          "member": "InlineEditCanceled",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tree.avalonia-extra.inline-edit-canceled"
+          ]
+        },
+        {
+          "member": "InlineEditCommitRequested",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tree.avalonia-extra.inline-edit-commit-requested"
           ]
         },
         {
@@ -104445,6 +104510,32 @@
           },
           "scenarioIds": [
             "scenario.v2.el-tree.avalonia-extra.selection-mode"
+          ]
+        },
+        {
+          "member": "StartCreate",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tree.avalonia-extra.start-create"
+          ]
+        },
+        {
+          "member": "StartRename",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tree.avalonia-extra.start-rename"
           ]
         },
         {
@@ -138577,6 +138668,86 @@
       "memberCount": 3,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-tree-expansion-changed-event-args"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCanceledEventArgs",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 5,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-tree-inline-edit-canceled-event-args"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCancelReason",
+      "kind": "enum",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 3,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-tree-inline-edit-cancel-reason"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCommitEventArgs",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 5,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-tree-inline-edit-commit-event-args"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditKind",
+      "kind": "enum",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-tree-inline-edit-kind"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditState",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 5,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-tree-inline-edit-state"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",

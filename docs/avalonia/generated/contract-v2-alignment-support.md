@@ -482,6 +482,11 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusTreeBudgetResult` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeChildrenLoader` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeExpansionChangedEventArgs` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTreeInlineEditCanceledEventArgs` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTreeInlineEditCancelReason` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTreeInlineEditCommitEventArgs` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTreeInlineEditKind` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTreeInlineEditState` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeInteractionSource` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeLazyLoadEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeLazyLoadState` | `avalonia-extra` |
