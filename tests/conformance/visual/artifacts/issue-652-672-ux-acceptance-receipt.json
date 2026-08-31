@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "6e45bc249b2d23f911edd3b8a2aedc96a45aa9077d5452210713950e419b51fd",
-  "candidateSha": "5bbf6109c5eecd3444875b052d9d2bc8c67ee85d",
-  "candidateDigest": "f055810345e2c8ea4b12f2d74a0a2d534a35c45b1b5ab54b2c1beff7841a480c",
+  "classificationReceiptDigest": "ef74d1e94e132a8064b31aa72c75484dc847ca0603a657a7d6b85c5b8ad1abeb",
+  "candidateSha": "84ea058468879a85703f37b8580ffc2986dffde7",
+  "candidateDigest": "4bfc99fd96e420b8b1af7e6faa20017ab1af3a631431100f69b48f45e8aa1b99",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,15 +13,15 @@
     "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
     "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
     "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506",
-    "7b34ea90d86060905b2df2868092a20244e35d3f4786b02f8b2f5e9ccfe7c78b",
+    "44c9b728456b10992e5b80453bd3efd3e5ba058a614b7d67f1c1467ebc556a1a",
     "4af382d77024fcd99fc430e279ec2a3a7b4035465ded20b5a74a8f0cfa04563d",
     "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1",
     "84256d5f4b725bf09aeef4187d9270b3513976efd68ee348dd28c1362eedcae9",
     "f5e26a1a64f47a0f1af7b712727f0f55058a6c916aad35aebb648a93cb87ef24"
   ],
-  "activeBaselineIdentityDigest": "32d0bfb4a55ed0b3da082c8f4a04e4da606539a051f3a7fb71c2e655e105eb1e",
+  "activeBaselineIdentityDigest": "7a6d4abdeee3b1e05bda410b0db7b8cf0a649911043f1920a15012f873b6aa73",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "6b358ebcc9fbf97b58f670a22c7a20f6c4af9c1d8d85264741d433b0805b9c4c",
+  "independenceEvidenceDigest": "90ced5d3af1b4daa21a993975bba3ea7e740b26ddae36ae1ad0ca971cdb6e7d4",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -98,5 +98,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "c19af26b81f644d1636226208bf703dda896bca7e757c56905eeb2fbc5e54b29"
+  "receiptDigest": "597cba433637045f689975888d9233356d1cfc1904087a4f6e531234b5cef37f"
 }

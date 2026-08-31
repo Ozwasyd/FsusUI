@@ -13,7 +13,7 @@
     { "id": "change-classification", "path": "docs/design/change-classification.md", "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84" },
     { "id": "visual-workflow", "path": "docs/workflows/visual-change.md", "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4" },
     { "id": "avalonia-index", "path": "docs/avalonia/README.md", "digest": "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506" },
-    { "id": "platform-differences", "path": "docs/avalonia/platform-differences.md", "digest": "7b34ea90d86060905b2df2868092a20244e35d3f4786b02f8b2f5e9ccfe7c78b" },
+    { "id": "platform-differences", "path": "docs/avalonia/platform-differences.md", "digest": "44c9b728456b10992e5b80453bd3efd3e5ba058a614b7d67f1c1467ebc556a1a" },
     { "id": "semantic-baseline", "path": "docs/avalonia/semantic-baseline.md", "digest": "4af382d77024fcd99fc430e279ec2a3a7b4035465ded20b5a74a8f0cfa04563d" },
     { "id": "api-stability", "path": "docs/api-stability.md", "digest": "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1" },
     { "id": "contract-v2", "path": "docs/api/contract-v2.md", "digest": "84256d5f4b725bf09aeef4187d9270b3513976efd68ee348dd28c1362eedcae9" },
@@ -24,20 +24,20 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "29bf2b51848969ea14b230e8580f3a2b982e3e93",
+    "revision": "54a4a382952bd48bb4cbe3cf5f6cf0ff9e7639a2",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "54bcc6a5863b45c5d17669ef3aac665465a7efea081677a545342e33029e5f4d",
+    "authorityDigest": "5f535d8cc894f4a796251044fd68b3c4d5c12edb10f53e809356d80e7ddd65f8",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "5bbf6109c5eecd3444875b052d9d2bc8c67ee85d",
-  "candidateDigest": "f055810345e2c8ea4b12f2d74a0a2d534a35c45b1b5ab54b2c1beff7841a480c",
+  "candidateSha": "84ea058468879a85703f37b8580ffc2986dffde7",
+  "candidateDigest": "4bfc99fd96e420b8b1af7e6faa20017ab1af3a631431100f69b48f45e8aa1b99",
   "stateEvidenceMatrix": [
-    { "state": "context-menu-pointer-keyboard-spelling-native-fallback-focus-accessibility", "viewport": "desktop and narrow desktop", "theme": "both", "evidenceDigest": "23806ecaf6c721ec5f5a27f6d0bbcc4995b5ccf304f9dd9d2cab038022436c58" },
-    { "state": "tagged-pdf-hierarchical-outline-capability-cancellation-stream", "viewport": "Windows and Linux adapter simulation", "theme": "both", "evidenceDigest": "2a02f77eb7d31d0ff9ed72ac986cea2c3718895ff98ad4a4c3737a5d0af113a9" }
+    { "state": "context-menu-pointer-keyboard-spelling-native-fallback-focus-accessibility", "viewport": "desktop and narrow desktop", "theme": "both", "evidenceDigest": "f34822c4302c32d625283d452b5e4e1d20c5d3a3be5ccc0b668234dba4943a3a" },
+    { "state": "tagged-pdf-hierarchical-outline-capability-cancellation-stream", "viewport": "Windows and Linux adapter simulation", "theme": "both", "evidenceDigest": "d79ca4bbfa5deeafb9bccd28e33731890f77c4ee7d45ed8ff0b0821f67dd77d8" }
   ],
   "inScope": [
     "one platform-neutral Avalonia WebView adapter contract for issues 652 and 672",
-    "typed context-menu, spelling, dictionary, developer-tools, PDF and document-outline capabilities",
+    "typed context-menu, spelling, dictionary, PDF and document-outline capabilities",
     "composition with FsusContextMenu, keyboard focus restoration, accessibility, themes and AOT verification",
     "public documentation, semantic baselines, Contract V2 registry and changeset"
   ],
@@ -48,8 +48,8 @@
     "new canonical design tokens, visual redesign or platform override",
     "claims of real external browser-engine or PDF-backend execution"
   ],
-  "classificationEvidenceDigest": "a40ed3ef1a0b5938f68d7606a17b2243056eb5e1c69b0d279ca3ef51385014b8",
+  "classificationEvidenceDigest": "73879b3662cb34140cba1907729cfa02dfa392e976bea64d13995e63717f260b",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "6e45bc249b2d23f911edd3b8a2aedc96a45aa9077d5452210713950e419b51fd"
+  "receiptDigest": "ef74d1e94e132a8064b31aa72c75484dc847ca0603a657a7d6b85c5b8ad1abeb"
 }
