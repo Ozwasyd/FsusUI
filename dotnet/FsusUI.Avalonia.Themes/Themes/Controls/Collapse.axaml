@@ -5,7 +5,7 @@
 
   <Style Selector="fsus|FsusCollapse">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
-    <Setter Property="BorderThickness" Value="0,1,0,1" />
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
     <Setter Property="Padding" Value="0" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
@@ -14,13 +14,14 @@
   <Style Selector="fsus|FsusCollapseItem">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel>
           <Border
             Name="PART_Header"
-            Height="48"
+            Height="52"
             Padding="20,0"
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
@@ -31,7 +32,7 @@
                 Grid.Column="0"
                 Text="{TemplateBinding Title}"
                 VerticalAlignment="Center"
-                FontSize="{DynamicResource FsusTypographyBodySmSize}"
+                FontSize="{DynamicResource FsusTypographyCaptionMdSize}"
                 FontWeight="Medium"
                 Foreground="{TemplateBinding Foreground}" />
               <Path
@@ -48,13 +49,16 @@
           </Border>
           <Border
             Name="PART_Content"
+            Height="48"
             Padding="20,0,20,25"
             Background="{TemplateBinding Background}"
+            BorderBrush="{DynamicResource FsusThemeBorderBrush}"
+            BorderThickness="0,0,0,1"
             IsVisible="{TemplateBinding IsActive}">
             <ContentPresenter
               Content="{TemplateBinding Content}"
               ContentTemplate="{TemplateBinding ContentTemplate}"
-              FontSize="{DynamicResource FsusTypographyBodySmSize}"
+              FontSize="{DynamicResource FsusTypographyCaptionMdSize}"
               Foreground="{TemplateBinding Foreground}" />
           </Border>
         </StackPanel>

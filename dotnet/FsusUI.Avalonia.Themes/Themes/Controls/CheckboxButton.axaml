@@ -3,15 +3,22 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:fsus="using:FsusUI.Avalonia.Controls">
 
+  <!-- Web authority: fsus-theme.scss `.el-checkbox-button__inner` —
+       transparent surface and border, text.quiet label at weight 500,
+       40px min height, 0×16px padding, 6px radius. Checked state swaps to
+       the paper surface, text-primary label, and the lighter panel shadow;
+       no blue border on the checked state. -->
   <Style Selector="fsus|FsusCheckboxButton">
-    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
-    <Setter Property="Padding" Value="{DynamicResource FsusSpace4}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="FontWeight" Value="Medium" />
-    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="FontWeight" Value="{DynamicResource FsusTypographyWeightMedium}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
     <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Border
@@ -19,7 +26,7 @@
           BorderBrush="{TemplateBinding BorderBrush}"
           BorderThickness="{TemplateBinding BorderThickness}"
           Padding="{TemplateBinding Padding}"
-          CornerRadius="{DynamicResource FsusRadiusControlSm}">
+          CornerRadius="6">
           <ContentPresenter
             Content="{TemplateBinding Content}"
             ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -34,9 +41,22 @@
   </Style>
 
   <Style Selector="fsus|FsusCheckboxButton.fsus-checked">
-    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource FsusThemeFocusBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+  </Style>
+
+  <Style Selector="fsus|FsusCheckboxButton.fsus-checked /template/ Border">
+    <Setter Property="BoxShadow" Value="0 2 8 0 #0F172A0A" />
+  </Style>
+
+  <Style Selector="fsus|FsusCheckboxButton.fsus-disabled">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorBorderLightBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Cursor" Value="Arrow" />
   </Style>
 
   <Style Selector="fsus|FsusCheckboxButton.fsus-disabled">
