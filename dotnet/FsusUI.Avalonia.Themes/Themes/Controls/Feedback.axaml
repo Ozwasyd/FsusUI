@@ -1,5 +1,6 @@
 <Styles
   xmlns="https://github.com/avaloniaui"
+  xmlns:conv="using:Avalonia.Data.Converters"
   xmlns:fsus="using:FsusUI.Avalonia.Controls"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Style Selector="fsus|FsusTag, fsus|FsusBadge, fsus|FsusAlert">
@@ -125,7 +126,29 @@
   </Style>
 
   <Style Selector="fsus|FsusDivider">
-    <Setter Property="Margin" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Margin" Value="0" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel>
+          <TextBlock
+            Name="PART_Title"
+            Text="{TemplateBinding Title}"
+            FontSize="13"
+            FontWeight="Medium"
+            Foreground="{TemplateBinding Foreground}"
+            Margin="0,0,0,12"
+            IsVisible="False" />
+          <Border
+            Name="PART_Line"
+            Height="1"
+            Background="{DynamicResource FsusColorBorderLighterBrush}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusDivider.fsus-has-title /template/ TextBlock#PART_Title">
+    <Setter Property="IsVisible" Value="True" />
   </Style>
 </Styles>

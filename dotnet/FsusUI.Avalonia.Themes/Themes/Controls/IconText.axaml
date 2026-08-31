@@ -64,4 +64,37 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
+
+  <!-- Web authority: el-link type colors — default uses text-color-regular
+       (quiet), and primary/success/warning/danger/info tint the label with
+       the corresponding action color. Links keep a text surface: no fill,
+       no border. -->
+  <Style Selector="fsus|FsusLink">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="4,1" />
+    <Setter Property="FontWeight" Value="500" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusLink.fsus-primary">
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusLink.fsus-success">
+    <Setter Property="Foreground" Value="#16A34A" />
+  </Style>
+
+  <Style Selector="fsus|FsusLink.fsus-warning">
+    <Setter Property="Foreground" Value="#D97706" />
+  </Style>
+
+  <Style Selector="fsus|FsusLink.fsus-danger">
+    <Setter Property="Foreground" Value="#DC2626" />
+  </Style>
+
+  <Style Selector="fsus|FsusLink.fsus-info">
+    <Setter Property="Foreground" Value="#71717A" />
+  </Style>
 </Styles>

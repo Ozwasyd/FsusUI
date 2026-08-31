@@ -5,7 +5,11 @@ Component ID: `icon-text`
 ## Avalonia API
 
 Use `FsusIcon`, `FsusText`, and `FsusLink` for generated icon resources,
-token-backed text variants, and command-capable text links.
+token-backed text variants, and command-capable text links. `FsusLink` renders
+the Web `el-link` type authority: the default label uses the muted text color,
+and `Primary`/`Success`/`Warning`/`Danger`/`Info` variants tint the label with
+the corresponding action color while keeping a text surface (no fill, no
+border, 4px inline padding, weight 500).
 
 ## Vue Contract Mapping
 
