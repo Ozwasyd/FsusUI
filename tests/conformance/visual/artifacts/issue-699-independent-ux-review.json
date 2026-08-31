@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "issue": 699,
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "12ea96c31d642059d3e1cef8bff3340453fcbeb8",
+  "candidateDigest": "1c3a006dc1c62104d1cb5c345c0bf41faee10a4c194371d04807539d50c6ad9f",
+  "classificationReceiptDigest": "6d4067cd300f0e0383b1a124e53188222a15b29bc479a6b9d4e824f1303811eb",
+  "productionFixture": true,
+  "implementationModifiedPaths": [],
+  "focusedTest": {
+    "command": "FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT=tests/conformance/visual/artifacts/issue-699 dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --filter FullyQualifiedName~FsusImageViewerHeadlessTests --logger 'console;verbosity=normal'",
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "preservedKeyboardAndFocusTest": "FsusUI.Avalonia.HeadlessTests.FsusImageViewerHeadlessTests.ImageViewerHeadlessKeyboardNavigationEscapeAndFocusRestoration",
+    "dragInteractionTest": "FsusUI.Avalonia.HeadlessTests.FsusImageViewerHeadlessTests.ImageViewerRealPointerWheelDragCaptureCancelAndSourceSwitchContract"
+  },
+  "interactionEvidence": {
+    "path": "tests/conformance/visual/artifacts/issue-699-avalonia-image-viewer-automation-report.json",
+    "digest": "7293401c9d2010e5fd06195feea0963ade4081898563fb67adbba627fa13796f",
+    "duringPointerCapture": "IsPanning=true, Cursor=SizeAll, translation=260 by 160",
+    "afterMouseUp": "IsPanning=false, panning class removed, Cursor=null, translation retained at 24 by 18"
+  },
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "All four inspected light and dark 96/144 DPI renders show the default 100% state, the 150% wheel-zoomed captured-drag state clipped to the viewer viewport, and the source-switch reset state without content escaping the viewport.",
+      "The production headless interaction report directly records the captured primary-pointer drag with SizeAll cursor and changed translation, followed by MouseUp clearing panning and the cursor while retaining translation.",
+      "The exact focused run passed all seven image-viewer tests, including Escape, previous/next keyboard navigation, focus restoration, accessible status, loader lifecycle, zoom bounds, reset, and source-switch reset/preserve behavior."
+    ]
+  },
+  "inspectedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-image-viewer-light-96dpi.png",
+      "digest": "ca704c7d7ab30d59b18a8a53b8b17220308a4fa6ea9d7f3f409476de864239b7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-image-viewer-light-144dpi.png",
+      "digest": "5110c9851301782293958bd019363920c9cbe3ce8d129db7826cf08548801b3b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-image-viewer-dark-96dpi.png",
+      "digest": "be80ee003ff9a816ec8ae5008383deac38215ee7552788487c53184d7c836159"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-image-viewer-dark-144dpi.png",
+      "digest": "6d2b832c9f5bf2b754a82381540482593e832de26ac9f8e7af0687a097109cc5"
+    }
+  ],
+  "manifest": {
+    "path": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-avalonia-image-viewer-render-manifest.json",
+    "digest": "a68955e8602bef96f7f2d606dbf80b0b5edf3304927a7401c130a3c75e9cfedc"
+  },
+  "limitation": "Deterministic local Avalonia headless Skia rendering and interaction simulation; the operating-system cursor is not composited into screenshots and no physical display or native assistive-technology session is claimed. Cursor evidence comes from the production Avalonia property during captured drag."
+}
