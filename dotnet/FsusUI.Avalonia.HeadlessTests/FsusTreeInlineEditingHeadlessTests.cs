@@ -25,7 +25,7 @@ public class FsusTreeInlineEditingHeadlessTests
   private const string CandidateEnvironmentVariable = "FSUS_ISSUE_697_CANDIDATE_SHA";
 
   [AvaloniaFact]
-  public void RealInputCommitValidationCancelAndStatePreservationAreComposable()
+  public async Task RealInputCommitValidationCancelAndStatePreservationAreComposable()
   {
     EnsureFullTheme();
     var fixture = CreateFixture(FsusThemeVariant.Light, FsusDensity.Default);
@@ -121,6 +121,34 @@ public class FsusTreeInlineEditingHeadlessTests
     Assert.Equal("WorkspaceService.cs", fixture.Service.Label);
     Assert.DoesNotContain("readme", fixture.Tree.SelectedKeys);
     Assert.Empty(activations);
+
+    fixture.Tree.ChildrenLoader = (node, _) => ValueTask.FromResult<IReadOnlyList<FsusTreeNode>>(
+      [new FsusTreeNode($"{node.Key}-child", "Generated.cs")]);
+    Assert.True(fixture.Tree.StartCreate("lazy-draft", fixture.Lazy.Key));
+    Arrange(fixture.Root);
+    Dispatcher.UIThread.RunJobs();
+    editor = FindEditor(fixture.Tree, "lazy-draft");
+    editor.Text = "CreatedAfterLoad.cs";
+    Assert.True(await fixture.Tree.LoadChildrenAsync(fixture.Lazy.Key));
+    Arrange(fixture.Root);
+    Dispatcher.UIThread.RunJobs();
+    Assert.Equal("lazy-draft", fixture.Tree.ActiveInlineEdit?.Key);
+    Assert.Equal("CreatedAfterLoad.cs", fixture.Tree.ActiveInlineEdit?.Text);
+    Assert.Equal("lazy-draft", fixture.Tree.FocusedKey);
+    Assert.Contains(fixture.Lazy.Key, fixture.Tree.ExpandedKeys);
+    Assert.True(FindEditor(fixture.Tree, "lazy-draft").IsFocused);
+
+    WriteInteractionEvidence(new[]
+    {
+      new { id = "collapsed-folder-create", passed = true, result = "expanded, empty editor focused, transient node absent from app data" },
+      new { id = "rename-selection", passed = true, result = "existing name selected while node selection and expansion remain" },
+      new { id = "enter-commit", passed = true, result = "one request per Enter; validation retained editor; accepted request ended editing without app-data mutation" },
+      new { id = "escape-cancel", passed = true, result = "Escape emitted stable key and text without renaming app data" },
+      new { id = "outside-pointer-cancel", passed = true, result = "cancel completed before target selection or activation" },
+      new { id = "validation-accessibility", passed = true, result = "editor stayed visible and focused with invalid class, item status, help text, and automation peer" },
+      new { id = "refresh-preservation", passed = true, result = "active rename, focus, node selection, and expansion survived RefreshView" },
+      new { id = "lazy-load-preservation", passed = true, result = "active create key, typed text, focus, and parent expansion survived same-parent load" },
+    });
     fixture.Window.Close();
   }
 
@@ -414,6 +442,26 @@ public class FsusTreeInlineEditingHeadlessTests
       }
     }
     throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
+  }
+
+  private static void WriteInteractionEvidence<T>(IReadOnlyList<T> outcomes)
+  {
+    var outputRoot = Environment.GetEnvironmentVariable("FSUS_ISSUE_697_EVIDENCE_ROOT")
+      ?? Path.Combine(AppContext.BaseDirectory, "TestResults", "issue-697-inline-edit");
+    Directory.CreateDirectory(outputRoot);
+    var report = new
+    {
+      schemaVersion = 1,
+      candidateSha = Environment.GetEnvironmentVariable(CandidateEnvironmentVariable)
+        ?? "working-tree-candidate",
+      evidenceClass = "local-headless-real-input-and-dispatcher",
+      productionFixture = true,
+      limitation = "Avalonia Headless real input injection and dispatcher execution; no physical input device claim.",
+      outcomes,
+    };
+    File.WriteAllText(
+      Path.Combine(outputRoot, "interaction-report.json"),
+      JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }) + "\n");
   }
 
   private static void Arrange(Control control)

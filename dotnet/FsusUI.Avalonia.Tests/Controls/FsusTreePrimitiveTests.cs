@@ -306,7 +306,9 @@ public class FsusTreePrimitiveTests
     var tree = new FsusTree();
     var folder = new FsusTreeNode("src", "src");
     folder.Children.Add(new FsusTreeNode("existing", "Existing.cs"));
+    var emptyFolder = new FsusTreeNode("empty", "Empty folder");
     tree.Nodes.Add(folder);
+    tree.Nodes.Add(emptyFolder);
     tree.Nodes.Add(new FsusTreeNode("readme", "README.md"));
     tree.RefreshView();
     tree.ToggleSelection("readme");
@@ -339,6 +341,12 @@ public class FsusTreePrimitiveTests
     Assert.Null(tree.ActiveInlineEdit?.ParentKey);
     Assert.True(tree.CancelInlineEdit());
     Assert.DoesNotContain(tree.Nodes, child => child.Key == "root-draft");
+
+    Assert.True(tree.StartCreate("empty-draft", emptyFolder.Key));
+    Assert.Equal(emptyFolder.Key, tree.ActiveInlineEdit?.ParentKey);
+    Assert.Contains(emptyFolder.Key, tree.ExpandedKeys);
+    Assert.True(tree.CancelInlineEdit());
+    Assert.DoesNotContain(emptyFolder.Children, child => child.Key == "empty-draft");
   }
 
   [Fact]
