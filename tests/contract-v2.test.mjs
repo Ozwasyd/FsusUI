@@ -416,6 +416,7 @@ test('Web-only components project complete reviewed platform exceptions', () => 
     ]) {
       assert.ok(contract.platformException[field], `${contract.id} ${field}`)
     }
+    assert.ok(contract.platformException.nativeSymbols.length > 0, contract.id)
   }
 })
 
@@ -428,6 +429,24 @@ test('Web-only component exception mutation fails closed', () => {
   assert.match(
     validateRegistry(mutated, gate).join('\n'),
     /component-v2\.el-popper platformException missing testPolicy/u,
+  )
+
+  const missingAuthority = clone(committedRegistry)
+  missingAuthority.contracts.find(
+    (contract) => contract.id === 'component-v2.el-popper',
+  ).platformException.authority = 'spec/avalonia/semantic/not-found.json'
+  assert.match(
+    validateRegistry(missingAuthority, gate).join('\n'),
+    /component-v2\.el-popper platformException authority is not a readable repository path/u,
+  )
+
+  const fakeSymbol = clone(committedRegistry)
+  fakeSymbol.contracts.find(
+    (contract) => contract.id === 'component-v2.el-popper-arrow',
+  ).platformException.nativeSymbols[1].members = ['NotARealMember']
+  assert.match(
+    validateRegistry(fakeSymbol, gate).join('\n'),
+    /component-v2\.el-popper-arrow platformException native member .*NotARealMember is missing/u,
   )
 
   const fakeNative = clone(committedRegistry)
@@ -478,6 +497,51 @@ test('content regions bind only to real Avalonia content properties', () => {
       { name: 'default', status: 'aligned-candidate', member: 'Content' },
       { name: 'icon', status: 'missing', member: null },
       { name: 'loading', status: 'missing', member: null },
+    ],
+  )
+})
+
+test('named scalar properties cannot satisfy content regions implicitly', () => {
+  const expectations = new Map([
+    ['component-v2.el-conversation-list-item', ['preview', 'title']],
+    ['component-v2.el-distribution-bar-row', ['label', 'value']],
+    ['component-v2.el-message-bubble', ['author']],
+    ['component-v2.el-metric-item', ['label']],
+  ])
+  for (const [id, names] of expectations) {
+    const contract = committedRegistry.contracts.find(
+      (candidate) => candidate.id === id,
+    )
+    for (const name of names) {
+      const input = contract.inputs.find((member) => member.name === name)
+      const region = contract.contentRegions.find(
+        (member) => member.name === name,
+      )
+      assert.ok(input?.avalonia, `${id} input ${name}`)
+      assert.equal(region?.avalonia, null, `${id} region ${name}`)
+      assert.equal(region?.status, 'missing', `${id} region ${name}`)
+    }
+  }
+
+  const empty = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-empty-state',
+  )
+  assert.deepEqual(
+    empty.contentRegions.map(({ name, status, avalonia }) => ({
+      name,
+      status,
+      member: avalonia?.member ?? null,
+    })),
+    [
+      { name: 'actions', status: 'aligned-candidate', member: 'ActionContent' },
+      { name: 'default', status: 'aligned-candidate', member: 'Content' },
+      { name: 'description', status: 'missing', member: null },
+      {
+        name: 'illustration',
+        status: 'aligned-candidate',
+        member: 'IllustrationContent',
+      },
+      { name: 'title', status: 'missing', member: null },
     ],
   )
 })

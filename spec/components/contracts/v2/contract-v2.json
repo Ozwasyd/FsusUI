@@ -34,7 +34,7 @@
     },
     "v1ContractRegistry": {
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
-      "hash": "087685b3db7af106f8b7d7499810b24cb4ba3ca1ccc6619cd9708907813511b8"
+      "hash": "7112c5411cac70096ed04fbd8c872aa6eeec43e4f191d3e1e435129d936183dc"
     }
   },
   "rules": {
@@ -7695,13 +7695,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Title",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -7713,7 +7708,12 @@
           "scenarioIds": [
             "scenario.v2.el-alert.content-region.title"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -7860,6 +7860,17 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "member": "title",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "avaloniaExtras": [
@@ -7977,11 +7988,11 @@
       ],
       "coverage": {
         "total": 10,
-        "alignedCandidate": 2,
+        "alignedCandidate": 1,
         "partial": 2,
-        "missing": 6,
+        "missing": 7,
         "webOnly": 0,
-        "mappedPercent": 40
+        "mappedPercent": 30
       }
     },
     {
@@ -24233,13 +24244,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Title",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -24251,7 +24257,12 @@
           "scenarioIds": [
             "scenario.v2.el-collapse-item.content-region.title"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -24342,6 +24353,17 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "member": "title",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "avaloniaExtras": [
@@ -24391,11 +24413,11 @@
       ],
       "coverage": {
         "total": 6,
-        "alignedCandidate": 4,
+        "alignedCandidate": 3,
         "partial": 0,
-        "missing": 2,
+        "missing": 3,
         "webOnly": 0,
-        "mappedPercent": 66.7
+        "mappedPercent": 50
       }
     },
     {
@@ -24555,8 +24577,14 @@
         "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
         "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
         "reviewedAt": "2026-08-31",
-        "authority": "docs/avalonia/components/data-display.md",
-        "reviewAfter": "2026-12-31"
+        "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+        "reviewAfter": "2026-12-31",
+        "nativeSymbols": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCollapse",
+            "members": []
+          }
+        ]
       }
     },
     {
@@ -29368,13 +29396,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Preview",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -29386,7 +29409,12 @@
           "scenarioIds": [
             "scenario.v2.el-conversation-list-item.content-region.preview"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "title",
@@ -29400,13 +29428,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Title",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -29418,7 +29441,12 @@
           "scenarioIds": [
             "scenario.v2.el-conversation-list-item.content-region.title"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -29598,6 +29626,28 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "member": "preview",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "title",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "avaloniaExtras": [
@@ -29681,11 +29731,11 @@
       ],
       "coverage": {
         "total": 13,
-        "alignedCandidate": 3,
+        "alignedCandidate": 1,
         "partial": 2,
-        "missing": 8,
+        "missing": 10,
         "webOnly": 0,
-        "mappedPercent": 38.5
+        "mappedPercent": 23.1
       }
     },
     {
@@ -37772,13 +37822,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Label",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -37790,7 +37835,12 @@
           "scenarioIds": [
             "scenario.v2.el-distribution-bar-row.content-region.label"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "rank",
@@ -37836,13 +37886,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Value",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -37854,7 +37899,12 @@
           "scenarioIds": [
             "scenario.v2.el-distribution-bar-row.content-region.value"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -37981,7 +38031,29 @@
           }
         },
         {
+          "member": "label",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "rank",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "value",
           "kind": "contentRegion",
           "status": "missing",
           "governance": {
@@ -38062,11 +38134,11 @@
       ],
       "coverage": {
         "total": 8,
-        "alignedCandidate": 2,
+        "alignedCandidate": 0,
         "partial": 3,
-        "missing": 3,
+        "missing": 5,
         "webOnly": 0,
-        "mappedPercent": 62.5
+        "mappedPercent": 37.5
       }
     },
     {
@@ -41790,13 +41862,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Description",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -41808,7 +41875,12 @@
           "scenarioIds": [
             "scenario.v2.el-empty.content-region.description"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "image",
@@ -41967,6 +42039,17 @@
           }
         },
         {
+          "member": "description",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "image",
           "kind": "contentRegion",
           "status": "missing",
@@ -42035,11 +42118,11 @@
       ],
       "coverage": {
         "total": 8,
-        "alignedCandidate": 2,
+        "alignedCandidate": 1,
         "partial": 1,
-        "missing": 5,
+        "missing": 6,
         "webOnly": 0,
-        "mappedPercent": 37.5
+        "mappedPercent": 25
       }
     },
     {
@@ -42820,8 +42903,13 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "ActionContent",
+            "content": true,
+            "contextType": null,
+            "payload": []
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -42833,12 +42921,7 @@
           "scenarioIds": [
             "scenario.v2.el-empty-state.content-region.actions"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia content region in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "default",
@@ -42884,13 +42967,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Description",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -42902,7 +42980,12 @@
           "scenarioIds": [
             "scenario.v2.el-empty-state.content-region.description"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "illustration",
@@ -42948,13 +43031,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Title",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -42966,7 +43044,12 @@
           "scenarioIds": [
             "scenario.v2.el-empty-state.content-region.title"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -43126,7 +43209,18 @@
           }
         },
         {
-          "member": "actions",
+          "member": "description",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "title",
           "kind": "contentRegion",
           "status": "missing",
           "governance": {
@@ -43137,21 +43231,7 @@
           }
         }
       ],
-      "avaloniaExtras": [
-        {
-          "member": "ActionContent",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-empty-state.avalonia-extra.fsus-ui-avalonia-controls-fsus-empty.action-content"
-          ]
-        }
-      ],
+      "avaloniaExtras": [],
       "scenarioIds": [
         "scenario.v2.el-empty-state.input.action-variant",
         "scenario.v2.el-empty-state.input.aria-live",
@@ -43173,11 +43253,11 @@
       ],
       "coverage": {
         "total": 13,
-        "alignedCandidate": 4,
+        "alignedCandidate": 3,
         "partial": 2,
-        "missing": 7,
+        "missing": 8,
         "webOnly": 0,
-        "mappedPercent": 46.2
+        "mappedPercent": 38.5
       }
     },
     {
@@ -45756,13 +45836,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Label",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -45774,7 +45849,12 @@
           "scenarioIds": [
             "scenario.v2.el-form-item.content-region.label"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -45983,6 +46063,17 @@
         },
         {
           "member": "error",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "label",
           "kind": "contentRegion",
           "status": "missing",
           "governance": {
@@ -46208,11 +46299,11 @@
       ],
       "coverage": {
         "total": 20,
-        "alignedCandidate": 6,
+        "alignedCandidate": 5,
         "partial": 2,
-        "missing": 12,
+        "missing": 13,
         "webOnly": 0,
-        "mappedPercent": 40
+        "mappedPercent": 35
       }
     },
     {
@@ -52917,13 +53008,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "PrefixContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -52935,7 +53021,12 @@
           "scenarioIds": [
             "scenario.v2.el-input.content-region.prefix"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "prepend",
@@ -52981,13 +53072,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "SuffixContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -52999,7 +53085,12 @@
           "scenarioIds": [
             "scenario.v2.el-input.content-region.suffix"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -53604,7 +53695,29 @@
           }
         },
         {
+          "member": "prefix",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "prepend",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "suffix",
           "kind": "contentRegion",
           "status": "missing",
           "governance": {
@@ -53721,6 +53834,32 @@
           ]
         },
         {
+          "member": "PrefixContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-input.avalonia-extra.fsus-ui-avalonia-controls-fsus-input.prefix-content"
+          ]
+        },
+        {
+          "member": "SuffixContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-input.avalonia-extra.fsus-ui-avalonia-controls-fsus-input.suffix-content"
+          ]
+        },
+        {
           "member": "UpdateImeComposition",
           "kind": "avalonia-extra",
           "governance": {
@@ -53828,11 +53967,11 @@
       ],
       "coverage": {
         "total": 52,
-        "alignedCandidate": 3,
+        "alignedCandidate": 1,
         "partial": 1,
-        "missing": 48,
+        "missing": 50,
         "webOnly": 0,
-        "mappedPercent": 7.7
+        "mappedPercent": 3.8
       }
     },
     {
@@ -66961,13 +67100,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Author",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -66979,7 +67113,12 @@
           "scenarioIds": [
             "scenario.v2.el-message-bubble.content-region.author"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "body",
@@ -67191,6 +67330,17 @@
           }
         },
         {
+          "member": "author",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "body",
           "kind": "contentRegion",
           "status": "missing",
@@ -67294,11 +67444,11 @@
       ],
       "coverage": {
         "total": 8,
-        "alignedCandidate": 1,
+        "alignedCandidate": 0,
         "partial": 1,
-        "missing": 6,
+        "missing": 7,
         "webOnly": 0,
-        "mappedPercent": 25
+        "mappedPercent": 12.5
       }
     },
     {
@@ -68464,13 +68614,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Label",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -68482,7 +68627,12 @@
           "scenarioIds": [
             "scenario.v2.el-metric-item.content-region.label"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "meta",
@@ -68705,6 +68855,17 @@
           }
         },
         {
+          "member": "label",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "meta",
           "kind": "contentRegion",
           "status": "missing",
@@ -68822,11 +68983,11 @@
       ],
       "coverage": {
         "total": 9,
-        "alignedCandidate": 1,
+        "alignedCandidate": 0,
         "partial": 1,
-        "missing": 7,
+        "missing": 8,
         "webOnly": 0,
-        "mappedPercent": 22.2
+        "mappedPercent": 11.1
       }
     },
     {
@@ -72429,13 +72590,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Breadcrumb",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -72447,7 +72603,12 @@
           "scenarioIds": [
             "scenario.v2.el-page-header.content-region.breadcrumb"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "content",
@@ -72557,13 +72718,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "IconContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -72575,7 +72731,12 @@
           "scenarioIds": [
             "scenario.v2.el-page-header.content-region.icon"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "title",
@@ -72589,13 +72750,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Title",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -72607,7 +72763,12 @@
           "scenarioIds": [
             "scenario.v2.el-page-header.content-region.title"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -72701,6 +72862,17 @@
           }
         },
         {
+          "member": "breadcrumb",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "content",
           "kind": "contentRegion",
           "status": "missing",
@@ -72713,6 +72885,28 @@
         },
         {
           "member": "extra",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "icon",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "title",
           "kind": "contentRegion",
           "status": "missing",
           "governance": {
@@ -72751,6 +72945,19 @@
           ]
         },
         {
+          "member": "Breadcrumb",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-page-header.avalonia-extra.fsus-ui-avalonia-controls-fsus-page-header.breadcrumb"
+          ]
+        },
+        {
           "member": "Description",
           "kind": "avalonia-extra",
           "governance": {
@@ -72761,6 +72968,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-page-header.avalonia-extra.fsus-ui-avalonia-controls-fsus-page-header.description"
+          ]
+        },
+        {
+          "member": "IconContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-page-header.avalonia-extra.fsus-ui-avalonia-controls-fsus-page-header.icon-content"
           ]
         },
         {
@@ -72799,11 +73019,11 @@
       ],
       "coverage": {
         "total": 10,
-        "alignedCandidate": 5,
+        "alignedCandidate": 2,
         "partial": 0,
-        "missing": 5,
+        "missing": 8,
         "webOnly": 0,
-        "mappedPercent": 50
+        "mappedPercent": 20
       }
     },
     {
@@ -74494,13 +74714,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Pagination",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -74512,7 +74727,12 @@
           "scenarioIds": [
             "scenario.v2.el-pagination-bar.content-region.pagination"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "summary",
@@ -74638,6 +74858,17 @@
           }
         },
         {
+          "member": "pagination",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "summary",
           "kind": "contentRegion",
           "status": "missing",
@@ -74675,6 +74906,19 @@
           "scenarioIds": [
             "scenario.v2.el-pagination-bar.avalonia-extra.fsus-ui-avalonia-controls-fsus-pagination-bar.page-size"
           ]
+        },
+        {
+          "member": "Pagination",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-pagination-bar.avalonia-extra.fsus-ui-avalonia-controls-fsus-pagination-bar.pagination"
+          ]
         }
       ],
       "scenarioIds": [
@@ -74690,11 +74934,11 @@
       ],
       "coverage": {
         "total": 5,
-        "alignedCandidate": 2,
+        "alignedCandidate": 1,
         "partial": 0,
-        "missing": 3,
+        "missing": 4,
         "webOnly": 0,
-        "mappedPercent": 40
+        "mappedPercent": 20
       }
     },
     {
@@ -81699,8 +81943,34 @@
         "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
         "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
         "reviewedAt": "2026-08-31",
-        "authority": "docs/avalonia/components/anchored-overlay.md",
-        "reviewAfter": "2026-12-31"
+        "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+        "reviewAfter": "2026-12-31",
+        "nativeSymbols": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+            "members": []
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPopover",
+            "members": []
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
+            "members": []
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDropdown",
+            "members": []
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+            "members": []
+          },
+          {
+            "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+            "members": []
+          }
+        ]
       }
     },
     {
@@ -81897,8 +82167,20 @@
         "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
         "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
         "reviewedAt": "2026-08-31",
-        "authority": "docs/avalonia/components/anchored-overlay.md",
-        "reviewAfter": "2026-12-31"
+        "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+        "reviewAfter": "2026-12-31",
+        "nativeSymbols": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAnchoredPlacement",
+            "members": []
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+            "members": [
+              "EffectivePlacement"
+            ]
+          }
+        ]
       }
     },
     {
@@ -83021,8 +83303,28 @@
         "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
         "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
         "reviewedAt": "2026-08-31",
-        "authority": "docs/avalonia/overlay-host.md",
-        "reviewAfter": "2026-12-31"
+        "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+        "reviewAfter": "2026-12-31",
+        "nativeSymbols": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+            "members": [
+              "OverlayContent"
+            ]
+          },
+          {
+            "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+            "members": []
+          },
+          {
+            "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+            "members": []
+          },
+          {
+            "type": "FsusUI.Avalonia.Overlay.FsusOverlayOptions",
+            "members": []
+          }
+        ]
       }
     },
     {
@@ -83641,8 +83943,20 @@
         "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
         "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
         "reviewedAt": "2026-08-31",
-        "authority": "docs/avalonia/components/anchored-overlay.md",
-        "reviewAfter": "2026-12-31"
+        "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+        "reviewAfter": "2026-12-31",
+        "nativeSymbols": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+            "members": [
+              "Content",
+              "TriggerMode",
+              "TriggerClick",
+              "Open",
+              "CloseAsync"
+            ]
+          }
+        ]
       }
     },
     {
@@ -86046,13 +86360,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Brand",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -86064,7 +86373,12 @@
           "scenarioIds": [
             "scenario.v2.el-public-shell.content-region.brand"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "default",
@@ -86798,6 +87112,17 @@
           }
         },
         {
+          "member": "brand",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "desktop-actions",
           "kind": "contentRegion",
           "status": "missing",
@@ -87088,11 +87413,11 @@
       ],
       "coverage": {
         "total": 45,
-        "alignedCandidate": 2,
+        "alignedCandidate": 1,
         "partial": 7,
-        "missing": 36,
+        "missing": 37,
         "webOnly": 0,
-        "mappedPercent": 20
+        "mappedPercent": 17.8
       }
     },
     {
@@ -92173,13 +92498,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "IconContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -92191,7 +92511,12 @@
           "scenarioIds": [
             "scenario.v2.el-result.content-region.icon"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "sub-title",
@@ -92237,13 +92562,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Title",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -92255,7 +92575,12 @@
           "scenarioIds": [
             "scenario.v2.el-result.content-region.title"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -92371,7 +92696,29 @@
           }
         },
         {
+          "member": "icon",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "sub-title",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "title",
           "kind": "contentRegion",
           "status": "missing",
           "governance": {
@@ -92410,6 +92757,19 @@
           ]
         },
         {
+          "member": "IconContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-result.avalonia-extra.fsus-ui-avalonia-controls-fsus-result.icon-content"
+          ]
+        },
+        {
           "member": "Variant",
           "kind": "avalonia-extra",
           "governance": {
@@ -92438,11 +92798,11 @@
       ],
       "coverage": {
         "total": 7,
-        "alignedCandidate": 2,
+        "alignedCandidate": 0,
         "partial": 1,
-        "missing": 4,
+        "missing": 6,
         "webOnly": 0,
-        "mappedPercent": 42.9
+        "mappedPercent": 14.3
       }
     },
     {
@@ -103209,13 +103569,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "BrandContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -103227,7 +103582,12 @@
           "scenarioIds": [
             "scenario.v2.el-site-header.content-region.brand"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "desktop-actions",
@@ -103241,13 +103601,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "DesktopActionsContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -103259,7 +103614,12 @@
           "scenarioIds": [
             "scenario.v2.el-site-header.content-region.desktop-actions"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "desktop-nav",
@@ -103337,13 +103697,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "MobilePrimaryActionsContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -103355,7 +103710,12 @@
           "scenarioIds": [
             "scenario.v2.el-site-header.content-region.mobile-primary-actions"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "mobile-secondary-actions",
@@ -103369,13 +103729,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "MobileSecondaryActionsContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -103387,7 +103742,12 @@
           "scenarioIds": [
             "scenario.v2.el-site-header.content-region.mobile-secondary-actions"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -103580,6 +103940,28 @@
           }
         },
         {
+          "member": "brand",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "desktop-actions",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "desktop-nav",
           "kind": "contentRegion",
           "status": "missing",
@@ -103592,6 +103974,28 @@
         },
         {
           "member": "mobile-overflow-trigger",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "mobile-primary-actions",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "mobile-secondary-actions",
           "kind": "contentRegion",
           "status": "missing",
           "governance": {
@@ -103614,6 +104018,32 @@
           },
           "scenarioIds": [
             "scenario.v2.el-site-header.avalonia-extra.fsus-ui-avalonia-controls-fsus-site-header.accessible-name"
+          ]
+        },
+        {
+          "member": "BrandContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-site-header.avalonia-extra.fsus-ui-avalonia-controls-fsus-site-header.brand-content"
+          ]
+        },
+        {
+          "member": "DesktopActionsContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-site-header.avalonia-extra.fsus-ui-avalonia-controls-fsus-site-header.desktop-actions-content"
           ]
         },
         {
@@ -103695,6 +104125,32 @@
           ]
         },
         {
+          "member": "MobilePrimaryActionsContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-site-header.avalonia-extra.fsus-ui-avalonia-controls-fsus-site-header.mobile-primary-actions-content"
+          ]
+        },
+        {
+          "member": "MobileSecondaryActionsContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-site-header.avalonia-extra.fsus-ui-avalonia-controls-fsus-site-header.mobile-secondary-actions-content"
+          ]
+        },
+        {
           "member": "NavAccessibleName",
           "kind": "avalonia-extra",
           "governance": {
@@ -103733,11 +104189,11 @@
       ],
       "coverage": {
         "total": 17,
-        "alignedCandidate": 4,
+        "alignedCandidate": 0,
         "partial": 1,
-        "missing": 12,
+        "missing": 16,
         "webOnly": 0,
-        "mappedPercent": 29.4
+        "mappedPercent": 5.9
       }
     },
     {
@@ -107736,13 +108192,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Prefix",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -107754,7 +108205,12 @@
           "scenarioIds": [
             "scenario.v2.el-statistic.content-region.prefix"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "suffix",
@@ -107768,13 +108224,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Suffix",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -107786,7 +108237,12 @@
           "scenarioIds": [
             "scenario.v2.el-statistic.content-region.suffix"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "title",
@@ -107800,13 +108256,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Title",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -107818,7 +108269,12 @@
           "scenarioIds": [
             "scenario.v2.el-statistic.content-region.title"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -107947,6 +108403,39 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "member": "prefix",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "suffix",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "title",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "avaloniaExtras": [
@@ -108001,11 +108490,11 @@
       ],
       "coverage": {
         "total": 13,
-        "alignedCandidate": 7,
+        "alignedCandidate": 4,
         "partial": 1,
-        "missing": 5,
+        "missing": 8,
         "webOnly": 0,
-        "mappedPercent": 61.5
+        "mappedPercent": 38.5
       }
     },
     {
@@ -108932,13 +109421,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Description",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -108950,7 +109434,12 @@
           "scenarioIds": [
             "scenario.v2.el-step.content-region.description"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "icon",
@@ -108964,13 +109453,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "IconContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -108982,7 +109466,12 @@
           "scenarioIds": [
             "scenario.v2.el-step.content-region.icon"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "title",
@@ -108996,13 +109485,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Title",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -109014,7 +109498,12 @@
           "scenarioIds": [
             "scenario.v2.el-step.content-region.title"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -109139,6 +109628,39 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "member": "description",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "icon",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "title",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "avaloniaExtras": [
@@ -109153,6 +109675,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-step.avalonia-extra.fsus-ui-avalonia-controls-fsus-step.effective-status"
+          ]
+        },
+        {
+          "member": "IconContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-step.avalonia-extra.fsus-ui-avalonia-controls-fsus-step.icon-content"
           ]
         }
       ],
@@ -109177,11 +109712,11 @@
       ],
       "coverage": {
         "total": 9,
-        "alignedCandidate": 3,
+        "alignedCandidate": 0,
         "partial": 3,
-        "missing": 3,
+        "missing": 6,
         "webOnly": 0,
-        "mappedPercent": 66.7
+        "mappedPercent": 33.3
       }
     },
     {
@@ -116742,13 +117277,8 @@
             ],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "CellContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -116760,7 +117290,12 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.content-region.cell"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "empty",
@@ -116774,13 +117309,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "EmptyContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -116792,7 +117322,12 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.content-region.empty"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "footer",
@@ -116806,13 +117341,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "FooterContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -116824,7 +117354,12 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.content-region.footer"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "header",
@@ -116932,13 +117467,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "OverlayContent",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -116950,7 +117480,12 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.content-region.overlay"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "row",
@@ -117278,6 +117813,50 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "member": "cell",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "empty",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "footer",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "overlay",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "avaloniaExtras": [
@@ -117331,6 +117910,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.fsus-ui-avalonia-controls-fsus-table-v2.background-version"
+          ]
+        },
+        {
+          "member": "CellContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.fsus-ui-avalonia-controls-fsus-table-v2.cell-content"
           ]
         },
         {
@@ -117464,6 +118056,19 @@
           ]
         },
         {
+          "member": "EmptyContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.fsus-ui-avalonia-controls-fsus-table-v2.empty-content"
+          ]
+        },
+        {
           "member": "EvaluateBudget",
           "kind": "avalonia-extra",
           "governance": {
@@ -117513,6 +118118,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.fsus-ui-avalonia-controls-fsus-table-v2.focused-row-index"
+          ]
+        },
+        {
+          "member": "FooterContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.fsus-ui-avalonia-controls-fsus-table-v2.footer-content"
           ]
         },
         {
@@ -117604,6 +118222,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.fsus-ui-avalonia-controls-fsus-table-v2.loaded-row-index-limit"
+          ]
+        },
+        {
+          "member": "OverlayContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.fsus-ui-avalonia-controls-fsus-table-v2.overlay-content"
           ]
         },
         {
@@ -117942,11 +118573,11 @@
       ],
       "coverage": {
         "total": 51,
-        "alignedCandidate": 32,
+        "alignedCandidate": 28,
         "partial": 3,
-        "missing": 16,
+        "missing": 20,
         "webOnly": 0,
-        "mappedPercent": 68.6
+        "mappedPercent": 60.8
       }
     },
     {
@@ -122219,13 +122850,8 @@
             "extractedPayload": [],
             "baseline": "spec/baselines/vue-current.json"
           },
-          "avalonia": {
-            "member": "Composer",
-            "content": true,
-            "contextType": null,
-            "payload": []
-          },
-          "status": "aligned-candidate",
+          "avalonia": null,
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -122237,7 +122863,12 @@
           "scenarioIds": [
             "scenario.v2.el-thread-panel.content-region.composer"
           ],
-          "governance": null
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "context",
@@ -122524,6 +123155,17 @@
           }
         },
         {
+          "member": "composer",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "context",
           "kind": "contentRegion",
           "status": "missing",
@@ -122581,6 +123223,19 @@
       ],
       "avaloniaExtras": [
         {
+          "member": "Composer",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-thread-panel.avalonia-extra.fsus-ui-avalonia-controls-fsus-thread-panel.composer"
+          ]
+        },
+        {
           "member": "Timeline",
           "kind": "avalonia-extra",
           "governance": {
@@ -122613,11 +123268,11 @@
       ],
       "coverage": {
         "total": 11,
-        "alignedCandidate": 1,
+        "alignedCandidate": 0,
         "partial": 0,
-        "missing": 10,
+        "missing": 11,
         "webOnly": 0,
-        "mappedPercent": 9.1
+        "mappedPercent": 0
       }
     },
     {
@@ -143325,11 +143980,11 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 227,
+    "aligned-candidate": 192,
     "partial": 95,
-    "missing": 1645,
+    "missing": 1680,
     "web-only": 45,
     "total": 2012,
-    "mappedPercent": 16
+    "mappedPercent": 14.3
   }
 }

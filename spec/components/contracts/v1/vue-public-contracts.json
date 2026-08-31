@@ -28988,7 +28988,13 @@
       "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
       "alternative": "Use FsusCollapse and the native reduced-motion-aware collapse template behavior; Avalonia does not expose a browser transition wrapper.",
-      "authority": "docs/avalonia/components/data-display.md",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusCollapse",
+          "members": []
+        }
+      ],
       "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
       "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
       "performanceBudget": {
@@ -29010,7 +29016,33 @@
       "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
       "alternative": "Use FsusTooltip, FsusPopover, FsusPopconfirm, or FsusDropdown with FsusAnchoredOverlaySurface and FsusOverlayHost.",
-      "authority": "docs/avalonia/components/anchored-overlay.md",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusPopover",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusDropdown",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+          "members": []
+        }
+      ],
       "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
       "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
       "performanceBudget": {
@@ -29032,7 +29064,17 @@
       "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
       "alternative": "Use the native anchored-overlay template and FsusAnchoredPlacement/EffectivePlacement; no public arrow primitive is exposed.",
-      "authority": "docs/avalonia/components/anchored-overlay.md",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredPlacement",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": ["EffectivePlacement"]
+        }
+      ],
       "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
       "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
       "performanceBudget": {
@@ -29054,7 +29096,25 @@
       "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
       "alternative": "Use FsusAnchoredOverlaySurface.OverlayContent with FsusOverlayHost, FsusOverlayEntry, and FsusOverlayOptions.",
-      "authority": "docs/avalonia/overlay-host.md",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": ["OverlayContent"]
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayOptions",
+          "members": []
+        }
+      ],
       "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
       "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
       "performanceBudget": {
@@ -29076,7 +29136,19 @@
       "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
       "alternative": "Use the native Content region with TriggerMode, TriggerClick, Open, and CloseAsync on the anchored-overlay surface.",
-      "authority": "docs/avalonia/components/anchored-overlay.md",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": [
+            "Content",
+            "TriggerMode",
+            "TriggerClick",
+            "Open",
+            "CloseAsync"
+          ]
+        }
+      ],
       "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
       "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
       "performanceBudget": {

@@ -296,6 +296,10 @@ const AVALONIA_MEMBER_BINDINGS = {
 }
 
 const CONTENT_REGION_BINDINGS = {
+  ElEmptyState: {
+    actions: { member: 'ActionContent' },
+    illustration: { member: 'IllustrationContent' },
+  },
   ElTableV2: {
     header: {
       member: 'HeaderContent',
@@ -961,18 +965,6 @@ const matchAvaloniaMethod = (webName, avaloniaTypes, componentName) => {
   return null
 }
 
-const matchAvaloniaContentProperty = (webName, avaloniaType) => {
-  const candidates = new Set([toKebab(webName), toKebab(`${webName}Content`)])
-  const properties = [
-    ...(avaloniaType.avaloniaProperties ?? []),
-    ...(avaloniaType.properties ?? []),
-  ]
-  return (
-    properties.find((property) => candidates.has(toKebab(property.name))) ??
-    null
-  )
-}
-
 const inputMember = ({
   componentName,
   contractKebab,
@@ -1267,7 +1259,7 @@ const contentRegionMember = ({
       : binding?.member
         ? matchAvaloniaProperty(binding.member, [avaloniaType], componentName)
             ?.property
-        : matchAvaloniaContentProperty(slot.name, avaloniaType)
+        : null
   const avalonia =
     slot.name === 'default' && avaloniaType?.contentProperty
       ? { member: avaloniaType.contentProperty, content: true }
@@ -1288,7 +1280,7 @@ const contentRegionMember = ({
     )
   } else {
     status = 'aligned-candidate'
-    if (binding) {
+    if (binding?.contextType) {
       const contextType = typeIndex.get(binding.contextType)
       const nativePayload = [
         ...(contextType?.avaloniaProperties ?? []),
@@ -1890,6 +1882,7 @@ export const buildRegistry = ({
           reviewedAt: decision.reviewedAt,
           authority: decision.authority,
           reviewAfter: decision.reviewAfter,
+          nativeSymbols: decision.nativeSymbols,
         },
       ]),
   )
@@ -2278,6 +2271,58 @@ export const validateContract = (contract, gate, errors) => {
         contractErrors.push(
           `${contract.id} platformException missing ${field}`,
         )
+      }
+    }
+    const authorityPath = path.resolve(
+      root,
+      contract.platformException?.authority ?? '',
+    )
+    if (
+      !authorityPath.startsWith(`${root}${path.sep}`) ||
+      !exists(authorityPath)
+    ) {
+      contractErrors.push(
+        `${contract.id} platformException authority is not a readable repository path`,
+      )
+    } else if (
+      !Array.isArray(contract.platformException?.nativeSymbols) ||
+      contract.platformException.nativeSymbols.length === 0
+    ) {
+      contractErrors.push(`${contract.id} platformException missing nativeSymbols`)
+    } else {
+      let semanticTypes
+      try {
+        semanticTypes = parseJson(authorityPath).semanticTypes
+      } catch {
+        semanticTypes = null
+      }
+      const typeIndex = new Map(
+        Array.isArray(semanticTypes)
+          ? semanticTypes.map((type) => [type.name, type])
+          : [],
+      )
+      for (const symbol of contract.platformException.nativeSymbols) {
+        const type = typeIndex.get(symbol.type)
+        if (!type) {
+          contractErrors.push(
+            `${contract.id} platformException native type ${symbol.type} is missing`,
+          )
+          continue
+        }
+        const nativeMembers = new Set([
+          type.contentProperty,
+          ...(type.properties ?? []).map((member) => member.name),
+          ...(type.avaloniaProperties ?? []).map((member) => member.name),
+          ...(type.events ?? []).map((member) => member.name),
+          ...(type.methods ?? []).map((member) => member.name),
+        ])
+        for (const member of symbol.members ?? []) {
+          if (!nativeMembers.has(member)) {
+            contractErrors.push(
+              `${contract.id} platformException native member ${symbol.type}.${member} is missing`,
+            )
+          }
+        }
       }
     }
   } else if (contract.platformException != null) {

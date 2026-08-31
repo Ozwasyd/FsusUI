@@ -33,27 +33,69 @@ const REVIEWED_WEB_ONLY_DECISIONS = {
   ElCollapseTransition: {
     alternative:
       'Use FsusCollapse and the native reduced-motion-aware collapse template behavior; Avalonia does not expose a browser transition wrapper.',
-    authority: 'docs/avalonia/components/data-display.md',
+    authority: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
+    nativeSymbols: [
+      { type: 'FsusUI.Avalonia.Controls.FsusCollapse', members: [] },
+    ],
   },
   ElPopper: {
     alternative:
       'Use FsusTooltip, FsusPopover, FsusPopconfirm, or FsusDropdown with FsusAnchoredOverlaySurface and FsusOverlayHost.',
-    authority: 'docs/avalonia/components/anchored-overlay.md',
+    authority: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
+    nativeSymbols: [
+      { type: 'FsusUI.Avalonia.Controls.FsusTooltip', members: [] },
+      { type: 'FsusUI.Avalonia.Controls.FsusPopover', members: [] },
+      { type: 'FsusUI.Avalonia.Controls.FsusPopconfirm', members: [] },
+      { type: 'FsusUI.Avalonia.Controls.FsusDropdown', members: [] },
+      {
+        type: 'FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface',
+        members: [],
+      },
+      { type: 'FsusUI.Avalonia.Overlay.FsusOverlayHost', members: [] },
+    ],
   },
   ElPopperArrow: {
     alternative:
       'Use the native anchored-overlay template and FsusAnchoredPlacement/EffectivePlacement; no public arrow primitive is exposed.',
-    authority: 'docs/avalonia/components/anchored-overlay.md',
+    authority: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
+    nativeSymbols: [
+      { type: 'FsusUI.Avalonia.Controls.FsusAnchoredPlacement', members: [] },
+      {
+        type: 'FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface',
+        members: ['EffectivePlacement'],
+      },
+    ],
   },
   ElPopperContent: {
     alternative:
       'Use FsusAnchoredOverlaySurface.OverlayContent with FsusOverlayHost, FsusOverlayEntry, and FsusOverlayOptions.',
-    authority: 'docs/avalonia/overlay-host.md',
+    authority: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
+    nativeSymbols: [
+      {
+        type: 'FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface',
+        members: ['OverlayContent'],
+      },
+      { type: 'FsusUI.Avalonia.Overlay.FsusOverlayHost', members: [] },
+      { type: 'FsusUI.Avalonia.Overlay.FsusOverlayEntry', members: [] },
+      { type: 'FsusUI.Avalonia.Overlay.FsusOverlayOptions', members: [] },
+    ],
   },
   ElPopperTrigger: {
     alternative:
       'Use the native Content region with TriggerMode, TriggerClick, Open, and CloseAsync on the anchored-overlay surface.',
-    authority: 'docs/avalonia/components/anchored-overlay.md',
+    authority: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
+    nativeSymbols: [
+      {
+        type: 'FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface',
+        members: [
+          'Content',
+          'TriggerMode',
+          'TriggerClick',
+          'Open',
+          'CloseAsync',
+        ],
+      },
+    ],
   },
 }
 
@@ -234,6 +276,61 @@ const validateRegistry = (registry, baseline) => {
         )
       }
     }
+    const authorityPath = path.resolve(root, decision.authority ?? '')
+    if (
+      !authorityPath.startsWith(`${root}${path.sep}`) ||
+      !exists(authorityPath)
+    ) {
+      errors.push(
+        `${decision.source.name} web-only decision authority is not a readable repository path`,
+      )
+      continue
+    }
+    if (
+      !Array.isArray(decision.nativeSymbols) ||
+      decision.nativeSymbols.length === 0
+    ) {
+      errors.push(
+        `${decision.source.name} web-only decision missing nativeSymbols`,
+      )
+      continue
+    }
+    let semanticTypes
+    try {
+      semanticTypes = parseJson(authorityPath).semanticTypes
+    } catch {
+      semanticTypes = null
+    }
+    if (!Array.isArray(semanticTypes)) {
+      errors.push(
+        `${decision.source.name} web-only decision authority is not an Avalonia semantic baseline`,
+      )
+      continue
+    }
+    const typeIndex = new Map(semanticTypes.map((type) => [type.name, type]))
+    for (const symbol of decision.nativeSymbols) {
+      const type = typeIndex.get(symbol.type)
+      if (!type) {
+        errors.push(
+          `${decision.source.name} web-only decision native type ${symbol.type} is missing`,
+        )
+        continue
+      }
+      const members = new Set([
+        type.contentProperty,
+        ...(type.properties ?? []).map((member) => member.name),
+        ...(type.avaloniaProperties ?? []).map((member) => member.name),
+        ...(type.events ?? []).map((member) => member.name),
+        ...(type.methods ?? []).map((member) => member.name),
+      ])
+      for (const member of symbol.members ?? []) {
+        if (!members.has(member)) {
+          errors.push(
+            `${decision.source.name} web-only decision native member ${symbol.type}.${member} is missing`,
+          )
+        }
+      }
+    }
   }
 
   return errors
@@ -371,6 +468,7 @@ const webOnlyDecisionForEntry = (entry, kind) => {
       'This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.',
     alternative: reviewed.alternative,
     authority: reviewed.authority,
+    nativeSymbols: reviewed.nativeSymbols,
     testPolicy:
       'Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.',
     reviewPolicy:
