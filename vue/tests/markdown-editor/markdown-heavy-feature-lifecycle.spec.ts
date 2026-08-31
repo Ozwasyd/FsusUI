@@ -839,6 +839,16 @@ test('renders the static heavy feature matrix across themes, widths, and zoom', 
           if (artifactRoot && screenshotName) {
             await renderer.screenshot({
               animations: 'disabled',
+              scale: 'css',
+            })
+            await page.evaluate(
+              () =>
+                new Promise<void>((resolveFrame) =>
+                  requestAnimationFrame(() => resolveFrame()),
+                ),
+            )
+            await renderer.screenshot({
+              animations: 'disabled',
               path: resolve(artifactRoot, screenshotName),
               scale: 'css',
             })
