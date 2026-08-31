@@ -267,7 +267,7 @@ const cases = [
       mutateText(
         'scripts/avalonia-stable-readiness-lib.mjs',
         'if (!release.releaseReady || alignment.consumers?.nugetStableEligible !== true) {',
-        'if (release.releaseReady || alignment.consumers?.nugetStableEligible !== true) {',
+        'if (false) {',
       ),
     command: ['node', ['--test', 'tests/conformance-v2-evidence.test.mjs']],
     expected: 'Missing expected exception',
