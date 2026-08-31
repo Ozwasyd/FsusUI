@@ -44,8 +44,8 @@
   {
     "name": "private-textarea-ref",
     "file": "vue",
-    "find": "defineExpose({\n  dispatchTransaction,",
-    "replace": "defineExpose({\n  textareaRef,\n  dispatchTransaction,",
+    "find": "defineExpose({\n  applyAttachmentResult,",
+    "replace": "defineExpose({\n  textareaRef,\n  applyAttachmentResult,",
     "expectError": "private editor or DOM refs must not be exposed"
   },
   {
