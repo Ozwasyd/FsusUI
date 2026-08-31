@@ -555,21 +555,39 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     documentKey: 'heavy-document-b',
     theme: 'dark',
   })
+  let afterThemeSwitch: LifecycleMetrics | undefined
   await expect
-    .poll(
-      async () =>
-        (await readMetrics(page))?.identities['code-highlight']?.theme,
-    )
-    .toBe('dark')
-  const afterThemeSwitch = (await readMetrics(page))!
-  expect(afterThemeSwitch.identities.mermaid?.theme).toBe('dark')
-  expect(afterThemeSwitch.identities.latex?.theme).toBe('token-bound')
-  await expect.poll(async () => (await readMetrics(page))?.active ?? -1).toBe(0)
-  await expect
-    .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
-    .toBe(0)
+    .poll(async () => {
+      const snapshot = await readMetrics(page)
+      if (!snapshot) return null
+      const settledThemeState = {
+        active: snapshot.active,
+        code: snapshot.identities['code-highlight']?.theme,
+        latex: snapshot.identities.latex?.theme,
+        mermaid: snapshot.identities.mermaid?.theme,
+        retainedResources: snapshot.retainedResources,
+      }
+      if (
+        settledThemeState.active === 0 &&
+        settledThemeState.code === 'dark' &&
+        settledThemeState.latex === 'token-bound' &&
+        settledThemeState.mermaid === 'dark' &&
+        settledThemeState.retainedResources === 0
+      ) {
+        afterThemeSwitch = snapshot
+      }
+      return settledThemeState
+    })
+    .toEqual({
+      active: 0,
+      code: 'dark',
+      latex: 'token-bound',
+      mermaid: 'dark',
+      retainedResources: 0,
+    })
+  expect(afterThemeSwitch).toBeDefined()
 
-  const beforeCodeDisable = (await readMetrics(page))!
+  const beforeCodeDisable = afterThemeSwitch!
   await transition(page, {
     codeHighlight: false,
     documentEpoch: 2,
