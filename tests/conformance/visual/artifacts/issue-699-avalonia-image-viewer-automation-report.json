@@ -16,6 +16,10 @@
     "ArrowRight",
     "Escape"
   ],
+  "cursors": {
+    "loaded": "Hand",
+    "capturedDrag": "SizeAll"
+  },
   "preservedFocusRestorationTest": "ImageViewerHeadlessKeyboardNavigationEscapeAndFocusRestoration",
   "limitations": "Inspects production Avalonia automation properties under the local headless backend; no Windows UIA, macOS VoiceOver, or Linux AT-SPI session is claimed."
 }

@@ -310,10 +310,13 @@ public class FsusImageViewerHeadlessTests
     Assert.Equal(0.5, viewer.Zoom);
 
     viewer.ResetTransform();
+    Assert.Equal("Hand", viewer.Cursor?.ToString());
+    var loadedCursor = viewer.Cursor!.ToString();
     window.MouseDown(center, MouseButton.Left);
     Assert.True(viewer.IsPanning);
     Assert.Contains("fsus-panning", viewer.Classes);
-    Assert.NotNull(viewer.Cursor);
+    Assert.Equal("SizeAll", viewer.Cursor?.ToString());
+    var panningCursor = viewer.Cursor!.ToString();
 
     var outsideViewer = new Point(560, 360);
     window.MouseMove(outsideViewer, RawInputModifiers.LeftMouseButton);
@@ -382,6 +385,11 @@ public class FsusImageViewerHeadlessTests
             sourceReset = AutomationProperties.GetItemStatus(viewer),
           },
           preservedKeyboard = new[] { "ArrowLeft", "ArrowRight", "Escape" },
+          cursors = new
+          {
+            loaded = loadedCursor,
+            capturedDrag = panningCursor,
+          },
           preservedFocusRestorationTest =
             "ImageViewerHeadlessKeyboardNavigationEscapeAndFocusRestoration",
           limitations =
@@ -461,7 +469,7 @@ public class FsusImageViewerHeadlessTests
           },
           states = new[]
           {
-            "default-loaded", "wheel-zoomed", "drag-panned",
+            "default-loaded", "wheel-zoomed", "drag-panning-captured-size-all-cursor",
             "source-reset", "viewport-clipped",
           },
           themes = new[] { "light", "dark" },
@@ -600,6 +608,12 @@ public class FsusImageViewerHeadlessTests
     Assert.Equal(default, resetViewer.Translation);
     Arrange(window);
 
+    window.MouseDown(center, MouseButton.Left);
+    window.MouseMove(new Point(center.X + 32, center.Y + 20), RawInputModifiers.LeftMouseButton);
+    Assert.True(transformedViewer.IsPanning);
+    Assert.Contains("fsus-panning", transformedViewer.Classes);
+    Assert.Equal("SizeAll", transformedViewer.Cursor?.ToString());
+
     var pixelSize = new PixelSize(640 * dpi / 96, 680 * dpi / 96);
     var output = Path.Combine(outputRoot, $"issue-699-image-viewer-{theme}-{dpi}dpi.png");
     using var bitmap = new RenderTargetBitmap(pixelSize, new Vector(dpi, dpi));
@@ -608,6 +622,8 @@ public class FsusImageViewerHeadlessTests
     {
       bitmap.Save(stream);
     }
+    window.MouseUp(new Point(center.X + 32, center.Y + 20), MouseButton.Left);
+    Assert.False(transformedViewer.IsPanning);
     window.Close();
 
     return new ImageViewerRenderCapture(
@@ -616,7 +632,7 @@ public class FsusImageViewerHeadlessTests
       new PixelDimension(pixelSize.Width, pixelSize.Height),
       theme,
       dpi,
-      "default-wheel-zoomed-drag-panned-source-reset-viewport-clipped");
+      "default-wheel-zoomed-drag-captured-size-all-source-reset-viewport-clipped");
   }
 
   private static void Arrange(Window window)
