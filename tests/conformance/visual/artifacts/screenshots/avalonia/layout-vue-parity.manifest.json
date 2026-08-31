@@ -1,0 +1,48 @@
+{
+  "component": "layout",
+  "runner": "headless-skia",
+  "screenshot": "/Users/brevis/Desktop/repos/FsusUI/tests/conformance/visual/artifacts/screenshots/avalonia/layout-vue-parity.png",
+  "surfaceBounds": [
+    0,
+    0,
+    1240,
+    92
+  ],
+  "controlBounds": [
+    {
+      "name": "FsusRow",
+      "x": 10,
+      "y": 12,
+      "width": 1220,
+      "height": 68
+    },
+    {
+      "name": "FsusCol",
+      "x": 10,
+      "y": 12,
+      "width": 290,
+      "height": 68
+    },
+    {
+      "name": "FsusCol",
+      "x": 312,
+      "y": 12,
+      "width": 290,
+      "height": 68
+    },
+    {
+      "name": "FsusCol",
+      "x": 614,
+      "y": 12,
+      "width": 290,
+      "height": 68
+    },
+    {
+      "name": "FsusCol",
+      "x": 916,
+      "y": 12,
+      "width": 290,
+      "height": 68
+    }
+  ]
+}
