@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "ab5a74ee446347ad3db6558235577f57a5eeaecf1d90217521d7f6d93cfccd1f",
+      "hash": "951ab590d431204777f6a9e296d0086fca8c106aa38706e8e727c2585f5803c0",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "5131094c0a0c6b7c2434bcf1272391f0082492050ba58057603d155b89f60cf7",
+      "hash": "bccd71f9193022011dd22048316fa3e4ccd6263a9edf15bcddfd91e8e7f96e1f",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -57035,6 +57035,71 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.avalonia-extra.retained-projection-node-ids"
+          ]
+        },
+        {
+          "member": "ScrollContentFloor",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.scroll-content-floor"
+          ]
+        },
+        {
+          "member": "ScrollExtentHeight",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.scroll-extent-height"
+          ]
+        },
+        {
+          "member": "ScrollPosition",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.scroll-position"
+          ]
+        },
+        {
+          "member": "ScrollToSourceLine",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.scroll-to-source-line"
+          ]
+        },
+        {
+          "member": "ScrollViewportHeight",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.scroll-viewport-height"
           ]
         },
         {
@@ -131206,6 +131271,38 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryEntrySnapshot",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 11,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-markdown-editor-history-entry-snapshot"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistorySnapshot",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 8,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-markdown-editor-history-snapshot"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryState",
       "kind": "record",
       "packageId": "avalonia",
@@ -131213,6 +131310,22 @@
       "memberCount": 7,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-markdown-editor-history-state"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryStepSnapshot",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 4,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-markdown-editor-history-step-snapshot"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
@@ -131354,7 +131467,7 @@
       "kind": "class",
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 16,
+      "memberCount": 18,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-markdown-editor-transaction-store"
       ],

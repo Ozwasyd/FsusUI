@@ -13149,7 +13149,7 @@
         {
           "name": "AfterSelection",
           "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13157,7 +13157,7 @@
         {
           "name": "BeforeSelection",
           "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13165,7 +13165,7 @@
         {
           "name": "BeforeValue",
           "type": "System.String",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13173,7 +13173,7 @@
         {
           "name": "History",
           "type": "System.String",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13181,7 +13181,7 @@
         {
           "name": "MergeDirection",
           "type": "System.String",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13189,7 +13189,7 @@
         {
           "name": "Origin",
           "type": "System.String",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13205,7 +13205,7 @@
         {
           "name": "Steps",
           "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryStepSnapshot\u003E",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13292,7 +13292,7 @@
         {
           "name": "Identity",
           "type": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13300,7 +13300,7 @@
         {
           "name": "Redo",
           "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryEntrySnapshot\u003E",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13316,7 +13316,7 @@
         {
           "name": "Selection",
           "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13324,7 +13324,7 @@
         {
           "name": "Undo",
           "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryEntrySnapshot\u003E",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13332,7 +13332,7 @@
         {
           "name": "Value",
           "type": "System.String",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13487,7 +13487,7 @@
         {
           "name": "Changes",
           "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusMarkdownEditorChange\u003E",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -13495,7 +13495,7 @@
         {
           "name": "Inverse",
           "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusMarkdownEditorChange\u003E",
-          "nullable": true,
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
