@@ -1051,6 +1051,50 @@ const validReviewedPlatformException = (contract) => {
   )
 }
 
+const validReviewedPublicValueException = (binding) =>
+  binding.status === 'web-only' &&
+  binding.avalonia === null &&
+  ['reason', 'alternative', 'owner', 'testPolicy', 'reviewPolicy', 'reviewedAt'].every(
+    (field) =>
+      typeof binding.governance?.[field] === 'string' &&
+      binding.governance[field].trim() !== '',
+  )
+
+const derivePublicValueGap = (binding, status) => {
+  const requiredEvidence = [
+    'required-member-coverage',
+    'same-identity-cross-platform-comparison',
+  ]
+  return {
+    contract: binding.id,
+    status,
+    reason: binding.governance?.reason,
+    owner: binding.governance?.owner,
+    requiredMembers: [
+      {
+        kind: 'publicValue',
+        name: binding.name,
+        status,
+        reason: binding.governance?.reason,
+        owner: binding.governance?.owner,
+        testPolicy: binding.governance?.testPolicy,
+        reviewPolicy: binding.governance?.reviewPolicy,
+        scenarioIds: binding.scenarioIds ?? [],
+      },
+    ],
+    requiredScenarios: [...new Set(binding.scenarioIds ?? [])],
+    requiredEvidence,
+    evidencePolicy: {
+      realExecution: true,
+      allowSkip: false,
+      allowOverrideWithoutGovernance: false,
+    },
+    missingMembers: status === 'missing' ? 1 : 0,
+    partialMembers: status === 'partial' ? 1 : 0,
+    missingArtifacts: requiredEvidence,
+  }
+}
+
 const validateReceiptForContract = (contract, receipt) => {
   if (!receipt) return null
   if (receipt.schema !== 'fsusui.conformance-contract-comparison.v2')
@@ -1185,6 +1229,16 @@ export function deriveAlignment(registry, comparison = null) {
     statuses.push({ id: contract.id, status, source: 'derived' })
     if (status !== 'aligned' && status !== 'web-only')
       gaps.push(deriveGap(contract, status, receipt))
+  }
+  for (const binding of registry.publicValueBindings ?? []) {
+    let status
+    if (validReviewedPublicValueException(binding)) status = 'web-only'
+    else if (binding.status === 'missing') status = 'missing'
+    else if (binding.status === 'partial') status = 'partial'
+    else status = 'blocked'
+    statuses.push({ id: binding.id, status, source: 'derived' })
+    if (status !== 'web-only')
+      gaps.push(derivePublicValueGap(binding, status))
   }
   for (const type of registry.avaloniaOnlyTypes ?? []) {
     statuses.push({

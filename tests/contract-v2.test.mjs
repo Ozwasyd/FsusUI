@@ -171,6 +171,17 @@ test('public value binding fails closed when an enum member is unmapped', () => 
   )
 })
 
+test('public value web-only exception requires review metadata', () => {
+  const mutated = clone(committedRegistry)
+  delete mutated.publicValueBindings.find(
+    (binding) => binding.name === 'TableV2Placeholder',
+  ).governance.reviewedAt
+  assert.match(
+    validateRegistry(mutated, gate).join('\n'),
+    /public value TableV2Placeholder web-only exception is not reviewed/u,
+  )
+})
+
 test('public export map fails closed when an alias is removed', () => {
   const mutated = clone(committedRegistry)
   mutated.publicExportMap = mutated.publicExportMap.filter(

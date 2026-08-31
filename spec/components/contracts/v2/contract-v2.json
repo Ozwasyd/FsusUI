@@ -3368,7 +3368,9 @@
         "reason": "The Symbol is a Vue renderer identity sentinel; Avalonia owns native placeholder row lifecycle and cannot expose the JavaScript identity value.",
         "owner": "FsusUI Core",
         "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
+        "reviewPolicy": "pr-review",
+        "alternative": "Use the native placeholder row lifecycle instead of a JavaScript identity sentinel.",
+        "reviewedAt": "2026-08-30"
       }
     },
     {

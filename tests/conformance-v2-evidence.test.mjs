@@ -296,6 +296,51 @@ test('unreviewed web-only labels remain release-blocking gaps', () => {
   assert.equal(alignment.consumers.releaseReady, false)
 })
 
+test('public values remain release-blocking until mapped and evidenced', () => {
+  const governance = {
+    reason: 'Behavior evidence is still required.',
+    owner: 'FsusUI Core',
+    testPolicy: 'contract',
+    reviewPolicy: 'pr-review',
+  }
+  const alignment = deriveAlignment({
+    contracts: [],
+    publicValueBindings: [
+      {
+        id: 'public-value.partial',
+        name: 'PartialValue',
+        status: 'partial',
+        avalonia: { type: 'FsusValue' },
+        scenarioIds: ['scenario.v2.public-value.partial'],
+        governance,
+      },
+      {
+        id: 'public-value.renderer-sentinel',
+        name: 'RendererSentinel',
+        status: 'web-only',
+        avalonia: null,
+        scenarioIds: ['scenario.v2.public-value.renderer-sentinel'],
+        governance: {
+          ...governance,
+          alternative: 'Use the native renderer lifecycle.',
+          reviewedAt: '2026-08-30',
+        },
+      },
+    ],
+  })
+  assert.deepEqual(
+    alignment.statuses.map(({ id, status }) => ({ id, status })),
+    [
+      { id: 'public-value.partial', status: 'partial' },
+      { id: 'public-value.renderer-sentinel', status: 'web-only' },
+    ],
+  )
+  assert.equal(alignment.gaps.length, 1)
+  assert.equal(alignment.gaps[0].contract, 'public-value.partial')
+  assert.equal(alignment.consumers.releaseReady, false)
+  validateReadiness(alignment)
+})
+
 test('T762-01 stable readiness rejects missing, stale, and tampered alignment', () => {
   const expected = stableReadinessCurrentIdentity()
   const valid = JSON.parse(

@@ -73,6 +73,9 @@ const PUBLIC_VALUE_BINDINGS = {
     webOnly: true,
     reason:
       'The Symbol is a Vue renderer identity sentinel; Avalonia owns native placeholder row lifecycle and cannot expose the JavaScript identity value.',
+    alternative:
+      'Use the native placeholder row lifecycle instead of a JavaScript identity sentinel.',
+    reviewedAt: '2026-08-30',
   },
 }
 
@@ -1201,7 +1204,11 @@ const buildPublicValueBindings = ({ vueBaseline, typeIndex }) =>
           status: 'web-only',
           valueMap: null,
           scenarioIds,
-          governance: defaultGovernance(binding.reason),
+          governance: {
+            ...defaultGovernance(binding.reason),
+            alternative: binding.alternative,
+            reviewedAt: binding.reviewedAt,
+          },
         }
       }
       const avaloniaType = typeIndex.get(binding.avaloniaType) ?? null
@@ -1763,6 +1770,16 @@ export const validateRegistry = (registry, gate) => {
     }
     if (binding.kind === 'sentinel' && binding.status !== 'web-only') {
       errors.push(`${context} sentinel must be explicitly web-only`)
+    }
+    if (
+      binding.status === 'web-only' &&
+      !['alternative', 'reviewedAt'].every(
+        (field) =>
+          typeof binding.governance?.[field] === 'string' &&
+          binding.governance[field].trim() !== '',
+      )
+    ) {
+      errors.push(`${context} web-only exception is not reviewed`)
     }
   }
   return errors
