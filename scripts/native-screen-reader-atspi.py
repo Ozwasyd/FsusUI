@@ -136,7 +136,10 @@ def main():
                 articles.append(node)
 
     named_markdown_editables = [
-        node for node in textboxes if 'markdown editor' in (node.get('name') or '').lower()
+        node
+        for node in textboxes
+        if 'markdown' in (node.get('name') or '').lower()
+        and ('editor' in (node.get('name') or '').lower() or '编辑' in (node.get('name') or ''))
     ]
     result = {
         'ok': bool(apps) and bool(named_markdown_editables),
