@@ -6,6 +6,7 @@
   "pointerAndKeyboardOrigins": true,
   "routedKeyDownPipeline": true,
   "nativeFallbackWithUnusableSuggestions": true,
+  "productionDeveloperToolsUnsupportedWithoutBackendDispatch": true,
   "escapeAndCloseRestoreInvokerFocus": true,
   "parsedAndRenderedLightAndDarkPdf": true
 }

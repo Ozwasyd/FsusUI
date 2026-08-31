@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "a2da638e13ebacda0c9a228556c58c703c48fb6624fd880291faf753fe3e953c",
-  "candidateSha": "877674f2b3a53692cd3b6f61d3d6a9b44c7123f4",
-  "candidateDigest": "b710477674109cbbc8a188a14376adb9ed70ad74882755c7619c0aacf2a9ac62",
+  "classificationReceiptDigest": "77526b361936085615b24de84ecef002c9b3b78f9b2e39622fd177818e03857a",
+  "candidateSha": "7f20d777dd1a9b0147dda4323bcdf0a8eb0184ca",
+  "candidateDigest": "37667ae8575925eb91508f8b3b17b20c45319935f98680d9cfff58042884c2e4",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,13 +13,13 @@
     "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
     "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
     "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506",
-    "44c9b728456b10992e5b80453bd3efd3e5ba058a614b7d67f1c1467ebc556a1a",
+    "96dd3a8cbb0724907d5cbead977241f33be09d1450b69953f745071d1dd2998a",
     "4af382d77024fcd99fc430e279ec2a3a7b4035465ded20b5a74a8f0cfa04563d",
     "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1",
     "84256d5f4b725bf09aeef4187d9270b3513976efd68ee348dd28c1362eedcae9",
     "f5e26a1a64f47a0f1af7b712727f0f55058a6c916aad35aebb648a93cb87ef24"
   ],
-  "activeBaselineIdentityDigest": "e8c887f006f7036dd4630fa4d3cf436dd738874f886d2ff5ece593c5bee73fd4",
+  "activeBaselineIdentityDigest": "9d7d510d0ec667317bd881bae05d035e6b17c2f770abb7773f3dd2d9eecbeafa",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "independenceEvidenceDigest": "90ced5d3af1b4daa21a993975bba3ea7e740b26ddae36ae1ad0ca971cdb6e7d4",
   "modifiedPaths": [],
@@ -138,12 +138,12 @@
       "id": "automation-semantics",
       "kind": "screen-reader-report",
       "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/automation-report.json",
-      "digest": "848d42888cbe469c99e9500d6efe34e9ada32cd96843bb5cce1b959b9a142672",
+      "digest": "3bed461ad131695376cd344e9d25197acd40fca0984caffe27b689d502348f9c",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "d6cbe07a694639924278bca35b42f32039c9eac6d08ea8316c109ae614117b0d"
+  "receiptDigest": "57e2508ea08cda0d7e064e2a97d4c7210f506c1d64af4f5dc9ed2555778df3fc"
 }

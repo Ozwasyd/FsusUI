@@ -4,7 +4,7 @@
     652,
     672
   ],
-  "candidateSha": "877674f2b3a53692cd3b6f61d3d6a9b44c7123f4",
+  "candidateSha": "7f20d777dd1a9b0147dda4323bcdf0a8eb0184ca",
   "fixtureClass": "production",
   "evidenceClass": "local-headless-skia-and-adapter-simulation",
   "simulation": "The real FsusContextMenu, theme, overlay, focus and automation paths are rendered. Embedded-browser and PDF engines are deterministic adapters, not external engine execution.",
@@ -2505,6 +2505,6 @@
   ],
   "automation": {
     "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/automation-report.json",
-    "sha256": "848d42888cbe469c99e9500d6efe34e9ada32cd96843bb5cce1b959b9a142672"
+    "sha256": "3bed461ad131695376cd344e9d25197acd40fca0984caffe27b689d502348f9c"
   }
 }

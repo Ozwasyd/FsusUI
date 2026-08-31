@@ -13,7 +13,7 @@
     { "id": "change-classification", "path": "docs/design/change-classification.md", "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84" },
     { "id": "visual-workflow", "path": "docs/workflows/visual-change.md", "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4" },
     { "id": "avalonia-index", "path": "docs/avalonia/README.md", "digest": "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506" },
-    { "id": "platform-differences", "path": "docs/avalonia/platform-differences.md", "digest": "44c9b728456b10992e5b80453bd3efd3e5ba058a614b7d67f1c1467ebc556a1a" },
+    { "id": "platform-differences", "path": "docs/avalonia/platform-differences.md", "digest": "96dd3a8cbb0724907d5cbead977241f33be09d1450b69953f745071d1dd2998a" },
     { "id": "semantic-baseline", "path": "docs/avalonia/semantic-baseline.md", "digest": "4af382d77024fcd99fc430e279ec2a3a7b4035465ded20b5a74a8f0cfa04563d" },
     { "id": "api-stability", "path": "docs/api-stability.md", "digest": "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1" },
     { "id": "contract-v2", "path": "docs/api/contract-v2.md", "digest": "84256d5f4b725bf09aeef4187d9270b3513976efd68ee348dd28c1362eedcae9" },
@@ -26,18 +26,18 @@
     "repository": "Ozwasyd/FsusUI",
     "revision": "5b6a5f604a8454e345860c2c8bcc1fd3973e36ac",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "5f535d8cc894f4a796251044fd68b3c4d5c12edb10f53e809356d80e7ddd65f8",
+    "authorityDigest": "c7d3c120f857964a6f537968317a3766dedf8d5413ad147a2f705aa6b76becee",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "877674f2b3a53692cd3b6f61d3d6a9b44c7123f4",
-  "candidateDigest": "b710477674109cbbc8a188a14376adb9ed70ad74882755c7619c0aacf2a9ac62",
+  "candidateSha": "7f20d777dd1a9b0147dda4323bcdf0a8eb0184ca",
+  "candidateDigest": "37667ae8575925eb91508f8b3b17b20c45319935f98680d9cfff58042884c2e4",
   "stateEvidenceMatrix": [
-    { "state": "context-menu-pointer-keyboard-spelling-native-fallback-focus-accessibility", "viewport": "desktop and narrow desktop", "theme": "both", "evidenceDigest": "848d42888cbe469c99e9500d6efe34e9ada32cd96843bb5cce1b959b9a142672" },
-    { "state": "tagged-pdf-hierarchical-outline-capability-cancellation-stream", "viewport": "Windows and Linux adapter simulation", "theme": "both", "evidenceDigest": "aad0818a651c4e669962b428a5929dd9bf0b5fd42f8d17195ea998121b6a8c9c" }
+    { "state": "context-menu-pointer-keyboard-spelling-native-fallback-focus-accessibility", "viewport": "desktop and narrow desktop", "theme": "both", "evidenceDigest": "3bed461ad131695376cd344e9d25197acd40fca0984caffe27b689d502348f9c" },
+    { "state": "tagged-pdf-hierarchical-outline-capability-cancellation-stream", "viewport": "Windows and Linux adapter simulation", "theme": "both", "evidenceDigest": "35d9c2f3fb4487e8cf5455ae45565ee722f7635ac737171deb116420dad098d4" }
   ],
   "inScope": [
     "one platform-neutral Avalonia WebView adapter contract for issues 652 and 672",
-    "typed context-menu, spelling, dictionary, PDF and document-outline capabilities",
+    "typed context-menu, spelling, dictionary, developer-tools, PDF and document-outline capabilities",
     "composition with FsusContextMenu, keyboard focus restoration, accessibility, themes and AOT verification",
     "public documentation, semantic baselines, Contract V2 registry and changeset"
   ],
@@ -48,8 +48,8 @@
     "new canonical design tokens, visual redesign or platform override",
     "claims of real external browser-engine or PDF-backend execution"
   ],
-  "classificationEvidenceDigest": "73879b3662cb34140cba1907729cfa02dfa392e976bea64d13995e63717f260b",
+  "classificationEvidenceDigest": "a40ed3ef1a0b5938f68d7606a17b2243056eb5e1c69b0d279ca3ef51385014b8",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "a2da638e13ebacda0c9a228556c58c703c48fb6624fd880291faf753fe3e953c"
+  "receiptDigest": "77526b361936085615b24de84ecef002c9b3b78f9b2e39622fd177818e03857a"
 }
