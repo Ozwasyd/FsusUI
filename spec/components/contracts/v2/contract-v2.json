@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "4ffa7876385ab201afcbfac8961d58522289e35ac86325d29b3ca3ce16bccecf",
+      "hash": "16d373ec7c7618689d2571b71de0891ef5179237b308641533dfbe8f313bf562",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -3202,34 +3202,6 @@
       "contractId": "component-v2.el-table-v2"
     },
     {
-      "name": "TableV2Alignment",
-      "module": "table-v2",
-      "role": "canonical",
-      "canonical": "TableV2Alignment",
-      "contractId": "component-v2.table-v2-alignment"
-    },
-    {
-      "name": "TableV2FixedDir",
-      "module": "table-v2",
-      "role": "canonical",
-      "canonical": "TableV2FixedDir",
-      "contractId": "component-v2.table-v2-fixed-dir"
-    },
-    {
-      "name": "TableV2Placeholder",
-      "module": "table-v2",
-      "role": "canonical",
-      "canonical": "TableV2Placeholder",
-      "contractId": "component-v2.table-v2-placeholder"
-    },
-    {
-      "name": "TableV2SortOrder",
-      "module": "table-v2",
-      "role": "canonical",
-      "canonical": "TableV2SortOrder",
-      "contractId": "component-v2.table-v2-sort-order"
-    },
-    {
       "name": "TimePickPanel",
       "module": "time-picker",
       "role": "canonical",
@@ -3242,6 +3214,222 @@
       "role": "canonical",
       "canonical": "vLoading",
       "contractId": "component-v2.v-loading"
+    }
+  ],
+  "publicValueBindings": [
+    {
+      "id": "public-value.table-v2-alignment",
+      "name": "TableV2Alignment",
+      "module": "table-v2",
+      "kind": "enum",
+      "web": {
+        "name": "TableV2Alignment",
+        "module": "table-v2",
+        "kind": "enum",
+        "source": {
+          "path": "vue/packages/components/table-v2/src/constants.ts",
+          "hash": "ac5ceaf94c9bb619566c587b064d9e80d92802206aa3d4e1e48facdd42fd5bb8",
+          "symbol": "Alignment"
+        },
+        "values": [
+          {
+            "name": "CENTER",
+            "value": "center"
+          },
+          {
+            "name": "RIGHT",
+            "value": "right"
+          }
+        ],
+        "classification": "native-adapter"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusLayoutAlignment",
+        "packageId": "avalonia",
+        "kind": "enum",
+        "values": [
+          {
+            "name": "Start",
+            "value": 0
+          },
+          {
+            "name": "Center",
+            "value": 1
+          },
+          {
+            "name": "End",
+            "value": 2
+          },
+          {
+            "name": "Stretch",
+            "value": 3
+          }
+        ]
+      },
+      "status": "partial",
+      "valueMap": {
+        "CENTER": "Center",
+        "RIGHT": "End"
+      },
+      "scenarioIds": [
+        "scenario.v2.public-value.table-v2-alignment"
+      ],
+      "governance": {
+        "reason": "The existing layout enum is the native counterpart, but right/end directionality requires behavior evidence before alignment.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "id": "public-value.table-v2-fixed-dir",
+      "name": "TableV2FixedDir",
+      "module": "table-v2",
+      "kind": "enum",
+      "web": {
+        "name": "TableV2FixedDir",
+        "module": "table-v2",
+        "kind": "enum",
+        "source": {
+          "path": "vue/packages/components/table-v2/src/constants.ts",
+          "hash": "ac5ceaf94c9bb619566c587b064d9e80d92802206aa3d4e1e48facdd42fd5bb8",
+          "symbol": "FixedDir"
+        },
+        "values": [
+          {
+            "name": "LEFT",
+            "value": "left"
+          },
+          {
+            "name": "RIGHT",
+            "value": "right"
+          }
+        ],
+        "classification": "native-adapter"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusDataTableFixedColumn",
+        "packageId": "avalonia",
+        "kind": "enum",
+        "values": [
+          {
+            "name": "None",
+            "value": 0
+          },
+          {
+            "name": "Left",
+            "value": 1
+          },
+          {
+            "name": "Right",
+            "value": 2
+          }
+        ]
+      },
+      "status": "partial",
+      "valueMap": {
+        "LEFT": "Left",
+        "RIGHT": "Right"
+      },
+      "scenarioIds": [
+        "scenario.v2.public-value.table-v2-fixed-dir"
+      ],
+      "governance": {
+        "reason": "The existing fixed-column enum carries the shared directions plus the Avalonia-only None state.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "id": "public-value.table-v2-placeholder",
+      "name": "TableV2Placeholder",
+      "module": "table-v2",
+      "kind": "sentinel",
+      "web": {
+        "name": "TableV2Placeholder",
+        "module": "table-v2",
+        "kind": "sentinel",
+        "source": {
+          "path": "vue/packages/components/table-v2/src/private.ts",
+          "hash": "5f5f5904b0a9cd38212b8e589149455787be5270242ab4b0e0cb946943068df5",
+          "symbol": "placeholderSign"
+        },
+        "values": [],
+        "classification": "native-adapter"
+      },
+      "avalonia": null,
+      "status": "web-only",
+      "valueMap": null,
+      "scenarioIds": [
+        "scenario.v2.public-value.table-v2-placeholder"
+      ],
+      "governance": {
+        "reason": "The Symbol is a Vue renderer identity sentinel; Avalonia owns native placeholder row lifecycle and cannot expose the JavaScript identity value.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "id": "public-value.table-v2-sort-order",
+      "name": "TableV2SortOrder",
+      "module": "table-v2",
+      "kind": "enum",
+      "web": {
+        "name": "TableV2SortOrder",
+        "module": "table-v2",
+        "kind": "enum",
+        "source": {
+          "path": "vue/packages/components/table-v2/src/constants.ts",
+          "hash": "ac5ceaf94c9bb619566c587b064d9e80d92802206aa3d4e1e48facdd42fd5bb8",
+          "symbol": "SortOrder"
+        },
+        "values": [
+          {
+            "name": "ASC",
+            "value": "asc"
+          },
+          {
+            "name": "DESC",
+            "value": "desc"
+          }
+        ],
+        "classification": "native-adapter"
+      },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusSortDirection",
+        "packageId": "avalonia",
+        "kind": "enum",
+        "values": [
+          {
+            "name": "None",
+            "value": 0
+          },
+          {
+            "name": "Ascending",
+            "value": 1
+          },
+          {
+            "name": "Descending",
+            "value": 2
+          }
+        ]
+      },
+      "status": "partial",
+      "valueMap": {
+        "ASC": "Ascending",
+        "DESC": "Descending"
+      },
+      "scenarioIds": [
+        "scenario.v2.public-value.table-v2-sort-order"
+      ],
+      "governance": {
+        "reason": "The existing sort enum carries the shared directions plus the Avalonia-only None state.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
     }
   ],
   "contracts": [
@@ -124462,346 +124650,6 @@
       }
     },
     {
-      "id": "component-v2.table-v2-alignment",
-      "version": "2.0.0",
-      "releaseClassification": "preview",
-      "owner": "FsusUI Core",
-      "component": {
-        "name": "TableV2Alignment",
-        "module": "table-v2",
-        "classification": "native-adapter",
-        "exportStatus": "aligned-candidate",
-        "exports": [
-          "TableV2Alignment"
-        ]
-      },
-      "bindings": {
-        "web": {
-          "status": "source",
-          "package": "@ozwasyd/element-plus",
-          "memberRef": {
-            "baseline": "spec/baselines/vue-current.json",
-            "kind": "component"
-          },
-          "exports": [
-            "TableV2Alignment"
-          ]
-        },
-        "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
-        }
-      },
-      "inputs": [],
-      "outputs": [],
-      "operations": [],
-      "contentRegions": [],
-      "states": {
-        "machine": "fsus-table-v2-alignment",
-        "states": [
-          {
-            "name": "default",
-            "kind": "initial"
-          }
-        ],
-        "transitions": []
-      },
-      "requirements": {
-        "keyboard": [
-          "All public operations must be keyboard reachable and activatable."
-        ],
-        "pointer": [],
-        "focus": [
-          "Focus entry must surface the same public focus state on both platforms."
-        ],
-        "a11y": [],
-        "motion": [
-          "Honor user reduced-motion preference."
-        ],
-        "perf": [
-          "Render and interaction budgets must match the component performance contract."
-        ]
-      },
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      },
-      "platformDifferences": [],
-      "avaloniaExtras": [],
-      "scenarioIds": [
-        "scenario.v2.table-v2-alignment.state.default",
-        "scenario.v2.table-v2-alignment.keyboard",
-        "scenario.v2.table-v2-alignment.focus",
-        "scenario.v2.table-v2-alignment.motion",
-        "scenario.v2.table-v2-alignment.perf"
-      ],
-      "coverage": {
-        "total": 0,
-        "alignedCandidate": 0,
-        "partial": 0,
-        "missing": 0,
-        "webOnly": 0,
-        "mappedPercent": 0
-      }
-    },
-    {
-      "id": "component-v2.table-v2-fixed-dir",
-      "version": "2.0.0",
-      "releaseClassification": "preview",
-      "owner": "FsusUI Core",
-      "component": {
-        "name": "TableV2FixedDir",
-        "module": "table-v2",
-        "classification": "native-adapter",
-        "exportStatus": "aligned-candidate",
-        "exports": [
-          "TableV2FixedDir"
-        ]
-      },
-      "bindings": {
-        "web": {
-          "status": "source",
-          "package": "@ozwasyd/element-plus",
-          "memberRef": {
-            "baseline": "spec/baselines/vue-current.json",
-            "kind": "component"
-          },
-          "exports": [
-            "TableV2FixedDir"
-          ]
-        },
-        "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
-        }
-      },
-      "inputs": [],
-      "outputs": [],
-      "operations": [],
-      "contentRegions": [],
-      "states": {
-        "machine": "fsus-table-v2-fixed-dir",
-        "states": [
-          {
-            "name": "default",
-            "kind": "initial"
-          }
-        ],
-        "transitions": []
-      },
-      "requirements": {
-        "keyboard": [
-          "All public operations must be keyboard reachable and activatable."
-        ],
-        "pointer": [],
-        "focus": [
-          "Focus entry must surface the same public focus state on both platforms."
-        ],
-        "a11y": [],
-        "motion": [
-          "Honor user reduced-motion preference."
-        ],
-        "perf": [
-          "Render and interaction budgets must match the component performance contract."
-        ]
-      },
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      },
-      "platformDifferences": [],
-      "avaloniaExtras": [],
-      "scenarioIds": [
-        "scenario.v2.table-v2-fixed-dir.state.default",
-        "scenario.v2.table-v2-fixed-dir.keyboard",
-        "scenario.v2.table-v2-fixed-dir.focus",
-        "scenario.v2.table-v2-fixed-dir.motion",
-        "scenario.v2.table-v2-fixed-dir.perf"
-      ],
-      "coverage": {
-        "total": 0,
-        "alignedCandidate": 0,
-        "partial": 0,
-        "missing": 0,
-        "webOnly": 0,
-        "mappedPercent": 0
-      }
-    },
-    {
-      "id": "component-v2.table-v2-placeholder",
-      "version": "2.0.0",
-      "releaseClassification": "preview",
-      "owner": "FsusUI Core",
-      "component": {
-        "name": "TableV2Placeholder",
-        "module": "table-v2",
-        "classification": "native-adapter",
-        "exportStatus": "aligned-candidate",
-        "exports": [
-          "TableV2Placeholder"
-        ]
-      },
-      "bindings": {
-        "web": {
-          "status": "source",
-          "package": "@ozwasyd/element-plus",
-          "memberRef": {
-            "baseline": "spec/baselines/vue-current.json",
-            "kind": "component"
-          },
-          "exports": [
-            "TableV2Placeholder"
-          ]
-        },
-        "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
-        }
-      },
-      "inputs": [],
-      "outputs": [],
-      "operations": [],
-      "contentRegions": [],
-      "states": {
-        "machine": "fsus-table-v2-placeholder",
-        "states": [
-          {
-            "name": "default",
-            "kind": "initial"
-          }
-        ],
-        "transitions": []
-      },
-      "requirements": {
-        "keyboard": [
-          "All public operations must be keyboard reachable and activatable."
-        ],
-        "pointer": [],
-        "focus": [
-          "Focus entry must surface the same public focus state on both platforms."
-        ],
-        "a11y": [],
-        "motion": [
-          "Honor user reduced-motion preference."
-        ],
-        "perf": [
-          "Render and interaction budgets must match the component performance contract."
-        ]
-      },
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      },
-      "platformDifferences": [],
-      "avaloniaExtras": [],
-      "scenarioIds": [
-        "scenario.v2.table-v2-placeholder.state.default",
-        "scenario.v2.table-v2-placeholder.keyboard",
-        "scenario.v2.table-v2-placeholder.focus",
-        "scenario.v2.table-v2-placeholder.motion",
-        "scenario.v2.table-v2-placeholder.perf"
-      ],
-      "coverage": {
-        "total": 0,
-        "alignedCandidate": 0,
-        "partial": 0,
-        "missing": 0,
-        "webOnly": 0,
-        "mappedPercent": 0
-      }
-    },
-    {
-      "id": "component-v2.table-v2-sort-order",
-      "version": "2.0.0",
-      "releaseClassification": "preview",
-      "owner": "FsusUI Core",
-      "component": {
-        "name": "TableV2SortOrder",
-        "module": "table-v2",
-        "classification": "native-adapter",
-        "exportStatus": "aligned-candidate",
-        "exports": [
-          "TableV2SortOrder"
-        ]
-      },
-      "bindings": {
-        "web": {
-          "status": "source",
-          "package": "@ozwasyd/element-plus",
-          "memberRef": {
-            "baseline": "spec/baselines/vue-current.json",
-            "kind": "component"
-          },
-          "exports": [
-            "TableV2SortOrder"
-          ]
-        },
-        "avalonia": {
-          "status": "unbound",
-          "package": null,
-          "type": null
-        }
-      },
-      "inputs": [],
-      "outputs": [],
-      "operations": [],
-      "contentRegions": [],
-      "states": {
-        "machine": "fsus-table-v2-sort-order",
-        "states": [
-          {
-            "name": "default",
-            "kind": "initial"
-          }
-        ],
-        "transitions": []
-      },
-      "requirements": {
-        "keyboard": [
-          "All public operations must be keyboard reachable and activatable."
-        ],
-        "pointer": [],
-        "focus": [
-          "Focus entry must surface the same public focus state on both platforms."
-        ],
-        "a11y": [],
-        "motion": [
-          "Honor user reduced-motion preference."
-        ],
-        "perf": [
-          "Render and interaction budgets must match the component performance contract."
-        ]
-      },
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      },
-      "platformDifferences": [],
-      "avaloniaExtras": [],
-      "scenarioIds": [
-        "scenario.v2.table-v2-sort-order.state.default",
-        "scenario.v2.table-v2-sort-order.keyboard",
-        "scenario.v2.table-v2-sort-order.focus",
-        "scenario.v2.table-v2-sort-order.motion",
-        "scenario.v2.table-v2-sort-order.perf"
-      ],
-      "coverage": {
-        "total": 0,
-        "alignedCandidate": 0,
-        "partial": 0,
-        "missing": 0,
-        "webOnly": 0,
-        "mappedPercent": 0
-      }
-    },
-    {
       "id": "component-v2.time-pick-panel",
       "version": "2.0.0",
       "releaseClassification": "preview",
@@ -125902,22 +125750,6 @@
       }
     },
     {
-      "type": "FsusUI.Avalonia.Controls.FsusDataTableFixedColumn",
-      "kind": "enum",
-      "packageId": "avalonia",
-      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 3,
-      "scenarioIds": [
-        "scenario.v2.avalonia-only.fsus-data-table-fixed-column"
-      ],
-      "governance": {
-        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
-        "owner": "FsusUI Core",
-        "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
-      }
-    },
-    {
       "type": "FsusUI.Avalonia.Controls.FsusDataTableRow",
       "kind": "class",
       "packageId": "avalonia",
@@ -126613,22 +126445,6 @@
       "memberCount": 5,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-key-value-item"
-      ],
-      "governance": {
-        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
-        "owner": "FsusUI Core",
-        "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
-      }
-    },
-    {
-      "type": "FsusUI.Avalonia.Controls.FsusLayoutAlignment",
-      "kind": "enum",
-      "packageId": "avalonia",
-      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 4,
-      "scenarioIds": [
-        "scenario.v2.avalonia-only.fsus-layout-alignment"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
@@ -128437,22 +128253,6 @@
       "memberCount": 4,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-slider-mark"
-      ],
-      "governance": {
-        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
-        "owner": "FsusUI Core",
-        "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
-      }
-    },
-    {
-      "type": "FsusUI.Avalonia.Controls.FsusSortDirection",
-      "kind": "enum",
-      "packageId": "avalonia",
-      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 3,
-      "scenarioIds": [
-        "scenario.v2.avalonia-only.fsus-sort-direction"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",

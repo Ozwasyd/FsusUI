@@ -1355,6 +1355,94 @@ export const loadModuleSources = (root, moduleName) => {
   return files.sort((a, b) => a.relativePath.localeCompare(b.relativePath))
 }
 
+export const extractPublicValueExports = ({
+  root,
+  moduleSources,
+  moduleName,
+}) => {
+  const resolver = new SemanticResolver(root, moduleSources)
+  const indexRel = `vue/packages/components/${moduleName}/index.ts`
+  const indexModule = resolver.parseTsModule(indexRel)
+  if (!indexModule) return []
+  const values = []
+  for (const statement of indexModule.ast.program.body) {
+    if (
+      statement.type !== 'ExportNamedDeclaration' ||
+      !statement.source?.value
+    ) {
+      continue
+    }
+    const targetRel = resolver.resolveSpecFile(statement.source.value, indexRel)
+    const targetModule = targetRel ? resolver.parseTsModule(targetRel) : null
+    if (!targetModule) continue
+    for (const specifier of statement.specifiers || []) {
+      if (specifier.type !== 'ExportSpecifier') continue
+      const localName =
+        specifier.local.type === 'Identifier'
+          ? specifier.local.name
+          : specifier.local.value
+      const exportName =
+        specifier.exported.type === 'Identifier'
+          ? specifier.exported.name
+          : specifier.exported.value
+      const enumNode = targetModule.ast.program.body
+        .map((candidate) =>
+          candidate.type === 'ExportNamedDeclaration'
+            ? candidate.declaration
+            : candidate,
+        )
+        .find(
+          (candidate) =>
+            candidate?.type === 'TSEnumDeclaration' &&
+            candidate.id.name === localName,
+        )
+      if (enumNode) {
+        values.push({
+          name: exportName,
+          module: moduleName,
+          kind: 'enum',
+          source: {
+            path: targetRel,
+            hash: sha256(targetModule.content),
+            symbol: localName,
+          },
+          values: enumNode.members.map((member) => ({
+            name:
+              member.id.type === 'Identifier'
+                ? member.id.name
+                : member.id.value,
+            value:
+              member.initializer?.type === 'StringLiteral' ||
+              member.initializer?.type === 'NumericLiteral'
+                ? member.initializer.value
+                : null,
+          })),
+        })
+        continue
+      }
+      const constant = targetModule.consts.get(localName)
+      if (
+        constant?.type === 'CallExpression' &&
+        constant.callee?.type === 'Identifier' &&
+        constant.callee.name === 'Symbol'
+      ) {
+        values.push({
+          name: exportName,
+          module: moduleName,
+          kind: 'sentinel',
+          source: {
+            path: targetRel,
+            hash: sha256(targetModule.content),
+            symbol: localName,
+          },
+          values: [],
+        })
+      }
+    }
+  }
+  return values.sort((first, second) => first.name.localeCompare(second.name))
+}
+
 const exportedAliasTarget = (sources, exportName) => {
   const indexSource = sources.find((source) =>
     source.relativePath.endsWith('/index.ts'),

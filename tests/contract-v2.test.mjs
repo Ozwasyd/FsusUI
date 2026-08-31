@@ -102,8 +102,9 @@ test('public compatibility aliases collapse into one source-owned contract', () 
     (entry) => entry.role === 'alias',
   )
   assert.equal(aliases.length, 50)
-  assert.equal(committedRegistry.publicExportMap.length, 228)
-  assert.equal(committedRegistry.contracts.length, 178)
+  assert.equal(committedRegistry.publicExportMap.length, 224)
+  assert.equal(committedRegistry.publicValueBindings.length, 4)
+  assert.equal(committedRegistry.contracts.length, 174)
 
   const collectionSummary = committedRegistry.contracts.find(
     (contract) => contract.id === 'component-v2.el-collection-summary',
@@ -117,6 +118,56 @@ test('public compatibility aliases collapse into one source-owned contract', () 
       (contract) => contract.id === 'component-v2.fsus-collection-summary',
     ),
     false,
+  )
+})
+
+test('Table V2 enums and renderer sentinel retain explicit public value status', () => {
+  assert.deepEqual(
+    committedRegistry.publicValueBindings.map(
+      ({ name, kind, status, avalonia }) => ({
+        name,
+        kind,
+        status,
+        avaloniaType: avalonia?.type ?? null,
+      }),
+    ),
+    [
+      {
+        name: 'TableV2Alignment',
+        kind: 'enum',
+        status: 'partial',
+        avaloniaType: 'FsusUI.Avalonia.Controls.FsusLayoutAlignment',
+      },
+      {
+        name: 'TableV2FixedDir',
+        kind: 'enum',
+        status: 'partial',
+        avaloniaType: 'FsusUI.Avalonia.Controls.FsusDataTableFixedColumn',
+      },
+      {
+        name: 'TableV2Placeholder',
+        kind: 'sentinel',
+        status: 'web-only',
+        avaloniaType: null,
+      },
+      {
+        name: 'TableV2SortOrder',
+        kind: 'enum',
+        status: 'partial',
+        avaloniaType: 'FsusUI.Avalonia.Controls.FsusSortDirection',
+      },
+    ],
+  )
+})
+
+test('public value binding fails closed when an enum member is unmapped', () => {
+  const mutated = clone(committedRegistry)
+  delete mutated.publicValueBindings.find(
+    (binding) => binding.name === 'TableV2FixedDir',
+  ).valueMap.RIGHT
+  assert.match(
+    validateRegistry(mutated, gate).join('\n'),
+    /public value TableV2FixedDir value map does not cover every Web enum member/u,
   )
 })
 

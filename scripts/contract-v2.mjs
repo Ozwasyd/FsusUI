@@ -50,6 +50,32 @@ const AVALONIA_COMPONENT_BINDINGS = {
   ElVisuallyHidden: 'FsusUI.Avalonia.Controls.FsusVisualHidden',
 }
 
+const PUBLIC_VALUE_BINDINGS = {
+  TableV2Alignment: {
+    avaloniaType: 'FsusUI.Avalonia.Controls.FsusLayoutAlignment',
+    valueMap: { CENTER: 'Center', RIGHT: 'End' },
+    reason:
+      'The existing layout enum is the native counterpart, but right/end directionality requires behavior evidence before alignment.',
+  },
+  TableV2FixedDir: {
+    avaloniaType: 'FsusUI.Avalonia.Controls.FsusDataTableFixedColumn',
+    valueMap: { LEFT: 'Left', RIGHT: 'Right' },
+    reason:
+      'The existing fixed-column enum carries the shared directions plus the Avalonia-only None state.',
+  },
+  TableV2SortOrder: {
+    avaloniaType: 'FsusUI.Avalonia.Controls.FsusSortDirection',
+    valueMap: { ASC: 'Ascending', DESC: 'Descending' },
+    reason:
+      'The existing sort enum carries the shared directions plus the Avalonia-only None state.',
+  },
+  TableV2Placeholder: {
+    webOnly: true,
+    reason:
+      'The Symbol is a Vue renderer identity sentinel; Avalonia owns native placeholder row lifecycle and cannot expose the JavaScript identity value.',
+  },
+}
+
 export const VUE_BASELINE_PATH = 'spec/baselines/vue-current.json'
 export const AVALONIA_SEMANTIC_PATHS = {
   avalonia: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
@@ -1116,6 +1142,68 @@ const avaloniaOnlyType = ({ type, packageId }) => ({
   ),
 })
 
+const buildPublicValueBindings = ({ vueBaseline, typeIndex }) =>
+  (vueBaseline.publicValues ?? [])
+    .map((value) => {
+      const binding = PUBLIC_VALUE_BINDINGS[value.name]
+      const scenarioIds = [`scenario.v2.public-value.${toKebab(value.name)}`]
+      if (!binding) {
+        return {
+          id: `public-value.${toKebab(value.name)}`,
+          name: value.name,
+          module: value.module,
+          kind: value.kind,
+          web: value,
+          avalonia: null,
+          status: 'missing',
+          valueMap: null,
+          scenarioIds,
+          governance: defaultGovernance(
+            'No explicit public value counterpart binding exists.',
+          ),
+        }
+      }
+      if (binding.webOnly) {
+        return {
+          id: `public-value.${toKebab(value.name)}`,
+          name: value.name,
+          module: value.module,
+          kind: value.kind,
+          web: value,
+          avalonia: null,
+          status: 'web-only',
+          valueMap: null,
+          scenarioIds,
+          governance: defaultGovernance(binding.reason),
+        }
+      }
+      const avaloniaType = typeIndex.get(binding.avaloniaType) ?? null
+      return {
+        id: `public-value.${toKebab(value.name)}`,
+        name: value.name,
+        module: value.module,
+        kind: value.kind,
+        web: value,
+        avalonia: avaloniaType
+          ? {
+              type: avaloniaType.name,
+              packageId: avaloniaType.packageId,
+              kind: avaloniaType.kind,
+              values: avaloniaType.enumMembers ?? [],
+            }
+          : null,
+        status: avaloniaType ? 'partial' : 'missing',
+        valueMap: binding.valueMap ?? null,
+        scenarioIds,
+        governance: defaultGovernance(
+          avaloniaType
+            ? binding.reason
+            : `Configured Avalonia public value type ${binding.avaloniaType} is missing from the semantic baseline.`,
+        ),
+      }
+    })
+    .sort((first, second) => first.name.localeCompare(second.name))
+
 export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
   const map = []
   for (const component of vueBaseline.components ?? []) {
@@ -1160,6 +1248,13 @@ export const buildRegistry = ({
   )
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
+  const publicValueBindings = buildPublicValueBindings({
+    vueBaseline,
+    typeIndex,
+  })
+  for (const binding of publicValueBindings) {
+    if (binding.avalonia?.type) mappedTypes.add(binding.avalonia.type)
+  }
   const contracts = []
   for (const component of vueBaseline.components ?? []) {
     if (component.exportIdentity?.role === 'alias') continue
@@ -1286,6 +1381,7 @@ export const buildRegistry = ({
     },
     componentMap,
     publicExportMap,
+    publicValueBindings,
     contracts,
     avaloniaOnlyTypes,
     coverage,
@@ -1498,6 +1594,9 @@ export const validateRegistry = (registry, gate) => {
   if (!Array.isArray(registry.publicExportMap)) {
     errors.push('registry publicExportMap must be an array')
   }
+  if (!Array.isArray(registry.publicValueBindings)) {
+    errors.push('registry publicValueBindings must be an array')
+  }
   const contractIds = new Set()
   for (const contract of registry.contracts) {
     if (contractIds.has(contract.id)) {
@@ -1549,6 +1648,52 @@ export const validateRegistry = (registry, gate) => {
       errors.push(
         `${contract.id} public export map does not match component exports`,
       )
+    }
+  }
+  const publicValueNames = new Set()
+  for (const binding of registry.publicValueBindings ?? []) {
+    const context = `public value ${binding.name ?? '<unknown>'}`
+    if (publicValueNames.has(binding.name)) errors.push(`duplicate ${context}`)
+    publicValueNames.add(binding.name)
+    if (!MEMBER_STATUSES.includes(binding.status)) {
+      errors.push(`${context} has invalid status ${binding.status}`)
+    }
+    if (!['enum', 'sentinel'].includes(binding.kind)) {
+      errors.push(`${context} has invalid kind ${binding.kind}`)
+    }
+    if (
+      !Array.isArray(binding.scenarioIds) ||
+      binding.scenarioIds.length === 0
+    ) {
+      errors.push(`${context} missing scenario coverage id`)
+    }
+    if (binding.status !== 'aligned-candidate') {
+      validateGovernance(binding.governance, context, errors)
+    }
+    if (binding.kind === 'enum' && binding.avalonia) {
+      if (binding.avalonia.kind !== 'enum') {
+        errors.push(`${context} counterpart is not an enum`)
+      }
+      const webNames = (binding.web?.values ?? [])
+        .map((value) => value.name)
+        .sort()
+      const mappedNames = Object.keys(binding.valueMap ?? {}).sort()
+      if (JSON.stringify(webNames) !== JSON.stringify(mappedNames)) {
+        errors.push(`${context} value map does not cover every Web enum member`)
+      }
+      const avaloniaNames = new Set(
+        (binding.avalonia.values ?? []).map((value) => value.name),
+      )
+      for (const mapped of Object.values(binding.valueMap ?? {})) {
+        if (!avaloniaNames.has(mapped)) {
+          errors.push(
+            `${context} maps to missing Avalonia enum member ${mapped}`,
+          )
+        }
+      }
+    }
+    if (binding.kind === 'sentinel' && binding.status !== 'web-only') {
+      errors.push(`${context} sentinel must be explicitly web-only`)
     }
   }
   return errors

@@ -105,6 +105,42 @@ const cases = [
     expected: 'fixture TSX widget source identity was not exact',
   },
   {
+    id: 'vue-public-alias-mutated',
+    file: 'vue/packages/components/collection-primitives/index.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/collection-primitives/index.ts',
+        'export const FsusCollectionSummary = ElCollectionSummary.FsusCollectionSummary',
+        'export const FsusCollectionSummaryMutation = ElCollectionSummary.FsusCollectionSummary',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'vue-public-enum-mutated',
+    file: 'vue/packages/components/table-v2/src/constants.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/table-v2/src/constants.ts',
+        "  RIGHT = 'right',",
+        "  RIGHT = 'right-mutation',",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'vue-public-sentinel-mutated',
+    file: 'vue/packages/components/table-v2/src/private.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/table-v2/src/private.ts',
+        "Symbol('placeholder')",
+        "Symbol('placeholder-mutation')",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
     id: 'vue-prop-removed',
     file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
     inject: () =>

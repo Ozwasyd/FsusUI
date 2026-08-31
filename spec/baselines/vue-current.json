@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "2750a338b97586af7092757f3b2cfb2fe5ac468c",
+    "commitSha": "0b098a1167d93d61cf04cfc92cdbad62a821c70c",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
@@ -11,20 +11,21 @@
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "15883d5c50dd041df1d085635dc215569a81c24fc2bdb5f3c9c9affd167a44ee"
+    "outputHash": "4c7b50bb2f61f863e59c952bb44a2613d1b09303510bfd3272b489332f0fd61f"
   },
   "summary": {
     "componentModules": 93,
-    "components": 228,
+    "components": 224,
     "installableComponents": 153,
     "directives": 3,
     "services": 4,
+    "publicValues": 4,
     "plugins": 7,
     "cssVariables": 482,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
-      "native-adapter": 76,
+      "native-adapter": 72,
       "platform-override": 21,
       "web-only": 5
     }
@@ -35308,90 +35309,6 @@
       }
     },
     {
-      "name": "TableV2Alignment",
-      "module": "table-v2",
-      "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
-      "exposed": [],
-      "semantic": {
-        "props": [],
-        "emits": [],
-        "exposed": [],
-        "slots": []
-      },
-      "exportIdentity": {
-        "role": "canonical",
-        "canonical": "TableV2Alignment",
-        "aliases": []
-      }
-    },
-    {
-      "name": "TableV2FixedDir",
-      "module": "table-v2",
-      "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
-      "exposed": [],
-      "semantic": {
-        "props": [],
-        "emits": [],
-        "exposed": [],
-        "slots": []
-      },
-      "exportIdentity": {
-        "role": "canonical",
-        "canonical": "TableV2FixedDir",
-        "aliases": []
-      }
-    },
-    {
-      "name": "TableV2Placeholder",
-      "module": "table-v2",
-      "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
-      "exposed": [],
-      "semantic": {
-        "props": [],
-        "emits": [],
-        "exposed": [],
-        "slots": []
-      },
-      "exportIdentity": {
-        "role": "canonical",
-        "canonical": "TableV2Placeholder",
-        "aliases": []
-      }
-    },
-    {
-      "name": "TableV2SortOrder",
-      "module": "table-v2",
-      "classification": "native-adapter",
-      "source": null,
-      "props": [],
-      "emits": [],
-      "slots": [],
-      "exposed": [],
-      "semantic": {
-        "props": [],
-        "emits": [],
-        "exposed": [],
-        "slots": []
-      },
-      "exportIdentity": {
-        "role": "canonical",
-        "canonical": "TableV2SortOrder",
-        "aliases": []
-      }
-    },
-    {
       "name": "TimePickPanel",
       "module": "time-picker",
       "classification": "native-adapter",
@@ -35432,6 +35349,83 @@
         "canonical": "vLoading",
         "aliases": []
       }
+    }
+  ],
+  "publicValues": [
+    {
+      "name": "TableV2Alignment",
+      "module": "table-v2",
+      "kind": "enum",
+      "source": {
+        "path": "vue/packages/components/table-v2/src/constants.ts",
+        "hash": "ac5ceaf94c9bb619566c587b064d9e80d92802206aa3d4e1e48facdd42fd5bb8",
+        "symbol": "Alignment"
+      },
+      "values": [
+        {
+          "name": "CENTER",
+          "value": "center"
+        },
+        {
+          "name": "RIGHT",
+          "value": "right"
+        }
+      ],
+      "classification": "native-adapter"
+    },
+    {
+      "name": "TableV2FixedDir",
+      "module": "table-v2",
+      "kind": "enum",
+      "source": {
+        "path": "vue/packages/components/table-v2/src/constants.ts",
+        "hash": "ac5ceaf94c9bb619566c587b064d9e80d92802206aa3d4e1e48facdd42fd5bb8",
+        "symbol": "FixedDir"
+      },
+      "values": [
+        {
+          "name": "LEFT",
+          "value": "left"
+        },
+        {
+          "name": "RIGHT",
+          "value": "right"
+        }
+      ],
+      "classification": "native-adapter"
+    },
+    {
+      "name": "TableV2Placeholder",
+      "module": "table-v2",
+      "kind": "sentinel",
+      "source": {
+        "path": "vue/packages/components/table-v2/src/private.ts",
+        "hash": "5f5f5904b0a9cd38212b8e589149455787be5270242ab4b0e0cb946943068df5",
+        "symbol": "placeholderSign"
+      },
+      "values": [],
+      "classification": "native-adapter"
+    },
+    {
+      "name": "TableV2SortOrder",
+      "module": "table-v2",
+      "kind": "enum",
+      "source": {
+        "path": "vue/packages/components/table-v2/src/constants.ts",
+        "hash": "ac5ceaf94c9bb619566c587b064d9e80d92802206aa3d4e1e48facdd42fd5bb8",
+        "symbol": "SortOrder"
+      },
+      "values": [
+        {
+          "name": "ASC",
+          "value": "asc"
+        },
+        {
+          "name": "DESC",
+          "value": "desc"
+        }
+      ],
+      "classification": "native-adapter"
     }
   ],
   "directives": [

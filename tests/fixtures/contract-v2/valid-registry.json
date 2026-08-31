@@ -361,6 +361,7 @@
       "contractId": "component-v2.el-markdown-editor"
     }
   ],
+  "publicValueBindings": [],
   "avaloniaOnlyTypes": [
     {
       "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
