@@ -1,5 +1,7 @@
 export const MARKDOWN_FEATURE_ACTIVATION_SCENARIO =
   'markdown-feature-activation'
+export const MARKDOWN_HEAVY_LIFECYCLE_SCENARIO =
+  'markdown-heavy-feature-lifecycle'
 
 const requiredFeatureKinds = Object.freeze([
   'code-highlight',
@@ -45,6 +47,21 @@ export const createMarkdownFeatureActivationSource = (revision: number) =>
     `const activationRevision: number = ${revision}`,
     '```',
   ].join('\n')
+
+export const createMarkdownHeavyLifecycleSource = (blockCount = 3000) =>
+  Array.from({ length: blockCount }, (_, index) => {
+    if (index % 30 !== 0) {
+      return `Paragraph ${index} with stable lifecycle filler text and Unicode 中文.`
+    }
+    const technicalIndex = index / 30
+    if (technicalIndex % 3 === 0) {
+      return `\`\`\`typescript\nconst heavyNode${technicalIndex}: number = ${technicalIndex}\n\`\`\``
+    }
+    if (technicalIndex % 3 === 1) {
+      return `\`\`\`mermaid\ngraph LR\nA${technicalIndex}-->B${technicalIndex}\n\`\`\``
+    }
+    return `$$\nheavy_{${technicalIndex}} = ${technicalIndex}^2\n$$`
+  }).join('\n\n')
 
 type PendingActivation = {
   reject: (error: Error) => void

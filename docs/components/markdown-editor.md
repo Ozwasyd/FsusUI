@@ -158,6 +158,12 @@ different-document 不得复用。unknown token、数字码、`write`/`ok` 别�
 `readMarkdownLiveCapability` 是唯一入口，不能从 DOM、class 或 error string
 猜测状态。
 
+Code highlighting, Mermaid, and LaTeX share one internal active/static/unmounted
+resource lifecycle. Offscreen technical nodes release node-local work while an
+unchanged node may reuse a bounded immutable render result through the same safe
+output gateway. Cache and lifecycle state never become source or transaction
+authority. See the [heavy-feature lifecycle contract](../api/markdown-heavy-feature-lifecycle.md).
+
 ## Command registry
 
 所有 command surface 消费同一 `MarkdownEditorCommand` registry。Command 使用稳定

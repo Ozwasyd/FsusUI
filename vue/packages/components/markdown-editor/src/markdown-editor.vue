@@ -389,6 +389,7 @@ import {
   useMarkdownEditorFrameScheduler,
   useNamespace,
 } from '@element-plus/hooks'
+import { provideMarkdownHeavyFeatureDocumentContext } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import {
   filterMarkdownEditorCommands,
   isMarkdownEditorCommandEnabled,
@@ -554,6 +555,11 @@ const transactionStore = new MarkdownEditorTransactionStore(
   initialSelection,
   documentIdentity,
 )
+provideMarkdownHeavyFeatureDocumentContext({
+  documentEpoch: () => transactionStore.documentIdentity.epoch,
+  documentKey: () => transactionStore.documentIdentity.id,
+  revision: () => transactionStore.revision,
+})
 const editorValue = ref(transactionStore.value)
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({

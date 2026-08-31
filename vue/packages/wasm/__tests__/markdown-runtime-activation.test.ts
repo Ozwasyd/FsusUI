@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { activateMarkdownFeatures } from '../markdown-runtime'
+import {
+  createMarkdownHeavyFeatureLifecycle,
+  type MarkdownHeavyFeatureKind,
+} from '../../hooks/use-markdown-heavy-feature-lifecycle'
 import { getMarkdownXssFeatureOutput } from '../../../tests/support/markdown-xss-corpus'
 
 const featureModuleMocks = vi.hoisted(() => ({
@@ -495,6 +499,71 @@ describe('markdown feature activation runtime', () => {
     expect(
       root.querySelectorAll('[data-markdown-feature-activated]'),
     ).toHaveLength(5)
+  })
+
+  it('reuses immutable mixed feature output through the gateway after remount', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    const markup = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>graph TD\nA--&gt;B</code></figure>',
+      '<span class="markdown-renderer__latex" data-latex-placeholder="true"><code>x^2</code></span>',
+      '<pre><code class="language-typescript">const ok = true</code></pre>',
+    ].join('')
+    const activate = async (root: HTMLElement) => {
+      const occurrence: Record<MarkdownHeavyFeatureKind, number> = {
+        'code-highlight': 0,
+        latex: 0,
+        mermaid: 0,
+      }
+      return activateMarkdownFeatures({
+        heavyLifecycle: lifecycle,
+        resolveHeavyFeatureIdentity: ({ kind }) => {
+          const node = occurrence[kind]++
+          return {
+            config: 'default',
+            documentEpoch: 1,
+            documentKey: 'doc-a',
+            featureKind: kind,
+            gatewayVersion: 'gateway@1',
+            locale: 'en',
+            nodeId: `${kind}-${node}`,
+            rendererVersion: 'renderer@1',
+            revision: 1,
+            sourceIdentity: 'source-a',
+            theme: 'light',
+          }
+        },
+        root,
+      })
+    }
+
+    const first = document.createElement('article')
+    first.innerHTML = markup
+    await activate(first)
+    expect(lifecycle.metrics()).toMatchObject({
+      activations: 3,
+      cacheEntries: 3,
+      staticNodes: 3,
+    })
+    lifecycle.unmountRoot(first)
+
+    const second = document.createElement('article')
+    second.innerHTML = markup
+    const result = await activate(second)
+
+    expect(result.errors).toEqual([])
+    expect(lifecycle.metrics()).toMatchObject({
+      activations: 3,
+      activeNodes: 0,
+      reuses: 3,
+      staticNodes: 3,
+      teardowns: 3,
+    })
+    expect(featureModuleMocks.mermaidRender).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.katexRenderToString).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledTimes(1)
+    expect(second.querySelector('[data-mermaid-rendered="true"]')).toBeTruthy()
+    expect(second.querySelector('[data-latex-rendered="katex"]')).toBeTruthy()
+    expect(second.querySelector('[data-code-highlighted="shiki"]')).toBeTruthy()
   })
 
   it('keeps stable feature-kind order when concurrency is one', async () => {

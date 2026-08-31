@@ -59,7 +59,8 @@
       :content-version="markdownContentVersion"
       :allow-latex="true"
       :allow-mermaid="true"
-      mode="article"
+      :features="markdownFeatures"
+      :mode="markdownMode"
       class="performance-scroll-target performance-markdown"
       @features-activated="captureMarkdownFeatureActivation"
       @render-profile="captureWasmProfile"
@@ -123,13 +124,16 @@ import {
   createFsusWorkerExecutor,
   FsusVirtualSizeIndex,
   getFsusRenderPipelineDiagnosticsSnapshot,
+  provideMarkdownHeavyFeatureDocumentContext,
   useFsusRenderScheduler,
 } from '@element-plus/hooks'
 import { createWasmSortController } from '@element-plus/components/table/src/composables/use-wasm-sort'
 import {
   MARKDOWN_FEATURE_ACTIVATION_SCENARIO,
+  MARKDOWN_HEAVY_LIFECYCLE_SCENARIO,
   MarkdownFeatureActivationSequence,
   createMarkdownFeatureActivationSource,
+  createMarkdownHeavyLifecycleSource,
   hasCompleteMarkdownFeatureActivation,
 } from './markdown-feature-performance'
 
@@ -154,10 +158,24 @@ const tableRevision = ref(0)
 const pipelineRevision = ref(0)
 const markdownActivationRevision = ref(0)
 const completedMarkdownActivationRevision = ref(0)
+const markdownDocumentEpoch = ref(1)
+const markdownDocumentKey = ref('heavy-document-a')
+const markdownHeavyLifecycleRevision = ref(1)
+const markdownFeatures = ref({
+  codeHighlight: true,
+  latex: true,
+  mermaid: true,
+})
+const markdownMode = ref<'about' | 'article' | 'editor' | 'preview'>('article')
 const markdownFeatureActivationSequence =
   new MarkdownFeatureActivationSequence()
 const tablePipeline = createWasmSortController('performance-fixture')
 const renderScheduler = useFsusRenderScheduler()
+provideMarkdownHeavyFeatureDocumentContext({
+  documentEpoch: () => markdownDocumentEpoch.value,
+  documentKey: () => markdownDocumentKey.value,
+  revision: () => markdownContentVersion.value ?? 'unversioned',
+})
 const virtualList = ref<{ scrollTo: (offset: number) => void } | null>(null)
 const virtualGrid = ref<{
   scrollTo: (position: { scrollLeft: number; scrollTop: number }) => void
@@ -245,6 +263,9 @@ const markdown = computed(() => {
       markdownActivationRevision.value,
     )
   }
+  if (props.scenario === MARKDOWN_HEAVY_LIFECYCLE_SCENARIO) {
+    return createMarkdownHeavyLifecycleSource()
+  }
   const target = Math.max(1024, props.size)
   const paragraph =
     '## Rendering fixture\n\nParagraph with **bold**, `code`, [link](https://example.com), and 中文文本.\n\n'
@@ -253,7 +274,9 @@ const markdown = computed(() => {
 const markdownContentVersion = computed(() =>
   props.scenario === MARKDOWN_FEATURE_ACTIVATION_SCENARIO
     ? `feature-activation-${markdownActivationRevision.value}`
-    : null,
+    : props.scenario === MARKDOWN_HEAVY_LIFECYCLE_SCENARIO
+      ? `heavy-lifecycle-${markdownHeavyLifecycleRevision.value}`
+      : null,
 )
 
 type PerformanceFixtureApi = {
@@ -281,6 +304,13 @@ type PerformanceFixtureApi = {
     parseMs: number
     transferMs: number
   } | null
+  markdownHeavyLifecycleTransition: (input: {
+    codeHighlight: boolean
+    documentEpoch: number
+    documentKey: string
+    mode: 'about' | 'article' | 'editor' | 'preview'
+    theme: 'dark' | 'light'
+  }) => Promise<void>
   wasmProbe: () => Promise<{
     startupMs: number
     computeMs: number
@@ -294,6 +324,22 @@ type PerformanceFixtureApi = {
     } | null
   }>
 }
+
+const markdownHeavyLifecycleTransition: PerformanceFixtureApi['markdownHeavyLifecycleTransition'] =
+  async (input) => {
+    ready.value = 'false'
+    markdownDocumentEpoch.value = input.documentEpoch
+    markdownDocumentKey.value = input.documentKey
+    markdownFeatures.value = {
+      codeHighlight: input.codeHighlight,
+      latex: true,
+      mermaid: true,
+    }
+    markdownMode.value = input.mode
+    document.documentElement.classList.toggle('dark', input.theme === 'dark')
+    markdownHeavyLifecycleRevision.value += 1
+    await nextTick()
+  }
 
 const createBurstWorker = () => {
   const source = `
@@ -645,6 +691,7 @@ onMounted(async () => {
   window.__FSUSUI_PERFORMANCE_FIXTURE__ = {
     act,
     dataPipelineProbe,
+    markdownHeavyLifecycleTransition,
     markdownPhaseProbe,
     workerPoolBurstProbe,
     workerProbe,
@@ -659,6 +706,7 @@ onBeforeUnmount(() => {
     new Error('markdown_feature_activation_fixture_unmounted'),
   )
   tablePipeline.dispose()
+  document.documentElement.classList.remove('dark')
   delete window.__FSUSUI_PERFORMANCE_FIXTURE__
 })
 </script>

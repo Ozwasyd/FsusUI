@@ -67,6 +67,7 @@ import {
   ref,
   shallowRef,
   toRaw,
+  useId,
   watch,
 } from 'vue'
 import { useGlobalConfig } from '@element-plus/components/config-provider'
@@ -77,9 +78,14 @@ import {
   useFsusVirtualWindow,
 } from '@element-plus/hooks'
 import {
+  createMarkdownHeavyFeatureLifecycle,
+  useMarkdownHeavyFeatureDocumentContext,
+} from '../../../hooks/use-markdown-heavy-feature-lifecycle'
+import {
   MARKDOWN_RENDERER_SURFACE_CLASSES as markdownSurfaceClasses,
   MARKDOWN_RENDERER_VERSION,
   activateMarkdownFeatures,
+  createMarkdownEditorProjection,
   renderMarkdownFallbackWithRuntime,
   isMarkdownRuntimeAuthorizedResult,
   normalizeMarkdownSource,
@@ -93,6 +99,10 @@ import {
   resolveMarkdownWorkerScriptUrl,
 } from './markdown-renderer'
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
+import type {
+  MarkdownHeavyFeatureIdentity,
+  MarkdownHeavyFeatureKind,
+} from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import type { FsusErrorDetail } from '@element-plus/utils'
 import type {
   MarkdownRenderChunk,
@@ -111,6 +121,9 @@ defineOptions({
 })
 
 const props = defineProps(markdownRendererProps)
+const localDocumentKey = `${useId()}-markdown-renderer`
+const heavyDocumentContext = useMarkdownHeavyFeatureDocumentContext()
+const heavyLifecycle = createMarkdownHeavyFeatureLifecycle()
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
   (event: 'render-error', error: FsusErrorDetail): void
@@ -221,6 +234,34 @@ let activationDurationMs = 0
 let commitDurationMs = 0
 const activatedChunkKeys = new Set<string>()
 const chunkActivationElements = new Map<string, HTMLElement>()
+let lastHeavyLifecycleIdentityContext: Readonly<{
+  config: string
+  documentEpoch: number | string
+  documentKey: string
+  revision: number | string
+  theme: string
+}> | null = null
+
+const recordHeavyLifecycleMetrics = () => {
+  const target = rootEl.value
+  if (!target) return
+  const metrics = heavyLifecycle.metrics()
+  target.dataset.markdownHeavyLifecycle = JSON.stringify({
+    aborts: metrics.aborts,
+    active: metrics.activeNodes,
+    activations: metrics.activations,
+    cacheBytes: metrics.cacheBytes,
+    cacheEntries: metrics.cacheEntries,
+    evictions: metrics.evictions,
+    identity: lastHeavyLifecycleIdentityContext,
+    retainedResources: metrics.activeNodes,
+    reuses: metrics.reuses,
+    stale: metrics.staleCommits,
+    static: metrics.staticNodes,
+    teardowns: metrics.teardowns,
+    unmounted: metrics.unmountedNodes,
+  })
+}
 
 type RenderAnchor = {
   htmlEndOffset?: number
@@ -246,6 +287,28 @@ const afterFrame = () =>
 const frameScheduler = useEmbeddedMarkdownEditorFrameScheduler()
 let renderAnchorDelta: number | null = null
 
+const scheduleHeavyFeatureCommit = (input: {
+  readonly key: string
+  readonly run: () => HTMLElement | void
+  readonly signal: AbortSignal
+}) =>
+  new Promise<HTMLElement | void>((resolve, reject) => {
+    let committed: HTMLElement | void
+    const abort = () => reject(new DOMException('Aborted', 'AbortError'))
+    input.signal.addEventListener('abort', abort, { once: true })
+    frameScheduler.schedule({
+      key: input.key,
+      mutate: () => {
+        if (!input.signal.aborted) committed = input.run()
+      },
+      postPaint: () => {
+        input.signal.removeEventListener('abort', abort)
+        if (input.signal.aborted) abort()
+        else resolve(committed)
+      },
+    })
+  })
+
 const settleRenderViewport = (key: string) =>
   new Promise<void>((resolve) => {
     frameScheduler.schedule({
@@ -267,7 +330,7 @@ const recordCommitDuration = (startedAt: number) => {
 }
 
 const findScrollContainer = (element: HTMLElement | null) => {
-  let current = element?.parentElement ?? null
+  let current = element
 
   while (current) {
     const style = window.getComputedStyle(current)
@@ -393,8 +456,7 @@ const restoreRenderAnchor = async (anchor: RenderAnchor | null) => {
         if (!nextAnchor) return
 
         const containerTop = anchor.scrollContainer.getBoundingClientRect().top
-        const nextOffset =
-          nextAnchor.getBoundingClientRect().top - containerTop
+        const nextOffset = nextAnchor.getBoundingClientRect().top - containerTop
         renderAnchorDelta = nextOffset - anchor.offset
       },
       mutate: () => {
@@ -443,7 +505,10 @@ const setChunkUnitRef = (key: string, element: Element | null) => {
   const previous = chunkActivationElements.get(key)
   if (previous && previous !== element) {
     activationObserver?.unobserve(previous)
+    heavyLifecycle.unmountRoot(previous)
+    activatedChunkKeys.delete(key)
     chunkActivationElements.delete(key)
+    recordHeavyLifecycleMetrics()
   }
   if (!(element instanceof HTMLElement)) return
   chunkActivationElements.set(key, element)
@@ -736,6 +801,87 @@ const resetFeatureActivation = () => {
   rootEl.value?.removeAttribute('data-fsus-markdown-activation-ms')
   activatedChunkKeys.clear()
   chunkActivationElements.clear()
+  if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
+  recordHeavyLifecycleMetrics()
+}
+
+const createHeavyFeatureIdentityResolver = (
+  result: MarkdownSafeRenderResult,
+) => {
+  const projection = createMarkdownEditorProjection(result.rawSource)
+  const resultChunks: readonly MarkdownRenderChunk[] =
+    'chunks' in result && Array.isArray(result.chunks)
+      ? (result.chunks as readonly MarkdownRenderChunk[])
+      : []
+  const nodes = {
+    'code-highlight': projection.nodes.filter((node) => node.kind === 'code'),
+    latex: projection.nodes.filter((node) => node.kind === 'latex'),
+    mermaid: projection.nodes.filter((node) => node.kind === 'mermaid'),
+  }
+  const cursors: Record<MarkdownHeavyFeatureKind, number> = {
+    'code-highlight': 0,
+    latex: 0,
+    mermaid: 0,
+  }
+  const features = resolveMarkdownFeatureOptions()
+  const config = JSON.stringify({
+    codeHighlight: features.codeHighlight,
+    latex: features.latex,
+    mermaid: features.mermaid,
+  })
+  const documentKey = heavyDocumentContext?.documentKey() ?? localDocumentKey
+  const documentEpoch = heavyDocumentContext?.documentEpoch() ?? 0
+  const revision =
+    heavyDocumentContext?.revision() ??
+    props.contentVersion ??
+    result.sourceIdentity
+  const theme = document.documentElement.classList.contains('dark')
+    ? 'dark'
+    : 'light'
+  const locale = document.documentElement.lang || 'und'
+  lastHeavyLifecycleIdentityContext = Object.freeze({
+    config,
+    documentEpoch,
+    documentKey,
+    revision,
+    theme,
+  })
+  heavyLifecycle.resetDocument(documentKey, documentEpoch)
+
+  return (input: {
+    readonly element: HTMLElement
+    readonly kind: MarkdownHeavyFeatureKind
+  }): MarkdownHeavyFeatureIdentity | null => {
+    const unitKey = input.element.closest<HTMLElement>(
+      '[data-fsus-render-unit-key]',
+    )?.dataset.fsusRenderUnitKey
+    const unitIndex = unitKey
+      ? resultChunks.findIndex((chunk) => chunk.key === unitKey)
+      : -1
+    const chunkKind = input.kind === 'code-highlight' ? 'code' : input.kind
+    const index =
+      unitIndex >= 0
+        ? resultChunks
+            .slice(0, unitIndex)
+            .filter((chunk) => chunk.kind === chunkKind).length
+        : cursors[input.kind]
+    if (unitIndex < 0) cursors[input.kind] += 1
+    const node = nodes[input.kind][index]
+    if (!node?.blockIdentity) return null
+    return Object.freeze({
+      config,
+      documentEpoch,
+      documentKey,
+      featureKind: input.kind,
+      gatewayVersion: 'markdown-feature-output-gateway@1',
+      locale,
+      nodeId: node.blockIdentity,
+      rendererVersion: result.rendererVersion,
+      revision,
+      sourceIdentity: result.sourceIdentity,
+      theme,
+    })
+  }
 }
 
 const activateRenderedFeatures = async (
@@ -753,7 +899,10 @@ const activateRenderedFeatures = async (
     concurrency: 3,
     cspNonce: props.cspNonce,
     features: resolveMarkdownFeatureOptions(),
+    heavyLifecycle,
+    resolveHeavyFeatureIdentity: createHeavyFeatureIdentityResolver(result),
     root: activationRoot,
+    scheduleHeavyFeatureCommit,
     signal,
   })
   if (signal?.aborted) return
@@ -763,6 +912,7 @@ const activateRenderedFeatures = async (
     activationDurationMs.toFixed(3),
   )
   emit('features-activated', activation, result)
+  recordHeavyLifecycleMetrics()
 }
 
 async function activateChunkFeatures(
@@ -985,6 +1135,7 @@ onBeforeUnmount(() => {
   chunkActivationElements.clear()
   currentTaskId += 1
   isRendering.value = false
+  heavyLifecycle.dispose()
 })
 
 defineExpose({
