@@ -1771,7 +1771,7 @@ const dispatchEditorOperation = (
         : undefined
     for (const job of attachmentJobs.value) {
       if (job.itemId === ownedItemId || job.phase === 'deleted') continue
-      rebaseMarkdownAttachmentJob(job, appliedChanges)
+      rebaseMarkdownAttachmentJob(job, appliedChanges, previousValue)
     }
     triggerRef(attachmentJobs)
   }
