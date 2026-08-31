@@ -1,0 +1,99 @@
+{
+  "schema": "fsusui-independent-ux-review.v1",
+  "issue": 285,
+  "candidateSha": "ba2a3e8b62e6305630c92c3855b813b9fa77fe70",
+  "reviewMode": "read-only-rendered-evidence-inspection",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "identity": {
+    "executionId": "conformance-v2-check-tag-ba2a3e8b62e6305630c92c3855b813b9fa77fe70",
+    "checkpoint": "check-tag-after-pointer-keyboard",
+    "contract": "component-v2.el-check-tag",
+    "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
+    "contractHash": "0608240bb9ffc67f406ef5e11212ace88aea5111ce5af943a4de476a9d9190a7",
+    "webBaselineHash": "b5847900ac006e00494148ab6f1bbf292dc63da835d1956cd3096849e9a5d3bf",
+    "avaloniaBaselineHash": "c3cb90d0e58212aa7e93a851ee9096cdcc6c699cb247fdecbd57eb6073a5ba4d",
+    "runnerHash": "854432136eda4acd1fee2f212dea48407c38c8894bcee21ee2997ad02ca9af82"
+  },
+  "viewportStateMatrix": [
+    {
+      "platform": "web",
+      "viewport": { "width": 1280, "height": 1100 },
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "density": "default",
+      "locale": "zh-CN",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
+      "evidenceDigest": "c0aef2e97109394990e6fcea663dfd47b54c4ae32b59c3b73945437409318b19"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": { "width": 960, "height": 720 },
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "density": "default",
+      "locale": "zh-CN",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": ["pointer", "keyboard", "automation-peer", "reduced-motion"],
+      "evidenceDigest": "eecf99d66b5c5aebc51db523287f08aa241216a1ee96a3dbd7ada9a70208e65c"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "check-tag-web-focused-unchecked",
+      "platform": "web",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
+      "digest": "c0aef2e97109394990e6fcea663dfd47b54c4ae32b59c3b73945437409318b19",
+      "bytes": 124238,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "check-tag-avalonia-focused-unchecked",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
+      "digest": "eecf99d66b5c5aebc51db523287f08aa241216a1ee96a3dbd7ada9a70208e65c",
+      "bytes": 9866,
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "governedCriteria": [
+    {
+      "id": "blue-focus-ring-visible",
+      "status": "accepted",
+      "observation": "Both focused unchecked CheckTag renders show a clear Scholarly Blue focus outline; Avalonia sampled 152 ring pixels, matched 140 to #2A599C within tolerance, and passed at ratio 0.9210526315789473."
+    },
+    {
+      "id": "no-black-default-adorner",
+      "status": "accepted",
+      "observation": "The Avalonia render contains the blue PART_FocusRing and no black Fluent focus adorner; the governed pixel probe found zero unexpected dark ring pixels."
+    },
+    {
+      "id": "unchecked-label-state-match",
+      "status": "accepted",
+      "observation": "Both platforms render the label Check tag at the same checkpoint with checked=false, focused=true, checkbox role, and an accessible unchecked state."
+    },
+    {
+      "id": "focus-no-bounds-shift",
+      "status": "accepted",
+      "observation": "The focus ring is overlaid rather than participating in layout; the adjacent editor keeps its position, and the same-candidate headless contract asserts identical CheckTag bounds before and after Tab focus."
+    }
+  ],
+  "observations": [
+    "The focused CheckTag remains the single visible focus target in both production full-window captures.",
+    "Native font metrics and full-window viewport sizes differ, but component meaning, unchecked state, keyboard focus, label, and restrained focus treatment match.",
+    "No new decoration, token, content, or adjacent layout change is present."
+  ],
+  "limitations": [
+    "The platforms use different native renderers and full-window viewport sizes, so this review does not claim pixel equality.",
+    "No CheckTag-specific numeric cross-platform geometry override exists; acceptance is limited to the governed qualitative focus-state criteria and the same-candidate bounds assertion."
+  ],
+  "blockers": [],
+  "status": "accepted"
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "bb51d40561ddbe0b7c1be9b1ddf997ac74703151a04e1e345c0ad708a579c9e5",
+  "candidateSha": "ba2a3e8b62e6305630c92c3855b813b9fa77fe70",
+  "candidateDigest": "0cc717ca1d5dbb3e7971f0b6f52e18814d96434df1b387fd37bb8d37864cd3d6",
+  "verificationClass": "ux-path",
+  "requiredSkillDigests": ["c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"],
+  "authorityDigests": [
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+    "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+    "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+  ],
+  "activeBaselineIdentityDigest": "b340459c14d53ee8b4548b13f0be891023fecfe85f2e41eb64f5ddbaac8859f8",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "b65dd811871094289bddba877a24a9eafa2aba926838b9e99f0add7458479a8f",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "1280x1100",
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
+      "evidenceDigest": "c0aef2e97109394990e6fcea663dfd47b54c4ae32b59c3b73945437409318b19"
+    },
+    {
+      "viewport": "960x720",
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "inputModes": ["pointer", "keyboard", "reduced-motion"],
+      "evidenceDigest": "eecf99d66b5c5aebc51db523287f08aa241216a1ee96a3dbd7ada9a70208e65c"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "check-tag-web-focused-unchecked",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
+      "digest": "c0aef2e97109394990e6fcea663dfd47b54c4ae32b59c3b73945437409318b19",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "check-tag-avalonia-focused-unchecked",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
+      "digest": "eecf99d66b5c5aebc51db523287f08aa241216a1ee96a3dbd7ada9a70208e65c",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "3275eabfe7edbeb9375dd0b2f0d187da572b8100af797d22b269bb1b74990769"
+}
