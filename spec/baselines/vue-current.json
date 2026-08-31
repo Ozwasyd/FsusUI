@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "7b13c097524b3a2b7b20d35a86909a64b61adcd9",
+    "commitSha": "c219685396d5aa6e28a8ef80a5330ef655916adb",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
@@ -11,7 +11,7 @@
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "b1f288d90de5391e87d1669997e960850b579727dc0734bce7fbcd0e0e4a6f29"
+    "outputHash": "db685b601f7ad5badc972da2ad0711a74ef3e89c65c096ecd32330ce2f08a010"
   },
   "summary": {
     "componentModules": 93,
