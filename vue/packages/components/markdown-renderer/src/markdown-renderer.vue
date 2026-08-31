@@ -1016,6 +1016,27 @@ function observeChunkForActivation(key: string, element: HTMLElement) {
   activationObserver.observe(element)
 }
 
+const observeMountedChunksForActivation = () => {
+  for (const [key, element] of chunkActivationElements) {
+    if (element.isConnected) observeChunkForActivation(key, element)
+  }
+}
+
+const activateMountedChunkFeatures = async (
+  result: MarkdownRuntimeChunkResult,
+  signal: AbortSignal | undefined,
+) => {
+  const root = rootEl.value
+  if (!root || signal?.aborted) return
+  for (const element of root.querySelectorAll<HTMLElement>(
+    '[data-fsus-render-unit-key]',
+  )) {
+    const key = element.dataset.fsusRenderUnitKey
+    if (key) activatedChunkKeys.add(key)
+  }
+  await activateRenderedFeatures(result, root, signal)
+}
+
 const performRender = async () => {
   const taskId = ++currentTaskId
   resetFeatureActivation()
@@ -1080,6 +1101,11 @@ const performRender = async () => {
       })
       emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
       await nextTick()
+      await activateMountedChunkFeatures(
+        resolvedResult,
+        activationController?.signal,
+      )
+      observeMountedChunksForActivation()
       await settleRenderViewport('markdown-render-settle-initial')
       await afterFrame()
       if (initialCount < resolvedUnits.length) {

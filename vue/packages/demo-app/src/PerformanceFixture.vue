@@ -335,6 +335,10 @@ const markdownHeavyLifecycleTransition: PerformanceFixtureApi['markdownHeavyLife
       mermaid: true,
     }
     document.documentElement.classList.toggle('dark', input.theme === 'dark')
+    document.documentElement.classList.toggle('light', input.theme === 'light')
+    document.documentElement.dataset.themeMode = input.theme
+    document.documentElement.dataset.themeResolved = input.theme
+    document.documentElement.style.colorScheme = input.theme
     document.documentElement.dispatchEvent(
       new CustomEvent('fsus:theme-change', {
         detail: { mode: input.theme, resolved: input.theme },

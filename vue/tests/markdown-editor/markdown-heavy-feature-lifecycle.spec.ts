@@ -65,14 +65,6 @@ const transition = async (
     }
     await fixture.markdownHeavyLifecycleTransition(next)
   }, input)
-  const renderer = page.locator('[data-markdown-renderer="wasm"]')
-  await renderer.evaluate((element) => {
-    element.scrollTop = Math.min(
-      element.scrollHeight - element.clientHeight,
-      element.scrollTop + element.clientHeight,
-    )
-    element.dispatchEvent(new Event('scroll'))
-  })
 }
 
 test('bounds mixed heavy feature lifecycle across virtual remounts', async ({

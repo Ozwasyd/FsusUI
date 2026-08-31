@@ -1746,7 +1746,7 @@ const markdownHeavyFeatureActivationRegistry = Object.freeze([
     enabled: (features: Required<MarkdownFeatureActivationFeatureOptions>) =>
       features.codeHighlight,
     kind: 'code-highlight' as const,
-    selector: 'pre code[class*="language-"]',
+    selector: 'pre code[class*="language-"],[data-code-highlighted="shiki"]',
   }),
 ])
 
