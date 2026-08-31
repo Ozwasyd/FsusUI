@@ -1,6 +1,6 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "a9b6458f9ca1e8fe04e5aee7eb7889c5dacd2c3081b43567020c6b88b9d36c75",
+  "classificationReceiptDigest": "50f642eeb3cc708049fe0a1326b6ea02e87b247168b809061facdee2fb09172d",
   "candidateSha": "dd69cff8ea632491619dfcd077c6e1d6b919d85a",
   "candidateDigest": "88b196ce936df624833ad0a8e459393eb4fe914312ef6a10935d17de53cb77f4",
   "verificationClass": "ux-system",
@@ -69,7 +69,7 @@
     {
       "viewport": "desktop-960x540",
       "state": "built-in-high-contrast-precedence",
-      "theme": "highcontrast",
+      "theme": "dark",
       "inputModes": [
         "keyboard",
         "reduced-motion"
@@ -121,5 +121,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "3345c58e0bd7c011225429e680e9a83624f552e63b50bcfda352eaebe152ecc1"
+  "receiptDigest": "3b147f69788a78591bd39775718b63910b63908a9b6c86e2a84b148b2c93343b"
 }

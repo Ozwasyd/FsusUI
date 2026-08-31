@@ -104,7 +104,7 @@
     {
       "state": "built-in-high-contrast-precedence",
       "viewport": "desktop-960x540",
-      "theme": "highcontrast",
+      "theme": "dark",
       "evidenceDigest": "e8d59809dc3ada3131cd0c87768e84a013f60368674748db0177e0e8d87d09cb"
     }
   ],
@@ -123,5 +123,5 @@
   "classificationEvidenceDigest": "5d50c6f26435700c32ef5c13cfb8462368e6a9185311bbbe51f630bc712d9918",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "a9b6458f9ca1e8fe04e5aee7eb7889c5dacd2c3081b43567020c6b88b9d36c75"
+  "receiptDigest": "50f642eeb3cc708049fe0a1326b6ea02e87b247168b809061facdee2fb09172d"
 }
