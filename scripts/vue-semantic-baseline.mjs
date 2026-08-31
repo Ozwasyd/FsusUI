@@ -827,6 +827,17 @@ class PropDescriptorParser {
 
   parseFromNode(node, name, relPath) {
     node = unwrapExpression(node)
+    if (node.type === 'Identifier') {
+      const source =
+        relPath === this.fromRelPath
+          ? this.source
+          : this.resolver.readSource(relPath) || ''
+      return new PropDescriptorParser(
+        this.resolver,
+        source,
+        relPath,
+      ).parsePropValue(node, name)
+    }
     if (node.type === 'ObjectExpression') {
       const source =
         relPath === this.fromRelPath

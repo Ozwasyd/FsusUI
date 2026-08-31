@@ -359,6 +359,52 @@ public class FsusVirtualizationHeadlessTests
   }
 
   [AvaloniaFact]
+  public void TableV2UsesFixedDataGetterAndExpandedRowCallbacks()
+  {
+    FsusTableV2RowExpansion? expansion = null;
+    IReadOnlyList<string>? expandedKeys = null;
+    var table = new FsusTableV2
+    {
+      RowHeight = 24,
+      ColumnWidth = 120,
+      Overscan = 0,
+      DataGetter = context => $"{context.Row.Key}:{context.Value}",
+      OnRowExpand = value => expansion = value,
+      OnExpandedRowsChange = value => expandedKeys = value,
+    };
+    table.Columns.Add(new FsusDataTableColumn("name", "Name"));
+    table.FixedData.Add(FsusDataTableRow.From("fixed", new Dictionary<string, object?>
+    {
+      ["name"] = "Pinned",
+    }));
+    for (var row = 0; row < 20; row++)
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{row}", new Dictionary<string, object?>
+      {
+        ["name"] = $"Row {row}",
+      }));
+    }
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(120, 48) });
+    table.RefreshLayout();
+    table.ScrollToRow(10);
+
+    Assert.Equal(21, table.EffectiveRowCount);
+    Assert.Contains(
+      table.RealizedCells,
+      cell => cell.RowIndex == 0 && Equals(cell.Content, "fixed:Pinned"));
+
+    Assert.True(table.SetRowExpanded("row-10", true));
+    Assert.Equal("row-10", expansion?.Row.Key);
+    Assert.True(expansion?.Expanded);
+    Assert.Equal(["row-10"], expandedKeys);
+    Assert.False(table.SetRowExpanded("row-10", true));
+
+    table.DefaultExpandedRowKeys.Add("fixed");
+    table.ResetExpandedRows();
+    Assert.Equal(["fixed"], table.ExpandedRowKeys);
+  }
+
+  [AvaloniaFact]
   public async Task TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults()
   {
     var table = new KeyboardTableV2

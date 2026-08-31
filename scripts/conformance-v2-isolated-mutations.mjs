@@ -129,6 +129,18 @@ const cases = [
     expected: 'Avalonia Vue public API baseline is stale',
   },
   {
+    id: 'vue-semantic-imported-runtime-constant-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        "if (node.type === 'Identifier') {\n      const source =",
+        "if (node.type === 'MissingIdentifier') {\n      const source =",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
     id: 'vue-public-alias-mutated',
     file: 'vue/packages/components/collection-primitives/index.ts',
     inject: () =>
@@ -278,6 +290,24 @@ const cases = [
       'OnScroll?.Invoke(position);',
       '_ = position;',
       'TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks',
+    ],
+    [
+      'table-v2-fixed-data-mutated',
+      'Enumerable.Range(0, FixedData.Count)',
+      'Enumerable.Empty<int>()',
+      'TableV2UsesFixedDataGetterAndExpandedRowCallbacks',
+    ],
+    [
+      'table-v2-data-getter-mutated',
+      'DataGetter?.Invoke(context) ??',
+      'null ??',
+      'TableV2UsesFixedDataGetterAndExpandedRowCallbacks',
+    ],
+    [
+      'table-v2-expanded-callback-mutated',
+      'OnExpandedRowsChange?.Invoke(ExpandedRowKeys.ToArray());',
+      '_ = ExpandedRowKeys.Count;',
+      'TableV2UsesFixedDataGetterAndExpandedRowCallbacks',
     ],
   ].map(([id, from, to, test]) => ({
     id,

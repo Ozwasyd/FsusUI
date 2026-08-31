@@ -23346,6 +23346,22 @@
           "isStatic": false
         },
         {
+          "name": "DataGetter",
+          "type": "System.Func\u003CFsusUI.Avalonia.Controls.FsusDataTableCellContext, System.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DefaultExpandedRowKeys",
+          "type": "System.Collections.ObjectModel.Collection\u003CSystem.String\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
           "name": "DiscardedCellCount",
           "type": "System.Int32",
           "nullable": false,
@@ -23375,6 +23391,30 @@
           "nullable": true,
           "canRead": true,
           "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ExpandColumnKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ExpandedRowKeys",
+          "type": "System.Collections.ObjectModel.Collection\u003CSystem.String\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "FixedData",
+          "type": "System.Collections.ObjectModel.Collection\u003CFsusUI.Avalonia.Controls.FsusDataTableRow\u003E",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
           "isStatic": false
         },
         {
@@ -23452,6 +23492,22 @@
         {
           "name": "OnEndReached",
           "type": "System.Action\u003CSystem.Double\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "OnExpandedRowsChange",
+          "type": "System.Action\u003CSystem.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "OnRowExpand",
+          "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2RowExpansion\u003E",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -23638,6 +23694,12 @@
           "parameters": []
         },
         {
+          "name": "ResetExpandedRows",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
           "name": "ScrollTo",
           "isStatic": false,
           "returnType": "System.Void",
@@ -23720,6 +23782,23 @@
             {
               "name": "height",
               "type": "System.Double",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SetRowExpanded",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "rowKey",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "expanded",
+              "type": "System.Boolean",
               "optional": false
             }
           ]
@@ -23951,6 +24030,58 @@
       "avaloniaProperties": [],
       "events": [],
       "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2RowExpansion",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Expanded",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Row",
+          "type": "FsusUI.Avalonia.Controls.FsusDataTableRow",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2RowExpansion",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Row",
+              "type": "FsusUI.Avalonia.Controls.FsusDataTableRow\u0026",
+              "optional": false
+            },
+            {
+              "name": "Expanded",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "FsusUI.Avalonia.Controls.FsusTableV2RowsRendered",

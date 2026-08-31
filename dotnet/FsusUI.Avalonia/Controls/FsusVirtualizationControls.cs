@@ -79,6 +79,8 @@ public sealed record FsusTableV2RowsRendered(
 
 public sealed record FsusTableV2ScrollPosition(double ScrollLeft, double ScrollTop);
 
+public sealed record FsusTableV2RowExpansion(FsusDataTableRow Row, bool Expanded);
+
 public delegate ValueTask<IReadOnlyList<FsusVirtualListItem>> FsusVirtualListSourceProvider(
   FsusVirtualWindow window,
   CancellationToken cancellationToken);
@@ -753,7 +755,11 @@ public class FsusTableV2 : ContentControl
   public string? AccessibleName { get; set; }
   public Collection<FsusDataTableColumn> Columns { get; } = [];
   public Collection<FsusDataTableRow> Data { get; } = [];
+  public Collection<FsusDataTableRow> FixedData { get; } = [];
+  public Collection<string> DefaultExpandedRowKeys { get; } = [];
+  public Collection<string> ExpandedRowKeys { get; } = [];
   public string RowKey { get; set; } = "id";
+  public string? ExpandColumnKey { get; set; }
   public int RowCount { get; set; }
   public int ColumnCount { get; set; }
   public double RowHeight { get; set; } = 32d;
@@ -766,6 +772,7 @@ public class FsusTableV2 : ContentControl
   public int RetainedRowMeasurementLimit { get; set; } = 2048;
   public int LoadedRowIndexLimit { get; set; } = 4096;
   public Func<int, int, object?>? CellProvider { get; set; }
+  public Func<FsusDataTableCellContext, object?>? DataGetter { get; set; }
   public IDataTemplate? CellTemplate { get; set; }
   public IDataTemplate? CellContent
   {
@@ -773,6 +780,8 @@ public class FsusTableV2 : ContentControl
     set => CellTemplate = value;
   }
   public Action<double>? OnEndReached { get; set; }
+  public Action<IReadOnlyList<string>>? OnExpandedRowsChange { get; set; }
+  public Action<FsusTableV2RowExpansion>? OnRowExpand { get; set; }
   public Action<FsusTableV2RowsRendered>? OnRowsRendered { get; set; }
   public Action<FsusTableV2ScrollPosition>? OnScroll { get; set; }
   public int FocusedRowIndex { get; private set; }
@@ -786,7 +795,8 @@ public class FsusTableV2 : ContentControl
 
   public bool IsVirtualized =>
     EffectiveRowCount > RealizedRowCount || EffectiveColumnCount > RealizedColumnCount;
-  public int EffectiveRowCount => Data.Count > 0 ? Data.Count : RowCount;
+  public int EffectiveRowCount =>
+    FixedData.Count + (Data.Count > 0 ? Data.Count : RowCount);
   public int EffectiveColumnCount => Columns.Count > 0 ? Columns.Count : ColumnCount;
   public int RealizedRowStartIndex => realizedRowStartIndex;
   public int RealizedColumnStartIndex => realizedColumnStartIndex;
@@ -833,7 +843,12 @@ public class FsusTableV2 : ContentControl
       columnCount,
       Math.Max(1, (int)Math.Ceiling(viewport.Width / Math.Max(1d, ColumnWidth)) + Math.Max(0, Overscan)));
     ClampStarts();
-    var rows = ResolveAxisIndices(realizedRowStartIndex, realizedRowCount, rowCount, FrozenRowCount);
+    var rows = ResolveAxisIndices(
+      realizedRowStartIndex,
+      realizedRowCount,
+      rowCount,
+      FrozenRowCount,
+      Enumerable.Range(0, FixedData.Count));
     var fixedColumns = Columns
       .Select((column, index) => (column, index))
       .Where(entry => entry.column.Fixed != FsusDataTableFixedColumn.None)
@@ -885,13 +900,11 @@ public class FsusTableV2 : ContentControl
     {
       var container = realizedCells[key];
       var sourceRow = ResolveSourceRow(key.Row);
-      var dataRow = sourceRow < Data.Count ? Data[sourceRow] : null;
+      var dataRow = ResolveDataRow(sourceRow);
       var column = key.Column < Columns.Count ? Columns[key.Column] : null;
       var content = CellProvider?.Invoke(sourceRow, key.Column) ??
         (dataRow is not null && column is not null
-          ? column.CellRenderer?.Invoke(
-              new FsusDataTableCellContext(dataRow, column, dataRow.GetValue(column.Key), sourceRow, key.Column)) ??
-            dataRow.GetValue(column.Key)
+          ? ResolveCellContent(dataRow, column, sourceRow, key.Column)
           : $"R{sourceRow + 1} C{key.Column + 1}");
       container.Bind(key.Row, key.Column, content, CellTemplate, ColumnWidth, RowHeight);
       Canvas.SetLeft(container, key.Column * Math.Max(1d, ColumnWidth));
@@ -957,6 +970,41 @@ public class FsusTableV2 : ContentControl
     rowSizeIndex.Update(rowIndex, previousHeight, nextHeight);
     TrimRowMeasurementCache();
     RefreshLayout();
+  }
+
+  public bool SetRowExpanded(string rowKey, bool expanded)
+  {
+    ArgumentException.ThrowIfNullOrWhiteSpace(rowKey);
+    var currentlyExpanded = ExpandedRowKeys.Contains(rowKey);
+    if (currentlyExpanded == expanded)
+    {
+      return false;
+    }
+    if (expanded)
+    {
+      ExpandedRowKeys.Add(rowKey);
+    }
+    else
+    {
+      ExpandedRowKeys.Remove(rowKey);
+    }
+    var row = FixedData.Concat(Data).FirstOrDefault(candidate => candidate.Key == rowKey);
+    if (row is not null)
+    {
+      OnRowExpand?.Invoke(new FsusTableV2RowExpansion(row, expanded));
+    }
+    OnExpandedRowsChange?.Invoke(ExpandedRowKeys.ToArray());
+    return true;
+  }
+
+  public void ResetExpandedRows()
+  {
+    ExpandedRowKeys.Clear();
+    foreach (var rowKey in DefaultExpandedRowKeys.Distinct(StringComparer.Ordinal))
+    {
+      ExpandedRowKeys.Add(rowKey);
+    }
+    OnExpandedRowsChange?.Invoke(ExpandedRowKeys.ToArray());
   }
 
   public async ValueTask<bool> UpdateRowIndexAsync(
@@ -1086,6 +1134,33 @@ public class FsusTableV2 : ContentControl
 
   private int ResolveSourceRow(int row) =>
     row >= 0 && row < loadedRowIndex.Count ? loadedRowIndex[row] : row;
+
+  private FsusDataTableRow? ResolveDataRow(int row)
+  {
+    if (row >= 0 && row < FixedData.Count)
+    {
+      return FixedData[row];
+    }
+    var dataIndex = row - FixedData.Count;
+    return dataIndex >= 0 && dataIndex < Data.Count ? Data[dataIndex] : null;
+  }
+
+  private object? ResolveCellContent(
+    FsusDataTableRow row,
+    FsusDataTableColumn column,
+    int rowIndex,
+    int columnIndex)
+  {
+    var context = new FsusDataTableCellContext(
+      row,
+      column,
+      row.GetValue(column.Key),
+      rowIndex,
+      columnIndex);
+    return DataGetter?.Invoke(context) ??
+      column.CellRenderer?.Invoke(context) ??
+      context.Value;
+  }
 
   private FsusTableV2CellContainer AcquireCell()
   {

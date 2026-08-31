@@ -38,7 +38,10 @@ the horizontal window moves. `ScrollTo`, `ScrollToLeft`, `ScrollToRow`, and
 the control move the focused cell through the same scrolling path. When
 `EstimatedRowHeight` is set, `SetMeasuredRowHeight` updates the variable-size
 index and the realized row offsets. `OnRowsRendered`, `OnScroll`, and
-`OnEndReached` report the actual realization and scrolling path.
+`OnEndReached` report the actual realization and scrolling path. `FixedData`
+rows remain realized, `DataGetter` receives the typed cell context, and
+expanded-row changes update `ExpandedRowKeys` before invoking
+`OnRowExpand`/`OnExpandedRowsChange`.
 
 Measurement corrections before the active anchor adjust the scroll offset so
 the same logical item remains visually stable. `NotifyItemsInserted` preserves

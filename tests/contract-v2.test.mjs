@@ -84,6 +84,15 @@ test('Vue semantic extraction resolves imported prop member descriptors', () => 
   }
 })
 
+test('Vue semantic extraction resolves imported runtime constants', () => {
+  const table = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-table-v2',
+  )
+  const input = table.inputs.find((member) => member.name === 'expandColumnKey')
+  assert.equal(input.web.runtimeType, 'String')
+  assert.equal(input.status, 'aligned-candidate')
+})
+
 const replaceAtPath = (value, pointer, replacement) => {
   const segments = pointer
     .split('/')
