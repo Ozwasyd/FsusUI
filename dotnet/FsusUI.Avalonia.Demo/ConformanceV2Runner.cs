@@ -402,13 +402,13 @@ internal static class ConformanceV2Runner
       Path.GetDirectoryName(absoluteOutput)!,
       "check-tag-avalonia.png");
     var checkTagPixelSize = new PixelSize(
-      Math.Max(1, (int)Math.Ceiling(checkTag.Bounds.Width)),
-      Math.Max(1, (int)Math.Ceiling(checkTag.Bounds.Height)));
+      Math.Max(1, (int)Math.Ceiling(window.Bounds.Width)),
+      Math.Max(1, (int)Math.Ceiling(window.Bounds.Height)));
     using (var bitmap = new RenderTargetBitmap(
       checkTagPixelSize,
       new Vector(96, 96)))
     {
-      bitmap.Render(checkTag);
+      bitmap.Render(window);
       bitmap.Save(checkTagScreenshotPath);
     }
     var checkTagScreenshotBytes = new FileInfo(checkTagScreenshotPath).Length;
