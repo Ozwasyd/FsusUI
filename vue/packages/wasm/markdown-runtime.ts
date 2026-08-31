@@ -1677,13 +1677,21 @@ const activateBuiltInFeature = async (
     element.tagName === 'CODE' ? element : element.querySelector('code')
   if (!code) return false
   const pre = code.closest('pre') ?? code
-  if (pre instanceof HTMLElement && pre.dataset.codeHighlighted === 'shiki') {
+  if (
+    pre instanceof HTMLElement &&
+    pre.dataset.codeHighlighted === 'shiki' &&
+    pre.dataset.markdownFeatureTheme === context.theme
+  ) {
     applyNonceToFeatureStyles(pre, context.cspNonce)
     mountPreRenderedHeavyFeature(pre, context)
     return false
   }
   const source = code.textContent ?? ''
   if (!source) return false
+  const language =
+    pre instanceof HTMLElement && pre.dataset.markdownFeatureLanguage
+      ? pre.dataset.markdownFeatureLanguage
+      : extractCodeLanguage(code)
   try {
     const gateway = await loadMarkdownFeatureOutputGateway()
     return await activateHeavyFeature({
@@ -1691,7 +1699,7 @@ const activateBuiltInFeature = async (
       element: pre,
       source,
       render: (signal) =>
-        renderCodeHighlightFeature(source, extractCodeLanguage(code), {
+        renderCodeHighlightFeature(source, language, {
           ...toFeatureRenderContext(context, element),
           signal,
         }),
@@ -1702,6 +1710,8 @@ const activateBuiltInFeature = async (
         })
         committed.dataset.codeHighlighted = 'shiki'
         committed.dataset.markdownFeatureActivated = 'code-highlight'
+        committed.dataset.markdownFeatureLanguage = language
+        committed.dataset.markdownFeatureTheme = context.theme
         return committed
       },
     })

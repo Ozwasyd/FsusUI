@@ -175,7 +175,7 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
   expect(afterThemeSwitch.identities.mermaid?.theme).toBe('dark')
   expect(afterThemeSwitch.identities.latex?.theme).toBe('token-bound')
 
-  const beforeCodeDisable = afterThemeSwitch.reuses
+  const beforeCodeDisable = afterThemeSwitch
   await transition(page, {
     codeHighlight: false,
     documentEpoch: 2,
@@ -189,11 +189,12 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     )
     .toBeNull()
   const afterCodeDisable = (await readMetrics(page))!
-  expect(afterCodeDisable.reuses).toBeGreaterThan(beforeCodeDisable)
+  expect(afterCodeDisable.activations).toBe(beforeCodeDisable.activations)
+  expect(afterCodeDisable.cacheEntries).toBe(beforeCodeDisable.cacheEntries)
   expect(afterCodeDisable.identities.latex?.theme).toBe('token-bound')
   expect(afterCodeDisable.identities.mermaid?.theme).toBe('dark')
 
-  const beforeCodeRestore = afterCodeDisable.reuses
+  const beforeCodeRestore = afterCodeDisable
   await transition(page, {
     codeHighlight: true,
     documentEpoch: 2,
@@ -211,7 +212,8 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
     .toBe(0)
   const afterConfigRestore = (await readMetrics(page))!
-  expect(afterConfigRestore.reuses).toBeGreaterThan(beforeCodeRestore)
+  expect(afterConfigRestore.activations).toBe(beforeCodeRestore.activations)
+  expect(afterConfigRestore.cacheEntries).toBe(beforeCodeRestore.cacheEntries)
   expect(afterConfigRestore.active).toBe(0)
   expect(afterConfigRestore.retainedResources).toBe(0)
 

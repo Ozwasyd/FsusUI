@@ -377,7 +377,7 @@ describe('markdown feature activation runtime', () => {
     root.innerHTML = [
       '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"></figure>',
       '<span class="markdown-renderer__latex" data-latex-rendered="katex"><span class="katex"></span></span>',
-      '<pre data-code-highlighted="shiki"><code class="language-ts">already highlighted</code></pre>',
+      '<pre data-code-highlighted="shiki" data-markdown-feature-language="ts" data-markdown-feature-theme="light"><code>already highlighted</code></pre>',
     ].join('')
 
     const result = await activateMarkdownFeatures({ root })
@@ -428,6 +428,50 @@ describe('markdown feature activation runtime', () => {
     })
     expect(featureModuleMocks.mermaidRender).not.toHaveBeenCalled()
     expect(featureModuleMocks.katexRenderToString).not.toHaveBeenCalled()
+  })
+
+  it('re-highlights an already-mounted code node when its material theme changes', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    featureModuleMocks.shikiCodeToHtml.mockImplementation(
+      async (source, options) =>
+        `<pre class="shiki ${options.theme}"><code><span class="line">${source}</span></code></pre>`,
+    )
+    const root = document.createElement('article')
+    root.dataset.themeResolved = 'light'
+    root.innerHTML =
+      '<pre><code class="language-typescript">const themed = true</code></pre>'
+    const activate = () =>
+      activateMarkdownHeavyFeatures({
+        heavyLifecycle: lifecycle,
+        resolveHeavyFeatureIdentity: ({ kind, theme }) => ({
+          config: '{}',
+          documentEpoch: 1,
+          documentKey: 'doc-a',
+          featureKind: kind,
+          gatewayVersion: 'gateway@2',
+          locale: 'locale-independent',
+          nodeId: 'code-0',
+          rendererVersion: 'renderer@1',
+          revision: 1,
+          sourceIdentity: 'source-a',
+          theme,
+        }),
+        root,
+      })
+
+    await activate()
+    expect(root.querySelector('pre')?.dataset.markdownFeatureTheme).toBe(
+      'light',
+    )
+    root.dataset.themeResolved = 'dark'
+    await activate()
+
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledTimes(2)
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenLastCalledWith(
+      'const themed = true',
+      expect.objectContaining({ lang: 'ts', theme: 'github-dark' }),
+    )
+    expect(root.querySelector('pre')?.dataset.markdownFeatureTheme).toBe('dark')
   })
 
   it('records default adapter failures as activation errors', async () => {
