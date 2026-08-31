@@ -54,7 +54,16 @@ describe('MarkdownEditor', () => {
         revision: 1,
         selection: { direction: 'forward', start: 5, end: 13 },
         signal: new AbortController().signal,
-        syntax: { range: { start: 5, end: 13 }, type: 'paragraph' },
+        syntax: {
+          blockIdentity: 'block:0',
+          contentRanges: [],
+          diagnosticCode: null,
+          markerRanges: [],
+          nodeId: 'paragraph:0',
+          range: { start: 5, end: 13 },
+          status: 'valid',
+          type: 'paragraph',
+        },
         value: 'edit markdown',
       }),
     ).resolves.toEqual({

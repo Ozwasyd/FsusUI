@@ -92,10 +92,12 @@ const projectedLink = (source: string) => {
 const makeContext = (
   overrides?: Partial<MarkdownEditorCommandContext>,
 ): MarkdownEditorCommandContext => ({
-  dispatch: {
-    dispatch: () => ({
-      accepted: true,
-      history: {
+    dispatch: {
+      dispatch: () => ({
+        accepted: true,
+        beforeRevision: 0,
+        documentIdentity: { epoch: 1, id: 'doc-1' },
+        history: {
         canRedo: false,
         canUndo: false,
         redoDepth: 0,
