@@ -13,8 +13,8 @@
     { "id": "change-classification", "path": "docs/design/change-classification.md", "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84" },
     { "id": "visual-change", "path": "docs/workflows/visual-change.md", "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4" },
     { "id": "avalonia", "path": "docs/avalonia/README.md", "digest": "069c6efa2e44f775544bb037cd550a0edbdd8ca98a4e40bfc473f6a1bb0d9f74" },
-    { "id": "media-decorative", "path": "docs/avalonia/components/media-decorative.md", "digest": "f7fc02309cd684891081e2ae727378827f4fd7cd7b5f508a5302b97e6b5412df" },
-    { "id": "avalonia-platform-differences", "path": "docs/avalonia/platform-differences.md", "digest": "fb789c0afd4f9df9c94d52dbd998dc2fb7bc2c2306d68df2e36d1eb848e0e159" },
+    { "id": "media-decorative", "path": "docs/avalonia/components/media-decorative.md", "digest": "22e065e168ba32d1302d16997177322929673d6afce326a435b47c8dd485a033" },
+    { "id": "avalonia-platform-differences", "path": "docs/avalonia/platform-differences.md", "digest": "2f8f9071f47aa6e233f0a5dd7f7a1afb549a099882e48c46a3b1880f73b987c9" },
     { "id": "accessibility", "path": "spec/accessibility/README.md", "digest": "f149631813fbfb060d49412329638555e0f0c371fb441cf89ab46cd64a3e3de6" }
   ],
   "requiredSkillDigests": [
@@ -22,20 +22,20 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "dd5b3bd478fd7ecad43178875c7c728fb973dbb6",
+    "revision": "54a4a382952bd48bb4cbe3cf5f6cf0ff9e7639a2",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "630bfcae67d9335cf843815dfa1df6b212e27e4fd4af40cf0e2597d031463525",
+    "authorityDigest": "d245bd85637515fdd8d5ba5829d067dc08c56aef346e5046d8082c32ecc1713f",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "dd5b3bd478fd7ecad43178875c7c728fb973dbb6",
-  "candidateDigest": "03821161b1e5262fc93a319855a8790a68911b610a52c3fb571cc154443d1e1c",
+  "candidateSha": "af46795862b8ca3e89f1a2f059592859a09e8189",
+  "candidateDigest": "b9e4db3138f5bc5db9a439660be45f24aa47f2b4ca20bd8bfd77dce9569c824e",
   "stateEvidenceMatrix": [
-    { "state": "default-loader-loaded-and-reset-transform", "viewport": "desktop", "theme": "both", "evidenceDigest": "e5a2c4226fbaefbb3b713060d2b145f684c44286abb91fa9ffff9ed5fbf8bf7a" },
-    { "state": "pointer-wheel-min-max-factor", "viewport": "desktop", "theme": "both", "evidenceDigest": "4480a1eaf18486253d8fbd5bfb42cc30fc063e64b71784e9925a1a4c43818f94" },
-    { "state": "primary-drag-capture-cancel-cursor", "viewport": "desktop", "theme": "both", "evidenceDigest": "84e0c00adf3be1ed15a58b3c97979aa76b2019ce88484e063a345bef42e2b4b4" },
-    { "state": "source-switch-reset-and-preserve", "viewport": "desktop", "theme": "both", "evidenceDigest": "c653787a628c22ae95f463a1d84f83cbd96d7591835d120cfe42bac8492df27d" },
-    { "state": "keyboard-navigation-dismiss-focus-and-accessibility", "viewport": "desktop", "theme": "both", "evidenceDigest": "b6b3ee06535158e187abb6f7a1d01a44bb0edbd183230e23c681be69b743735b" },
-    { "state": "viewport-clip-dpi-zoom", "viewport": "desktop-dpi-matrix", "theme": "both", "evidenceDigest": "6c8ec3eceeff97dc06d237028af16c2ddcea10696e3107c47631c0a3b1f43d8b" }
+    { "state": "default-loader-loaded-and-reset-transform", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
+    { "state": "pointer-wheel-min-max-factor", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
+    { "state": "primary-drag-capture-cancel-cursor", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
+    { "state": "source-switch-reset-and-preserve", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
+    { "state": "keyboard-navigation-dismiss-focus-and-accessibility", "viewport": "desktop", "theme": "both", "evidenceDigest": "afebea9f40f10a431bfb4f3445f97a33152f2bc7f4ed914f371db263b30f9c03" },
+    { "state": "viewport-clip-dpi-zoom", "viewport": "desktop-dpi-matrix", "theme": "both", "evidenceDigest": "a68955e8602bef96f7f2d606dbf80b0b5edf3304927a7401c130a3c75e9cfedc" }
   ],
   "inScope": [
     "FsusImageViewer configurable pointer-wheel zoom bounds and factor",
@@ -53,8 +53,8 @@
     "rotation, download, touch gestures or consumer persistence",
     "changes to adjacent FsusImage, FsusCarousel or FsusWatermark contracts"
   ],
-  "classificationEvidenceDigest": "9cad4a633390bf43753708c05c88ce96fb217db319026d83c40374c60bb50d47",
+  "classificationEvidenceDigest": "ccf26302f2bbec49dcdae124fa13e6823803800f6ae84c8e82b320dcd62b3de5",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "11c59544f7992df4325e01b6c9ad6aad21cacbf91b918312a276508b81a92a53"
+  "receiptDigest": "26d5b79f287e0b687a9ce1f4572f0dc1b7a2083f9cb62e234470813d5bd95b7f"
 }
