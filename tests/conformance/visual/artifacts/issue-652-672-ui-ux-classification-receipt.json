@@ -29,11 +29,11 @@
     "authorityDigest": "5f535d8cc894f4a796251044fd68b3c4d5c12edb10f53e809356d80e7ddd65f8",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "d14fb463b751ff55d3853853b96c4d8621e4a7aa",
-  "candidateDigest": "2e506c96c4ff84206e648aa2d7ae631ccc446089cf7ea8a44d5e37493b39d55c",
+  "candidateSha": "1907438ca42082a535872e7798070b32dcd47c68",
+  "candidateDigest": "b2cd428e778732515379e2c17b1d0a119ef216b75223ee9b86303dfad953b48e",
   "stateEvidenceMatrix": [
-    { "state": "context-menu-pointer-keyboard-spelling-native-fallback-focus-accessibility", "viewport": "desktop and narrow desktop", "theme": "both", "evidenceDigest": "f34822c4302c32d625283d452b5e4e1d20c5d3a3be5ccc0b668234dba4943a3a" },
-    { "state": "tagged-pdf-hierarchical-outline-capability-cancellation-stream", "viewport": "Windows and Linux adapter simulation", "theme": "both", "evidenceDigest": "d79ca4bbfa5deeafb9bccd28e33731890f77c4ee7d45ed8ff0b0821f67dd77d8" }
+    { "state": "context-menu-pointer-keyboard-spelling-native-fallback-focus-accessibility", "viewport": "desktop and narrow desktop", "theme": "both", "evidenceDigest": "848d42888cbe469c99e9500d6efe34e9ada32cd96843bb5cce1b959b9a142672" },
+    { "state": "tagged-pdf-hierarchical-outline-capability-cancellation-stream", "viewport": "Windows and Linux adapter simulation", "theme": "both", "evidenceDigest": "317d2d1c2b6304e282f2c44c8cdc3ac5b4be55ed1e00dd1a701b77725cbc78bb" }
   ],
   "inScope": [
     "one platform-neutral Avalonia WebView adapter contract for issues 652 and 672",
@@ -51,5 +51,5 @@
   "classificationEvidenceDigest": "73879b3662cb34140cba1907729cfa02dfa392e976bea64d13995e63717f260b",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "78d0c926711f04d3ad42424111a0a3a842b8f236a69131fdcd3b6d648f39a984"
+  "receiptDigest": "2c396e8935d65062dedabe78d16b874d406d7094955dafd7ae66c957e82543fa"
 }

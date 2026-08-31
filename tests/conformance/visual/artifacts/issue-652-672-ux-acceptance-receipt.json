@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "78d0c926711f04d3ad42424111a0a3a842b8f236a69131fdcd3b6d648f39a984",
-  "candidateSha": "d14fb463b751ff55d3853853b96c4d8621e4a7aa",
-  "candidateDigest": "2e506c96c4ff84206e648aa2d7ae631ccc446089cf7ea8a44d5e37493b39d55c",
+  "classificationReceiptDigest": "2c396e8935d65062dedabe78d16b874d406d7094955dafd7ae66c957e82543fa",
+  "candidateSha": "1907438ca42082a535872e7798070b32dcd47c68",
+  "candidateDigest": "b2cd428e778732515379e2c17b1d0a119ef216b75223ee9b86303dfad953b48e",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -52,13 +52,20 @@
       "theme": "dark",
       "inputModes": ["keyboard", "zoom", "screen-reader", "reduced-motion"],
       "evidenceDigest": "481f900e84b3359f836ecf991f0dba1d88101a344cb346c4320ca2ed0360433b"
+    },
+    {
+      "viewport": "900x520",
+      "state": "unusable-spelling-suggestions-native-menu-fallback",
+      "theme": "light",
+      "inputModes": ["keyboard", "screen-reader"],
+      "evidenceDigest": "9880e1ef53ab073fe2f88aff026aaa76d5d830acd851aeff4e76597cf61b882c"
     }
   ],
   "inspectedRenderedArtifacts": [
     {
       "id": "light-wide-pointer",
       "kind": "screenshot",
-      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/visual-evidence/issue-652-672-webview-adapter/webview-context-light-wide-pointer.png",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-light-wide-pointer.png",
       "digest": "fed7b81f113f37add93fcf6025b4aa6fee2202d653022144a6394408690be854",
       "inspected": true,
       "fixtureClass": "production"
@@ -66,7 +73,7 @@
     {
       "id": "dark-wide-keyboard",
       "kind": "screenshot",
-      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/visual-evidence/issue-652-672-webview-adapter/webview-context-dark-wide-keyboard.png",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-dark-wide-keyboard.png",
       "digest": "81824def24f200eada89a1d1ceeaf3e9dd4b4bd85dc46aa8a3a657837b383b2c",
       "inspected": true,
       "fixtureClass": "production"
@@ -74,7 +81,7 @@
     {
       "id": "light-narrow-localized-pointer",
       "kind": "screenshot",
-      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/visual-evidence/issue-652-672-webview-adapter/webview-context-light-narrow-pointer.png",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-light-narrow-pointer.png",
       "digest": "ea04f1f5331290cc332febbb311507f2d40ba2b333657d34b36fe46be7cfcb55",
       "inspected": true,
       "fixtureClass": "production"
@@ -82,21 +89,61 @@
     {
       "id": "dark-keyboard-zoom-200",
       "kind": "screenshot",
-      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/visual-evidence/issue-652-672-webview-adapter/webview-context-dark-zoom-equivalent-200.png",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-dark-zoom-equivalent-200.png",
       "digest": "481f900e84b3359f836ecf991f0dba1d88101a344cb346c4320ca2ed0360433b",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "light-native-fallback",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-light-native-fallback.png",
+      "digest": "9880e1ef53ab073fe2f88aff026aaa76d5d830acd851aeff4e76597cf61b882c",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "light-pdf-page-1",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light-1.png",
+      "digest": "a96a928d1db074d81d3b9bda50db155bc9981804793b128ad5ded16558e97795",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "light-pdf-page-2",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light-2.png",
+      "digest": "6ef20343918e7cf72dda69501d4e408c26485817da8373ea6be644dc57342ba3",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "dark-pdf-page-1",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark-1.png",
+      "digest": "30edb51fab100232f1d1af58af97b59d9316cb1f00de7eaf438ea2f93ad30e58",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "dark-pdf-page-2",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark-2.png",
+      "digest": "1503339d472b1067cc1df0179b7521f3f3f73e906b49d811ec0ac977ab77b36a",
       "inspected": true,
       "fixtureClass": "production"
     },
     {
       "id": "automation-semantics",
       "kind": "screen-reader-report",
-      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/visual-evidence/issue-652-672-webview-adapter/automation-report.json",
-      "digest": "34fe38fc05e33de3546e7c010fe8c4229b6f6874aeab9e12572e884cc2e2db6d",
+      "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/automation-report.json",
+      "digest": "848d42888cbe469c99e9500d6efe34e9ada32cd96843bb5cce1b959b9a142672",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "7a2f6d16c534b4ce33249a44f06b5a8d4de2c2505503a8bc087ce4a4a1e243d6"
+  "receiptDigest": "7b91374664e687af1085201e0ebdae53dcd1a4328a38f4a4673f13b717ee087b"
 }

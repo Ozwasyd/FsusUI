@@ -1,0 +1,2510 @@
+{
+  "schemaVersion": 1,
+  "issues": [
+    652,
+    672
+  ],
+  "candidateSha": "1907438ca42082a535872e7798070b32dcd47c68",
+  "fixtureClass": "production",
+  "evidenceClass": "local-headless-skia-and-adapter-simulation",
+  "simulation": "The real FsusContextMenu, theme, overlay, focus and automation paths are rendered. Embedded-browser and PDF engines are deterministic adapters, not external engine execution.",
+  "captures": [
+    {
+      "Name": "light-wide-pointer",
+      "theme": "light",
+      "viewport": "900x520",
+      "zoomPercent": 100,
+      "input": "pointer",
+      "artifact": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-light-wide-pointer.png",
+      "sha256": "fed7b81f113f37add93fcf6025b4aa6fee2202d653022144a6394408690be854",
+      "menuBounds": {
+        "X": 190,
+        "Y": 53,
+        "Width": 280,
+        "Height": 280,
+        "Position": {
+          "X": 190,
+          "Y": 53
+        },
+        "Size": {
+          "AspectRatio": 1,
+          "Width": 280,
+          "Height": 280
+        },
+        "Right": 470,
+        "Bottom": 333,
+        "Left": 190,
+        "Top": 53,
+        "TopLeft": {
+          "X": 190,
+          "Y": 53
+        },
+        "TopRight": {
+          "X": 470,
+          "Y": 53
+        },
+        "BottomLeft": {
+          "X": 190,
+          "Y": 333
+        },
+        "BottomRight": {
+          "X": 470,
+          "Y": 333
+        },
+        "Center": {
+          "X": 330,
+          "Y": 193
+        }
+      },
+      "itemEvidence": [
+        {
+          "Key": "fsus-webview:replace:0",
+          "name": "the",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 0,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 44,
+            "Left": 0,
+            "Top": 0,
+            "TopLeft": {
+              "X": 0,
+              "Y": 0
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 0
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "Center": {
+              "X": 135,
+              "Y": 22
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:replace:1",
+          "name": "tech",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 44,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 44
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 88,
+            "Left": 0,
+            "Top": 44,
+            "TopLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 88
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 88
+            },
+            "Center": {
+              "X": 135,
+              "Y": 66
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:add-to-dictionary",
+          "name": "Add to dictionary",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 88,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 88
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 132,
+            "Left": 0,
+            "Top": 88,
+            "TopLeft": {
+              "X": 0,
+              "Y": 88
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 88
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 132
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 132
+            },
+            "Center": {
+              "X": 135,
+              "Y": 110
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:cut",
+          "name": "Cut",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 133,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 133
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 177,
+            "Left": 0,
+            "Top": 133,
+            "TopLeft": {
+              "X": 0,
+              "Y": 133
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 133
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "Center": {
+              "X": 135,
+              "Y": 155
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy",
+          "name": "Copy",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 177,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 177
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 221,
+            "Left": 0,
+            "Top": 177,
+            "TopLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "Center": {
+              "X": 135,
+              "Y": 199
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste",
+          "name": "Paste",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 221,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 221
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 265,
+            "Left": 0,
+            "Top": 221,
+            "TopLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "Center": {
+              "X": 135,
+              "Y": 243
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:rich-copy",
+          "name": "Copy with formatting",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 265,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 265
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 309,
+            "Left": 0,
+            "Top": 265,
+            "TopLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "Center": {
+              "X": 135,
+              "Y": 287
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy-html",
+          "name": "Copy HTML",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 309,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 309
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 353,
+            "Left": 0,
+            "Top": 309,
+            "TopLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "Center": {
+              "X": 135,
+              "Y": 331
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste-plain",
+          "name": "Paste as plain text",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 353,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 353
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 397,
+            "Left": 0,
+            "Top": 353,
+            "TopLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 397
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 397
+            },
+            "Center": {
+              "X": 135,
+              "Y": 375
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:insert-paragraph",
+          "name": "Insert paragraph",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 397,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 397
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 441,
+            "Left": 0,
+            "Top": 397,
+            "TopLeft": {
+              "X": 0,
+              "Y": 397
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 397
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 441
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 441
+            },
+            "Center": {
+              "X": 135,
+              "Y": 419
+            }
+          }
+        }
+      ],
+      "keyboard": {
+        "arrowFocused": "fsus-webview:replace:1",
+        "enterCommand": "ReplaceWord",
+        "enterReplacement": "tech",
+        "escapeClosed": true
+      },
+      "focusRestored": true
+    },
+    {
+      "Name": "dark-wide-keyboard",
+      "theme": "dark",
+      "viewport": "900x520",
+      "zoomPercent": 100,
+      "input": "keyboard",
+      "artifact": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-dark-wide-keyboard.png",
+      "sha256": "81824def24f200eada89a1d1ceeaf3e9dd4b4bd85dc46aa8a3a657837b383b2c",
+      "menuBounds": {
+        "X": 190,
+        "Y": 53,
+        "Width": 280,
+        "Height": 280,
+        "Position": {
+          "X": 190,
+          "Y": 53
+        },
+        "Size": {
+          "AspectRatio": 1,
+          "Width": 280,
+          "Height": 280
+        },
+        "Right": 470,
+        "Bottom": 333,
+        "Left": 190,
+        "Top": 53,
+        "TopLeft": {
+          "X": 190,
+          "Y": 53
+        },
+        "TopRight": {
+          "X": 470,
+          "Y": 53
+        },
+        "BottomLeft": {
+          "X": 190,
+          "Y": 333
+        },
+        "BottomRight": {
+          "X": 470,
+          "Y": 333
+        },
+        "Center": {
+          "X": 330,
+          "Y": 193
+        }
+      },
+      "itemEvidence": [
+        {
+          "Key": "fsus-webview:replace:0",
+          "name": "the",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 0,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 44,
+            "Left": 0,
+            "Top": 0,
+            "TopLeft": {
+              "X": 0,
+              "Y": 0
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 0
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "Center": {
+              "X": 135,
+              "Y": 22
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:replace:1",
+          "name": "tech",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 44,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 44
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 88,
+            "Left": 0,
+            "Top": 44,
+            "TopLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 88
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 88
+            },
+            "Center": {
+              "X": 135,
+              "Y": 66
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:add-to-dictionary",
+          "name": "Add to dictionary",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 88,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 88
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 132,
+            "Left": 0,
+            "Top": 88,
+            "TopLeft": {
+              "X": 0,
+              "Y": 88
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 88
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 132
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 132
+            },
+            "Center": {
+              "X": 135,
+              "Y": 110
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:cut",
+          "name": "Cut",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 133,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 133
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 177,
+            "Left": 0,
+            "Top": 133,
+            "TopLeft": {
+              "X": 0,
+              "Y": 133
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 133
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "Center": {
+              "X": 135,
+              "Y": 155
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy",
+          "name": "Copy",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 177,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 177
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 221,
+            "Left": 0,
+            "Top": 177,
+            "TopLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "Center": {
+              "X": 135,
+              "Y": 199
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste",
+          "name": "Paste",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 221,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 221
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 265,
+            "Left": 0,
+            "Top": 221,
+            "TopLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "Center": {
+              "X": 135,
+              "Y": 243
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:rich-copy",
+          "name": "Copy with formatting",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 265,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 265
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 309,
+            "Left": 0,
+            "Top": 265,
+            "TopLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "Center": {
+              "X": 135,
+              "Y": 287
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy-html",
+          "name": "Copy HTML",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 309,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 309
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 353,
+            "Left": 0,
+            "Top": 309,
+            "TopLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "Center": {
+              "X": 135,
+              "Y": 331
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste-plain",
+          "name": "Paste as plain text",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 353,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 353
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 397,
+            "Left": 0,
+            "Top": 353,
+            "TopLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 397
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 397
+            },
+            "Center": {
+              "X": 135,
+              "Y": 375
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:insert-paragraph",
+          "name": "Insert paragraph",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 397,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 397
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 441,
+            "Left": 0,
+            "Top": 397,
+            "TopLeft": {
+              "X": 0,
+              "Y": 397
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 397
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 441
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 441
+            },
+            "Center": {
+              "X": 135,
+              "Y": 419
+            }
+          }
+        }
+      ],
+      "keyboard": {
+        "arrowFocused": "fsus-webview:replace:1",
+        "enterCommand": "ReplaceWord",
+        "enterReplacement": "tech",
+        "escapeClosed": true
+      },
+      "focusRestored": true
+    },
+    {
+      "Name": "light-narrow-pointer",
+      "theme": "light",
+      "viewport": "520x520",
+      "zoomPercent": 100,
+      "input": "pointer",
+      "artifact": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-light-narrow-pointer.png",
+      "sha256": "ea04f1f5331290cc332febbb311507f2d40ba2b333657d34b36fe46be7cfcb55",
+      "menuBounds": {
+        "X": 190,
+        "Y": 53,
+        "Width": 280,
+        "Height": 280,
+        "Position": {
+          "X": 190,
+          "Y": 53
+        },
+        "Size": {
+          "AspectRatio": 1,
+          "Width": 280,
+          "Height": 280
+        },
+        "Right": 470,
+        "Bottom": 333,
+        "Left": 190,
+        "Top": 53,
+        "TopLeft": {
+          "X": 190,
+          "Y": 53
+        },
+        "TopRight": {
+          "X": 470,
+          "Y": 53
+        },
+        "BottomLeft": {
+          "X": 190,
+          "Y": 333
+        },
+        "BottomRight": {
+          "X": 470,
+          "Y": 333
+        },
+        "Center": {
+          "X": 330,
+          "Y": 193
+        }
+      },
+      "itemEvidence": [
+        {
+          "Key": "fsus-webview:replace:0",
+          "name": "the",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 0,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 44,
+            "Left": 0,
+            "Top": 0,
+            "TopLeft": {
+              "X": 0,
+              "Y": 0
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 0
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "Center": {
+              "X": 135,
+              "Y": 22
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:replace:1",
+          "name": "tech",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 44,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 44
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 88,
+            "Left": 0,
+            "Top": 44,
+            "TopLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 88
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 88
+            },
+            "Center": {
+              "X": 135,
+              "Y": 66
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:add-to-dictionary",
+          "name": "\u6DFB\u52A0\u5230\u8BCD\u5178",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 88,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 88
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 132,
+            "Left": 0,
+            "Top": 88,
+            "TopLeft": {
+              "X": 0,
+              "Y": 88
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 88
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 132
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 132
+            },
+            "Center": {
+              "X": 135,
+              "Y": 110
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:cut",
+          "name": "\u526A\u5207",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 133,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 133
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 177,
+            "Left": 0,
+            "Top": 133,
+            "TopLeft": {
+              "X": 0,
+              "Y": 133
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 133
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "Center": {
+              "X": 135,
+              "Y": 155
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy",
+          "name": "\u590D\u5236",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 177,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 177
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 221,
+            "Left": 0,
+            "Top": 177,
+            "TopLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "Center": {
+              "X": 135,
+              "Y": 199
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste",
+          "name": "\u7C98\u8D34",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 221,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 221
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 265,
+            "Left": 0,
+            "Top": 221,
+            "TopLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "Center": {
+              "X": 135,
+              "Y": 243
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:rich-copy",
+          "name": "Copy with formatting",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 265,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 265
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 309,
+            "Left": 0,
+            "Top": 265,
+            "TopLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "Center": {
+              "X": 135,
+              "Y": 287
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy-html",
+          "name": "Copy HTML",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 309,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 309
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 353,
+            "Left": 0,
+            "Top": 309,
+            "TopLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "Center": {
+              "X": 135,
+              "Y": 331
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste-plain",
+          "name": "Paste as plain text",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 353,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 353
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 397,
+            "Left": 0,
+            "Top": 353,
+            "TopLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 397
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 397
+            },
+            "Center": {
+              "X": 135,
+              "Y": 375
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:insert-paragraph",
+          "name": "Insert paragraph",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 397,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 397
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 441,
+            "Left": 0,
+            "Top": 397,
+            "TopLeft": {
+              "X": 0,
+              "Y": 397
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 397
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 441
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 441
+            },
+            "Center": {
+              "X": 135,
+              "Y": 419
+            }
+          }
+        }
+      ],
+      "keyboard": {
+        "arrowFocused": "fsus-webview:replace:1",
+        "enterCommand": "ReplaceWord",
+        "enterReplacement": "tech",
+        "escapeClosed": true
+      },
+      "focusRestored": true
+    },
+    {
+      "Name": "dark-zoom-equivalent-200",
+      "theme": "dark",
+      "viewport": "450x360",
+      "zoomPercent": 200,
+      "input": "keyboard",
+      "artifact": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-dark-zoom-equivalent-200.png",
+      "sha256": "481f900e84b3359f836ecf991f0dba1d88101a344cb346c4320ca2ed0360433b",
+      "menuBounds": {
+        "X": 170,
+        "Y": 53,
+        "Width": 280,
+        "Height": 280,
+        "Position": {
+          "X": 170,
+          "Y": 53
+        },
+        "Size": {
+          "AspectRatio": 1,
+          "Width": 280,
+          "Height": 280
+        },
+        "Right": 450,
+        "Bottom": 333,
+        "Left": 170,
+        "Top": 53,
+        "TopLeft": {
+          "X": 170,
+          "Y": 53
+        },
+        "TopRight": {
+          "X": 450,
+          "Y": 53
+        },
+        "BottomLeft": {
+          "X": 170,
+          "Y": 333
+        },
+        "BottomRight": {
+          "X": 450,
+          "Y": 333
+        },
+        "Center": {
+          "X": 310,
+          "Y": 193
+        }
+      },
+      "itemEvidence": [
+        {
+          "Key": "fsus-webview:replace:0",
+          "name": "the",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 0,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 44,
+            "Left": 0,
+            "Top": 0,
+            "TopLeft": {
+              "X": 0,
+              "Y": 0
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 0
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "Center": {
+              "X": 135,
+              "Y": 22
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:replace:1",
+          "name": "tech",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 44,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 44
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 88,
+            "Left": 0,
+            "Top": 44,
+            "TopLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 88
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 88
+            },
+            "Center": {
+              "X": 135,
+              "Y": 66
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:add-to-dictionary",
+          "name": "Add to dictionary",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 88,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 88
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 132,
+            "Left": 0,
+            "Top": 88,
+            "TopLeft": {
+              "X": 0,
+              "Y": 88
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 88
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 132
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 132
+            },
+            "Center": {
+              "X": 135,
+              "Y": 110
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:cut",
+          "name": "Cut",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 133,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 133
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 177,
+            "Left": 0,
+            "Top": 133,
+            "TopLeft": {
+              "X": 0,
+              "Y": 133
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 133
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "Center": {
+              "X": 135,
+              "Y": 155
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy",
+          "name": "Copy",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 177,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 177
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 221,
+            "Left": 0,
+            "Top": 177,
+            "TopLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "Center": {
+              "X": 135,
+              "Y": 199
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste",
+          "name": "Paste",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 221,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 221
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 265,
+            "Left": 0,
+            "Top": 221,
+            "TopLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "Center": {
+              "X": 135,
+              "Y": 243
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:rich-copy",
+          "name": "Copy with formatting",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 265,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 265
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 309,
+            "Left": 0,
+            "Top": 265,
+            "TopLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "Center": {
+              "X": 135,
+              "Y": 287
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy-html",
+          "name": "Copy HTML",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 309,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 309
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 353,
+            "Left": 0,
+            "Top": 309,
+            "TopLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "Center": {
+              "X": 135,
+              "Y": 331
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste-plain",
+          "name": "Paste as plain text",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 353,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 353
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 397,
+            "Left": 0,
+            "Top": 353,
+            "TopLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 397
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 397
+            },
+            "Center": {
+              "X": 135,
+              "Y": 375
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:insert-paragraph",
+          "name": "Insert paragraph",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 397,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 397
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 441,
+            "Left": 0,
+            "Top": 397,
+            "TopLeft": {
+              "X": 0,
+              "Y": 397
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 397
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 441
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 441
+            },
+            "Center": {
+              "X": 135,
+              "Y": 419
+            }
+          }
+        }
+      ],
+      "keyboard": {
+        "arrowFocused": "fsus-webview:replace:1",
+        "enterCommand": "ReplaceWord",
+        "enterReplacement": "tech",
+        "escapeClosed": true
+      },
+      "focusRestored": true
+    },
+    {
+      "Name": "light-native-fallback",
+      "theme": "light",
+      "viewport": "900x520",
+      "zoomPercent": 100,
+      "input": "keyboard",
+      "artifact": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-context-light-native-fallback.png",
+      "sha256": "9880e1ef53ab073fe2f88aff026aaa76d5d830acd851aeff4e76597cf61b882c",
+      "menuBounds": {
+        "X": 190,
+        "Y": 53,
+        "Width": 280,
+        "Height": 440,
+        "Position": {
+          "X": 190,
+          "Y": 53
+        },
+        "Size": {
+          "AspectRatio": 0.6363636363636364,
+          "Width": 280,
+          "Height": 440
+        },
+        "Right": 470,
+        "Bottom": 493,
+        "Left": 190,
+        "Top": 53,
+        "TopLeft": {
+          "X": 190,
+          "Y": 53
+        },
+        "TopRight": {
+          "X": 470,
+          "Y": 53
+        },
+        "BottomLeft": {
+          "X": 190,
+          "Y": 493
+        },
+        "BottomRight": {
+          "X": 470,
+          "Y": 493
+        },
+        "Center": {
+          "X": 330,
+          "Y": 273
+        }
+      },
+      "itemEvidence": [
+        {
+          "Key": "fsus-webview:add-to-dictionary",
+          "name": "Add to dictionary",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 0,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 44,
+            "Left": 0,
+            "Top": 0,
+            "TopLeft": {
+              "X": 0,
+              "Y": 0
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 0
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 44
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 44
+            },
+            "Center": {
+              "X": 135,
+              "Y": 22
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:cut",
+          "name": "Cut",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 45,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 45
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 89,
+            "Left": 0,
+            "Top": 45,
+            "TopLeft": {
+              "X": 0,
+              "Y": 45
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 45
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 89
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 89
+            },
+            "Center": {
+              "X": 135,
+              "Y": 67
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy",
+          "name": "Copy",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 89,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 89
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 133,
+            "Left": 0,
+            "Top": 89,
+            "TopLeft": {
+              "X": 0,
+              "Y": 89
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 89
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 133
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 133
+            },
+            "Center": {
+              "X": 135,
+              "Y": 111
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste",
+          "name": "Paste",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 133,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 133
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 177,
+            "Left": 0,
+            "Top": 133,
+            "TopLeft": {
+              "X": 0,
+              "Y": 133
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 133
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "Center": {
+              "X": 135,
+              "Y": 155
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:rich-copy",
+          "name": "Copy with formatting",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 177,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 177
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 221,
+            "Left": 0,
+            "Top": 177,
+            "TopLeft": {
+              "X": 0,
+              "Y": 177
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 177
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "Center": {
+              "X": 135,
+              "Y": 199
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:copy-html",
+          "name": "Copy HTML",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 221,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 221
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 265,
+            "Left": 0,
+            "Top": 221,
+            "TopLeft": {
+              "X": 0,
+              "Y": 221
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 221
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "Center": {
+              "X": 135,
+              "Y": 243
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:paste-plain",
+          "name": "Paste as plain text",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 265,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 265
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 309,
+            "Left": 0,
+            "Top": 265,
+            "TopLeft": {
+              "X": 0,
+              "Y": 265
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 265
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "Center": {
+              "X": 135,
+              "Y": 287
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:insert-paragraph",
+          "name": "Insert paragraph",
+          "status": "disabled",
+          "bounds": {
+            "X": 0,
+            "Y": 309,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 309
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 353,
+            "Left": 0,
+            "Top": 309,
+            "TopLeft": {
+              "X": 0,
+              "Y": 309
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 309
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 353
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 353
+            },
+            "Center": {
+              "X": 135,
+              "Y": 331
+            }
+          }
+        },
+        {
+          "Key": "fsus-webview:native-menu",
+          "name": "Show system spelling menu",
+          "status": "available",
+          "bounds": {
+            "X": 0,
+            "Y": 354,
+            "Width": 270,
+            "Height": 44,
+            "Position": {
+              "X": 0,
+              "Y": 354
+            },
+            "Size": {
+              "AspectRatio": 6.136363636363637,
+              "Width": 270,
+              "Height": 44
+            },
+            "Right": 270,
+            "Bottom": 398,
+            "Left": 0,
+            "Top": 354,
+            "TopLeft": {
+              "X": 0,
+              "Y": 354
+            },
+            "TopRight": {
+              "X": 270,
+              "Y": 354
+            },
+            "BottomLeft": {
+              "X": 0,
+              "Y": 398
+            },
+            "BottomRight": {
+              "X": 270,
+              "Y": 398
+            },
+            "Center": {
+              "X": 135,
+              "Y": 376
+            }
+          }
+        }
+      ],
+      "keyboard": {
+        "arrowFocused": "fsus-webview:native-menu",
+        "enterCommand": "UseNativeMenu",
+        "enterReplacement": null,
+        "escapeClosed": true
+      },
+      "focusRestored": true
+    }
+  ],
+  "pdfCaptures": [
+    {
+      "theme": "light",
+      "pdf": {
+        "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light.pdf",
+        "sha256": "7699ccdc673772004527b7570955ad6cf0f24ca05a4e4250aab66d2041bcbd27"
+      },
+      "parser": {
+        "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light-pdfinfo.txt",
+        "sha256": "ebbf2fe8933a68dc61f6dbe0968b47a49a4b99d05a30a8d34222a178e95f2132"
+      },
+      "text": {
+        "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light.txt",
+        "sha256": "077fc9cfc2f8961ba47956ff051de07facf3fb72456cc3b48a7421781f33fe87"
+      },
+      "renderedPages": [
+        {
+          "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light-1.png",
+          "sha256": "a96a928d1db074d81d3b9bda50db155bc9981804793b128ad5ded16558e97795"
+        },
+        {
+          "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light-2.png",
+          "sha256": "6ef20343918e7cf72dda69501d4e408c26485817da8373ea6be644dc57342ba3"
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "pdf": {
+        "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark.pdf",
+        "sha256": "d4cd8b9f2ebf2100e5a3ac9e792e4a64df9a02b77fa54e08d09d6d136eaea16a"
+      },
+      "parser": {
+        "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark-pdfinfo.txt",
+        "sha256": "9cb98014ebb01329c8e70e194f5939a9462c052aa4c74e46e04371e7e8023248"
+      },
+      "text": {
+        "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark.txt",
+        "sha256": "077fc9cfc2f8961ba47956ff051de07facf3fb72456cc3b48a7421781f33fe87"
+      },
+      "renderedPages": [
+        {
+          "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark-1.png",
+          "sha256": "30edb51fab100232f1d1af58af97b59d9316cb1f00de7eaf438ea2f93ad30e58"
+        },
+        {
+          "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark-2.png",
+          "sha256": "1503339d472b1067cc1df0179b7521f3f3f73e906b49d811ec0ac977ab77b36a"
+        }
+      ]
+    }
+  ],
+  "automation": {
+    "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/automation-report.json",
+    "sha256": "848d42888cbe469c99e9500d6efe34e9ada32cd96843bb5cce1b959b9a142672"
+  }
+}

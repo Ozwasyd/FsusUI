@@ -1,0 +1,11 @@
+{
+  "evidenceClass": "local-avalonia-automation-simulation",
+  "limitation": "AutomationPeer and AutomationProperties inspection; not a real OS screen-reader or external WebView run.",
+  "menuRole": "Menu",
+  "itemRole": "MenuItem",
+  "pointerAndKeyboardOrigins": true,
+  "routedKeyDownPipeline": true,
+  "nativeFallbackWithUnusableSuggestions": true,
+  "escapeAndCloseRestoreInvokerFocus": true,
+  "parsedAndRenderedLightAndDarkPdf": true
+}

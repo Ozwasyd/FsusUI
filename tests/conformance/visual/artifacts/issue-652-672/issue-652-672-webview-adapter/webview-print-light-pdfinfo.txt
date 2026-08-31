@@ -1,0 +1,15 @@
+Producer:        FsusUI deterministic WebView backend simulation
+Custom Metadata: yes
+Metadata Stream: no
+Tagged:          yes
+UserProperties:  no
+Suspects:        no
+Form:            none
+JavaScript:      no
+Pages:           2
+Encrypted:       no
+Page size:       612 x 792 pts (letter)
+Page rot:        0
+File size:       2875 bytes
+Optimized:       no
+PDF version:     1.7
