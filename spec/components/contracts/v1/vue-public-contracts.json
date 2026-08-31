@@ -28987,7 +28987,7 @@
       "reviewAfter": "2026-12-31",
       "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Use FsusCollapse and the native reduced-motion-aware collapse template behavior; Avalonia does not expose a browser transition wrapper.",
+      "alternative": "Use the native FsusCollapse public surface; Avalonia does not expose a browser transition-wrapper component.",
       "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "nativeSymbols": [
         {

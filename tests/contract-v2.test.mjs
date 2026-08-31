@@ -418,6 +418,12 @@ test('Web-only components project complete reviewed platform exceptions', () => 
     }
     assert.ok(contract.platformException.nativeSymbols.length > 0, contract.id)
   }
+  assert.equal(
+    committedRegistry.contracts.find(
+      (contract) => contract.id === 'component-v2.el-collapse-transition',
+    ).platformException.alternative,
+    'Use the native FsusCollapse public surface; Avalonia does not expose a browser transition-wrapper component.',
+  )
 })
 
 test('Web-only component exception mutation fails closed', () => {
@@ -518,6 +524,11 @@ test('named scalar properties cannot satisfy content regions implicitly', () => 
         (member) => member.name === name,
       )
       assert.ok(input?.avalonia, `${id} input ${name}`)
+      assert.ok(
+        input.avalonia.type === 'System.String' ||
+          input.avalonia.type === 'System.Double',
+        `${id} input ${name} must exercise a scalar String/Double surface`,
+      )
       assert.equal(region?.avalonia, null, `${id} region ${name}`)
       assert.equal(region?.status, 'missing', `${id} region ${name}`)
     }
@@ -543,6 +554,66 @@ test('named scalar properties cannot satisfy content regions implicitly', () => 
       },
       { name: 'title', status: 'missing', member: null },
     ],
+  )
+})
+
+test('audited named content surfaces bind explicitly without scalar guessing', () => {
+  const expected = new Map([
+    ['component-v2.el-input', { prefix: 'PrefixContent', suffix: 'SuffixContent' }],
+    [
+      'component-v2.el-page-header',
+      { breadcrumb: 'Breadcrumb', icon: 'IconContent' },
+    ],
+    ['component-v2.el-pagination-bar', { pagination: 'Pagination' }],
+    ['component-v2.el-result', { icon: 'IconContent' }],
+    [
+      'component-v2.el-site-header',
+      {
+        brand: 'BrandContent',
+        'desktop-actions': 'DesktopActionsContent',
+        'mobile-primary-actions': 'MobilePrimaryActionsContent',
+        'mobile-secondary-actions': 'MobileSecondaryActionsContent',
+      },
+    ],
+    ['component-v2.el-step', { icon: 'IconContent' }],
+    [
+      'component-v2.el-table-v2',
+      {
+        cell: 'CellContent',
+        empty: 'EmptyContent',
+        footer: 'FooterContent',
+        overlay: 'OverlayContent',
+      },
+    ],
+    ['component-v2.el-thread-panel', { composer: 'Composer' }],
+  ])
+  for (const [id, regions] of expected) {
+    const contract = committedRegistry.contracts.find(
+      (candidate) => candidate.id === id,
+    )
+    for (const [name, member] of Object.entries(regions)) {
+      const region = contract.contentRegions.find(
+        (candidate) => candidate.name === name,
+      )
+      assert.equal(region?.avalonia?.member, member, `${id} ${name}`)
+      assert.ok(
+        ['aligned-candidate', 'partial'].includes(region?.status),
+        `${id} ${name} status`,
+      )
+    }
+  }
+
+  const cell = committedRegistry.contracts
+    .find((contract) => contract.id === 'component-v2.el-table-v2')
+    .contentRegions.find((region) => region.name === 'cell')
+  assert.equal(cell.status, 'partial')
+  assert.equal(
+    cell.avalonia.contextType,
+    'FsusUI.Avalonia.Controls.FsusDataTableCellContext',
+  )
+  assert.notDeepEqual(
+    [...cell.web.extractedPayload].sort(),
+    ['column', 'columnIndex', 'row', 'rowIndex', 'value'],
   )
 })
 

@@ -32,7 +32,7 @@ const allowedPlatformClassifications = new Set([
 const REVIEWED_WEB_ONLY_DECISIONS = {
   ElCollapseTransition: {
     alternative:
-      'Use FsusCollapse and the native reduced-motion-aware collapse template behavior; Avalonia does not expose a browser transition wrapper.',
+      'Use the native FsusCollapse public surface; Avalonia does not expose a browser transition-wrapper component.',
     authority: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
     nativeSymbols: [
       { type: 'FsusUI.Avalonia.Controls.FsusCollapse', members: [] },

@@ -300,7 +300,48 @@ const CONTENT_REGION_BINDINGS = {
     actions: { member: 'ActionContent' },
     illustration: { member: 'IllustrationContent' },
   },
+  ElInput: {
+    prefix: { member: 'PrefixContent' },
+    suffix: { member: 'SuffixContent' },
+  },
+  ElPageHeader: {
+    breadcrumb: { member: 'Breadcrumb' },
+    icon: { member: 'IconContent' },
+  },
+  ElPaginationBar: {
+    pagination: { member: 'Pagination' },
+  },
+  ElResult: {
+    icon: { member: 'IconContent' },
+  },
+  ElSiteHeader: {
+    brand: { member: 'BrandContent' },
+    'desktop-actions': { member: 'DesktopActionsContent' },
+    'mobile-primary-actions': { member: 'MobilePrimaryActionsContent' },
+    'mobile-secondary-actions': { member: 'MobileSecondaryActionsContent' },
+  },
+  ElStep: {
+    icon: { member: 'IconContent' },
+  },
   ElTableV2: {
+    cell: {
+      member: 'CellContent',
+      contextType: 'FsusUI.Avalonia.Controls.FsusDataTableCellContext',
+      webPayloadType: 'TableV2RowCellRenderParam',
+      payload: [
+        'column',
+        'columnIndex',
+        'columns',
+        'depth',
+        'expandIconProps',
+        'isScrolling',
+        'rowData',
+        'rowIndex',
+        'style',
+      ],
+    },
+    empty: { member: 'EmptyContent' },
+    footer: { member: 'FooterContent' },
     header: {
       member: 'HeaderContent',
       contextType: 'FsusUI.Avalonia.Controls.FsusTableV2HeaderContext',
@@ -327,6 +368,10 @@ const CONTENT_REGION_BINDINGS = {
         'isScrolling',
       ],
     },
+    overlay: { member: 'OverlayContent' },
+  },
+  ElThreadPanel: {
+    composer: { member: 'Composer' },
   },
 }
 
