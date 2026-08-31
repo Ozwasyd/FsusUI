@@ -1,19 +1,19 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "e7530f0130b14e50e56dc4554ded9cbefe68228c",
+  "candidateSha": "a4cf59e7017f237f8549703a44516c96bd3d7aef",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-e7530f0130b14e50e56dc4554ded9cbefe68228c",
+    "executionId": "conformance-v2-check-tag-a4cf59e7017f237f8549703a44516c96bd3d7aef",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "abbbaeaa65f5cf586ea58a64770b92f41528b0a2b1212070c2c2a934e9f12ad6",
+    "contractHash": "7abc5f7c6e526cae6fd1f98ec4f8f7b4b1c1463bc0db4848e7ad103d09bf946a",
     "webBaselineHash": "4832864259e23de6e04b1d12e85d6f5142a2d8de3057773d47bfc48bd0ff618f",
     "avaloniaBaselineHash": "9ab83ab32d4a3784b3470f78a52df55646b90382f5e6eea23fd298b964d25441",
-    "runnerHash": "86a66a5559f8f6e656c0bf4934ce88d96e7b4166acc5538e5e89026333d8ffd9"
+    "runnerHash": "cf54c07bb273c8507f52aa5c85932b984814f78960eeabcb74c3444ac0f19ca3"
   },
   "viewportStateMatrix": [
     {
@@ -26,7 +26,7 @@
       "direction": "ltr",
       "motion": "reduced",
       "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
-      "evidenceDigest": "380508804f93e90e8c7604aa07dee78a92110bdb64395df4588bffefd3d2e070"
+      "evidenceDigest": "7e4efb7b7b57ec50e4db4d756cf73ac5b9217c570318a1dc57559abb6e1436f0"
     },
     {
       "platform": "avalonia",
@@ -47,8 +47,8 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "380508804f93e90e8c7604aa07dee78a92110bdb64395df4588bffefd3d2e070",
-      "bytes": 1493,
+      "digest": "7e4efb7b7b57ec50e4db4d756cf73ac5b9217c570318a1dc57559abb6e1436f0",
+      "bytes": 1481,
       "width": 88,
       "height": 25,
       "inspected": true,

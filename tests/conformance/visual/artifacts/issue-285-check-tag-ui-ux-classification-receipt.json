@@ -39,14 +39,14 @@
     "authorityDigest": "0301f8cf9dc78a13ad971ddb9058546ef3615b23a9a84187690342dd75061ea3",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "e7530f0130b14e50e56dc4554ded9cbefe68228c",
-  "candidateDigest": "6b9f3eefcd71442ccd9dd64e338269287afab70408fe9a28776a8ad1654f2325",
+  "candidateSha": "a4cf59e7017f237f8549703a44516c96bd3d7aef",
+  "candidateDigest": "850b1b3a122ff2f50d0d6fc00f55ab96a9ab69f745ec8ff81ad04b1d352b3113",
   "stateEvidenceMatrix": [
     {
       "state": "focused-unchecked-after-pointer-keyboard",
       "viewport": "88x25",
       "theme": "light",
-      "evidenceDigest": "380508804f93e90e8c7604aa07dee78a92110bdb64395df4588bffefd3d2e070"
+      "evidenceDigest": "7e4efb7b7b57ec50e4db4d756cf73ac5b9217c570318a1dc57559abb6e1436f0"
     },
     {
       "state": "focused-unchecked-after-pointer-keyboard",
@@ -68,5 +68,5 @@
   "classificationEvidenceDigest": "e2a5042f75f7eedd9c232013322dea4cc49e665ad6a6537d6fa9c21a1fc93fdb",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "3c00e37f877c787da40061825e7165bbd1ea5d7d60829f9601ee28184f700117"
+  "receiptDigest": "624ffad7b33498dcbb5d6289a42ae8dfc9fd367d48a0088145d8a02b0ceef9c4"
 }
