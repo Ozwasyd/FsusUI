@@ -6,6 +6,14 @@ Component ID: `selection`
 
 Use `FsusCheckbox`, `FsusCheckboxGroup`, `FsusCheckboxButton`, `FsusRadio`,
 `FsusRadioGroup`, `FsusCheckTag`, and `FsusSwitch` for boolean, three-state,
+and grouped selection. `FsusCheckTag` renders the Web authority presentation:
+`color.fill.lighter` surface with a 1px `color.border.subtle` outline at
+11px/700, and a checked state filled with Scholarly Blue
+(`color.action.primary`) and paper-white text. `FsusCheckboxButton` renders
+the Web authority presentation: a transparent surface with `color.text.quiet`
+label at weight 500, and a checked state on the paper surface with
+`color.text.primary` label and the `shadow.panel.lighter` elevation; the
+disabled state uses the paper surface with a `color.border.light` outline.
 button-styled, toggleable, grouped, and exclusive selection.
 
 `FsusSwitch` ships a native control template in
