@@ -54,6 +54,8 @@ public class FsusCheckTagTests
       AutomationControlType.CheckBox,
       AutomationProperties.GetControlTypeOverride(tag));
     Assert.Equal("Review complete", AutomationProperties.GetName(tag));
+    tag.Content = "Review renamed";
+    Assert.Equal("Review renamed", AutomationProperties.GetName(tag));
 
     var toggle = Assert.IsAssignableFrom<IToggleProvider>(
       ControlAutomationPeer.CreatePeerForElement(tag));
