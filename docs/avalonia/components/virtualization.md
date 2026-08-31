@@ -35,7 +35,10 @@ does not create a source-sized visual tree. `ContainerPoolLimit`,
 `FsusDataTableRow` model. Columns marked `Left` or `Right` remain realized while
 the horizontal window moves. `ScrollTo`, `ScrollToLeft`, `ScrollToRow`, and
 `ScrollToTop` update the owned scroll surface, and arrow-key events raised on
-the control move the focused cell through the same scrolling path.
+the control move the focused cell through the same scrolling path. When
+`EstimatedRowHeight` is set, `SetMeasuredRowHeight` updates the variable-size
+index and the realized row offsets. `OnRowsRendered`, `OnScroll`, and
+`OnEndReached` report the actual realization and scrolling path.
 
 Measurement corrections before the active anchor adjust the scroll offset so
 the same logical item remains visually stable. `NotifyItemsInserted` preserves

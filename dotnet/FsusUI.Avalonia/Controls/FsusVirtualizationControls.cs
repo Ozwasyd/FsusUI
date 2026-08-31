@@ -71,6 +71,14 @@ public sealed record FsusTableV2BudgetResult(
     RealizedCellCount <= Budget.RealizedCells;
 }
 
+public sealed record FsusTableV2RowsRendered(
+  int StartIndex,
+  int StopIndex,
+  int VisibleStartIndex,
+  int VisibleStopIndex);
+
+public sealed record FsusTableV2ScrollPosition(double ScrollLeft, double ScrollTop);
+
 public delegate ValueTask<IReadOnlyList<FsusVirtualListItem>> FsusVirtualListSourceProvider(
   FsusVirtualWindow window,
   CancellationToken cancellationToken);
@@ -697,7 +705,10 @@ public class FsusAutoResizer : ContentControl
 public class FsusTableV2 : ContentControl
 {
   private readonly Dictionary<(int Row, int Column), FsusTableV2CellContainer> realizedCells = [];
+  private readonly Dictionary<int, double> rowMeasurementCache = [];
+  private readonly Queue<int> rowMeasurementOrder = [];
   private readonly Queue<FsusTableV2CellContainer> cellPool = [];
+  private readonly FsusVariableSizeIndex rowSizeIndex = new();
   private readonly Canvas cellHost = new();
   private readonly ScrollViewer scrollViewer = new();
   private readonly List<int> loadedRowIndex = [];
@@ -729,9 +740,11 @@ public class FsusTableV2 : ContentControl
       {
         viewport = scrollViewer.Viewport;
       }
-      realizedRowStartIndex = ResolveStart(scrollViewer.Offset.Y, RowHeight, EffectiveRowCount, realizedRowCount);
+      EnsureRowSizeIndex();
+      realizedRowStartIndex = ResolveRowStart(scrollViewer.Offset.Y);
       realizedColumnStartIndex = ResolveStart(scrollViewer.Offset.X, ColumnWidth, EffectiveColumnCount, realizedColumnCount);
       RefreshLayout(updateScrollViewer: false);
+      NotifyScroll();
     };
     Content = scrollViewer;
     SyncState();
@@ -744,11 +757,13 @@ public class FsusTableV2 : ContentControl
   public int RowCount { get; set; }
   public int ColumnCount { get; set; }
   public double RowHeight { get; set; } = 32d;
+  public double? EstimatedRowHeight { get; set; }
   public double ColumnWidth { get; set; } = 120d;
   public int Overscan { get; set; } = 2;
   public int FrozenRowCount { get; set; }
   public int FrozenColumnCount { get; set; }
   public int ContainerPoolLimit { get; set; } = 1536;
+  public int RetainedRowMeasurementLimit { get; set; } = 2048;
   public int LoadedRowIndexLimit { get; set; } = 4096;
   public Func<int, int, object?>? CellProvider { get; set; }
   public IDataTemplate? CellTemplate { get; set; }
@@ -757,6 +772,9 @@ public class FsusTableV2 : ContentControl
     get => CellTemplate;
     set => CellTemplate = value;
   }
+  public Action<double>? OnEndReached { get; set; }
+  public Action<FsusTableV2RowsRendered>? OnRowsRendered { get; set; }
+  public Action<FsusTableV2ScrollPosition>? OnScroll { get; set; }
   public int FocusedRowIndex { get; private set; }
   public int FocusedColumnIndex { get; private set; }
   public FsusTableV2Budget VirtualizationBudget { get; set; } = new(
@@ -780,6 +798,7 @@ public class FsusTableV2 : ContentControl
   public int CreatedCellCount { get; private set; }
   public int DiscardedCellCount { get; private set; }
   public int CellPoolCount => cellPool.Count;
+  public int RetainedRowMeasurementCount => rowMeasurementCache.Count;
   public int AutomationUpdateCount { get; private set; }
   public bool LastBackgroundCanceled { get; private set; }
   public int BackgroundVersion => backgroundVersion;
@@ -806,9 +825,10 @@ public class FsusTableV2 : ContentControl
   {
     var rowCount = EffectiveRowCount;
     var columnCount = EffectiveColumnCount;
+    EnsureRowSizeIndex();
     realizedRowCount = Math.Min(
       rowCount,
-      Math.Max(1, (int)Math.Ceiling(viewport.Height / Math.Max(1d, RowHeight)) + Math.Max(0, Overscan)));
+      ResolveVisibleRowCount(rowCount));
     realizedColumnCount = Math.Min(
       columnCount,
       Math.Max(1, (int)Math.Ceiling(viewport.Width / Math.Max(1d, ColumnWidth)) + Math.Max(0, Overscan)));
@@ -875,15 +895,17 @@ public class FsusTableV2 : ContentControl
           : $"R{sourceRow + 1} C{key.Column + 1}");
       container.Bind(key.Row, key.Column, content, CellTemplate, ColumnWidth, RowHeight);
       Canvas.SetLeft(container, key.Column * Math.Max(1d, ColumnWidth));
-      Canvas.SetTop(container, key.Row * Math.Max(1d, RowHeight));
+      Canvas.SetTop(container, ResolveRowOffset(key.Row));
+      container.Height = ResolveRowHeight(key.Row);
     }
 
     cellHost.Width = Math.Max(0, columnCount) * Math.Max(1d, ColumnWidth);
-    cellHost.Height = Math.Max(0, rowCount) * Math.Max(1d, RowHeight);
+    cellHost.Height = ResolveTotalRowHeight();
     if (updateScrollViewer)
     {
       ApplyScrollOffset();
     }
+    NotifyRowsRendered();
     SyncState();
   }
 
@@ -903,17 +925,39 @@ public class FsusTableV2 : ContentControl
   public void ScrollTo(double scrollLeft, double scrollTop)
   {
     realizedColumnStartIndex = ResolveStart(scrollLeft, ColumnWidth, EffectiveColumnCount, realizedColumnCount);
-    realizedRowStartIndex = ResolveStart(scrollTop, RowHeight, EffectiveRowCount, realizedRowCount);
+    EnsureRowSizeIndex();
+    realizedRowStartIndex = ResolveRowStart(scrollTop);
     RefreshLayout();
+    NotifyScroll();
   }
 
   public void ScrollToLeft(double scrollLeft) =>
-    ScrollTo(scrollLeft, realizedRowStartIndex * Math.Max(1d, RowHeight));
+    ScrollTo(scrollLeft, ResolveRowOffset(realizedRowStartIndex));
 
   public void ScrollToRow(int rowIndex) => ScrollToCell(rowIndex, FocusedColumnIndex);
 
   public void ScrollToTop(double scrollTop) =>
     ScrollTo(realizedColumnStartIndex * Math.Max(1d, ColumnWidth), scrollTop);
+
+  public void SetMeasuredRowHeight(int rowIndex, double height)
+  {
+    if (rowIndex < 0 || rowIndex >= EffectiveRowCount)
+    {
+      return;
+    }
+
+    EnsureRowSizeIndex();
+    var nextHeight = Math.Max(1d, height);
+    var previousHeight = ResolveRowHeight(rowIndex);
+    if (!rowMeasurementCache.ContainsKey(rowIndex))
+    {
+      rowMeasurementOrder.Enqueue(rowIndex);
+    }
+    rowMeasurementCache[rowIndex] = nextHeight;
+    rowSizeIndex.Update(rowIndex, previousHeight, nextHeight);
+    TrimRowMeasurementCache();
+    RefreshLayout();
+  }
 
   public async ValueTask<bool> UpdateRowIndexAsync(
     Func<CancellationToken, ValueTask<IReadOnlyList<int>>> provider)
@@ -1075,11 +1119,94 @@ public class FsusTableV2 : ContentControl
     {
       scrollViewer.Offset = new Vector(
         realizedColumnStartIndex * Math.Max(1d, ColumnWidth),
-        realizedRowStartIndex * Math.Max(1d, RowHeight));
+        ResolveRowOffset(realizedRowStartIndex));
     }
     finally
     {
       isApplyingScroll = false;
+    }
+  }
+
+  private void EnsureRowSizeIndex() =>
+    rowSizeIndex.Ensure(EffectiveRowCount, EstimatedRowHeight ?? RowHeight, rowMeasurementCache);
+
+  private double ResolveRowHeight(int rowIndex) =>
+    EstimatedRowHeight is not null && rowMeasurementCache.TryGetValue(rowIndex, out var measured)
+      ? measured
+      : Math.Max(1d, EstimatedRowHeight ?? RowHeight);
+
+  private double ResolveRowOffset(int rowIndex) =>
+    EstimatedRowHeight is null
+      ? Math.Clamp(rowIndex, 0, EffectiveRowCount) * Math.Max(1d, RowHeight)
+      : rowSizeIndex.PrefixSize(rowIndex);
+
+  private double ResolveTotalRowHeight() =>
+    EstimatedRowHeight is null
+      ? Math.Max(0, EffectiveRowCount) * Math.Max(1d, RowHeight)
+      : rowSizeIndex.TotalSize;
+
+  private int ResolveRowStart(double offset) =>
+    EstimatedRowHeight is null
+      ? ResolveStart(offset, RowHeight, EffectiveRowCount, realizedRowCount)
+      : Math.Clamp(
+          rowSizeIndex.FindIndex(offset),
+          0,
+          Math.Max(0, EffectiveRowCount - Math.Max(1, realizedRowCount)));
+
+  private int ResolveVisibleRowCount(int rowCount)
+  {
+    if (rowCount <= 0)
+    {
+      return 0;
+    }
+
+    var visible = 0;
+    var covered = 0d;
+    for (var row = realizedRowStartIndex; row < rowCount && covered < viewport.Height; row++)
+    {
+      covered += ResolveRowHeight(row);
+      visible++;
+    }
+    return Math.Max(1, visible + Math.Max(0, Overscan));
+  }
+
+  private void TrimRowMeasurementCache()
+  {
+    while (rowMeasurementCache.Count > Math.Max(0, RetainedRowMeasurementLimit) &&
+      rowMeasurementOrder.TryDequeue(out var rowIndex))
+    {
+      if (!rowMeasurementCache.Remove(rowIndex, out var previousHeight))
+      {
+        continue;
+      }
+      rowSizeIndex.Update(rowIndex, previousHeight, Math.Max(1d, EstimatedRowHeight ?? RowHeight));
+    }
+  }
+
+  private void NotifyRowsRendered()
+  {
+    if (EffectiveRowCount == 0 || realizedRowCount == 0)
+    {
+      return;
+    }
+    var stopIndex = Math.Min(EffectiveRowCount - 1, realizedRowStartIndex + realizedRowCount - 1);
+    OnRowsRendered?.Invoke(new FsusTableV2RowsRendered(
+      realizedRowStartIndex,
+      stopIndex,
+      realizedRowStartIndex,
+      stopIndex));
+  }
+
+  private void NotifyScroll()
+  {
+    var position = new FsusTableV2ScrollPosition(
+      realizedColumnStartIndex * Math.Max(1d, ColumnWidth),
+      ResolveRowOffset(realizedRowStartIndex));
+    OnScroll?.Invoke(position);
+    var distance = Math.Max(0d, ResolveTotalRowHeight() - position.ScrollTop - viewport.Height);
+    if (distance <= 0d)
+    {
+      OnEndReached?.Invoke(distance);
     }
   }
 

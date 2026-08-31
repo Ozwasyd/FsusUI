@@ -23370,6 +23370,14 @@
           "isStatic": false
         },
         {
+          "name": "EstimatedRowHeight",
+          "type": "System.Double?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "FocusedCellStatus",
           "type": "System.String",
           "nullable": false,
@@ -23442,6 +23450,30 @@
           "isStatic": false
         },
         {
+          "name": "OnEndReached",
+          "type": "System.Action\u003CSystem.Double\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "OnRowsRendered",
+          "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2RowsRendered\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "OnScroll",
+          "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2ScrollPosition\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "Overscan",
           "type": "System.Int32",
           "nullable": false,
@@ -23507,6 +23539,22 @@
         },
         {
           "name": "RecycledCellCount",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RetainedRowMeasurementCount",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "RetainedRowMeasurementLimit",
           "type": "System.Int32",
           "nullable": false,
           "canRead": true,
@@ -23654,6 +23702,23 @@
           "parameters": [
             {
               "name": "scrollTop",
+              "type": "System.Double",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SetMeasuredRowHeight",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "rowIndex",
+              "type": "System.Int32",
+              "optional": false
+            },
+            {
+              "name": "height",
               "type": "System.Double",
               "optional": false
             }
@@ -23886,6 +23951,136 @@
       "avaloniaProperties": [],
       "events": [],
       "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2RowsRendered",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "StartIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "StopIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "VisibleStartIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "VisibleStopIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2RowsRendered",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "StartIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "StopIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "VisibleStartIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "VisibleStopIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "ScrollLeft",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ScrollTop",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "ScrollLeft",
+              "type": "System.Double\u0026",
+              "optional": false
+            },
+            {
+              "name": "ScrollTop",
+              "type": "System.Double\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "FsusUI.Avalonia.Controls.FsusTabs",

@@ -73,6 +73,17 @@ test('Vue semantic extraction resolves nested imported prop spreads', () => {
   assert.equal(data.status, 'aligned-candidate')
 })
 
+test('Vue semantic extraction resolves imported prop member descriptors', () => {
+  const table = committedRegistry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-table-v2',
+  )
+  for (const name of ['estimatedRowHeight', 'onRowsRendered', 'onScroll']) {
+    const input = table.inputs.find((member) => member.name === name)
+    assert.notEqual(input.web.runtimeType, null)
+    assert.equal(input.status, 'aligned-candidate')
+  }
+})
+
 const replaceAtPath = (value, pointer, replacement) => {
   const segments = pointer
     .split('/')

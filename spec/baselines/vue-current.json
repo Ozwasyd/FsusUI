@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "183b036af276f8619358b1f55c25e1c475e75a79",
+    "commitSha": "07857e8d3e243b5b53ee8283068265132354cdc9",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
@@ -11,7 +11,7 @@
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "16c47922b10732c87c35a95dbcee33d5d5268a6dd357c9e52370bd6602fccafc"
+    "outputHash": "0d7f00c18ae5aed0556f58092f7948267ddd18a802370cd23f925b94f594d6b4"
   },
   "summary": {
     "componentModules": 93,
@@ -1282,12 +1282,13 @@
           },
           {
             "name": "teleported",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "required": false,
             "readonly": false
@@ -3181,10 +3182,10 @@
           },
           {
             "name": "tagType",
-            "runtimeType": null,
+            "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
-            "values": null,
+            "values": ["success", "info", "warning", "danger", ""],
             "default": {
               "kind": "literal",
               "value": "info"
@@ -3194,12 +3195,13 @@
           },
           {
             "name": "teleported",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "required": false,
             "readonly": false
@@ -7980,24 +7982,26 @@
           },
           {
             "name": "teleported",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "required": false,
             "readonly": false
           },
           {
             "name": "trigger",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "Arrayable<TooltipTriggerType>",
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": "hover"
             },
             "required": false,
             "readonly": false
@@ -16336,7 +16340,7 @@
           },
           {
             "name": "persistent",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
@@ -16348,12 +16352,13 @@
           },
           {
             "name": "teleported",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "required": false,
             "readonly": false
@@ -16489,19 +16494,20 @@
           },
           {
             "name": "content",
-            "runtimeType": null,
+            "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": ""
             },
             "required": false,
             "readonly": false
           },
           {
             "name": "disabled",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
@@ -16589,12 +16595,13 @@
           },
           {
             "name": "placement",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "String",
+            "semanticType": "Placement",
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": "bottom"
             },
             "required": false,
             "readonly": false
@@ -16613,12 +16620,13 @@
           },
           {
             "name": "popperOptions",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Object",
+            "semanticType": "Partial<Options>",
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "function",
+              "sourceHash": "d3a63129b65aed00ae18632b426020bfea8d9a107477eacaad812cad7d5d804d"
             },
             "required": false,
             "readonly": false
@@ -16663,24 +16671,26 @@
           },
           {
             "name": "tabindex",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "number | string",
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 0
             },
             "required": false,
             "readonly": false
           },
           {
             "name": "teleported",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "required": false,
             "readonly": false
@@ -16699,7 +16709,7 @@
           },
           {
             "name": "transition",
-            "runtimeType": null,
+            "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
             "values": null,
@@ -16711,24 +16721,26 @@
           },
           {
             "name": "trigger",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "Arrayable<TooltipTriggerType>",
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": "hover"
             },
             "required": false,
             "readonly": false
           },
           {
             "name": "visible",
-            "runtimeType": null,
-            "semanticType": null,
-            "nullable": false,
+            "runtimeType": "Boolean",
+            "semanticType": "boolean | null",
+            "nullable": true,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "null",
+              "value": null
             },
             "required": false,
             "readonly": false
@@ -20856,10 +20868,10 @@
           },
           {
             "name": "tagType",
-            "runtimeType": null,
+            "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
-            "values": null,
+            "values": ["success", "info", "warning", "danger", ""],
             "default": {
               "kind": "literal",
               "value": "info"
@@ -20869,12 +20881,13 @@
           },
           {
             "name": "teleported",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "required": false,
             "readonly": false
@@ -21500,12 +21513,13 @@
           },
           {
             "name": "teleported",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "required": false,
             "readonly": false
@@ -24474,12 +24488,13 @@
         "props": [
           {
             "name": "cache",
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 2
             },
             "required": false,
             "readonly": false
@@ -24559,12 +24574,12 @@
           },
           {
             "name": "estimatedRowHeight",
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -24572,7 +24587,7 @@
           {
             "name": "expandColumnKey",
             "runtimeType": null,
-            "semanticType": null,
+            "semanticType": "expandColumnKey",
             "nullable": false,
             "values": null,
             "default": {
@@ -24657,12 +24672,13 @@
           },
           {
             "name": "headerHeight",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "number | number[]",
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 50
             },
             "required": false,
             "readonly": false
@@ -24693,12 +24709,13 @@
           },
           {
             "name": "hScrollbarSize",
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 6
             },
             "required": false,
             "readonly": false
@@ -24779,8 +24796,8 @@
           },
           {
             "name": "onRowExpand",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "RowExpandHandler",
             "nullable": false,
             "values": null,
             "default": {
@@ -24791,8 +24808,8 @@
           },
           {
             "name": "onRowsRendered",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "(params: onRowRenderedParams) => void",
             "nullable": false,
             "values": null,
             "default": {
@@ -24803,8 +24820,8 @@
           },
           {
             "name": "onScroll",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "(...args: any[]) => void",
             "nullable": false,
             "values": null,
             "default": {
@@ -24827,8 +24844,8 @@
           },
           {
             "name": "rowEventHandlers",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Object",
+            "semanticType": "RowEventHandlers",
             "nullable": false,
             "values": null,
             "default": {
@@ -24877,7 +24894,7 @@
           },
           {
             "name": "scrollbarAlwaysOn",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
@@ -24938,12 +24955,13 @@
           },
           {
             "name": "vScrollbarSize",
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 6
             },
             "required": false,
             "readonly": false
@@ -34877,12 +34895,13 @@
         "props": [
           {
             "name": "cache",
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 2
             },
             "required": false,
             "readonly": false
@@ -34962,12 +34981,12 @@
           },
           {
             "name": "estimatedRowHeight",
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -34975,7 +34994,7 @@
           {
             "name": "expandColumnKey",
             "runtimeType": null,
-            "semanticType": null,
+            "semanticType": "expandColumnKey",
             "nullable": false,
             "values": null,
             "default": {
@@ -35060,12 +35079,13 @@
           },
           {
             "name": "headerHeight",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "number | number[]",
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 50
             },
             "required": false,
             "readonly": false
@@ -35096,12 +35116,13 @@
           },
           {
             "name": "hScrollbarSize",
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 6
             },
             "required": false,
             "readonly": false
@@ -35182,8 +35203,8 @@
           },
           {
             "name": "onRowExpand",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "RowExpandHandler",
             "nullable": false,
             "values": null,
             "default": {
@@ -35194,8 +35215,8 @@
           },
           {
             "name": "onRowsRendered",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "(params: onRowRenderedParams) => void",
             "nullable": false,
             "values": null,
             "default": {
@@ -35206,8 +35227,8 @@
           },
           {
             "name": "onScroll",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "(...args: any[]) => void",
             "nullable": false,
             "values": null,
             "default": {
@@ -35230,8 +35251,8 @@
           },
           {
             "name": "rowEventHandlers",
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Object",
+            "semanticType": "RowEventHandlers",
             "nullable": false,
             "values": null,
             "default": {
@@ -35280,7 +35301,7 @@
           },
           {
             "name": "scrollbarAlwaysOn",
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "values": null,
@@ -35341,12 +35362,13 @@
           },
           {
             "name": "vScrollbarSize",
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 6
             },
             "required": false,
             "readonly": false

@@ -117,6 +117,18 @@ const cases = [
     expected: 'Avalonia Vue public API baseline is stale',
   },
   {
+    id: 'vue-semantic-member-descriptor-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        "['MemberExpression', 'OptionalMemberExpression'].includes(valueNode.type)",
+        "['MissingMemberExpression'].includes(valueNode.type)",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
     id: 'vue-public-alias-mutated',
     file: 'vue/packages/components/collection-primitives/index.ts',
     inject: () =>
@@ -226,6 +238,63 @@ const cases = [
         'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
         '--filter',
         'FullyQualifiedName~AutoResizerObservesArrangedViewportAndHonorsDisabledAxes',
+      ],
+    ],
+    expected: 'Assert.',
+  })),
+  ...[
+    [
+      'table-v2-typed-data-mutated',
+      'dataRow is not null && column is not null',
+      'false && dataRow is not null && column is not null',
+      'TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll',
+    ],
+    [
+      'table-v2-fixed-column-mutated',
+      'entry.column.Fixed != FsusDataTableFixedColumn.None',
+      'entry.column.Fixed == FsusDataTableFixedColumn.None',
+      'TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll',
+    ],
+    [
+      'table-v2-keyboard-mutated',
+      'e.Handled = HandleKeyAsync(e.Key).GetAwaiter().GetResult();',
+      'e.Handled = false;',
+      'TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll',
+    ],
+    [
+      'table-v2-scroll-mutated',
+      'realizedColumnStartIndex = ResolveStart(scrollLeft, ColumnWidth, EffectiveColumnCount, realizedColumnCount);',
+      'realizedColumnStartIndex = 0;',
+      'TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll',
+    ],
+    [
+      'table-v2-dynamic-height-mutated',
+      'rowSizeIndex.Update(rowIndex, previousHeight, nextHeight);',
+      'rowSizeIndex.Update(rowIndex, previousHeight, previousHeight);',
+      'TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks',
+    ],
+    [
+      'table-v2-scroll-callback-mutated',
+      'OnScroll?.Invoke(position);',
+      '_ = position;',
+      'TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks',
+    ],
+  ].map(([id, from, to, test]) => ({
+    id,
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs',
+        from,
+        to,
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
+        '--filter',
+        `FullyQualifiedName~${test}`,
       ],
     ],
     expected: 'Assert.',

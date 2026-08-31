@@ -769,6 +769,41 @@ class PropDescriptorParser {
       return this.parseDescriptorObject(valueNode, name)
     }
     if (
+      ['MemberExpression', 'OptionalMemberExpression'].includes(valueNode.type)
+    ) {
+      const memberName = valueNode.computed
+        ? valueNode.property?.type === 'StringLiteral'
+          ? valueNode.property.value
+          : null
+        : valueNode.property?.type === 'Identifier'
+          ? valueNode.property.name
+          : null
+      if (valueNode.object?.type === 'Identifier' && memberName) {
+        const resolved = this.resolver.resolveIdentifier(
+          valueNode.object.name,
+          this.fromRelPath,
+        )
+        const resolvedNode = unwrapExpression(resolved?.node)
+        const propsNode =
+          resolvedNode?.type === 'CallExpression' &&
+          resolvedNode.callee?.type === 'Identifier' &&
+          resolvedNode.callee.name === 'buildProps'
+            ? unwrapExpression(resolvedNode.arguments?.[0])
+            : resolvedNode
+        if (propsNode?.type === 'ObjectExpression') {
+          const source = this.resolver.readSource(resolved.relPath) || ''
+          const descriptor = new PropDescriptorParser(
+            this.resolver,
+            source,
+            resolved.relPath,
+          )
+            .parseBuildPropsObject(propsNode)
+            .find((candidate) => candidate.name === memberName)
+          if (descriptor) return { ...descriptor, name }
+        }
+      }
+    }
+    if (
       valueNode.type === 'CallExpression' &&
       valueNode.callee?.type === 'Identifier' &&
       valueNode.callee.name === 'buildProp'
@@ -855,27 +890,15 @@ class PropDescriptorParser {
     let readonly = false
     for (const property of objectNode.properties || []) {
       if (property.type === 'SpreadElement') {
-        const resolved = this.resolver.resolveIdentifier(
-          property.argument?.name,
-          this.fromRelPath,
-        )
-        const resolvedNode = unwrapExpression(resolved?.node)
-        if (resolvedNode?.type === 'ObjectExpression') {
-          const source = this.resolver.readSource(resolved.relPath) || ''
-          const merged = new PropDescriptorParser(
-            this.resolver,
-            source,
-            resolved.relPath,
-          ).parseDescriptorObject(resolvedNode, name)
-          if (merged) {
-            runtimeType = merged.runtimeType
-            semanticType = merged.semanticType
-            nullable = merged.nullable
-            values = merged.values
-            defaultValue = merged.default
-            required = merged.required
-            readonly = merged.readonly
-          }
+        const merged = this.parsePropValue(property.argument, name)
+        if (merged) {
+          runtimeType = merged.runtimeType
+          semanticType = merged.semanticType
+          nullable = merged.nullable
+          values = merged.values
+          defaultValue = merged.default
+          required = merged.required
+          readonly = merged.readonly
         }
         continue
       }

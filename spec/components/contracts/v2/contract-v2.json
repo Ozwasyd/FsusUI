@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "145ef09d896146ddc0e5ce9dd8b077cff06e0caeb838748b9322c525c4096a5d",
+      "hash": "737c83a37d662890ff4d373dacf9eb1f5c41d5bff69fe729e51dd449086774cb",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "0f8e7b960a3b5bc347f0c00b08ef38361c1362e581e2addcfce77b8debe651ed",
+      "hash": "3214b798d35075618a2c2dd4508ea7522b6bc7f52f5b4bee5fc0d568d94379a6",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -6126,13 +6126,14 @@
           "web": {
             "member": "teleported",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "values": null,
             "required": false,
@@ -14909,16 +14910,22 @@
           "web": {
             "member": "tagType",
             "categories": [
-              "unknown"
+              "string"
             ],
-            "runtimeType": null,
+            "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
             "default": {
               "kind": "literal",
               "value": "info"
             },
-            "values": null,
+            "values": [
+              "success",
+              "info",
+              "warning",
+              "danger",
+              ""
+            ],
             "required": false,
             "readonly": false
           },
@@ -14948,13 +14955,14 @@
           "web": {
             "member": "teleported",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "values": null,
             "required": false,
@@ -35988,13 +35996,14 @@
           "web": {
             "member": "teleported",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "values": null,
             "required": false,
@@ -36026,13 +36035,14 @@
           "web": {
             "member": "trigger",
             "categories": [
-              "unknown"
+              "array"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "Arrayable<TooltipTriggerType>",
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": "hover"
             },
             "values": null,
             "required": false,
@@ -73280,9 +73290,9 @@
           "web": {
             "member": "persistent",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
@@ -73318,13 +73328,14 @@
           "web": {
             "member": "teleported",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "values": null,
             "required": false,
@@ -73962,13 +73973,14 @@
           "web": {
             "member": "content",
             "categories": [
-              "unknown"
+              "string"
             ],
-            "runtimeType": null,
+            "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": ""
             },
             "values": null,
             "required": false,
@@ -74000,9 +74012,9 @@
           "web": {
             "member": "disabled",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
@@ -74270,13 +74282,14 @@
           "web": {
             "member": "placement",
             "categories": [
-              "unknown"
+              "string"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "String",
+            "semanticType": "Placement",
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": "bottom"
             },
             "values": null,
             "required": false,
@@ -74346,13 +74359,14 @@
           "web": {
             "member": "popperOptions",
             "categories": [
-              "unknown"
+              "object"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Object",
+            "semanticType": "Partial<Options>",
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "function",
+              "sourceHash": "d3a63129b65aed00ae18632b426020bfea8d9a107477eacaad812cad7d5d804d"
             },
             "values": null,
             "required": false,
@@ -74500,13 +74514,14 @@
           "web": {
             "member": "tabindex",
             "categories": [
-              "unknown"
+              "array"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "number | string",
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 0
             },
             "values": null,
             "required": false,
@@ -74538,13 +74553,14 @@
           "web": {
             "member": "teleported",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "values": null,
             "required": false,
@@ -74614,9 +74630,9 @@
           "web": {
             "member": "transition",
             "categories": [
-              "unknown"
+              "string"
             ],
-            "runtimeType": null,
+            "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
             "default": {
@@ -74652,13 +74668,14 @@
           "web": {
             "member": "trigger",
             "categories": [
-              "unknown"
+              "array"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "Arrayable<TooltipTriggerType>",
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": "hover"
             },
             "values": null,
             "required": false,
@@ -74690,13 +74707,14 @@
           "web": {
             "member": "visible",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
-            "semanticType": null,
-            "nullable": false,
+            "runtimeType": "Boolean",
+            "semanticType": "boolean | null",
+            "nullable": true,
             "default": {
-              "kind": "missing"
+              "kind": "null",
+              "value": null
             },
             "values": null,
             "required": false,
@@ -91489,16 +91507,22 @@
           "web": {
             "member": "tagType",
             "categories": [
-              "unknown"
+              "string"
             ],
-            "runtimeType": null,
+            "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
             "default": {
               "kind": "literal",
               "value": "info"
             },
-            "values": null,
+            "values": [
+              "success",
+              "info",
+              "warning",
+              "danger",
+              ""
+            ],
             "required": false,
             "readonly": false
           },
@@ -91528,13 +91552,14 @@
           "web": {
             "member": "teleported",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "values": null,
             "required": false,
@@ -94571,13 +94596,14 @@
           "web": {
             "member": "teleported",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": true
             },
             "values": null,
             "required": false,
@@ -108102,13 +108128,14 @@
           "web": {
             "member": "cache",
             "categories": [
-              "unknown"
+              "number"
             ],
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 2
             },
             "values": null,
             "required": false,
@@ -108373,20 +108400,27 @@
           "web": {
             "member": "estimatedRowHeight",
             "categories": [
-              "unknown"
+              "number"
             ],
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "undefined"
             },
             "values": null,
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "EstimatedRowHeight",
+            "categories": [
+              "number"
+            ],
+            "type": "System.Double?",
+            "nullable": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -108398,12 +108432,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.estimated-row-height"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "expandColumnKey",
@@ -108414,7 +108443,7 @@
               "unknown"
             ],
             "runtimeType": null,
-            "semanticType": null,
+            "semanticType": "expandColumnKey",
             "nullable": false,
             "default": {
               "kind": "missing"
@@ -108679,13 +108708,14 @@
           "web": {
             "member": "headerHeight",
             "categories": [
-              "unknown"
+              "array"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Array",
+            "semanticType": "number | number[]",
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 50
             },
             "values": null,
             "required": false,
@@ -108793,13 +108823,14 @@
           "web": {
             "member": "hScrollbarSize",
             "categories": [
-              "unknown"
+              "number"
             ],
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 6
             },
             "values": null,
             "required": false,
@@ -108997,8 +109028,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "OnEndReached",
+            "categories": [
+              "function"
+            ],
+            "type": "System.Action<System.Double>",
+            "nullable": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109010,12 +109048,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.on-end-reached"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "onExpandedRowsChange",
@@ -109061,10 +109094,10 @@
           "web": {
             "member": "onRowExpand",
             "categories": [
-              "unknown"
+              "function"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "RowExpandHandler",
             "nullable": false,
             "default": {
               "kind": "missing"
@@ -109099,10 +109132,10 @@
           "web": {
             "member": "onRowsRendered",
             "categories": [
-              "unknown"
+              "function"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "(params: onRowRenderedParams) => void",
             "nullable": false,
             "default": {
               "kind": "missing"
@@ -109111,8 +109144,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "OnRowsRendered",
+            "categories": [
+              "function"
+            ],
+            "type": "System.Action<FsusUI.Avalonia.Controls.FsusTableV2RowsRendered>",
+            "nullable": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109124,12 +109164,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.on-rows-rendered"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "onScroll",
@@ -109137,10 +109172,10 @@
           "web": {
             "member": "onScroll",
             "categories": [
-              "unknown"
+              "function"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Function",
+            "semanticType": "(...args: any[]) => void",
             "nullable": false,
             "default": {
               "kind": "missing"
@@ -109149,8 +109184,15 @@
             "required": false,
             "readonly": false
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "OnScroll",
+            "categories": [
+              "function"
+            ],
+            "type": "System.Action<FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition>",
+            "nullable": true
+          },
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -109162,12 +109204,7 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.on-scroll"
           ],
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "rowClass",
@@ -109213,10 +109250,10 @@
           "web": {
             "member": "rowEventHandlers",
             "categories": [
-              "unknown"
+              "object"
             ],
-            "runtimeType": null,
-            "semanticType": null,
+            "runtimeType": "Object",
+            "semanticType": "RowEventHandlers",
             "nullable": false,
             "default": {
               "kind": "missing"
@@ -109376,9 +109413,9 @@
           "web": {
             "member": "scrollbarAlwaysOn",
             "categories": [
-              "unknown"
+              "boolean"
             ],
-            "runtimeType": null,
+            "runtimeType": "Boolean",
             "semanticType": null,
             "nullable": false,
             "default": {
@@ -109567,13 +109604,14 @@
           "web": {
             "member": "vScrollbarSize",
             "categories": [
-              "unknown"
+              "number"
             ],
-            "runtimeType": null,
+            "runtimeType": "Number",
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "missing"
+              "kind": "literal",
+              "value": 6
             },
             "values": null,
             "required": false,
@@ -110118,17 +110156,6 @@
           }
         },
         {
-          "member": "estimatedRowHeight",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "expandColumnKey",
           "kind": "input",
           "status": "missing",
@@ -110294,17 +110321,6 @@
           }
         },
         {
-          "member": "onEndReached",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
           "member": "onExpandedRowsChange",
           "kind": "input",
           "status": "missing",
@@ -110317,28 +110333,6 @@
         },
         {
           "member": "onRowExpand",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "onRowsRendered",
-          "kind": "input",
-          "status": "missing",
-          "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        {
-          "member": "onScroll",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -110980,6 +110974,32 @@
           ]
         },
         {
+          "member": "RetainedRowMeasurementCount",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.retained-row-measurement-count"
+          ]
+        },
+        {
+          "member": "RetainedRowMeasurementLimit",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.retained-row-measurement-limit"
+          ]
+        },
+        {
           "member": "RowCount",
           "kind": "avalonia-extra",
           "governance": {
@@ -111016,6 +111036,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.scroll-to-cell"
+          ]
+        },
+        {
+          "member": "SetMeasuredRowHeight",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.set-measured-row-height"
           ]
         },
         {
@@ -111120,11 +111153,11 @@
       ],
       "coverage": {
         "total": 51,
-        "alignedCandidate": 8,
+        "alignedCandidate": 12,
         "partial": 1,
-        "missing": 42,
+        "missing": 38,
         "webOnly": 0,
-        "mappedPercent": 17.6
+        "mappedPercent": 25.5
       }
     },
     {
@@ -133016,6 +133049,38 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2RowsRendered",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 6,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-rows-rendered"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 4,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-scroll-position"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusTabPaneContextEventArgs",
       "kind": "class",
       "packageId": "avalonia",
@@ -134825,11 +134890,11 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 208,
+    "aligned-candidate": 212,
     "partial": 50,
-    "missing": 1709,
+    "missing": 1705,
     "web-only": 45,
     "total": 2012,
-    "mappedPercent": 12.8
+    "mappedPercent": 13
   }
 }

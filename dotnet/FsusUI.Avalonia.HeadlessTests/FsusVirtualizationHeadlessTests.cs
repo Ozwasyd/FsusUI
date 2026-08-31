@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
@@ -317,6 +318,44 @@ public class FsusVirtualizationHeadlessTests
     Assert.Equal(1, table.FocusedColumnIndex);
     table.ScrollToLeft(120);
     Assert.Equal(1, table.RealizedColumnStartIndex);
+  }
+
+  [AvaloniaFact]
+  public void TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks()
+  {
+    FsusTableV2RowsRendered? rendered = null;
+    FsusTableV2ScrollPosition? scrolled = null;
+    var endReached = 0;
+    var table = new FsusTableV2
+    {
+      RowCount = 100,
+      ColumnCount = 2,
+      EstimatedRowHeight = 24,
+      ColumnWidth = 120,
+      Overscan = 0,
+      OnRowsRendered = value => rendered = value,
+      OnScroll = value => scrolled = value,
+      OnEndReached = _ => endReached++,
+    };
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(240, 72) });
+    table.RefreshLayout();
+
+    Assert.Equal(3, table.RealizedRowCount);
+    Assert.Equal(0, rendered?.StartIndex);
+    Assert.Equal(2, rendered?.StopIndex);
+
+    table.SetMeasuredRowHeight(0, 60);
+    var secondRow = Assert.Single(
+      table.RealizedCells,
+      cell => cell.RowIndex == 1 && cell.ColumnIndex == 0);
+    Assert.Equal(60, Canvas.GetTop(secondRow));
+    Assert.Equal(1, table.RetainedRowMeasurementCount);
+
+    table.ScrollToTop(60);
+    Assert.Equal(1, table.RealizedRowStartIndex);
+    Assert.Equal(60, scrolled?.ScrollTop);
+    table.ScrollToTop(double.MaxValue);
+    Assert.Equal(1, endReached);
   }
 
   [AvaloniaFact]
