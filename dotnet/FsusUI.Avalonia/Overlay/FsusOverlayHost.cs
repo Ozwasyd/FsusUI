@@ -186,7 +186,7 @@ public sealed class FsusOverlayHost : Panel
     var resolvedOptions = dialog
       .CreateOverlayOptions(options)
       with
-      { Placement = FsusOverlayPlacement.Center };
+    { Placement = FsusOverlayPlacement.Center };
     return Open(dialog, resolvedOptions);
   }
 

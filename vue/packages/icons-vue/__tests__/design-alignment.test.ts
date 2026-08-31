@@ -25,10 +25,7 @@ const readSorted = (dir: string, extension: string) =>
     .filter((file) => file.endsWith(extension))
     .sort((a, b) => a.localeCompare(b))
 
-const commonSvgPatterns = [
-  /viewBox="0 0 1024 1024"/u,
-  /fill="currentColor"/u,
-]
+const commonSvgPatterns = [/viewBox="0 0 1024 1024"/u, /fill="currentColor"/u]
 
 const tokenEntries = JSON.parse(
   readFileSync(path.join(repoRoot, 'spec', 'tokens', 'tokens.json'), 'utf8'),
@@ -62,7 +59,7 @@ const sourceStrokeWidth = (source: string) => {
 }
 
 const expectedSourceStrokeWidth = (source: string) =>
-  visualStrokePx * viewBoxWidth(source) / renderedIconSizePx
+  (visualStrokePx * viewBoxWidth(source)) / renderedIconSizePx
 
 const lineSvgStaticPatterns = [
   /stroke-linejoin="round"/u,
@@ -90,7 +87,7 @@ describe('icons-vue design alignment', () => {
     )
 
     expect(componentNames).toEqual(svgNames)
-    expect(svgNames).toHaveLength(293)
+    expect(svgNames).toHaveLength(302)
   })
 
   it('classifies line and solid source icon contracts separately', () => {
@@ -164,7 +161,8 @@ describe('icons-vue design alignment', () => {
           `${name}.vue should derive stroke from icon tokens`,
         ).toMatch(expectedStrokePattern)
         expect(
-          sourceStrokeWidth(source) * renderedIconSizePx / viewBoxWidth(source),
+          (sourceStrokeWidth(source) * renderedIconSizePx) /
+            viewBoxWidth(source),
         ).toBeCloseTo(visualStrokePx, 5)
       } else {
         for (const pattern of solidForbiddenSvgPatterns) {
@@ -200,5 +198,26 @@ describe('icons-vue design alignment', () => {
     expect(index).toContain(
       "export { default as Next } from './arrow-right.vue'",
     )
+  })
+
+  it('binds the confirm registry entry to the existing check component exactly once', () => {
+    const registry = readFileSync(
+      path.join(repoRoot, 'spec', 'icons', 'registry.yaml'),
+      'utf8',
+    )
+    const confirmEntry = registry.match(
+      /^[ ]{2}- id: confirm\n(?<body>(?:[ ]{4}.+\n)+)/mu,
+    )
+    const index = readFileSync(path.join(componentsRoot, 'index.ts'), 'utf8')
+
+    expect(confirmEntry?.groups?.body).toContain(
+      'source: vue/packages/icons-svg/check.svg',
+    )
+    expect(
+      index.match(/export \{ default as Confirm \} from '\.\/check\.vue'/gu),
+    ).toHaveLength(1)
+    expect(index).toContain("export { default as Check } from './check.vue'")
+    expect(readSorted(componentsRoot, '.vue')).toContain('check.vue')
+    expect(readSorted(componentsRoot, '.vue')).not.toContain('confirm.vue')
   })
 })

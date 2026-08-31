@@ -6,6 +6,7 @@ import {
   evaluateMarkdownUrlMutations,
   validateMarkdownUrl,
 } from '../markdown-runtime'
+import { getMarkdownXssSourceUrl } from '../../../tests/support/markdown-xss-corpus'
 
 const identity = {
   documentEpoch: 1,
@@ -17,6 +18,9 @@ const identity = {
 
 describe('markdown URL validation authority', () => {
   it('classifies relative, hash, internal, external, and blocked schemes the same for editor and renderer', () => {
+    const javascriptUrl = getMarkdownXssSourceUrl(
+      'mxss-url-javascript-link',
+    )
     const cases = [
       ['/docs', 'valid-relative'],
       ['./a.md', 'valid-relative'],
@@ -24,7 +28,7 @@ describe('markdown URL validation authority', () => {
       ['note-id', 'valid-internal'],
       ['https://example.com', 'valid-external'],
       ['mailto:a@b.test', 'valid-external'],
-      ['javascript:alert(1)', 'blocked-scheme'],
+      [javascriptUrl, 'blocked-scheme'],
       ['data:text/html,hi', 'blocked-scheme'],
       ['file:///tmp/x', 'blocked-scheme'],
       ['ftp://x', 'unsupported'],

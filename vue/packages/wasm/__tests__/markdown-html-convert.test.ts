@@ -6,6 +6,10 @@ import {
   convertMarkdownHtmlImportSnapshot,
   evaluateMarkdownHtmlConversionMutations,
 } from '../markdown-html-convert'
+import { getMarkdownXssSourceUrl } from '../../../tests/support/markdown-xss-corpus'
+
+const stableNow = () => 0
+
 describe('markdown HTML import conversion', () => {
   it('maps headings, emphasis, lists, quotes, code, tables, and safe links deterministically', () => {
     const html =
@@ -14,7 +18,10 @@ describe('markdown HTML import conversion', () => {
       '<blockquote><p>quoted</p></blockquote><pre><code>line</code></pre>' +
       '<table><tr><th>A</th><th>B</th></tr><tr><td>1</td><td>2</td></tr></table>' +
       '<p><a href="https://example.com">site</a></p>'
-    const result = convertMarkdownHtmlImportSnapshot({ html, explicit: true })
+    const result = convertMarkdownHtmlImportSnapshot(
+      { html, explicit: true },
+      { now: stableNow },
+    )
     expect(result.mappingVersion).toBe(MARKDOWN_HTML_CONVERSION_VERSION)
     expect(result.markdown).toContain('# Title')
     expect(result.markdown).toContain('**world**')
@@ -28,7 +35,10 @@ describe('markdown HTML import conversion', () => {
     expect(result.markdown).toContain('[site](https://example.com)')
     expect(result.markdown).not.toMatch(/<[a-z]/i)
     expect(Object.keys(MARKDOWN_HTML_CONVERSION_MAP).length).toBeGreaterThan(10)
-    const again = convertMarkdownHtmlImportSnapshot({ html, explicit: true })
+    const again = convertMarkdownHtmlImportSnapshot(
+      { html, explicit: true },
+      { now: stableNow },
+    )
     expect(again.markdown).toBe(result.markdown)
   })
 
@@ -63,8 +73,11 @@ describe('markdown HTML import conversion', () => {
   })
 
   it('uses the same URL authority and keeps wrapper compatibility loss codes', () => {
+    const javascriptUrl = getMarkdownXssSourceUrl(
+      'mxss-url-javascript-link',
+    )
     const unsafe = convertMarkdownHtmlImportSnapshot({
-      html: '<a href="javascript:alert(1)">click</a><a href="https://ok.example">ok</a>',
+      html: `<a href="${javascriptUrl}">click</a><a href="https://ok.example">ok</a>`,
       explicit: true,
     })
     expect(unsafe.markdown).toContain('[ok](https://ok.example)')

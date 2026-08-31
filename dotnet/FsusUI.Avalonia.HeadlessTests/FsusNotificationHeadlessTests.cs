@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text.Json;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
@@ -7,6 +9,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
@@ -20,10 +23,41 @@ namespace FsusUI.Avalonia.HeadlessTests;
 
 public class FsusNotificationHeadlessTests
 {
+  private static readonly ContentScenario[] ContentScenarios =
+  [
+    new("dismiss-only", string.Empty, string.Empty, false),
+    new("title-only", "Update available", string.Empty, false),
+    new("message-only", string.Empty, "Version 2.0 is ready.", false),
+    new("action-only", string.Empty, string.Empty, true),
+    new(
+      "complete",
+      "Update available",
+      "Version 2.0 is ready to install.",
+      true),
+  ];
+
   public static IEnumerable<object[]> ThemeVariants()
   {
     yield return new object[] { nameof(ThemeVariant.Light) };
     yield return new object[] { nameof(ThemeVariant.Dark) };
+  }
+
+  public static IEnumerable<object[]> ThemeDensityVariants()
+  {
+    foreach (var themeName in new[]
+             {
+               nameof(ThemeVariant.Light),
+               nameof(ThemeVariant.Dark),
+             })
+      foreach (var density in new[]
+               {
+                 FsusDensity.Compact,
+                 FsusDensity.Default,
+                 FsusDensity.Spacious,
+               })
+      {
+        yield return new object[] { themeName, density };
+      }
   }
 
   [AvaloniaTheory]
@@ -96,6 +130,182 @@ public class FsusNotificationHeadlessTests
     Assert.False(handle.IsClosed);
 
     window.Close();
+  }
+
+  [AvaloniaTheory]
+  [MemberData(nameof(ThemeDensityVariants))]
+  public void ActionAndDismissRemainContainedAcrossThemeAndDensity(
+    string themeName,
+    FsusDensity density)
+  {
+    var (window, _, service) = CreateStyledService(themeName, density);
+
+    var handle = service.ShowAsync(new FsusNotificationOptions
+    {
+      Title = "Update available",
+      Message = "Version 2.0 is ready to install.",
+      ActionLabel = "Install",
+      ActionCommand = new TestCommand(_ => { }),
+    }).AsTask().GetAwaiter().GetResult();
+
+    Assert.NotNull(handle);
+    window.UpdateLayout();
+    Dispatcher.UIThread.RunJobs();
+
+    var notification = handle!.Control;
+    var actionButton = RequirePart<FsusButton>(notification, "PART_ActionButton");
+    var dismissButton = RequirePart<Button>(notification, "PART_DismissButton");
+    var actionBounds = BoundsRelativeTo(notification, actionButton);
+    var dismissBounds = BoundsRelativeTo(notification, dismissButton);
+
+    Assert.True(actionButton.IsVisible);
+    Assert.True(dismissButton.IsVisible);
+    Assert.True(actionBounds.Width > 0);
+    Assert.True(dismissBounds.Width > 0);
+    Assert.False(actionBounds.Intersects(dismissBounds));
+    AssertContainedBy(notification, actionBounds);
+    AssertContainedBy(notification, dismissBounds);
+    Assert.Equal(
+      Assert.IsType<double>(
+        window.Resources[FsusThemeResourceKeys.DensityControlDefaultY]),
+      actionButton.Bounds.Height);
+    Assert.Equal(
+      Assert.IsType<double>(
+        window.Resources[FsusThemeResourceKeys.DensityControlDefaultY]),
+      dismissButton.Bounds.Height);
+
+    window.Close();
+  }
+
+  [AvaloniaTheory]
+  [MemberData(nameof(ThemeDensityVariants))]
+  public void OptionalContentCombinationsPreserveVisibilityAndContainment(
+    string themeName,
+    FsusDensity density)
+  {
+    foreach (var scenario in ContentScenarios)
+    {
+      var (window, _, service) = CreateStyledService(themeName, density);
+      var handle = service.ShowAsync(new FsusNotificationOptions
+      {
+        Title = scenario.Title,
+        Message = scenario.Message,
+        ActionLabel = scenario.HasAction ? "Install" : null,
+        ActionCommand = scenario.HasAction ? new TestCommand(_ => { }) : null,
+      }).AsTask().GetAwaiter().GetResult();
+
+      Assert.NotNull(handle);
+      window.UpdateLayout();
+      Dispatcher.UIThread.RunJobs();
+
+      var notification = handle!.Control;
+      var title = RequirePart<TextBlock>(notification, "PART_TitleText");
+      var message = RequirePart<TextBlock>(notification, "PART_MessageText");
+      var actionButton = RequirePart<FsusButton>(notification, "PART_ActionButton");
+      var dismissButton = RequirePart<Button>(notification, "PART_DismissButton");
+      Assert.Equal(scenario.HasTitle, title.IsVisible);
+      Assert.Equal(scenario.HasMessage, message.IsVisible);
+      Assert.Equal(scenario.HasAction, actionButton.IsVisible);
+
+      var dismissBounds = BoundsRelativeTo(notification, dismissButton);
+      AssertContainedBy(notification, dismissBounds);
+      if (scenario.HasAction)
+      {
+        var actionBounds = BoundsRelativeTo(notification, actionButton);
+        Assert.False(actionBounds.Intersects(dismissBounds));
+        AssertContainedBy(notification, actionBounds);
+      }
+
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public void ProductionThemeRenderCapturesThemeAndDensityMatrix()
+  {
+    var outputRoot =
+      Environment.GetEnvironmentVariable("FSUS_ISSUE_723_EVIDENCE_DIR");
+    var captures = new List<RenderCapture>();
+
+    foreach (var values in ThemeDensityVariants())
+    {
+      var themeName = Assert.IsType<string>(values[0]);
+      var density = Assert.IsType<FsusDensity>(values[1]);
+      var (window, _, service) = CreateStyledService(themeName, density);
+      var handle = service.ShowAsync(new FsusNotificationOptions
+      {
+        Title = "Update available",
+        Message = "Version 2.0 is ready to install.",
+        ActionLabel = "Install",
+        ActionCommand = new TestCommand(_ => { }),
+      }).AsTask().GetAwaiter().GetResult();
+
+      Assert.NotNull(handle);
+      window.UpdateLayout();
+      Dispatcher.UIThread.RunJobs();
+
+      using var bitmap =
+        new RenderTargetBitmap(new PixelSize(600, 480), new Vector(96, 96));
+      bitmap.Render(window);
+      using var stream = new MemoryStream();
+      bitmap.Save(stream);
+      var bytes = stream.ToArray();
+      Assert.Equal(
+        new byte[] { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a },
+        bytes[..8]);
+
+      var notification = handle!.Control;
+      var actionButton = RequirePart<FsusButton>(notification, "PART_ActionButton");
+      var dismissButton = RequirePart<Button>(notification, "PART_DismissButton");
+      var fileName =
+        $"notification-{themeName.ToLowerInvariant()}-{density.ToString().ToLowerInvariant()}.png";
+      if (!string.IsNullOrWhiteSpace(outputRoot))
+      {
+        Directory.CreateDirectory(outputRoot);
+        File.WriteAllBytes(Path.Combine(outputRoot, fileName), bytes);
+      }
+
+      captures.Add(new RenderCapture(
+        fileName,
+        themeName.ToLowerInvariant(),
+        density.ToString().ToLowerInvariant(),
+        Convert.ToHexStringLower(SHA256.HashData(bytes)),
+        BoundsRelativeTo(notification, actionButton),
+        BoundsRelativeTo(notification, dismissButton),
+        notification.Bounds));
+      window.Close();
+    }
+
+    Assert.Equal(6, captures.Count);
+    Assert.All(captures, capture =>
+    {
+      Assert.NotEmpty(capture.Sha256);
+      Assert.False(capture.ActionBounds.Intersects(capture.DismissBounds));
+      Assert.True(capture.ActionBounds.Right <= capture.NotificationBounds.Width);
+      Assert.True(capture.DismissBounds.Right <= capture.NotificationBounds.Width);
+    });
+
+    if (!string.IsNullOrWhiteSpace(outputRoot))
+    {
+      File.WriteAllText(
+        Path.Combine(outputRoot, "manifest.json"),
+        JsonSerializer.Serialize(
+          new
+          {
+            schemaVersion = 1,
+            generatedBy =
+              "FsusNotificationHeadlessTests.ProductionThemeRenderCapturesThemeAndDensityMatrix",
+            repository = "Ozwasyd/FsusUI",
+            issue = 723,
+            candidateRevision =
+              Environment.GetEnvironmentVariable("FSUS_ISSUE_723_CANDIDATE"),
+            renderer = "avalonia-headless-skia",
+            limitation =
+              "Deterministic local simulation; no physical display, native window compositor, touch hardware, or screen reader was available.",
+            captures,
+          },
+          new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    }
   }
 
   [AvaloniaFact]
@@ -237,8 +447,21 @@ public class FsusNotificationHeadlessTests
   }
 
   private static (Window Window, FsusOverlayHost Host, FsusNotificationService Service)
-    CreateStyledService(string themeName)
+    CreateStyledService(
+      string themeName,
+      FsusDensity density = FsusDensity.Default)
   {
+    var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
+    var themeOptions = new FsusThemeOptions
+    {
+      Variant = themeName == nameof(ThemeVariant.Dark)
+        ? FsusThemeVariant.Dark
+        : FsusThemeVariant.Light,
+      Density = density,
+      MotionMode = FsusMotionMode.Reduced,
+    };
+    var themeManager = new FsusThemeManager();
+    themeManager.Apply(application, themeOptions);
     var window = new Window
     {
       Width = 600,
@@ -253,12 +476,28 @@ public class FsusNotificationHeadlessTests
     {
       Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
     });
+    themeManager.Apply(window.Resources, themeOptions);
     var host = new FsusOverlayHost();
     window.Content = host;
     window.Show();
     window.UpdateLayout();
     Dispatcher.UIThread.RunJobs();
     return (window, host, new FsusNotificationService(host));
+  }
+
+  private static Rect BoundsRelativeTo(Control ancestor, Control control)
+  {
+    var topLeft = control.TransformToVisual(ancestor)!.Value.Transform(new Point());
+    return new Rect(topLeft, control.Bounds.Size);
+  }
+
+  private static void AssertContainedBy(Control ancestor, Rect bounds)
+  {
+    var context = $"child={bounds}; ancestor={ancestor.Bounds}";
+    Assert.True(bounds.Left >= 0, context);
+    Assert.True(bounds.Top >= 0, context);
+    Assert.True(bounds.Right <= ancestor.Bounds.Width, context);
+    Assert.True(bounds.Bottom <= ancestor.Bounds.Height, context);
   }
 
   private static void ClickCenter(Window window, Control control)
@@ -300,4 +539,23 @@ public class FsusNotificationHeadlessTests
 
     public void Execute(object? parameter) => execute(parameter);
   }
+
+  private sealed record ContentScenario(
+    string Id,
+    string Title,
+    string Message,
+    bool HasAction)
+  {
+    public bool HasTitle => !string.IsNullOrWhiteSpace(Title);
+    public bool HasMessage => !string.IsNullOrWhiteSpace(Message);
+  }
+
+  private sealed record RenderCapture(
+    string File,
+    string Theme,
+    string Density,
+    string Sha256,
+    Rect ActionBounds,
+    Rect DismissBounds,
+    Rect NotificationBounds);
 }

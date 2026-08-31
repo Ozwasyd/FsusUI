@@ -6,12 +6,15 @@ Component ID: `data-display`
 
 Use `FsusPagination`, `FsusPaginationBar`, `FsusDescriptions`,
 `FsusDescriptionsItem`, `FsusTimeline`, `FsusTimelineItem`, `FsusStatistic`,
-and `FsusCountdown`.
+`FsusCountdown`, and `FsusAvatar` for bounded data display. `FsusAvatar`
+renders a source image or fallback content in a clipped circle or square.
 
 ## Vue Contract Mapping
 
-Vue pagination, descriptions, timeline, statistic, and countdown contracts map
-to page values, item collections, placement/status enums, and content controls.
+Vue pagination, descriptions, timeline, statistic, countdown, avatar, and
+collapse contracts map to page values, item collections, placement/status
+enums, content controls, `FsusAvatarShape`, and `FsusCollapse`
+`Accordion`/`ActiveNames` state.
 
 ## Supported Platform Differences
 
