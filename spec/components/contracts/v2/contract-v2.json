@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "9afc72c3afd8a0e4dd099d8e002a8ab2307af53e698a858b0dd5317b8df611cd",
+      "hash": "c0c821a48017efc71c33b7e93ad4cb70a6ab1d96be145c242297e21c0f0589bc",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "15cc1e57c6f466647406c4f9514b6db6b905d61c03c6d755f8801606708cecbd",
+      "hash": "0955889be0f0e2e3dd69af61777e510bb3f496005ddab582455124897c96c097",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -47986,6 +47986,44 @@
           }
         },
         {
+          "name": "lang",
+          "kind": "input",
+          "web": {
+            "member": "lang",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.lang"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "loading",
           "kind": "input",
           "web": {
@@ -48262,6 +48300,48 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.input.model-value"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "nativeWritingTools",
+          "kind": "input",
+          "web": {
+            "member": "nativeWritingTools",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownNativeWritingToolsMode>",
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": "auto"
+            },
+            "values": [
+              "auto",
+              "disabled"
+            ],
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.native-writing-tools"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -48727,6 +48807,45 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.input.show-submit-action"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "spellcheck",
+          "kind": "input",
+          "web": {
+            "member": "spellcheck",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "PropType<MarkdownSpellcheckMode | boolean>",
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": "auto"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.spellcheck"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -49739,6 +49858,17 @@
           }
         },
         {
+          "member": "lang",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "loading",
           "kind": "input",
           "status": "missing",
@@ -49806,6 +49936,17 @@
         },
         {
           "member": "modelValue",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "nativeWritingTools",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -49938,6 +50079,17 @@
         },
         {
           "member": "showSubmitAction",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "spellcheck",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -50389,6 +50541,7 @@
         "scenario.v2.el-markdown-editor.input.editor-profile",
         "scenario.v2.el-markdown-editor.input.image-action-label",
         "scenario.v2.el-markdown-editor.input.interaction-profile",
+        "scenario.v2.el-markdown-editor.input.lang",
         "scenario.v2.el-markdown-editor.input.loading",
         "scenario.v2.el-markdown-editor.input.locale-text",
         "scenario.v2.el-markdown-editor.input.metrics",
@@ -50396,6 +50549,7 @@
         "scenario.v2.el-markdown-editor.input.mobile-layout",
         "scenario.v2.el-markdown-editor.input.mode",
         "scenario.v2.el-markdown-editor.input.model-value",
+        "scenario.v2.el-markdown-editor.input.native-writing-tools",
         "scenario.v2.el-markdown-editor.input.placeholder",
         "scenario.v2.el-markdown-editor.input.preview-base-url",
         "scenario.v2.el-markdown-editor.input.preview-csp-nonce",
@@ -50408,6 +50562,7 @@
         "scenario.v2.el-markdown-editor.input.show-mode-switcher",
         "scenario.v2.el-markdown-editor.input.show-save-action",
         "scenario.v2.el-markdown-editor.input.show-submit-action",
+        "scenario.v2.el-markdown-editor.input.spellcheck",
         "scenario.v2.el-markdown-editor.input.status-density",
         "scenario.v2.el-markdown-editor.input.submit-action-label",
         "scenario.v2.el-markdown-editor.input.surfaces",
@@ -50453,12 +50608,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 55,
+        "total": 58,
         "alignedCandidate": 6,
         "partial": 4,
-        "missing": 45,
+        "missing": 48,
         "webOnly": 0,
-        "mappedPercent": 18.2
+        "mappedPercent": 17.2
       },
       "markdownEditor": {
         "modes": [
@@ -103864,32 +104019,6 @@
           ]
         },
         {
-          "member": "ActiveInlineEdit",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-tree.avalonia-extra.active-inline-edit"
-          ]
-        },
-        {
-          "member": "CancelInlineEdit",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-tree.avalonia-extra.cancel-inline-edit"
-          ]
-        },
-        {
           "member": "Checkable",
           "kind": "avalonia-extra",
           "governance": {
@@ -103939,19 +104068,6 @@
           },
           "scenarioIds": [
             "scenario.v2.el-tree.avalonia-extra.collapse"
-          ]
-        },
-        {
-          "member": "CommitInlineEdit",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-tree.avalonia-extra.commit-inline-edit"
           ]
         },
         {
@@ -104056,32 +104172,6 @@
           },
           "scenarioIds": [
             "scenario.v2.el-tree.avalonia-extra.get-node-state"
-          ]
-        },
-        {
-          "member": "InlineEditCanceled",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-tree.avalonia-extra.inline-edit-canceled"
-          ]
-        },
-        {
-          "member": "InlineEditCommitRequested",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-tree.avalonia-extra.inline-edit-commit-requested"
           ]
         },
         {
@@ -104238,32 +104328,6 @@
           },
           "scenarioIds": [
             "scenario.v2.el-tree.avalonia-extra.selection-mode"
-          ]
-        },
-        {
-          "member": "StartCreate",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-tree.avalonia-extra.start-create"
-          ]
-        },
-        {
-          "member": "StartRename",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-tree.avalonia-extra.start-rename"
           ]
         },
         {
@@ -138389,86 +138453,6 @@
       }
     },
     {
-      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCanceledEventArgs",
-      "kind": "class",
-      "packageId": "avalonia",
-      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 5,
-      "scenarioIds": [
-        "scenario.v2.avalonia-only.fsus-tree-inline-edit-canceled-event-args"
-      ],
-      "governance": {
-        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
-        "owner": "FsusUI Core",
-        "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
-      }
-    },
-    {
-      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCancelReason",
-      "kind": "enum",
-      "packageId": "avalonia",
-      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 3,
-      "scenarioIds": [
-        "scenario.v2.avalonia-only.fsus-tree-inline-edit-cancel-reason"
-      ],
-      "governance": {
-        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
-        "owner": "FsusUI Core",
-        "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
-      }
-    },
-    {
-      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCommitEventArgs",
-      "kind": "class",
-      "packageId": "avalonia",
-      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 5,
-      "scenarioIds": [
-        "scenario.v2.avalonia-only.fsus-tree-inline-edit-commit-event-args"
-      ],
-      "governance": {
-        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
-        "owner": "FsusUI Core",
-        "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
-      }
-    },
-    {
-      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditKind",
-      "kind": "enum",
-      "packageId": "avalonia",
-      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 2,
-      "scenarioIds": [
-        "scenario.v2.avalonia-only.fsus-tree-inline-edit-kind"
-      ],
-      "governance": {
-        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
-        "owner": "FsusUI Core",
-        "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
-      }
-    },
-    {
-      "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditState",
-      "kind": "class",
-      "packageId": "avalonia",
-      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 5,
-      "scenarioIds": [
-        "scenario.v2.avalonia-only.fsus-tree-inline-edit-state"
-      ],
-      "governance": {
-        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
-        "owner": "FsusUI Core",
-        "testPolicy": "contract",
-        "reviewPolicy": "pr-review"
-      }
-    },
-    {
       "type": "FsusUI.Avalonia.Controls.FsusTreeInteractionSource",
       "kind": "enum",
       "packageId": "avalonia",
@@ -139496,9 +139480,9 @@
   "coverage": {
     "aligned-candidate": 62,
     "partial": 83,
-    "missing": 2016,
+    "missing": 2019,
     "web-only": 20,
-    "total": 2181,
+    "total": 2184,
     "mappedPercent": 6.6
   }
 }

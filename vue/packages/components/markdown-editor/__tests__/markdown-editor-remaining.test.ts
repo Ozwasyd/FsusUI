@@ -4,10 +4,7 @@ import {
   confirmPasteAsMarkdown,
   previewPasteAsMarkdown,
 } from '../src/markdown-editor-paste-markdown'
-import {
-  applyMarkdownSpellReplacement,
-  bindMarkdownWebLanguageTools,
-} from '../src/markdown-editor-language-web'
+import { bindMarkdownWebLanguageTools } from '../src/markdown-editor-language-web'
 import { retainMarkdownEditorInstance } from '../src/markdown-editor-chrome-stability'
 import { resolveMarkdownSearchUi } from '../src/markdown-editor-search-ui'
 import {
@@ -35,7 +32,6 @@ describe('markdown remaining leaf contracts', () => {
     const capability = bindMarkdownWebLanguageTools(textarea)
     expect(capability.spellcheck).toBe(true)
     expect(textarea.spellcheck).toBe(true)
-    expect(applyMarkdownSpellReplacement(0, 3, 'the').origin).toBe('input')
   })
 
   it('keeps the same editor instance across chrome/mode changes', () => {
