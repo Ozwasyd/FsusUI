@@ -1,0 +1,27 @@
+{
+  "component": "avatar",
+  "runner": "headless-skia",
+  "screenshot": "/Users/brevis/Desktop/repos/FsusUI/tests/conformance/visual/artifacts/screenshots/avalonia/avatar-vue-parity.png",
+  "surfaceBounds": [
+    0,
+    0,
+    200,
+    112
+  ],
+  "controlBounds": [
+    {
+      "name": "FsusAvatar",
+      "x": 24,
+      "y": 24,
+      "width": 64,
+      "height": 64
+    },
+    {
+      "name": "FsusAvatar",
+      "x": 104,
+      "y": 24,
+      "width": 64,
+      "height": 64
+    }
+  ]
+}
