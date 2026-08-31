@@ -1,10 +1,13 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Demo;
+using FsusUI.Avalonia.Icons;
 using FsusUI.Avalonia.Themes;
 
 namespace FsusUI.Avalonia.HeadlessTests;
@@ -60,9 +63,9 @@ public class FsusThemeManagerHeadlessTests
         Variant = FsusThemeVariant.Dark,
         Palette = new FsusThemePaletteOptions
         {
-          Background = Color.Parse("#102030"),
-          Text = Color.Parse("#F0E0D0"),
-          Icon = Color.Parse("#ABCDEF"),
+          Background = Brush("#102030"),
+          Text = Brush("#F0E0D0"),
+          Icon = Brush("#ABCDEF"),
         },
       }
     );
@@ -86,8 +89,14 @@ public class FsusThemeManagerHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRendersPaletteFallbackMatrix()
   {
-    var application = new App();
+    var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
     var manager = new FsusThemeManager();
+    var themeStyles = new StyleInclude(
+      new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
+    {
+      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
+    };
+    application.Styles.Add(themeStyles);
     var outputRoot = Path.Combine(
       FindRepositoryRoot(),
       "tests/conformance/visual/artifacts/screenshots/avalonia");
@@ -95,76 +104,182 @@ public class FsusThemeManagerHeadlessTests
 
     var cases = new[]
     {
-      ("light", FsusThemeOptions.Default),
-      ("dark", FsusThemeOptions.Default with { Variant = FsusThemeVariant.Dark }),
+      ("light", FsusThemeOptions.Default, "#FFFFFF", "#F8FAFC", "#111827"),
+      ("dark", FsusThemeOptions.Default with { Variant = FsusThemeVariant.Dark }, "#1B2433", "#1F2937", "#F0F0F4"),
       ("custom", FsusThemeOptions.Default with
       {
         Palette = new FsusThemePaletteOptions
         {
-          Background = Color.Parse("#FFF4D6"),
-          Surface = Color.Parse("#E0F2FE"),
-          SurfaceRaised = Color.Parse("#DCFCE7"),
-          Text = Color.Parse("#312E81"),
-          MutedText = Color.Parse("#6D28D9"),
-          Border = Color.Parse("#BE123C"),
-          Icon = Color.Parse("#0369A1"),
+          Background = Brush("#FFF4D6"),
+          Surface = Brush("#E0F2FE"),
+          SurfaceRaised = Brush("#DCFCE7"),
+          Text = Brush("#312E81"),
+          MutedText = Brush("#6D28D9"),
+          Border = Brush("#BE123C"),
+          Icon = Brush("#0369A1"),
         },
-      }),
+      }, "#E0F2FE", "#DCFCE7", "#0369A1"),
       ("partial-dark", FsusThemeOptions.Default with
       {
         Variant = FsusThemeVariant.Dark,
         Palette = new FsusThemePaletteOptions
         {
-          Surface = Color.Parse("#14342B"),
-          Icon = Color.Parse("#FBBF24"),
+          Surface = Brush("#14342B"),
+          Icon = Brush("#FBBF24"),
         },
-      }),
-      ("highcontrast", FsusThemeOptions.Default with { HighContrast = true }),
+      }, "#14342B", "#1F2937", "#FBBF24"),
+      ("highcontrast", FsusThemeOptions.Default with
+      {
+        HighContrast = true,
+        Palette = new FsusThemePaletteOptions
+        {
+          Surface = Brush("#14342B"),
+          SurfaceRaised = Brush("#DCFCE7"),
+          Icon = Brush("#FBBF24"),
+        },
+      }, "#000000", "#111827", "#FFFFFF"),
     };
 
-    foreach (var (name, options) in cases)
+    try
     {
-      manager.Apply(application, options);
-      RenderPalette(application, Path.Combine(outputRoot, $"issue-708-theme-{name}.png"));
+      foreach (var (name, options, expectedSurface, expectedRaised, expectedIcon) in cases)
+      {
+        manager.Apply(application, options);
+        RenderPalette(
+          application,
+          Path.Combine(outputRoot, $"issue-708-theme-{name}.png"),
+          expectedSurface,
+          expectedRaised,
+          expectedIcon);
+      }
+    }
+    finally
+    {
+      application.Styles.Remove(themeStyles);
     }
   }
 
-  private static void RenderPalette(App application, string output)
+  private static void RenderPalette(
+    Application application,
+    string output,
+    string expectedSurface,
+    string expectedRaised,
+    string expectedIcon)
   {
-    var window = new Window { Width = 640, Height = 360 };
+    var window = new Window { Width = 640, Height = 360, ShowInTaskbar = false };
+    window.Resources.MergedDictionaries.Add(new ResourceInclude(
+      new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
+    {
+      Source = new Uri("avares://FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml"),
+    });
     var root = BindBrush(application, FsusThemeResourceKeys.BackgroundBrush);
     root.Width = 640;
     root.Height = 360;
-    root.Padding = new Thickness(32);
+    root.Padding = new Thickness(20);
 
-    var surface = BindBrush(application, FsusThemeResourceKeys.SurfaceBrush);
-    surface.Padding = new Thickness(24);
-    surface.BorderThickness = new Thickness(4);
-    surface.Bind(
-      Border.BorderBrushProperty,
-      application.Resources.GetResourceObservable(FsusThemeResourceKeys.BorderBrush));
-    var raised = BindBrush(application, FsusThemeResourceKeys.SurfaceRaisedBrush);
-    raised.Padding = new Thickness(24);
-    var text = new TextBlock { Text = "Theme palette text and icon resource", FontSize = 20 };
-    text.Bind(
-      TextBlock.ForegroundProperty,
-      application.Resources.GetResourceObservable(FsusThemeResourceKeys.TextBrush));
-    var muted = new TextBlock { Text = "Muted text keeps its independent semantic role", FontSize = 15 };
-    muted.Bind(
-      TextBlock.ForegroundProperty,
-      application.Resources.GetResourceObservable(FsusThemeResourceKeys.MutedTextBrush));
-    var icon = new Border { Width = 48, Height = 48, CornerRadius = new CornerRadius(24) };
-    icon.Bind(
-      Border.BackgroundProperty,
-      application.Resources.GetResourceObservable(FsusThemeResourceKeys.IconBrush));
-    raised.Child = new StackPanel { Spacing = 16, Children = { text, muted, icon } };
-    surface.Child = raised;
-    root.Child = surface;
+    var textEditor = new FsusTextEditor
+    {
+      AccessibleName = "Native text editor",
+      MinHeight = 0,
+      Height = 76,
+      Text = "Surface override reaches the native editor",
+      Content = new FsusText { Text = "Text editor" },
+    };
+    var markdownEditor = new FsusMarkdownEditor
+    {
+      MinHeight = 0,
+      Height = 76,
+      Document = "# Markdown editor",
+    };
+    var tree = new FsusTree
+    {
+      AccessibleName = "Workspace tree",
+      MinHeight = 0,
+      Height = 76,
+    };
+    tree.Nodes.Add(new FsusTreeNode("docs", "docs"));
+    tree.Nodes.Add(new FsusTreeNode("theme", "theme-palette.md"));
+    tree.RefreshView();
+
+    var select = new FsusSelect
+    {
+      AccessibleName = "Theme selector",
+      MinHeight = 0,
+      Height = 48,
+    };
+    select.Options.Add(new FsusOption
+    {
+      Label = "Surface palette",
+      Value = "surface",
+      Content = "Surface palette",
+    });
+    select.RefreshOptions();
+    select.SelectValue("surface");
+
+    var raisedEditor = new FsusTextEditor
+    {
+      AccessibleName = "Read-only raised editor",
+      IsReadOnly = true,
+      MinHeight = 0,
+      Height = 76,
+      Text = "Raised surface fallback",
+      Content = new FsusText { Text = "Read-only raised surface" },
+    };
+    var icon = new FsusIcon
+    {
+      AccessibleName = "Palette icon",
+      IconKey = FsusIconKeys.Folder,
+      Width = 40,
+      Height = 40,
+    };
+    var iconRow = new StackPanel
+    {
+      Orientation = global::Avalonia.Layout.Orientation.Horizontal,
+      Spacing = 12,
+      VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+      Children =
+      {
+        icon,
+        new FsusText { Text = "Icon / muted text" },
+        new FsusText { Text = "Fallback", Classes = { "fsus-text-muted" } },
+      },
+    };
+
+    var grid = new Grid
+    {
+      ColumnDefinitions = new ColumnDefinitions("*,*"),
+      RowDefinitions = new RowDefinitions("82,82,82"),
+      ColumnSpacing = 12,
+      RowSpacing = 8,
+    };
+    AddGridChild(grid, textEditor, 0, 0);
+    AddGridChild(grid, markdownEditor, 0, 1);
+    AddGridChild(grid, tree, 1, 0);
+    AddGridChild(grid, select, 1, 1);
+    AddGridChild(grid, raisedEditor, 2, 0);
+    AddGridChild(grid, iconRow, 2, 1);
+
+    var shell = new FsusPublicShell
+    {
+      AccessibleName = "Palette shell",
+      Width = 600,
+      Height = 320,
+      Content = grid,
+    };
+    root.Child = shell;
     window.Content = root;
     window.Show();
     Dispatcher.UIThread.RunJobs();
     window.Measure(new Size(640, 360));
     window.Arrange(new Rect(0, 0, 640, 360));
+
+    AssertControlBrush(shell.Background, expectedSurface);
+    AssertControlBrush(textEditor.Background, expectedSurface);
+    AssertControlBrush(markdownEditor.Background, expectedSurface);
+    AssertControlBrush(tree.Background, expectedSurface);
+    AssertControlBrush(select.Background, expectedSurface);
+    AssertControlBrush(raisedEditor.Background, expectedRaised);
+    AssertControlBrush(icon.Fill, expectedIcon);
 
     using var bitmap = new RenderTargetBitmap(new PixelSize(640, 360), new Vector(96, 96));
     bitmap.Render(root);
@@ -174,6 +289,21 @@ public class FsusThemeManagerHeadlessTests
     }
     window.Close();
   }
+
+  private static void AddGridChild(Grid grid, Control child, int row, int column)
+  {
+    Grid.SetRow(child, row);
+    Grid.SetColumn(child, column);
+    grid.Children.Add(child);
+  }
+
+  private static void AssertControlBrush(IBrush? brush, string color)
+  {
+    Assert.Equal(Color.Parse(color), Assert.IsType<SolidColorBrush>(brush).Color);
+  }
+
+  private static SolidColorBrush Brush(string color) =>
+    new(Color.Parse(color));
 
   private static string FindRepositoryRoot()
   {
@@ -185,7 +315,7 @@ public class FsusThemeManagerHeadlessTests
     return current?.FullName ?? throw new InvalidOperationException("Repository root not found.");
   }
 
-  private static Border BindBrush(App application, string resourceKey)
+  private static Border BindBrush(Application application, string resourceKey)
   {
     var consumer = new Border();
     consumer.Bind(

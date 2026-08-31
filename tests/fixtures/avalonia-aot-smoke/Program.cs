@@ -331,17 +331,54 @@ internal static class Program
         Density = FsusDensity.Compact,
         Palette = new FsusThemePaletteOptions
         {
-          Surface = Color.Parse("#102030"),
-          Icon = Color.Parse("#ABCDEF"),
+          Surface = new SolidColorBrush(Color.Parse("#102030")),
+          SurfaceRaised = new SolidColorBrush(Color.Parse("#203040")),
+          Icon = new SolidColorBrush(Color.Parse("#ABCDEF")),
         },
       }
     );
     var highContrastBackground = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.BackgroundBrush]!).Color;
     var customSurface = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.SurfaceBrush]!).Color;
     var customIcon = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.IconBrush]!).Color;
-    if (customSurface != Color.Parse("#102030") || customIcon != Color.Parse("#ABCDEF"))
+    var customTreeSurface = ((SolidColorBrush)themeResources["FsusThemeTreeSurfaceBrush"]!).Color;
+    var customPickerSurface = ((SolidColorBrush)themeResources["FsusThemePickerSurfaceBrush"]!).Color;
+    var customShellSurface = ((SolidColorBrush)themeResources["FsusThemePublicShellSurfaceBrush"]!).Color;
+    var customEditorSurface = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.TextEditorSurfaceBrush]!).Color;
+    var customRaised = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.ValuePickerTrackBrush]!).Color;
+    if (
+      customSurface != Color.Parse("#000000") ||
+      customTreeSurface != Color.Parse("#000000") ||
+      customPickerSurface != Color.Parse("#000000") ||
+      customShellSurface != Color.Parse("#000000") ||
+      customEditorSurface != Color.Parse("#000000") ||
+      customRaised != Color.Parse("#1F2937") ||
+      customIcon != Color.Parse("#FFFFFF"))
     {
-      throw new InvalidOperationException("AOT theme palette overrides did not apply.");
+      throw new InvalidOperationException("AOT high-contrast theme precedence did not apply.");
+    }
+
+    themeManager.Apply(
+      themeResources,
+      new FsusThemeOptions
+      {
+        Variant = FsusThemeVariant.Dark,
+        Palette = new FsusThemePaletteOptions
+        {
+          Surface = new SolidColorBrush(Color.Parse("#102030")),
+          SurfaceRaised = new SolidColorBrush(Color.Parse("#203040")),
+          Icon = new SolidColorBrush(Color.Parse("#ABCDEF")),
+        },
+      });
+    if (
+      ((SolidColorBrush)themeResources[FsusThemeResourceKeys.SurfaceBrush]!).Color != Color.Parse("#102030") ||
+      ((SolidColorBrush)themeResources["FsusThemeTreeSurfaceBrush"]!).Color != Color.Parse("#102030") ||
+      ((SolidColorBrush)themeResources["FsusThemePickerSurfaceBrush"]!).Color != Color.Parse("#102030") ||
+      ((SolidColorBrush)themeResources["FsusThemePublicShellSurfaceBrush"]!).Color != Color.Parse("#102030") ||
+      ((SolidColorBrush)themeResources[FsusThemeResourceKeys.TextEditorSurfaceBrush]!).Color != Color.Parse("#102030") ||
+      ((SolidColorBrush)themeResources[FsusThemeResourceKeys.ValuePickerTrackBrush]!).Color != Color.Parse("#203040") ||
+      ((SolidColorBrush)themeResources[FsusThemeResourceKeys.IconBrush]!).Color != Color.Parse("#ABCDEF"))
+    {
+      throw new InvalidOperationException("AOT theme palette overrides did not reach shell aliases.");
     }
     report.ThemeVariant = resolvedTheme.Variant.ToString();
     report.ThemeDensity = resolvedTheme.Density.ToString();

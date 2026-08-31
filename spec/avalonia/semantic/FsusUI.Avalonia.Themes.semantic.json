@@ -1066,7 +1066,7 @@
       "properties": [
         {
           "name": "Background",
-          "type": "Avalonia.Media.Color?",
+          "type": "Avalonia.Media.IBrush",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -1074,7 +1074,7 @@
         },
         {
           "name": "Border",
-          "type": "Avalonia.Media.Color?",
+          "type": "Avalonia.Media.IBrush",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -1082,7 +1082,7 @@
         },
         {
           "name": "Icon",
-          "type": "Avalonia.Media.Color?",
+          "type": "Avalonia.Media.IBrush",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -1090,7 +1090,7 @@
         },
         {
           "name": "MutedText",
-          "type": "Avalonia.Media.Color?",
+          "type": "Avalonia.Media.IBrush",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -1098,7 +1098,7 @@
         },
         {
           "name": "Surface",
-          "type": "Avalonia.Media.Color?",
+          "type": "Avalonia.Media.IBrush",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -1106,7 +1106,7 @@
         },
         {
           "name": "SurfaceRaised",
-          "type": "Avalonia.Media.Color?",
+          "type": "Avalonia.Media.IBrush",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -1114,7 +1114,7 @@
         },
         {
           "name": "Text",
-          "type": "Avalonia.Media.Color?",
+          "type": "Avalonia.Media.IBrush",
           "nullable": true,
           "canRead": true,
           "canWrite": true,

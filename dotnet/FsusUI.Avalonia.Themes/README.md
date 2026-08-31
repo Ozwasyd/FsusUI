@@ -34,10 +34,10 @@ manager.Apply(
     HighContrast = false,
     Palette = new FsusThemePaletteOptions
     {
-      Background = Color.Parse("#F7F4EE"),
-      Surface = Color.Parse("#FFFFFF"),
-      Text = Color.Parse("#24211C"),
-      Icon = Color.Parse("#4A453D"),
+      Background = new SolidColorBrush(Color.Parse("#F7F4EE")),
+      Surface = new SolidColorBrush(Color.Parse("#FFFFFF")),
+      Text = new SolidColorBrush(Color.Parse("#24211C")),
+      Icon = new SolidColorBrush(Color.Parse("#4A453D")),
     },
     FollowSystemTheme = false,
   });
@@ -46,14 +46,16 @@ manager.Apply(
 The manager applies resources in this order:
 
 1. built-in light, dark, or high-contrast palette
-2. nullable `FsusThemePaletteOptions` fields
+2. nullable `FsusThemePaletteOptions` brush fields when high contrast is off
 3. accent override
 4. density resources
 5. motion resources
 
-`FsusThemePaletteOptions` can override `Background`, `Surface`,
+`FsusThemePaletteOptions` accepts any `IBrush` for `Background`, `Surface`,
 `SurfaceRaised`, `Text`, `MutedText`, `Border`, and `Icon` independently. A
-null field keeps the selected built-in value, including high-contrast values.
+null field keeps the selected built-in value. `Surface` also feeds the existing
+shell, editor, tree, and picker surface aliases; `SurfaceRaised` feeds raised
+picker and read-only states. High contrast retains its complete built-in palette.
 Calling `Apply` again replaces the runtime resources, so controls consuming the
 corresponding `DynamicResource` update without replacing theme dictionaries.
 

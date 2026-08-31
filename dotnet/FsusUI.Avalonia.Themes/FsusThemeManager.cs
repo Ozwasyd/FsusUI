@@ -43,13 +43,13 @@ public sealed record FsusThemeOptions
 
 public sealed record FsusThemePaletteOptions
 {
-  public Color? Background { get; init; }
-  public Color? Surface { get; init; }
-  public Color? SurfaceRaised { get; init; }
-  public Color? Text { get; init; }
-  public Color? MutedText { get; init; }
-  public Color? Border { get; init; }
-  public Color? Icon { get; init; }
+  public IBrush? Background { get; init; }
+  public IBrush? Surface { get; init; }
+  public IBrush? SurfaceRaised { get; init; }
+  public IBrush? Text { get; init; }
+  public IBrush? MutedText { get; init; }
+  public IBrush? Border { get; init; }
+  public IBrush? Icon { get; init; }
 }
 
 public sealed record FsusTypographyOptions
@@ -92,6 +92,21 @@ public sealed class FsusThemeManager
   private const string FocusBorderThicknessResourceKey = "FsusThemeFocusBorderThickness";
   private const string PickerSurfaceResourceKey = "FsusThemePickerSurfaceBrush";
   private const string TreeSurfaceResourceKey = "FsusThemeTreeSurfaceBrush";
+  private static readonly string[] SpecializedSurfaceResourceKeys =
+  [
+    PickerSurfaceResourceKey,
+    "FsusThemeDateTimeSurfaceBrush",
+    "FsusThemeUploadSurfaceBrush",
+    "FsusThemeDataDisplaySurfaceBrush",
+    "FsusThemeMediaSurfaceBrush",
+    "FsusThemeDataTableSurfaceBrush",
+    "FsusThemeVirtualizationSurfaceBrush",
+    TreeSurfaceResourceKey,
+    "FsusThemeTextViewerSurfaceBrush",
+    "FsusThemePublicShellSurfaceBrush",
+    "FsusThemeProductPrimitiveSurfaceBrush",
+    "FsusThemePerceptionChallengeSurfaceBrush",
+  ];
 
   private static readonly ThemePalette LightPalette =
     new(
@@ -179,7 +194,7 @@ public sealed class FsusThemeManager
         ? DarkPalette
         : LightPalette;
 
-    ApplyPalette(resources, palette, resolved.Palette);
+    ApplyPalette(resources, palette, resolved.HighContrast ? null : resolved.Palette);
     ApplyAccent(resources, resolved.AccentOverride);
     ApplyTypography(resources, resolved.Typography);
     ApplyDensity(resources, resolved.Density);
@@ -213,10 +228,20 @@ public sealed class FsusThemeManager
     SetBrush(resources, FsusThemeResourceKeys.BackgroundBrush, overrides?.Background, palette.Background);
     SetBrush(resources, FsusThemeResourceKeys.SurfaceBrush, overrides?.Surface, palette.Surface);
     SetBrush(resources, FsusThemeResourceKeys.SurfaceRaisedBrush, overrides?.SurfaceRaised, palette.SurfaceRaised);
-    SetBrush(resources, PickerSurfaceResourceKey, palette.TreeSurface);
-    SetBrush(resources, TreeSurfaceResourceKey, palette.TreeSurface);
-    SetBrush(resources, FsusThemeResourceKeys.TextEditorSurfaceBrush, palette.TextEditorSurface);
-    SetBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, palette.ValuePickerTrack);
+    foreach (var resourceKey in SpecializedSurfaceResourceKeys)
+    {
+      SetBrush(resources, resourceKey, overrides?.Surface, palette.TreeSurface);
+    }
+    SetBrush(
+      resources,
+      FsusThemeResourceKeys.TextEditorSurfaceBrush,
+      overrides?.Surface,
+      palette.TextEditorSurface);
+    SetBrush(
+      resources,
+      FsusThemeResourceKeys.ValuePickerTrackBrush,
+      overrides?.SurfaceRaised,
+      palette.ValuePickerTrack);
     SetBrush(resources, FsusThemeResourceKeys.TextBrush, overrides?.Text, palette.Text);
     SetBrush(resources, FsusThemeResourceKeys.MutedTextBrush, overrides?.MutedText, palette.MutedText);
     SetBrush(resources, FsusThemeResourceKeys.BorderBrush, overrides?.Border, palette.Border);
@@ -339,10 +364,10 @@ public sealed class FsusThemeManager
   private static void SetBrush(
     IResourceDictionary resources,
     string key,
-    Color? color,
+    IBrush? brush,
     string fallback)
   {
-    resources[key] = new SolidColorBrush(color ?? Color.Parse(fallback));
+    resources[key] = brush ?? new SolidColorBrush(Color.Parse(fallback));
   }
 
   private sealed record ThemePalette(
