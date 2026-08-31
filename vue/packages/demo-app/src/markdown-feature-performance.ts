@@ -50,10 +50,15 @@ export const createMarkdownFeatureActivationSource = (revision: number) =>
 
 export const createMarkdownHeavyLifecycleSource = (blockCount = 3000) =>
   Array.from({ length: blockCount }, (_, index) => {
-    if (index % 30 !== 0) {
+    const technicalIndex =
+      index < 3
+        ? index
+        : index % 30 === 0 && index / 30 <= 97
+          ? index / 30 + 2
+          : null
+    if (technicalIndex === null) {
       return `Paragraph ${index} with stable lifecycle filler text and Unicode 中文.`
     }
-    const technicalIndex = index / 30
     if (technicalIndex % 3 === 0) {
       return `\`\`\`typescript\nconst heavyNode${technicalIndex}: number = ${technicalIndex}\n\`\`\``
     }
