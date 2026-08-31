@@ -1069,7 +1069,15 @@ const activateRenderedFeatures = async (
   })
   for (let step = 0; step < 8; step += 1) await Promise.resolve()
   recordHeavyLifecycleMetrics()
-  const activation = await activationPromise
+  let activation: Awaited<typeof activationPromise>
+  try {
+    activation = await activationPromise
+  } finally {
+    // An aborted activation still settles its adapter bridge asynchronously.
+    // Publish the authoritative post-settlement resource counts before the
+    // early return so diagnostics cannot retain the pre-teardown snapshot.
+    recordHeavyLifecycleMetrics()
+  }
   if (signal?.aborted) return
   activationDurationMs += readPerformanceNow() - activationStartedAt
   rootEl.value?.setAttribute(
