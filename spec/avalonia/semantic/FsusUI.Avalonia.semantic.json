@@ -25822,6 +25822,14 @@
           "isStatic": false
         },
         {
+          "name": "ActiveInlineEdit",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditState",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "Checkable",
           "type": "System.Boolean",
           "nullable": false,
@@ -25927,6 +25935,18 @@
           "isStatic": false
         },
         {
+          "name": "InlineEditCanceled",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusTreeInlineEditCanceledEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "InlineEditCommitRequested",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusTreeInlineEditCommitEventArgs\u003E",
+          "isStatic": false
+        },
+        {
           "name": "LazyLoadStateChanged",
           "kind": "clr",
           "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusTreeLazyLoadEventArgs\u003E",
@@ -25970,6 +25990,12 @@
           ]
         },
         {
+          "name": "CancelInlineEdit",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": []
+        },
+        {
           "name": "Collapse",
           "isStatic": false,
           "returnType": "System.Boolean",
@@ -25980,6 +26006,12 @@
               "optional": false
             }
           ]
+        },
+        {
+          "name": "CommitInlineEdit",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": []
         },
         {
           "name": "Expand",
@@ -26048,6 +26080,40 @@
             {
               "name": "source",
               "type": "FsusUI.Avalonia.Controls.FsusTreeInteractionSource",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "StartCreate",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "parentKey",
+              "type": "System.String",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "StartRename",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "initialValue",
+              "type": "System.String",
               "optional": false
             }
           ]
@@ -26261,6 +26327,208 @@
           "nullable": false,
           "canRead": true,
           "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCancelReason",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Programmatic",
+          "value": 0
+        },
+        {
+          "name": "Escape",
+          "value": 1
+        },
+        {
+          "name": "PointerOutside",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCanceledEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Kind",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditKind",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ParentKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Reason",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCancelReason",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Text",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTreeInlineEditCommitEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Kind",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditKind",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ParentKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Text",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ValidationError",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTreeInlineEditKind",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Rename",
+          "value": 0
+        },
+        {
+          "name": "Create",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTreeInlineEditState",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Kind",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeInlineEditKind",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ParentKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Text",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ValidationError",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
           "isStatic": false
         }
       ],
