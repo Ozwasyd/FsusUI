@@ -1624,9 +1624,10 @@ const contractForComponent = ({
             status: 'bound',
             package: 'FsusUI.Avalonia',
             type: avaloniaType.name,
-            ...(avaloniaTypes.length > 1
-              ? { types: avaloniaTypes.map((type) => type.name) }
-              : {}),
+            surfaces: avaloniaTypes.map((type) => ({
+              type: type.name,
+              packageId: type.packageId,
+            })),
           }
         : { status: 'unbound', package: null, type: null },
     },
@@ -1835,9 +1836,10 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
       avalonia: {
         type: avaloniaType.name,
         packageId: avaloniaType.packageId,
-        ...(avaloniaTypes.length > 1
-          ? { types: avaloniaTypes.map((type) => type.name) }
-          : {}),
+        surfaces: avaloniaTypes.map((type) => ({
+          type: type.name,
+          packageId: type.packageId,
+        })),
       },
       basis: AVALONIA_COMPONENT_BINDINGS[component.name]
         ? 'explicit-component-binding'
@@ -1888,8 +1890,8 @@ export const buildRegistry = ({
   )
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(
-    componentMap.flatMap(
-      (entry) => entry.avalonia.types ?? [entry.avalonia.type],
+    componentMap.flatMap((entry) =>
+      entry.avalonia.surfaces.map((surface) => surface.type),
     ),
   )
   const publicValueBindings = buildPublicValueBindings({
@@ -2229,7 +2231,9 @@ export const validateContract = (contract, gate, errors) => {
     ...(contract.operations ?? []),
     ...(contract.contentRegions ?? []),
   ]
-  const boundTypes = contract.bindings?.avalonia?.types ??
+  const boundTypes = contract.bindings?.avalonia?.surfaces?.map(
+    (surface) => surface.type,
+  ) ??
     (contract.bindings?.avalonia?.type
       ? [contract.bindings.avalonia.type]
       : [])
@@ -2497,6 +2501,17 @@ export const validateRegistry = (registry, gate) => {
     }
   }
   const componentMapByVueName = new Map()
+  const packageByType = new Map()
+  if (usesProductionAuthority) {
+    for (const [packageId, relativePath] of Object.entries(
+      AVALONIA_SEMANTIC_PATHS,
+    )) {
+      const semantic = parseJson(path.join(root, relativePath))
+      for (const type of semantic.semanticTypes ?? []) {
+        packageByType.set(type.name, packageId)
+      }
+    }
+  }
   for (const entry of registry.componentMap ?? []) {
     if (componentMapByVueName.has(entry.vue?.name)) {
       errors.push(`duplicate componentMap ${entry.vue?.name ?? '<unknown>'}`)
@@ -2528,10 +2543,48 @@ export const validateRegistry = (registry, gate) => {
       errors.push(`${contract.id} bound contract missing componentMap entry`)
       continue
     }
-    const contractTypes = binding.types ?? [binding.type]
-    const mapTypes = mapEntry.avalonia?.types ?? [mapEntry.avalonia?.type]
-    if (JSON.stringify(contractTypes) !== JSON.stringify(mapTypes)) {
+    const contractSurfaces = binding.surfaces
+    const mapSurfaces = mapEntry.avalonia?.surfaces
+    if (
+      usesProductionAuthority &&
+      (!Array.isArray(contractSurfaces) || contractSurfaces.length === 0)
+    ) {
+      errors.push(`${contract.id} bound contract missing package surfaces`)
+      continue
+    }
+    if (
+      usesProductionAuthority &&
+      (!Array.isArray(mapSurfaces) || mapSurfaces.length === 0)
+    ) {
+      errors.push(`${contract.id} componentMap missing package surfaces`)
+      continue
+    }
+    if (
+      JSON.stringify(contractSurfaces ?? [{ type: binding.type }]) !==
+      JSON.stringify(mapSurfaces ?? [{ type: mapEntry.avalonia?.type }])
+    ) {
       errors.push(`${contract.id} componentMap type binding mismatch`)
+    }
+    if (usesProductionAuthority) {
+      const seenTypes = new Set()
+      for (const surface of contractSurfaces) {
+        if (!surface.type || !surface.packageId) {
+          errors.push(`${contract.id} package surface is incomplete`)
+          continue
+        }
+        if (seenTypes.has(surface.type)) {
+          errors.push(`${contract.id} package surface duplicates ${surface.type}`)
+        }
+        seenTypes.add(surface.type)
+        if (packageByType.get(surface.type) !== surface.packageId) {
+          errors.push(
+            `${contract.id} package ownership mismatch for ${surface.type}`,
+          )
+        }
+      }
+      if (binding.type !== contractSurfaces[0]?.type) {
+        errors.push(`${contract.id} primary type does not match first surface`)
+      }
     }
   }
   const exportNames = new Set()

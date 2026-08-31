@@ -63,7 +63,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTableV2",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -75,7 +81,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusVirtualList",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusVirtualList",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -87,7 +99,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAffix",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAffix",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -99,7 +117,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAlert",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAlert",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -111,7 +135,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAside",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAside",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -123,7 +153,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAutocomplete",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAutocomplete",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -135,7 +171,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAutoResizer",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAutoResizer",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -147,7 +189,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAvatar",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusAvatar",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -159,7 +207,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusBacktop",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusBacktop",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -171,7 +225,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusBadge",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusBadge",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -183,7 +243,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusBreadcrumb",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusBreadcrumb",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -195,7 +261,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusBreadcrumbItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusBreadcrumbItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -207,7 +279,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusButton",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusButton",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -219,7 +297,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusButtonGroup",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusButtonGroup",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -231,7 +315,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCalendar",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCalendar",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -243,7 +333,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCard",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCard",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -255,7 +351,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCarousel",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCarousel",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -267,7 +369,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCarouselItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCarouselItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -279,7 +387,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCascader",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCascader",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -291,7 +405,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCascaderPanel",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCascaderPanel",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -303,7 +423,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCheckbox",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCheckbox",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -315,7 +441,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCheckboxButton",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCheckboxButton",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -327,7 +459,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCheckboxGroup",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCheckboxGroup",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -339,7 +477,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCheckTag",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCheckTag",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -351,7 +495,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCol",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCol",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -363,7 +513,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCollapse",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCollapse",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -375,7 +531,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCollapseItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCollapseItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -387,7 +549,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusColorPicker",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusColorPicker",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -400,11 +568,23 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Localization.FsusAvaloniaLocaleProvider",
         "packageId": "avalonia",
-        "types": [
-          "FsusUI.Avalonia.Localization.FsusAvaloniaLocaleProvider",
-          "FsusUI.Avalonia.Themes.FsusThemeManager",
-          "FsusUI.Avalonia.Themes.FsusThemeOptions",
-          "FsusUI.Avalonia.Themes.FsusMotionService"
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Localization.FsusAvaloniaLocaleProvider",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Themes.FsusThemeManager",
+            "packageId": "avaloniaThemes"
+          },
+          {
+            "type": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+            "packageId": "avaloniaThemes"
+          },
+          {
+            "type": "FsusUI.Avalonia.Themes.FsusMotionService",
+            "packageId": "avaloniaThemes"
+          }
         ]
       },
       "basis": "explicit-component-binding"
@@ -417,7 +597,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusContainer",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusContainer",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -431,7 +617,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusConversationContextBar",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusConversationContextBar",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -445,7 +637,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusConversationList",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusConversationList",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -459,7 +657,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusConversationListItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusConversationListItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -473,7 +677,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCopyableDetail",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCopyableDetail",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -485,7 +695,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusCountdown",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusCountdown",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -499,7 +715,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDangerZone",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDangerZone",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -511,7 +733,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDatePicker",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDatePicker",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -523,7 +751,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDescriptions",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDescriptions",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -535,7 +769,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDescriptionsItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDescriptionsItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -549,7 +789,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDestructiveActionPanel",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDestructiveActionPanel",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -563,7 +809,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -577,7 +829,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsList",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsList",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -589,7 +847,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDialog",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDialog",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -603,7 +867,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDistributionBarRow",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDistributionBarRow",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -617,7 +887,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDistributionList",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDistributionList",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -629,7 +905,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDivider",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDivider",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -641,7 +923,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDrawer",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDrawer",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -653,7 +941,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDropdown",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDropdown",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -665,7 +959,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDropdownItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDropdownItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -677,7 +977,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDropdownMenu",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDropdownMenu",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -689,7 +995,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusEmpty",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusEmpty",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -703,7 +1015,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusEmpty",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusEmpty",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -715,7 +1033,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusFooter",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusFooter",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -727,7 +1051,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusForm",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusForm",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -739,7 +1069,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusFormItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusFormItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -753,7 +1089,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSettingsFormSection",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsFormSection",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -765,7 +1107,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusHeader",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusHeader",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -777,7 +1125,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusIcon",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusIcon",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -789,7 +1143,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusImage",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusImage",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -801,7 +1161,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusImageViewer",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusImageViewer",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -815,7 +1181,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInboxEmptyState",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusInboxEmptyState",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -829,7 +1201,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInboxLayout",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusInboxLayout",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -841,7 +1219,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInfiniteScroll",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusInfiniteScroll",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -855,7 +1239,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInlineActions",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusInlineActions",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -867,7 +1257,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInput",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusInput",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -879,7 +1275,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInputNumber",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusInputNumber",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -893,7 +1295,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusKeyValueGrid",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusKeyValueGrid",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -907,7 +1315,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusKeyValueItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusKeyValueItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -921,7 +1335,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusKpiGroup",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusKpiGroup",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -933,7 +1353,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusLink",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLink",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -946,10 +1372,19 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
         "packageId": "avalonia",
-        "types": [
-          "FsusUI.Avalonia.Controls.FsusLoadingService",
-          "FsusUI.Avalonia.Controls.FsusLoadingOverlay",
-          "FsusUI.Avalonia.Controls.FsusLoadingOptions"
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLoadingOverlay",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLoadingOptions",
+            "packageId": "avalonia"
+          }
         ]
       },
       "basis": "explicit-component-binding"
@@ -963,9 +1398,15 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
         "packageId": "avalonia",
-        "types": [
-          "FsusUI.Avalonia.Controls.FsusLoadingService",
-          "FsusUI.Avalonia.Controls.FsusLoadingOverlay"
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLoadingOverlay",
+            "packageId": "avalonia"
+          }
         ]
       },
       "basis": "explicit-component-binding"
@@ -978,7 +1419,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -992,7 +1439,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusLocalizationChallenge",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLocalizationChallenge",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1004,7 +1457,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMain",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMain",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1016,7 +1475,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1028,7 +1493,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTextViewer",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTextViewer",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1040,7 +1511,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMenu",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMenu",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1052,7 +1529,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMenuItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMenuItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1064,7 +1547,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMenuItemGroup",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMenuItemGroup",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1077,10 +1566,19 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMessageService",
         "packageId": "avalonia",
-        "types": [
-          "FsusUI.Avalonia.Controls.FsusMessageService",
-          "FsusUI.Avalonia.Controls.FsusMessageToast",
-          "FsusUI.Avalonia.Controls.FsusMessageOptions"
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMessageService",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMessageToast",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMessageOptions",
+            "packageId": "avalonia"
+          }
         ]
       },
       "basis": "explicit-component-binding"
@@ -1093,7 +1591,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMessageBox",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMessageBox",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1107,7 +1611,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMessageBubble",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMessageBubble",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1121,7 +1631,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMessageTimeline",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMessageTimeline",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1135,7 +1651,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1149,7 +1671,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataRow",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataRow",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1163,7 +1691,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMetricItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMetricItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1177,7 +1711,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMetricList",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMetricList",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1191,7 +1731,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusMicroInteractionChallenge",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusMicroInteractionChallenge",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1203,7 +1749,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusNotification",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusNotification",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1215,7 +1767,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusOption",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusOption",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1227,7 +1785,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusOptionGroup",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusOptionGroup",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1240,10 +1804,19 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
         "packageId": "avalonia",
-        "types": [
-          "FsusUI.Avalonia.Overlay.FsusOverlayHost",
-          "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
-          "FsusUI.Avalonia.Overlay.FsusOverlayOptions"
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Overlay.FsusOverlayOptions",
+            "packageId": "avalonia"
+          }
         ]
       },
       "basis": "explicit-component-binding"
@@ -1256,7 +1829,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPageHeader",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPageHeader",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1268,7 +1847,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPagination",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPagination",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1282,7 +1867,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPaginationBar",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPaginationBar",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1296,7 +1887,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1310,7 +1907,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPerceptionCharacterChallenge",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPerceptionCharacterChallenge",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1322,7 +1925,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1334,7 +1943,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPopover",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPopover",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1346,7 +1961,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPopover",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPopover",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1358,7 +1979,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusProgress",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusProgress",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1370,7 +1997,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusPublicShell",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusPublicShell",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1382,7 +2015,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusRadio",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusRadio",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1394,7 +2033,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusRadio",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusRadio",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1406,7 +2051,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusRadioGroup",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusRadioGroup",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1418,7 +2069,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusRate",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusRate",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1432,7 +2089,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusReplyComposerShell",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusReplyComposerShell",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1446,7 +2109,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSettingsResourceList",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsResourceList",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1458,7 +2127,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusResponsiveCollection",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusResponsiveCollection",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1470,7 +2145,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusResult",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusResult",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1484,7 +2165,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusRiskNotice",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusRiskNotice",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1496,7 +2183,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusRow",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusRow",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1508,7 +2201,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusScrollbar",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusScrollbar",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1522,7 +2221,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionHeader",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionHeader",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1537,9 +2242,15 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionNav",
         "packageId": "avalonia",
-        "types": [
-          "FsusUI.Avalonia.Controls.FsusSettingsSectionNav",
-          "FsusUI.Avalonia.Controls.FsusSettingsNavItem"
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionNav",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsNavItem",
+            "packageId": "avalonia"
+          }
         ]
       },
       "basis": "explicit-component-binding"
@@ -1554,7 +2265,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSettingsNavItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsNavItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1566,7 +2283,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSelect",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSelect",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1578,7 +2301,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSelectV2",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSelectV2",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1592,7 +2321,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSettingsSection",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSettingsSection",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1604,7 +2339,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSiteHeader",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSiteHeader",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1616,7 +2357,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSkeleton",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSkeleton",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1628,7 +2375,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSlider",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSlider",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1640,7 +2393,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSpace",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSpace",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1655,9 +2414,15 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInboxSplitPane",
         "packageId": "avalonia",
-        "types": [
-          "FsusUI.Avalonia.Controls.FsusInboxSplitPane",
-          "FsusUI.Avalonia.Controls.FsusInboxLayout"
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusInboxSplitPane",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusInboxLayout",
+            "packageId": "avalonia"
+          }
         ]
       },
       "basis": "explicit-component-binding"
@@ -1670,7 +2435,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusStatistic",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusStatistic",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1684,7 +2455,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusStatusSummary",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusStatusSummary",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1696,7 +2473,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusStep",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusStep",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1708,7 +2491,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSteps",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSteps",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1720,7 +2509,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSubMenu",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSubMenu",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1732,7 +2527,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusSwitch",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusSwitch",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1744,7 +2545,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTable",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTable",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1756,7 +2563,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1770,7 +2583,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTableV2",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1782,7 +2601,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTabPane",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTabPane",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1794,7 +2619,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTabs",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTabs",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1806,7 +2637,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTag",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTag",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1818,7 +2655,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusText",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusText",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1832,7 +2675,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTextTaskChallenge",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTextTaskChallenge",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1844,7 +2693,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggle",
-        "packageId": "avaloniaThemes"
+        "packageId": "avaloniaThemes",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggle",
+            "packageId": "avaloniaThemes"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1858,7 +2713,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusThreadPanel",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusThreadPanel",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1870,7 +2731,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTimeline",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTimeline",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1882,7 +2749,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTimelineItem",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTimelineItem",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1894,7 +2767,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTimePicker",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTimePicker",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1906,7 +2785,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTimeSelect",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTimeSelect",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1918,7 +2803,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTooltip",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1930,7 +2821,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTooltip",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -1942,7 +2839,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTransfer",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTransfer",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1954,7 +2857,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTree",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTree",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1966,7 +2875,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTreeSelect",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTreeSelect",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1978,7 +2893,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTreeV2",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTreeV2",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -1992,7 +2913,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTypedConfirmField",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTypedConfirmField",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -2004,7 +2931,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusUpload",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusUpload",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -2016,7 +2949,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusVisualHidden",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusVisualHidden",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -2028,7 +2967,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusWatermark",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusWatermark",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "canonical-export-name-equality"
     },
@@ -2040,7 +2985,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTableV2",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -2052,7 +3003,13 @@
       },
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusVirtualList",
-        "packageId": "avalonia"
+        "packageId": "avalonia",
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusVirtualList",
+            "packageId": "avalonia"
+          }
+        ]
       },
       "basis": "explicit-component-binding"
     },
@@ -2065,9 +3022,15 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
         "packageId": "avalonia",
-        "types": [
-          "FsusUI.Avalonia.Controls.FsusLoadingService",
-          "FsusUI.Avalonia.Controls.FsusLoadingOverlay"
+        "surfaces": [
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+            "packageId": "avalonia"
+          },
+          {
+            "type": "FsusUI.Avalonia.Controls.FsusLoadingOverlay",
+            "packageId": "avalonia"
+          }
         ]
       },
       "basis": "explicit-component-binding"
@@ -4768,7 +5731,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTableV2"
+          "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -5945,7 +6914,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusVirtualList"
+          "type": "FsusUI.Avalonia.Controls.FsusVirtualList",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusVirtualList",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -6706,7 +7681,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusAffix"
+          "type": "FsusUI.Avalonia.Controls.FsusAffix",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusAffix",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -7318,7 +8299,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusAlert"
+          "type": "FsusUI.Avalonia.Controls.FsusAlert",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusAlert",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -8024,7 +9011,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusAside"
+          "type": "FsusUI.Avalonia.Controls.FsusAside",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusAside",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -8231,7 +9224,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusAutoResizer"
+          "type": "FsusUI.Avalonia.Controls.FsusAutoResizer",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusAutoResizer",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -8558,7 +9557,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusAutocomplete"
+          "type": "FsusUI.Avalonia.Controls.FsusAutocomplete",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusAutocomplete",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -10826,7 +11831,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusAvatar"
+          "type": "FsusUI.Avalonia.Controls.FsusAvatar",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusAvatar",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -11426,7 +12437,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusBacktop"
+          "type": "FsusUI.Avalonia.Controls.FsusBacktop",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusBacktop",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -11702,7 +12719,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusBadge"
+          "type": "FsusUI.Avalonia.Controls.FsusBadge",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusBadge",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -12203,7 +13226,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusBreadcrumb"
+          "type": "FsusUI.Avalonia.Controls.FsusBreadcrumb",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusBreadcrumb",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -12564,7 +13593,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusBreadcrumbItem"
+          "type": "FsusUI.Avalonia.Controls.FsusBreadcrumbItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusBreadcrumbItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -12912,7 +13947,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusButton"
+          "type": "FsusUI.Avalonia.Controls.FsusButton",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusButton",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -14531,7 +15572,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusButtonGroup"
+          "type": "FsusUI.Avalonia.Controls.FsusButtonGroup",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusButtonGroup",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -14725,7 +15772,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCalendar"
+          "type": "FsusUI.Avalonia.Controls.FsusCalendar",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCalendar",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -15549,7 +16602,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCard"
+          "type": "FsusUI.Avalonia.Controls.FsusCard",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCard",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -16180,7 +17239,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCarousel"
+          "type": "FsusUI.Avalonia.Controls.FsusCarousel",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCarousel",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -17182,7 +18247,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCarouselItem"
+          "type": "FsusUI.Avalonia.Controls.FsusCarouselItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCarouselItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -17440,7 +18511,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCascader"
+          "type": "FsusUI.Avalonia.Controls.FsusCascader",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCascader",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -19213,7 +20290,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCascaderPanel"
+          "type": "FsusUI.Avalonia.Controls.FsusCascaderPanel",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCascaderPanel",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -19703,7 +20786,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCheckTag"
+          "type": "FsusUI.Avalonia.Controls.FsusCheckTag",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCheckTag",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -19976,7 +21065,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCheckbox"
+          "type": "FsusUI.Avalonia.Controls.FsusCheckbox",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCheckbox",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -21003,7 +22098,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCheckboxButton"
+          "type": "FsusUI.Avalonia.Controls.FsusCheckboxButton",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCheckboxButton",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -21971,7 +23072,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCheckboxGroup"
+          "type": "FsusUI.Avalonia.Controls.FsusCheckboxGroup",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCheckboxGroup",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -22795,7 +23902,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCol"
+          "type": "FsusUI.Avalonia.Controls.FsusCol",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCol",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -23546,7 +24659,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCollapse"
+          "type": "FsusUI.Avalonia.Controls.FsusCollapse",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCollapse",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -24036,7 +25155,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCollapseItem"
+          "type": "FsusUI.Avalonia.Controls.FsusCollapseItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCollapseItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -25710,7 +26835,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusColorPicker"
+          "type": "FsusUI.Avalonia.Controls.FsusColorPicker",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusColorPicker",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -26970,11 +28101,23 @@
           "status": "bound",
           "package": "FsusUI.Avalonia",
           "type": "FsusUI.Avalonia.Localization.FsusAvaloniaLocaleProvider",
-          "types": [
-            "FsusUI.Avalonia.Localization.FsusAvaloniaLocaleProvider",
-            "FsusUI.Avalonia.Themes.FsusThemeManager",
-            "FsusUI.Avalonia.Themes.FsusThemeOptions",
-            "FsusUI.Avalonia.Themes.FsusMotionService"
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Localization.FsusAvaloniaLocaleProvider",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Themes.FsusThemeManager",
+              "packageId": "avaloniaThemes"
+            },
+            {
+              "type": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+              "packageId": "avaloniaThemes"
+            },
+            {
+              "type": "FsusUI.Avalonia.Themes.FsusMotionService",
+              "packageId": "avaloniaThemes"
+            }
           ]
         }
       },
@@ -28138,7 +29281,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusContainer"
+          "type": "FsusUI.Avalonia.Controls.FsusContainer",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusContainer",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -28373,7 +29522,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusConversationContextBar"
+          "type": "FsusUI.Avalonia.Controls.FsusConversationContextBar",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusConversationContextBar",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -28582,7 +29737,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusConversationList"
+          "type": "FsusUI.Avalonia.Controls.FsusConversationList",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusConversationList",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -28946,7 +30107,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusConversationListItem"
+          "type": "FsusUI.Avalonia.Controls.FsusConversationListItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusConversationListItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -29769,7 +30936,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCopyableDetail"
+          "type": "FsusUI.Avalonia.Controls.FsusCopyableDetail",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCopyableDetail",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -30489,7 +31662,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusCountdown"
+          "type": "FsusUI.Avalonia.Controls.FsusCountdown",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusCountdown",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -31180,7 +32359,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDangerZone"
+          "type": "FsusUI.Avalonia.Controls.FsusDangerZone",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDangerZone",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -32623,7 +33808,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDatePicker"
+          "type": "FsusUI.Avalonia.Controls.FsusDatePicker",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDatePicker",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -33098,7 +34289,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDescriptions"
+          "type": "FsusUI.Avalonia.Controls.FsusDescriptions",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDescriptions",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -33792,7 +34989,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDescriptionsItem"
+          "type": "FsusUI.Avalonia.Controls.FsusDescriptionsItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDescriptionsItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -34362,7 +35565,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDestructiveActionPanel"
+          "type": "FsusUI.Avalonia.Controls.FsusDestructiveActionPanel",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDestructiveActionPanel",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -34819,7 +36028,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsItem"
+          "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -35676,7 +36891,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsList"
+          "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsList",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDiagnosticsList",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -35961,7 +37182,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDialog"
+          "type": "FsusUI.Avalonia.Controls.FsusDialog",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDialog",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -37583,7 +38810,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDistributionBarRow"
+          "type": "FsusUI.Avalonia.Controls.FsusDistributionBarRow",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDistributionBarRow",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -38172,7 +39405,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDistributionList"
+          "type": "FsusUI.Avalonia.Controls.FsusDistributionList",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDistributionList",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -38457,7 +39696,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDivider"
+          "type": "FsusUI.Avalonia.Controls.FsusDivider",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDivider",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -38798,7 +40043,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDrawer"
+          "type": "FsusUI.Avalonia.Controls.FsusDrawer",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDrawer",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -39360,7 +40611,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDropdown"
+          "type": "FsusUI.Avalonia.Controls.FsusDropdown",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDropdown",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -40747,7 +42004,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDropdownItem"
+          "type": "FsusUI.Avalonia.Controls.FsusDropdownItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDropdownItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -41324,7 +42587,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDropdownMenu"
+          "type": "FsusUI.Avalonia.Controls.FsusDropdownMenu",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDropdownMenu",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -41609,7 +42878,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusEmpty"
+          "type": "FsusUI.Avalonia.Controls.FsusEmpty",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusEmpty",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -42557,7 +43832,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusEmpty"
+          "type": "FsusUI.Avalonia.Controls.FsusEmpty",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusEmpty",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -43598,7 +44879,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusFooter"
+          "type": "FsusUI.Avalonia.Controls.FsusFooter",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusFooter",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -43805,7 +45092,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusForm"
+          "type": "FsusUI.Avalonia.Controls.FsusForm",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusForm",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -45101,7 +46394,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusFormItem"
+          "type": "FsusUI.Avalonia.Controls.FsusFormItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusFormItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -46337,7 +47636,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSettingsFormSection"
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsFormSection",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsFormSection",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -46979,7 +48284,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusHeader"
+          "type": "FsusUI.Avalonia.Controls.FsusHeader",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusHeader",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -47186,7 +48497,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusIcon"
+          "type": "FsusUI.Avalonia.Controls.FsusIcon",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusIcon",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -47580,7 +48897,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusImage"
+          "type": "FsusUI.Avalonia.Controls.FsusImage",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusImage",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -49003,7 +50326,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusImageViewer"
+          "type": "FsusUI.Avalonia.Controls.FsusImageViewer",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusImageViewer",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -50280,7 +51609,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusInboxEmptyState"
+          "type": "FsusUI.Avalonia.Controls.FsusInboxEmptyState",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusInboxEmptyState",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -50536,7 +51871,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusInboxLayout"
+          "type": "FsusUI.Avalonia.Controls.FsusInboxLayout",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusInboxLayout",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -50760,7 +52101,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusInfiniteScroll"
+          "type": "FsusUI.Avalonia.Controls.FsusInfiniteScroll",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusInfiniteScroll",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -50938,7 +52285,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusInlineActions"
+          "type": "FsusUI.Avalonia.Controls.FsusInlineActions",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusInlineActions",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -51195,7 +52548,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusInput"
+          "type": "FsusUI.Avalonia.Controls.FsusInput",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusInput",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -54003,7 +55362,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusInputNumber"
+          "type": "FsusUI.Avalonia.Controls.FsusInputNumber",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusInputNumber",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -55428,7 +56793,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusKeyValueGrid"
+          "type": "FsusUI.Avalonia.Controls.FsusKeyValueGrid",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusKeyValueGrid",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -55651,7 +57022,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusKeyValueItem"
+          "type": "FsusUI.Avalonia.Controls.FsusKeyValueItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusKeyValueItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -56156,7 +57533,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusKpiGroup"
+          "type": "FsusUI.Avalonia.Controls.FsusKpiGroup",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusKpiGroup",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -56377,7 +57760,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusLink"
+          "type": "FsusUI.Avalonia.Controls.FsusLink",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLink",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -56921,10 +58310,19 @@
           "status": "bound",
           "package": "FsusUI.Avalonia",
           "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
-          "types": [
-            "FsusUI.Avalonia.Controls.FsusLoadingService",
-            "FsusUI.Avalonia.Controls.FsusLoadingOverlay",
-            "FsusUI.Avalonia.Controls.FsusLoadingOptions"
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLoadingOverlay",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLoadingOptions",
+              "packageId": "avalonia"
+            }
           ]
         }
       },
@@ -57269,9 +58667,15 @@
           "status": "bound",
           "package": "FsusUI.Avalonia",
           "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
-          "types": [
-            "FsusUI.Avalonia.Controls.FsusLoadingService",
-            "FsusUI.Avalonia.Controls.FsusLoadingOverlay"
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLoadingOverlay",
+              "packageId": "avalonia"
+            }
           ]
         }
       },
@@ -57494,7 +58898,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusLoadingService"
+          "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -57659,7 +59069,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusLocalizationChallenge"
+          "type": "FsusUI.Avalonia.Controls.FsusLocalizationChallenge",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLocalizationChallenge",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -58310,7 +59726,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMain"
+          "type": "FsusUI.Avalonia.Controls.FsusMain",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMain",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -58464,7 +59886,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditor"
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -61891,7 +63319,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTextViewer"
+          "type": "FsusUI.Avalonia.Controls.FsusTextViewer",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTextViewer",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -62840,7 +64274,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMenu"
+          "type": "FsusUI.Avalonia.Controls.FsusMenu",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMenu",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -64123,7 +65563,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMenuItem"
+          "type": "FsusUI.Avalonia.Controls.FsusMenuItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMenuItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -64530,7 +65976,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMenuItemGroup"
+          "type": "FsusUI.Avalonia.Controls.FsusMenuItemGroup",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMenuItemGroup",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -64744,10 +66196,19 @@
           "status": "bound",
           "package": "FsusUI.Avalonia",
           "type": "FsusUI.Avalonia.Controls.FsusMessageService",
-          "types": [
-            "FsusUI.Avalonia.Controls.FsusMessageService",
-            "FsusUI.Avalonia.Controls.FsusMessageToast",
-            "FsusUI.Avalonia.Controls.FsusMessageOptions"
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMessageService",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMessageToast",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMessageOptions",
+              "packageId": "avalonia"
+            }
           ]
         }
       },
@@ -66031,7 +67492,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMessageBox"
+          "type": "FsusUI.Avalonia.Controls.FsusMessageBox",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMessageBox",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -66916,7 +68383,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMessageBubble"
+          "type": "FsusUI.Avalonia.Controls.FsusMessageBubble",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMessageBubble",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -67482,7 +68955,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMessageTimeline"
+          "type": "FsusUI.Avalonia.Controls.FsusMessageTimeline",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMessageTimeline",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -67756,7 +69235,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataItem"
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -68167,7 +69652,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataRow"
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataRow",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsMetadataRow",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -68390,7 +69881,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMetricItem"
+          "type": "FsusUI.Avalonia.Controls.FsusMetricItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMetricItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -69021,7 +70518,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMetricList"
+          "type": "FsusUI.Avalonia.Controls.FsusMetricList",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMetricList",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -69295,7 +70798,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusMicroInteractionChallenge"
+          "type": "FsusUI.Avalonia.Controls.FsusMicroInteractionChallenge",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusMicroInteractionChallenge",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -69726,7 +71235,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusNotification"
+          "type": "FsusUI.Avalonia.Controls.FsusNotification",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusNotification",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -70897,7 +72412,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusOption"
+          "type": "FsusUI.Avalonia.Controls.FsusOption",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusOption",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -71279,7 +72800,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusOptionGroup"
+          "type": "FsusUI.Avalonia.Controls.FsusOptionGroup",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusOptionGroup",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -71537,10 +73064,19 @@
           "status": "bound",
           "package": "FsusUI.Avalonia",
           "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
-          "types": [
-            "FsusUI.Avalonia.Overlay.FsusOverlayHost",
-            "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
-            "FsusUI.Avalonia.Overlay.FsusOverlayOptions"
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayOptions",
+              "packageId": "avalonia"
+            }
           ]
         }
       },
@@ -72421,7 +73957,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPageHeader"
+          "type": "FsusUI.Avalonia.Controls.FsusPageHeader",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPageHeader",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -73055,7 +74597,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPagination"
+          "type": "FsusUI.Avalonia.Controls.FsusPagination",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPagination",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -74585,7 +76133,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPaginationBar"
+          "type": "FsusUI.Avalonia.Controls.FsusPaginationBar",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPaginationBar",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -74972,7 +76526,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge"
+          "type": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -77232,7 +78792,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPerceptionCharacterChallenge"
+          "type": "FsusUI.Avalonia.Controls.FsusPerceptionCharacterChallenge",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPerceptionCharacterChallenge",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -79071,7 +80637,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPopconfirm"
+          "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -80028,7 +81600,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPopover"
+          "type": "FsusUI.Avalonia.Controls.FsusPopover",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPopover",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -81651,7 +83229,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPopover"
+          "type": "FsusUI.Avalonia.Controls.FsusPopover",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPopover",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -83988,7 +85572,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusProgress"
+          "type": "FsusUI.Avalonia.Controls.FsusProgress",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusProgress",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -84924,7 +86514,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusPublicShell"
+          "type": "FsusUI.Avalonia.Controls.FsusPublicShell",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusPublicShell",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -87449,7 +89045,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusRadio"
+          "type": "FsusUI.Avalonia.Controls.FsusRadio",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusRadio",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -87913,7 +89515,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusRadio"
+          "type": "FsusUI.Avalonia.Controls.FsusRadio",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusRadio",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -88186,7 +89794,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusRadioGroup"
+          "type": "FsusUI.Avalonia.Controls.FsusRadioGroup",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusRadioGroup",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -88901,7 +90515,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusRate"
+          "type": "FsusUI.Avalonia.Controls.FsusRate",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusRate",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -90360,7 +91980,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusReplyComposerShell"
+          "type": "FsusUI.Avalonia.Controls.FsusReplyComposerShell",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusReplyComposerShell",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -90798,7 +92424,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSettingsResourceList"
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsResourceList",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsResourceList",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -91617,7 +93249,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusResponsiveCollection"
+          "type": "FsusUI.Avalonia.Controls.FsusResponsiveCollection",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusResponsiveCollection",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -92316,7 +93954,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusResult"
+          "type": "FsusUI.Avalonia.Controls.FsusResult",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusResult",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -92836,7 +94480,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusRiskNotice"
+          "type": "FsusUI.Avalonia.Controls.FsusRiskNotice",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusRiskNotice",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -93202,7 +94852,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusRow"
+          "type": "FsusUI.Avalonia.Controls.FsusRow",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusRow",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -93614,7 +95270,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusScrollbar"
+          "type": "FsusUI.Avalonia.Controls.FsusScrollbar",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusScrollbar",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -95008,7 +96670,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionHeader"
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionHeader",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionHeader",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -95520,9 +97188,15 @@
           "status": "bound",
           "package": "FsusUI.Avalonia",
           "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionNav",
-          "types": [
-            "FsusUI.Avalonia.Controls.FsusSettingsSectionNav",
-            "FsusUI.Avalonia.Controls.FsusSettingsNavItem"
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionNav",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsNavItem",
+              "packageId": "avalonia"
+            }
           ]
         }
       },
@@ -95977,7 +97651,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSettingsNavItem"
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsNavItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsNavItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -96859,7 +98539,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSelect"
+          "type": "FsusUI.Avalonia.Controls.FsusSelect",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSelect",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -99912,7 +101598,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSelectV2"
+          "type": "FsusUI.Avalonia.Controls.FsusSelectV2",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSelectV2",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -102463,7 +104155,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSettingsSection"
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsSection",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsSection",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -103119,7 +104817,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSiteHeader"
+          "type": "FsusUI.Avalonia.Controls.FsusSiteHeader",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSiteHeader",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -104225,7 +105929,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSkeleton"
+          "type": "FsusUI.Avalonia.Controls.FsusSkeleton",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSkeleton",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -104958,7 +106668,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSlider"
+          "type": "FsusUI.Avalonia.Controls.FsusSlider",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSlider",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -106606,7 +108322,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSpace"
+          "type": "FsusUI.Avalonia.Controls.FsusSpace",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSpace",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -107296,9 +109018,15 @@
           "status": "bound",
           "package": "FsusUI.Avalonia",
           "type": "FsusUI.Avalonia.Controls.FsusInboxSplitPane",
-          "types": [
-            "FsusUI.Avalonia.Controls.FsusInboxSplitPane",
-            "FsusUI.Avalonia.Controls.FsusInboxLayout"
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusInboxSplitPane",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusInboxLayout",
+              "packageId": "avalonia"
+            }
           ]
         }
       },
@@ -107773,7 +109501,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusStatistic"
+          "type": "FsusUI.Avalonia.Controls.FsusStatistic",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusStatistic",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -108528,7 +110262,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusStatusSummary"
+          "type": "FsusUI.Avalonia.Controls.FsusStatusSummary",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusStatusSummary",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -109134,7 +110874,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusStep"
+          "type": "FsusUI.Avalonia.Controls.FsusStep",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusStep",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -109748,7 +111494,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSteps"
+          "type": "FsusUI.Avalonia.Controls.FsusSteps",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSteps",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -110313,7 +112065,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSubMenu"
+          "type": "FsusUI.Avalonia.Controls.FsusSubMenu",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSubMenu",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -111191,7 +112949,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusSwitch"
+          "type": "FsusUI.Avalonia.Controls.FsusSwitch",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusSwitch",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -112819,7 +114583,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTabPane"
+          "type": "FsusUI.Avalonia.Controls.FsusTabPane",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTabPane",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -113244,7 +115014,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTable"
+          "type": "FsusUI.Avalonia.Controls.FsusTable",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTable",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -114740,7 +116516,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn"
+          "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -115445,7 +117227,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTableV2"
+          "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -118609,7 +120397,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTabs"
+          "type": "FsusUI.Avalonia.Controls.FsusTabs",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTabs",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -119724,7 +121518,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTag"
+          "type": "FsusUI.Avalonia.Controls.FsusTag",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTag",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -120978,7 +122778,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusText"
+          "type": "FsusUI.Avalonia.Controls.FsusText",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusText",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -121416,7 +123222,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTextTaskChallenge"
+          "type": "FsusUI.Avalonia.Controls.FsusTextTaskChallenge",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTextTaskChallenge",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -121870,7 +123682,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggle"
+          "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggle",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggle",
+              "packageId": "avaloniaThemes"
+            }
+          ]
         }
       },
       "inputs": [
@@ -122649,7 +124467,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusThreadPanel"
+          "type": "FsusUI.Avalonia.Controls.FsusThreadPanel",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusThreadPanel",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -123304,7 +125128,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTimePicker"
+          "type": "FsusUI.Avalonia.Controls.FsusTimePicker",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTimePicker",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -123719,7 +125549,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTimeSelect"
+          "type": "FsusUI.Avalonia.Controls.FsusTimeSelect",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTimeSelect",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -125101,7 +126937,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTimeline"
+          "type": "FsusUI.Avalonia.Controls.FsusTimeline",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTimeline",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -125290,7 +127132,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTimelineItem"
+          "type": "FsusUI.Avalonia.Controls.FsusTimelineItem",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTimelineItem",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -125931,7 +127779,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTooltip"
+          "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -126752,7 +128606,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTooltip"
+          "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -127204,7 +129064,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTransfer"
+          "type": "FsusUI.Avalonia.Controls.FsusTransfer",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTransfer",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -128797,7 +130663,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTree"
+          "type": "FsusUI.Avalonia.Controls.FsusTree",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTree",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -131357,7 +133229,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTreeSelect"
+          "type": "FsusUI.Avalonia.Controls.FsusTreeSelect",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTreeSelect",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -131664,7 +133542,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTreeV2"
+          "type": "FsusUI.Avalonia.Controls.FsusTreeV2",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTreeV2",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -133904,7 +135788,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTypedConfirmField"
+          "type": "FsusUI.Avalonia.Controls.FsusTypedConfirmField",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTypedConfirmField",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -134668,7 +136558,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusUpload"
+          "type": "FsusUI.Avalonia.Controls.FsusUpload",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusUpload",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -135770,7 +137666,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusVisualHidden"
+          "type": "FsusUI.Avalonia.Controls.FsusVisualHidden",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusVisualHidden",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -135977,7 +137879,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusWatermark"
+          "type": "FsusUI.Avalonia.Controls.FsusWatermark",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusWatermark",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [
@@ -136678,7 +138586,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusTableV2"
+          "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusTableV2",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -137855,7 +139769,13 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusVirtualList"
+          "type": "FsusUI.Avalonia.Controls.FsusVirtualList",
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusVirtualList",
+              "packageId": "avalonia"
+            }
+          ]
         }
       },
       "inputs": [],
@@ -138740,9 +140660,15 @@
           "status": "bound",
           "package": "FsusUI.Avalonia",
           "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
-          "types": [
-            "FsusUI.Avalonia.Controls.FsusLoadingService",
-            "FsusUI.Avalonia.Controls.FsusLoadingOverlay"
+          "surfaces": [
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLoadingService",
+              "packageId": "avalonia"
+            },
+            {
+              "type": "FsusUI.Avalonia.Controls.FsusLoadingOverlay",
+              "packageId": "avalonia"
+            }
           ]
         }
       },

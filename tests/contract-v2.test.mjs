@@ -593,6 +593,12 @@ test('container, button group, and visual hidden keep explicit truthful bindings
       avalonia: {
         type: 'FsusUI.Avalonia.Controls.FsusVisualHidden',
         packageId: 'avalonia',
+        surfaces: [
+          {
+            type: 'FsusUI.Avalonia.Controls.FsusVisualHidden',
+            packageId: 'avalonia',
+          },
+        ],
       },
       basis: 'explicit-component-binding',
     },
@@ -721,7 +727,11 @@ test('multi-type component bindings retain exact declaring types', () => {
     const contract = committedRegistry.contracts.find(
       (candidate) => candidate.id === id,
     )
-    assert.deepEqual(contract.bindings.avalonia.types, types, id)
+    assert.deepEqual(
+      contract.bindings.avalonia.surfaces.map((surface) => surface.type),
+      types,
+      id,
+    )
     for (const member of [
       ...contract.inputs,
       ...contract.outputs,
@@ -754,10 +764,27 @@ test('multi-type generated binding mutations fail closed', () => {
   const entry = projection.componentMap.find(
     (candidate) => candidate.vue.name === 'ElOverlay',
   )
-  entry.avalonia.types.pop()
+  entry.avalonia.surfaces.pop()
   assert.match(
     validateRegistry(projection, gate).join('\n'),
     /component-v2\.el-overlay componentMap type binding mismatch/u,
+  )
+
+  const packageOwnership = clone(committedRegistry)
+  const configProvider = packageOwnership.contracts.find(
+    (contract) => contract.id === 'component-v2.el-config-provider',
+  )
+  configProvider.bindings.avalonia.surfaces.find((surface) =>
+    surface.type.endsWith('.FsusThemeOptions'),
+  ).packageId = 'avalonia'
+  packageOwnership.componentMap
+    .find((entry) => entry.vue.name === 'ElConfigProvider')
+    .avalonia.surfaces.find((surface) =>
+      surface.type.endsWith('.FsusThemeOptions'),
+    ).packageId = 'avalonia'
+  assert.match(
+    validateRegistry(packageOwnership, gate).join('\n'),
+    /component-v2\.el-config-provider package ownership mismatch for .*FsusThemeOptions/u,
   )
 })
 
