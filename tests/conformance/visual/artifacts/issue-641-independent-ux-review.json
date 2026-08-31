@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "issue": 641,
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "893138cfa3583b501865a94a3016e432e9843ca8",
+  "candidateDigest": "d8fb3346bfc2ded7460cacede416675b34e9e0076df544746f0e86486ed4d886",
+  "classificationReceiptDigest": "a397d5b1cec94dd1f93b2a01d41d5e8aa6c18545d93f96a6b53f646435fad1b4",
+  "productionFixture": true,
+  "implementationModifiedPaths": [],
+  "candidateModifiedPaths": [
+    ".changeset/markdown-heavy-feature-lifecycle.md",
+    "docs/api/markdown-heavy-feature-lifecycle.md",
+    "docs/components/markdown-editor.md",
+    "tests/conformance/visual/artifacts/screenshots/web/issue-641-heavy-lifecycle",
+    "vue/packages/components/markdown-editor/__tests__",
+    "vue/packages/components/markdown-editor/src",
+    "vue/packages/components/markdown-renderer",
+    "vue/packages/demo-app",
+    "vue/packages/hooks/use-markdown-editor-frame-scheduler",
+    "vue/packages/hooks/use-markdown-heavy-feature-lifecycle",
+    "vue/packages/wasm",
+    "vue/tests/markdown-editor/markdown-heavy-feature-lifecycle.spec.ts",
+    "vue/tests/visual/markdown-feature-smoke.spec.ts",
+    "vue/typings/vite-worker.d.ts"
+  ],
+  "focusedEvidence": {
+    "command": "FSUS_HEAVY_LIFECYCLE_EVIDENCE=1 FSUS_MARKDOWN_EDITOR_PORT=5291 pnpm exec playwright test markdown-heavy-feature-lifecycle.spec.ts --config=vue/playwright.markdown-editor.config.ts --project=chromium --grep 'renders the static heavy feature matrix|preserves heavy atomic source entry'",
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0
+  },
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "All twelve Light and Dark production screenshots at 375, 768 and 1440 pixels with 150 and 200 percent zoom were inspected and match their committed SHA-256 digests.",
+      "The narrow Code region begins at the source start in static captures; the manifest separately records successful end-scroll reach and screenshotScrollLeft zero without document overflow.",
+      "The atomic interaction report records actual Code, Mermaid and LaTeX textarea focus and zero selection before Escape, then focus return and end selection with unchanged source after Escape."
+    ]
+  },
+  "manifest": {
+    "path": "tests/conformance/visual/artifacts/screenshots/web/issue-641-heavy-lifecycle/render-manifest.json",
+    "digest": "459b092e1d4f20e1309ea4e7e88d8b0d204cb3e97f0590d48ccebe1420db77ae"
+  },
+  "interactionReport": {
+    "path": "tests/conformance/visual/artifacts/screenshots/web/issue-641-heavy-lifecycle/atomic-interaction-report.json",
+    "digest": "8e2f6bfaf592a68e2ca1d913a4ac261a52184fdfe7b808ad8f965be0d49b8ea3"
+  },
+  "limitation": "The committed rendered artifacts and interaction report are Chromium production-fixture evidence only. Firefox and official Playwright 1.59.1 Noble WebKit are verified by separate current-run commands and are not claimed by these artifacts."
+}
