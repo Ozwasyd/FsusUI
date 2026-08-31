@@ -32,6 +32,8 @@ public class FsusCheckTagHeadlessTests
       checkTag.GetVisualDescendants().OfType<Border>(),
       border => border.Name == "PART_FocusRing");
     Assert.Equal(new Thickness(2), focusRing.BorderThickness);
+    Assert.True(window.TryFindResource("FsusThemeFocusBrush", out var focusBrush));
+    Assert.Equal(focusBrush, focusRing.BorderBrush);
     Assert.Equal(before, checkTag.Bounds.Size);
     window.Close();
   }

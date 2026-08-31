@@ -16,11 +16,6 @@
       <ControlTemplate>
         <Grid>
           <Border
-            Name="PART_FocusRing"
-            BorderBrush="{DynamicResource FsusThemeFocusRingBrush}"
-            CornerRadius="{TemplateBinding CornerRadius}"
-            IsHitTestVisible="False" />
-          <Border
             Background="{TemplateBinding Background}"
             CornerRadius="{TemplateBinding CornerRadius}"
             Padding="{TemplateBinding Padding}">
@@ -32,6 +27,11 @@
               FontSize="{TemplateBinding FontSize}"
               VerticalAlignment="Center" />
           </Border>
+          <Border
+            Name="PART_FocusRing"
+            BorderBrush="{DynamicResource FsusThemeFocusBrush}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False" />
         </Grid>
       </ControlTemplate>
     </Setter>
