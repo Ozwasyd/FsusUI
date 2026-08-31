@@ -339,6 +339,8 @@ public class FsusTreePrimitiveTests
     Assert.Null(tree.ActiveInlineEdit?.ParentKey);
     Assert.True(tree.CancelInlineEdit());
     Assert.DoesNotContain(tree.Nodes, child => child.Key == "root-draft");
+
+    Assert.False(tree.StartCreate("leaf-draft", "readme"));
   }
 
   [Fact]

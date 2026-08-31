@@ -153,6 +153,35 @@ public class FsusTreeInlineEditingHeadlessTests
   }
 
   [AvaloniaFact]
+  public async Task ActiveCreateSurvivesItsFolderLazyLoadAndRetainsTextAndFocus()
+  {
+    EnsureFullTheme();
+    var fixture = CreateFixture(FsusThemeVariant.Light, FsusDensity.Default);
+    fixture.Window.Show();
+    Arrange(fixture.Root);
+    fixture.Tree.ChildrenLoader = (node, _) => ValueTask.FromResult<IReadOnlyList<FsusTreeNode>>(
+      [new FsusTreeNode($"{node.Key}-child", "Generated.cs")]);
+
+    Assert.True(fixture.Tree.StartCreate("lazy-draft", fixture.Lazy.Key));
+    Arrange(fixture.Root);
+    Dispatcher.UIThread.RunJobs();
+    var editor = FindEditor(fixture.Tree, "lazy-draft");
+    editor.Text = "CreatedAfterLoad.cs";
+
+    Assert.True(await fixture.Tree.LoadChildrenAsync(fixture.Lazy.Key));
+    Arrange(fixture.Root);
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.Equal("lazy-draft", fixture.Tree.ActiveInlineEdit?.Key);
+    Assert.Equal("CreatedAfterLoad.cs", fixture.Tree.ActiveInlineEdit?.Text);
+    Assert.Equal("lazy-draft", fixture.Tree.FocusedKey);
+    Assert.Contains(fixture.Lazy.Key, fixture.Tree.ExpandedKeys);
+    Assert.Contains(fixture.Lazy.Children, node => node.Key == "lazy-child");
+    Assert.True(FindEditor(fixture.Tree, "lazy-draft").IsFocused);
+    fixture.Window.Close();
+  }
+
+  [AvaloniaFact]
   public void RealHeadlessSkiaRendersRenameCreateValidationAndAutomationEvidence()
   {
     EnsureFullTheme();
