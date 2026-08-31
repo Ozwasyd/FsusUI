@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "candidateSha": "53aa4ebba9e1de3f9d03c91891897f3852187845",
+  "candidateSha": "524773cf6c42c99f7218aa23b6da1f3533e8fb90",
   "evidenceClass": "local-headless-skia-and-input-simulation",
   "productionFixture": true,
   "limitation": "Avalonia Headless Skia and automation-property inspection; no claim of a physical screen reader session.",
@@ -12,7 +12,7 @@
   ],
   "captures": [
     {
-      "path": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/tree-inline-edit/tests/conformance/visual/artifacts/issue-697-inline-edit/tree-inline-edit-light-default-zoom-100.png",
+      "path": "tests/conformance/visual/artifacts/issue-697-inline-edit/tree-inline-edit-light-default-zoom-100.png",
       "theme": "light",
       "density": "default",
       "zoomPercent": 100,
@@ -189,7 +189,7 @@
       ]
     },
     {
-      "path": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/tree-inline-edit/tests/conformance/visual/artifacts/issue-697-inline-edit/tree-inline-edit-dark-spacious-zoom-200.png",
+      "path": "tests/conformance/visual/artifacts/issue-697-inline-edit/tree-inline-edit-dark-spacious-zoom-200.png",
       "theme": "dark",
       "density": "spacious",
       "zoomPercent": 200,
