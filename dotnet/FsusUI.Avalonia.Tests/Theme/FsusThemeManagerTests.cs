@@ -33,7 +33,13 @@ public class FsusThemeManagerTests
     Assert.Equal(FsusDensity.Compact, resolved.Density);
     Assert.Equal(FsusMotionMode.Disabled, resolved.MotionMode);
     AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#000000");
+    AssertBrush(resources, "FsusThemeTreeSurfaceBrush", "#000000");
     AssertBrush(resources, FsusThemeResourceKeys.FocusBrush, "#FF00AA");
+    AssertBrush(
+      resources,
+      FsusTokens.ColorActionPrimaryBrushResourceKey,
+      "#FF00AA"
+    );
     AssertBrush(
       resources,
       FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultResourceKey,
@@ -49,6 +55,47 @@ public class FsusThemeManagerTests
       TimeSpan.FromMilliseconds(1),
       resources[FsusThemeResourceKeys.MotionDurationEffective]
     );
+  }
+
+  [Fact]
+  public void ApplyRefreshesColorActionPrimaryBrushForVariantPalettes()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#2A599C");
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#EEF3FA");
+
+    manager.Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Dark });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#4B79CC");
+    AssertBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey,
+      "#4B79CC"
+    );
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#243043");
+
+    manager.Apply(resources, new FsusThemeOptions { HighContrast = true });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#FFFF00");
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#1F2937");
+  }
+
+  [Fact]
+  public void ApplyUpdatesTreeSurfaceForRuntimeDarkThemeChanges()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions { Variant = FsusThemeVariant.Dark });
+
+    AssertBrush(resources, "FsusThemeTreeSurfaceBrush", "#1B2433");
+    AssertBrush(resources, FsusThemeResourceKeys.TextEditorSurfaceBrush, "#1B2433");
   }
 
   [Fact]

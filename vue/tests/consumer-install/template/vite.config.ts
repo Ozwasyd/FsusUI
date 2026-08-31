@@ -4,7 +4,16 @@ import { createFsusViteManualChunks } from '../../../scripts/vite-manual-chunks.
 
 export default defineConfig({
   plugins: [vue()],
+  worker: {
+    format: 'es',
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/w-[hash].mjs',
+      },
+    },
+  },
   build: {
+    assetsInlineLimit: 0,
     chunkSizeWarningLimit: Number.POSITIVE_INFINITY,
     manifest: true,
     rollupOptions: {

@@ -49,9 +49,149 @@
     gap: 4px;
   }
 
+  @include e(attachment-picker) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  @include e(attachments) {
+    display: grid;
+    gap: var(--fsus-space-1, 4px);
+    min-width: 0;
+    margin: 0;
+    padding: var(--fsus-space-2, 8px);
+    border-top: 1px solid getCssVar('border-color-lighter');
+    list-style: none;
+  }
+
+  @include e(attachment) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto) auto;
+    gap: var(--fsus-space-2, 8px);
+    align-items: center;
+    min-width: 0;
+    color: getCssVar('text-color', 'regular');
+    font-size: 12px;
+  }
+
+  @include e(attachment-name) {
+    overflow: hidden;
+    color: getCssVar('text-color', 'primary');
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @include e(attachment-status) {
+    color: var(--fsus-color-text-quiet, var(--el-text-color-secondary));
+  }
+
+  @include e(attachment-actions) {
+    display: flex;
+    gap: var(--fsus-space-1, 4px);
+
+    button {
+      min-inline-size: 44px;
+      min-block-size: 44px;
+      padding-inline: var(--fsus-space-2, 8px);
+      border: 1px solid getCssVar('border-color');
+      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+      background: getCssVar('fill-color', 'blank');
+      color: getCssVar('text-color', 'regular');
+      font: inherit;
+
+      &:focus-visible {
+        @include a11y-focus-ring(
+          2px,
+          var(--fsus-radius-control, var(--el-border-radius-base))
+        );
+      }
+    }
+  }
+
+  @include e(media-properties) {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--fsus-space-2, 8px);
+    padding: var(--fsus-space-2, 8px);
+    border-top: 1px solid getCssVar('border-color-lighter');
+    background: getCssVar('fill-color', 'blank');
+
+    label {
+      display: grid;
+      gap: var(--fsus-space-1, 4px);
+      min-width: 0;
+      color: getCssVar('text-color', 'regular');
+      font-size: 12px;
+    }
+
+    input {
+      min-width: 0;
+      min-height: 44px;
+      padding-inline: var(--fsus-space-2, 8px);
+      border: 1px solid getCssVar('border-color');
+      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+      background: getCssVar('fill-color', 'blank');
+      color: getCssVar('text-color', 'primary');
+      font: inherit;
+
+      &:focus-visible {
+        @include a11y-focus-ring(
+          2px,
+          var(--fsus-radius-control, var(--el-border-radius-base))
+        );
+      }
+    }
+
+    [role='alert'] {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: getCssVar('color-danger');
+      font-size: 12px;
+    }
+  }
+
+  @include e(media-actions) {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    gap: var(--fsus-space-1, 4px);
+
+    button {
+      min-width: 44px;
+      min-height: 44px;
+      padding-inline: var(--fsus-space-2, 8px);
+      border: 1px solid getCssVar('border-color');
+      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+      background: getCssVar('fill-color', 'blank');
+      color: getCssVar('text-color', 'regular');
+      font: inherit;
+
+      &:focus-visible {
+        @include a11y-focus-ring(
+          2px,
+          var(--fsus-radius-control, var(--el-border-radius-base))
+        );
+      }
+    }
+  }
+
   @include e((command, command-more)) {
     min-inline-size: 2rem;
     white-space: nowrap;
+  }
+
+  @media (max-width: 767px) {
+    @include e(media-properties) {
+      grid-template-columns: 1fr;
+      max-block-size: min(
+        70vh,
+        var(--el-markdown-editor-visual-viewport-height, 70vh)
+      );
+      overflow-y: auto;
+    }
   }
 
   @include e(command-more) {
@@ -378,6 +518,10 @@
     }
 
     @include e(actions) {
+      /* Own toolbar row below the mode switcher: modes and actions share
+         the two-column grid only while their combined min-content fits, and
+         overflow made split/preview tabs unreachable to pointer input. */
+      grid-column: 1 / -1;
       justify-self: end;
       gap: 8px;
     }
@@ -660,6 +804,19 @@
   }
 
   @media (max-width: 40rem) {
+    @include e(attachment) {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    @include e(attachment-status) {
+      grid-column: 1;
+    }
+
+    @include e(attachment-actions) {
+      grid-row: 1 / 3;
+      grid-column: 2;
+    }
+
     @include e(paste-backdrop) {
       align-items: end;
       padding: var(--fsus-space-2, 8px);

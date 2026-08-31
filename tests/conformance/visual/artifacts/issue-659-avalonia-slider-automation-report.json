@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "issue": 659,
+  "generatedBy": "FsusSliderHeadlessTests.LocalAutomationSimulationWritesInspectableRangeReceipt",
+  "evidenceClass": "local-headless-automation-simulation",
+  "notRealOsScreenReader": true,
+  "controlType": "Slider",
+  "pattern": "RangeValue",
+  "states": [
+    {
+      "state": "enabled",
+      "name": "Editor line height",
+      "valueText": "1.6 lines",
+      "Minimum": 1,
+      "Maximum": 2,
+      "Value": 1.6,
+      "SmallChange": 0.1,
+      "LargeChange": 1,
+      "IsReadOnly": false
+    },
+    {
+      "state": "disabled",
+      "name": "Locked code font size",
+      "valueText": "14 pixels",
+      "Minimum": 10,
+      "Maximum": 24,
+      "Value": 14,
+      "SmallChange": 1,
+      "LargeChange": 10,
+      "IsReadOnly": true
+    }
+  ],
+  "relatedInteractionTests": [
+    "PointerPressDragReleaseUsesCaptureAndCommitsOnce",
+    "KeyboardFocusDisabledAndRangeAutomationUseProductionSemantics"
+  ],
+  "limitations": "Inspects Avalonia automation properties and the production RangeValue provider in the headless backend; no Windows UIA, macOS VoiceOver, or Linux AT-SPI session is claimed."
+}

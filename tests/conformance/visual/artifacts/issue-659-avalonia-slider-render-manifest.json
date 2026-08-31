@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "issue": 659,
+  "generatedBy": "FsusSliderHeadlessTests.RealHeadlessSkiaRendersIssue659ProductionStateMatrix",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "avaloniaVersion": "12.0.4.0",
+    "productionFixture": true,
+    "limitations": "Local deterministic headless rendering; no physical display or operating-system assistive technology is claimed."
+  },
+  "states": [
+    "default",
+    "changed",
+    "keyboard-focus",
+    "disabled",
+    "compact-density",
+    "spacious-density",
+    "reversed-bounds"
+  ],
+  "motionMode": "reduced",
+  "captures": [
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-659-slider-light.png",
+      "Sha256": "3758209e27d946188b7a5075cc9aeed5cdd39301cfd1937eb6e3c491db6f610c",
+      "PixelSize": {
+        "Width": 760,
+        "Height": 600
+      },
+      "Theme": "light",
+      "HighContrast": false,
+      "State": "default-changed-focused-disabled-density-reversed"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-659-slider-dark.png",
+      "Sha256": "f54471101b4d8263c08d34aa23bfa4a36a809ef22b22c7f2919f81bad9e8be7c",
+      "PixelSize": {
+        "Width": 760,
+        "Height": 600
+      },
+      "Theme": "dark",
+      "HighContrast": false,
+      "State": "default-changed-focused-disabled-density-reversed"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-659-slider-highcontrast.png",
+      "Sha256": "698cac6e43995994149ea9115183d2eff91a7b9824ccd41b99583f5984021587",
+      "PixelSize": {
+        "Width": 760,
+        "Height": 600
+      },
+      "Theme": "highcontrast",
+      "HighContrast": true,
+      "State": "default-changed-focused-disabled-density-reversed"
+    }
+  ]
+}

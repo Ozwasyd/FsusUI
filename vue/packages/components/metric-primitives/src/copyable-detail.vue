@@ -7,6 +7,7 @@
       type="button"
       :class="ns.e('button')"
       :aria-label="label"
+      :disabled="disabled"
       @click="handleCopy"
     >
       <slot name="button">{{ label }}</slot>
@@ -37,6 +38,7 @@ const detailKls = computed(() => [
   ns.b(),
   ns.is('inline', props.inline),
   ns.is('monospace', props.monospace),
+  ns.is('disabled', props.disabled),
 ])
 const feedbackText = computed(() => {
   if (copyState.value === 'copied') return props.copiedLabel
@@ -45,6 +47,8 @@ const feedbackText = computed(() => {
 })
 
 const handleCopy = async () => {
+  if (props.disabled) return
+
   try {
     if (!navigator?.clipboard?.writeText) {
       throw new Error('Clipboard API unavailable')

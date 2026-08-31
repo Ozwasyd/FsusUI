@@ -215,7 +215,7 @@ export const createMarkdownEditorPositionMap = (
       return mapMarkdownEditorOffset(frozenChanges, offset, association)
     },
     mapRange,
-    rebase(anchor) {
+    rebase(anchor: MarkdownEditorCommandAnchor) {
       let source = originalSource
       let current = Object.freeze({
         start: anchor.start,
@@ -286,7 +286,7 @@ export const composeMarkdownEditorPositionMapInstances = (
       }
       return mapped
     },
-    rebase(anchor) {
+    rebase(anchor: MarkdownEditorCommandAnchor) {
       let current: MarkdownEditorRebasedAnchor = {
         ...anchor,
         status: 'mapped',

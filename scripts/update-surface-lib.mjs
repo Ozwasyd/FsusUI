@@ -655,7 +655,7 @@ export function buildExpectedUpdateSurface(root) {
     surfaces,
     exclusions: EXCLUSIONS,
     governance: {
-      automerge: false,
+      automerge: true,
       majorEnabled: true,
       minorEnabled: true,
       patchEnabled: true,

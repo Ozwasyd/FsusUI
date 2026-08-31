@@ -181,6 +181,8 @@ export const evaluateMarkdownEditorCommandAsyncMutations = (
     dispatch: {
       dispatch: () => ({
         accepted: true,
+        beforeRevision: 0,
+        documentIdentity: { epoch: 0, id: 'doc-1' },
         history: {
           canRedo: false,
           canUndo: false,

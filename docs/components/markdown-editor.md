@@ -88,6 +88,7 @@ cursor 或产生半替换。
 const result = editor.value?.dispatchTransaction(transaction)
 editor.value?.undo()
 editor.value?.redo()
+editor.value?.applyAttachmentResult(providerResult)
 
 const inserted = editor.value?.insertMarkdownAtCursor('plain markdown')
 const placeholder = editor.value?.dispatchTransaction({
@@ -107,6 +108,10 @@ const placeholder = editor.value?.dispatchTransaction({
 - `insertMarkdownAtCursor(markdown, options?)`：保留原有 boolean 返回合同；内部仍只
   调用同一个 dispatcher。`options` 可传 `selection`、`expectedRevision` 和只读
   `metadata`；需要 revision/result 的新代码直接调用 `dispatchTransaction()`。
+- `applyAttachmentResult(result)`：把 provider 的 progress、resolved、rejected、
+  cancelled、stale 或 document-abort result 交回对应 item。组件只通过保存的
+  document/revision/item identity 和已 rebase 的 source range 提交 replacement；
+  cancelled、deleted 与 stale item 不会在当前 caret 复活。
 
 组件不公开 textarea ref、内部 store、DOM/HTML state 或第三方 editor 类型。
 `applyMarkdownEditorCommand` 与 `defaultMarkdownEditorCommands` 仍是可复用的纯
@@ -241,14 +246,31 @@ frozen anchor stale and the command fails without rebasing or inserting at a
 guessed position. Cancel, rejection, and successful confirmation restore editor
 focus and the applicable selection.
 
+Picker、paste 与 drop 都会以实际 `File` metadata 建立同一 attachment batch；picker
+不会预先制造空文件。Drop 位置必须由 browser pointer caret 经公共 source anchor map
+映射，无法取得可靠 pointer anchor 时拒绝该 drop，而不是退回当前 selection。
 Attachment descriptors are emitted only as an identity- and revision-bound
 provider intent through `upload-image`; the editor does not perform upload I/O or
-insert clipboard data URLs. The command blocks duplicate activation while
+insert clipboard data URLs. Consumers return lifecycle updates through
+`applyAttachmentResult()`. The editor owns the undoable pending source form and
+the compact, visible pending/error actions; it never stores provider HTML or a
+consumer-private URL scheme. The command blocks duplicate activation while
 reading the clipboard and fails closed during composition, when `readonly`,
 `disabled`, or `loading` is set, and in `preview` mode. Conversion and
 sanitization remain owned by
 [Markdown editor input](../api/markdown-editor-input.md) and the existing HTML
 import boundary.
+
+When the shared projection identifies the current selection as an image, the
+editor exposes one compact property surface for alternative text, destination,
+title, and the adjacent `::caption[...]` text. Apply, source reveal, safe open,
+exact/visible copy, attachment replace, caption removal, and atomic figure
+removal are visible keyboard and touch actions with a minimum 44px target. Each
+edit uses the projection-owned raw subrange and the transaction dispatcher;
+unsafe destinations are rejected by the Markdown URL authority. The surface
+does not inspect rendered `<img>` attributes, regroup DOM, synthesize alt from
+title/caption, or provide a parser fallback when the projection has no image
+node.
 
 ## History and grouping
 
@@ -287,23 +309,52 @@ non-composition input 可继续编辑。窗口外仍会拒绝 `isComposing` 或
 `insertCompositionText` 标记的孤立旧 payload；迟到 `compositionend` 后的即时
 commit 也不会越过当前受控值。
 
+## Web language tools
+
+Source 与 Live 的同一个 textarea 会绑定 browser spellcheck、autocorrect、dictation、
+context-menu correction 与 text replacement capability。`spellcheck` 接受 `auto`、
+`enabled`、`disabled` 或相应 boolean；`lang` 提供 optional BCP-47 hint，
+`nativeWritingTools` 接受 `auto` 或 `disabled`。这些属性只配置 browser capability，
+不建立第二份 document 或拼写引擎。
+
+`insertReplacementText` 必须先建立绑定当前 document identity、revision 与 selection
+的 language-tool session，再把明确 raw UTF-16 range 转成一个 `history: 'separate'`
+transaction。每次 editor revision 或 source 更新都会刷新 Web adapter 的当前状态；
+旧 session 不会被重用或猜测 rebase。composition-active、readonly、disabled、preview
+以及 stale document/revision/selection 会 fail closed。code、URL、hidden marker 与
+atomic context 的 suppression 是局部 capability，切换 Source/Live 不会通过全局关闭
+spellcheck 规避映射。
+
+raw range、hidden marker、nested syntax、atomic node 与 visual point 均消费
+`@ozwasyd/element-plus/markdown-runtime` 的稳定 projection 与 anchor map；language
+tool adapter 不解析 Markdown，也不把 raw offset 当作 visual offset。map、projection
+或 source 不属于当前 document/revision 时 replacement 会 fail closed。
+
+Playwright Chromium、Firefox 与 WebKit 测试覆盖 production fixture 中的 replacement
+event routing、revision/session refresh、Source/Live 切换、composition interlock、
+touch 与 accessibility semantics。dictation、writing-tools、context-menu、screen-reader
+和 IME 的自动化均为可重复的本地事件/输入模拟；它验证 editor 内部
+session/selection/transaction/map 语义，但不等同于 native OS spellchecker、真实
+context menu、语音服务、辅助技术或 OS IME 设备证据。完整 native host/device matrix
+归独立验收，不由这些模拟替代。
+
 ## Events
 
-| 事件名             | 说明                                                         |
-| ------------------ | ------------------------------------------------------------ |
-| update:modelValue  | 已接受的公开内容更新                                         |
-| change             | 与 `update:modelValue` 相同的公开内容更新                    |
-| transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction |
-| selection-change   | revision 与 grapheme-safe、direction-preserving selection    |
-| history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units            |
-| command            | toolbar command 已通过 dispatcher 执行                       |
-| mode-change        | 编辑模式切换                                                 |
-| save               | 保存事件                                                     |
-| submit             | 提交事件                                                     |
-| upload-image       | 上传图片事件                                                 |
-| render-complete    | preview renderer 完成                                        |
-| render-error       | preview renderer 失败                                        |
-| features-activated | preview feature activation 完成                              |
+| 事件名             | 说明                                                               |
+| ------------------ | ------------------------------------------------------------------ |
+| update:modelValue  | 已接受的公开内容更新                                               |
+| change             | 与 `update:modelValue` 相同的公开内容更新                          |
+| transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction       |
+| selection-change   | revision 与 grapheme-safe、direction-preserving selection          |
+| history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units                  |
+| command            | toolbar command 已通过 dispatcher 执行                             |
+| mode-change        | 编辑模式切换                                                       |
+| save               | 保存事件                                                           |
+| submit             | 提交事件                                                           |
+| upload-image       | 实际 picker/paste/drop 文件组成的 attachment batch provider intent |
+| render-complete    | preview renderer 完成                                              |
+| render-error       | preview renderer 失败                                              |
+| features-activated | preview feature activation 完成                                    |
 
 ## Attributes
 
@@ -322,6 +373,9 @@ commit 也不会越过当前受控值。
 | preview-csp-nonce | preview renderer 的 CSP nonce                | `string \| null`                             | `null`   |
 | preview-features  | preview renderer 的 feature activation 开关  | `MarkdownFeatureActivationFeatureOptions`    | —        |
 | min-rows          | 编辑区最小行数                               | `number`                                     | `12`     |
+| spellcheck        | Browser spellcheck capability                | `'auto' \| 'enabled' \| 'disabled' \| boolean` | `auto`   |
+| lang              | Optional BCP-47 language hint                 | `string`                                     | —        |
+| native-writing-tools | Browser native writing-tools capability     | `'auto' \| 'disabled'`                       | `auto`   |
 
 ## Migration
 

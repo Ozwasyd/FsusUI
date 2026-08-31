@@ -1,3 +1,32 @@
+export {
+  commitMarkdownLanguageToolMutation,
+  createMarkdownLanguageToolSession,
+  resolveMarkdownLanguageToolCapability,
+  resolveMarkdownLanguageToolContextCapability,
+  type MarkdownLanguageToolCapability,
+  type MarkdownLanguageToolCommitInput,
+  type MarkdownLanguageToolCommitResult,
+  type MarkdownLanguageToolConfig,
+  type MarkdownLanguageToolReason,
+  type MarkdownLanguageToolSession,
+  type MarkdownLanguageToolSessionKind,
+  type MarkdownLanguageToolStatus,
+  type MarkdownNativeWritingToolsMode,
+  type MarkdownSpellcheckMode,
+} from './markdown-editor-language-tools'
+export {
+  bindMarkdownWebLanguageTools,
+  planMarkdownWebReplacement,
+  resolveMarkdownWebLanguageCoordinates,
+  type MarkdownWebLanguageBeforeInput,
+  type MarkdownWebLanguageController,
+  type MarkdownWebLanguageCoordinates,
+  type MarkdownWebTextareaLike,
+} from './markdown-editor-language-web'
+import type {
+  MarkdownNativeWritingToolsMode,
+  MarkdownSpellcheckMode,
+} from './markdown-editor-language-tools'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { buildProps, definePropType } from '@element-plus/utils'
 
@@ -9,6 +38,95 @@ import type {
 import type MarkdownEditor from './markdown-editor.vue'
 import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
+export {
+  captureMarkdownAttachmentInput,
+  createMarkdownAttachmentCaptureSession,
+  createMarkdownAttachmentAtomicPresentation,
+  createMarkdownAttachmentBatch,
+  createMarkdownAttachmentRequest,
+  createMarkdownAttachmentSession,
+  commitMarkdownAttachmentResult,
+  evaluateMarkdownAttachmentAcceptance,
+  evaluateMarkdownAttachmentCaptureMutations,
+  evaluateMarkdownAttachmentMutations,
+  evaluateMarkdownAttachmentPresentationMutations,
+  markdownFromAttachmentPayload,
+  queryMarkdownAttachmentUnfinishedCount,
+  validateMarkdownAttachmentPrepublish,
+  type MarkdownAttachmentAcceptanceReport,
+  type MarkdownAttachmentAnchor,
+  type MarkdownAttachmentAtomicAction,
+  type MarkdownAttachmentAtomicPresentation,
+  type MarkdownAttachmentBatchIntent,
+  type MarkdownAttachmentCaptureContext,
+  type MarkdownAttachmentCaptureInput,
+  type MarkdownAttachmentCaptureRejection,
+  type MarkdownAttachmentCaptureResult,
+  type MarkdownAttachmentCaptureSession,
+  type MarkdownAttachmentInputFile,
+  type MarkdownAttachmentIntent,
+  type MarkdownAttachmentItemIntent,
+  type MarkdownAttachmentItemKind,
+  type MarkdownAttachmentMarkdownKind,
+  type MarkdownAttachmentMutationKind,
+  type MarkdownAttachmentPresentationMutationKind,
+  type MarkdownAttachmentProvider,
+  type MarkdownAttachmentProviderRequest,
+  type MarkdownAttachmentProviderResult,
+  type MarkdownAttachmentProviderStatus,
+  type MarkdownAttachmentQueryState,
+  type MarkdownAttachmentRange,
+  type MarkdownAttachmentSourceKind,
+} from './markdown-editor-attachment'
+export {
+  cancelMarkdownAttachmentJob,
+  createMarkdownAttachmentJob,
+  evaluateMarkdownAttachmentLifecycleMutations,
+  formatMarkdownAttachmentPendingSource,
+  planMarkdownAttachmentInsert,
+  planMarkdownAttachmentRemove,
+  planMarkdownAttachmentResolve,
+  progressMarkdownAttachmentJob,
+  rebaseMarkdownAttachmentJob,
+  retryMarkdownAttachmentJob,
+  type MarkdownAttachmentJob,
+  type MarkdownAttachmentLifecycleMutationKind,
+  type MarkdownAttachmentPhase,
+} from './markdown-editor-attachment-lifecycle'
+export {
+  decomposeMarkdownImageNode,
+  evaluateMarkdownImagePropertyMutations,
+  evaluateMarkdownPropertyMutations,
+  planMarkdownImageAltChange,
+  planMarkdownImageAltEdit,
+  planMarkdownImageAttachmentReplace,
+  planMarkdownImageDestinationEdit,
+  planMarkdownImageRemove,
+  planMarkdownImageTitleEdit,
+  planMarkdownLinkUnwrap,
+  validateMarkdownPropertyUrl,
+  type DecomposedMarkdownImageNode,
+  type DecomposedMarkdownImageSubrange,
+  type MarkdownImagePropertyMutationKind,
+} from './markdown-editor-link-image'
+export {
+  escapeCaptionText,
+  evaluateMarkdownCaptionAcceptance,
+  evaluateMarkdownCaptionAcceptanceMutations,
+  findMarkdownFigures,
+  formatMarkdownFigureExactCopy,
+  formatMarkdownFigureVisibleCopy,
+  planMarkdownCaptionEdit,
+  planMarkdownCaptionInsert,
+  planMarkdownCaptionRemove,
+  planMarkdownFigureCut,
+  planMarkdownFigureDelete,
+  planMarkdownFigureMove,
+  type MarkdownCaptionAcceptanceMutationKind,
+  type MarkdownCaptionAcceptanceReport,
+  type MarkdownFigure,
+} from './markdown-editor-caption'
+
 import type {
   MarkdownEditorHistoryState,
   MarkdownEditorDocumentIdentity,
@@ -490,7 +608,11 @@ export interface MarkdownEditorLocaleText {
     title: string
     unsafeUrl: string
   }>
-  readonly commandGroups: Readonly<Record<string, string>>
+  readonly commandGroups: Readonly<
+    Partial<Record<'block' | 'format' | 'insert', string>> & {
+      readonly [key: string]: string | undefined
+    }
+  >
   readonly surfaces: Readonly<{
     selectionToolbar: string
     slashMenu: string
@@ -1234,6 +1356,10 @@ export const markdownEditorProps = buildProps({
     type: String,
     default: '',
   },
+  documentIdentity: {
+    type: definePropType<MarkdownEditorDocumentIdentity>(Object),
+    default: undefined,
+  },
   defaultMode: {
     type: String as PropType<MarkdownEditorMode>,
     values: ['source', 'live', 'split', 'preview'],
@@ -1251,10 +1377,6 @@ export const markdownEditorProps = buildProps({
   },
   localeText: {
     type: definePropType<MarkdownEditorLocaleTextOverride>(Object),
-    default: undefined,
-  },
-  documentIdentity: {
-    type: definePropType<MarkdownEditorDocumentIdentity>(Object),
     default: undefined,
   },
   statusDensity: {
@@ -1373,6 +1495,19 @@ export const markdownEditorProps = buildProps({
     type: Number,
     default: 12,
   },
+  spellcheck: {
+    type: [String, Boolean] as PropType<MarkdownSpellcheckMode | boolean>,
+    default: 'auto',
+  },
+  lang: {
+    type: String,
+    default: undefined,
+  },
+  nativeWritingTools: {
+    type: String as PropType<MarkdownNativeWritingToolsMode>,
+    values: ['auto', 'disabled'],
+    default: 'auto',
+  },
 } as const)
 
 export const markdownEditorEmits = {
@@ -1386,7 +1521,7 @@ export const markdownEditorEmits = {
     mode === 'preview',
   save: (value: string) => typeof value === 'string',
   submit: (value: string) => typeof value === 'string',
-  'upload-image': (_batch?: MarkdownAttachmentBatchIntent) => true,
+  'upload-image': (_batch: MarkdownAttachmentBatchIntent) => true,
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,

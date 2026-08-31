@@ -9,7 +9,6 @@ import {
   ElEmptyState,
   type EmptyStateProps,
 } from '__FSUS_PACKAGE_NAME__/es/components/empty-state/index.mjs'
-import { installThemeModeTestHelper } from '__FSUS_PACKAGE_NAME__/es/components/config-provider/src/theme-mode.mjs'
 import type { MotionPresetName } from '__FSUS_PACKAGE_NAME__/motion'
 import type {
   CharacterChallengeProps,
@@ -97,8 +96,6 @@ const fsusBlogPackageContract = {
   rowKey: 'packed-row' satisfies DataListRowKey,
 }
 void fsusBlogPackageContract
-
-installThemeModeTestHelper({ mode: 'light' })
 
 app.component('ElButton', ElButton)
 app.component('ElEmptyState', ElEmptyState)

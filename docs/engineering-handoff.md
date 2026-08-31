@@ -46,7 +46,7 @@ pnpm verify:release
 
 - `test:coverage`：成功生成 `coverage/`，包含 `lcov`
 - `test:visual:full`：Playwright 四 project + 单次 Dev 的权威完整覆盖；普通 `test:visual` 仅打印 profile 帮助
-- `verify:release`：`verify`、`check:npm-dist-tag`、`build:npm-package` 和 `test:consumer-install` 一并通过
+- `verify:release`：`verify`、`check:npm-dist-tag`、唯一 candidate 和三 profile `test:consumer-matrix` 一并通过
 
 ## WASM
 
@@ -87,7 +87,7 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - `verify:pr-fast` 是 PR 默认快速门，用于小改动迭代；它覆盖 lint、按变更路径选择的 affected typecheck/unit、token/icon/design governance 和最小包构建 smoke。
 - `verify:full` 是完整本地质量门，等价于历史 `verify` 的覆盖面。
 - `verify` 保留为 `verify:full` 的安全别名，避免旧命令降低检查覆盖。
-- `verify:release` 用于发布前完整核验，在 `verify:full` 基础上增加 npm dist-tag、package build 和 consumer-install。
+- `verify:release` 用于发布前完整核验，在 `verify:full` 基础上增加 npm dist-tag、唯一 package candidate、consumer matrix fixtures 与三 profile cold install。
 - `verify:release` 不替代视觉/覆盖率证据；发布前仍需显式执行 `test:coverage` 与 `test:visual:evidence`。
 
 ### Test artifact cache
@@ -101,8 +101,8 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - 本地运行 `pnpm ci:capacity:plan --dry-run` 可看到同一 shard/worker 计划；`pnpm test:unit` 会在一次 artifact prepare 后按该计划有限并发执行，等价的诊断入口是 `vitest run --shard=<n>/<total>`。不要在每个 shard 前重复生成 icon/WASM 工件。
 - Typecheck 四配置由 capacity runner 分批执行；`verify:pr-fast` / `verify:full` 的 sibling tasks 也按 lane 批次运行并保留完整失败收集语义，避免外层和内层同时占满全部 CPU。
 - `pnpm ci:capacity:check` 使用 v1、v2、无 cgroup、2C/8GB、4C/16GB、高配、CPU/内存不对称和 override fixtures 验证纯调度逻辑，不依赖 Actions、网络或固定耗时。
-- `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-candidate`，其中包含唯一 npm tarball、SHA-256 sidecar 与 candidate manifest，并导出 `candidate-digest`。`consumer-install` 校验该 digest，从同一个 tarball执行 package smoke 和冷安装，不再构建第二份目录。
-- `verify:release` 可在本地从零运行 `package:candidate:build`、`package:candidate:verify`、candidate fixtures 与 consumer install。独立重建必须用 `package:candidate:compare` 比较 canonical 文件树；不得无比较地替换已测试 candidate。
+- `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-candidate`，其中包含唯一 npm tarball、SHA-256 sidecar 与 candidate manifest，并导出 `candidate-digest`。`consumer-install` 校验该 digest，从同一个 tarball执行三个固定 profile；receipts 与 impact plan 上传为 `consumer-matrix` artifact，不再构建第二份目录。
+- `verify:release` 可在本地从零运行 `package:candidate:build`、`package:candidate:verify`、candidate/matrix negative fixtures 与 consumer matrix。独立重建必须用 `package:candidate:compare` 比较 canonical 文件树；不得无比较地替换已测试 candidate。
 
 ### CI 入口
 

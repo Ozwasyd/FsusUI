@@ -50,3 +50,12 @@ Keyboard and pointer dismissal use the same close pipeline:
 
 The host removes closed overlay content from `Children` and `OpenOverlays`, so
 repeated open/close cycles do not retain overlay instances.
+
+When the host is attached to a visual tree it also wires the passive dismiss
+paths itself: Escape invokes `DismissKeyboardAsync` for the topmost overlay,
+and a pointer press outside the topmost overlay invokes
+`DismissPointerOutsideAsync`, so consumers no longer need to duplicate modal
+input plumbing. Modal entries render a scrim behind the content, and
+`OpenDialog` centers the dialog surface in the overlay viewport. Focus moves
+into the modal after it loads and is restored to `RestoreFocusTo` or the
+host's last focused element on close.

@@ -376,6 +376,8 @@ export const evaluateMarkdownCommandPaletteMutations = () => {
     dispatch: {
       dispatch: () => ({
         accepted: true,
+        beforeRevision: 0,
+        documentIdentity: { epoch: 0, id: 'palette-mutations' },
         history: {
           canRedo: false,
           canUndo: false,

@@ -8,37 +8,6 @@ namespace FsusUI.Avalonia.HeadlessTests;
 
 public class AvaloniaGalleryRegistryTests
 {
-  private static readonly string[] RequiredStableFamilies =
-  [
-    "button",
-    "icon-text",
-    "input",
-    "selection",
-    "form",
-    "display",
-    "layout",
-    "navigation",
-    "modal-panel",
-    "anchored-overlay",
-    "service-helper",
-    "picker",
-    "date-time",
-    "value-picker",
-    "upload-transfer",
-    "data-display",
-    "media-decorative",
-    "data-table",
-    "virtualization",
-    "tree",
-    "text-viewer",
-    "text-editor",
-    "markdown-editor",
-    "public-shell",
-    "product-primitives",
-    "perception-challenge",
-    "locale-formatting",
-  ];
-
   private static readonly string[] RequiredStates =
   [
     "default",
@@ -57,17 +26,10 @@ public class AvaloniaGalleryRegistryTests
   ];
 
   [Fact]
-  public void StableGalleryRegistryCoversEveryStableFamily()
+  public void StableGalleryRegistryContainsOnlyGeneratedAlignedFamilies()
   {
     var routes = FsusAvaloniaGalleryRegistry.StableRoutes;
-    var ids = routes.Select((route) => route.ComponentId).ToHashSet(StringComparer.Ordinal);
-
-    foreach (var family in RequiredStableFamilies)
-    {
-      Assert.Contains(family, ids);
-    }
-
-    Assert.Empty(ids.Except(RequiredStableFamilies));
+    Assert.Empty(routes);
   }
 
   [Fact]
@@ -109,22 +71,40 @@ public class AvaloniaGalleryRegistryTests
   public void MarkdownEditorGalleryInstantiatesPublicFsusMarkdownEditor()
   {
     var route = Assert.Single(
-      FsusAvaloniaGalleryRegistry.StableRoutes,
+      FsusAvaloniaGalleryRegistry.AllRoutes,
       candidate => candidate.ComponentId == "markdown-editor");
     var page = route.CreatePage();
     var editors = page.GetLogicalDescendants()
       .OfType<FsusMarkdownEditor>()
       .ToArray();
     Assert.Single(editors);
-    Assert.Equal("partial", editors[0].CapabilityState);
+    Assert.Equal(FsusMarkdownEditorMode.Live, editors[0].Mode);
+    Assert.Equal("aligned", editors[0].CapabilityState);
+    Assert.NotNull(editors[0].ProjectionMap);
     Assert.Equal(typeof(FsusMarkdownEditor), editors[0].GetType());
+  }
+
+  [Fact]
+  public void CodeEditorGalleryInstantiatesConfiguredPublicFsusCodeEditor()
+  {
+    var route = Assert.Single(
+      FsusAvaloniaGalleryRegistry.AllRoutes,
+      candidate => candidate.ComponentId == "code-editor");
+    var page = route.CreatePage();
+    var editor = Assert.Single(page.GetLogicalDescendants().OfType<FsusCodeEditor>());
+
+    Assert.Equal(typeof(FsusCodeEditor), editor.GetType());
+    Assert.Equal("gallery-code", editor.DocumentIdentity?.Id);
+    Assert.True(editor.WordWrap);
+    Assert.True(editor.ShowLineNumbers);
+    Assert.NotEmpty(editor.HighlightSpans);
   }
 
   [Fact]
   public void PerceptionGalleryInstantiatesAllEightCharacterStates()
   {
     var route = Assert.Single(
-      FsusAvaloniaGalleryRegistry.StableRoutes,
+      FsusAvaloniaGalleryRegistry.AllRoutes,
       candidate => candidate.ComponentId == "perception-challenge");
     var page = route.CreatePage();
     var challenges = page.GetLogicalDescendants()

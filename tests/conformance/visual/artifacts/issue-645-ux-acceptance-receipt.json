@@ -1,0 +1,112 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "e61ef3e868f68b1a1458a8e654ad7d61cd96409cfc9a60a1fde34acae3857277",
+  "candidateSha": "a664c0398efea301261a8a5cfb54d1598c5956d3",
+  "candidateDigest": "658c3a2a274fd34713367350282a5e18139c63f4ea80d6e586ba1b0b3ae71b38",
+  "verificationClass": "ux-path",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+    "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+    "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
+    "30a437250c3f373bc5306a72eaf6bfb380afebd1bd0d937e317d168d3f75d56b",
+    "bfd43d0e258938b485ada4fd87f96a8fff1b73230d0c12d13aa3edd6abc9c9fd",
+    "e2a141bd7241739693e94c140f3f43cff1587e44da94c741f804800e14b2a633",
+    "339ae5fb4d0ba1b91fd1c88e29b37f66764e4ada412c0cef400fab42565b8cdc",
+    "0d19909c5dc473d3e6226a5c85307e5890d66edb08f9b9e9410b993529ab44ba",
+    "be4d02b622db259891060ec9e13fce9d1f1ad3e150fa78e91c886934259a82b2",
+    "4af382d77024fcd99fc430e279ec2a3a7b4035465ded20b5a74a8f0cfa04563d",
+    "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1"
+  ],
+  "activeBaselineIdentityDigest": "fe938d0a9473c0ebf8d417641d385915a1177ba7da18c3c6e281b78cade83125",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "9a93475c2dec99d1c0c98b49fc0d3239208a76b17f0f4ef9d6e0508117d1aca4",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "desktop 760x400",
+      "state": "wrapped Markdown source with line numbers and selected find match",
+      "theme": "light",
+      "inputModes": ["keyboard"],
+      "evidenceDigest": "38c52fd53e0d504958c734a2f85dff9ffe56f452015b09d45bdf3ab6602eede3"
+    },
+    {
+      "viewport": "desktop 760x400",
+      "state": "unwrapped Markdown source without line numbers and selected find match",
+      "theme": "light",
+      "inputModes": ["keyboard"],
+      "evidenceDigest": "6658f857b34879c52e333038a5e6595d55cb6c8ec1215479faf27bbc14b53b4a"
+    },
+    {
+      "viewport": "desktop 760x400",
+      "state": "wrapped Markdown source with line numbers and selected find match",
+      "theme": "dark",
+      "inputModes": ["keyboard"],
+      "evidenceDigest": "ea804fe7454b0aae6ac3a6b63ae650fd1a06c115fc7283963d8c640586402d9a"
+    },
+    {
+      "viewport": "desktop 760x400",
+      "state": "unwrapped Markdown source without line numbers and selected find match",
+      "theme": "dark",
+      "inputModes": ["keyboard"],
+      "evidenceDigest": "e6fa578c1ead92d46b62c5c04112af6a34dc4c97b2e365200b75ff0c4989f355"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "code-editor-light-wrapped-lines",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-light-wrapped-lines.png",
+      "digest": "38c52fd53e0d504958c734a2f85dff9ffe56f452015b09d45bdf3ab6602eede3",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "code-editor-light-unwrapped-no-lines",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-light-unwrapped-no-lines.png",
+      "digest": "6658f857b34879c52e333038a5e6595d55cb6c8ec1215479faf27bbc14b53b4a",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "code-editor-dark-wrapped-lines",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-dark-wrapped-lines.png",
+      "digest": "ea804fe7454b0aae6ac3a6b63ae650fd1a06c115fc7283963d8c640586402d9a",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "code-editor-dark-unwrapped-no-lines",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-dark-unwrapped-no-lines.png",
+      "digest": "e6fa578c1ead92d46b62c5c04112af6a34dc4c97b2e365200b75ff0c4989f355",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "code-editor-highcontrast-wrapped-lines",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-highcontrast-wrapped-lines.png",
+      "digest": "a20f3ad6dd9aa7ffeb55f8787135b296cb84c78620ef712efb64f79234e062af",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "code-editor-highcontrast-unwrapped-no-lines",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-645-code-editor-highcontrast-unwrapped-no-lines.png",
+      "digest": "d118dd9c190d21bd8aea6fcebf60398bfda8364a104b364cfed07b2dbf038d1b",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "f84a62389595aae201ff1839dc81b0b9a5ff7676c91c14fdf8681be40b77b641"
+}

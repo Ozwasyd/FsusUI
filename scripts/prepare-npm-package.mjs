@@ -34,7 +34,28 @@ const installDependencyFields = [
   'peerDependencies',
   'optionalDependencies',
 ]
-const bundledWorkspaceDependencyNames = new Set(['@element-plus/motion'])
+const bundledWorkspaceDependencyNames = new Set([
+  '@element-plus/icons-vue',
+  '@element-plus/motion',
+])
+const bundledWorkspaceRuntimeEntries = new Map([
+  [
+    '@element-plus/icons-vue',
+    {
+      es: 'es/icons-vue/src/index.mjs',
+      lib: 'lib/icons-vue/src/index.js',
+      types: 'es/icons-vue',
+    },
+  ],
+  [
+    '@element-plus/motion',
+    {
+      es: 'es/motion/index.mjs',
+      lib: 'lib/motion/index.js',
+      types: 'es/motion',
+    },
+  ],
+])
 const unpublishedWorkspaceDependencyNames = new Set([
   '@element-plus/motion',
   '@element-plus/icons-vue',
@@ -693,13 +714,21 @@ function resolveBundledWorkspaceRuntimeSpecifier(
   rootDir,
   filePath,
   packageName,
+  dependencyName,
 ) {
+  const entries = bundledWorkspaceRuntimeEntries.get(dependencyName)
+  if (!entries) {
+    throw new Error(
+      `No bundled runtime entry mapping for workspace dependency "${dependencyName}".`,
+    )
+  }
+
   if (
     filePath.endsWith('.d.ts') ||
     filePath.endsWith('.d.mts') ||
     filePath.endsWith('.d.cts')
   ) {
-    return `${packageName}/es/motion`
+    return `${packageName}/${entries.types}`
   }
 
   const relativePath = path
@@ -710,10 +739,7 @@ function resolveBundledWorkspaceRuntimeSpecifier(
 
   if (relativePath.startsWith('es/') && extension === '.mjs') {
     return toModuleSpecifier(
-      path.relative(
-        path.dirname(filePath),
-        path.join(rootDir, 'es', 'motion', 'index.mjs'),
-      ),
+      path.relative(path.dirname(filePath), path.join(rootDir, entries.es)),
     )
   }
 
@@ -722,10 +748,7 @@ function resolveBundledWorkspaceRuntimeSpecifier(
     (extension === '.js' || extension === '.cjs')
   ) {
     return toModuleSpecifier(
-      path.relative(
-        path.dirname(filePath),
-        path.join(rootDir, 'lib', 'motion', 'index.js'),
-      ),
+      path.relative(path.dirname(filePath), path.join(rootDir, entries.lib)),
     )
   }
 
@@ -752,6 +775,7 @@ function rewriteBundledWorkspaceDependencyReferences(rootDir, packageName) {
         rootDir,
         filePath,
         packageName,
+        dependencyName,
       )
       const pattern = new RegExp(
         `(['"])${dependencyName.replace('/', '\\/')}\\1`,

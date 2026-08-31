@@ -250,7 +250,16 @@ export const evaluateMarkdownEditorCommandMutations = (
   }
   const syntaxContext: MarkdownEditorCommandContext = {
     ...context,
-    syntax: { type: 'paragraph' },
+    syntax: {
+      blockIdentity: 'block:0',
+      contentRanges: [],
+      diagnosticCode: null,
+      markerRanges: [],
+      nodeId: 'paragraph:0',
+      range: { end: 13, start: 0 },
+      status: 'valid',
+      type: 'paragraph',
+    },
     value: '`unterminated',
   }
 
