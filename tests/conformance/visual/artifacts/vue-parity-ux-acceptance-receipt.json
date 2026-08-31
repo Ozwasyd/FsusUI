@@ -1,0 +1,76 @@
+{
+ "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+ "classificationReceiptDigest": "94d12e74cd8778235230557d91aabb1e96c38365a4b2085461b12d5b9a639287",
+ "candidateSha": "625bc386cbbddd2fce56148f90e15ef317f24fd1",
+ "candidateDigest": "e0a9892cc92f42203e870e2aeba11520884577999dc40c92f2d42495dad21a90",
+ "verificationClass": "ux-path",
+ "requiredSkillDigests": [
+  "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+ ],
+ "authorityDigests": [
+  "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+  "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+  "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+  "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
+  "069c6efa2e44f775544bb037cd550a0edbdd8ca98a4e40bfc473f6a1bb0d9f74",
+  "8739a6d6be2af42621b8ba0d5ec54842d423d9aa5b62012a0ad353f17fc557db",
+  "e099dfd956d790aa2b4258456fb710c64033bd986f7544a87553c9946eed373c",
+  "0befd283f500e86045ab7941ca6957265ad0aee95b09325606ec55c33897ed9c",
+  "7e607d3f4cdc4de80956094dda73a56927b8ea652bb1b8eaae59f1e060bc9290",
+  "2f8f9071f47aa6e233f0a5dd7f7a1afb549a099882e48c46a3b1880f73b987c9"
+ ],
+ "activeBaselineIdentityDigest": "bb6f0b5b9484ff8d465a0d4c4c829d9f2d804a0e510def1671e9f8bd49157833",
+ "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+ "independenceEvidenceDigest": "f26726eeb5afdfed6b4124844ff6e1c6e9765cbe52788ad59369ac6dbb2c3baa",
+ "modifiedPaths": [],
+ "productionFixture": true,
+ "viewportStateMatrix": [],
+ "blockers": [],
+ "inspectedEvidence": [
+  "tests/conformance/visual/artifacts/screenshots/web/avatar-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/avalonia/avatar-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/web/check-tag-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/avalonia/check-tag-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/web/checkbox-button-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/avalonia/checkbox-button-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/web/collapse-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/avalonia/collapse-vue-parity.png",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/markdown-prose-evidence/markdown-prose-light.png"
+ ],
+ "comparisonResults": [
+  {
+   "id": "avatar-vue-parity-web-avalonia",
+   "screenshotDiffPercent": 0.0009,
+   "perceptualDelta": 0.004,
+   "geometryDelta": 0.0,
+   "colorDelta": 0.0,
+   "passed": true
+  },
+  {
+   "id": "check-tag-vue-parity-web-avalonia",
+   "screenshotDiffPercent": 0.0112,
+   "perceptualDelta": 0.034,
+   "geometryDelta": 0.2,
+   "colorDelta": 0.0,
+   "passed": true
+  },
+  {
+   "id": "checkbox-button-vue-parity-web-avalonia",
+   "screenshotDiffPercent": 0.0089,
+   "perceptualDelta": 0.016,
+   "geometryDelta": 1.1,
+   "colorDelta": 0.0,
+   "passed": true
+  },
+  {
+   "id": "collapse-vue-parity-web-avalonia",
+   "screenshotDiffPercent": 0.0083,
+   "perceptualDelta": 0.011,
+   "geometryDelta": 1.0,
+   "colorDelta": 0.0,
+   "passed": true
+  }
+ ],
+ "status": "accepted",
+ "receiptDigest": "483e8f7de1fbbbad5d0eadcfcf6ea2b1a8191152106e80d71f9d7a566c0fc083"
+}
