@@ -39,6 +39,7 @@
         v-for="(item, visibleIndex) in virtualWindow.visibleItems.value"
         :key="item.key"
         :ref="(element) => setChunkUnitTemplateRef(item.key, element)"
+        v-markdown-heavy-lifecycle-unmount
         class="markdown-renderer__virtual-unit"
         v-bind="getChunkUnitAttrs(item, visibleIndex)"
         v-html="resolveCommittedHtml(item.unit.html)"
@@ -91,9 +92,12 @@ import {
   resolveMarkdownSourceIdentity,
   renderMarkdownChunksWithRuntime,
   renderMarkdownResultWithRuntime,
+  stabilizeMarkdownEditorProjection,
 } from '@element-plus/wasm'
 import { activateMarkdownHeavyFeatures } from '../../../wasm/markdown-heavy-feature-activation'
+import { createMarkdownHeavyFeatureIsolatedRender } from '../../../wasm/markdown-heavy-feature-isolated-client'
 import { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from '../../../wasm/markdown-feature-output-gateway'
+import { deriveMarkdownEditorChange } from '../../../wasm/markdown-syntax-identity'
 import { isFsusErr, toFsusError } from '@element-plus/utils'
 import {
   markdownRendererProps,
@@ -104,10 +108,12 @@ import type {
   MarkdownHeavyFeatureIdentity,
   MarkdownHeavyFeatureKind,
 } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
+import type { MarkdownHeavyFeatureIsolatedRenderFactory } from '../../../wasm/markdown-heavy-feature-resource'
 import type { FsusErrorDetail } from '@element-plus/utils'
 import type {
   MarkdownRenderChunk,
   MarkdownRenderRequest,
+  MarkdownStableProjection,
   MarkdownFeatureActivationResult,
   MarkdownFeatureThemeTokens,
   MarkdownRuntimeChunkResult,
@@ -125,7 +131,9 @@ defineOptions({
 const props = defineProps(markdownRendererProps)
 const localDocumentKey = `${useId()}-markdown-renderer`
 const heavyDocumentContext = useMarkdownHeavyFeatureDocumentContext()
-const heavyLifecycle = createMarkdownHeavyFeatureLifecycle()
+const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
+  onMetricsChange: recordHeavyLifecycleMetrics,
+})
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
 const handleHeavyFeatureThemeChange = () => {
@@ -261,6 +269,7 @@ type HeavyLifecycleIdentityContext = Readonly<{
   config: string
   documentEpoch: number | string
   documentKey: string
+  nodeId: string
   revision: number | string
   theme: string
 }>
@@ -270,8 +279,53 @@ let lastHeavyLifecycleIdentityContext: HeavyLifecycleIdentityContext | null =
 let heavyLifecycleIdentityContexts: Partial<
   Record<MarkdownHeavyFeatureKind, HeavyLifecycleIdentityContext>
 > = {}
+let heavyLifecycleIdentitySequences: Partial<
+  Record<MarkdownHeavyFeatureKind, readonly HeavyLifecycleIdentityContext[]>
+> = {}
+let heavyLifecycleProjectionNodeIds: Partial<
+  Record<MarkdownHeavyFeatureKind, readonly string[]>
+> = {}
+let previousHeavyProjection: MarkdownStableProjection | undefined
+let previousHeavyProjectionDocument: Readonly<{
+  epoch: number
+  id: string
+}> | null = null
 
-const recordHeavyLifecycleMetrics = () => {
+const stabilizeHeavyProjection = (
+  source: string,
+  documentKey: string,
+  documentEpoch: number | string,
+) => {
+  if (!Number.isInteger(documentEpoch)) return null
+  const documentIdentity = {
+    epoch: documentEpoch as number,
+    id: documentKey,
+  }
+  if (
+    previousHeavyProjectionDocument?.id !== documentIdentity.id ||
+    previousHeavyProjectionDocument.epoch !== documentIdentity.epoch
+  ) {
+    previousHeavyProjection = undefined
+  }
+  const nextProjection = createMarkdownEditorProjection(source)
+  const change = previousHeavyProjection
+    ? deriveMarkdownEditorChange(
+        previousHeavyProjection.normalizedSource,
+        nextProjection.identity.normalizedSource,
+      )
+    : undefined
+  const projection = stabilizeMarkdownEditorProjection(
+    nextProjection,
+    documentIdentity,
+    previousHeavyProjection,
+    change,
+  )
+  previousHeavyProjection = projection
+  previousHeavyProjectionDocument = documentIdentity
+  return projection
+}
+
+function recordHeavyLifecycleMetrics() {
   const target = rootEl.value
   if (!target) return
   const metrics = heavyLifecycle.metrics()
@@ -283,7 +337,9 @@ const recordHeavyLifecycleMetrics = () => {
     cacheEntries: metrics.cacheEntries,
     evictions: metrics.evictions,
     identities: heavyLifecycleIdentityContexts,
+    identitySequences: heavyLifecycleIdentitySequences,
     identity: lastHeavyLifecycleIdentityContext,
+    projectionNodeIds: heavyLifecycleProjectionNodeIds,
     retainedListeners: metrics.retainedListeners,
     retainedObservers: metrics.retainedObservers,
     retainedResources: metrics.retainedResources,
@@ -330,7 +386,7 @@ const scheduleHeavyFeatureCommit = (input: {
     let committed: HTMLElement | void
     const abort = () => reject(new DOMException('Aborted', 'AbortError'))
     input.signal.addEventListener('abort', abort, { once: true })
-    frameScheduler.schedule({
+    const accepted = frameScheduler.schedule({
       key: input.key,
       mutate: () => {
         if (!input.signal.aborted) committed = input.run()
@@ -341,6 +397,10 @@ const scheduleHeavyFeatureCommit = (input: {
         else resolve(committed)
       },
     })
+    if (!accepted) {
+      input.signal.removeEventListener('abort', abort)
+      reject(new DOMException('Frame scheduler unavailable', 'AbortError'))
+    }
   })
 
 const settleRenderViewport = (key: string) =>
@@ -554,6 +614,19 @@ const setChunkUnitTemplateRef = (
   element: Element | ComponentPublicInstance | null,
 ) => {
   setChunkUnitRef(key, element instanceof Element ? element : null)
+}
+
+const vMarkdownHeavyLifecycleUnmount = {
+  beforeUnmount(element: HTMLElement) {
+    const key = element.dataset.fsusRenderUnitKey
+    activationObserver?.unobserve(element)
+    if (key) {
+      activatedChunkKeys.delete(key)
+      chunkActivationElements.delete(key)
+    }
+    heavyLifecycle.unmountRoot(element)
+    recordHeavyLifecycleMetrics()
+  },
 }
 
 const countMarkdownParagraphBreaks = (source: string) => {
@@ -838,6 +911,8 @@ const resetFeatureActivation = () => {
   chunkActivationElements.clear()
   lastHeavyLifecycleIdentityContext = null
   heavyLifecycleIdentityContexts = {}
+  heavyLifecycleIdentitySequences = {}
+  heavyLifecycleProjectionNodeIds = {}
   if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
   recordHeavyLifecycleMetrics()
 }
@@ -845,21 +920,6 @@ const resetFeatureActivation = () => {
 const createHeavyFeatureIdentityResolver = (
   result: MarkdownSafeRenderResult,
 ) => {
-  const projection = createMarkdownEditorProjection(result.rawSource)
-  const resultChunks: readonly MarkdownRenderChunk[] =
-    'chunks' in result && Array.isArray(result.chunks)
-      ? (result.chunks as readonly MarkdownRenderChunk[])
-      : []
-  const nodes = {
-    'code-highlight': projection.nodes.filter((node) => node.kind === 'code'),
-    latex: projection.nodes.filter((node) => node.kind === 'latex'),
-    mermaid: projection.nodes.filter((node) => node.kind === 'mermaid'),
-  }
-  const cursors: Record<MarkdownHeavyFeatureKind, number> = {
-    'code-highlight': 0,
-    latex: 0,
-    mermaid: 0,
-  }
   const documentKey = heavyDocumentContext?.documentKey() ?? localDocumentKey
   const documentEpoch = heavyDocumentContext?.documentEpoch() ?? 0
   const revision =
@@ -867,6 +927,32 @@ const createHeavyFeatureIdentityResolver = (
     props.contentVersion ??
     result.sourceIdentity
   heavyLifecycle.resetDocument(documentKey, documentEpoch)
+  const projection = stabilizeHeavyProjection(
+    result.rawSource,
+    documentKey,
+    documentEpoch,
+  )
+  const resultChunks: readonly MarkdownRenderChunk[] =
+    'chunks' in result && Array.isArray(result.chunks)
+      ? (result.chunks as readonly MarkdownRenderChunk[])
+      : []
+  const nodes = {
+    'code-highlight': projection?.nodes.filter((node) => node.kind === 'code'),
+    latex: projection?.nodes.filter((node) => node.kind === 'latex'),
+    mermaid: projection?.nodes.filter((node) => node.kind === 'mermaid'),
+  }
+  heavyLifecycleProjectionNodeIds = {
+    'code-highlight': Object.freeze(
+      (nodes['code-highlight'] ?? []).map((node) => node.id),
+    ),
+    latex: Object.freeze((nodes.latex ?? []).map((node) => node.id)),
+    mermaid: Object.freeze((nodes.mermaid ?? []).map((node) => node.id)),
+  }
+  const cursors: Record<MarkdownHeavyFeatureKind, number> = {
+    'code-highlight': 0,
+    latex: 0,
+    mermaid: 0,
+  }
 
   return (input: {
     readonly element: HTMLElement
@@ -888,8 +974,8 @@ const createHeavyFeatureIdentityResolver = (
             .filter((chunk) => chunk.kind === chunkKind).length
         : cursors[input.kind]
     if (unitIndex < 0) cursors[input.kind] += 1
-    const node = nodes[input.kind][index]
-    if (!node?.blockIdentity) return null
+    const node = nodes[input.kind]?.[index]
+    if (!node?.id) return null
     const config =
       input.kind === 'mermaid'
         ? JSON.stringify({ tokens: input.tokens })
@@ -901,6 +987,7 @@ const createHeavyFeatureIdentityResolver = (
       config,
       documentEpoch,
       documentKey,
+      nodeId: node.id,
       revision,
       theme,
     })
@@ -909,6 +996,13 @@ const createHeavyFeatureIdentityResolver = (
       ...heavyLifecycleIdentityContexts,
       [input.kind]: context,
     }
+    heavyLifecycleIdentitySequences = {
+      ...heavyLifecycleIdentitySequences,
+      [input.kind]: [
+        ...(heavyLifecycleIdentitySequences[input.kind] ?? []),
+        context,
+      ],
+    }
     return Object.freeze({
       config,
       documentEpoch,
@@ -916,7 +1010,7 @@ const createHeavyFeatureIdentityResolver = (
       featureKind: input.kind,
       gatewayVersion: MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION,
       locale: 'locale-independent',
-      nodeId: node.blockIdentity,
+      nodeId: node.id,
       rendererVersion: result.rendererVersion,
       revision,
       sourceIdentity: result.sourceIdentity,
@@ -935,17 +1029,33 @@ const activateRenderedFeatures = async (
   if (!activationRoot || signal?.aborted) return
 
   const activationStartedAt = readPerformanceNow()
-  const activation = await activateMarkdownHeavyFeatures({
+  const isolatedRenderFactory: MarkdownHeavyFeatureIsolatedRenderFactory = <T,>(
+    request: Parameters<MarkdownHeavyFeatureIsolatedRenderFactory>[0],
+  ) => {
+    const handle = createMarkdownHeavyFeatureIsolatedRender(
+      request,
+      props.trustedScriptUrlFactory,
+    )
+    return Object.freeze({
+      ...handle,
+      promise: handle.promise as Promise<T>,
+    })
+  }
+  const activationPromise = activateMarkdownHeavyFeatures({
     baseUrl: props.baseUrl,
     concurrency: 3,
     cspNonce: props.cspNonce,
     features: resolveMarkdownFeatureOptions(),
     heavyLifecycle,
+    isolatedRenderFactory,
     resolveHeavyFeatureIdentity: createHeavyFeatureIdentityResolver(result),
     root: activationRoot,
     scheduleHeavyFeatureCommit,
     signal,
   })
+  for (let step = 0; step < 8; step += 1) await Promise.resolve()
+  recordHeavyLifecycleMetrics()
+  const activation = await activationPromise
   if (signal?.aborted) return
   activationDurationMs += readPerformanceNow() - activationStartedAt
   rootEl.value?.setAttribute(
@@ -1101,11 +1211,6 @@ const performRender = async () => {
       })
       emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
       await nextTick()
-      await activateMountedChunkFeatures(
-        resolvedResult,
-        activationController?.signal,
-      )
-      observeMountedChunksForActivation()
       await settleRenderViewport('markdown-render-settle-initial')
       await afterFrame()
       if (initialCount < resolvedUnits.length) {
@@ -1116,6 +1221,13 @@ const performRender = async () => {
         await nextTick()
         await settleRenderViewport('markdown-render-settle-full')
       }
+      const initialFeatureActivation = activateMountedChunkFeatures(
+        resolvedResult,
+        activationController?.signal,
+      )
+      observeMountedChunksForActivation()
+      await initialFeatureActivation
+      if (taskId !== currentTaskId) return
       recordCommitDuration(commitStartedAt)
       emit('render-complete', resolvedResult)
       scheduleMeasurementWarmup()

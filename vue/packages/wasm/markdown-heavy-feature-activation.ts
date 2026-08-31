@@ -11,9 +11,11 @@ import type {
   MarkdownHeavyFeatureKind,
   MarkdownHeavyFeatureLifecycle,
 } from '../hooks/use-markdown-heavy-feature-lifecycle'
+import type { MarkdownHeavyFeatureIsolatedRenderFactory } from './markdown-heavy-feature-resource'
 
 interface MarkdownHeavyFeatureActivationOptions extends MarkdownFeatureActivationOptions {
   readonly heavyLifecycle: MarkdownHeavyFeatureLifecycle
+  readonly isolatedRenderFactory?: MarkdownHeavyFeatureIsolatedRenderFactory
   readonly resolveHeavyFeatureIdentity: (input: {
     readonly element: HTMLElement
     readonly kind: MarkdownHeavyFeatureKind

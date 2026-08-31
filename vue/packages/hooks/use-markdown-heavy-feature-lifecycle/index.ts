@@ -59,6 +59,7 @@ export interface MarkdownHeavyFeatureResources {
   readonly listeners: number
   readonly observers: number
   readonly runtimes: number
+  readonly subscribe?: (listener: () => void) => () => void
   readonly tasks: number
 }
 
@@ -91,6 +92,9 @@ export interface MarkdownHeavyFeatureLifecycle {
 export interface MarkdownHeavyFeatureLifecycleOptions {
   readonly maxBytes?: number
   readonly maxEntries?: number
+  readonly onMetricsChange?: (
+    metrics: MarkdownHeavyFeatureLifecycleMetrics,
+  ) => void
 }
 
 interface CacheEntry {
@@ -106,7 +110,9 @@ interface NodeRecord {
   documentKey: string
   element: HTMLElement
   identityKey: string
-  resources: MarkdownHeavyFeatureResources
+  removeExternalAbort?: () => void
+  removeResourceChange?: () => void
+  resources: Partial<MarkdownHeavyFeatureResources>
   state: Exclude<MarkdownHeavyFeatureState, 'unmounted'>
   teardown?: () => void
 }
@@ -157,13 +163,7 @@ const normalizeResources = (
   tasks: normalizeResourceCount(resources?.tasks),
 })
 
-const totalResources = (resources: MarkdownHeavyFeatureResources) =>
-  resources.listeners +
-  resources.observers +
-  resources.runtimes +
-  resources.tasks
-
-const EMPTY_RESOURCES = Object.freeze({
+const EMPTY_RESOURCES: MarkdownHeavyFeatureResources = Object.freeze({
   listeners: 0,
   observers: 0,
   runtimes: 0,
@@ -207,22 +207,19 @@ export const createMarkdownHeavyFeatureLifecycle = (
   let activations = 0
   let evictions = 0
   let reuses = 0
-  let retainedListeners = 0
-  let retainedObservers = 0
-  let retainedRuntimes = 0
-  let retainedTasks = 0
   let staleCommits = 0
   let teardowns = 0
   let unmountedNodes = 0
   let disposed = false
 
+  const notifyMetricsChange = () => options.onMetricsChange?.(metrics())
+
   const releaseActiveResource = (record: NodeRecord) => {
-    const resources = record.resources
-    retainedListeners -= resources.listeners
-    retainedObservers -= resources.observers
-    retainedRuntimes -= resources.runtimes
-    retainedTasks -= resources.tasks
+    record.removeResourceChange?.()
+    record.removeResourceChange = undefined
     record.resources = EMPTY_RESOURCES
+    record.removeExternalAbort?.()
+    record.removeExternalAbort = undefined
     const teardown = record.teardown
     record.teardown = undefined
     teardown?.()
@@ -253,8 +250,8 @@ export const createMarkdownHeavyFeatureLifecycle = (
 
   const activate = async <T>(input: MarkdownHeavyFeatureActivation<T>) => {
     if (disposed || !validIdentity(input.identity)) return false
-    const resources = normalizeResources(input.resources)
-    if (totalResources(resources) > 0 && !input.teardown) {
+    const resources = input.resources ?? EMPTY_RESOURCES
+    if (input.resources && !input.teardown) {
       throw new Error('markdown_heavy_feature_teardown_required')
     }
     const nodeKey = nodeKeyOf(input.identity)
@@ -276,19 +273,22 @@ export const createMarkdownHeavyFeatureLifecycle = (
       state: 'active-work',
       teardown: input.teardown,
     }
-    retainedListeners += resources.listeners
-    retainedObservers += resources.observers
-    retainedRuntimes += resources.runtimes
-    retainedTasks += resources.tasks
     nodes.set(nodeKey, record)
+    record.removeResourceChange = resources.subscribe?.(notifyMetricsChange)
+    notifyMetricsChange()
     const discardIfCurrent = () => {
       if (nodes.get(nodeKey) !== record) return
       teardownRecord(record)
       nodes.delete(nodeKey)
       unmountedNodes += 1
+      notifyMetricsChange()
     }
     const abort = () => discardIfCurrent()
     input.signal?.addEventListener('abort', abort, { once: true })
+    if (input.signal) {
+      record.removeExternalAbort = () =>
+        input.signal?.removeEventListener('abort', abort)
+    }
     if (input.signal?.aborted) {
       discardIfCurrent()
       input.signal.removeEventListener('abort', abort)
@@ -313,6 +313,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
         record.controller = null
         record.state = 'static-mounted'
         reuses += 1
+        notifyMetricsChange()
         return false
       }
 
@@ -360,6 +361,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
         cacheBytes += bytes
         evict()
       }
+      notifyMetricsChange()
       return true
     } catch (error) {
       if (controller.signal.aborted) {
@@ -370,20 +372,24 @@ export const createMarkdownHeavyFeatureLifecycle = (
       discardIfCurrent()
       throw error
     } finally {
-      input.signal?.removeEventListener('abort', abort)
+      record.removeExternalAbort?.()
+      record.removeExternalAbort = undefined
       if (record.controller === controller) record.controller = null
     }
   }
 
   const unmountRoot = (root: ParentNode) => {
     const rootNode = root as Node
+    let changed = false
     for (const [key, record] of nodes) {
       if (rootNode === record.element || rootNode.contains(record.element)) {
         teardownRecord(record)
         nodes.delete(key)
         unmountedNodes += 1
+        changed = true
       }
     }
+    if (changed) notifyMetricsChange()
   }
 
   const mountStatic: MarkdownHeavyFeatureLifecycle['mountStatic'] = (input) => {
@@ -400,6 +406,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
       resources: EMPTY_RESOURCES,
       state: 'static-mounted',
     })
+    notifyMetricsChange()
     return true
   }
 
@@ -407,6 +414,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
     documentKey: string,
     documentEpoch: number | string,
   ) => {
+    let changed = false
     for (const [key, record] of nodes) {
       if (
         record.documentKey !== documentKey ||
@@ -415,16 +423,29 @@ export const createMarkdownHeavyFeatureLifecycle = (
         teardownRecord(record)
         nodes.delete(key)
         unmountedNodes += 1
+        changed = true
       }
     }
+    if (changed) notifyMetricsChange()
   }
 
-  const metrics = (): MarkdownHeavyFeatureLifecycleMetrics => {
+  function metrics(): MarkdownHeavyFeatureLifecycleMetrics {
     let activeNodes = 0
     let staticNodes = 0
+    let retainedListeners = 0
+    let retainedObservers = 0
+    let retainedRuntimes = 0
+    let retainedTasks = 0
     for (const record of nodes.values()) {
-      if (record.state === 'active-work') activeNodes += 1
-      else staticNodes += 1
+      if (record.state === 'active-work') {
+        activeNodes += 1
+        const resources = normalizeResources(record.resources)
+        retainedListeners +=
+          resources.listeners + (record.removeExternalAbort ? 1 : 0)
+        retainedObservers += resources.observers
+        retainedRuntimes += resources.runtimes
+        retainedTasks += resources.tasks
+      } else staticNodes += 1
     }
     return Object.freeze({
       aborts,
@@ -456,6 +477,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
     nodes.clear()
     cache.clear()
     cacheBytes = 0
+    notifyMetricsChange()
   }
 
   return Object.freeze({

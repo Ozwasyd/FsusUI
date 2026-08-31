@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { activateMarkdownFeatures } from '../markdown-runtime'
 import { activateMarkdownHeavyFeatures } from '../markdown-heavy-feature-activation'
+import { registerMarkdownHeavyFeatureIsolatedRenderFactory } from '../markdown-heavy-feature-resource'
 import {
   createMarkdownHeavyFeatureLifecycle,
   type MarkdownHeavyFeatureKind,
@@ -430,6 +431,28 @@ describe('markdown feature activation runtime', () => {
     expect(featureModuleMocks.katexRenderToString).not.toHaveBeenCalled()
   })
 
+  it('fails closed when lifecycle identity cannot be resolved', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    const root = document.createElement('article')
+    root.innerHTML =
+      '<pre><code class="language-typescript">const unresolved = true</code></pre>'
+
+    const result = await activateMarkdownHeavyFeatures({
+      heavyLifecycle: lifecycle,
+      resolveHeavyFeatureIdentity: () => null,
+      root,
+    })
+
+    expect(result).toEqual({ activated: [], errors: [] })
+    expect(root.querySelector('pre')?.dataset.codeHighlighted).toBeUndefined()
+    expect(lifecycle.metrics()).toMatchObject({
+      activations: 0,
+      cacheEntries: 0,
+      retainedResources: 0,
+    })
+    expect(featureModuleMocks.shikiCodeToHtml).not.toHaveBeenCalled()
+  })
+
   it('re-highlights an already-mounted code node when its material theme changes', async () => {
     const lifecycle = createMarkdownHeavyFeatureLifecycle()
     featureModuleMocks.shikiCodeToHtml.mockImplementation(
@@ -652,12 +675,26 @@ describe('markdown feature activation runtime', () => {
 
   it('registers and tears down the real adapter task and abort listener offscreen', async () => {
     const lifecycle = createMarkdownHeavyFeatureLifecycle()
-    const deferred = createDeferred()
-    featureModuleMocks.mermaidRender.mockImplementation(async (id: string) => {
-      await deferred.promise
-      const output = getMarkdownXssFeatureOutput('mxss-feature-mermaid-script')
-      return { svg: output.payload.replaceAll(output.rootId!, id) }
-    })
+    let rejectRender!: (reason: unknown) => void
+    let terminated = false
+    let active = true
+    registerMarkdownHeavyFeatureIsolatedRenderFactory(<T>() => ({
+      promise: new Promise<T>((_resolve, reject) => {
+        rejectRender = reject
+      }),
+      resources: () => ({
+        listeners: active ? 2 : 0,
+        observers: 0,
+        runtimes: active ? 1 : 0,
+        tasks: active ? 1 : 0,
+      }),
+      teardown: () => {
+        if (!active) return
+        active = false
+        terminated = true
+        rejectRender(new DOMException('Aborted', 'AbortError'))
+      },
+    }))
     const root = document.createElement('article')
     root.innerHTML =
       '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>graph TD\nA--&gt;B</code></figure>'
@@ -679,13 +716,12 @@ describe('markdown feature activation runtime', () => {
       root,
     })
 
-    await vi.waitFor(() =>
-      expect(featureModuleMocks.mermaidRender).toHaveBeenCalledTimes(1),
-    )
+    await vi.waitFor(() => expect(lifecycle.metrics().activeNodes).toBe(1))
     expect(lifecycle.metrics()).toMatchObject({
       activeNodes: 1,
-      retainedListeners: 2,
-      retainedResources: 3,
+      retainedListeners: 3,
+      retainedResources: 5,
+      retainedRuntimes: 1,
       retainedTasks: 1,
     })
 
@@ -697,9 +733,10 @@ describe('markdown feature activation runtime', () => {
       retainedTasks: 0,
     })
     expect(await activation).toEqual({ activated: [], errors: [] })
+    expect(terminated).toBe(true)
+    expect(featureModuleMocks.mermaidRender).not.toHaveBeenCalled()
     expect(root.querySelector('[data-markdown-feature-activated]')).toBeNull()
-    deferred.release()
-    await Promise.resolve()
+    registerMarkdownHeavyFeatureIsolatedRenderFactory(null)
   })
 
   it('keeps stable feature-kind order when concurrency is one', async () => {

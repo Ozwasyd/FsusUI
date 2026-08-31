@@ -31,7 +31,12 @@ Mermaid and LaTeX output already materialized by the authorized Markdown render
 result enters the same authority directly as a zero-resource `static-mounted`
 node. Placeholder-driven Mermaid, KaTeX, and Shiki adapter work instead enters
 `active-work`, registers its real abort listeners and task, and releases both
-before becoming static. Neither path creates a resident per-node renderer.
+before becoming static. Browser adapter work runs in a disposable same-origin
+frame realm so teardown terminates the underlying renderer task rather than
+only rejecting a wrapper promise. Neither path creates a resident per-node
+renderer. If the document epoch or another required identity field cannot be
+validated, the lifecycle fails closed to the existing source-only/degraded
+presentation instead of rendering outside the authority.
 
 ## Cache budget
 
@@ -61,8 +66,10 @@ teardown/eviction/stale totals, cache entries/bytes, and independent retained
 task/listener/observer/runtime counts. A declared retained resource without one
 teardown hook fails closed; entering `static-mounted`, leaving the virtual
 window, aborting, switching documents, or disposing releases that hook exactly
-once. This attribute and the lifecycle implementation are internal diagnostic
-evidence, not public component or hooks API and not source authority.
+once. Counts update when the real adapter task and realm start or stop, not from
+the active-node count alone. This attribute and the lifecycle implementation
+are internal diagnostic evidence, not public component or hooks API and not
+source authority.
 
 Security output still commits through the existing sanitizer/gateway on initial
 render and cache reuse. CSP, XSS, source reveal, caret/copy/delete, IME,

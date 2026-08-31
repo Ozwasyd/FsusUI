@@ -4,12 +4,37 @@ import {
   createMarkdownEditorProjection,
   stabilizeMarkdownEditorProjection,
 } from '../markdown-runtime'
+import { deriveMarkdownEditorChange } from '../markdown-syntax-identity'
 
 describe('markdown syntax stable identity', () => {
+  it('derives one surrogate-safe source change for insert, delete, replace, move, split, and undo', () => {
+    for (const [previous, next] of [
+      ['Alpha', 'A-x-lpha'],
+      ['Alpha', 'Alha'],
+      ['Alpha', 'Alpine'],
+      ['First\n\nSecond\n', 'Second\n\nFirst\n'],
+      ['Hello world.\n', 'Hello\n\nworld.\n'],
+      ['Hello\n\nworld.\n', 'Hello world.\n'],
+      ['A😀B', 'A😃B'],
+    ] as const) {
+      const change = deriveMarkdownEditorChange(previous, next)
+      expect(change).toBeDefined()
+      expect(
+        `${previous.slice(0, change!.from)}${change!.insert}${previous.slice(change!.to)}`,
+      ).toBe(next)
+      expect(previous.charCodeAt(change!.from)).not.toBeGreaterThanOrEqual(
+        0xdc00,
+      )
+      expect(previous.charCodeAt(change!.to)).not.toBeGreaterThanOrEqual(0xdc00)
+    }
+    expect(deriveMarkdownEditorChange('same', 'same')).toBeUndefined()
+  })
+
   it('gives duplicate headings different identities that survive prefix text', () => {
     const document = { id: 'doc-1', epoch: 4 }
+    const source = '# Alpha\n\n# Alpha\n'
     const first = stabilizeMarkdownEditorProjection(
-      createMarkdownEditorProjection('# Alpha\n\n# Alpha\n'),
+      createMarkdownEditorProjection(source),
       document,
     )
     expect(first.nodes).toHaveLength(2)
@@ -17,10 +42,12 @@ describe('markdown syntax stable identity', () => {
     expect(first.nodes[1].kind).toBe('heading')
     expect(first.nodes[0].id).not.toBe(first.nodes[1].id)
 
+    const nextSource = 'intro text\n\n# Alpha\n\n# Alpha\n'
     const afterPrefix = stabilizeMarkdownEditorProjection(
-      createMarkdownEditorProjection('intro text\n\n# Alpha\n\n# Alpha\n'),
+      createMarkdownEditorProjection(nextSource),
       document,
       first,
+      deriveMarkdownEditorChange(source, nextSource),
     )
     expect(afterPrefix.nodes.map((node) => node.kind)).toEqual([
       'paragraph',
@@ -114,6 +141,10 @@ describe('markdown syntax stable identity', () => {
       createMarkdownEditorProjection('# Beta\n\n# Alpha\n'),
       document,
       movedFrom,
+      deriveMarkdownEditorChange(
+        movedFrom.normalizedSource,
+        '# Beta\n\n# Alpha\n',
+      ),
     )
     expect(moved.nodes[0].id).toBe(movedFrom.nodes[1].id)
     expect(moved.nodes[1].id).toBe(movedFrom.nodes[0].id)
@@ -126,6 +157,10 @@ describe('markdown syntax stable identity', () => {
       createMarkdownEditorProjection('Hello\n\nworld.\n'),
       document,
       beforeSplit,
+      deriveMarkdownEditorChange(
+        beforeSplit.normalizedSource,
+        'Hello\n\nworld.\n',
+      ),
     )
     expect(split.nodes).toHaveLength(2)
     expect(split.nodes[0].id).toBe(beforeSplit.nodes[0].id)
@@ -140,6 +175,10 @@ describe('markdown syntax stable identity', () => {
       createMarkdownEditorProjection('Hello world.\n'),
       document,
       beforeMerge,
+      deriveMarkdownEditorChange(
+        beforeMerge.normalizedSource,
+        'Hello world.\n',
+      ),
     )
     expect(merged.nodes).toHaveLength(1)
     expect(merged.nodes[0].id).toBe(beforeMerge.nodes[0].id)

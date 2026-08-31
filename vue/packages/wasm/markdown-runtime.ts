@@ -31,6 +31,8 @@ import type {
 import {
   assertMarkdownHeavyFeatureAdapterResourceBridge,
   createMarkdownHeavyFeatureAdapterResourceBridge,
+  type MarkdownHeavyFeatureIsolatedRenderFactory,
+  type MarkdownHeavyFeatureIsolatedRenderRequest,
 } from './markdown-heavy-feature-resource'
 import type {
   FsusErrorCode,
@@ -686,6 +688,7 @@ export interface MarkdownFeatureActivationOptions {
 
 interface MarkdownHeavyFeatureActivationOptions extends MarkdownFeatureActivationOptions {
   readonly heavyLifecycle?: MarkdownHeavyFeatureLifecycle
+  readonly isolatedRenderFactory?: MarkdownHeavyFeatureIsolatedRenderFactory
   readonly resolveHeavyFeatureIdentity?: (input: {
     readonly element: HTMLElement
     readonly kind: MarkdownHeavyFeatureKind
@@ -1486,6 +1489,7 @@ interface MarkdownFeatureActivationContext extends Omit<
   ) => Readonly<MarkdownFeatureThemeTokens>
   readonly root: ParentNode
   readonly heavyLifecycle?: MarkdownHeavyFeatureLifecycle
+  readonly isolatedRenderFactory?: MarkdownHeavyFeatureIsolatedRenderFactory
   readonly resolveHeavyFeatureIdentity?: MarkdownHeavyFeatureActivationOptions['resolveHeavyFeatureIdentity']
   readonly scheduleHeavyFeatureCommit?: MarkdownHeavyFeatureActivationOptions['scheduleHeavyFeatureCommit']
 }
@@ -1511,6 +1515,7 @@ const activateHeavyFeature = async (input: {
   readonly render: (
     signal: AbortSignal | undefined,
   ) => Promise<FeatureRenderOutput>
+  readonly isolatedRequest: MarkdownHeavyFeatureIsolatedRenderRequest
   readonly source: string
 }) => {
   const identity = input.context.resolveHeavyFeatureIdentity?.({
@@ -1520,14 +1525,26 @@ const activateHeavyFeature = async (input: {
     theme: input.context.theme,
     tokens: input.context.resolveTokens(input.element),
   })
-  if (!input.context.heavyLifecycle || !identity) {
+  if (!input.context.heavyLifecycle) {
     const output = await input.render(input.context.signal)
     if (input.context.signal?.aborted) return false
     input.commit(output)
     return true
   }
+  if (!identity) return false
+  const isolatedRequest = Object.freeze({
+    ...input.isolatedRequest,
+    lifecycleKey: [
+      identity.documentKey,
+      identity.documentEpoch,
+      identity.nodeId,
+      identity.featureKind,
+    ].join(':'),
+  })
   const resourceBridge = assertMarkdownHeavyFeatureAdapterResourceBridge(
-    createMarkdownHeavyFeatureAdapterResourceBridge(),
+    createMarkdownHeavyFeatureAdapterResourceBridge(
+      input.context.isolatedRenderFactory,
+    ),
   )
   try {
     return await input.context.heavyLifecycle.activate({
@@ -1550,8 +1567,10 @@ const activateHeavyFeature = async (input: {
       estimateBytes: estimateFeatureOutputBytes,
       identity,
       render: (signal) =>
-        resourceBridge.run(signal, (adapterSignal) =>
-          input.render(adapterSignal),
+        resourceBridge.run(
+          signal,
+          (adapterSignal) => input.render(adapterSignal),
+          isolatedRequest,
         ),
       resources: resourceBridge.resources,
       signal: input.context.signal,
@@ -1604,6 +1623,13 @@ const activateBuiltInFeature = async (
         context,
         element,
         source,
+        isolatedRequest: {
+          cspNonce: context.cspNonce,
+          kind: 'mermaid',
+          source,
+          theme: context.theme,
+          tokens: context.resolveTokens(element),
+        },
         render: (signal) =>
           renderMermaidFeature(source, {
             ...toFeatureRenderContext(context, element),
@@ -1647,6 +1673,14 @@ const activateBuiltInFeature = async (
         context,
         element,
         source,
+        isolatedRequest: {
+          cspNonce: context.cspNonce,
+          displayMode: isBlockLatexElement(element),
+          kind: 'latex',
+          source,
+          theme: context.theme,
+          tokens: context.resolveTokens(element),
+        },
         render: (signal) =>
           renderLatexFeature(
             source,
@@ -1698,6 +1732,14 @@ const activateBuiltInFeature = async (
       context,
       element: pre,
       source,
+      isolatedRequest: {
+        cspNonce: context.cspNonce,
+        kind: 'code-highlight',
+        language,
+        source,
+        theme: context.theme,
+        tokens: context.resolveTokens(element),
+      },
       render: (signal) =>
         renderCodeHighlightFeature(source, language, {
           ...toFeatureRenderContext(context, element),
@@ -1880,6 +1922,7 @@ export const activateMarkdownFeatures = async (
     const context: MarkdownFeatureActivationContext = {
       cspNonce: options.cspNonce,
       heavyLifecycle: heavyOptions.heavyLifecycle,
+      isolatedRenderFactory: heavyOptions.isolatedRenderFactory,
       kind,
       resolveHeavyFeatureIdentity: heavyOptions.resolveHeavyFeatureIdentity,
       scheduleHeavyFeatureCommit: heavyOptions.scheduleHeavyFeatureCommit,

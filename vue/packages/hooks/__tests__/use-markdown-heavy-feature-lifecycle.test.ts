@@ -136,14 +136,39 @@ describe('markdown heavy feature lifecycle', () => {
       },
     )
     lifecycle.unmountRoot(element)
+    expect(lifecycle.metrics()).toMatchObject({
+      cacheEntries: 0,
+      retainedResources: 0,
+    })
     resolve(Object.freeze({ payload: 'late' }))
     await pending
     expect(commits).toBe(0)
     expect(lifecycle.metrics()).toMatchObject({
       aborts: 1,
       activeNodes: 0,
+      cacheEntries: 0,
       staleCommits: 1,
       teardowns: 1,
+    })
+
+    const settled = document.createElement('div')
+    await activate(
+      lifecycle,
+      identity('latex'),
+      settled,
+      async () => Object.freeze({ payload: 'current' }),
+    )
+    lifecycle.unmountRoot(settled)
+    await activate(
+      lifecycle,
+      identity('latex'),
+      document.createElement('div'),
+      async () => Object.freeze({ payload: 'must-not-render' }),
+    )
+    expect(lifecycle.metrics()).toMatchObject({
+      activations: 2,
+      cacheEntries: 1,
+      reuses: 1,
     })
   })
 
