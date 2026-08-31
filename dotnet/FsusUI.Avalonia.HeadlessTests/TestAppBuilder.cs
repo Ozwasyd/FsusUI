@@ -27,7 +27,10 @@ public static class TestAppBuilder
       })
       .ConfigureFonts(fontManager =>
       {
-        fontManager.AddFontCollection(new GoogleSansFontCollection().Collection);
+        if (Environment.GetEnvironmentVariable("FSUS_HEADLESS_GSANS") == "1")
+        {
+          fontManager.AddFontCollection(new GoogleSansFontCollection().Collection);
+        }
       });
 }
 
