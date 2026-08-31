@@ -18,6 +18,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\tests\fixtures\avalonia-webview\TestWebViewPdfDocument.cs" Link="Fixtures\TestWebViewPdfDocument.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResources Include="Assets/Fonts/*.ttf" />
+    <Content Include="Assets/Fonts/*.ttf" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

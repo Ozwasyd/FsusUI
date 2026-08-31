@@ -49,6 +49,13 @@ manager.Apply(
     Variant = FsusThemeVariant.Light,
     Density = FsusDensity.Default,
     MotionMode = FsusMotionMode.System,
+    Palette = new FsusThemePaletteOptions
+    {
+      Background = new SolidColorBrush(Color.Parse("#F7F4EE")),
+      Surface = new SolidColorBrush(Color.Parse("#FFFFFF")),
+      Text = new SolidColorBrush(Color.Parse("#24211C")),
+      Icon = new SolidColorBrush(Color.Parse("#4A453D")),
+    },
   });
 ```
 
@@ -57,6 +64,12 @@ every call. `{DynamicResource FsusColorActionPrimaryBrush}` resolves to
 `#2A599C` under the light palette and `#4B79CC` under the dark palette; an
 explicit `AccentOverride` replaces it while one is provided. Components bound
 through `{DynamicResource ...}` update immediately when the variant switches.
+The optional `Palette` record independently accepts nullable `IBrush` overrides
+for background, surface, raised surface, text, muted text, border, and icon.
+`Surface` reaches the existing shell, editor, tree, and picker surface aliases,
+while `SurfaceRaised` reaches raised picker and read-only states. Null fields use
+the selected built-in light or dark resource; high contrast keeps its complete
+built-in palette, so callers do not need to fork the shipped dictionaries.
 
 ## Clean Consumer Sample
 

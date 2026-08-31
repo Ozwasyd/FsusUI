@@ -151,6 +151,7 @@ internal static class Program
         .AsTask()
         .GetAwaiter()
         .GetResult();
+      var webViewAdapterReady = ExerciseWebViewAdapter();
       var documents = new FsusDocumentTabs();
       documents.AddDocument(new FsusDocumentTab
       {
@@ -174,7 +175,12 @@ internal static class Program
         Status = "Ready",
       };
       var panel = new StackPanel();
-      var scenarios = CreateStableScenarios(button, icon);
+      var scenarios = CreateStableScenarios(
+        button,
+        icon,
+        activityShell,
+        documents,
+        titleBar);
       foreach (var scenario in scenarios)
       {
         panel.Children.Add(scenario.Control);
@@ -245,6 +251,7 @@ internal static class Program
               report.MarkdownProjectionProducerReady =
                 projectionCommit.Accepted &&
                 markdownEditor.CapabilityState == "aligned";
+              report.WebViewAdapterReady = webViewAdapterReady;
               report.ActivitySectionCount = activityShell.Sections.Count;
               report.DocumentCount = documents.Documents.Count;
               report.TitleBarPlatform = titleBar.EffectivePlatform.ToString();
@@ -259,7 +266,8 @@ internal static class Program
                 report.ActivitySectionCount == 1 &&
                 report.DocumentCount == 1 &&
                 report.CodeEditorReady &&
-                report.MarkdownProjectionProducerReady
+                report.MarkdownProjectionProducerReady &&
+                report.WebViewAdapterReady
                   ? 0
                   : 1;
               if (report.ExitCode != 0)
@@ -293,7 +301,12 @@ internal static class Program
     }
   }
 
-  private static IReadOnlyList<SmokeScenario> CreateStableScenarios(FsusButton button, FsusIcon icon)
+  private static IReadOnlyList<SmokeScenario> CreateStableScenarios(
+    FsusButton button,
+    FsusIcon icon,
+    FsusActivityRailShell activityShell,
+    FsusDocumentTabs documents,
+    FsusNativeTitleBar titleBar)
   {
     AutomationProperties.SetName(button, "Native AOT smoke");
     AutomationProperties.SetName(icon, "Settings icon");
@@ -316,6 +329,8 @@ internal static class Program
     thirdPartyItem.ResetField();
 
     var themeSurface = Named(new Border(), "AOT theme surface");
+    var themeMutedText = new FsusText { Text = "AOT muted shell status" };
+    titleBar.Status = themeMutedText;
     var themeResources = new ResourceDictionary();
     var themeManager = new FsusThemeManager();
     themeManager.Apply(themeResources, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
@@ -329,9 +344,77 @@ internal static class Program
         Variant = FsusThemeVariant.Dark,
         HighContrast = true,
         Density = FsusDensity.Compact,
+        Palette = new FsusThemePaletteOptions
+        {
+          Background = new SolidColorBrush(Color.Parse("#010203")),
+          Surface = new SolidColorBrush(Color.Parse("#102030")),
+          SurfaceRaised = new SolidColorBrush(Color.Parse("#203040")),
+          Text = new SolidColorBrush(Color.Parse("#F0E0D0")),
+          MutedText = new SolidColorBrush(Color.Parse("#C0B0A0")),
+          Border = new SolidColorBrush(Color.Parse("#405060")),
+          Icon = new SolidColorBrush(Color.Parse("#ABCDEF")),
+        },
       }
     );
     var highContrastBackground = ((SolidColorBrush)themeResources[FsusThemeResourceKeys.BackgroundBrush]!).Color;
+    if (
+      BrushColor(themeResources, FsusThemeResourceKeys.BackgroundBrush) != Color.Parse("#000000") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.SurfaceBrush) != Color.Parse("#000000") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.SurfaceRaisedBrush) != Color.Parse("#111827") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.TextBrush) != Color.Parse("#FFFFFF") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.MutedTextBrush) != Color.Parse("#FDE68A") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.BorderBrush) != Color.Parse("#FFFFFF") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.IconBrush) != Color.Parse("#FFFFFF") ||
+      BrushColor(themeResources, "FsusThemeTreeSurfaceBrush") != Color.Parse("#000000") ||
+      BrushColor(themeResources, "FsusThemePickerSurfaceBrush") != Color.Parse("#000000") ||
+      BrushColor(themeResources, "FsusThemePublicShellSurfaceBrush") != Color.Parse("#000000") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.TextEditorSurfaceBrush) != Color.Parse("#000000") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.ValuePickerTrackBrush) != Color.Parse("#1F2937"))
+    {
+      throw new InvalidOperationException("AOT high-contrast theme precedence did not apply.");
+    }
+
+    themeManager.Apply(
+      themeResources,
+      new FsusThemeOptions
+      {
+        Variant = FsusThemeVariant.Dark,
+        Palette = new FsusThemePaletteOptions
+        {
+          Background = new SolidColorBrush(Color.Parse("#010203")),
+          Surface = new SolidColorBrush(Color.Parse("#102030")),
+          SurfaceRaised = new SolidColorBrush(Color.Parse("#203040")),
+          Text = new SolidColorBrush(Color.Parse("#F0E0D0")),
+          MutedText = new SolidColorBrush(Color.Parse("#C0B0A0")),
+          Border = new SolidColorBrush(Color.Parse("#405060")),
+          Icon = new SolidColorBrush(Color.Parse("#ABCDEF")),
+        },
+      });
+    if (
+      BrushColor(themeResources, FsusThemeResourceKeys.BackgroundBrush) != Color.Parse("#010203") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.SurfaceBrush) != Color.Parse("#102030") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.SurfaceRaisedBrush) != Color.Parse("#203040") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.TextBrush) != Color.Parse("#F0E0D0") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.MutedTextBrush) != Color.Parse("#C0B0A0") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.BorderBrush) != Color.Parse("#405060") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.IconBrush) != Color.Parse("#ABCDEF") ||
+      BrushColor(themeResources, "FsusThemeTreeSurfaceBrush") != Color.Parse("#102030") ||
+      BrushColor(themeResources, "FsusThemePickerSurfaceBrush") != Color.Parse("#102030") ||
+      BrushColor(themeResources, "FsusThemePublicShellSurfaceBrush") != Color.Parse("#102030") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.TextEditorSurfaceBrush) != Color.Parse("#102030") ||
+      BrushColor(themeResources, FsusThemeResourceKeys.ValuePickerTrackBrush) != Color.Parse("#203040"))
+    {
+      throw new InvalidOperationException("AOT theme palette overrides did not reach shell aliases.");
+    }
+    themeSurface.Background = ThemeBrush(themeResources, FsusThemeResourceKeys.SurfaceBrush);
+    activityShell.Background = ThemeBrush(themeResources, FsusThemeResourceKeys.BackgroundBrush);
+    activityShell.Foreground = ThemeBrush(themeResources, FsusThemeResourceKeys.TextBrush);
+    documents.Background = ThemeBrush(themeResources, FsusThemeResourceKeys.BackgroundBrush);
+    titleBar.Background = ThemeBrush(themeResources, FsusThemeResourceKeys.SurfaceRaisedBrush);
+    titleBar.Foreground = ThemeBrush(themeResources, FsusThemeResourceKeys.TextBrush);
+    titleBar.BorderBrush = ThemeBrush(themeResources, FsusThemeResourceKeys.BorderBrush);
+    themeMutedText.Foreground = ThemeBrush(themeResources, FsusThemeResourceKeys.MutedTextBrush);
+    icon.Fill = ThemeBrush(themeResources, FsusThemeResourceKeys.IconBrush);
     report.ThemeVariant = resolvedTheme.Variant.ToString();
     report.ThemeDensity = resolvedTheme.Density.ToString();
     report.ThemeHighContrast = resolvedTheme.HighContrast;
@@ -401,7 +484,7 @@ internal static class Program
     var stable = new Dictionary<string, SmokeScenario>(StringComparer.Ordinal)
     {
       ["button"] = new("button", button, () => button.IsEnabled && AutomationProperties.GetName(button) == "Native AOT smoke"),
-      ["icon-text"] = new("icon-text", themeSurface, () => icon.IconKey == FsusIconKeys.Settings && icon.IsDecorative && AutomationProperties.GetName(icon) == "Settings icon" && lightBackground != darkBackground && highContrastBackground != darkBackground && resolvedTheme.HighContrast && resolvedTheme.Density == FsusDensity.Compact),
+      ["icon-text"] = new("icon-text", themeSurface, () => icon.IconKey == FsusIconKeys.Settings && icon.IsDecorative && AutomationProperties.GetName(icon) == "Settings icon" && lightBackground != darkBackground && highContrastBackground != darkBackground && resolvedTheme.HighContrast && resolvedTheme.Density == FsusDensity.Compact && BrushColor(activityShell.Background, "activity shell background") == Color.Parse("#010203") && BrushColor(themeSurface.Background, "theme surface") == Color.Parse("#102030") && BrushColor(titleBar.Background, "title bar background") == Color.Parse("#203040") && BrushColor(activityShell.Foreground, "activity shell foreground") == Color.Parse("#F0E0D0") && BrushColor(themeMutedText.Foreground, "muted shell status") == Color.Parse("#C0B0A0") && BrushColor(titleBar.BorderBrush, "title bar border") == Color.Parse("#405060") && BrushColor(icon.Fill, "icon fill") == Color.Parse("#ABCDEF")),
       ["input"] = new("input", input, () => input.Text?.Contains("CJK 漢字 emoji 🚀", StringComparison.Ordinal) is true && AutomationProperties.GetName(input) == "AOT input"),
       ["selection"] = new("selection", checkbox, () => checkbox.IsChecked == true),
       ["form"] = new("form", form, () => form.Children.Count == 2 && generatedItem.FieldAdapterError is null && thirdPartyItem.FieldAdapterError is null && generatedInput.Text == "generated-adapter" && thirdPartyInput.Text == "third-party-adapter"),
@@ -440,6 +523,112 @@ internal static class Program
     AutomationProperties.SetName(control, name);
     return control;
   }
+
+  private static bool ExerciseWebViewAdapter()
+  {
+    var backend = new AotWebViewBackend();
+    using var adapter = new FsusWebViewAdapter(backend);
+    var host = new FsusOverlayHost();
+    var menu = new FsusContextMenu
+    {
+      OverlaySize = new Size(240, 280),
+      ViewportBounds = new Rect(0, 0, 320, 480),
+    };
+    var invoker = new Button { Content = "Native AOT WebView" };
+    FsusWebViewContextMenuRequest? observed = null;
+    adapter.ContextMenuRequested += (_, args) => observed = args.Request;
+    var contextRequest = new FsusWebViewContextMenuRequest
+    {
+      Origin = FsusWebViewContextMenuOrigin.Keyboard,
+      ViewportPoint = new FsusWebViewViewportPoint(24, 48),
+      IsEditable = true,
+      HasSelection = true,
+      EditCapabilities = FsusWebViewEditCapabilities.Copy |
+        FsusWebViewEditCapabilities.RichCopy,
+      MisspelledWord = "teh",
+      SpellingSuggestions =
+      [
+        new FsusWebViewSpellingSuggestion("the", "Replace with the"),
+      ],
+      NativeMenuFallbackAvailable = true,
+    };
+    backend.RaiseContextMenu(contextRequest);
+    adapter.OpenContextMenu(host, menu, contextRequest, invoker);
+    var spellingComposed = menu.Items.OfType<FsusContextMenuItem>()
+      .Any(item => item.Key == "fsus-webview:replace:0" && Equals(item.Header, "Replace with the"));
+    var spellingChosen = menu.ChooseAsync("fsus-webview:replace:0")
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    var fallbackRequest = contextRequest with
+    {
+      SpellingSuggestions =
+      [
+        new FsusWebViewSpellingSuggestion(" ", "blank"),
+        new FsusWebViewSpellingSuggestion("", "empty"),
+      ],
+    };
+    adapter.OpenContextMenu(host, menu, fallbackRequest, invoker);
+    var fallbackComposed = menu.Items.OfType<FsusContextMenuItem>()
+      .Any(item => item.Key == "fsus-webview:native-menu") &&
+      !menu.Items.OfType<FsusContextMenuItem>()
+        .Any(item => item.Key.StartsWith("fsus-webview:replace:", StringComparison.Ordinal));
+    var fallbackChosen = menu.ChooseAsync("fsus-webview:native-menu")
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    var developerTools = adapter.OpenDeveloperToolsAsync()
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    using var destination = new MemoryStream();
+    var pdf = adapter.ExportPdfAsync(
+        new FsusWebViewPdfExportOptions
+        {
+          GenerateTaggedPdf = true,
+          GenerateDocumentOutline = true,
+          Theme = FsusWebViewPrintTheme.Dark,
+        },
+        destination)
+      .AsTask()
+      .GetAwaiter()
+      .GetResult();
+    return ReferenceEquals(observed, contextRequest) &&
+      spellingComposed &&
+      spellingChosen &&
+      fallbackComposed &&
+      fallbackChosen &&
+      developerTools.Status == FsusWebViewCommandStatus.Unsupported &&
+      backend.DeveloperToolsCalls == 0 &&
+      backend.ContextCommands is
+      [
+        { Command: FsusWebViewContextCommand.ReplaceWord, Replacement: "the" },
+        { Command: FsusWebViewContextCommand.UseNativeMenu },
+      ] &&
+      pdf.Status == FsusWebViewCommandStatus.Succeeded &&
+      pdf.TaggedPdfApplied &&
+      pdf.DocumentOutlineApplied &&
+      pdf.DestinationLeftOpen &&
+      destination.CanWrite &&
+      destination.Length == pdf.BytesWritten &&
+      pdf.Outline is [{ HeadingLevel: 1, Destination: "heading-aot" }];
+  }
+  private static Color BrushColor(IResourceDictionary resources, string key) =>
+    BrushColor((IBrush?)resources[key]);
+
+  private static IBrush ThemeBrush(IResourceDictionary resources, string key) =>
+    (IBrush?)resources[key]
+      ?? throw new InvalidOperationException($"Expected theme brush resource {key}.");
+
+  private static Color BrushColor(IBrush? brush) =>
+    brush is SolidColorBrush solid
+      ? solid.Color
+      : throw new InvalidOperationException("Expected a solid theme brush.");
+
+  private static Color BrushColor(IBrush? brush, string role) =>
+    brush is SolidColorBrush solid
+      ? solid.Color
+      : throw new InvalidOperationException($"Expected a solid theme brush for {role}.");
 
   private static int Fail(string kind, Exception error)
   {
@@ -583,6 +772,78 @@ internal sealed class AotProjectionProducer(
   }
 }
 
+internal sealed class AotWebViewBackend : IFsusWebViewBackendAdapter
+{
+  public FsusWebViewCapabilities Capabilities { get; } = new()
+  {
+    Platform = FsusWebViewPlatform.Linux,
+    SpellingSuggestions = true,
+    ReplaceWord = true,
+    AddToDictionary = true,
+    NativeContextMenu = true,
+    DeveloperTools = false,
+    TaggedPdf = true,
+    DocumentOutline = true,
+  };
+
+  public event EventHandler<FsusWebViewContextMenuRequestedEventArgs>? ContextMenuRequested;
+  public FsusWebViewContextCommandRequest? LastCommand { get; private set; }
+  public List<FsusWebViewContextCommandRequest> ContextCommands { get; } = [];
+  public int DeveloperToolsCalls { get; private set; }
+
+  public void RaiseContextMenu(FsusWebViewContextMenuRequest request) =>
+    ContextMenuRequested?.Invoke(
+      this,
+      new FsusWebViewContextMenuRequestedEventArgs(request));
+
+  public ValueTask<FsusWebViewCommandResult> ExecuteContextCommandAsync(
+    FsusWebViewContextCommandRequest request,
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    LastCommand = request;
+    ContextCommands.Add(request);
+    return ValueTask.FromResult(new FsusWebViewCommandResult(
+      FsusWebViewCommandStatus.Succeeded));
+  }
+
+  public ValueTask<FsusWebViewCommandResult> OpenDeveloperToolsAsync(
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    DeveloperToolsCalls++;
+    return ValueTask.FromResult(new FsusWebViewCommandResult(
+      FsusWebViewCommandStatus.Succeeded));
+  }
+
+  public async ValueTask<FsusWebViewPdfExportResult> ExportPdfAsync(
+    FsusWebViewPdfExportOptions options,
+    Stream destination,
+    CancellationToken cancellationToken = default)
+  {
+    cancellationToken.ThrowIfCancellationRequested();
+    var bytes = AotWebViewPdfDocument.Create();
+    await destination.WriteAsync(bytes, cancellationToken);
+    return new FsusWebViewPdfExportResult
+    {
+      Status = FsusWebViewCommandStatus.Succeeded,
+      TaggedPdfApplied = options.GenerateTaggedPdf,
+      DocumentOutlineApplied = options.GenerateDocumentOutline,
+      DestinationLeftOpen = destination.CanWrite,
+      BytesWritten = bytes.Length,
+      Outline =
+      [
+        new FsusWebViewDocumentOutlineNode
+        {
+          Title = "AOT",
+          HeadingLevel = 1,
+          Destination = "heading-aot",
+        },
+      ],
+    };
+  }
+}
+
 internal sealed class ThirdPartyTextAdapter(TextBox control) : IFsusFormFieldAdapter
 {
   public FsusFormFieldAdapterCapabilities Capabilities =>
@@ -656,6 +917,7 @@ internal sealed record SmokeReport
   public int CommandPaletteTreeCount { get; set; }
   public bool CodeEditorReady { get; set; }
   public bool MarkdownProjectionProducerReady { get; set; }
+  public bool WebViewAdapterReady { get; set; }
   public int ActivitySectionCount { get; set; }
   public int DocumentCount { get; set; }
   public string? TitleBarPlatform { get; set; }

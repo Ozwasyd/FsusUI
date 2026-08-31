@@ -1,7 +1,9 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using Avalonia.Utilities;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -221,21 +223,29 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
   private TextLayout? layout;
   private string text = string.Empty;
   private FsusMarkdownProjectionMap? map;
+  private IReadOnlyList<FsusMarkdownProjectionSpan>? spans;
+  private IReadOnlyList<ValueSpan<TextRunProperties>>? styleOverrides;
+  private IReadOnlyList<ProseDecoration>? decorations;
   private FsusMarkdownEditorSelection selection = new(0, 0);
 
   public void Update(
     string displayText,
     FsusMarkdownProjectionMap? projectionMap,
-    FsusMarkdownEditorSelection sourceSelection)
+    FsusMarkdownEditorSelection sourceSelection,
+    IReadOnlyList<FsusMarkdownProjectionSpan>? projectionSpans)
   {
     var presentationChanged =
       !string.Equals(text, displayText, StringComparison.Ordinal) ||
-      !ReferenceEquals(map, projectionMap);
+      !ReferenceEquals(map, projectionMap) ||
+      !ReferenceEquals(spans, projectionSpans);
     text = displayText;
     map = projectionMap;
+    spans = projectionSpans;
     selection = sourceSelection;
     if (presentationChanged)
     {
+      styleOverrides = null;
+      decorations = null;
       layout = null;
       InvalidateMeasure();
     }
@@ -343,6 +353,13 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
           new Rect(start.Left, start.Top, width, Math.Max(start.Height, FontSize * 1.2)));
       }
     }
+    if (decorations is not null)
+    {
+      foreach (var decoration in decorations)
+      {
+        decoration.Draw(context, layout);
+      }
+    }
     layout.Draw(context, default);
     if (visualStart == visualEnd)
     {
@@ -365,6 +382,8 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       change.Property == FontFeaturesProperty ||
       change.Property == ForegroundProperty)
     {
+      styleOverrides = null;
+      decorations = null;
       layout = null;
       InvalidateMeasure();
       InvalidateVisual();
@@ -377,6 +396,7 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
     {
       return;
     }
+    BuildProsePresentation();
     layout = new TextLayout(
       text,
       new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
@@ -393,7 +413,257 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       0,
       0,
       FontFeatures,
+      styleOverrides,
       null);
+  }
+
+  /// <summary>
+  /// Resolves the fsus-prose-equivalent presentation for the committed
+  /// projection spans: typography runs per SemanticKind plus the quote and
+  /// list decorations. Presentation is theme-driven; every value resolves
+  /// through a theme resource with a light/dark-safe fallback.
+  /// </summary>
+  private void BuildProsePresentation()
+  {
+    styleOverrides = null;
+    decorations = null;
+    if (map is null || spans is null || spans.Count == 0 || text.Length == 0)
+    {
+      return;
+    }
+
+    var runs = new List<ValueSpan<TextRunProperties>>();
+    var decorationsToDraw = new List<ProseDecoration>();
+    var headingLevels = BuildHeadingLevels(spans);
+    IBrush? linkBrush = ResolveBrush("FsusColorActionPrimaryBrush");
+    IBrush? quietBrush = ResolveBrush("FsusThemeMutedTextBrush");
+    IBrush? codeBackgroundBrush = ResolveBrush("FsusThemeSurfaceRaisedBrush");
+    var monospace = new Typeface("monospace");
+
+    foreach (var span in spans)
+    {
+      if (span.Kind == FsusMarkdownProjectionSpanKind.HiddenMarker ||
+        span.Kind == FsusMarkdownProjectionSpanKind.SourceFallback ||
+        span.SemanticKind is null)
+      {
+        continue;
+      }
+      var visualStart = map.SourceToVisual(span.SourceRange.Start, -1);
+      var visualEnd = map.SourceToVisual(span.SourceRange.End, 1);
+      if (visualEnd <= visualStart)
+      {
+        continue;
+      }
+      visualStart = Math.Clamp(visualStart, 0, text.Length);
+      visualEnd = Math.Clamp(visualEnd, 0, text.Length);
+      if (visualEnd <= visualStart)
+      {
+        continue;
+      }
+
+      var kind = span.SemanticKind;
+      if (kind == "strong")
+      {
+        runs.Add(new(visualStart, visualEnd - visualStart, new ProseTextRunProperties(
+          new Typeface(FontFamily, FontStyle, FontWeight.Bold, FontStretch),
+          FontSize,
+          Foreground ?? Brushes.Black,
+          null)));
+      }
+      else if (kind == "code")
+      {
+        runs.Add(new(visualStart, visualEnd - visualStart, new ProseTextRunProperties(
+          monospace,
+          Math.Max(8, FontSize * 0.9),
+          Foreground ?? Brushes.Black,
+          codeBackgroundBrush)));
+      }
+      else if (kind == "link")
+      {
+        runs.Add(new(visualStart, visualEnd - visualStart, new ProseTextRunProperties(
+          new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
+          FontSize,
+          linkBrush ?? Foreground ?? Brushes.Black,
+          null)));
+      }
+      else if (kind == "heading" &&
+        headingLevels.TryGetValue(span.NodeId, out var level))
+      {
+        // prose.scss ladder: h1 base+16, h2 base+8, h3 base+4, h4-h6 inherit;
+        // all heading levels share weight 700 and line-height 1.2.
+        var sizeDelta = level switch
+        {
+          1 => 16,
+          2 => 8,
+          3 => 4,
+          _ => 0,
+        };
+        runs.Add(new(visualStart, visualEnd - visualStart, new ProseTextRunProperties(
+          new Typeface(FontFamily, FontStyle, FontWeight.Bold, FontStretch),
+          FontSize + sizeDelta,
+          Foreground ?? Brushes.Black,
+          null)));
+      }
+      else if (kind == "quote")
+      {
+        runs.Add(new(visualStart, visualEnd - visualStart, new ProseTextRunProperties(
+          new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
+          FontSize,
+          quietBrush ?? Foreground ?? Brushes.Black,
+          null)));
+        decorationsToDraw.Add(new QuoteBorderDecoration(visualStart, visualEnd, quietBrush));
+      }
+      else if (kind is "list" or "task")
+      {
+        decorationsToDraw.Add(new ListMarkerDecoration(visualStart, quietBrush));
+      }
+    }
+
+    if (runs.Count > 0)
+    {
+      styleOverrides = runs
+        .OrderBy(run => run.Start)
+        .ToList();
+    }
+    if (decorationsToDraw.Count > 0)
+    {
+      decorations = decorationsToDraw;
+    }
+  }
+
+  /// <summary>
+  /// Derives heading levels (1-6) by pairing each heading text span with the
+  /// hidden marker span immediately before it. The level is the marker range
+  /// length; no Markdown syntax is re-parsed beyond consuming the canonical
+  /// runtime's marker geometry.
+  /// </summary>
+  private static Dictionary<string, int> BuildHeadingLevels(
+    IReadOnlyList<FsusMarkdownProjectionSpan> spans)
+  {
+    var levels = new Dictionary<string, int>(StringComparer.Ordinal);
+    FsusMarkdownProjectionSpan? previous = null;
+    foreach (var span in spans)
+    {
+      if (previous is not null &&
+        previous.Kind == FsusMarkdownProjectionSpanKind.HiddenMarker &&
+        previous.SourceRange.End == span.SourceRange.Start &&
+        span.SemanticKind == "heading")
+      {
+        var level = previous.SourceRange.End - previous.SourceRange.Start;
+        if (level >= 1 && level <= 6)
+        {
+          levels[span.NodeId] = level;
+        }
+      }
+      previous = span;
+    }
+    return levels;
+  }
+
+  private IBrush? ResolveBrush(string key) =>
+    this.TryFindResource(key, out var resource) && resource is IBrush brush ? brush : null;
+
+  private sealed class ProseTextRunProperties(
+    Typeface typeface,
+    double fontRenderingEmSize,
+    IBrush? foregroundBrush,
+    IBrush? backgroundBrush) : TextRunProperties
+  {
+    public override Typeface Typeface { get; } = typeface;
+
+    public override double FontRenderingEmSize { get; } = fontRenderingEmSize;
+
+    public override TextDecorationCollection? TextDecorations => null;
+
+    public override IBrush? ForegroundBrush { get; } = foregroundBrush;
+
+    public override IBrush? BackgroundBrush { get; } = backgroundBrush;
+
+    public override CultureInfo? CultureInfo => null;
+
+    public override FontFeatureCollection? FontFeatures => null;
+
+    public override BaselineAlignment BaselineAlignment => BaselineAlignment.Baseline;
+  }
+
+  private abstract class ProseDecoration(int visualStart, int visualEnd)
+  {
+    protected readonly int VisualStart = visualStart;
+    protected readonly int VisualEnd = visualEnd;
+
+    public abstract void Draw(DrawingContext context, TextLayout layout);
+  }
+
+  private sealed class QuoteBorderDecoration(
+    int visualStart,
+    int visualEnd,
+    IBrush? brush) : ProseDecoration(visualStart, visualEnd)
+  {
+    public override void Draw(DrawingContext context, TextLayout layout)
+    {
+      if (brush is null || layout.TextLines.Count == 0)
+      {
+        return;
+      }
+      var first = LineBounds(layout, VisualStart);
+      var last = LineBounds(layout, Math.Max(VisualStart, VisualEnd - 1));
+      if (first is null)
+      {
+        return;
+      }
+      var top = first.Value.Top;
+      var bottom = last?.Bottom ?? first.Value.Bottom;
+      context.FillRectangle(
+        new Pen(brush, 2).Brush,
+        new Rect(Math.Max(0, first.Value.Left - 8), top, 2, Math.Max(2, bottom - top)));
+    }
+  }
+
+  private sealed class ListMarkerDecoration(
+    int visualStart,
+    IBrush? brush) : ProseDecoration(visualStart, visualStart)
+  {
+    public override void Draw(DrawingContext context, TextLayout layout)
+    {
+      if (brush is null)
+      {
+        return;
+      }
+      var line = LineBounds(layout, VisualStart);
+      if (line is null)
+      {
+        return;
+      }
+      var size = 4d;
+      var top = line.Value.Top + (line.Value.Height * 0.6) - (size / 2);
+      context.DrawRectangle(
+        brush,
+        null,
+        new RoundedRect(
+          new Rect(Math.Max(2, line.Value.Left - 14), top, size, size),
+          size / 2));
+    }
+  }
+
+  private static Rect? LineBounds(TextLayout layout, int visualOffset)
+  {
+    if (layout.TextLines.Count == 0)
+    {
+      return null;
+    }
+    var clamped = Math.Max(0, visualOffset);
+    var lineTop = 0d;
+    foreach (var line in layout.TextLines)
+    {
+      var lineEnd = line.FirstTextSourceIndex + line.Length;
+      if (clamped < lineEnd || ReferenceEquals(line, layout.TextLines[^1]))
+      {
+        var position = layout.HitTestTextPosition(clamped);
+        return new Rect(position.Left, lineTop, Math.Max(position.Width, 1), line.Height);
+      }
+      lineTop += line.Height;
+    }
+    return null;
   }
 }
 
