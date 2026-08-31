@@ -6,6 +6,6 @@ internal static class FsusGeneratedAlignment
 {
   public static IReadOnlySet<string> StableFamilies { get; } = new HashSet<string>(StringComparer.Ordinal)
   {
-
+    "check-tag",
   };
 }
