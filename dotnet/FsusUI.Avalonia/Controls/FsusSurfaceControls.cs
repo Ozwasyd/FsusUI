@@ -120,6 +120,7 @@ public class FsusDivider : Separator
   public FsusDivider()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-divider");
+    FsusComponentClasses.Ensure(this, "fsus-has-title", !string.IsNullOrWhiteSpace(Title));
     SyncAutomation();
   }
 

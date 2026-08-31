@@ -1,0 +1,143 @@
+{
+ "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+ "ownerRepository": "Ozwasyd/FsusUI",
+ "affectedSurfaces": [
+  "Avalonia FsusLink variant label colors (Web el-link authority)",
+  "Avalonia FsusDivider template (title row + color.border.lighter rule, zero margin)",
+  "Avalonia FsusThemeTextBrush light value aligned to color.text.primary token (#0F0F11)",
+  "Avalonia FsusThemeIconBrush light value aligned to color.text.primary token (#0F0F11)",
+  "markdown-editor source-surface cross-platform comparison evidence"
+ ],
+ "uiDecisionClass": "prescribed",
+ "verificationClass": "ux-path",
+ "requiredAuthorities": [
+  {
+   "id": "design",
+   "path": "docs/design.md",
+   "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+  },
+  {
+   "id": "design-governance",
+   "path": "docs/design/governance.md",
+   "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5"
+  },
+  {
+   "id": "change-classification",
+   "path": "docs/design/change-classification.md",
+   "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84"
+  },
+  {
+   "id": "visual-workflow",
+   "path": "docs/workflows/visual-change.md",
+   "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+  },
+  {
+   "id": "avalonia-index",
+   "path": "docs/avalonia/README.md",
+   "digest": "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506"
+  },
+  {
+   "id": "icon-text",
+   "path": "docs/avalonia/components/icon-text.md",
+   "digest": "dbbf8a617bf1680ed98c9f34f99daa3066fd4e86837a415d596dc106d1526988"
+  },
+  {
+   "id": "layout",
+   "path": "docs/avalonia/components/layout.md",
+   "digest": "236b75a211d8f753228965c215bdcaccc7080df4b5699e5cfa9e77ee63c3dd40"
+  },
+  {
+   "id": "display",
+   "path": "docs/avalonia/components/display.md",
+   "digest": "e099dfd956d790aa2b4258456fb710c64033bd986f7544a87553c9946eed373c"
+  },
+  {
+   "id": "markdown-editor",
+   "path": "docs/avalonia/components/markdown-editor.md",
+   "digest": "f1cbea9be45f2439dfe7578f176ec3845c6d491294c7cd7a2e6d3665a818fe7c"
+  },
+  {
+   "id": "platform-differences",
+   "path": "docs/avalonia/platform-differences.md",
+   "digest": "96dd3a8cbb0724907d5cbead977241f33be09d1450b69953f745071d1dd2998a"
+  }
+ ],
+ "requiredSkillDigests": [
+  "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+ ],
+ "activeBaselineIdentity": {
+  "repository": "Ozwasyd/FsusUI",
+  "revision": "c3bd2184ef",
+  "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+  "authorityDigest": "01afd68fe61bbde7b10dc88fad5dcaef0b7847b3abc38e7f17d34798d585c8d6",
+  "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+ },
+ "candidateSha": "3837751f4474088e953d9bc9a6f77da726e4672a",
+ "candidateDigest": "e52ceb78d3fe0c0e1fd28836994824430708b5797de07c0f83f0590a4dc04ab2",
+ "stateEvidenceMatrix": [
+  {
+   "state": "markdown-editor-avalonia-rendered-light",
+   "viewport": "headless-96dpi",
+   "theme": "light",
+   "evidenceDigest": "cca4a38e5232f0750dcff4e2af36f1b1c4edeffe0b44bcb86f614b471b0b15c7"
+  },
+  {
+   "state": "markdown-editor-web-captured-light",
+   "viewport": "chrome-element",
+   "theme": "light",
+   "evidenceDigest": "d4958286c4fe539bf0f5d98b9e9634004d43db84e9d2d1903966f4065b2293f2"
+  },
+  {
+   "state": "icon-text-avalonia-rendered-light",
+   "viewport": "headless-96dpi",
+   "theme": "light",
+   "evidenceDigest": "0f9aa83d55fd7fbba951abe84c21a664355524ebe26578ea90c43b93466f2097"
+  },
+  {
+   "state": "icon-text-web-captured-light",
+   "viewport": "chrome-element",
+   "theme": "light",
+   "evidenceDigest": "f3882c85a410abb0df0bcd731f38831427dc80559a7b6117e8ff1ec622c27307"
+  },
+  {
+   "state": "layout-avalonia-rendered-light",
+   "viewport": "headless-96dpi",
+   "theme": "light",
+   "evidenceDigest": "2a85bc81db9e97655981bf89876aa5dab67f5425c4dfc594c8015b95b68ab8cb"
+  },
+  {
+   "state": "layout-web-captured-light",
+   "viewport": "chrome-element",
+   "theme": "light",
+   "evidenceDigest": "be67b42944c4e70ea5a6384e895305db89222c2acd95f325db8b159e83464de2"
+  },
+  {
+   "state": "divider-avalonia-rendered-light",
+   "viewport": "headless-96dpi",
+   "theme": "light",
+   "evidenceDigest": "955ea9665b53f2828de38cb1305f88df111aa9295fdc13eede369cd2fa8d54a7"
+  },
+  {
+   "state": "divider-web-captured-light",
+   "viewport": "chrome-element",
+   "theme": "light",
+   "evidenceDigest": "3d9a2c93410b35d0f8e7f0b35910f2b111d4357ad2d1f2af61b362962781a9f1"
+  }
+ ],
+ "inScope": [
+  "link variant label colors matching el-link type authority",
+  "divider visible rule + optional title template under pure FsusTheme",
+  "theme text/icon brush alignment to canonical color.text.primary token",
+  "real dual-platform captures for markdown-editor source surface, link row, row/col grid, divider"
+ ],
+ "outOfScope": [
+  "token file changes (spec/tokens/tokens.json untouched)",
+  "issue 717 parity work (blocked by draft PRs 664/665)",
+  "code-editor comparison (no Vue-side counterpart component)",
+  "issue 285 conformance derivation"
+ ],
+ "classificationEvidenceDigest": "c724729dabf40cca2f6d4b7285b2202697ebcabff467aba786679be906ce2aa3",
+ "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+ "status": "frozen",
+ "receiptDigest": "61cd16ea2e7f234af622352048ba0452434302f7ff5a1baef258da1c83a8e1b2"
+}

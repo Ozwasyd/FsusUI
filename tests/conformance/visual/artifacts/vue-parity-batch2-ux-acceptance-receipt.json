@@ -1,0 +1,76 @@
+{
+ "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+ "classificationReceiptDigest": "1ed8be4cda40563fa230d2d171c5cfb669fc84bc89b05575d3e503b3596226bb",
+ "candidateSha": "3837751f4474088e953d9bc9a6f77da726e4672a",
+ "candidateDigest": "e52ceb78d3fe0c0e1fd28836994824430708b5797de07c0f83f0590a4dc04ab2",
+ "verificationClass": "ux-path",
+ "requiredSkillDigests": [
+  "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+ ],
+ "authorityDigests": [
+  "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+  "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+  "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+  "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
+  "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506",
+  "dbbf8a617bf1680ed98c9f34f99daa3066fd4e86837a415d596dc106d1526988",
+  "236b75a211d8f753228965c215bdcaccc7080df4b5699e5cfa9e77ee63c3dd40",
+  "e099dfd956d790aa2b4258456fb710c64033bd986f7544a87553c9946eed373c",
+  "f1cbea9be45f2439dfe7578f176ec3845c6d491294c7cd7a2e6d3665a818fe7c",
+  "96dd3a8cbb0724907d5cbead977241f33be09d1450b69953f745071d1dd2998a"
+ ],
+ "activeBaselineIdentityDigest": "01afd68fe61bbde7b10dc88fad5dcaef0b7847b3abc38e7f17d34798d585c8d6",
+ "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+ "independenceEvidenceDigest": "876a57ed7c49c30872019898d4555ba279fbe8422acb5533d84be1651b67fb7b",
+ "modifiedPaths": [],
+ "productionFixture": true,
+ "viewportStateMatrix": [],
+ "blockers": [],
+ "inspectedEvidence": [
+  "tests/conformance/visual/artifacts/screenshots/web/markdown-editor-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/avalonia/markdown-editor-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/web/icon-text-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/avalonia/icon-text-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/web/layout-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/avalonia/layout-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/web/divider-vue-parity.png",
+  "tests/conformance/visual/artifacts/screenshots/avalonia/divider-vue-parity.png"
+ ],
+ "comparisonResults": [
+  {
+   "id": "markdown-editor-vue-parity-web-avalonia",
+   "screenshotDiffPercent": 0.001,
+   "perceptualDelta": 0.091,
+   "geometryDelta": 0.4,
+   "colorDelta": 0.0,
+   "overrideId": "visual-markdown-source-surface-002",
+   "passed": true
+  },
+  {
+   "id": "icon-text-vue-parity-web-avalonia",
+   "screenshotDiffPercent": 0.000531,
+   "perceptualDelta": 0.071,
+   "geometryDelta": 0.9,
+   "colorDelta": 0.0,
+   "passed": true
+  },
+  {
+   "id": "layout-vue-parity-web-avalonia",
+   "screenshotDiffPercent": 8.6e-05,
+   "perceptualDelta": 0.03,
+   "geometryDelta": 0.0,
+   "colorDelta": 0.0,
+   "passed": true
+  },
+  {
+   "id": "divider-vue-parity-web-avalonia",
+   "screenshotDiffPercent": 7.6e-05,
+   "perceptualDelta": 0.007,
+   "geometryDelta": 0.0,
+   "colorDelta": 0.0,
+   "passed": true
+  }
+ ],
+ "status": "accepted",
+ "receiptDigest": "7eb76881151b096438aa756e7c1a227b3318e58919cc5980b65eed2183807d98"
+}
