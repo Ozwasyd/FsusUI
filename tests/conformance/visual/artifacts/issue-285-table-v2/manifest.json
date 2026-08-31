@@ -1,0 +1,61 @@
+{
+  "schema": "fsusui-table-v2-render-evidence.v1",
+  "issue": 285,
+  "candidateSha": "e9ec7e3c8145b598d41b08d3610ab6f245c258ca",
+  "candidateDigest": "1a9ff9de943cd711c652d4ad3a779e0212e9f074714ba0f69e838a277d1ccb79",
+  "productionFixture": true,
+  "theme": "light",
+  "motionMode": "reduced",
+  "generationCommand": "FSUSUI_UPDATE_VISUAL_ARTIFACTS=1 dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --filter 'FullyQualifiedName~FsusTableV2RenderedEvidenceTests' --no-restore",
+  "verificationCommands": [
+    "dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --filter 'FullyQualifiedName~FsusTableV2RenderedEvidenceTests' --no-restore",
+    "pnpm run conformance:v2:table-v2-render"
+  ],
+  "sources": [
+    {
+      "path": "dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs",
+      "sha256": "426cc98671f476bf27b8949411b8e1805ada4771ae93e6583e6b237c3b5fc8a6"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
+      "sha256": "6e68f52a5ace3c92b890077682ad8c5f962066b2cc0b0250802a16cee3b5384a"
+    },
+    {
+      "path": "scripts/vue-semantic-baseline.mjs",
+      "sha256": "b76c1394f6b44692aa9efe41ebeb33b135e6a50b2a0eefa2b47485263e5dab68"
+    },
+    {
+      "path": "scripts/contract-v2.mjs",
+      "sha256": "037e5adfd2fe474183f2f690a96f7b7b42f3f89349933402aac0d281891161f6"
+    },
+    {
+      "path": "scripts/table-v2-render-evidence.mjs",
+      "sha256": "48d8c750e5ae438a0435dac00edc34e63bc7d37d246d85059258cdf818cf6e51"
+    },
+    {
+      "path": "spec/components/contracts/v2/contract-v2.json",
+      "sha256": "abbbaeaa65f5cf586ea58a64770b92f41528b0a2b1212070c2c2a934e9f12ad6"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "table-v2-content-regions-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
+      "sha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+      "bytes": 38293,
+      "width": 488,
+      "height": 540,
+      "state": "two-row-scoped-header-populated-footer-empty"
+    },
+    {
+      "id": "table-v2-whole-header-overlay-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png",
+      "sha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+      "bytes": 17037,
+      "width": 488,
+      "height": 320,
+      "state": "whole-header-loading-overlay"
+    }
+  ],
+  "manifestDigest": "6c36aca59e6c101ba06972b7620ace3185d8a5e55447290bab29671728243d6b"
+}

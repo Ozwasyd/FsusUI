@@ -1,0 +1,87 @@
+{
+  "schema": "fsusui-independent-ux-review.v1",
+  "issue": 285,
+  "candidateSha": "e9ec7e3c8145b598d41b08d3610ab6f245c258ca",
+  "candidateDigest": "1a9ff9de943cd711c652d4ad3a779e0212e9f074714ba0f69e838a277d1ccb79",
+  "reviewMode": "read-only-rendered-evidence-inspection",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 488,
+        "height": 540
+      },
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "theme": "light",
+      "motion": "reduced",
+      "evidenceDigest": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 488,
+        "height": 320
+      },
+      "state": "whole-header-loading-overlay",
+      "theme": "light",
+      "motion": "reduced",
+      "evidenceDigest": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "table-v2-content-regions-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
+      "digest": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+      "bytes": 38293,
+      "width": 488,
+      "height": 540,
+      "inspected": true
+    },
+    {
+      "id": "table-v2-whole-header-overlay-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png",
+      "digest": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+      "bytes": 17037,
+      "width": 488,
+      "height": 320,
+      "inspected": true
+    }
+  ],
+  "governedCriteria": [
+    {
+      "id": "scoped-content-regions-readable",
+      "status": "accepted",
+      "observation": "Both scoped header rows are fully visible and aligned to the same three-column grid; eight realized row payloads, the footer, and the independent empty state remain legible without collision."
+    },
+    {
+      "id": "bounded-data-region-layout",
+      "status": "accepted",
+      "observation": "Rows end above the footer, the scrollbar remains inside the frame, and no text clipping, frame overflow, or layout shift is visible."
+    },
+    {
+      "id": "whole-header-overlay-hierarchy",
+      "status": "accepted",
+      "observation": "The whole header replaces cell headers cleanly while the restrained translucent overlay mutes the body and keeps its centered status readable without obscuring the header, scrollbar, or outline."
+    },
+    {
+      "id": "intellectual-minimalist-restraint",
+      "status": "accepted",
+      "observation": "The fixed states use flat rows, subtle rules, neutral paper surfaces, and one structural accent without cards, badges, icons, glow, motion, or decorative copy."
+    }
+  ],
+  "observations": [
+    "The first artifact shows Contract fields, Review state, and Assignment above Name, Status, and Owner, with all six cells visibly bounded.",
+    "The first artifact shows eight realized rows, a separate 20 rows footer, and a separate No rows empty state.",
+    "The second artifact shows Contract review queue and a centered Refreshing rows overlay without clipping or overflow.",
+    "The exact candidate range from 95c488c0 to e9ec7e3c changes only the fail-closed evidence validator and package command; it does not change product or PNG bytes."
+  ],
+  "limitations": [
+    "This review is limited to the two exact light-theme fixed-viewport Avalonia artifacts and does not claim dark, mobile, zoom, screen-reader, or cross-platform pixel coverage.",
+    "Any candidate SHA or PNG byte change requires a new exact-candidate receipt binding and rendered reinspection."
+  ],
+  "blockers": [],
+  "status": "accepted"
+}
