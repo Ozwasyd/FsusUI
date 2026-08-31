@@ -72,6 +72,36 @@ describe('markdown heavy feature lifecycle', () => {
     })
   })
 
+  it('bounds the 0/1/100 mixed heavy-node matrix in one registry', async () => {
+    const empty = createMarkdownHeavyFeatureLifecycle()
+    expect(empty.metrics()).toMatchObject({
+      activeNodes: 0,
+      cacheEntries: 0,
+      staticNodes: 0,
+    })
+
+    for (const count of [1, 100]) {
+      const lifecycle = createMarkdownHeavyFeatureLifecycle()
+      for (const kind of ['code-highlight', 'mermaid', 'latex'] as const) {
+        for (let index = 0; index < count; index += 1) {
+          await activate(
+            lifecycle,
+            identity(kind, { nodeId: `${kind}-${index}` }),
+            document.createElement('div'),
+            async () => Object.freeze({ payload: `${kind}-${index}` }),
+          )
+        }
+      }
+      expect(lifecycle.metrics()).toMatchObject({
+        activations: count * 3,
+        activeNodes: 0,
+        cacheEntries: Math.min(128, count * 3),
+        retainedResources: 0,
+        staticNodes: count * 3,
+      })
+    }
+  })
+
   it('tracks already-rendered immutable visuals as zero-resource static nodes', () => {
     const lifecycle = createMarkdownHeavyFeatureLifecycle()
     const root = document.createElement('article')
@@ -152,11 +182,8 @@ describe('markdown heavy feature lifecycle', () => {
     })
 
     const settled = document.createElement('div')
-    await activate(
-      lifecycle,
-      identity('latex'),
-      settled,
-      async () => Object.freeze({ payload: 'current' }),
+    await activate(lifecycle, identity('latex'), settled, async () =>
+      Object.freeze({ payload: 'current' }),
     )
     lifecycle.unmountRoot(settled)
     await activate(
@@ -341,6 +368,59 @@ describe('markdown heavy feature lifecycle', () => {
     })
   })
 
+  it('evicts entry and byte budgets independently under memory pressure', async () => {
+    const entryBound = createMarkdownHeavyFeatureLifecycle({
+      maxBytes: 1_024,
+      maxEntries: 1,
+    })
+    for (const nodeId of ['entry-a', 'entry-b']) {
+      await activate(
+        entryBound,
+        identity('code-highlight', { nodeId }),
+        document.createElement('pre'),
+        async () => Object.freeze({ payload: nodeId }),
+      )
+    }
+    expect(entryBound.metrics()).toMatchObject({
+      cacheEntries: 1,
+      evictions: 1,
+    })
+    expect(entryBound.metrics().cacheBytes).toBeLessThan(1_024)
+
+    const byteBound = createMarkdownHeavyFeatureLifecycle({
+      maxBytes: 16,
+      maxEntries: 10,
+    })
+    for (const nodeId of ['byte-a', 'byte-b']) {
+      await activate(
+        byteBound,
+        identity('mermaid', { nodeId }),
+        document.createElement('div'),
+        async () => Object.freeze({ payload: '123456' }),
+      )
+    }
+    expect(byteBound.metrics()).toMatchObject({
+      cacheBytes: 12,
+      cacheEntries: 1,
+      evictions: 1,
+    })
+
+    const oversized = createMarkdownHeavyFeatureLifecycle({
+      maxBytes: 8,
+      maxEntries: 10,
+    })
+    await activate(
+      oversized,
+      identity('latex'),
+      document.createElement('span'),
+      async () => Object.freeze({ payload: '12345' }),
+    )
+    expect(oversized.metrics()).toMatchObject({
+      cacheBytes: 0,
+      cacheEntries: 0,
+    })
+  })
+
   it('keys material theme/config/version changes without clearing unrelated cache', async () => {
     const lifecycle = createMarkdownHeavyFeatureLifecycle()
     let renders = 0
@@ -361,14 +441,31 @@ describe('markdown heavy feature lifecycle', () => {
     await run({ theme: 'dark' })
     await run({ config: 'strict', theme: 'dark' })
     await run({ rendererVersion: 'renderer@2', theme: 'dark' })
+    await run({ locale: 'fr', rendererVersion: 'renderer@2', theme: 'dark' })
+    await run({
+      gatewayVersion: 'gateway@2',
+      locale: 'fr',
+      rendererVersion: 'renderer@2',
+      theme: 'dark',
+    })
     await run({ theme: 'light' })
-    expect(renders).toBe(4)
-    expect(lifecycle.metrics()).toMatchObject({ cacheEntries: 4, reuses: 1 })
+    expect(renders).toBe(6)
+    expect(lifecycle.metrics()).toMatchObject({ cacheEntries: 6, reuses: 1 })
   })
 
   it('kills the required lifecycle mutation fixtures', async () => {
     const adapterMutations =
       evaluateMarkdownHeavyFeatureAdapterResourceMutations()
+    expect(adapterMutations.featureLocalRetention.cleanAttempts).toEqual([])
+    expect(adapterMutations.featureLocalRetention.mutantAttempts).toEqual([
+      'feature-local-mutation-observer',
+      'feature-local-resize-observer',
+      'feature-local-promise-retry',
+      'feature-local-promise-retry',
+      'feature-local-promise-retry',
+      'feature-local-promise-retry',
+      'feature-local-promise-retry',
+    ])
     expect(adapterMutations.featureLocalScheduler.cleanAttempts).toEqual([])
     expect(adapterMutations.featureLocalScheduler.mutantAttempts).toEqual([
       'feature-local-raf',
@@ -376,7 +473,7 @@ describe('markdown heavy feature lifecycle', () => {
     ])
     const report =
       await evaluateMarkdownHeavyFeatureLifecycleMutations(adapterMutations)
-    expect(report.mutations).toHaveLength(6)
+    expect(report.mutations).toHaveLength(7)
     expect(report.mutations.every((mutation) => !mutation.accepted)).toBe(true)
   })
 })

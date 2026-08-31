@@ -346,6 +346,11 @@ function recordHeavyLifecycleMetrics() {
     retainedRuntimes: metrics.retainedRuntimes,
     retainedTasks: metrics.retainedTasks,
     reuses: metrics.reuses,
+    scheduler: {
+      authority: 'markdown-editor-frame-scheduler@1',
+      mutateCommits: heavyFeatureMutateCommits,
+      postPaintCommits: heavyFeaturePostPaintCommits,
+    },
     stale: metrics.staleCommits,
     static: metrics.staticNodes,
     teardowns: metrics.teardowns,
@@ -375,6 +380,8 @@ const afterFrame = () =>
 // (#640): embedded in ElMarkdownEditor this is the editor instance provided
 // via inject; standalone renders create an equivalent local instance.
 const frameScheduler = useEmbeddedMarkdownEditorFrameScheduler()
+let heavyFeatureMutateCommits = 0
+let heavyFeaturePostPaintCommits = 0
 let renderAnchorDelta: number | null = null
 
 const scheduleHeavyFeatureCommit = (input: {
@@ -384,17 +391,24 @@ const scheduleHeavyFeatureCommit = (input: {
 }) =>
   new Promise<HTMLElement | void>((resolve, reject) => {
     let committed: HTMLElement | void
+    let mutatePhaseRan = false
     const abort = () => reject(new DOMException('Aborted', 'AbortError'))
     input.signal.addEventListener('abort', abort, { once: true })
     const accepted = frameScheduler.schedule({
       key: input.key,
       mutate: () => {
-        if (!input.signal.aborted) committed = input.run()
+        if (!input.signal.aborted) {
+          committed = input.run()
+          mutatePhaseRan = true
+          heavyFeatureMutateCommits += 1
+        }
       },
       postPaint: () => {
+        if (mutatePhaseRan) heavyFeaturePostPaintCommits += 1
         input.signal.removeEventListener('abort', abort)
         if (input.signal.aborted) abort()
         else resolve(committed)
+        recordHeavyLifecycleMetrics()
       },
     })
     if (!accepted) {

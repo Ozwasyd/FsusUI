@@ -829,6 +829,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .performance-fixture {
   box-sizing: border-box;
+  max-width: 100%;
   min-height: 720px;
   padding: 24px;
   width: 1024px;

@@ -27,7 +27,12 @@ describe('markdown latex preview', () => {
     expect(block.node?.nodeId.startsWith('syn:')).toBe(true)
     expect(block.display).toBe('block')
     expect(block.wraps).toBe(false)
-    expect(blockSource.slice(block.node!.ranges.body.raw.start, block.node!.ranges.body.raw.end)).toContain('x^2')
+    expect(
+      blockSource.slice(
+        block.node!.ranges.body.raw.start,
+        block.node!.ranges.body.raw.end,
+      ),
+    ).toContain('x^2')
     expect(block.request?.id).toBe(
       `tech:${identity.id}:${identity.epoch}:3:${block.node!.nodeId}`,
     )
@@ -43,7 +48,12 @@ describe('markdown latex preview', () => {
     expect(inline.display).toBe('inline')
     expect(inline.wraps).toBe(true)
     expect(inline.classification.verdict).toBe('valid')
-    expect(inlineSource.slice(inline.node!.rawRange.start, inline.node!.rawRange.end)).toBe('\\(x^2\\)')
+    expect(
+      inlineSource.slice(
+        inline.node!.rawRange.start,
+        inline.node!.rawRange.end,
+      ),
+    ).toBe('\\(x^2\\)')
   })
 
   it('maps CRLF, BOM, CJK, and RTL around math without rewriting source', () => {
@@ -53,7 +63,12 @@ describe('markdown latex preview', () => {
       source,
     })
     expect(plan.node?.kind).toBe('latex')
-    expect(source.slice(plan.node!.ranges.body.raw.start, plan.node!.ranges.body.raw.end)).toContain('中文')
+    expect(
+      source.slice(
+        plan.node!.ranges.body.raw.start,
+        plan.node!.ranges.body.raw.end,
+      ),
+    ).toContain('中文')
     expect(plan.sourceUnchanged).toBe(true)
     expect(plan.classification.rewrite).toBe(false)
   })
@@ -82,7 +97,10 @@ describe('markdown latex preview', () => {
       source: blockSource,
     })
     const committed = commitMarkdownLatexPreview({
-      output: { kind: 'latex', payload: '<span class="katex"><math></math></span>' },
+      output: {
+        kind: 'latex',
+        payload: '<span class="katex"><math></math></span>',
+      },
       plan,
       source: blockSource,
     })
@@ -112,6 +130,27 @@ describe('markdown latex preview', () => {
         source: 'plain paragraph\n',
       }).state,
     ).toBe('deleted')
+
+    const retry = planMarkdownLatexPreview({
+      documentIdentity: identity,
+      intent: 'retry',
+      source: blockSource,
+    })
+    expect(retry).toMatchObject({
+      action: 'pending',
+      sourceUnchanged: true,
+    })
+    expect(retry.request).not.toBeNull()
+    const cancel = planMarkdownLatexPreview({
+      documentIdentity: identity,
+      intent: 'cancel',
+      source: blockSource,
+    })
+    expect(cancel).toMatchObject({
+      action: 'cancel',
+      sourceUnchanged: true,
+    })
+    expect(cancel.request).toBeNull()
   })
 
   it('rejects XSS latex payloads and keeps inline selection plus block scroll stable', () => {
@@ -120,7 +159,10 @@ describe('markdown latex preview', () => {
       revision: 1,
       source: blockSource,
     })
-    for (const id of ['mxss-feature-latex-event', 'mxss-feature-latex-annotation'] as const) {
+    for (const id of [
+      'mxss-feature-latex-event',
+      'mxss-feature-latex-annotation',
+    ] as const) {
       const committed = commitMarkdownLatexPreview({
         output: getMarkdownXssFeatureOutput(id),
         plan,
@@ -130,13 +172,14 @@ describe('markdown latex preview', () => {
       expect(committed.rewrite).toBe(false)
       expect(committed.editorCapability).toBe('supported')
     }
-    const modes = (['source', 'live', 'split', 'preview'] as const).map((mode) =>
-      planMarkdownLatexPreview({
-        documentIdentity: identity,
-        mode,
-        revision: 2,
-        source: blockSource,
-      }),
+    const modes = (['source', 'live', 'split', 'preview'] as const).map(
+      (mode) =>
+        planMarkdownLatexPreview({
+          documentIdentity: identity,
+          mode,
+          revision: 2,
+          source: blockSource,
+        }),
     )
     expect(new Set(modes.map((item) => item.node?.nodeId)).size).toBe(1)
     expect(modes[0]?.height.scrollIntoView).toBe(false)

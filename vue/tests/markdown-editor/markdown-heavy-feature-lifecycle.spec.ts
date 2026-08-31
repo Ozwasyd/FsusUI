@@ -51,6 +51,11 @@ type LifecycleMetrics = {
   retainedRuntimes: number
   retainedTasks: number
   reuses: number
+  scheduler: {
+    authority: string
+    mutateCommits: number
+    postPaintCommits: number
+  }
   stale: number
   static: number
   teardowns: number
@@ -315,6 +320,13 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     theme: 'token-bound',
   })
   expect(initial!.identities.mermaid?.config).toContain('"tokens"')
+  expect(initial!.scheduler).toMatchObject({
+    authority: 'markdown-editor-frame-scheduler@1',
+  })
+  expect(initial!.scheduler.mutateCommits).toBeGreaterThan(0)
+  expect(initial!.scheduler.postPaintCommits).toBe(
+    initial!.scheduler.mutateCommits,
+  )
   const initialCodeNodeId = initial!.identities['code-highlight']!.nodeId
   const initialMountedUnits = await renderer
     .locator('[data-fsus-render-unit]')
@@ -354,6 +366,82 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     .poll(async () => (await readMetrics(page))?.reuses ?? 0)
     .toBeGreaterThan(0)
   await expect.poll(async () => (await readMetrics(page))?.active ?? -1).toBe(0)
+
+  const settledCycles: Array<{ cacheBytes: number; cacheEntries: number }> = []
+  for (let cycle = 0; cycle < 3; cycle += 1) {
+    for (const position of ['bottom', 'top'] as const) {
+      await renderer.evaluate((element, nextPosition) => {
+        element.scrollTop = nextPosition === 'bottom' ? element.scrollHeight : 0
+        element.dispatchEvent(new Event('scroll'))
+      }, position)
+      await page.evaluate(
+        () =>
+          new Promise<void>((resolve) => {
+            let frames = 0
+            const next = () => {
+              frames += 1
+              if (frames >= 4) resolve()
+              else requestAnimationFrame(next)
+            }
+            requestAnimationFrame(next)
+          }),
+      )
+      await expect
+        .poll(async () => (await readMetrics(page))?.active ?? -1, {
+          timeout: 60_000,
+        })
+        .toBe(0)
+      await expect
+        .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
+        .toBe(0)
+      const settled = (await readMetrics(page))!
+      settledCycles.push({
+        cacheBytes: settled.cacheBytes,
+        cacheEntries: settled.cacheEntries,
+      })
+    }
+  }
+  expect(
+    settledCycles.every(
+      ({ cacheBytes, cacheEntries }) =>
+        cacheEntries <= 128 && cacheBytes <= 4 * 1024 * 1024,
+    ),
+  ).toBe(true)
+  expect(
+    settledCycles.some(
+      (entry, index) =>
+        index > 0 &&
+        entry.cacheEntries <= settledCycles[index - 1]!.cacheEntries &&
+        entry.cacheBytes <= settledCycles[index - 1]!.cacheBytes,
+    ),
+  ).toBe(true)
+
+  const beforeIdle = (await readMetrics(page))!
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        let frames = 0
+        const next = () => {
+          frames += 1
+          if (frames >= 30) resolve()
+          else requestAnimationFrame(next)
+        }
+        requestAnimationFrame(next)
+      }),
+  )
+  const afterIdle = (await readMetrics(page))!
+  expect(afterIdle).toMatchObject({
+    activations: beforeIdle.activations,
+    retainedListeners: 0,
+    retainedObservers: 0,
+    retainedResources: 0,
+    retainedRuntimes: 0,
+    retainedTasks: 0,
+    reuses: beforeIdle.reuses,
+  })
+  expect(
+    await page.locator('iframe[data-fsus-markdown-heavy-work]').count(),
+  ).toBe(0)
 
   const repeatedCodePrefix = [
     '```typescript',
@@ -512,17 +600,6 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
   expect(afterConfigRestore.active).toBe(0)
   expect(afterConfigRestore.retainedResources).toBe(0)
 
-  for (const width of [375, 768, 1440]) {
-    await page.setViewportSize({ height: 900, width })
-    for (const zoom of [1, 1.5, 2]) {
-      await page.evaluate((nextZoom) => {
-        document.documentElement.style.zoom = String(nextZoom)
-      }, zoom)
-      await expect(renderer).toBeVisible()
-      expect((await readMetrics(page))?.retainedResources).toBe(0)
-    }
-  }
-
   await testInfo.attach(`heavy-feature-lifecycle-${testInfo.project.name}`, {
     body: await renderer.screenshot({ animations: 'disabled' }),
     contentType: 'image/png',
@@ -543,6 +620,72 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     remainingFrames: 0,
     started: true,
   })
+})
+
+test('renders the static heavy feature matrix across themes, widths, and zoom', async ({
+  page,
+}, testInfo) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto(
+    '/?visual=basic&theme=light&performance=markdown-heavy-feature-lifecycle&size=100000',
+    { waitUntil: 'domcontentloaded' },
+  )
+  const fixture = page.locator(
+    '[data-performance-scenario="markdown-heavy-feature-lifecycle"]',
+  )
+  const renderer = page.locator('[data-markdown-renderer="wasm"]')
+  await expect(fixture).toHaveAttribute('data-performance-ready', 'true')
+  await expect
+    .poll(async () => (await readMetrics(page))?.cacheEntries ?? 0, {
+      timeout: 60_000,
+    })
+    .toBeGreaterThan(0)
+
+  for (const theme of ['light', 'dark'] as const) {
+    await transition(page, { theme })
+    await expect
+      .poll(async () => (await readMetrics(page))?.active ?? -1)
+      .toBe(0)
+    await expect
+      .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
+      .toBe(0)
+    for (const width of [375, 768, 1440]) {
+      await page.setViewportSize({ height: 900, width })
+      for (const zoom of [1, 1.5, 2]) {
+        await renderer.evaluate((element, nextZoom) => {
+          element.style.zoom = String(nextZoom)
+        }, zoom)
+        await expect(renderer).toBeVisible()
+        await expect
+          .poll(async () => (await readMetrics(page))?.active ?? -1)
+          .toBe(0)
+        await expect
+          .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
+          .toBe(0)
+        const geometry = await renderer.evaluate((element) => {
+          const code = element.querySelector<HTMLElement>('pre')
+          if (code) code.scrollLeft = code.scrollWidth
+          return {
+            documentOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            rendererOverflow: element.scrollWidth - element.clientWidth,
+          }
+        })
+        expect(geometry.documentOverflow).toBeLessThanOrEqual(1)
+        expect(geometry.rendererOverflow).toBeGreaterThanOrEqual(0)
+        if (zoom > 1) {
+          await testInfo.attach(
+            `heavy-feature-${theme}-${width}-zoom-${Math.round(zoom * 100)}-${testInfo.project.name}`,
+            {
+              body: await renderer.screenshot({ animations: 'disabled' }),
+              contentType: 'image/png',
+            },
+          )
+        }
+      }
+    }
+  }
 })
 
 test('aborts real pending adapter work on interaction exit and virtual unmount', async ({
@@ -616,9 +759,72 @@ test('aborts real pending adapter work on interaction exit and virtual unmount',
   const afterInteractionExit = (await readMetrics(page))!
   expect(afterInteractionExit.cacheEntries).toBe(baseline.cacheEntries)
 
-  const restoredPendingSnapshot = await runAtCodeAdapterStarted(
+  const documentSwitchSnapshot = await runAtCodeAdapterStarted(
     page,
     pendingInput,
+    {
+      input: {
+        ...pendingInput,
+        documentEpoch: 2,
+        documentKey: 'heavy-document-b',
+        revision: 3,
+      },
+      kind: 'transition',
+    },
+  )
+  expect(documentSwitchSnapshot.count).toBeGreaterThan(0)
+  expect(documentSwitchSnapshot.metrics?.retainedTasks).toBeGreaterThan(0)
+  await expect
+    .poll(async () => (await readMetrics(page))?.identity?.documentKey)
+    .toBe('heavy-document-b')
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          (nodeKeys) =>
+            Array.from(
+              document.querySelectorAll<HTMLIFrameElement>(
+                'iframe[data-fsus-markdown-heavy-node]',
+              ),
+              (frame) => frame.dataset.fsusMarkdownHeavyNode ?? '',
+            ).filter((key) => nodeKeys.includes(key)).length,
+          documentSwitchSnapshot.nodeKeys,
+        ),
+      { timeout: 60_000 },
+    )
+    .toBe(0)
+  await expect
+    .poll(async () => (await readMetrics(page))?.aborts ?? 0)
+    .toBeGreaterThan(afterInteractionExit.aborts)
+  await transition(page, {
+    codeHighlight: false,
+    documentEpoch: 2,
+    documentKey: 'heavy-document-b',
+    latex: false,
+    mermaid: false,
+    revision: 3,
+    theme: 'dark',
+  })
+  await expect
+    .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
+    .toBe(0)
+
+  const restoredPendingInput = {
+    ...pendingInput,
+    revision: 4,
+    sourcePrefix: [
+      '```csharp',
+      ...Array.from(
+        { length: 20_000 },
+        (_, index) => `int staleLifecycleMarker_${index} = ${index};`,
+      ),
+      '```',
+      '',
+    ].join('\n'),
+  } as const
+  const restoredPendingSnapshot = await runAtCodeAdapterStarted(
+    page,
+    restoredPendingInput,
     { kind: 'scroll-bottom' },
   )
   expect(restoredPendingSnapshot.count).toBeGreaterThan(0)
@@ -703,10 +909,10 @@ test('aborts real pending adapter work on interaction exit and virtual unmount',
     .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
     .toBe(0)
   expect((await readMetrics(page))?.identity?.documentKey).toBe(
-    pendingInput.documentKey,
+    restoredPendingInput.documentKey,
   )
   expect((await readMetrics(page))?.identity?.revision).toBe(
-    `heavy-lifecycle-${pendingInput.revision}`,
+    `heavy-lifecycle-${restoredPendingInput.revision}`,
   )
   await expect(renderer).not.toContainText('staleLifecycleMarker_0')
 

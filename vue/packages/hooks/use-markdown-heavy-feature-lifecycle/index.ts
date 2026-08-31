@@ -509,12 +509,14 @@ export const useMarkdownHeavyFeatureDocumentContext = () =>
 export type MarkdownHeavyFeatureLifecycleMutationKind =
   | 'cross-document-reuse'
   | 'feature-local-scheduler'
+  | 'hidden-background-loop'
   | 'missing-teardown'
   | 'offscreen-resident-runtime'
   | 'stale-commit'
   | 'unbounded-cache'
 
 export interface MarkdownHeavyFeatureAdapterMutationEvidence {
+  readonly featureLocalRetention: Readonly<{ accepted: boolean }>
   readonly featureLocalScheduler: Readonly<{ accepted: boolean }>
   readonly missingTeardown: Readonly<{ accepted: boolean }>
 }
@@ -614,6 +616,10 @@ export const evaluateMarkdownHeavyFeatureLifecycleMutations = async (
       {
         accepted: adapterMutations.featureLocalScheduler.accepted,
         kind: 'feature-local-scheduler' as const,
+      },
+      {
+        accepted: adapterMutations.featureLocalRetention.accepted,
+        kind: 'hidden-background-loop' as const,
       },
     ]),
     report,
