@@ -29,6 +29,34 @@ const allowedPlatformClassifications = new Set([
   'web-only',
 ])
 
+const REVIEWED_WEB_ONLY_DECISIONS = {
+  ElCollapseTransition: {
+    alternative:
+      'Use FsusCollapse and the native reduced-motion-aware collapse template behavior; Avalonia does not expose a browser transition wrapper.',
+    authority: 'docs/avalonia/components/data-display.md',
+  },
+  ElPopper: {
+    alternative:
+      'Use FsusTooltip, FsusPopover, FsusPopconfirm, or FsusDropdown with FsusAnchoredOverlaySurface and FsusOverlayHost.',
+    authority: 'docs/avalonia/components/anchored-overlay.md',
+  },
+  ElPopperArrow: {
+    alternative:
+      'Use the native anchored-overlay template and FsusAnchoredPlacement/EffectivePlacement; no public arrow primitive is exposed.',
+    authority: 'docs/avalonia/components/anchored-overlay.md',
+  },
+  ElPopperContent: {
+    alternative:
+      'Use FsusAnchoredOverlaySurface.OverlayContent with FsusOverlayHost, FsusOverlayEntry, and FsusOverlayOptions.',
+    authority: 'docs/avalonia/overlay-host.md',
+  },
+  ElPopperTrigger: {
+    alternative:
+      'Use the native Content region with TriggerMode, TriggerClick, Open, and CloseAsync on the anchored-overlay surface.',
+    authority: 'docs/avalonia/components/anchored-overlay.md',
+  },
+}
+
 const read = (file) => fs.readFileSync(file, 'utf8')
 const exists = (file) => fs.existsSync(file)
 const write = (file, content) => {
@@ -181,15 +209,30 @@ const validateRegistry = (registry, baseline) => {
   }
 
   for (const decision of registry.webOnlyDecisions ?? []) {
-    if (
-      !decision.id ||
-      !decision.reason ||
-      !decision.owner ||
-      !decision.reviewAfter
-    ) {
+    if (!decision.id || !decision.source?.name) {
       errors.push(
         `${decision.source?.name ?? '<unknown>'} web-only decision is incomplete`,
       )
+      continue
+    }
+    for (const field of [
+      'reason',
+      'alternative',
+      'owner',
+      'authority',
+      'testPolicy',
+      'reviewPolicy',
+      'reviewedAt',
+      'reviewAfter',
+    ]) {
+      if (
+        typeof decision[field] !== 'string' ||
+        decision[field].trim() === ''
+      ) {
+        errors.push(
+          `${decision.source.name} web-only decision missing ${field}`,
+        )
+      }
     }
   }
 
@@ -306,22 +349,35 @@ const contractForEntry = (entry, kind) => ({
   performanceBudget: performanceBudget(entry.classification),
 })
 
-const webOnlyDecisionForEntry = (entry, kind) => ({
-  id: `web-only.${kind}.${toKebab(entry.name)}`,
-  source: {
-    kind,
-    name: entry.name,
-    module: entry.module,
-    baseline: 'spec/baselines/vue-current.json',
-  },
-  owner: 'FsusUI Core',
-  reviewAfter: '2026-12-31',
-  reason:
-    'This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.',
-  alternative:
-    'Document an Avalonia-native contract in a future minor registry version before implementation.',
-  performanceBudget: performanceBudget(entry.classification),
-})
+const webOnlyDecisionForEntry = (entry, kind) => {
+  const reviewed = REVIEWED_WEB_ONLY_DECISIONS[entry.name]
+  if (!reviewed) {
+    throw new Error(
+      `web-only ${kind} ${entry.name} requires an explicit reviewed decision`,
+    )
+  }
+  return {
+    id: `web-only.${kind}.${toKebab(entry.name)}`,
+    source: {
+      kind,
+      name: entry.name,
+      module: entry.module,
+      baseline: 'spec/baselines/vue-current.json',
+    },
+    owner: 'FsusUI Core',
+    reviewAfter: '2026-12-31',
+    reviewedAt: '2026-08-31',
+    reason:
+      'This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.',
+    alternative: reviewed.alternative,
+    authority: reviewed.authority,
+    testPolicy:
+      'Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.',
+    reviewPolicy:
+      'Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.',
+    performanceBudget: performanceBudget(entry.classification),
+  }
+}
 
 const buildRegistry = (baseline) => {
   const entries = [

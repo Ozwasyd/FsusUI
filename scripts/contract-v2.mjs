@@ -1300,6 +1300,7 @@ const contractForComponent = ({
   typeIndex,
   gate,
   performanceBudget,
+  platformException,
 }) => {
   // Keep the full export name in the stable id so distinct public exports such
   // as ElCollectionSummary and FsusCollectionSummary never collide.
@@ -1462,6 +1463,9 @@ const contractForComponent = ({
       blockedBy: gate?.blockedBy ?? [],
       requiredStatus: gate?.requiredStatus ?? 'partial',
     }
+  }
+  if (classification === 'web-only') {
+    contract.platformException = platformException ?? null
   }
   return contract
 }
@@ -1634,6 +1638,23 @@ export const buildRegistry = ({
       .filter((contract) => contract.source?.kind === 'component')
       .map((contract) => [contract.source?.name, contract.performanceBudget]),
   )
+  const platformExceptionByComponent = new Map(
+    (v1Registry.webOnlyDecisions ?? [])
+      .filter((decision) => decision.source?.kind === 'component')
+      .map((decision) => [
+        decision.source.name,
+        {
+          reason: decision.reason,
+          alternative: decision.alternative,
+          owner: decision.owner,
+          testPolicy: decision.testPolicy,
+          reviewPolicy: decision.reviewPolicy,
+          reviewedAt: decision.reviewedAt,
+          authority: decision.authority,
+          reviewAfter: decision.reviewAfter,
+        },
+      ]),
+  )
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
   const publicValueBindings = buildPublicValueBindings({
@@ -1654,6 +1675,7 @@ export const buildRegistry = ({
         typeIndex,
         gate,
         performanceBudget: performanceBudgetByComponent.get(component.name),
+        platformException: platformExceptionByComponent.get(component.name),
       }),
     )
   }
@@ -1972,6 +1994,31 @@ export const validateContract = (contract, gate, errors) => {
   ]
   for (const member of members) {
     validateMember(member, contract.id, contractErrors)
+  }
+  if (contract.component?.exportStatus === 'web-only') {
+    for (const field of [
+      'reason',
+      'alternative',
+      'owner',
+      'testPolicy',
+      'reviewPolicy',
+      'reviewedAt',
+      'authority',
+      'reviewAfter',
+    ]) {
+      if (
+        typeof contract.platformException?.[field] !== 'string' ||
+        contract.platformException[field].trim() === ''
+      ) {
+        contractErrors.push(
+          `${contract.id} platformException missing ${field}`,
+        )
+      }
+    }
+  } else if (contract.platformException != null) {
+    contractErrors.push(
+      `${contract.id} non-web-only contract must not declare platformException`,
+    )
   }
   for (const difference of contract.platformDifferences ?? []) {
     validateGovernance(

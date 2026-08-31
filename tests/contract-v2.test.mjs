@@ -386,6 +386,60 @@ test('public value web-only exception requires review metadata', () => {
   )
 })
 
+test('Web-only components project complete reviewed platform exceptions', () => {
+  const expected = new Set([
+    'component-v2.el-collapse-transition',
+    'component-v2.el-popper',
+    'component-v2.el-popper-arrow',
+    'component-v2.el-popper-content',
+    'component-v2.el-popper-trigger',
+  ])
+  const actual = committedRegistry.contracts.filter(
+    (contract) => contract.component.exportStatus === 'web-only',
+  )
+  assert.deepEqual(
+    new Set(actual.map((contract) => contract.id)),
+    expected,
+  )
+  for (const contract of actual) {
+    assert.equal(contract.bindings.avalonia.status, 'unbound', contract.id)
+    for (const field of [
+      'reason',
+      'alternative',
+      'owner',
+      'testPolicy',
+      'reviewPolicy',
+      'reviewedAt',
+      'authority',
+      'reviewAfter',
+    ]) {
+      assert.ok(contract.platformException[field], `${contract.id} ${field}`)
+    }
+  }
+})
+
+test('Web-only component exception mutation fails closed', () => {
+  const mutated = clone(committedRegistry)
+  const popper = mutated.contracts.find(
+    (contract) => contract.id === 'component-v2.el-popper',
+  )
+  delete popper.platformException.testPolicy
+  assert.match(
+    validateRegistry(mutated, gate).join('\n'),
+    /component-v2\.el-popper platformException missing testPolicy/u,
+  )
+
+  const fakeNative = clone(committedRegistry)
+  const arrow = fakeNative.contracts.find(
+    (contract) => contract.id === 'component-v2.el-popper-arrow',
+  )
+  arrow.component.exportStatus = 'missing'
+  assert.match(
+    validateRegistry(fakeNative, gate).join('\n'),
+    /component-v2\.el-popper-arrow non-web-only contract must not declare platformException/u,
+  )
+})
+
 test('public export map fails closed when an alias is removed', () => {
   const mutated = clone(committedRegistry)
   mutated.publicExportMap = mutated.publicExportMap.filter(
