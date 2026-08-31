@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import {
+  copyFileSync,
   cpSync,
   existsSync,
   lstatSync,
@@ -192,6 +193,36 @@ function collectFiles(rootDir, currentDir = rootDir) {
   return files
 }
 
+export function moveCandidateTarball(
+  source,
+  destination,
+  {
+    copyFile = copyFileSync,
+    makeTempDirectory = mkdtempSync,
+    remove = rmSync,
+    rename = renameSync,
+  } = {},
+) {
+  try {
+    rename(source, destination)
+    return
+  } catch (error) {
+    if (error?.code !== 'EXDEV') throw error
+  }
+
+  const stagingDirectory = makeTempDirectory(
+    path.join(path.dirname(destination), '.fsusui-candidate-move-'),
+  )
+  const stagingPath = path.join(stagingDirectory, path.basename(destination))
+  try {
+    copyFile(source, stagingPath)
+    rename(stagingPath, destination)
+    remove(source, { force: true })
+  } finally {
+    remove(stagingDirectory, { force: true, recursive: true })
+  }
+}
+
 function packDirectory(packageRoot, outputDir) {
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'fsusui-npm-pack-'))
   try {
@@ -205,7 +236,7 @@ function packDirectory(packageRoot, outputDir) {
     if (!filename)
       throw new Error('npm pack did not report a tarball filename.')
     const destination = path.join(outputDir, candidateTarballName)
-    renameSync(path.join(tempDir, filename), destination)
+    moveCandidateTarball(path.join(tempDir, filename), destination)
     return destination
   } finally {
     rmSync(tempDir, { force: true, recursive: true })

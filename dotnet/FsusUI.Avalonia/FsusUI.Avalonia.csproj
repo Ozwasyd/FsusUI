@@ -15,4 +15,8 @@
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FsusUI.Avalonia.HeadlessTests" />
+  </ItemGroup>
 </Project>

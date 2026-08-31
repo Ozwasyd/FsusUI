@@ -222,26 +222,19 @@ assert.ok(
 assert.ok(workflow.includes('fromJSON(needs.capacity.outputs.unit-matrix)'))
 assert.ok(workflow.includes('FSUS_VITEST_WORKERS: ${{ matrix.workers }}'))
 assert.ok(!workflow.includes("shard: ['1/4', '2/4', '3/4', '4/4']"))
-assert.ok(
-  consumerInstallSource.includes(
-    "path.join(repoRoot, 'scripts', 'with-node-heap.mjs')",
-  ),
-  'consumer typecheck must use the shared Node heap wrapper',
+const consumerTypecheckCall = consumerInstallSource.match(
+  /stage\('typecheck', \(\) => \{\s*run\(\s*'node',\s*\[\s*path\.join\(repoRoot, 'scripts', 'with-node-heap\.mjs'\),\s*packageManager,\s*\.\.\.execArgs\('vue-tsc', \['--noEmit'\]\),\s*\],\s*\{\s*cwd: fixtureRoot,\s*env: \{\s*FSUS_NODE_HEAP_PROFILE: 'typecheck',\s*NODE_OPTIONS: '',\s*\},\s*\},\s*\)\s*\}\)/u,
 )
 assert.ok(
-  consumerInstallSource.includes("FSUS_NODE_HEAP_PROFILE: 'typecheck'"),
-  'consumer typecheck must request the typecheck heap profile',
-)
-assert.ok(
-  consumerInstallSource.includes("NODE_OPTIONS: ''"),
-  'consumer typecheck must clear the inherited small-task heap limit',
+  consumerTypecheckCall,
+  'consumer typecheck must use the governed package manager and shared typecheck heap profile without inheriting small-task NODE_OPTIONS',
 )
 const consumerViteBuildCall = consumerInstallSource.match(
-  /const viteOutput = runAndCollect\(\s*'node',\s*\[\s*path\.join\(repoRoot, 'scripts', 'with-node-heap\.mjs'\),\s*'pnpm',\s*'exec',\s*'vite',\s*'build',\s*\],\s*\{\s*cwd: fixtureRoot,\s*env: \{\s*FSUS_NODE_HEAP_PROFILE: 'build',\s*NODE_OPTIONS: '',\s*\},\s*\},\s*\)/u,
+  /const viteOutput = stage\('build', \(\) =>\s*runAndCollect\(\s*'node',\s*\[\s*path\.join\(repoRoot, 'scripts', 'with-node-heap\.mjs'\),\s*packageManager,\s*\.\.\.execArgs\('vite', \['build'\]\),\s*\],\s*\{\s*cwd: fixtureRoot,\s*env: \{\s*FSUS_NODE_HEAP_PROFILE: 'build',\s*NODE_OPTIONS: '',\s*\},\s*\},\s*\),\s*\)/u,
 )
 assert.ok(
   consumerViteBuildCall,
-  'consumer Vite build must use the shared build heap profile without inheriting small-task NODE_OPTIONS',
+  'consumer Vite build must use the governed package manager and shared build heap profile without inheriting small-task NODE_OPTIONS',
 )
 
 console.log('[ci-capacity] fixtures ok')

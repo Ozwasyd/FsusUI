@@ -4,6 +4,7 @@ import {
   inspectArtifactGroup,
   root,
   toRelativePath,
+  writeArtifactDigest,
   writeFingerprint,
 } from './test-artifact-cache.mjs'
 
@@ -44,7 +45,9 @@ const native = status.fingerprints.find(
 )
 
 if (!bundle || !native) {
-  console.error('[ensure-wasm] internal artifact policy is missing fingerprints')
+  console.error(
+    '[ensure-wasm] internal artifact policy is missing fingerprints',
+  )
   process.exit(1)
 }
 
@@ -90,6 +93,12 @@ if (bundle.cachedFingerprint === null) {
   bundleStaleReasons.push('bundle artifact fingerprint changed')
 }
 
+if (bundle.cachedArtifactDigest === null) {
+  bundleStaleReasons.push('bundle artifact content digest is missing')
+} else if (bundle.cachedArtifactDigest !== bundle.currentArtifactDigest) {
+  bundleStaleReasons.push('bundle artifact content digest changed')
+}
+
 if (nativeStaleReasons.length > 0) {
   if (dryRun) {
     console.info(
@@ -116,6 +125,9 @@ if (nativeStaleReasons.length > 0) {
   )
   await run('pnpm', ['run', '_build:wasm:artifacts'])
   await writeFingerprint(bundle.fingerprintPath, bundle.currentFingerprint)
+  await writeArtifactDigest(
+    group.fingerprints.find(({ id }) => id === 'bundle'),
+  )
   await writeFingerprint(native.fingerprintPath, native.currentFingerprint)
   process.exit(0)
 }
@@ -146,6 +158,9 @@ if (bundleStaleReasons.length > 0) {
   )
   await run('pnpm', ['run', '-C', 'vue/packages/wasm', 'build'])
   await writeFingerprint(bundle.fingerprintPath, bundle.currentFingerprint)
+  await writeArtifactDigest(
+    group.fingerprints.find(({ id }) => id === 'bundle'),
+  )
   rebuiltBundleArtifacts = true
 }
 

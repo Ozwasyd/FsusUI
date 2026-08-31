@@ -1,0 +1,46 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+
+  <Style Selector="fsus|FsusCheckboxButton">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace4}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          Padding="{TemplateBinding Padding}"
+          CornerRadius="{DynamicResource FsusRadiusControlSm}">
+          <ContentPresenter
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}"
+            Foreground="{TemplateBinding Foreground}"
+            FontWeight="{TemplateBinding FontWeight}"
+            FontSize="{TemplateBinding FontSize}"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusCheckboxButton.fsus-checked">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusCheckboxButton.fsus-disabled">
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+    <Setter Property="Cursor" Value="Arrow" />
+  </Style>
+</Styles>

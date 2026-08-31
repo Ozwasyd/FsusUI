@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { confirmPasteAsMarkdown, previewPasteAsMarkdown } from '../src/markdown-editor-paste-markdown'
+import {
+  confirmPasteAsMarkdown,
+  previewPasteAsMarkdown,
+} from '../src/markdown-editor-paste-markdown'
 import {
   applyMarkdownSpellReplacement,
   bindMarkdownWebLanguageTools,
@@ -12,10 +15,14 @@ import {
   planMarkdownAnchorInsert,
 } from '../src/markdown-editor-anchor-commands'
 import { resolveMarkdownEmbedPresentation } from '../../../wasm/markdown-embed-presentation'
+import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('markdown remaining leaf contracts', () => {
   it('previews and confirms paste as markdown in one transaction', () => {
-    const preview = previewPasteAsMarkdown('<p>Hello</p><script>x()</script>')
+    const scriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-raw-script-basic',
+    )
+    const preview = previewPasteAsMarkdown(`<p>Hello</p>${scriptAttack}`)
     expect(preview.markdown).toContain('Hello')
     expect(preview.loss).toContain('script')
     const tx = confirmPasteAsMarkdown('<p>Hi</p>', 0)
@@ -46,7 +53,9 @@ describe('markdown remaining leaf contracts', () => {
     })
     const insert = planMarkdownAnchorInsert('Hello', 5, 'intro')
     const next = `Hello${insert.changes[0]!.insert}`
-    expect(currentMarkdownAnchors(next).some((node) => node.id === 'intro')).toBe(true)
+    expect(
+      currentMarkdownAnchors(next).some((node) => node.id === 'intro'),
+    ).toBe(true)
   })
 
   it('presents resolved embed results without card chrome', () => {

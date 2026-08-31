@@ -478,6 +478,18 @@ public sealed record FsusNativeMenuOptions
 public sealed class FsusNativeMenuBuilder : IDisposable
 {
   private readonly List<Action> cleanupActions = [];
+  private readonly IFsusMacOSNativeMenuAdapter macOSAdapter;
+
+  public FsusNativeMenuBuilder()
+    : this(FsusMacOSNativeMenuAdapter.Instance)
+  {
+  }
+
+  internal FsusNativeMenuBuilder(IFsusMacOSNativeMenuAdapter macOSAdapter)
+  {
+    this.macOSAdapter = macOSAdapter ??
+      throw new ArgumentNullException(nameof(macOSAdapter));
+  }
 
   public int ActiveSubscriptionCount => cleanupActions.Count;
 
@@ -507,6 +519,11 @@ public sealed class FsusNativeMenuBuilder : IDisposable
       {
         menu.Items.Add(nativeItem);
       }
+    }
+
+    if (resolvedPlatform == FsusShortcutPlatform.macOS)
+    {
+      BindMacOSServicesMenu(menu);
     }
 
     return menu;
@@ -612,14 +629,17 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     if (model.Command is not null)
     {
       var cmd = model.Command;
+      var role = cmd.Role != FsusPlatformRole.None
+        ? cmd.Role
+        : model.Role;
       var itemCommand = new ActionCommand(
         () => cmd.IsEnabled &&
           (cmd.Command?.CanExecute(cmd.CommandParameter) ?? true),
-        _ => cmd.Execute());
+        _ => ExecuteRoleOrCommand(role, platform, cmd));
       item.Command = itemCommand;
       FsusNativeMenuMetadata.Set(
         item,
-        cmd.Role != FsusPlatformRole.None ? cmd.Role : model.Role,
+        role,
         cmd.Id,
         model.AccessibleName ?? cmd.Label);
 
@@ -634,7 +654,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
         item.ToolTip = cmd.Description;
         FsusNativeMenuMetadata.Set(
           item,
-          cmd.Role != FsusPlatformRole.None ? cmd.Role : model.Role,
+          role,
           cmd.Id,
           model.AccessibleName ?? cmd.Label);
       };
@@ -644,6 +664,13 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     }
     else
     {
+      if (platform == FsusShortcutPlatform.macOS &&
+          IsMacOSNativeResponderRole(model.Role))
+      {
+        item.Command = new ActionCommand(
+          () => true,
+          _ => macOSAdapter.TryExecuteRole(model.Role));
+      }
       FsusNativeMenuMetadata.Set(
         item,
         model.Role,
@@ -653,6 +680,59 @@ public sealed class FsusNativeMenuBuilder : IDisposable
 
     return item;
   }
+
+  private void ExecuteRoleOrCommand(
+    FsusPlatformRole role,
+    FsusShortcutPlatform platform,
+    FsusPlatformCommand command)
+  {
+    if (platform != FsusShortcutPlatform.macOS ||
+        !IsMacOSNativeResponderRole(role) ||
+        !macOSAdapter.TryExecuteRole(role))
+    {
+      command.Execute();
+    }
+  }
+
+  private void BindMacOSServicesMenu(NativeMenu menu)
+  {
+    foreach (var item in EnumerateNativeItems(menu))
+    {
+      if (FsusNativeMenuMetadata.GetRole(item) == FsusPlatformRole.Services &&
+          item.Menu is not null)
+      {
+        macOSAdapter.BindServicesMenu(item.Menu);
+        return;
+      }
+    }
+  }
+
+  private static IEnumerable<NativeMenuItem> EnumerateNativeItems(
+    NativeMenu menu)
+  {
+    foreach (var item in menu.Items.OfType<NativeMenuItem>())
+    {
+      yield return item;
+      if (item.Menu is null)
+      {
+        continue;
+      }
+
+      foreach (var child in EnumerateNativeItems(item.Menu))
+      {
+        yield return child;
+      }
+    }
+  }
+
+  private static bool IsMacOSNativeResponderRole(FsusPlatformRole role) =>
+    role is FsusPlatformRole.Hide or
+      FsusPlatformRole.HideOthers or
+      FsusPlatformRole.ShowAll or
+      FsusPlatformRole.Quit or
+      FsusPlatformRole.WindowMinimize or
+      FsusPlatformRole.WindowZoom or
+      FsusPlatformRole.WindowBringAllToFront;
 
   private NativeMenuItem BuildRecentSubmenu(
     FsusNativeMenuItemModel model,
@@ -859,7 +939,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
             "Quit Application",
             new FsusShortcutGesture(Key.Q, KeyModifiers.Control)),
         ]);
-      }
+    }
 
     NormalizeMacWindowMenu(list, synthesized);
     return SortTopLevelMenus(list, includeApplication: true);

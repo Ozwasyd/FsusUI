@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "issue": 723,
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "5abd62f79e84a06130a5337c55772c27bb461e3f",
+  "candidateDigest": "2610b64ee08d6ecc241b87599b2caf1f577ed39e1ac9c2f155a5dfb666fae461",
+  "classificationReceiptDigest": "4c741e483dd0c8bc4b78e1343a8142a2be599598212818e2c3ef16f2493dddb1",
+  "productionFixture": true,
+  "implementationModifiedPaths": [],
+  "testResult": {
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0
+  },
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "All six rendered notification surfaces contain the title, message, Install action, and dismiss control without overlap or clipping.",
+      "Action and dismiss controls remain within the 320 by 80 notification surface in compact, default, and spacious density modes.",
+      "Light and dark variants preserve hierarchy, legibility, spacing restraint, and focusable control geometry."
+    ]
+  },
+  "inspectedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-723/notification-light-compact.png",
+      "digest": "694d94bcb1beff2c2e990e43f93c99d80b6c8c9625604447a8a9c8e8d34b9d45"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-723/notification-light-default.png",
+      "digest": "12e92864925dd0fd568480f5ce2dace0afcd98ec8cd60aaf1557658cb4e0f076"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-723/notification-light-spacious.png",
+      "digest": "a197849348531c8beee0de838e9546042461f40828b31996f09bed8337c9fc1d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-723/notification-dark-compact.png",
+      "digest": "6160f4eac5e63593a4c7104575ca261f81bea68a7bf8506d4a781936ab4116c2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-723/notification-dark-default.png",
+      "digest": "6a4b83888c911f6948608f38efcfc0e9766457019729b08d72cd029f44aa1789"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-723/notification-dark-spacious.png",
+      "digest": "22f33100e2933e5bf7356ba21666ed4ac31ec37a5eb70335171c96ea1e359e48"
+    }
+  ],
+  "manifest": {
+    "path": "tests/conformance/visual/artifacts/issue-723/manifest.json",
+    "digest": "a5f88dd7f860369986aff08348a3f8587e908ed3a4a4197643e78166a4f55af3"
+  },
+  "limitation": "Deterministic local Avalonia headless Skia simulation; no physical display, native compositor, touch hardware, or screen reader was available."
+}
