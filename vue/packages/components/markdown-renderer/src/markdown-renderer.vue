@@ -84,7 +84,6 @@ import {
 import {
   MARKDOWN_RENDERER_SURFACE_CLASSES as markdownSurfaceClasses,
   MARKDOWN_RENDERER_VERSION,
-  activateMarkdownFeatures,
   createMarkdownEditorProjection,
   renderMarkdownFallbackWithRuntime,
   isMarkdownRuntimeAuthorizedResult,
@@ -93,6 +92,7 @@ import {
   renderMarkdownChunksWithRuntime,
   renderMarkdownResultWithRuntime,
 } from '@element-plus/wasm'
+import { activateMarkdownHeavyFeatures } from '../../../wasm/markdown-heavy-feature-activation'
 import { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from '../../../wasm/markdown-feature-output-gateway'
 import { isFsusErr, toFsusError } from '@element-plus/utils'
 import {
@@ -109,6 +109,7 @@ import type {
   MarkdownRenderChunk,
   MarkdownRenderRequest,
   MarkdownFeatureActivationResult,
+  MarkdownFeatureThemeTokens,
   MarkdownRuntimeChunkResult,
   MarkdownRuntimeProfile,
   MarkdownSafeHtml,
@@ -125,6 +126,27 @@ const props = defineProps(markdownRendererProps)
 const localDocumentKey = `${useId()}-markdown-renderer`
 const heavyDocumentContext = useMarkdownHeavyFeatureDocumentContext()
 const heavyLifecycle = createMarkdownHeavyFeatureLifecycle()
+const heavyThemeRevision = ref(0)
+let heavyThemeListenerInstalled = false
+const handleHeavyFeatureThemeChange = () => {
+  heavyThemeRevision.value += 1
+}
+const ensureHeavyFeatureThemeListener = () => {
+  if (heavyThemeListenerInstalled) return
+  document.documentElement.addEventListener(
+    'fsus:theme-change',
+    handleHeavyFeatureThemeChange,
+  )
+  heavyThemeListenerInstalled = true
+}
+const removeHeavyFeatureThemeListener = () => {
+  if (!heavyThemeListenerInstalled) return
+  document.documentElement.removeEventListener(
+    'fsus:theme-change',
+    handleHeavyFeatureThemeChange,
+  )
+  heavyThemeListenerInstalled = false
+}
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
   (event: 'render-error', error: FsusErrorDetail): void
@@ -235,13 +257,19 @@ let activationDurationMs = 0
 let commitDurationMs = 0
 const activatedChunkKeys = new Set<string>()
 const chunkActivationElements = new Map<string, HTMLElement>()
-let lastHeavyLifecycleIdentityContext: Readonly<{
+type HeavyLifecycleIdentityContext = Readonly<{
   config: string
   documentEpoch: number | string
   documentKey: string
   revision: number | string
   theme: string
-}> | null = null
+}>
+
+let lastHeavyLifecycleIdentityContext: HeavyLifecycleIdentityContext | null =
+  null
+let heavyLifecycleIdentityContexts: Partial<
+  Record<MarkdownHeavyFeatureKind, HeavyLifecycleIdentityContext>
+> = {}
 
 const recordHeavyLifecycleMetrics = () => {
   const target = rootEl.value
@@ -254,6 +282,7 @@ const recordHeavyLifecycleMetrics = () => {
     cacheBytes: metrics.cacheBytes,
     cacheEntries: metrics.cacheEntries,
     evictions: metrics.evictions,
+    identities: heavyLifecycleIdentityContexts,
     identity: lastHeavyLifecycleIdentityContext,
     retainedListeners: metrics.retainedListeners,
     retainedObservers: metrics.retainedObservers,
@@ -797,6 +826,7 @@ const resolveMarkdownFeatureOptions = () => ({
 })
 
 const resetFeatureActivation = () => {
+  removeHeavyFeatureThemeListener()
   activationController?.abort()
   activationController = new AbortController()
   activationObserver?.disconnect()
@@ -806,6 +836,8 @@ const resetFeatureActivation = () => {
   rootEl.value?.removeAttribute('data-fsus-markdown-activation-ms')
   activatedChunkKeys.clear()
   chunkActivationElements.clear()
+  lastHeavyLifecycleIdentityContext = null
+  heavyLifecycleIdentityContexts = {}
   if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
   recordHeavyLifecycleMetrics()
 }
@@ -828,34 +860,19 @@ const createHeavyFeatureIdentityResolver = (
     latex: 0,
     mermaid: 0,
   }
-  const features = resolveMarkdownFeatureOptions()
-  const config = JSON.stringify({
-    codeHighlight: features.codeHighlight,
-    latex: features.latex,
-    mermaid: features.mermaid,
-  })
   const documentKey = heavyDocumentContext?.documentKey() ?? localDocumentKey
   const documentEpoch = heavyDocumentContext?.documentEpoch() ?? 0
   const revision =
     heavyDocumentContext?.revision() ??
     props.contentVersion ??
     result.sourceIdentity
-  const theme = document.documentElement.classList.contains('dark')
-    ? 'dark'
-    : 'light'
-  const locale = document.documentElement.lang || 'und'
-  lastHeavyLifecycleIdentityContext = Object.freeze({
-    config,
-    documentEpoch,
-    documentKey,
-    revision,
-    theme,
-  })
   heavyLifecycle.resetDocument(documentKey, documentEpoch)
 
   return (input: {
     readonly element: HTMLElement
     readonly kind: MarkdownHeavyFeatureKind
+    readonly theme: 'dark' | 'light'
+    readonly tokens: Readonly<MarkdownFeatureThemeTokens>
   }): MarkdownHeavyFeatureIdentity | null => {
     const unitKey = input.element.closest<HTMLElement>(
       '[data-fsus-render-unit-key]',
@@ -873,13 +890,32 @@ const createHeavyFeatureIdentityResolver = (
     if (unitIndex < 0) cursors[input.kind] += 1
     const node = nodes[input.kind][index]
     if (!node?.blockIdentity) return null
+    const config =
+      input.kind === 'mermaid'
+        ? JSON.stringify({ tokens: input.tokens })
+        : input.kind === 'latex'
+          ? JSON.stringify({ danger: input.tokens.danger })
+          : '{}'
+    const theme = input.kind === 'latex' ? 'token-bound' : input.theme
+    const context = Object.freeze({
+      config,
+      documentEpoch,
+      documentKey,
+      revision,
+      theme,
+    })
+    lastHeavyLifecycleIdentityContext = context
+    heavyLifecycleIdentityContexts = {
+      ...heavyLifecycleIdentityContexts,
+      [input.kind]: context,
+    }
     return Object.freeze({
       config,
       documentEpoch,
       documentKey,
       featureKind: input.kind,
       gatewayVersion: MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION,
-      locale,
+      locale: 'locale-independent',
       nodeId: node.blockIdentity,
       rendererVersion: result.rendererVersion,
       revision,
@@ -899,7 +935,7 @@ const activateRenderedFeatures = async (
   if (!activationRoot || signal?.aborted) return
 
   const activationStartedAt = readPerformanceNow()
-  const activation = await activateMarkdownFeatures({
+  const activation = await activateMarkdownHeavyFeatures({
     baseUrl: props.baseUrl,
     concurrency: 3,
     cspNonce: props.cspNonce,
@@ -918,6 +954,15 @@ const activateRenderedFeatures = async (
   )
   emit('features-activated', activation, result)
   recordHeavyLifecycleMetrics()
+  if (
+    heavyLifecycle.metrics().staticNodes > 0 ||
+    activation.activated.some(
+      ({ kind }) =>
+        kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
+    )
+  ) {
+    ensureHeavyFeatureThemeListener()
+  }
 }
 
 async function activateChunkFeatures(
@@ -1114,6 +1159,7 @@ watch(
     props.baseUrl,
     props.cspNonce,
     props.features,
+    heavyThemeRevision.value,
   ],
   () => {
     if (debounceTimer) {
@@ -1127,6 +1173,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  removeHeavyFeatureThemeListener()
   if (debounceTimer) {
     clearTimeout(debounceTimer)
     debounceTimer = null

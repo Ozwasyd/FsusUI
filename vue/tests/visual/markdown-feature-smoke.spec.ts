@@ -27,7 +27,11 @@ type MarkdownActivationSnapshot = {
     active: number
     cacheBytes: number
     cacheEntries: number
+    retainedListeners: number
+    retainedObservers: number
     retainedResources: number
+    retainedRuntimes: number
+    retainedTasks: number
     static: number
   } | null
 }
@@ -45,7 +49,11 @@ const readActivationSnapshot = (page: Page) =>
       'svg[id^="fsus-markdown-mermaid-"]',
     )
     const activated = renderer
-      ? [...renderer.querySelectorAll<HTMLElement>('[data-markdown-feature-activated]')]
+      ? [
+          ...renderer.querySelectorAll<HTMLElement>(
+            '[data-markdown-feature-activated]',
+          ),
+        ]
       : []
     const lifecycle = renderer?.dataset.markdownHeavyLifecycle
       ? JSON.parse(renderer.dataset.markdownHeavyLifecycle)
@@ -99,7 +107,8 @@ const readActivationSnapshot = (page: Page) =>
                 /^on/i.test(attribute.name),
               ).length,
             ),
-            foreignObjectCount: mermaid.querySelectorAll('foreignObject').length,
+            foreignObjectCount:
+              mermaid.querySelectorAll('foreignObject').length,
             id: mermaid.id || null,
             scriptCount: mermaid.querySelectorAll('script').length,
             text: mermaid.textContent ?? '',
@@ -130,7 +139,9 @@ test(SMOKE_MARKDOWN_FEATURE_TEST_TITLE, async ({ page }, testInfo) => {
     { waitUntil: 'domcontentloaded' },
   )
 
-  const fixture = page.locator('[data-performance-scenario="markdown-feature-activation"]')
+  const fixture = page.locator(
+    '[data-performance-scenario="markdown-feature-activation"]',
+  )
   await expect(fixture).toHaveAttribute('data-performance-ready', 'true')
   await expect(page.locator('[data-markdown-renderer="wasm"]')).toBeVisible()
 
@@ -158,14 +169,20 @@ test(SMOKE_MARKDOWN_FEATURE_TEST_TITLE, async ({ page }, testInfo) => {
   expect(activated.katex?.classes).toEqual(['katex'])
   expect(activated.katex?.mathmlCount).toBeGreaterThan(0)
   expect(activated.mermaid?.text).toContain('revision 1')
-  expect(activated.mermaid?.id).toMatch(/^fsus-markdown-mermaid-[A-Za-z0-9_-]+$/u)
+  expect(activated.mermaid?.id).toMatch(
+    /^fsus-markdown-mermaid-[A-Za-z0-9_-]+$/u,
+  )
   expect(activated.forbiddenHostClassTokens).toEqual([])
   expect(activated.mermaid?.scriptCount).toBe(0)
   expect(activated.mermaid?.foreignObjectCount).toBe(0)
   expect(activated.mermaid?.eventAttributeCount).toBe(0)
   expect(activated.lifecycle).toMatchObject({
     active: 0,
+    retainedListeners: 0,
+    retainedObservers: 0,
     retainedResources: 0,
+    retainedRuntimes: 0,
+    retainedTasks: 0,
     static: 3,
   })
   expect(activated.lifecycle!.cacheEntries).toBeGreaterThanOrEqual(3)

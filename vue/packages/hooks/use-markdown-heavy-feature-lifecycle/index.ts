@@ -470,66 +470,14 @@ export type MarkdownHeavyFeatureLifecycleMutationKind =
   | 'stale-commit'
   | 'unbounded-cache'
 
-type MarkdownHeavyFeatureSchedulerAttempt =
-  | 'feature-local-interval'
-  | 'feature-local-raf'
-
-const captureMarkdownHeavyFeatureSchedulerAttempts = (run: () => void) => {
-  const target = globalThis as typeof globalThis &
-    Record<'requestAnimationFrame' | 'setInterval', unknown>
-  const descriptors = new Map<PropertyKey, PropertyDescriptor | undefined>()
-  const attempts: MarkdownHeavyFeatureSchedulerAttempt[] = []
-  const replace = (key: 'requestAnimationFrame' | 'setInterval', value: unknown) => {
-    descriptors.set(key, Object.getOwnPropertyDescriptor(target, key))
-    Object.defineProperty(target, key, {
-      configurable: true,
-      value,
-      writable: true,
-    })
-  }
-  const restore = () => {
-    for (const [key, descriptor] of descriptors) {
-      if (descriptor) Object.defineProperty(target, key, descriptor)
-      else delete target[key as 'requestAnimationFrame' | 'setInterval']
-    }
-  }
-
-  try {
-    replace('requestAnimationFrame', () => {
-      attempts.push('feature-local-raf')
-      return 1
-    })
-    replace('setInterval', () => {
-      attempts.push('feature-local-interval')
-      return 1
-    })
-    run()
-  } finally {
-    restore()
-  }
-  return Object.freeze([...attempts])
+export interface MarkdownHeavyFeatureAdapterMutationEvidence {
+  readonly featureLocalScheduler: Readonly<{ accepted: boolean }>
+  readonly missingTeardown: Readonly<{ accepted: boolean }>
 }
 
-export const evaluateMarkdownHeavyFeatureSchedulerMutation = () => {
-  const cleanAttempts = captureMarkdownHeavyFeatureSchedulerAttempts(() => {
-    createMarkdownHeavyFeatureLifecycle().dispose()
-  })
-  const mutantAttempts = captureMarkdownHeavyFeatureSchedulerAttempts(() => {
-    requestAnimationFrame(() => undefined)
-    setInterval(() => undefined, 16)
-  })
-  return Object.freeze({
-    accepted:
-      cleanAttempts.length > 0 ||
-      mutantAttempts.length !== 2 ||
-      !mutantAttempts.includes('feature-local-raf') ||
-      !mutantAttempts.includes('feature-local-interval'),
-    cleanAttempts,
-    mutantAttempts,
-  })
-}
-
-export const evaluateMarkdownHeavyFeatureLifecycleMutations = async () => {
+export const evaluateMarkdownHeavyFeatureLifecycleMutations = async (
+  adapterMutations: MarkdownHeavyFeatureAdapterMutationEvidence,
+) => {
   const lifecycle = createMarkdownHeavyFeatureLifecycle({
     maxBytes: 32,
     maxEntries: 1,
@@ -598,7 +546,6 @@ export const evaluateMarkdownHeavyFeatureLifecycleMutations = async () => {
     })
   }
   const report = lifecycle.metrics()
-  const schedulerMutation = evaluateMarkdownHeavyFeatureSchedulerMutation()
   lifecycle.dispose()
   return Object.freeze({
     mutations: Object.freeze([
@@ -611,17 +558,21 @@ export const evaluateMarkdownHeavyFeatureLifecycleMutations = async () => {
       },
       { accepted: report.cacheEntries > 1, kind: 'unbounded-cache' as const },
       { accepted: report.staleCommits === 0, kind: 'stale-commit' as const },
-      { accepted: report.teardowns === 0, kind: 'missing-teardown' as const },
+      {
+        accepted:
+          report.teardowns === 0 || adapterMutations.missingTeardown.accepted,
+        kind: 'missing-teardown' as const,
+      },
       {
         accepted: documentRenders !== 2,
         kind: 'cross-document-reuse' as const,
       },
       {
-        accepted: schedulerMutation.accepted,
+        accepted: adapterMutations.featureLocalScheduler.accepted,
         kind: 'feature-local-scheduler' as const,
       },
     ]),
     report,
-    schedulerMutation,
+    adapterMutations,
   })
 }

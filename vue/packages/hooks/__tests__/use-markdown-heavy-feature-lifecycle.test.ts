@@ -3,10 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   createMarkdownHeavyFeatureLifecycle,
   evaluateMarkdownHeavyFeatureLifecycleMutations,
-  evaluateMarkdownHeavyFeatureSchedulerMutation,
   type MarkdownHeavyFeatureIdentity,
   type MarkdownHeavyFeatureKind,
 } from '../use-markdown-heavy-feature-lifecycle'
+import { evaluateMarkdownHeavyFeatureAdapterResourceMutations } from '../../wasm/markdown-heavy-feature-resource'
 
 const identity = (
   kind: MarkdownHeavyFeatureKind,
@@ -245,16 +245,6 @@ describe('markdown heavy feature lifecycle', () => {
     })
   })
 
-  it('kills real feature-local RAF and interval scheduler mutations', () => {
-    const mutation = evaluateMarkdownHeavyFeatureSchedulerMutation()
-    expect(mutation.cleanAttempts).toEqual([])
-    expect(mutation.mutantAttempts).toEqual([
-      'feature-local-raf',
-      'feature-local-interval',
-    ])
-    expect(mutation.accepted).toBe(false)
-  })
-
   it('does not collide when exact identity fields contain separators', async () => {
     const lifecycle = createMarkdownHeavyFeatureLifecycle()
     let renders = 0
@@ -329,7 +319,15 @@ describe('markdown heavy feature lifecycle', () => {
   })
 
   it('kills the required lifecycle mutation fixtures', async () => {
-    const report = await evaluateMarkdownHeavyFeatureLifecycleMutations()
+    const adapterMutations =
+      evaluateMarkdownHeavyFeatureAdapterResourceMutations()
+    expect(adapterMutations.featureLocalScheduler.cleanAttempts).toEqual([])
+    expect(adapterMutations.featureLocalScheduler.mutantAttempts).toEqual([
+      'feature-local-raf',
+      'feature-local-interval',
+    ])
+    const report =
+      await evaluateMarkdownHeavyFeatureLifecycleMutations(adapterMutations)
     expect(report.mutations).toHaveLength(6)
     expect(report.mutations.every((mutation) => !mutation.accepted)).toBe(true)
   })

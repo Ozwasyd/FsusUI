@@ -15,7 +15,23 @@ type LifecycleMetrics = {
     revision: number | string
     theme: string
   } | null
+  identities: Partial<
+    Record<
+      'code-highlight' | 'latex' | 'mermaid',
+      {
+        config: string
+        documentEpoch: number | string
+        documentKey: string
+        revision: number | string
+        theme: string
+      }
+    >
+  >
   retainedResources: number
+  retainedListeners: number
+  retainedObservers: number
+  retainedRuntimes: number
+  retainedTasks: number
   reuses: number
   stale: number
   static: number
@@ -27,7 +43,6 @@ type HeavyLifecycleTransition = (input: {
   codeHighlight: boolean
   documentEpoch: number
   documentKey: string
-  mode: 'about' | 'article' | 'editor' | 'preview'
   theme: 'dark' | 'light'
 }) => Promise<void>
 
@@ -79,9 +94,24 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     .toBeGreaterThan(0)
 
   const initial = await readMetrics(page)
-  expect(initial).toMatchObject({ active: 0, retainedResources: 0 })
+  expect(initial).toMatchObject({
+    active: 0,
+    retainedListeners: 0,
+    retainedObservers: 0,
+    retainedResources: 0,
+    retainedRuntimes: 0,
+    retainedTasks: 0,
+  })
   expect(initial!.cacheEntries).toBeLessThanOrEqual(128)
   expect(initial!.cacheBytes).toBeLessThanOrEqual(4 * 1024 * 1024)
+  expect(initial!.identities['code-highlight']).toMatchObject({
+    config: '{}',
+    theme: 'light',
+  })
+  expect(initial!.identities.latex).toMatchObject({
+    theme: 'token-bound',
+  })
+  expect(initial!.identities.mermaid?.config).toContain('"tokens"')
   const initialMountedUnits = await renderer
     .locator('[data-fsus-render-unit]')
     .count()
@@ -98,7 +128,13 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
   const afterBottom = await readMetrics(page)
   expect(afterBottom!.cacheEntries).toBeLessThanOrEqual(128)
   expect(afterBottom!.cacheBytes).toBeLessThanOrEqual(4 * 1024 * 1024)
-  expect(afterBottom!.retainedResources).toBe(0)
+  expect(afterBottom).toMatchObject({
+    retainedListeners: 0,
+    retainedObservers: 0,
+    retainedResources: 0,
+    retainedRuntimes: 0,
+    retainedTasks: 0,
+  })
 
   await renderer.evaluate((element) => {
     element.scrollTop = 0
@@ -114,7 +150,6 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
     codeHighlight: true,
     documentEpoch: 2,
     documentKey: 'heavy-document-b',
-    mode: 'preview',
     theme: 'light',
   })
   await expect
@@ -124,46 +159,62 @@ test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
   expect(afterDocumentSwitch.reuses).toBe(beforeIdentitySwitches.reuses)
   expect(afterDocumentSwitch.identity).toMatchObject({
     documentEpoch: 2,
-    revision: 'heavy-lifecycle-2',
+    revision: 'heavy-lifecycle-1',
   })
 
   await transition(page, {
     codeHighlight: true,
     documentEpoch: 2,
     documentKey: 'heavy-document-b',
-    mode: 'article',
     theme: 'dark',
   })
   await expect
-    .poll(async () => (await readMetrics(page))?.identity?.theme)
+    .poll(
+      async () =>
+        (await readMetrics(page))?.identities['code-highlight']?.theme,
+    )
     .toBe('dark')
+  const afterThemeSwitch = (await readMetrics(page))!
+  expect(afterThemeSwitch.identities.mermaid?.theme).toBe('dark')
+  expect(afterThemeSwitch.identities.latex?.theme).toBe('token-bound')
 
+  const beforeCodeDisable = afterThemeSwitch.reuses
   await transition(page, {
     codeHighlight: false,
     documentEpoch: 2,
     documentKey: 'heavy-document-b',
-    mode: 'article',
     theme: 'dark',
   })
   await expect
-    .poll(async () => (await readMetrics(page))?.identity?.config)
-    .toContain('"codeHighlight":false')
+    .poll(
+      async () =>
+        (await readMetrics(page))?.identities['code-highlight'] ?? null,
+    )
+    .toBeNull()
+  const afterCodeDisable = (await readMetrics(page))!
+  expect(afterCodeDisable.reuses).toBeGreaterThan(beforeCodeDisable)
+  expect(afterCodeDisable.identities.latex?.theme).toBe('token-bound')
+  expect(afterCodeDisable.identities.mermaid?.theme).toBe('dark')
 
+  const beforeCodeRestore = afterCodeDisable.reuses
   await transition(page, {
     codeHighlight: true,
     documentEpoch: 2,
     documentKey: 'heavy-document-b',
-    mode: 'article',
     theme: 'dark',
   })
   await expect
-    .poll(async () => (await readMetrics(page))?.identity?.config)
-    .toContain('"codeHighlight":true')
+    .poll(
+      async () =>
+        (await readMetrics(page))?.identities['code-highlight']?.config,
+    )
+    .toBe('{}')
   await expect.poll(async () => (await readMetrics(page))?.active ?? -1).toBe(0)
   await expect
     .poll(async () => (await readMetrics(page))?.retainedResources ?? -1)
     .toBe(0)
   const afterConfigRestore = (await readMetrics(page))!
+  expect(afterConfigRestore.reuses).toBeGreaterThan(beforeCodeRestore)
   expect(afterConfigRestore.active).toBe(0)
   expect(afterConfigRestore.retainedResources).toBe(0)
 

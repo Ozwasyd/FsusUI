@@ -28,6 +28,10 @@ import type {
   MarkdownFeatureOutputCommitOptions,
   MarkdownFeatureOutputKind,
 } from './markdown-feature-output-gateway'
+import {
+  assertMarkdownHeavyFeatureAdapterResourceBridge,
+  createMarkdownHeavyFeatureAdapterResourceBridge,
+} from './markdown-heavy-feature-resource'
 import type {
   FsusErrorCode,
   FsusErrorDetail,
@@ -634,7 +638,14 @@ interface MarkdownHeavyFeatureLifecycle {
     readonly estimateBytes: (value: T) => number
     readonly identity: MarkdownHeavyFeatureIdentity
     readonly render: (signal: AbortSignal) => Promise<T>
+    readonly resources?: Readonly<{
+      listeners?: number
+      observers?: number
+      runtimes?: number
+      tasks?: number
+    }>
     readonly signal?: AbortSignal
+    readonly teardown?: () => void
   }) => Promise<boolean>
 }
 
@@ -667,16 +678,18 @@ export interface MarkdownFeatureActivationOptions {
   features?: MarkdownFeatureActivationFeatureOptions
   root: ParentNode
   signal?: AbortSignal
-  /** @internal MarkdownEditor heavy-resource lifecycle authority. */
-  heavyLifecycle?: MarkdownHeavyFeatureLifecycle
-  /** @internal Exact cache identity; a missing identity disables reuse. */
-  resolveHeavyFeatureIdentity?: (input: {
+}
+
+interface MarkdownHeavyFeatureActivationOptions extends MarkdownFeatureActivationOptions {
+  readonly heavyLifecycle?: MarkdownHeavyFeatureLifecycle
+  readonly resolveHeavyFeatureIdentity?: (input: {
     readonly element: HTMLElement
     readonly kind: MarkdownHeavyFeatureKind
     readonly source: string
+    readonly theme: MarkdownFeatureActivationTheme
+    readonly tokens: Readonly<MarkdownFeatureThemeTokens>
   }) => MarkdownHeavyFeatureIdentity | null
-  /** @internal Route visual commits through the editor-owned mutate phase. */
-  scheduleHeavyFeatureCommit?: (input: {
+  readonly scheduleHeavyFeatureCommit?: (input: {
     readonly key: string
     readonly run: () => HTMLElement | void
     readonly signal: AbortSignal
@@ -1469,8 +1482,8 @@ interface MarkdownFeatureActivationContext extends Omit<
   ) => Readonly<MarkdownFeatureThemeTokens>
   readonly root: ParentNode
   readonly heavyLifecycle?: MarkdownHeavyFeatureLifecycle
-  readonly resolveHeavyFeatureIdentity?: MarkdownFeatureActivationOptions['resolveHeavyFeatureIdentity']
-  readonly scheduleHeavyFeatureCommit?: MarkdownFeatureActivationOptions['scheduleHeavyFeatureCommit']
+  readonly resolveHeavyFeatureIdentity?: MarkdownHeavyFeatureActivationOptions['resolveHeavyFeatureIdentity']
+  readonly scheduleHeavyFeatureCommit?: MarkdownHeavyFeatureActivationOptions['scheduleHeavyFeatureCommit']
 }
 
 const toFeatureRenderContext = (
@@ -1500,6 +1513,8 @@ const activateHeavyFeature = async (input: {
     element: input.element,
     kind: input.context.kind,
     source: input.source,
+    theme: input.context.theme,
+    tokens: input.context.resolveTokens(input.element),
   })
   if (!input.context.heavyLifecycle || !identity) {
     const output = await input.render(input.context.signal)
@@ -1507,28 +1522,40 @@ const activateHeavyFeature = async (input: {
     input.commit(output)
     return true
   }
-  return input.context.heavyLifecycle.activate({
-    commit: (output, signal) =>
-      input.context.scheduleHeavyFeatureCommit
-        ? input.context.scheduleHeavyFeatureCommit({
-            key: [
-              'markdown-heavy-feature',
-              identity.documentKey,
-              identity.documentEpoch,
-              identity.revision,
-              identity.nodeId,
-              identity.featureKind,
-            ].join(':'),
-            run: () => input.commit(output),
-            signal,
-          })
-        : input.commit(output),
-    element: input.element,
-    estimateBytes: estimateFeatureOutputBytes,
-    identity,
-    render: (signal) => input.render(signal),
-    signal: input.context.signal,
-  })
+  const resourceBridge = assertMarkdownHeavyFeatureAdapterResourceBridge(
+    createMarkdownHeavyFeatureAdapterResourceBridge(),
+  )
+  try {
+    return await input.context.heavyLifecycle.activate({
+      commit: (output, signal) =>
+        input.context.scheduleHeavyFeatureCommit
+          ? input.context.scheduleHeavyFeatureCommit({
+              key: [
+                'markdown-heavy-feature',
+                identity.documentKey,
+                identity.documentEpoch,
+                identity.revision,
+                identity.nodeId,
+                identity.featureKind,
+              ].join(':'),
+              run: () => input.commit(output),
+              signal,
+            })
+          : input.commit(output),
+      element: input.element,
+      estimateBytes: estimateFeatureOutputBytes,
+      identity,
+      render: (signal) =>
+        resourceBridge.run(signal, (adapterSignal) =>
+          input.render(adapterSignal),
+        ),
+      resources: resourceBridge.resources,
+      signal: input.context.signal,
+      teardown: resourceBridge.teardown,
+    })
+  } finally {
+    resourceBridge.teardown()
+  }
 }
 
 const activateBuiltInFeature = async (
@@ -1773,6 +1800,7 @@ const activateMarkdownFeatureWork = async (
 export const activateMarkdownFeatures = async (
   options: MarkdownFeatureActivationOptions,
 ): Promise<MarkdownFeatureActivationResult> => {
+  const heavyOptions = options as MarkdownHeavyFeatureActivationOptions
   const features = toMarkdownFeatureOptions(options.features)
   const activated: MarkdownFeatureActivationItem[] = []
   const errors: MarkdownFeatureActivationError[] = []
@@ -1809,16 +1837,20 @@ export const activateMarkdownFeatures = async (
   const batches: MarkdownFeatureActivationBatch[] = []
   const priorWork: MarkdownFeatureActivationWork[] = []
 
-  for (const { enabled, kind, selector } of markdownHeavyFeatureActivationRegistry) {
+  for (const {
+    enabled,
+    kind,
+    selector,
+  } of markdownHeavyFeatureActivationRegistry) {
     if (options.signal?.aborted) break
     if (!enabled(features)) continue
 
     const context: MarkdownFeatureActivationContext = {
       cspNonce: options.cspNonce,
-      heavyLifecycle: options.heavyLifecycle,
+      heavyLifecycle: heavyOptions.heavyLifecycle,
       kind,
-      resolveHeavyFeatureIdentity: options.resolveHeavyFeatureIdentity,
-      scheduleHeavyFeatureCommit: options.scheduleHeavyFeatureCommit,
+      resolveHeavyFeatureIdentity: heavyOptions.resolveHeavyFeatureIdentity,
+      scheduleHeavyFeatureCommit: heavyOptions.scheduleHeavyFeatureCommit,
       resolveTokens,
       root: options.root,
       signal: options.signal,

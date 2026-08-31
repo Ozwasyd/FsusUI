@@ -308,7 +308,6 @@ type PerformanceFixtureApi = {
     codeHighlight: boolean
     documentEpoch: number
     documentKey: string
-    mode: 'about' | 'article' | 'editor' | 'preview'
     theme: 'dark' | 'light'
   }) => Promise<void>
   wasmProbe: () => Promise<{
@@ -335,9 +334,12 @@ const markdownHeavyLifecycleTransition: PerformanceFixtureApi['markdownHeavyLife
       latex: true,
       mermaid: true,
     }
-    markdownMode.value = input.mode
     document.documentElement.classList.toggle('dark', input.theme === 'dark')
-    markdownHeavyLifecycleRevision.value += 1
+    document.documentElement.dispatchEvent(
+      new CustomEvent('fsus:theme-change', {
+        detail: { mode: input.theme, resolved: input.theme },
+      }),
+    )
     await nextTick()
   }
 
