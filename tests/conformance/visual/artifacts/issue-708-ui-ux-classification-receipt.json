@@ -51,7 +51,7 @@
     {
       "id": "avalonia-installation",
       "path": "docs/avalonia/installation.md",
-      "digest": "9ed46eacfe99b595589c46d9018a5d58aa468bcaf2375ae16a6aa8a69713a98f"
+      "digest": "a6c145d58f581481afff720f38463e1fbd6222e55f4cc3fd6bf7cbe814a71245"
     },
     {
       "id": "platform-differences",
@@ -69,49 +69,50 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "29bf2b51848969ea14b230e8580f3a2b982e3e93",
+    "revision": "54a4a382952bd48bb4cbe3cf5f6cf0ff9e7639a2",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "2e1f48d3f98ba65a0a4f36a6629852bae459289b9e63c893c6029fe4f398a64b",
+    "authorityDigest": "c22f322c6f3fd639d1e0fca29d43b5afd9a5655cdc1945688ff9a5ed75663239",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "6e6da51554db819e89ebc77a41a9dd45f3838940",
-  "candidateDigest": "6505dc188e3fd6b355e7cd1496fde43388f0408bdb08963a5765224c4bf215c8",
+  "candidateSha": "bc3bd6d5f73e5d8bce0e76356e8a71d731c316f9",
+  "candidateDigest": "9ee40129e1e4541676378853a47a5d84d345762557cb4ec7dd4665dd2e22f85c",
   "stateEvidenceMatrix": [
     {
       "state": "built-in-light",
       "viewport": "desktop-640x360",
       "theme": "light",
-      "evidenceDigest": "f4e3ea473f3bbf3122ca29840c9e275351ee0b5d6bbb60c68e150bb73fc6c60b"
+      "evidenceDigest": "7550b74eeb660cfc1b3357ac5065c1b82cefe1e45549fc9cd409c50fc05cba2c"
     },
     {
       "state": "built-in-dark",
       "viewport": "desktop-640x360",
       "theme": "dark",
-      "evidenceDigest": "b5a4211f9e3ec779ed45d4075fdcd99b1228faac845d3715c2da98300fce3b23"
+      "evidenceDigest": "f28322f2aa9bb0e69033637e7ba25a64cec17b19ce9b549982ec8ccde3f97e0e"
     },
     {
       "state": "complete-custom-palette",
       "viewport": "desktop-640x360",
       "theme": "light",
-      "evidenceDigest": "7597d3b9d7d7ab84b2a870ed74c3a1996df28b2c4cf43b341fabbf89261ca10a"
+      "evidenceDigest": "907456032b786b54b9b5042ae1181667f16c9cadef64967249c99d766084222e"
     },
     {
       "state": "partial-custom-with-dark-fallback",
       "viewport": "desktop-640x360",
       "theme": "dark",
-      "evidenceDigest": "a9b6b207f9b97399fc26e01aad7e06f437094492b9296183a0d0b5ad51ad00c6"
+      "evidenceDigest": "a6ca9990de9b9c844e3d3ed8d0d7e4b58ff5961051ce650f6feb9f76c7504193"
     },
     {
-      "state": "built-in-high-contrast",
+      "state": "built-in-high-contrast-precedence",
       "viewport": "desktop-640x360",
       "theme": "dark",
-      "evidenceDigest": "2ce289f4613c0e9dbc2fd7be14ba7fa6bf6bd122af24f96b1130f954d5808fc0"
+      "evidenceDigest": "abe4d616230988413718a7dd9cdbcfc69d480ec89fb5ee7e3a1fc2e22c4a713f"
     }
   ],
   "inScope": [
-    "one optional public Avalonia palette record with nullable background, surface, raised-surface, text, muted-text, border, and icon colors",
-    "per-field built-in light, dark, and high-contrast fallback applied by FsusThemeManager",
-    "runtime DynamicResource refresh, public API and semantic baselines, nearest docs, tests, rendered evidence, AOT fixture, and patch changeset"
+    "one optional public Avalonia palette record with nullable background, surface, raised-surface, text, muted-text, border, and icon IBrush overrides",
+    "per-field built-in light and dark fallback plus complete built-in high-contrast precedence applied by FsusThemeManager",
+    "runtime DynamicResource refresh across shell, editor, tree, picker, read-only, text, border, and icon resources",
+    "public API and semantic baselines, nearest docs, tests, production-control rendered evidence, AOT fixture, and patch changeset"
   ],
   "outOfScope": [
     "new canonical tokens or a second palette authority",
@@ -119,8 +120,8 @@
     "consumer-specific theme menus, editor stylesheets, persistence, or layout changes",
     "changes to accent, density, motion, typography, or unrelated component behavior"
   ],
-  "classificationEvidenceDigest": "b7dadf7dfc32c99c7c9abb0851e3ef38da2194448a8d67092c95ed2954892469",
+  "classificationEvidenceDigest": "5d50c6f26435700c32ef5c13cfb8462368e6a9185311bbbe51f630bc712d9918",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "dd6c9d0bd52bbfe0c35f04c29f7552b7ecfe26484f9986e2c030258531cea0f2"
+  "receiptDigest": "82c56bf19a07d55f246ec3709f35ff498e145e5cb80ab08fe5db9f86705f5dea"
 }

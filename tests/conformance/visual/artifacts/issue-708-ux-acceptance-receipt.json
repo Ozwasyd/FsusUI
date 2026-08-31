@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "dd6c9d0bd52bbfe0c35f04c29f7552b7ecfe26484f9986e2c030258531cea0f2",
-  "candidateSha": "6e6da51554db819e89ebc77a41a9dd45f3838940",
-  "candidateDigest": "6505dc188e3fd6b355e7cd1496fde43388f0408bdb08963a5765224c4bf215c8",
+  "classificationReceiptDigest": "82c56bf19a07d55f246ec3709f35ff498e145e5cb80ab08fe5db9f86705f5dea",
+  "candidateSha": "bc3bd6d5f73e5d8bce0e76356e8a71d731c316f9",
+  "candidateDigest": "9ee40129e1e4541676378853a47a5d84d345762557cb4ec7dd4665dd2e22f85c",
   "verificationClass": "ux-system",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -16,13 +16,13 @@
     "fdf27f2ad6d153acd5d0abfafd13f3106708fe4df31490f5ebed80c8061e5650",
     "298ff4b6078a9b5043e65703338cf03342e9a3577dbe7e3a1b0b1bd3c686260e",
     "069c6efa2e44f775544bb037cd550a0edbdd8ca98a4e40bfc473f6a1bb0d9f74",
-    "9ed46eacfe99b595589c46d9018a5d58aa468bcaf2375ae16a6aa8a69713a98f",
+    "a6c145d58f581481afff720f38463e1fbd6222e55f4cc3fd6bf7cbe814a71245",
     "2f8f9071f47aa6e233f0a5dd7f7a1afb549a099882e48c46a3b1880f73b987c9",
     "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1"
   ],
-  "activeBaselineIdentityDigest": "f1807d28a29659af5f19178c6c3075922fe64a1e48928e446746f180792ee77f",
+  "activeBaselineIdentityDigest": "61b2f27b01700d8aeac197e3157c01a4895ce8699346e1f1b561023f8c8038f0",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "20a11f9ee9c895241c174f4a0af28c365cadbbe538334c768ba3eeecd69e7673",
+  "independenceEvidenceDigest": "b7b90f88472d6b8fd8335a5d447f8db9fcc2c025b513b1cb67d1e601d40a5e1f",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -35,7 +35,7 @@
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "f4e3ea473f3bbf3122ca29840c9e275351ee0b5d6bbb60c68e150bb73fc6c60b"
+      "evidenceDigest": "7550b74eeb660cfc1b3357ac5065c1b82cefe1e45549fc9cd409c50fc05cba2c"
     },
     {
       "viewport": "desktop-640x360",
@@ -46,7 +46,7 @@
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "b5a4211f9e3ec779ed45d4075fdcd99b1228faac845d3715c2da98300fce3b23"
+      "evidenceDigest": "f28322f2aa9bb0e69033637e7ba25a64cec17b19ce9b549982ec8ccde3f97e0e"
     },
     {
       "viewport": "desktop-640x360",
@@ -57,7 +57,7 @@
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "7597d3b9d7d7ab84b2a870ed74c3a1996df28b2c4cf43b341fabbf89261ca10a"
+      "evidenceDigest": "907456032b786b54b9b5042ae1181667f16c9cadef64967249c99d766084222e"
     },
     {
       "viewport": "desktop-640x360",
@@ -68,18 +68,18 @@
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "a9b6b207f9b97399fc26e01aad7e06f437094492b9296183a0d0b5ad51ad00c6"
+      "evidenceDigest": "a6ca9990de9b9c844e3d3ed8d0d7e4b58ff5961051ce650f6feb9f76c7504193"
     },
     {
       "viewport": "desktop-640x360",
-      "state": "built-in-high-contrast",
+      "state": "built-in-high-contrast-precedence",
       "theme": "dark",
       "inputModes": [
         "pointer",
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "2ce289f4613c0e9dbc2fd7be14ba7fa6bf6bd122af24f96b1130f954d5808fc0"
+      "evidenceDigest": "abe4d616230988413718a7dd9cdbcfc69d480ec89fb5ee7e3a1fc2e22c4a713f"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -87,7 +87,7 @@
       "id": "light-built-in-fallback",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-light.png",
-      "digest": "f4e3ea473f3bbf3122ca29840c9e275351ee0b5d6bbb60c68e150bb73fc6c60b",
+      "digest": "7550b74eeb660cfc1b3357ac5065c1b82cefe1e45549fc9cd409c50fc05cba2c",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -95,7 +95,7 @@
       "id": "dark-built-in-fallback",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-dark.png",
-      "digest": "b5a4211f9e3ec779ed45d4075fdcd99b1228faac845d3715c2da98300fce3b23",
+      "digest": "f28322f2aa9bb0e69033637e7ba25a64cec17b19ce9b549982ec8ccde3f97e0e",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -103,7 +103,7 @@
       "id": "complete-custom-palette",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-custom.png",
-      "digest": "7597d3b9d7d7ab84b2a870ed74c3a1996df28b2c4cf43b341fabbf89261ca10a",
+      "digest": "907456032b786b54b9b5042ae1181667f16c9cadef64967249c99d766084222e",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -111,7 +111,7 @@
       "id": "partial-dark-fallback",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-partial-dark.png",
-      "digest": "a9b6b207f9b97399fc26e01aad7e06f437094492b9296183a0d0b5ad51ad00c6",
+      "digest": "a6ca9990de9b9c844e3d3ed8d0d7e4b58ff5961051ce650f6feb9f76c7504193",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -119,12 +119,12 @@
       "id": "high-contrast-fallback",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-708-theme-highcontrast.png",
-      "digest": "2ce289f4613c0e9dbc2fd7be14ba7fa6bf6bd122af24f96b1130f954d5808fc0",
+      "digest": "abe4d616230988413718a7dd9cdbcfc69d480ec89fb5ee7e3a1fc2e22c4a713f",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "d1194e1a2a5d638471bf540cd2d0ed7490042c4e98238b115c3f2aa80f7a8ea2"
+  "receiptDigest": "e6c40f0ffeead69648a56c5d57aabcf3e26976191ee4357fa8c6d2c9572a9b5d"
 }
