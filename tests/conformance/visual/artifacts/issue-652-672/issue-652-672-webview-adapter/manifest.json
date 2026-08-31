@@ -4,7 +4,7 @@
     652,
     672
   ],
-  "candidateSha": "1907438ca42082a535872e7798070b32dcd47c68",
+  "candidateSha": "877674f2b3a53692cd3b6f61d3d6a9b44c7123f4",
   "fixtureClass": "production",
   "evidenceClass": "local-headless-skia-and-adapter-simulation",
   "simulation": "The real FsusContextMenu, theme, overlay, focus and automation paths are rendered. Embedded-browser and PDF engines are deterministic adapters, not external engine execution.",
@@ -2456,11 +2456,11 @@
       "theme": "light",
       "pdf": {
         "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light.pdf",
-        "sha256": "7699ccdc673772004527b7570955ad6cf0f24ca05a4e4250aab66d2041bcbd27"
+        "sha256": "95dd6ed4bd92d09dc94641d11bc0ee6663b84ef46bfaf18f351c79386d3d33d1"
       },
       "parser": {
         "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light-pdfinfo.txt",
-        "sha256": "ebbf2fe8933a68dc61f6dbe0968b47a49a4b99d05a30a8d34222a178e95f2132"
+        "sha256": "e6da2867ea3abb37fb3d028f6c90f6c58a5dccccb611c9b8137df8ea84dcc07a"
       },
       "text": {
         "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-light.txt",
@@ -2481,11 +2481,11 @@
       "theme": "dark",
       "pdf": {
         "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark.pdf",
-        "sha256": "d4cd8b9f2ebf2100e5a3ac9e792e4a64df9a02b77fa54e08d09d6d136eaea16a"
+        "sha256": "87036a3673e27276993c454be605cf7653af46120c3db9a360d77a905dcc9716"
       },
       "parser": {
         "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark-pdfinfo.txt",
-        "sha256": "9cb98014ebb01329c8e70e194f5939a9462c052aa4c74e46e04371e7e8023248"
+        "sha256": "456ca6dedeeb6a38d55e9a993ce2def4f67ce51dc31d09d029a2d87b98c21822"
       },
       "text": {
         "path": "tests/conformance/visual/artifacts/issue-652-672/issue-652-672-webview-adapter/webview-print-dark.txt",
