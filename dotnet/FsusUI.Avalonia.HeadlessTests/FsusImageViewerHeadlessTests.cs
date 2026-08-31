@@ -336,7 +336,10 @@ public class FsusImageViewerHeadlessTests
     window.MouseMove(new Point(center.X + 24, center.Y + 18), RawInputModifiers.LeftMouseButton);
     window.MouseUp(new Point(center.X + 24, center.Y + 18), MouseButton.Left);
     Assert.False(viewer.IsPanning);
+    Assert.DoesNotContain("fsus-panning", viewer.Classes);
+    Assert.Null(viewer.Cursor);
     Assert.NotEqual(default, viewer.Translation);
+    var releasedTranslation = viewer.Translation;
     viewer.PreserveTransformOnSourceChange = true;
     var preservedZoom = viewer.Zoom;
     var preservedTranslation = viewer.Translation;
@@ -386,6 +389,22 @@ public class FsusImageViewerHeadlessTests
           cursors = new
           {
             capturedDrag = panningCursor,
+            afterMouseUp = viewer.Cursor?.ToString(),
+          },
+          dragLifecycle = new
+          {
+            duringPointerCapture = new
+            {
+              isPanning = true,
+              cursor = panningCursor,
+              translation = capturedTranslation,
+            },
+            afterMouseUp = new
+            {
+              isPanning = false,
+              cursor = viewer.Cursor?.ToString(),
+              translation = releasedTranslation,
+            },
           },
           preservedFocusRestorationTest =
             "ImageViewerHeadlessKeyboardNavigationEscapeAndFocusRestoration",
