@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -155,7 +156,9 @@ public class FsusThemeManagerHeadlessTests
         expectedBorder,
         expectedIcon) in cases)
       {
-        manager.Apply(application, options);
+        manager.Apply(
+          application,
+          options with { MotionMode = FsusMotionMode.Reduced });
         RenderPalette(
           application,
           Path.Combine(outputRoot, $"issue-708-theme-{name}.png"),
@@ -340,6 +343,8 @@ public class FsusThemeManagerHeadlessTests
     window.Arrange(new Rect(0, 0, width, height));
     root.Measure(new Size(width, height));
     root.Arrange(new Rect(0, 0, width, height));
+    Dispatcher.UIThread.RunJobs();
+    Assert.True(select.Focus(NavigationMethod.Tab));
     Dispatcher.UIThread.RunJobs();
 
     var activityRail = shell.GetVisualDescendants()
