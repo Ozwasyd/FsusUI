@@ -1049,6 +1049,11 @@ const activateRenderedFeatures = async (
     const handle = createMarkdownHeavyFeatureIsolatedRender(
       request,
       props.trustedScriptUrlFactory,
+      (key, run) =>
+        frameScheduler.schedule({
+          key,
+          mutate: run,
+        }),
     )
     return Object.freeze({
       ...handle,

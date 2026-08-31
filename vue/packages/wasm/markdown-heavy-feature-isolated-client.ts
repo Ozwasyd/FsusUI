@@ -1,5 +1,6 @@
 import MarkdownHeavyFeatureFrameUrl from './markdown-heavy-feature-frame.ts?worker&url'
 import {
+  MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
   registerMarkdownHeavyFeatureIsolatedRenderFactory,
   type MarkdownHeavyFeatureAdapterResources,
   type MarkdownHeavyFeatureIsolatedRenderRequest,
@@ -8,13 +9,16 @@ import {
 } from './markdown-heavy-feature-resource'
 import type { FeatureRenderOutput } from './markdown-feature-output-gateway'
 
-const MESSAGE_SCOPE = 'fsus-markdown-heavy-feature-frame@1'
-
 const abortError = () => new DOMException('Aborted', 'AbortError')
 
 export type MarkdownHeavyFeatureTrustedScriptUrlFactory = (
   moduleUrl: URL,
 ) => unknown
+
+export type MarkdownHeavyFeatureFrameContinueScheduler = (
+  key: string,
+  run: () => void,
+) => boolean
 
 const createCapability = () => {
   const cryptoApi = globalThis.crypto
@@ -38,6 +42,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
 >(
   request: MarkdownHeavyFeatureIsolatedRenderRequest,
   trustedScriptUrlFactory?: MarkdownHeavyFeatureTrustedScriptUrlFactory,
+  scheduleContinue?: MarkdownHeavyFeatureFrameContinueScheduler,
 ) => {
   const validatedRequest =
     validateMarkdownHeavyFeatureIsolatedRenderRequest(request)
@@ -85,7 +90,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
       !active ||
       event.source !== iframe.contentWindow ||
       event.origin !== expectedOrigin ||
-      event.data?.scope !== MESSAGE_SCOPE ||
+      event.data?.scope !== MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE ||
       event.data?.type !== 'ready' ||
       event.data?.capability !== capability
     ) {
@@ -98,7 +103,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
     port.onmessage = (message) => {
       if (!active) return
       if (
-        message.data?.scope !== MESSAGE_SCOPE ||
+        message.data?.scope !== MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE ||
         message.data?.capability !== capability
       ) {
         teardown()
@@ -108,6 +113,25 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
         iframe.dataset.fsusMarkdownHeavyWork = validatedRequest.kind
         if (validatedRequest.lifecycleKey) {
           iframe.dataset.fsusMarkdownHeavyNode = validatedRequest.lifecycleKey
+        }
+        const continueRender = () => {
+          if (!active) return
+          port?.postMessage({
+            capability,
+            scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+            type: 'continue',
+          })
+        }
+        if (
+          scheduleContinue &&
+          !scheduleContinue(
+            `markdown-heavy-frame-continue:${validatedRequest.lifecycleKey ?? capability}`,
+            continueRender,
+          )
+        ) {
+          teardown()
+        } else if (!scheduleContinue) {
+          continueRender()
         }
         return
       }
@@ -146,7 +170,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
       {
         capability,
         request: validatedRequest,
-        scope: MESSAGE_SCOPE,
+        scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
         type: 'render',
       },
       expectedOrigin,

@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createMarkdownHeavyFeatureIsolatedRender } from '../markdown-heavy-feature-isolated-client'
 import {
+  MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+  validateMarkdownHeavyFeatureFrameContinueMessage,
   validateMarkdownHeavyFeatureIsolatedRenderOutput,
   validateMarkdownHeavyFeatureIsolatedRenderRequest,
 } from '../markdown-heavy-feature-resource'
@@ -15,6 +17,54 @@ const validRequest = Object.freeze({
 })
 
 describe('markdown heavy feature isolated client', () => {
+  it('fails closed for malformed, wrong-kind, and oversized continue messages', () => {
+    const capability = 'a'.repeat(64)
+    expect(
+      validateMarkdownHeavyFeatureFrameContinueMessage(
+        {
+          capability,
+          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+          type: 'continue',
+        },
+        capability,
+      ),
+    ).toBe(true)
+    expect(
+      validateMarkdownHeavyFeatureFrameContinueMessage(null, capability),
+    ).toBe(false)
+    expect(
+      validateMarkdownHeavyFeatureFrameContinueMessage(
+        {
+          capability,
+          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+          type: 'resolve',
+        },
+        capability,
+      ),
+    ).toBe(false)
+    expect(
+      validateMarkdownHeavyFeatureFrameContinueMessage(
+        {
+          capability: `${capability}extra`,
+          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+          type: 'continue',
+        },
+        capability,
+      ),
+    ).toBe(false)
+    expect(
+      validateMarkdownHeavyFeatureFrameContinueMessage(
+        {
+          capability,
+          extra: 'unexpected',
+          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+          type: 'continue',
+        },
+        capability,
+      ),
+    ).toBe(false)
+  })
+
   it('copies and bounds requests before sending source into the frame realm', () => {
     const request =
       validateMarkdownHeavyFeatureIsolatedRenderRequest(validRequest)

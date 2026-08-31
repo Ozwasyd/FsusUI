@@ -1,11 +1,11 @@
 import { activateMarkdownFeatures } from './markdown-runtime'
 import type { FeatureRenderOutput } from './markdown-runtime'
 import {
+  MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+  validateMarkdownHeavyFeatureFrameContinueMessage,
   validateMarkdownHeavyFeatureIsolatedRenderRequest,
   type MarkdownHeavyFeatureIsolatedRenderRequest,
 } from './markdown-heavy-feature-resource'
-
-const MESSAGE_SCOPE = 'fsus-markdown-heavy-feature-frame@1'
 
 const frameWindow = window as Window & typeof globalThis
 const capability = document.documentElement.dataset.fsusMarkdownFrameCapability
@@ -124,7 +124,7 @@ const receiveRenderRequest = (event: MessageEvent) => {
   if (
     event.source !== frameWindow.parent ||
     event.origin !== parentOrigin ||
-    event.data?.scope !== MESSAGE_SCOPE ||
+    event.data?.scope !== MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE ||
     event.data?.type !== 'render' ||
     event.data?.capability !== capability ||
     !event.ports[0]
@@ -140,35 +140,61 @@ const receiveRenderRequest = (event: MessageEvent) => {
     port.postMessage({
       capability,
       message: 'markdown_heavy_feature_frame_request_invalid',
-      scope: MESSAGE_SCOPE,
+      scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
       type: 'reject',
     })
     port.close()
     return
   }
-  port.postMessage({ capability, scope: MESSAGE_SCOPE, type: 'started' })
-  void render(request).then(
-    (output) =>
+  port.onmessage = (message) => {
+    if (
+      !validateMarkdownHeavyFeatureFrameContinueMessage(
+        message.data,
+        capability,
+      )
+    ) {
       port.postMessage({
         capability,
-        scope: MESSAGE_SCOPE,
-        type: 'resolve',
-        output,
-      }),
-    (error: unknown) =>
-      port.postMessage({
-        capability,
-        message: error instanceof Error ? error.message : String(error),
-        scope: MESSAGE_SCOPE,
+        message: 'markdown_heavy_feature_frame_continue_invalid',
+        scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
         type: 'reject',
-      }),
-  )
+      })
+      port.close()
+      return
+    }
+    port.onmessage = null
+    void render(request).then(
+      (output) =>
+        port.postMessage({
+          capability,
+          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+          type: 'resolve',
+          output,
+        }),
+      (error: unknown) =>
+        port.postMessage({
+          capability,
+          message: error instanceof Error ? error.message : String(error),
+          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+          type: 'reject',
+        }),
+    )
+  }
+  port.postMessage({
+    capability,
+    scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+    type: 'started',
+  })
 }
 
 frameWindow.addEventListener('message', receiveRenderRequest)
 
 frameWindow.parent.postMessage(
-  { capability, scope: MESSAGE_SCOPE, type: 'ready' },
+  {
+    capability,
+    scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+    type: 'ready',
+  },
   parentOrigin,
 )
 

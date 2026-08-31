@@ -4,8 +4,25 @@ const MAX_ISOLATED_SOURCE_LENGTH = 16 * 1024 * 1024
 const MAX_ISOLATED_OUTPUT_LENGTH = 128 * 1024 * 1024
 const MAX_ISOLATED_TOKEN_COUNT = 32
 
+export const MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE =
+  'fsus-markdown-heavy-feature-frame@1'
+
 const boundedString = (value: unknown, maxLength: number) =>
   typeof value === 'string' && value.length <= maxLength
+
+export const validateMarkdownHeavyFeatureFrameContinueMessage = (
+  value: unknown,
+  capability: string,
+) => {
+  if (!value || typeof value !== 'object') return false
+  const message = value as Record<string, unknown>
+  return (
+    Reflect.ownKeys(message).length === 3 &&
+    message.capability === capability &&
+    message.scope === MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE &&
+    message.type === 'continue'
+  )
+}
 
 export interface MarkdownHeavyFeatureAdapterResources {
   readonly listeners: number
