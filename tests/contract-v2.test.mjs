@@ -4,6 +4,7 @@ import path from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
 import {
+  buildComponentMap,
   compareMembers,
   validateRegistry,
   MARKDOWN_EDITOR_GATE_PATH,
@@ -534,7 +535,7 @@ test('container, button group, and visual hidden keep explicit truthful bindings
   )
 })
 
-test('explicit divergent names and canonical records bind real native surfaces', () => {
+test('explicit divergent names and explicit records bind real native surfaces', () => {
   const expected = new Map([
     ['component-v2.dynamic-size-grid', 'FsusUI.Avalonia.Controls.FsusTableV2'],
     [
@@ -575,6 +576,125 @@ test('explicit divergent names and canonical records bind real native surfaces',
     assert.equal(contract.bindings.avalonia.type, nativeType, id)
     assert.notEqual(contract.component.exportStatus, 'aligned-candidate', id)
   }
+})
+
+test('arbitrary same-kebab records do not auto-bind', () => {
+  const map = buildComponentMap({
+    vueBaseline: {
+      components: [
+        {
+          name: 'ElArbitraryRecord',
+          module: 'fixture',
+          exportIdentity: { role: 'canonical', aliases: [] },
+        },
+      ],
+    },
+    typeIndex: new Map([
+      [
+        'FsusUI.Avalonia.Controls.FsusArbitraryRecord',
+        {
+          name: 'FsusUI.Avalonia.Controls.FsusArbitraryRecord',
+          kind: 'record',
+          packageId: 'avalonia',
+        },
+      ],
+    ]),
+  })
+  assert.deepEqual(map, [])
+})
+
+test('multi-type component bindings retain exact declaring types', () => {
+  const expected = new Map([
+    [
+      'component-v2.el-config-provider',
+      [
+        'FsusUI.Avalonia.Localization.FsusAvaloniaLocaleProvider',
+        'FsusUI.Avalonia.Themes.FsusThemeManager',
+        'FsusUI.Avalonia.Themes.FsusThemeOptions',
+        'FsusUI.Avalonia.Themes.FsusMotionService',
+      ],
+    ],
+    [
+      'component-v2.el-loading',
+      [
+        'FsusUI.Avalonia.Controls.FsusLoadingService',
+        'FsusUI.Avalonia.Controls.FsusLoadingOverlay',
+        'FsusUI.Avalonia.Controls.FsusLoadingOptions',
+      ],
+    ],
+    [
+      'component-v2.el-message',
+      [
+        'FsusUI.Avalonia.Controls.FsusMessageService',
+        'FsusUI.Avalonia.Controls.FsusMessageToast',
+        'FsusUI.Avalonia.Controls.FsusMessageOptions',
+      ],
+    ],
+    [
+      'component-v2.el-overlay',
+      [
+        'FsusUI.Avalonia.Overlay.FsusOverlayHost',
+        'FsusUI.Avalonia.Overlay.FsusOverlayEntry',
+        'FsusUI.Avalonia.Overlay.FsusOverlayOptions',
+      ],
+    ],
+    [
+      'component-v2.el-section-nav',
+      [
+        'FsusUI.Avalonia.Controls.FsusSettingsSectionNav',
+        'FsusUI.Avalonia.Controls.FsusSettingsNavItem',
+      ],
+    ],
+    [
+      'component-v2.el-split-pane',
+      [
+        'FsusUI.Avalonia.Controls.FsusInboxSplitPane',
+        'FsusUI.Avalonia.Controls.FsusInboxLayout',
+      ],
+    ],
+  ])
+  for (const [id, types] of expected) {
+    const contract = committedRegistry.contracts.find(
+      (candidate) => candidate.id === id,
+    )
+    assert.deepEqual(contract.bindings.avalonia.types, types, id)
+    for (const member of [
+      ...contract.inputs,
+      ...contract.outputs,
+      ...contract.operations,
+      ...contract.contentRegions,
+    ]) {
+      if (member.avalonia) {
+        assert.ok(types.includes(member.avalonia.declaringType), id)
+      }
+    }
+    for (const extra of contract.avaloniaExtras) {
+      assert.ok(types.includes(extra.declaringType), id)
+    }
+  }
+})
+
+test('multi-type generated binding mutations fail closed', () => {
+  const mutated = clone(committedRegistry)
+  const message = mutated.contracts.find(
+    (contract) => contract.id === 'component-v2.el-message',
+  )
+  message.inputs.find((input) => input.name === 'duration').avalonia.declaringType =
+    'FsusUI.Avalonia.Controls.NotBound'
+  assert.match(
+    validateRegistry(mutated, gate).join('\n'),
+    /component-v2\.el-message member duration declaringType is outside the component binding/u,
+  )
+
+  const projection = clone(committedRegistry)
+  const entry = projection.componentMap.find(
+    (candidate) => candidate.vue.name === 'ElOverlay',
+  )
+  entry.avalonia.types.pop()
+  assert.match(
+    validateRegistry(projection, gate).join('\n'),
+    /component-v2\.el-overlay componentMap type binding mismatch/u,
+  )
 })
 
 test('zero-denominator and rejected candidate surfaces stay fail-closed', () => {

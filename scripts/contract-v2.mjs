@@ -232,6 +232,46 @@ export const CONTRACT_V2_GALLERY_ROUTES = [
 ].sort()
 
 const AVALONIA_MEMBER_BINDINGS = {
+  ElMessage: {
+    inputs: {
+      duration: {
+        member: 'Duration',
+        declaringType: 'FsusUI.Avalonia.Controls.FsusMessageOptions',
+      },
+      message: {
+        member: 'Message',
+        declaringType: 'FsusUI.Avalonia.Controls.FsusMessageOptions',
+      },
+      type: {
+        member: 'Type',
+        declaringType: 'FsusUI.Avalonia.Controls.FsusMessageOptions',
+      },
+    },
+  },
+  ElOverlay: {
+    inputs: {
+      zIndex: {
+        member: 'ZIndex',
+        declaringType: 'FsusUI.Avalonia.Overlay.FsusOverlayEntry',
+      },
+    },
+  },
+  ElSectionNav: {
+    inputs: {
+      items: {
+        member: 'Items',
+        declaringType: 'FsusUI.Avalonia.Controls.FsusSettingsSectionNav',
+      },
+    },
+  },
+  ElSplitPane: {
+    inputs: {
+      mobilePane: {
+        member: 'MobilePane',
+        declaringType: 'FsusUI.Avalonia.Controls.FsusInboxLayout',
+      },
+    },
+  },
   ElTableV2: {
     inputs: {
       cache: { member: 'Overscan' },
@@ -289,20 +329,65 @@ const CONTENT_REGION_BINDINGS = {
 const AVALONIA_COMPONENT_BINDINGS = {
   DynamicSizeGrid: 'FsusUI.Avalonia.Controls.FsusTableV2',
   DynamicSizeList: 'FsusUI.Avalonia.Controls.FsusVirtualList',
+  ElConversationListItem:
+    'FsusUI.Avalonia.Controls.FsusConversationListItem',
+  ElDiagnosticsItem: 'FsusUI.Avalonia.Controls.FsusDiagnosticsItem',
+  ElDistributionBarRow: 'FsusUI.Avalonia.Controls.FsusDistributionBarRow',
   ElEmptyState: 'FsusUI.Avalonia.Controls.FsusEmpty',
   ElFormSection: 'FsusUI.Avalonia.Controls.FsusSettingsFormSection',
+  ElKeyValueItem: 'FsusUI.Avalonia.Controls.FsusKeyValueItem',
+  ElConfigProvider: [
+    'FsusUI.Avalonia.Localization.FsusAvaloniaLocaleProvider',
+    'FsusUI.Avalonia.Themes.FsusThemeManager',
+    'FsusUI.Avalonia.Themes.FsusThemeOptions',
+    'FsusUI.Avalonia.Themes.FsusMotionService',
+  ],
+  ElLoading: [
+    'FsusUI.Avalonia.Controls.FsusLoadingService',
+    'FsusUI.Avalonia.Controls.FsusLoadingOverlay',
+    'FsusUI.Avalonia.Controls.FsusLoadingOptions',
+  ],
+  ElLoadingDirective: [
+    'FsusUI.Avalonia.Controls.FsusLoadingService',
+    'FsusUI.Avalonia.Controls.FsusLoadingOverlay',
+  ],
   ElMarkdownRenderer: 'FsusUI.Avalonia.Controls.FsusTextViewer',
+  ElMessageBubble: 'FsusUI.Avalonia.Controls.FsusMessageBubble',
+  ElMessage: [
+    'FsusUI.Avalonia.Controls.FsusMessageService',
+    'FsusUI.Avalonia.Controls.FsusMessageToast',
+    'FsusUI.Avalonia.Controls.FsusMessageOptions',
+  ],
   ElMetadataItem: 'FsusUI.Avalonia.Controls.FsusSettingsMetadataItem',
   ElMetadataRow: 'FsusUI.Avalonia.Controls.FsusSettingsMetadataRow',
+  ElMetricItem: 'FsusUI.Avalonia.Controls.FsusMetricItem',
+  ElOverlay: [
+    'FsusUI.Avalonia.Overlay.FsusOverlayHost',
+    'FsusUI.Avalonia.Overlay.FsusOverlayEntry',
+    'FsusUI.Avalonia.Overlay.FsusOverlayOptions',
+  ],
+  ElPopoverDirective: 'FsusUI.Avalonia.Controls.FsusPopover',
   ElRadioButton: 'FsusUI.Avalonia.Controls.FsusRadio',
   ElResourceList: 'FsusUI.Avalonia.Controls.FsusSettingsResourceList',
   ElSectionHeader: 'FsusUI.Avalonia.Controls.FsusSettingsSectionHeader',
+  ElSectionNav: [
+    'FsusUI.Avalonia.Controls.FsusSettingsSectionNav',
+    'FsusUI.Avalonia.Controls.FsusSettingsNavItem',
+  ],
   ElSectionNavLink: 'FsusUI.Avalonia.Controls.FsusSettingsNavItem',
+  ElSplitPane: [
+    'FsusUI.Avalonia.Controls.FsusInboxSplitPane',
+    'FsusUI.Avalonia.Controls.FsusInboxLayout',
+  ],
   ElTableColumn: 'FsusUI.Avalonia.Controls.FsusDataTableColumn',
   ElTooltipV2: 'FsusUI.Avalonia.Controls.FsusTooltip',
   ElVisuallyHidden: 'FsusUI.Avalonia.Controls.FsusVisualHidden',
   FixedSizeGrid: 'FsusUI.Avalonia.Controls.FsusTableV2',
   FixedSizeList: 'FsusUI.Avalonia.Controls.FsusVirtualList',
+  vLoading: [
+    'FsusUI.Avalonia.Controls.FsusLoadingService',
+    'FsusUI.Avalonia.Controls.FsusLoadingOverlay',
+  ],
 }
 
 const PUBLIC_VALUE_BINDINGS = {
@@ -688,8 +773,13 @@ const webPropRef = (prop) => ({
   readonly: Boolean(prop.readonly),
 })
 
-const avaloniaPropRef = (property, alternateProperties = []) => ({
+const avaloniaPropRef = (
+  property,
+  alternateProperties = [],
+  declaringType = null,
+) => ({
   member: property.name,
+  ...(declaringType ? { declaringType } : {}),
   alternateMembers: alternateProperties.map((alternate) => ({
     member: alternate.name,
     categories: categoriesFromClrType(alternate.type),
@@ -710,7 +800,7 @@ const avaloniaPropRef = (property, alternateProperties = []) => ({
   enumMembers: property.enumMembers ?? undefined,
 })
 
-const avaloniaEventRef = (event, binding = null) => {
+const avaloniaEventRef = (event, binding = null, declaringType = null) => {
   const payload = binding?.payloadMember
     ? event.payloadMembers?.find(
         (member) => member.name === binding.payloadMember,
@@ -718,6 +808,7 @@ const avaloniaEventRef = (event, binding = null) => {
     : null
   return {
     member: event.name,
+    ...(declaringType ? { declaringType } : {}),
     categories: categoriesFromClrType(payload?.type ?? event.argsType),
     argsType: event.argsType,
     payloadMember: payload?.name ?? null,
@@ -733,8 +824,9 @@ const webEventRef = (emit) => ({
     emit.payload?.length === 1 ? (emit.payload[0].type ?? null) : null,
 })
 
-const avaloniaMethodRef = (method) => ({
+const avaloniaMethodRef = (method, declaringType = null) => ({
   member: method.name,
+  ...(declaringType ? { declaringType } : {}),
   signature: {
     returnType: method.returnType,
     parameters: (method.parameters ?? []).map((parameter) => ({
@@ -764,25 +856,59 @@ const avaloniaSemanticIndex = (baselines) => {
   return index
 }
 
-const findAvaloniaType = (componentName, typeIndex) => {
-  const explicitType = AVALONIA_COMPONENT_BINDINGS[componentName]
-  if (explicitType) return typeIndex.get(explicitType) ?? null
+const findAvaloniaTypes = (componentName, typeIndex) => {
+  const explicitBinding = AVALONIA_COMPONENT_BINDINGS[componentName]
+  if (explicitBinding) {
+    const names = Array.isArray(explicitBinding)
+      ? explicitBinding
+      : [explicitBinding]
+    const resolved = names.map((name) => typeIndex.get(name) ?? null)
+    const missing = names.filter((_, index) => !resolved[index])
+    if (missing.length > 0) {
+      throw new Error(
+        `${componentName} explicit Avalonia binding missing ${missing.join(', ')}`,
+      )
+    }
+    return resolved
+  }
   const kebab = kebabName(componentName)
   for (const [fullName, type] of typeIndex) {
     const shortName = fullName.split('.').pop() ?? ''
     if (
       kebabName(shortName) === kebab &&
-      ['class', 'record'].includes(type.kind)
+      type.kind === 'class'
     ) {
-      return type
+      return [type]
     }
   }
-  return null
+  return []
 }
 
-const matchAvaloniaProperty = (webName, avaloniaType, componentName) => {
+const memberOwnerType = ({
+  componentName,
+  kind,
+  webName,
+  avaloniaTypes,
+}) => {
+  const binding = memberBinding(componentName, kind, webName)
+  if (binding?.declaringType) {
+    return (
+      avaloniaTypes.find((type) => type.name === binding.declaringType) ?? null
+    )
+  }
+  return avaloniaTypes.length === 1 ? avaloniaTypes[0] : null
+}
+
+const matchAvaloniaProperty = (webName, avaloniaTypes, componentName) => {
   const binding = memberBinding(componentName, 'inputs', webName)
   const normalized = normalizeMemberName(binding?.member ?? webName)
+  const avaloniaType = memberOwnerType({
+    componentName,
+    kind: 'inputs',
+    webName,
+    avaloniaTypes,
+  })
+  if (!avaloniaType) return null
   const properties = [
     ...(avaloniaType.avaloniaProperties ?? []),
     ...(avaloniaType.properties ?? []),
@@ -791,7 +917,9 @@ const matchAvaloniaProperty = (webName, avaloniaType, componentName) => {
   for (const property of properties) {
     if (seen.has(property.name)) continue
     seen.add(property.name)
-    if (normalizeMemberName(property.name) === normalized) return property
+    if (normalizeMemberName(property.name) === normalized) {
+      return { property, declaringType: avaloniaType }
+    }
   }
   return null
 }
@@ -799,20 +927,36 @@ const matchAvaloniaProperty = (webName, avaloniaType, componentName) => {
 const memberBinding = (componentName, kind, webName) =>
   AVALONIA_MEMBER_BINDINGS[componentName]?.[kind]?.[webName] ?? null
 
-const matchAvaloniaEvent = (webName, avaloniaType, componentName) => {
+const matchAvaloniaEvent = (webName, avaloniaTypes, componentName) => {
   const binding = memberBinding(componentName, 'outputs', webName)
   const normalized = normalizeMemberName(binding?.member ?? webName)
+  const avaloniaType = memberOwnerType({
+    componentName,
+    kind: 'outputs',
+    webName,
+    avaloniaTypes,
+  })
+  if (!avaloniaType) return null
   for (const event of avaloniaType.events ?? []) {
     if (normalizeMemberName(event.name) === normalized)
-      return { event, binding }
+      return { event, binding, declaringType: avaloniaType }
   }
   return null
 }
 
-const matchAvaloniaMethod = (webName, avaloniaType) => {
+const matchAvaloniaMethod = (webName, avaloniaTypes, componentName) => {
   const normalized = normalizeMemberName(webName)
+  const avaloniaType = memberOwnerType({
+    componentName,
+    kind: 'operations',
+    webName,
+    avaloniaTypes,
+  })
+  if (!avaloniaType) return null
   for (const method of avaloniaType.methods ?? []) {
-    if (normalizeMemberName(method.name) === normalized) return method
+    if (normalizeMemberName(method.name) === normalized) {
+      return { method, declaringType: avaloniaType }
+    }
   }
   return null
 }
@@ -834,6 +978,7 @@ const inputMember = ({
   contractKebab,
   prop,
   avaloniaType,
+  avaloniaTypes,
   classification,
 }) => {
   if (!avaloniaType) {
@@ -855,17 +1000,27 @@ const inputMember = ({
             ),
     }
   }
-  const avalonia = matchAvaloniaProperty(prop.name, avaloniaType, componentName)
+  const avaloniaMatch = matchAvaloniaProperty(
+    prop.name,
+    avaloniaTypes,
+    componentName,
+  )
+  const avalonia = avaloniaMatch?.property ?? null
+  const declaringType = avaloniaMatch?.declaringType ?? null
   const binding = memberBinding(componentName, 'inputs', prop.name)
   const nativeProperties = [
-    ...(avaloniaType.avaloniaProperties ?? []),
-    ...(avaloniaType.properties ?? []),
+    ...(declaringType?.avaloniaProperties ?? []),
+    ...(declaringType?.properties ?? []),
   ]
   const alternateProperties = (binding?.alternateMembers ?? [])
     .map((name) => nativeProperties.find((property) => property.name === name))
     .filter(Boolean)
   const nativeReference = avalonia
-    ? avaloniaPropRef(avalonia, alternateProperties)
+    ? avaloniaPropRef(
+        avalonia,
+        alternateProperties,
+        avaloniaTypes.length > 1 ? declaringType.name : null,
+      )
     : null
   let status
   let governance = null
@@ -911,6 +1066,7 @@ const outputMember = ({
   contractKebab,
   emit,
   avaloniaType,
+  avaloniaTypes,
   classification,
 }) => {
   const web = webEventRef(emit)
@@ -935,12 +1091,16 @@ const outputMember = ({
   }
   const avaloniaMatch = matchAvaloniaEvent(
     emit.name,
-    avaloniaType,
+    avaloniaTypes,
     componentName,
   )
   const avalonia = avaloniaMatch?.event ?? null
   const avaloniaRef = avalonia
-    ? avaloniaEventRef(avalonia, avaloniaMatch.binding)
+    ? avaloniaEventRef(
+        avalonia,
+        avaloniaMatch.binding,
+        avaloniaTypes.length > 1 ? avaloniaMatch.declaringType.name : null,
+      )
     : null
   let status
   let governance = null
@@ -982,9 +1142,11 @@ const outputMember = ({
 }
 
 const operationMember = ({
+  componentName,
   contractKebab,
   exposed,
   avaloniaType,
+  avaloniaTypes,
   classification,
 }) => {
   const web = {
@@ -1014,7 +1176,18 @@ const operationMember = ({
             ),
     }
   }
-  const avalonia = matchAvaloniaMethod(exposed.name, avaloniaType)
+  const avaloniaMatch = matchAvaloniaMethod(
+    exposed.name,
+    avaloniaTypes,
+    componentName,
+  )
+  const avalonia = avaloniaMatch?.method ?? null
+  const avaloniaRef = avalonia
+    ? avaloniaMethodRef(
+        avalonia,
+        avaloniaTypes.length > 1 ? avaloniaMatch.declaringType.name : null,
+      )
+    : null
   let status
   let governance = null
   let drift = emptyDrift()
@@ -1031,7 +1204,7 @@ const operationMember = ({
   } else {
     const comparison = compareMembers({
       web: { categories: ['unknown'], signature: web.signature },
-      avalonia: avaloniaMethodRef(avalonia),
+      avalonia: avaloniaRef,
       kind: 'operation',
     })
     drift = comparison.drift
@@ -1046,7 +1219,7 @@ const operationMember = ({
     name: exposed.name,
     kind: 'operation',
     web,
-    avalonia: avalonia ? avaloniaMethodRef(avalonia) : null,
+    avalonia: avaloniaRef,
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'operation', exposed.name)],
@@ -1059,6 +1232,7 @@ const contentRegionMember = ({
   contractKebab,
   slot,
   avaloniaType,
+  avaloniaTypes,
   typeIndex,
   classification,
 }) => {
@@ -1091,7 +1265,8 @@ const contentRegionMember = ({
     slot.name === 'default'
       ? null
       : binding?.member
-        ? matchAvaloniaProperty(binding.member, avaloniaType, componentName)
+        ? matchAvaloniaProperty(binding.member, [avaloniaType], componentName)
+            ?.property
         : matchAvaloniaContentProperty(slot.name, avaloniaType)
   const avalonia =
     slot.name === 'default' && avaloniaType?.contentProperty
@@ -1152,6 +1327,9 @@ const contentRegionMember = ({
     avalonia: avalonia
       ? {
           ...avalonia,
+          ...(avaloniaTypes.length > 1
+            ? { declaringType: avaloniaType.name }
+            : {}),
           contextType: binding?.contextType ?? null,
           payload: binding?.payload ?? [],
         }
@@ -1315,6 +1493,7 @@ const contractCoverage = (members) => {
 const contractForComponent = ({
   component,
   avaloniaType,
+  avaloniaTypes,
   typeIndex,
   gate,
   performanceBudget,
@@ -1330,6 +1509,7 @@ const contractForComponent = ({
       contractKebab,
       prop,
       avaloniaType,
+      avaloniaTypes,
       classification,
     }),
   )
@@ -1349,11 +1529,19 @@ const contractForComponent = ({
       contractKebab,
       emit,
       avaloniaType,
+      avaloniaTypes,
       classification,
     }),
   )
   const operations = semanticExposed.map((exposed) =>
-    operationMember({ contractKebab, exposed, avaloniaType, classification }),
+    operationMember({
+      componentName: component.name,
+      contractKebab,
+      exposed,
+      avaloniaType,
+      avaloniaTypes,
+      classification,
+    }),
   )
   const contentRegions = (component.slots ?? []).map((slot) =>
     contentRegionMember({
@@ -1361,6 +1549,7 @@ const contractForComponent = ({
       contractKebab,
       slot,
       avaloniaType,
+      avaloniaTypes,
       typeIndex,
       classification,
     }),
@@ -1403,6 +1592,7 @@ const contractForComponent = ({
         contractKebab,
         component,
         avaloniaType,
+        avaloniaTypes,
         inputs,
         outputs,
         operations,
@@ -1442,6 +1632,9 @@ const contractForComponent = ({
             status: 'bound',
             package: 'FsusUI.Avalonia',
             type: avaloniaType.name,
+            ...(avaloniaTypes.length > 1
+              ? { types: avaloniaTypes.map((type) => type.name) }
+              : {}),
           }
         : { status: 'unbound', package: null, type: null },
     },
@@ -1497,42 +1690,55 @@ const contractForComponent = ({
 
 const extractAvaloniaExtras = ({
   contractKebab,
-  avaloniaType,
+  avaloniaTypes,
   inputs,
   outputs,
   operations,
   contentRegions,
 }) => {
-  const matchedAvaloniaNames = new Set([
-    ...inputs.map((input) => input.avalonia?.member),
-    ...outputs.map((output) => output.avalonia?.member),
-    ...operations.map((operation) => operation.avalonia?.member),
-    ...contentRegions.map((region) => region.avalonia?.member),
-  ])
+  const matchedAvaloniaMembers = [
+    ...inputs.map((input) => input.avalonia),
+    ...outputs.map((output) => output.avalonia),
+    ...operations.map((operation) => operation.avalonia),
+    ...contentRegions.map((region) => region.avalonia),
+  ].filter(Boolean)
   const extras = []
-  const addExtra = (member) => {
+  const addExtra = (member, declaringType) => {
     const normalized = normalizeMemberName(member.name)
-    const matched = [...matchedAvaloniaNames].some(
-      (avaloniaName) =>
-        avaloniaName && normalizeMemberName(avaloniaName) === normalized,
+    const matched = matchedAvaloniaMembers.some(
+      (avaloniaMember) =>
+        normalizeMemberName(avaloniaMember.member) === normalized &&
+        (!avaloniaMember.declaringType ||
+          avaloniaMember.declaringType === declaringType.name),
     )
     if (matched) return
     extras.push({
       member: member.name,
+      ...(avaloniaTypes.length > 1
+        ? { declaringType: declaringType.name }
+        : {}),
       kind: 'avalonia-extra',
       governance: defaultGovernance(
         'Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.',
       ),
       scenarioIds: [
-        `scenario.v2.${contractKebab}.avalonia-extra.${toKebab(member.name)}`,
+        `scenario.v2.${contractKebab}.avalonia-extra.${toKebab(declaringType.name)}.${toKebab(member.name)}`,
       ],
     })
   }
-  for (const property of avaloniaType.properties ?? []) addExtra(property)
-  for (const event of avaloniaType.events ?? []) addExtra(event)
-  for (const method of avaloniaType.methods ?? []) addExtra(method)
+  for (const avaloniaType of avaloniaTypes) {
+    for (const property of avaloniaType.properties ?? []) {
+      addExtra(property, avaloniaType)
+    }
+    for (const event of avaloniaType.events ?? []) addExtra(event, avaloniaType)
+    for (const method of avaloniaType.methods ?? []) {
+      addExtra(method, avaloniaType)
+    }
+  }
   return extras.sort((first, second) =>
-    first.member.localeCompare(second.member),
+    `${first.declaringType ?? ''}.${first.member}`.localeCompare(
+      `${second.declaringType ?? ''}.${second.member}`,
+    ),
   )
 }
 
@@ -1625,7 +1831,8 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
   const map = []
   for (const component of vueBaseline.components ?? []) {
     if (component.exportIdentity?.role === 'alias') continue
-    const avaloniaType = findAvaloniaType(component.name, typeIndex)
+    const avaloniaTypes = findAvaloniaTypes(component.name, typeIndex)
+    const avaloniaType = avaloniaTypes[0] ?? null
     if (!avaloniaType) continue
     map.push({
       vue: {
@@ -1633,7 +1840,13 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
         module: component.module,
         aliases: component.exportIdentity?.aliases ?? [],
       },
-      avalonia: { type: avaloniaType.name, packageId: avaloniaType.packageId },
+      avalonia: {
+        type: avaloniaType.name,
+        packageId: avaloniaType.packageId,
+        ...(avaloniaTypes.length > 1
+          ? { types: avaloniaTypes.map((type) => type.name) }
+          : {}),
+      },
       basis: AVALONIA_COMPONENT_BINDINGS[component.name]
         ? 'explicit-component-binding'
         : 'canonical-export-name-equality',
@@ -1681,7 +1894,11 @@ export const buildRegistry = ({
       ]),
   )
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
-  const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
+  const mappedTypes = new Set(
+    componentMap.flatMap(
+      (entry) => entry.avalonia.types ?? [entry.avalonia.type],
+    ),
+  )
   const publicValueBindings = buildPublicValueBindings({
     vueBaseline,
     typeIndex,
@@ -1692,11 +1909,13 @@ export const buildRegistry = ({
   const contracts = []
   for (const component of vueBaseline.components ?? []) {
     if (component.exportIdentity?.role === 'alias') continue
-    const avaloniaType = findAvaloniaType(component.name, typeIndex)
+    const avaloniaTypes = findAvaloniaTypes(component.name, typeIndex)
+    const avaloniaType = avaloniaTypes[0] ?? null
     contracts.push(
       contractForComponent({
         component,
         avaloniaType,
+        avaloniaTypes,
         typeIndex,
         gate,
         performanceBudget: performanceBudgetByComponent.get(component.name),
@@ -2017,8 +2236,29 @@ export const validateContract = (contract, gate, errors) => {
     ...(contract.operations ?? []),
     ...(contract.contentRegions ?? []),
   ]
+  const boundTypes = contract.bindings?.avalonia?.types ??
+    (contract.bindings?.avalonia?.type
+      ? [contract.bindings.avalonia.type]
+      : [])
   for (const member of members) {
     validateMember(member, contract.id, contractErrors)
+    if (
+      boundTypes.length > 1 &&
+      member.avalonia &&
+      !member.avalonia.declaringType
+    ) {
+      contractErrors.push(
+        `${contract.id} member ${member.name} missing declaringType for multi-type binding`,
+      )
+    }
+    if (
+      member.avalonia?.declaringType &&
+      !boundTypes.includes(member.avalonia.declaringType)
+    ) {
+      contractErrors.push(
+        `${contract.id} member ${member.name} declaringType is outside the component binding`,
+      )
+    }
   }
   if (contract.component?.exportStatus === 'web-only') {
     for (const field of [
@@ -2066,6 +2306,16 @@ export const validateContract = (contract, gate, errors) => {
     if (!Array.isArray(extra.scenarioIds) || extra.scenarioIds.length === 0) {
       contractErrors.push(
         `${contract.id} avalonia extra ${extra.member ?? '<unknown>'} missing scenario coverage id`,
+      )
+    }
+    if (boundTypes.length > 1 && !extra.declaringType) {
+      contractErrors.push(
+        `${contract.id} avalonia extra ${extra.member ?? '<unknown>'} missing declaringType for multi-type binding`,
+      )
+    }
+    if (extra.declaringType && !boundTypes.includes(extra.declaringType)) {
+      contractErrors.push(
+        `${contract.id} avalonia extra ${extra.member ?? '<unknown>'} declaringType is outside the component binding`,
       )
     }
   }
@@ -2201,7 +2451,12 @@ export const validateRegistry = (registry, gate) => {
       errors.push(`${context} missing scenario coverage id`)
     }
   }
+  const componentMapByVueName = new Map()
   for (const entry of registry.componentMap ?? []) {
+    if (componentMapByVueName.has(entry.vue?.name)) {
+      errors.push(`duplicate componentMap ${entry.vue?.name ?? '<unknown>'}`)
+    }
+    componentMapByVueName.set(entry.vue?.name, entry)
     if (
       ![
         'canonical-export-name-equality',
@@ -2211,6 +2466,27 @@ export const validateRegistry = (registry, gate) => {
       errors.push(
         `componentMap ${entry.vue?.name ?? '<unknown>'} must use canonical-export-name-equality basis`,
       )
+    }
+  }
+  for (const contract of registry.contracts) {
+    const mapEntry = componentMapByVueName.get(contract.component?.name)
+    const binding = contract.bindings?.avalonia
+    if (binding?.status === 'unbound') {
+      if (mapEntry) {
+        errors.push(
+          `${contract.id} unbound contract must not have a componentMap entry`,
+        )
+      }
+      continue
+    }
+    if (!mapEntry) {
+      errors.push(`${contract.id} bound contract missing componentMap entry`)
+      continue
+    }
+    const contractTypes = binding.types ?? [binding.type]
+    const mapTypes = mapEntry.avalonia?.types ?? [mapEntry.avalonia?.type]
+    if (JSON.stringify(contractTypes) !== JSON.stringify(mapTypes)) {
+      errors.push(`${contract.id} componentMap type binding mismatch`)
     }
   }
   const exportNames = new Set()
