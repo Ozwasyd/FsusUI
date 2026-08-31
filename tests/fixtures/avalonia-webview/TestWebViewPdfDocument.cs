@@ -93,11 +93,11 @@ internal static class TestWebViewPdfDocument
 
     var xrefOffset = Encoding.ASCII.GetByteCount(builder.ToString());
     builder.Append("xref\n0 ").Append(objects.Length).Append("\n")
-      .Append("0000000000 65535 f \n");
+      .Append("0000000000 65535 f\r\n");
     for (var index = 1; index < objects.Length; index++)
     {
       builder.Append(offsets[index].ToString("D10", System.Globalization.CultureInfo.InvariantCulture))
-        .Append(" 00000 n \n");
+        .Append(" 00000 n\r\n");
     }
     builder.Append("trailer\n<< /Size ").Append(objects.Length)
       .Append(" /Root 1 0 R /Info 19 0 R >>\nstartxref\n")
