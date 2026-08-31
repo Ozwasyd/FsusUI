@@ -3,19 +3,29 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:fsus="using:FsusUI.Avalonia.Controls">
 
+  <!-- Web authority: fsus-theme.scss `.el-check-tag` (fsus-control base plus
+       the 1370 override): fill.lighter surface, 1px border.subtle outline,
+       6px control radius, text.quiet label at 11px/700, 4px×16px padding.
+       Checked state fills scholarly-blue with paper-white text. -->
   <Style Selector="fsus|FsusCheckTag">
-    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Background" Value="{DynamicResource FsusColorFillLighterBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
-    <Setter Property="Padding" Value="8,4" />
-    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorBorderSubtleBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="16,4" />
+    <Setter Property="MinHeight" Value="24" />
+    <Setter Property="CornerRadius" Value="6" />
     <Setter Property="FontWeight" Value="Bold" />
-    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
+    <Setter Property="FontSize" Value="11" />
     <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="Template">
       <ControlTemplate>
         <Border
           Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
           CornerRadius="{TemplateBinding CornerRadius}"
           Padding="{TemplateBinding Padding}">
           <ContentPresenter
@@ -31,7 +41,8 @@
   </Style>
 
   <Style Selector="fsus|FsusCheckTag.fsus-checked">
-    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="Background" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorSurfaceBaseBrush}" />
   </Style>
 </Styles>

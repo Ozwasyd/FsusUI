@@ -71,20 +71,52 @@
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-baseline.png",
-        "geometry": { "x": 24, "y": 32, "width": 96, "height": 40 },
-        "color": { "token": "color.brand.primary", "lab": [54.1, 12.2, -41.4] },
+        "geometry": {
+          "x": 24,
+          "y": 32,
+          "width": 96,
+          "height": 40
+        },
+        "color": {
+          "token": "color.brand.primary",
+          "lab": [
+            54.1,
+            12.2,
+            -41.4
+          ]
+        },
         "radius": 6,
-        "spacing": { "paddingX": 16, "paddingY": 8, "gap": 8 },
+        "spacing": {
+          "paddingX": 16,
+          "paddingY": 8,
+          "gap": 8
+        },
         "textBaseline": 25.2
       },
       "candidate": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-rerun.png",
-        "geometry": { "x": 24, "y": 32.1, "width": 96, "height": 40 },
-        "color": { "token": "color.brand.primary", "lab": [54.2, 12.1, -41.3] },
+        "geometry": {
+          "x": 24,
+          "y": 32.1,
+          "width": 96,
+          "height": 40
+        },
+        "color": {
+          "token": "color.brand.primary",
+          "lab": [
+            54.2,
+            12.1,
+            -41.3
+          ]
+        },
         "radius": 6,
-        "spacing": { "paddingX": 16, "paddingY": 8, "gap": 8 },
+        "spacing": {
+          "paddingX": 16,
+          "paddingY": 8,
+          "gap": 8
+        },
         "textBaseline": 25.25
       },
       "screenshotDiffPercent": 0.001,
@@ -110,20 +142,52 @@
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-dark-compact.png",
-        "geometry": { "x": 20, "y": 28, "width": 84, "height": 34 },
-        "color": { "token": "color.brand.primary", "lab": [49.6, 11.7, -38.9] },
+        "geometry": {
+          "x": 20,
+          "y": 28,
+          "width": 84,
+          "height": 34
+        },
+        "color": {
+          "token": "color.brand.primary",
+          "lab": [
+            49.6,
+            11.7,
+            -38.9
+          ]
+        },
         "radius": 5,
-        "spacing": { "paddingX": 12, "paddingY": 6, "gap": 6 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 6,
+          "gap": 6
+        },
         "textBaseline": 21.8
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-primary-dark-compact.png",
-        "geometry": { "x": 20.8, "y": 28.5, "width": 84.4, "height": 34.2 },
-        "color": { "token": "color.brand.primary", "lab": [50, 12, -39.2] },
+        "geometry": {
+          "x": 20.8,
+          "y": 28.5,
+          "width": 84.4,
+          "height": 34.2
+        },
+        "color": {
+          "token": "color.brand.primary",
+          "lab": [
+            50,
+            12,
+            -39.2
+          ]
+        },
         "radius": 5.5,
-        "spacing": { "paddingX": 12.5, "paddingY": 6.5, "gap": 6 },
+        "spacing": {
+          "paddingX": 12.5,
+          "paddingY": 6.5,
+          "gap": 6
+        },
         "textBaseline": 22.4
       },
       "screenshotDiffPercent": 0.011,
@@ -157,35 +221,78 @@
           "link",
           "plain"
         ],
-        "sizes": ["sm", "md", "lg"],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "sizes": [
+          "sm",
+          "md",
+          "lg"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-stable-variants.png",
-        "geometry": { "x": 24, "y": 32, "width": 360, "height": 184 },
+        "geometry": {
+          "x": 24,
+          "y": 32,
+          "width": 360,
+          "height": 184
+        },
         "color": {
           "token": "color.button.stable-variants",
-          "lab": [50, 6, -20]
+          "lab": [
+            50,
+            6,
+            -20
+          ]
         },
         "radius": 6,
-        "spacing": { "paddingX": 16, "paddingY": 8, "gap": 8 },
+        "spacing": {
+          "paddingX": 16,
+          "paddingY": 8,
+          "gap": 8
+        },
         "textBaseline": 25.2
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-stable-variants.png",
-        "geometry": { "x": 24.7, "y": 32.5, "width": 360.8, "height": 184.4 },
+        "geometry": {
+          "x": 24.7,
+          "y": 32.5,
+          "width": 360.8,
+          "height": 184.4
+        },
         "color": {
           "token": "color.button.stable-variants",
-          "lab": [50.4, 6.2, -20.3]
+          "lab": [
+            50.4,
+            6.2,
+            -20.3
+          ]
         },
         "radius": 6.4,
-        "spacing": { "paddingX": 16.5, "paddingY": 8.4, "gap": 8.5 },
+        "spacing": {
+          "paddingX": 16.5,
+          "paddingY": 8.4,
+          "gap": 8.5
+        },
         "textBaseline": 25.8
       },
       "screenshotDiffPercent": 0.012,
@@ -211,20 +318,52 @@
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-group-borders.png",
-        "geometry": { "x": 20, "y": 28, "width": 178, "height": 34 },
-        "color": { "token": "border.button.group", "lab": [48, 10, -37] },
+        "geometry": {
+          "x": 20,
+          "y": 28,
+          "width": 178,
+          "height": 34
+        },
+        "color": {
+          "token": "border.button.group",
+          "lab": [
+            48,
+            10,
+            -37
+          ]
+        },
         "radius": 5,
-        "spacing": { "paddingX": 12, "paddingY": 6, "gap": 0 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 6,
+          "gap": 0
+        },
         "textBaseline": 21.8
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-group-borders.png",
-        "geometry": { "x": 20.5, "y": 28.4, "width": 178.6, "height": 34.2 },
-        "color": { "token": "border.button.group", "lab": [48.4, 10.2, -37.3] },
+        "geometry": {
+          "x": 20.5,
+          "y": 28.4,
+          "width": 178.6,
+          "height": 34.2
+        },
+        "color": {
+          "token": "border.button.group",
+          "lab": [
+            48.4,
+            10.2,
+            -37.3
+          ]
+        },
         "radius": 5.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 6.2, "gap": 0 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 6.2,
+          "gap": 0
+        },
         "textBaseline": 22.2
       },
       "screenshotDiffPercent": 0.012,
@@ -251,20 +390,52 @@
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-body-zh-rtl.png",
-        "geometry": { "x": 16, "y": 18, "width": 220, "height": 28 },
-        "color": { "token": "typography.body.color", "lab": [23, 0, -2] },
+        "geometry": {
+          "x": 16,
+          "y": 18,
+          "width": 220,
+          "height": 28
+        },
+        "color": {
+          "token": "typography.body.color",
+          "lab": [
+            23,
+            0,
+            -2
+          ]
+        },
         "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 0 },
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
         "textBaseline": 18
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-body-zh-rtl.png",
-        "geometry": { "x": 16.5, "y": 18.4, "width": 220.5, "height": 28.5 },
-        "color": { "token": "typography.body.color", "lab": [23.4, 0.1, -2.2] },
+        "geometry": {
+          "x": 16.5,
+          "y": 18.4,
+          "width": 220.5,
+          "height": 28.5
+        },
+        "color": {
+          "token": "typography.body.color",
+          "lab": [
+            23.4,
+            0.1,
+            -2.2
+          ]
+        },
         "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 0 },
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
         "textBaseline": 19.2
       },
       "screenshotDiffPercent": 0.012,
@@ -290,20 +461,52 @@
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/icon-alignment-stable17.png",
-        "geometry": { "x": 24, "y": 32, "width": 128, "height": 40 },
-        "color": { "token": "icon.size.md", "lab": [25, 1, -3] },
+        "geometry": {
+          "x": 24,
+          "y": 32,
+          "width": 128,
+          "height": 40
+        },
+        "color": {
+          "token": "icon.size.md",
+          "lab": [
+            25,
+            1,
+            -3
+          ]
+        },
         "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 8 },
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 8
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-alignment-stable17.png",
-        "geometry": { "x": 24.4, "y": 32.3, "width": 128.5, "height": 40.4 },
-        "color": { "token": "icon.size.md", "lab": [25.3, 1.1, -3.1] },
+        "geometry": {
+          "x": 24.4,
+          "y": 32.3,
+          "width": 128.5,
+          "height": 40.4
+        },
+        "color": {
+          "token": "icon.size.md",
+          "lab": [
+            25.3,
+            1.1,
+            -3.1
+          ]
+        },
         "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 8.3 },
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 8.3
+        },
         "textBaseline": 24.4
       },
       "screenshotDiffPercent": 0.009,
@@ -329,20 +532,52 @@
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-link-baseline-stable17.png",
-        "geometry": { "x": 20, "y": 24, "width": 260, "height": 48 },
-        "color": { "token": "typography.body.color", "lab": [23, 0, -2] },
+        "geometry": {
+          "x": 20,
+          "y": 24,
+          "width": 260,
+          "height": 48
+        },
+        "color": {
+          "token": "typography.body.color",
+          "lab": [
+            23,
+            0,
+            -2
+          ]
+        },
         "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 2, "gap": 10 },
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 2,
+          "gap": 10
+        },
         "textBaseline": 26
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-link-baseline-stable17.png",
-        "geometry": { "x": 20.5, "y": 24.4, "width": 260.6, "height": 48.5 },
-        "color": { "token": "typography.body.color", "lab": [23.4, 0.1, -2.2] },
+        "geometry": {
+          "x": 20.5,
+          "y": 24.4,
+          "width": 260.6,
+          "height": 48.5
+        },
+        "color": {
+          "token": "typography.body.color",
+          "lab": [
+            23.4,
+            0.1,
+            -2.2
+          ]
+        },
         "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 2.2, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 2.2,
+          "gap": 10.4
+        },
         "textBaseline": 26.6
       },
       "screenshotDiffPercent": 0.011,
@@ -374,27 +609,66 @@
           "clearable",
           "composition"
         ],
-        "densities": ["compact", "default", "spacious"],
-        "controls": ["FsusInput", "FsusTextarea"]
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "controls": [
+          "FsusInput",
+          "FsusTextarea"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/input-family-stable18.png",
-        "geometry": { "x": 24, "y": 28, "width": 360, "height": 214 },
-        "color": { "token": "input.surface.states", "lab": [92, 0, -3] },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 360,
+          "height": 214
+        },
+        "color": {
+          "token": "input.surface.states",
+          "lab": [
+            92,
+            0,
+            -3
+          ]
+        },
         "radius": 6,
-        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 10 },
+        "spacing": {
+          "paddingX": 10,
+          "paddingY": 6,
+          "gap": 10
+        },
         "textBaseline": 24.5
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/input-family-stable18.png",
-        "geometry": { "x": 24.6, "y": 28.4, "width": 360.7, "height": 214.5 },
-        "color": { "token": "input.surface.states", "lab": [92.4, 0.1, -3.2] },
+        "geometry": {
+          "x": 24.6,
+          "y": 28.4,
+          "width": 360.7,
+          "height": 214.5
+        },
+        "color": {
+          "token": "input.surface.states",
+          "lab": [
+            92.4,
+            0.1,
+            -3.2
+          ]
+        },
         "radius": 6.4,
-        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 10.5 },
+        "spacing": {
+          "paddingX": 10.4,
+          "paddingY": 6.3,
+          "gap": 10.5
+        },
         "textBaseline": 25.1
       },
       "screenshotDiffPercent": 0.012,
@@ -417,28 +691,73 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "states": ["enabled", "focus-visible", "invalid", "disabled"],
-        "constraints": ["min", "max", "step"],
-        "densities": ["compact", "default", "spacious"]
+        "states": [
+          "enabled",
+          "focus-visible",
+          "invalid",
+          "disabled"
+        ],
+        "constraints": [
+          "min",
+          "max",
+          "step"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/input-number-stable18.png",
-        "geometry": { "x": 20, "y": 28, "width": 168, "height": 34 },
-        "color": { "token": "input.number.spin", "lab": [49, 2, -14] },
+        "geometry": {
+          "x": 20,
+          "y": 28,
+          "width": 168,
+          "height": 34
+        },
+        "color": {
+          "token": "input.number.spin",
+          "lab": [
+            49,
+            2,
+            -14
+          ]
+        },
         "radius": 5,
-        "spacing": { "paddingX": 8, "paddingY": 4, "gap": 4 },
+        "spacing": {
+          "paddingX": 8,
+          "paddingY": 4,
+          "gap": 4
+        },
         "textBaseline": 21.8
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/input-number-stable18.png",
-        "geometry": { "x": 20.4, "y": 28.3, "width": 168.5, "height": 34.3 },
-        "color": { "token": "input.number.spin", "lab": [49.4, 2.2, -14.2] },
+        "geometry": {
+          "x": 20.4,
+          "y": 28.3,
+          "width": 168.5,
+          "height": 34.3
+        },
+        "color": {
+          "token": "input.number.spin",
+          "lab": [
+            49.4,
+            2.2,
+            -14.2
+          ]
+        },
         "radius": 5.4,
-        "spacing": { "paddingX": 8.3, "paddingY": 4.2, "gap": 4.4 },
+        "spacing": {
+          "paddingX": 8.3,
+          "paddingY": 4.2,
+          "gap": 4.4
+        },
         "textBaseline": 22.3
       },
       "screenshotDiffPercent": 0.011,
@@ -476,29 +795,62 @@
           "loading",
           "focus-visible"
         ],
-        "densities": ["compact", "default", "spacious"]
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/selection-controls-stable19.png",
-        "geometry": { "x": 24, "y": 28, "width": 360, "height": 220 },
-        "color": { "token": "selection.controls.states", "lab": [52, 6, -22] },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 360,
+          "height": 220
+        },
+        "color": {
+          "token": "selection.controls.states",
+          "lab": [
+            52,
+            6,
+            -22
+          ]
+        },
         "radius": 6,
-        "spacing": { "paddingX": 8, "paddingY": 4, "gap": 6 },
+        "spacing": {
+          "paddingX": 8,
+          "paddingY": 4,
+          "gap": 6
+        },
         "textBaseline": 24.5
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/selection-controls-stable19.png",
-        "geometry": { "x": 24.6, "y": 28.5, "width": 360.7, "height": 220.6 },
+        "geometry": {
+          "x": 24.6,
+          "y": 28.5,
+          "width": 360.7,
+          "height": 220.6
+        },
         "color": {
           "token": "selection.controls.states",
-          "lab": [52.4, 6.2, -22.3]
+          "lab": [
+            52.4,
+            6.2,
+            -22.3
+          ]
         },
         "radius": 6.4,
-        "spacing": { "paddingX": 8.4, "paddingY": 4.3, "gap": 6.4 },
+        "spacing": {
+          "paddingX": 8.4,
+          "paddingY": 4.3,
+          "gap": 6.4
+        },
         "textBaseline": 25
       },
       "screenshotDiffPercent": 0.012,
@@ -529,31 +881,75 @@
           "FsusRadio",
           "FsusSwitch"
         ],
-        "labelPositions": ["left", "right", "top"],
-        "states": ["required", "validating", "success", "error", "disabled"],
-        "content": ["long-label", "cjk-label", "help-text", "error-message"]
+        "labelPositions": [
+          "left",
+          "right",
+          "top"
+        ],
+        "states": [
+          "required",
+          "validating",
+          "success",
+          "error",
+          "disabled"
+        ],
+        "content": [
+          "long-label",
+          "cjk-label",
+          "help-text",
+          "error-message"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/form-stable20.png",
-        "geometry": { "x": 24, "y": 28, "width": 420, "height": 324 },
-        "color": { "token": "form.layout.validation", "lab": [51, 7, -19] },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 420,
+          "height": 324
+        },
+        "color": {
+          "token": "form.layout.validation",
+          "lab": [
+            51,
+            7,
+            -19
+          ]
+        },
         "radius": 6,
-        "spacing": { "paddingX": 12, "paddingY": 6, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 6,
+          "gap": 12
+        },
         "textBaseline": 24.5
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/form-stable20.png",
-        "geometry": { "x": 24.6, "y": 28.5, "width": 420.7, "height": 324.6 },
+        "geometry": {
+          "x": 24.6,
+          "y": 28.5,
+          "width": 420.7,
+          "height": 324.6
+        },
         "color": {
           "token": "form.layout.validation",
-          "lab": [51.3, 7.2, -19.2]
+          "lab": [
+            51.3,
+            7.2,
+            -19.2
+          ]
         },
         "radius": 6.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 6.3, "gap": 12.5 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 6.3,
+          "gap": 12.5
+        },
         "textBaseline": 25
       },
       "screenshotDiffPercent": 0.012,
@@ -596,31 +992,73 @@
           "empty-action",
           "result-variants"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/display-primitives-stable21.png",
-        "geometry": { "x": 24, "y": 28, "width": 460, "height": 390 },
-        "color": { "token": "display.primitives.states", "lab": [54, 5, -18] },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 460,
+          "height": 390
+        },
+        "color": {
+          "token": "display.primitives.states",
+          "lab": [
+            54,
+            5,
+            -18
+          ]
+        },
         "radius": 12,
-        "spacing": { "paddingX": 20, "paddingY": 20, "gap": 12 },
+        "spacing": {
+          "paddingX": 20,
+          "paddingY": 20,
+          "gap": 12
+        },
         "textBaseline": 25
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/display-primitives-stable21.png",
-        "geometry": { "x": 24.7, "y": 28.6, "width": 460.8, "height": 390.7 },
+        "geometry": {
+          "x": 24.7,
+          "y": 28.6,
+          "width": 460.8,
+          "height": 390.7
+        },
         "color": {
           "token": "display.primitives.states",
-          "lab": [54.4, 5.2, -18.3]
+          "lab": [
+            54.4,
+            5.2,
+            -18.3
+          ]
         },
         "radius": 12.5,
-        "spacing": { "paddingX": 20.5, "paddingY": 20.4, "gap": 12.5 },
+        "spacing": {
+          "paddingX": 20.5,
+          "paddingY": 20.4,
+          "gap": 12.5
+        },
         "textBaseline": 25.7
       },
       "screenshotDiffPercent": 0.012,
@@ -665,31 +1103,73 @@
           "pointer-scroll",
           "screen-reader-only-label"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/layout-primitives-stable22.png",
-        "geometry": { "x": 20, "y": 28, "width": 480, "height": 360 },
-        "color": { "token": "layout.primitives.geometry", "lab": [48, 4, -16] },
+        "geometry": {
+          "x": 20,
+          "y": 28,
+          "width": 480,
+          "height": 360
+        },
+        "color": {
+          "token": "layout.primitives.geometry",
+          "lab": [
+            48,
+            4,
+            -16
+          ]
+        },
         "radius": 12,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/layout-primitives-stable22.png",
-        "geometry": { "x": 20.8, "y": 28.7, "width": 480.9, "height": 360.8 },
+        "geometry": {
+          "x": 20.8,
+          "y": 28.7,
+          "width": 480.9,
+          "height": 360.8
+        },
         "color": {
           "token": "layout.primitives.geometry",
-          "lab": [48.4, 4.2, -16.3]
+          "lab": [
+            48.4,
+            4.2,
+            -16.3
+          ]
         },
         "radius": 12.5,
-        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
+        "spacing": {
+          "paddingX": 12.5,
+          "paddingY": 8.4,
+          "gap": 12.5
+        },
         "textBaseline": 25.2
       },
       "screenshotDiffPercent": 0.012,
@@ -735,34 +1215,73 @@
           "step-process",
           "step-error"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/navigation-primitives-stable23.png",
-        "geometry": { "x": 24, "y": 28, "width": 520, "height": 360 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 520,
+          "height": 360
+        },
         "color": {
           "token": "navigation.active.indicator",
-          "lab": [49, 6, -18]
+          "lab": [
+            49,
+            6,
+            -18
+          ]
         },
         "radius": 6,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/navigation-primitives-stable23.png",
-        "geometry": { "x": 24.7, "y": 28.6, "width": 520.8, "height": 360.7 },
+        "geometry": {
+          "x": 24.7,
+          "y": 28.6,
+          "width": 520.8,
+          "height": 360.7
+        },
         "color": {
           "token": "navigation.active.indicator",
-          "lab": [49.4, 6.2, -18.3]
+          "lab": [
+            49.4,
+            6.2,
+            -18.3
+          ]
         },
         "radius": 6.4,
-        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
+        "spacing": {
+          "paddingX": 12.5,
+          "paddingY": 8.4,
+          "gap": 12.5
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -801,34 +1320,73 @@
           "keyboard-close",
           "message-box-confirm-cancel"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/modal-panel-stable24.png",
-        "geometry": { "x": 24, "y": 28, "width": 520, "height": 420 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 520,
+          "height": 420
+        },
         "color": {
           "token": "overlay.dialog.surface",
-          "lab": [42, 4, -14]
+          "lab": [
+            42,
+            4,
+            -14
+          ]
         },
         "radius": 12,
-        "spacing": { "paddingX": 20, "paddingY": 20, "gap": 12 },
+        "spacing": {
+          "paddingX": 20,
+          "paddingY": 20,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/modal-panel-stable24.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 520.9, "height": 420.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.7,
+          "width": 520.9,
+          "height": 420.8
+        },
         "color": {
           "token": "overlay.dialog.surface",
-          "lab": [42.4, 4.2, -14.3]
+          "lab": [
+            42.4,
+            4.2,
+            -14.3
+          ]
         },
         "radius": 12.5,
-        "spacing": { "paddingX": 20.5, "paddingY": 20.4, "gap": 12.5 },
+        "spacing": {
+          "paddingX": 20.5,
+          "paddingY": 20.4,
+          "gap": 12.5
+        },
         "textBaseline": 24.8
       },
       "screenshotDiffPercent": 0.012,
@@ -880,34 +1438,73 @@
           "confirmed",
           "boundary-flipped"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/anchored-overlay-stable25.png",
-        "geometry": { "x": 24, "y": 28, "width": 560, "height": 380 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 560,
+          "height": 380
+        },
         "color": {
           "token": "overlay.anchored.surface",
-          "lab": [46, 5, -17]
+          "lab": [
+            46,
+            5,
+            -17
+          ]
         },
         "radius": 12,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 8 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 8
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/anchored-overlay-stable25.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 560.9, "height": 380.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.7,
+          "width": 560.9,
+          "height": 380.8
+        },
         "color": {
           "token": "overlay.anchored.surface",
-          "lab": [46.4, 5.2, -17.3]
+          "lab": [
+            46.4,
+            5.2,
+            -17.3
+          ]
         },
         "radius": 12.5,
-        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 8.5 },
+        "spacing": {
+          "paddingX": 12.5,
+          "paddingY": 8.4,
+          "gap": 8.5
+        },
         "textBaseline": 24.8
       },
       "screenshotDiffPercent": 0.012,
@@ -946,34 +1543,73 @@
           "backtop-visible",
           "keyboard-activate"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/service-helper-stable26.png",
-        "geometry": { "x": 24, "y": 28, "width": 540, "height": 360 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 540,
+          "height": 360
+        },
         "color": {
           "token": "service.helper.surface",
-          "lab": [50, 5, -15]
+          "lab": [
+            50,
+            5,
+            -15
+          ]
         },
         "radius": 12,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/service-helper-stable26.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 540.9, "height": 360.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.7,
+          "width": 540.9,
+          "height": 360.8
+        },
         "color": {
           "token": "service.helper.surface",
-          "lab": [50.4, 5.2, -15.3]
+          "lab": [
+            50.4,
+            5.2,
+            -15.3
+          ]
         },
         "radius": 12.5,
-        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
+        "spacing": {
+          "paddingX": 12.5,
+          "paddingY": 8.4,
+          "gap": 12.5
+        },
         "textBaseline": 24.8
       },
       "screenshotDiffPercent": 0.012,
@@ -1015,34 +1651,73 @@
           "virtualized-list",
           "cascader-path"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/picker-stable27.png",
-        "geometry": { "x": 24, "y": 28, "width": 620, "height": 420 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 620,
+          "height": 420
+        },
         "color": {
           "token": "picker.surface",
-          "lab": [54, 4, -13]
+          "lab": [
+            54,
+            4,
+            -13
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/picker-stable27.png",
-        "geometry": { "x": 24.7, "y": 28.8, "width": 620.8, "height": 420.8 },
+        "geometry": {
+          "x": 24.7,
+          "y": 28.8,
+          "width": 620.8,
+          "height": 420.8
+        },
         "color": {
           "token": "picker.surface",
-          "lab": [54.4, 4.2, -13.2]
+          "lab": [
+            54.4,
+            4.2,
+            -13.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1065,7 +1740,9 @@
         "motionMode": "system"
       },
       "coverage": {
-        "controls": ["FsusCalendar"],
+        "controls": [
+          "FsusCalendar"
+        ],
         "states": [
           "date-selection",
           "range-selection",
@@ -1073,34 +1750,73 @@
           "keyboard-navigation",
           "locale-format"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-calendar-stable28-grid.png",
-        "geometry": { "x": 24, "y": 28, "width": 360, "height": 320 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 360,
+          "height": 320
+        },
         "color": {
           "token": "date.time.surface",
-          "lab": [55, 3, -11]
+          "lab": [
+            55,
+            3,
+            -11
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 8 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 8
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-calendar-stable28-grid.png",
-        "geometry": { "x": 24.7, "y": 28.8, "width": 360.8, "height": 320.7 },
+        "geometry": {
+          "x": 24.7,
+          "y": 28.8,
+          "width": 360.8,
+          "height": 320.7
+        },
         "color": {
           "token": "date.time.surface",
-          "lab": [55.3, 3.1, -11.2]
+          "lab": [
+            55.3,
+            3.1,
+            -11.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 8.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 8.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1137,34 +1853,73 @@
           "disabled-time",
           "time-range"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-panel.png",
-        "geometry": { "x": 24, "y": 28, "width": 520, "height": 360 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 520,
+          "height": 360
+        },
         "color": {
           "token": "date.time.surface",
-          "lab": [55, 3, -11]
+          "lab": [
+            55,
+            3,
+            -11
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-panel.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 520.8, "height": 360.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.7,
+          "width": 520.8,
+          "height": 360.8
+        },
         "color": {
           "token": "date.time.surface",
-          "lab": [55.3, 3.2, -11.2]
+          "lab": [
+            55.3,
+            3.2,
+            -11.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
         "textBaseline": 24.8
       },
       "screenshotDiffPercent": 0.012,
@@ -1199,34 +1954,73 @@
           "selected-date",
           "selected-time"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-compact.png",
-        "geometry": { "x": 24, "y": 28, "width": 480, "height": 300 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 480,
+          "height": 300
+        },
         "color": {
           "token": "date.time.surface",
-          "lab": [55, 3, -11]
+          "lab": [
+            55,
+            3,
+            -11
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 8 },
+        "spacing": {
+          "paddingX": 10,
+          "paddingY": 6,
+          "gap": 8
+        },
         "textBaseline": 22
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-compact.png",
-        "geometry": { "x": 24.7, "y": 28.7, "width": 480.8, "height": 300.7 },
+        "geometry": {
+          "x": 24.7,
+          "y": 28.7,
+          "width": 480.8,
+          "height": 300.7
+        },
         "color": {
           "token": "date.time.surface",
-          "lab": [55.3, 3.2, -11.2]
+          "lab": [
+            55.3,
+            3.2,
+            -11.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 8.4 },
+        "spacing": {
+          "paddingX": 10.4,
+          "paddingY": 6.3,
+          "gap": 8.4
+        },
         "textBaseline": 22.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1249,7 +2043,11 @@
         "motionMode": "system"
       },
       "coverage": {
-        "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
+        "controls": [
+          "FsusSlider",
+          "FsusRate",
+          "FsusColorPicker"
+        ],
         "states": [
           "keyboard-step",
           "pointer-drag",
@@ -1258,34 +2056,69 @@
           "alpha",
           "preset-colors"
         ],
-        "themes": ["light"],
-        "densities": ["default"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light"
+        ],
+        "densities": [
+          "default"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-light-default.png",
-        "geometry": { "x": 24, "y": 28, "width": 520, "height": 300 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 520,
+          "height": 300
+        },
         "color": {
           "token": "value.picker.track",
-          "lab": [58, 2, -12]
+          "lab": [
+            58,
+            2,
+            -12
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-light-default.png",
-        "geometry": { "x": 24.7, "y": 28.7, "width": 520.8, "height": 300.8 },
+        "geometry": {
+          "x": 24.7,
+          "y": 28.7,
+          "width": 520.8,
+          "height": 300.8
+        },
         "color": {
           "token": "value.picker.track",
-          "lab": [58.3, 2.1, -12.2]
+          "lab": [
+            58.3,
+            2.1,
+            -12.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1308,41 +2141,80 @@
         "motionMode": "system"
       },
       "coverage": {
-        "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
+        "controls": [
+          "FsusSlider",
+          "FsusRate",
+          "FsusColorPicker"
+        ],
         "states": [
           "disabled-state",
           "clearable-color",
           "alpha",
           "automation-value"
         ],
-        "themes": ["dark"],
-        "densities": ["spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "dark"
+        ],
+        "densities": [
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-dark-spacious.png",
-        "geometry": { "x": 24, "y": 28, "width": 560, "height": 330 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 560,
+          "height": 330
+        },
         "color": {
           "token": "value.picker.track",
-          "lab": [29, 2, -11]
+          "lab": [
+            29,
+            2,
+            -11
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 14, "paddingY": 10, "gap": 14 },
+        "spacing": {
+          "paddingX": 14,
+          "paddingY": 10,
+          "gap": 14
+        },
         "textBaseline": 26
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-dark-spacious.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 560.8, "height": 330.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 560.8,
+          "height": 330.8
+        },
         "color": {
           "token": "value.picker.track",
-          "lab": [29.3, 2.1, -11.2]
+          "lab": [
+            29.3,
+            2.1,
+            -11.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 14.4, "paddingY": 10.3, "gap": 14.4 },
+        "spacing": {
+          "paddingX": 14.4,
+          "paddingY": 10.3,
+          "gap": 14.4
+        },
         "textBaseline": 26.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1365,41 +2237,80 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
+        "controls": [
+          "FsusSlider",
+          "FsusRate",
+          "FsusColorPicker"
+        ],
         "states": [
           "keyboard-step",
           "focus-visible",
           "invalid-form",
           "compact-density"
         ],
-        "themes": ["high-contrast"],
-        "densities": ["compact"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "high-contrast"
+        ],
+        "densities": [
+          "compact"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-high-contrast-compact.png",
-        "geometry": { "x": 24, "y": 28, "width": 500, "height": 280 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 500,
+          "height": 280
+        },
         "color": {
           "token": "value.picker.track",
-          "lab": [18, 0, -6]
+          "lab": [
+            18,
+            0,
+            -6
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 8 },
+        "spacing": {
+          "paddingX": 10,
+          "paddingY": 6,
+          "gap": 8
+        },
         "textBaseline": 22
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-high-contrast-compact.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 500.8, "height": 280.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.7,
+          "width": 500.8,
+          "height": 280.8
+        },
         "color": {
           "token": "value.picker.track",
-          "lab": [18.2, 0.1, -6.1]
+          "lab": [
+            18.2,
+            0.1,
+            -6.1
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 8.4 },
+        "spacing": {
+          "paddingX": 10.4,
+          "paddingY": 6.3,
+          "gap": 8.4
+        },
         "textBaseline": 22.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1422,7 +2333,10 @@
         "motionMode": "system"
       },
       "coverage": {
-        "controls": ["FsusUpload", "FsusTransfer"],
+        "controls": [
+          "FsusUpload",
+          "FsusTransfer"
+        ],
         "states": [
           "queued",
           "uploading",
@@ -1434,34 +2348,73 @@
           "keyboard-selection",
           "large-list"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/upload-transfer-stable30.png",
-        "geometry": { "x": 24, "y": 28, "width": 680, "height": 420 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 680,
+          "height": 420
+        },
         "color": {
           "token": "upload.transfer.surface",
-          "lab": [56, 2, -12]
+          "lab": [
+            56,
+            2,
+            -12
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/upload-transfer-stable30.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 680.8, "height": 420.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 680.8,
+          "height": 420.8
+        },
         "color": {
           "token": "upload.transfer.surface",
-          "lab": [56.3, 2.1, -12.2]
+          "lab": [
+            56.3,
+            2.1,
+            -12.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1500,34 +2453,73 @@
           "statistic-format",
           "countdown-complete"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-display-stable31.png",
-        "geometry": { "x": 24, "y": 28, "width": 680, "height": 420 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 680,
+          "height": 420
+        },
         "color": {
           "token": "data.display.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-display-stable31.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 680.8, "height": 420.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 680.8,
+          "height": 420.8
+        },
         "color": {
           "token": "data.display.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1563,34 +2555,73 @@
           "disabled-pagination",
           "deterministic-clock"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-display-stable31-compact.png",
-        "geometry": { "x": 24, "y": 28, "width": 560, "height": 340 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 560,
+          "height": 340
+        },
         "color": {
           "token": "data.display.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 8 },
+        "spacing": {
+          "paddingX": 10,
+          "paddingY": 6,
+          "gap": 8
+        },
         "textBaseline": 22
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-display-stable31-compact.png",
-        "geometry": { "x": 24.7, "y": 28.7, "width": 560.8, "height": 340.8 },
+        "geometry": {
+          "x": 24.7,
+          "y": 28.7,
+          "width": 560.8,
+          "height": 340.8
+        },
         "color": {
           "token": "data.display.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 8.4 },
+        "spacing": {
+          "paddingX": 10.4,
+          "paddingY": 6.3,
+          "gap": 8.4
+        },
         "textBaseline": 22.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1628,34 +2659,73 @@
           "reduced-motion",
           "watermark-tiling"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/media-decorative-stable32.png",
-        "geometry": { "x": 24, "y": 28, "width": 680, "height": 420 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 680,
+          "height": 420
+        },
         "color": {
           "token": "media.surface",
-          "lab": [55, 2, -10]
+          "lab": [
+            55,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/media-decorative-stable32.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 680.8, "height": 420.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 680.8,
+          "height": 420.8
+        },
         "color": {
           "token": "media.surface",
-          "lab": [55.3, 2.1, -10.2]
+          "lab": [
+            55.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1678,7 +2748,10 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusTable", "FsusDataTable"],
+        "controls": [
+          "FsusTable",
+          "FsusDataTable"
+        ],
         "states": [
           "sorted",
           "selected",
@@ -1689,34 +2762,73 @@
           "empty",
           "error"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-table-stable33.png",
-        "geometry": { "x": 24, "y": 28, "width": 760, "height": 460 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 760,
+          "height": 460
+        },
         "color": {
           "token": "data.table.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-table-stable33.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 760.8, "height": 460.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 760.8,
+          "height": 460.8
+        },
         "color": {
           "token": "data.table.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1739,7 +2851,11 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusVirtualList", "FsusAutoResizer", "FsusTableV2"],
+        "controls": [
+          "FsusVirtualList",
+          "FsusAutoResizer",
+          "FsusTableV2"
+        ],
         "states": [
           "fixed-size",
           "variable-size",
@@ -1748,34 +2864,73 @@
           "async-cancel",
           "two-axis-virtualized"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/virtualization-stable34.png",
-        "geometry": { "x": 24, "y": 28, "width": 780, "height": 460 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 780,
+          "height": 460
+        },
         "color": {
           "token": "virtualization.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/virtualization-stable34.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 780.8, "height": 460.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 780.8,
+          "height": 460.8
+        },
         "color": {
           "token": "virtualization.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1814,34 +2969,73 @@
           "overlay-open",
           "tree-table"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/tree-stable35.png",
-        "geometry": { "x": 24, "y": 28, "width": 780, "height": 480 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 780,
+          "height": 480
+        },
         "color": {
           "token": "tree.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/tree-stable35.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 780.8, "height": 480.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 780.8,
+          "height": 480.8
+        },
         "color": {
           "token": "tree.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1864,7 +3058,9 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusTextViewer"],
+        "controls": [
+          "FsusTextViewer"
+        ],
         "states": [
           "structured-blocks",
           "mixed-language",
@@ -1872,34 +3068,73 @@
           "virtualized",
           "canceled-render"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-viewer-stable36.png",
-        "geometry": { "x": 24, "y": 28, "width": 700, "height": 440 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 700,
+          "height": 440
+        },
         "color": {
           "token": "text.viewer.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-viewer-stable36.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 700.8, "height": 440.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 700.8,
+          "height": 440.8
+        },
         "color": {
           "token": "text.viewer.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1922,7 +3157,10 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusTextEditor", "FsusTextViewer"],
+        "controls": [
+          "FsusTextEditor",
+          "FsusTextViewer"
+        ],
         "states": [
           "typing",
           "selection",
@@ -1932,34 +3170,73 @@
           "split-preview",
           "preview-synced"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-editor-stable37.png",
-        "geometry": { "x": 24, "y": 28, "width": 840, "height": 520 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 840,
+          "height": 520
+        },
         "color": {
           "token": "text.editor.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-editor-stable37.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 840.8, "height": 520.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 840.8,
+          "height": 520.8
+        },
         "color": {
           "token": "text.editor.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -1996,34 +3273,73 @@
           "responsive-collection",
           "long-localized-labels"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/public-shell-stable38.png",
-        "geometry": { "x": 0, "y": 0, "width": 960, "height": 640 },
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 640
+        },
         "color": {
           "token": "public.shell.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 0,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 16 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 16
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/public-shell-stable38.png",
-        "geometry": { "x": 0.8, "y": 0.8, "width": 960.8, "height": 640.8 },
+        "geometry": {
+          "x": 0.8,
+          "y": 0.8,
+          "width": 960.8,
+          "height": 640.8
+        },
         "color": {
           "token": "public.shell.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 0.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 16.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 16.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -2061,34 +3377,73 @@
           "keyboard",
           "long-text"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/settings-primitives-stable39.png",
-        "geometry": { "x": 24, "y": 28, "width": 860, "height": 520 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 860,
+          "height": 520
+        },
         "color": {
           "token": "product.primitive.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/settings-primitives-stable39.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 860.8, "height": 520.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 860.8,
+          "height": 520.8
+        },
         "color": {
           "token": "product.primitive.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -2127,34 +3482,73 @@
           "keyboard",
           "long-text"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/metric-primitives-stable39.png",
-        "geometry": { "x": 24, "y": 28, "width": 860, "height": 520 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 860,
+          "height": 520
+        },
         "color": {
           "token": "product.primitive.surface",
-          "lab": [42, 0, -8]
+          "lab": [
+            42,
+            0,
+            -8
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/metric-primitives-stable39.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 860.8, "height": 520.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 860.8,
+          "height": 520.8
+        },
         "color": {
           "token": "product.primitive.surface",
-          "lab": [42.3, 0.1, -8.2]
+          "lab": [
+            42.3,
+            0.1,
+            -8.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -2193,34 +3587,73 @@
           "keyboard",
           "long-text"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/inbox-primitives-stable39.png",
-        "geometry": { "x": 24, "y": 28, "width": 900, "height": 560 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 900,
+          "height": 560
+        },
         "color": {
           "token": "product.primitive.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/inbox-primitives-stable39.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 900.8, "height": 560.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 900.8,
+          "height": 560.8
+        },
         "color": {
           "token": "product.primitive.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -2259,34 +3692,73 @@
           "keyboard-only",
           "long-prompt"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-challenge-stable40.png",
-        "geometry": { "x": 24, "y": 28, "width": 760, "height": 420 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 760,
+          "height": 420
+        },
         "color": {
           "token": "perception.challenge.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-challenge-stable40.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 760.8, "height": 420.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 760.8,
+          "height": 420.8
+        },
         "color": {
           "token": "perception.challenge.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
@@ -2309,7 +3781,9 @@
         "motionMode": "enabled-reduced"
       },
       "coverage": {
-        "controls": ["FsusPerceptionCharacterChallenge"],
+        "controls": [
+          "FsusPerceptionCharacterChallenge"
+        ],
         "states": [
           "loading",
           "ready",
@@ -2326,9 +3800,22 @@
           "unavailable-alternative",
           "replacement-release"
         ],
-        "viewports": ["desktop", "mobile", "zoom-200", "zoom-400"],
-        "themes": ["light", "dark", "high-contrast", "forced-colors"],
-        "motionModes": ["enabled", "reduced"],
+        "viewports": [
+          "desktop",
+          "mobile",
+          "zoom-200",
+          "zoom-400"
+        ],
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast",
+          "forced-colors"
+        ],
+        "motionModes": [
+          "enabled",
+          "reduced"
+        ],
         "accessibility": [
           "labels",
           "error-association",
@@ -2367,7 +3854,10 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusAvaloniaLocaleProvider", "FsusLocalizedText"],
+        "controls": [
+          "FsusAvaloniaLocaleProvider",
+          "FsusLocalizedText"
+        ],
         "states": [
           "english",
           "simplified-chinese",
@@ -2377,38 +3867,361 @@
           "layout-direction",
           "long-labels"
         ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
+        "themes": [
+          "light",
+          "dark",
+          "high-contrast"
+        ],
+        "densities": [
+          "compact",
+          "default",
+          "spacious"
+        ],
+        "motionModes": [
+          "system",
+          "enabled",
+          "reduced",
+          "disabled"
+        ]
       },
       "baseline": {
         "platform": "web",
         "runner": "playwright",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/web/locale-formatting-stable41.png",
-        "geometry": { "x": 24, "y": 28, "width": 780, "height": 360 },
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 780,
+          "height": 360
+        },
         "color": {
           "token": "locale.formatting.surface",
-          "lab": [56, 2, -10]
+          "lab": [
+            56,
+            2,
+            -10
+          ]
         },
         "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
         "textBaseline": 24
       },
       "candidate": {
         "platform": "avalonia",
         "runner": "headless-skia",
         "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/locale-formatting-stable41.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 780.8, "height": 360.8 },
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 780.8,
+          "height": 360.8
+        },
         "color": {
           "token": "locale.formatting.surface",
-          "lab": [56.3, 2.1, -10.2]
+          "lab": [
+            56.3,
+            2.1,
+            -10.2
+          ]
         },
         "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
         "textBaseline": 24.7
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "avatar-vue-parity-web-avalonia",
+      "component": "display-primitives",
+      "mode": "crossPlatform",
+      "token": "color.fill.base",
+      "fixture": {
+        "page": "visual/display-primitives",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "circle-square-fallback-64",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/avatar-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 64,
+          "height": 64
+        },
+        "color": {
+          "token": "color.fill.base",
+          "lab": [
+            96.2,
+            0.2,
+            -0.5
+          ]
+        },
+        "radius": 299.5,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 16
+        },
+        "textBaseline": 46
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/avatar-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 64,
+          "height": 64
+        },
+        "color": {
+          "token": "color.fill.base",
+          "lab": [
+            96.2,
+            0.2,
+            -0.5
+          ]
+        },
+        "radius": 299.5,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 16
+        },
+        "textBaseline": 46
+      },
+      "screenshotDiffPercent": 0.0009,
+      "perceptualDelta": 0.004
+    },
+    {
+      "id": "check-tag-vue-parity-web-avalonia",
+      "component": "selection-controls",
+      "mode": "crossPlatform",
+      "token": "color.action.primary",
+      "fixture": {
+        "page": "visual/selection-controls",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "checked-unchecked-pair",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/check-tag-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 100.8,
+          "height": 24
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [
+            37.9,
+            7.8,
+            -41.2
+          ]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 7.9
+        },
+        "textBaseline": 45
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/check-tag-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 101,
+          "height": 24
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [
+            37.9,
+            7.8,
+            -41.2
+          ]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 7.9
+        },
+        "textBaseline": 45
+      },
+      "screenshotDiffPercent": 0.0112,
+      "perceptualDelta": 0.034
+    },
+    {
+      "id": "checkbox-button-vue-parity-web-avalonia",
+      "component": "selection-controls",
+      "mode": "crossPlatform",
+      "token": "color.surface.base",
+      "fixture": {
+        "page": "visual/selection-controls",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "checked-unchecked-disabled-triple",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/checkbox-button-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 91.1,
+          "height": 40
+        },
+        "color": {
+          "token": "color.surface.base",
+          "lab": [
+            100,
+            0,
+            0
+          ]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 8
+        },
+        "textBaseline": 44
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/checkbox-button-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 90,
+          "height": 40
+        },
+        "color": {
+          "token": "color.surface.base",
+          "lab": [
+            100,
+            0,
+            0
+          ]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 8
+        },
+        "textBaseline": 44
+      },
+      "screenshotDiffPercent": 0.0089,
+      "perceptualDelta": 0.016
+    },
+    {
+      "id": "collapse-vue-parity-web-avalonia",
+      "component": "navigation-primitives",
+      "mode": "crossPlatform",
+      "token": "color.surface.base",
+      "fixture": {
+        "page": "visual/navigation-primitives",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "first-expanded-disabled-third",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/collapse-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 512,
+          "height": 152
+        },
+        "color": {
+          "token": "color.surface.base",
+          "lab": [
+            100,
+            0,
+            0
+          ]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 0
+        },
+        "textBaseline": 45
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/collapse-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 512,
+          "height": 151
+        },
+        "color": {
+          "token": "color.surface.base",
+          "lab": [
+            100,
+            0,
+            0
+          ]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 0
+        },
+        "textBaseline": 45
+      },
+      "screenshotDiffPercent": 0.0083,
+      "perceptualDelta": 0.011
     }
   ]
 }
