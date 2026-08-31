@@ -11,7 +11,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-affix` | `partial` |
 | `component-v2.el-alert` | `partial` |
 | `component-v2.el-aside` | `partial` |
-| `component-v2.el-auto-resizer` | `partial` |
+| `component-v2.el-auto-resizer` | `blocked` |
 | `component-v2.el-autocomplete` | `partial` |
 | `component-v2.el-avatar` | `partial` |
 | `component-v2.el-backtop` | `partial` |
@@ -103,7 +103,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-micro-interaction-challenge` | `partial` |
 | `component-v2.el-notification` | `partial` |
 | `component-v2.el-option` | `partial` |
-| `component-v2.el-option-group` | `partial` |
+| `component-v2.el-option-group` | `blocked` |
 | `component-v2.el-overlay` | `missing` |
 | `component-v2.el-page-header` | `partial` |
 | `component-v2.el-pagination` | `partial` |
@@ -297,7 +297,10 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistory` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryChangedEventArgs` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryEntrySnapshot` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistorySnapshot` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryState` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryStepSnapshot` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorMode` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorPositionMap` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection` | `avalonia-extra` |
@@ -404,6 +407,13 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusTableV2Budget` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTableV2BudgetResult` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTableV2CellContainer` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2HeaderCellContext` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2HeaderContext` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2RowContext` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2RowExpansion` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2RowsRendered` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2Sort` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTabPaneContextEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTextarea` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTextBlockKind` | `avalonia-extra` |
