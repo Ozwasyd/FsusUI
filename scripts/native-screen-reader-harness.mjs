@@ -382,7 +382,10 @@ const main = async () => {
         getComputedStyle(element).boxShadow !== '',
     }))
     const checkTagScreenshotPath = join(options.out, 'check-tag-browser.png')
-    await page.screenshot({ path: checkTagScreenshotPath })
+    const checkTagVisualBounds = await checkTag.boundingBox()
+    if (!checkTagVisualBounds)
+      throw new Error('CheckTag visual bounds are unavailable')
+    await checkTag.screenshot({ path: checkTagScreenshotPath })
     const checkTagAccessibilityStartedAt = performance.now()
     const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
     const checkTagAccessibilityMilliseconds =
@@ -942,8 +945,8 @@ const main = async () => {
               content: (await checkTag.textContent())?.trim(),
               focused: checkTagFocus === 'checkbox',
               focusIndicatorVisible: checkTagMotion.focusIndicatorVisible,
-              width: 1280,
-              height: 1100,
+              width: Math.round(checkTagVisualBounds.width),
+              height: Math.round(checkTagVisualBounds.height),
             },
           },
         },
