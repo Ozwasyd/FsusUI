@@ -1,0 +1,69 @@
+{
+  "schema": "fsusui.avalonia.markdown-projection-producer-contract.v1",
+  "contractVersion": "1",
+  "canonicalRuntime": {
+    "identity": "@ozwasyd/element-plus/markdown-runtime",
+    "implementationAuthority": "vue/packages/wasm/markdown",
+    "nativeConsumptionDecision": "versioned-dotnet-producer-envelope",
+    "futureCanonicalProducer": "native-binding-of-the-same-cpp-runtime",
+    "currentSanctionedProducer": "interim-host-bridge-of-canonical-runtime-output"
+  },
+  "spanTiling": {
+    "coordinateUnit": "raw-utf16",
+    "order": "ascending-non-overlapping",
+    "explicitSpanLength": "positive",
+    "gaps": "implicit-exact-source-fallback",
+    "sourceFallback": "explicit-exact-source-with-reason"
+  },
+  "semanticKinds": [
+    "anchor",
+    "caption",
+    "code",
+    "embed",
+    "explicit-paragraph",
+    "footnote",
+    "heading",
+    "image",
+    "latex",
+    "link",
+    "list",
+    "malformed",
+    "mermaid",
+    "paragraph",
+    "quote",
+    "strong",
+    "table",
+    "task"
+  ],
+  "identity": {
+    "scope": "document-id-and-epoch",
+    "nodeIds": "opaque-stable-within-epoch",
+    "deletedIds": "retired-and-never-reused-within-epoch",
+    "documentSwitch": "no-node-id-reuse"
+  },
+  "invalidation": {
+    "requestBinding": [
+      "documentIdentity",
+      "revision",
+      "source",
+      "featureRevision"
+    ],
+    "staleResult": "reject",
+    "unaffectedNodes": "retain-node-id",
+    "removedNodes": "record-retired-node-id",
+    "invalidatedGaps": "exact-current-source-fallback"
+  },
+  "upgradeCompatibility": {
+    "unknownContractVersion": "reject",
+    "runtimeVersion": "opaque-reported-version",
+    "producerSwap": "document-epoch-boundary-unless-identity-state-is-imported",
+    "snapshotEnvelope": "stable-across-interim-and-canonical-producers"
+  },
+  "forbidden": [
+    "second-csharp-markdown-parser",
+    "regex-range-parser",
+    "webview-or-html-round-trip",
+    "per-block-textbox",
+    "visual-tree-as-content-or-history-authority"
+  ]
+}

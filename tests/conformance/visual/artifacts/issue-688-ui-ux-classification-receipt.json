@@ -1,0 +1,53 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "Avalonia native application menu interaction",
+    "Avalonia native window menu interaction"
+  ],
+  "uiDecisionClass": "interaction-judgment",
+  "verificationClass": "ux-system",
+  "requiredAuthorities": [
+    { "id": "design", "path": "docs/design.md", "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039" },
+    { "id": "design-governance", "path": "docs/design/governance.md", "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5" },
+    { "id": "change-classification", "path": "docs/design/change-classification.md", "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84" },
+    { "id": "visual-workflow", "path": "docs/workflows/visual-change.md", "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4" },
+    { "id": "avalonia-index", "path": "docs/avalonia/README.md", "digest": "069c6efa2e44f775544bb037cd550a0edbdd8ca98a4e40bfc473f6a1bb0d9f74" },
+    { "id": "platform-differences", "path": "docs/avalonia/platform-differences.md", "digest": "fb789c0afd4f9df9c94d52dbd998dc2fb7bc2c2306d68df2e36d1eb848e0e159" },
+    { "id": "navigation", "path": "docs/avalonia/components/navigation.md", "digest": "c5c4a05d6f7d49eb536264cba91174a188cfee33150e5bb2eb07c4385ac70ffd" },
+    { "id": "api-stability", "path": "docs/api-stability.md", "digest": "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1" },
+    { "id": "macos-platform-override", "path": "spec/platform-overrides/avalonia-macos.yaml", "digest": "4923d196b676897638870704a38770e7b1fbe72468ef90369789702b816a12b9" }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "c44c9ab32239d72f0ea4952f30b4926b1556ea45",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "5abc315451cbfb2a0fee8292c5f5b707b1545dccee794d6323f7e6de2aaaa38b",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "c44c9ab32239d72f0ea4952f30b4926b1556ea45",
+  "candidateDigest": "b276dc5323f7454630f2ab6a56218ed921c8a5a40fae5c3e35ddf9a257e53fa6",
+  "stateEvidenceMatrix": [
+    { "state": "macOS Services registration and native responder roles", "viewport": "native application menu", "theme": "not-applicable", "evidenceDigest": "a6c55d8e4c30b0ccc2f62bce0aef5c0db1caf3001692b87dce86bf6c4510b881" },
+    { "state": "Windows and Linux deterministic degradation", "viewport": "native application menu", "theme": "not-applicable", "evidenceDigest": "66b830dc5ed99b1010eb6bc9eeffa480b959f36aac4a4678a4bf06093dccb1b6" },
+    { "state": "dispatcher-safe native-menu interaction coverage", "viewport": "Avalonia headless", "theme": "not-applicable", "evidenceDigest": "8876220940f4f62bbacd3c4db488f071cc935dcdb62f637fe9c6a72e6dbd1a4f" }
+  ],
+  "inScope": [
+    "move all twelve existing native-menu unit cases to Avalonia Headless without weakening assertions",
+    "bind macOS Services and declared application or window roles through a library-owned internal adapter seam",
+    "preserve metadata, ordering, subscription lifetime, and Windows or Linux degradation"
+  ],
+  "outOfScope": [
+    "new native-menu public configuration API",
+    "AppKit types in the public API",
+    "visual styling, theme, token, layout, or motion changes",
+    "consumer-specific application commands or routing policy"
+  ],
+  "classificationEvidenceDigest": "95a1cf21e55eb1d9eac374bebe5d26bfeedf178d575f7fba8cbfebf2bbae1b52",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "e911856d9e7ac045b758e2ac8c019bde7f7b613ceacad50927c438ccc9d98ff5"
+}

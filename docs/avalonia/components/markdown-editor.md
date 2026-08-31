@@ -27,6 +27,25 @@ revision. A stale document, revision, source, or feature snapshot is rejected
 without replacing the current source. `ProjectionRequested` identifies the
 exact state for which a new projection is needed.
 
+Native hosts consume that runtime through the versioned
+`IFsusMarkdownProjectionProducer` boundary. The current sanctioned
+`InterimHostBridge` adapts output produced outside .NET by
+`@ozwasyd/element-plus/markdown-runtime`; it must not parse Markdown. The future
+`CanonicalNativeBinding` will bind the same C++ runtime and keep the production
+envelope unchanged. `FsusMarkdownProjectionProducerContract.Validate` rejects
+an unknown contract version, noncanonical source-runtime identity, stale
+request binding, malformed tiling, vocabulary drift, retired identity reuse,
+or cross-document identity reuse before `CommitProjection` runs.
+
+Explicit spans are positive-length, ascending, non-overlapping raw UTF-16
+ranges. Uncovered gaps are exact current-source fallback tiles; an explicit
+`SourceFallback` also reproduces its source slice and names a reason. The
+machine vocabulary and identity/invalidation/upgrade rules are owned by
+[`spec/avalonia/markdown-projection-producer-contract.json`](../../../spec/avalonia/markdown-projection-producer-contract.json),
+with executable vectors beside it. Removed node ids remain retired for the
+document epoch. A producer swap occurs at a new epoch unless it imports the
+canonical identity allocator and tombstones.
+
 Projection spans use raw UTF-16 source ranges and stable node identities.
 `Text`, `HiddenMarker`, `Atomic`, and `SourceFallback` presentations support
 ordinary text, hidden Markdown syntax, atomic before/after caret placement, and
@@ -103,22 +122,20 @@ var editor = new FsusMarkdownEditor
   StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
 };
 
-editor.ProjectionRequested += (_, request) =>
+editor.ProjectionRequested += async (_, request) =>
 {
-  // Resolve spans from the canonical FsusUI Markdown projection owner.
+  var result = await FsusMarkdownProjectionProducerContract.ProduceAndCommitAsync(
+    editor,
+    canonicalProjectionProducer,
+    request);
+  if (!result.Accepted)
+  {
+    // Live remains in its current-source fallback state.
+    return;
+  }
 };
 
 editor.Mode = FsusMarkdownEditorMode.Live;
-editor.CommitProjection(new FsusMarkdownProjectionSnapshot(
-  editor.DocumentIdentity,
-  editor.TransactionStore.Revision,
-  editor.Document,
-  [
-    new("open", new(0, 2), FsusMarkdownProjectionSpanKind.HiddenMarker, ""),
-    new("text", new(2, 7), FsusMarkdownProjectionSpanKind.Text, "Draft", "strong"),
-    new("close", new(7, 9), FsusMarkdownProjectionSpanKind.HiddenMarker, ""),
-  ],
-  editor.ProjectionFeatureRevision));
 ```
 
 ## Known Limitations
@@ -128,5 +145,8 @@ native IME matrix acceptance, atomic-node AutomationPeer actions, and final AOT
 acceptance remain partial. When no current canonical snapshot exists, Live
 mode intentionally presents localized/current raw source fallback and reports
 `source-fallback`.
+The shipped producer contract does not include the future native shared
+library or an in-process .NET Markdown parser; hosts must provide a canonical
+runtime bridge until the native binding is packaged.
 The Vue-only paste-as-Markdown review flow does not currently map to a native
 Avalonia command.
