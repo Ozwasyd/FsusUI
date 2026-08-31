@@ -855,7 +855,7 @@ const cases = [
     [
       'check-tag-evidence-checkpoint-mutated',
       (execution) => (execution.identity.checkpoint = 'wrong-checkpoint'),
-      'steps[0].binding mismatch',
+      'check-tag.visual-review.identity.checkpoint mismatch',
     ],
     [
       'check-tag-evidence-coverage-mutated',
