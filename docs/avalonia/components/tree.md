@@ -28,9 +28,7 @@ lazy-load request reports `Canceled` and never emits a stale `Completed`.
 focuses it, and selects the supplied name. `StartCreate(key, parentKey)` adds a
 transient empty editor at the root or directly below the supplied folder; a
 collapsed parent expands before the editor receives focus. The transient key
-must not already belong to a node. A parent key must resolve to an enabled node
-that already has children or advertises lazy children; ordinary leaf nodes
-cannot host a create row.
+must not already belong to a node.
 
 Enter raises one `InlineEditCommitRequested` event with
 `FsusTreeInlineEditKind`, the stable edit key, optional parent key, and entered

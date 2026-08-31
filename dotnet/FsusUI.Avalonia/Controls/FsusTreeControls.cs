@@ -428,14 +428,11 @@ public class FsusTree : ContentControl
 
   public bool StartCreate(string key, string? parentKey = null)
   {
-    var parent = parentKey is null ? null : FindNode(parentKey);
     if (
       ActiveInlineEdit is not null ||
       string.IsNullOrEmpty(key) ||
       FindNode(key) is not null ||
-      (parentKey is not null &&
-        (parent is not { IsDisabled: false } ||
-          (parent.Children.Count == 0 && !parent.HasLazyChildren))))
+      (parentKey is not null && FindNode(parentKey) is not { IsDisabled: false }))
     {
       return false;
     }

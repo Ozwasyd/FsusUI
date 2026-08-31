@@ -235,7 +235,7 @@ public class FsusTreeInlineEditingHeadlessTests
 
       captures.Add(new
       {
-        path,
+        path = HeadlessVisualEvidenceOutput.RecordPath(FindRepositoryRoot(), path),
         theme = theme.ToString().ToLowerInvariant(),
         density = density.ToString().ToLowerInvariant(),
         zoomPercent = zoom,
@@ -400,6 +400,20 @@ public class FsusTreeInlineEditingHeadlessTests
       Density = density,
       MotionMode = FsusMotionMode.Reduced,
     });
+  }
+
+  private static string FindRepositoryRoot()
+  {
+    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
+      directory is not null;
+      directory = directory.Parent)
+    {
+      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
+      {
+        return directory.FullName;
+      }
+    }
+    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private static void Arrange(Control control)
