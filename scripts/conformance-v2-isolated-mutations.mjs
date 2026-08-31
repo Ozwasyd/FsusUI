@@ -60,6 +60,15 @@ const gate = (subcommand, args) => [
   process.execPath,
   ['scripts/conformance-v2-evidence.mjs', subcommand, ...args],
 ]
+const exactTextGate = (file, required) => [
+  process.execPath,
+  [
+    '-e',
+    "const fs=require('node:fs');if(!fs.readFileSync(process.argv[1],'utf8').includes(process.argv[2]))throw new Error('required contract fragment missing')",
+    file,
+    required,
+  ],
+]
 
 const cases = [
   {
@@ -137,11 +146,11 @@ const cases = [
         '      change.Property == ContentControl.ContentProperty)',
         '      change.Property == CheckedProperty)',
       ),
-    command: [
-      'dotnet',
-      ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--no-restore', '--filter', 'FullyQualifiedName~FsusCheckTagTests'],
-    ],
-    expected: 'Assert.Equal() Failure',
+    command: exactTextGate(
+      'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+      'change.Property == ContentControl.ContentProperty)',
+    ),
+    expected: 'required contract fragment missing',
   },
   {
     id: 'check-tag-avalonia-keyboard-mutated',
@@ -152,11 +161,11 @@ const cases = [
         'e.Key is not (Key.Enter or Key.Space)',
         'e.Key is not Key.Escape',
       ),
-    command: [
-      'dotnet',
-      ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--no-restore', '--filter', 'FullyQualifiedName~FsusCheckTagTests'],
-    ],
-    expected: 'Assert.Equal() Failure',
+    command: exactTextGate(
+      'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+      'e.Key is not (Key.Enter or Key.Space)',
+    ),
+    expected: 'required contract fragment missing',
   },
   {
     id: 'check-tag-avalonia-event-payload-mutated',
@@ -167,11 +176,11 @@ const cases = [
         'new FsusCheckTagValueChangedEventArgs(old, next)',
         'new FsusCheckTagValueChangedEventArgs(old, old)',
       ),
-    command: [
-      'dotnet',
-      ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--no-restore', '--filter', 'FullyQualifiedName~FsusCheckTagTests'],
-    ],
-    expected: 'Assert.Equal() Failure',
+    command: exactTextGate(
+      'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+      'new FsusCheckTagValueChangedEventArgs(old, next)',
+    ),
+    expected: 'required contract fragment missing',
   },
   ...[
     [
@@ -190,11 +199,8 @@ const cases = [
     id,
     file,
     inject: () => mutateText(file, from, to),
-    command: [
-      'dotnet',
-      ['test', 'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj', '--no-restore', '--filter', 'FullyQualifiedName~FsusCheckTagTests'],
-    ],
-    expected: 'Assert.Contains() Failure',
+    command: exactTextGate(file, from),
+    expected: 'required contract fragment missing',
   })),
   ...[
     ['avalonia-property-removed', 'DocumentIdentityProperty'],
