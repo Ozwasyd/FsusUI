@@ -132,7 +132,13 @@ test('resolved Vue emits and exposed signatures own Contract V2 members', () => 
     (contract) => contract.id === 'component-v2.el-check-tag',
   )
   assert.deepEqual(
-    checkTag.outputs.map(({ name, web }) => ({ name, payload: web.payload })),
+    checkTag.outputs.map(({ name, web, avalonia, status }) => ({
+      name,
+      payload: web.payload,
+      status,
+      member: avalonia?.member ?? null,
+      payloadMember: avalonia?.payloadMember ?? null,
+    })),
     [
       {
         name: 'change',
@@ -144,6 +150,9 @@ test('resolved Vue emits and exposed signatures own Contract V2 members', () => 
             rest: false,
           },
         ],
+        status: 'aligned-candidate',
+        member: 'CheckedChanged',
+        payloadMember: 'NewChecked',
       },
       {
         name: 'update:checked',
@@ -155,6 +164,9 @@ test('resolved Vue emits and exposed signatures own Contract V2 members', () => 
             rest: false,
           },
         ],
+        status: 'aligned-candidate',
+        member: 'CheckedChanged',
+        payloadMember: 'NewChecked',
       },
     ],
   )

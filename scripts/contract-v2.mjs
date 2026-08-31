@@ -29,6 +29,18 @@ export const MARKDOWN_EDITOR_CAPABILITIES = [
   'fatal',
 ]
 
+const AVALONIA_MEMBER_BINDINGS = {
+  ElCheckTag: {
+    outputs: {
+      change: { member: 'CheckedChanged', payloadMember: 'NewChecked' },
+      'update:checked': {
+        member: 'CheckedChanged',
+        payloadMember: 'NewChecked',
+      },
+    },
+  },
+}
+
 export const VUE_BASELINE_PATH = 'spec/baselines/vue-current.json'
 export const AVALONIA_SEMANTIC_PATHS = {
   avalonia: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
@@ -253,13 +265,13 @@ export const compareMembers = ({ web, avalonia, kind }) => {
 
   if (kind === 'output') {
     const webPayload = web.payloadType
-    const avaloniaPayload = avalonia?.argsType
+    const avaloniaPayload = avalonia?.payloadType ?? avalonia?.argsType
     if (webPayload && avaloniaPayload) {
       const payloadCompatible = categoriesOverlap(
         categoriesFromClrType(avaloniaPayload),
-        [webPayload.toLowerCase()],
+        categoriesFromVueProp({ semanticType: webPayload }),
       )
-      if (payloadCompatible === false) {
+      if (payloadCompatible !== true) {
         setDrift(
           drift,
           'eventPayload',
@@ -328,11 +340,20 @@ const avaloniaPropRef = (property) => ({
   enumMembers: property.enumMembers ?? undefined,
 })
 
-const avaloniaEventRef = (event) => ({
-  member: event.name,
-  categories: categoriesFromClrType(event.argsType),
-  argsType: event.argsType,
-})
+const avaloniaEventRef = (event, binding = null) => {
+  const payload = binding?.payloadMember
+    ? event.payloadMembers?.find(
+        (member) => member.name === binding.payloadMember,
+      )
+    : null
+  return {
+    member: event.name,
+    categories: categoriesFromClrType(payload?.type ?? event.argsType),
+    argsType: event.argsType,
+    payloadMember: payload?.name ?? null,
+    payloadType: payload?.type ?? null,
+  }
+}
 
 const webEventRef = (emit) => ({
   member: emit.name,
@@ -359,6 +380,15 @@ const avaloniaSemanticIndex = (baselines) => {
   for (const [packageId] of Object.entries(AVALONIA_SEMANTIC_PATHS)) {
     for (const type of baselines[packageId]?.semanticTypes ?? []) {
       index.set(type.name, { ...type, packageId })
+    }
+  }
+  for (const type of index.values()) {
+    for (const event of type.events ?? []) {
+      const argsType = event.argsType?.match(
+        /^System\.EventHandler<(.+)>$/u,
+      )?.[1]
+      const payloadType = argsType ? index.get(argsType) : null
+      event.payloadMembers = payloadType?.properties ?? []
     }
   }
   return index
@@ -390,10 +420,19 @@ const matchAvaloniaProperty = (webName, avaloniaType) => {
   return null
 }
 
-const matchAvaloniaEvent = (webName, avaloniaType) => {
-  const normalized = normalizeMemberName(webName)
+const memberBinding = (componentName, kind, webName) =>
+  AVALONIA_MEMBER_BINDINGS[componentName]?.[kind]?.[webName] ?? null
+
+const matchAvaloniaEvent = (
+  webName,
+  avaloniaType,
+  componentName,
+) => {
+  const binding = memberBinding(componentName, 'outputs', webName)
+  const normalized = normalizeMemberName(binding?.member ?? webName)
   for (const event of avaloniaType.events ?? []) {
-    if (normalizeMemberName(event.name) === normalized) return event
+    if (normalizeMemberName(event.name) === normalized)
+      return { event, binding }
   }
   return null
 }
@@ -481,7 +520,13 @@ const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
   }
 }
 
-const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => {
+const outputMember = ({
+  componentName,
+  contractKebab,
+  emit,
+  avaloniaType,
+  classification,
+}) => {
   const web = webEventRef(emit)
   if (!avaloniaType) {
     return {
@@ -502,7 +547,15 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
             ),
     }
   }
-  const avalonia = matchAvaloniaEvent(emit.name, avaloniaType)
+  const avaloniaMatch = matchAvaloniaEvent(
+    emit.name,
+    avaloniaType,
+    componentName,
+  )
+  const avalonia = avaloniaMatch?.event ?? null
+  const avaloniaRef = avalonia
+    ? avaloniaEventRef(avalonia, avaloniaMatch.binding)
+    : null
   let status
   let governance = null
   let drift = emptyDrift()
@@ -519,7 +572,7 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
   } else {
     const comparison = compareMembers({
       web: { ...web, categories: ['unknown'] },
-      avalonia: avaloniaEventRef(avalonia),
+      avalonia: avaloniaRef,
       kind: 'output',
     })
     drift = comparison.drift
@@ -534,7 +587,7 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
     name: emit.name,
     kind: 'output',
     web,
-    avalonia: avalonia ? avaloniaEventRef(avalonia) : null,
+    avalonia: avaloniaRef,
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'output', emit.name)],
@@ -791,7 +844,13 @@ const contractForComponent = ({ component, avaloniaType, gate }) => {
       returnType: null,
     }))
   const outputs = semanticEmits.map((emit) =>
-    outputMember({ contractKebab, emit, avaloniaType, classification }),
+    outputMember({
+      componentName: component.name,
+      contractKebab,
+      emit,
+      avaloniaType,
+      classification,
+    }),
   )
   const operations = semanticExposed.map((exposed) =>
     operationMember({ contractKebab, exposed, avaloniaType, classification }),
@@ -890,17 +949,18 @@ const extractAvaloniaExtras = ({
   operations,
   contentRegions,
 }) => {
-  const matchedWebNames = new Set([
-    ...inputs.map((input) => input.web.member),
-    ...outputs.map((output) => output.web.member),
-    ...operations.map((operation) => operation.web.member),
-    ...contentRegions.map((region) => region.web.member),
+  const matchedAvaloniaNames = new Set([
+    ...inputs.map((input) => input.avalonia?.member),
+    ...outputs.map((output) => output.avalonia?.member),
+    ...operations.map((operation) => operation.avalonia?.member),
+    ...contentRegions.map((region) => region.avalonia?.member),
   ])
   const extras = []
   const addExtra = (member) => {
     const normalized = normalizeMemberName(member.name)
-    const matched = [...matchedWebNames].some(
-      (webName) => normalizeMemberName(webName) === normalized,
+    const matched = [...matchedAvaloniaNames].some(
+      (avaloniaName) =>
+        avaloniaName && normalizeMemberName(avaloniaName) === normalized,
     )
     if (matched) return
     extras.push({

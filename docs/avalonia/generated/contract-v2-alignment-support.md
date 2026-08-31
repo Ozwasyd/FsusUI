@@ -26,7 +26,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-carousel-item` | `partial` |
 | `component-v2.el-cascader` | `partial` |
 | `component-v2.el-cascader-panel` | `partial` |
-| `component-v2.el-check-tag` | `partial` |
+| `component-v2.el-check-tag` | `blocked` |
 | `component-v2.el-checkbox` | `partial` |
 | `component-v2.el-checkbox-button` | `partial` |
 | `component-v2.el-checkbox-group` | `partial` |
