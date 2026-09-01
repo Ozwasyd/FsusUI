@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "748a1e7fb1f15e73b0b5e114077b5177253cad5b74f6bcd190da9c5217976998",
+      "hash": "125ca974f860c104ae154483e4eff8515ed226d14a63b5febed532f95c9d6e93",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -48020,6 +48020,44 @@
           }
         },
         {
+          "name": "embedProvider",
+          "kind": "input",
+          "web": {
+            "member": "embedProvider",
+            "categories": [
+              "function"
+            ],
+            "runtimeType": "Function",
+            "semanticType": "MarkdownEmbedProvider",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.embed-provider"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "imageActionLabel",
           "kind": "input",
           "web": {
@@ -49337,6 +49375,60 @@
           }
         },
         {
+          "name": "embed-open-source",
+          "kind": "output",
+          "web": {
+            "member": "embed-open-source",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.output.embed-open-source"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "embed-retry",
+          "kind": "output",
+          "web": {
+            "member": "embed-retry",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.output.embed-retry"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "features-activated",
           "kind": "output",
           "web": {
@@ -49666,6 +49758,33 @@
           }
         },
         {
+          "name": "closeSearch",
+          "kind": "operation",
+          "web": {
+            "member": "closeSearch",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.close-search"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "dispatchTransaction",
           "kind": "operation",
           "web": {
@@ -49754,6 +49873,33 @@
           }
         },
         {
+          "name": "openSearch",
+          "kind": "operation",
+          "web": {
+            "member": "openSearch",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.open-search"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "redo",
           "kind": "operation",
           "web": {
@@ -49780,6 +49926,114 @@
             "scenario.v2.el-markdown-editor.operation.redo"
           ],
           "governance": null
+        },
+        {
+          "name": "searchNavigate",
+          "kind": "operation",
+          "web": {
+            "member": "searchNavigate",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.search-navigate"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "searchReplaceAll",
+          "kind": "operation",
+          "web": {
+            "member": "searchReplaceAll",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.search-replace-all"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "searchReplaceCurrent",
+          "kind": "operation",
+          "web": {
+            "member": "searchReplaceCurrent",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.search-replace-current"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "searchUi",
+          "kind": "operation",
+          "web": {
+            "member": "searchUi",
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.search-ui"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "undo",
@@ -49993,6 +50247,17 @@
         },
         {
           "member": "editorProfile",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "embedProvider",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -50377,6 +50642,28 @@
           }
         },
         {
+          "member": "embed-open-source",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "embed-retry",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "features-activated",
           "kind": "output",
           "status": "missing",
@@ -50476,6 +50763,17 @@
           }
         },
         {
+          "member": "closeSearch",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "insertMarkdownAtCursor",
           "kind": "operation",
           "status": "missing",
@@ -50488,6 +50786,61 @@
         },
         {
           "member": "openCommandPalette",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "openSearch",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "searchNavigate",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "searchReplaceAll",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "searchReplaceCurrent",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "searchUi",
           "kind": "operation",
           "status": "missing",
           "governance": {
@@ -50793,6 +51146,7 @@
         "scenario.v2.el-markdown-editor.input.disabled",
         "scenario.v2.el-markdown-editor.input.document-identity",
         "scenario.v2.el-markdown-editor.input.editor-profile",
+        "scenario.v2.el-markdown-editor.input.embed-provider",
         "scenario.v2.el-markdown-editor.input.image-action-label",
         "scenario.v2.el-markdown-editor.input.interaction-profile",
         "scenario.v2.el-markdown-editor.input.lang",
@@ -50827,6 +51181,8 @@
         "scenario.v2.el-markdown-editor.output.change-event",
         "scenario.v2.el-markdown-editor.output.update-model-event",
         "scenario.v2.el-markdown-editor.output.command",
+        "scenario.v2.el-markdown-editor.output.embed-open-source",
+        "scenario.v2.el-markdown-editor.output.embed-retry",
         "scenario.v2.el-markdown-editor.output.features-activated",
         "scenario.v2.el-markdown-editor.output.history-change",
         "scenario.v2.el-markdown-editor.output.mode-change",
@@ -50839,10 +51195,16 @@
         "scenario.v2.el-markdown-editor.output.upload-image",
         "scenario.v2.el-markdown-editor.operation.apply-attachment-result",
         "scenario.v2.el-markdown-editor.operation.close-command-palette",
+        "scenario.v2.el-markdown-editor.operation.close-search",
         "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
         "scenario.v2.el-markdown-editor.operation.insert-markdown-at-cursor",
         "scenario.v2.el-markdown-editor.operation.open-command-palette",
+        "scenario.v2.el-markdown-editor.operation.open-search",
         "scenario.v2.el-markdown-editor.operation.redo",
+        "scenario.v2.el-markdown-editor.operation.search-navigate",
+        "scenario.v2.el-markdown-editor.operation.search-replace-all",
+        "scenario.v2.el-markdown-editor.operation.search-replace-current",
+        "scenario.v2.el-markdown-editor.operation.search-ui",
         "scenario.v2.el-markdown-editor.operation.undo",
         "scenario.v2.el-markdown-editor.content-region.status",
         "scenario.v2.el-markdown-editor.state.default",
@@ -50864,12 +51226,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 60,
+        "total": 69,
         "alignedCandidate": 6,
         "partial": 4,
-        "missing": 50,
+        "missing": 59,
         "webOnly": 0,
-        "mappedPercent": 16.7
+        "mappedPercent": 14.5
       },
       "markdownEditor": {
         "modes": [
@@ -140342,9 +140704,9 @@
   "coverage": {
     "aligned-candidate": 62,
     "partial": 83,
-    "missing": 2022,
+    "missing": 2031,
     "web-only": 20,
-    "total": 2187,
+    "total": 2196,
     "mappedPercent": 6.6
   }
 }

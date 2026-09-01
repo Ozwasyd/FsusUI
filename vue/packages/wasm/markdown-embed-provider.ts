@@ -8,6 +8,12 @@ export type MarkdownEmbedProviderStatus =
   | 'rejected'
   | 'stale'
   | 'forbidden'
+  | 'missing'
+  | 'cycle'
+  | 'depth-exceeded'
+  | 'size-exceeded'
+  | 'time-exceeded'
+  | 'mode-mismatch'
 
 export interface MarkdownEmbedRequest {
   readonly requestId: string
@@ -35,6 +41,10 @@ export interface MarkdownEmbedResult {
 export type MarkdownEmbedProvider = (
   request: MarkdownEmbedRequest,
 ) => Promise<MarkdownEmbedResult> | MarkdownEmbedResult
+
+export const forgetMarkdownEmbedRequest = (requestId: string) => {
+  requests.delete(requestId)
+}
 
 const requests = new Map<string, MarkdownEmbedRequest>()
 
@@ -74,7 +84,7 @@ export const commitMarkdownEmbedResult = (
   result: MarkdownEmbedResult,
 ): MarkdownEmbedResult => {
   if (!isMarkdownEmbedResultCurrent(request, result)) {
-    return Object.freeze({ ...result, status: 'stale' as const })
+    return Object.freeze({ ...request, status: 'stale' as const })
   }
   return result
 }

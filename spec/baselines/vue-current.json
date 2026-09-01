@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "94f27160b1681ca6a34bef7b8ea81ec2e8c82c7e",
+    "commitSha": "6aff4c767aaea53dfb39b61d894dc487bc8ad007",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "8b2fbc2da64efd27610c3641abeeebaef797b9460c536f81655d174eec167e62",
+    "inputTreeHash": "3cf66ad04a2a3f22cddf55fa6acb2f97766b68bbc076706e76718ca77b688df8",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "ca158c3113dff0337e597ffb66d825a7a4ce136290dda0026a7ee1be899aed97"
+    "outputHash": "c84b89cea809034c17a78088cdcab2aef6ca00385d898c0e52666dc835120612"
   },
   "summary": {
     "componentModules": 93,
@@ -20,7 +20,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 486,
+    "cssVariables": 488,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -11005,6 +11005,7 @@
         "disabled",
         "documentIdentity",
         "editorProfile",
+        "embedProvider",
         "imageActionLabel",
         "interactionProfile",
         "lang",
@@ -11041,6 +11042,8 @@
         "[CHANGE_EVENT]",
         "[UPDATE_MODEL_EVENT]",
         "command",
+        "embed-open-source",
+        "embed-retry",
         "features-activated",
         "history-change",
         "mode-change",
@@ -11061,10 +11064,16 @@
       "exposed": [
         "applyAttachmentResult",
         "closeCommandPalette",
+        "closeSearch",
         "dispatchTransaction",
         "insertMarkdownAtCursor",
         "openCommandPalette",
+        "openSearch",
         "redo",
+        "searchNavigate",
+        "searchReplaceAll",
+        "searchReplaceCurrent",
+        "searchUi",
         "undo"
       ],
       "semantic": {
@@ -11166,6 +11175,18 @@
             "default": {
               "kind": "literal",
               "value": "markdown"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "embedProvider",
+            "runtimeType": "Function",
+            "semanticType": "MarkdownEmbedProvider",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11585,6 +11606,40 @@
             ]
           },
           {
+            "name": "embed-open-source",
+            "payload": [
+              {
+                "name": "target",
+                "type": "string",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "mode",
+                "type": "string",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "embed-retry",
+            "payload": [
+              {
+                "name": "target",
+                "type": "string",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "mode",
+                "type": "string",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
             "name": "features-activated",
             "payload": [
               {
@@ -11725,6 +11780,11 @@
             "returnType": null
           },
           {
+            "name": "closeSearch",
+            "parameters": [],
+            "returnType": null
+          },
+          {
             "name": "dispatchTransaction",
             "parameters": [
               {
@@ -11760,7 +11820,46 @@
             "returnType": null
           },
           {
+            "name": "openSearch",
+            "parameters": [
+              {
+                "name": "replace",
+                "type": null,
+                "optional": true,
+                "rest": false
+              }
+            ],
+            "returnType": null
+          },
+          {
             "name": "redo",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "searchNavigate",
+            "parameters": [
+              {
+                "name": "direction",
+                "type": "'next' | 'previous'",
+                "optional": false,
+                "rest": false
+              }
+            ],
+            "returnType": null
+          },
+          {
+            "name": "searchReplaceAll",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "searchReplaceCurrent",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "searchUi",
             "parameters": [],
             "returnType": null
           },
@@ -31342,6 +31441,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/mixins/_var.scss"
       ],
       "classification": "portable"
@@ -31349,6 +31449,16 @@
     {
       "name": "--el-color-primary-dark-2",
       "files": ["vue/packages/theme-chalk/src/common/var.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--el-color-primary-light-7",
+      "files": ["vue/packages/theme-chalk/src/markdown-editor.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--el-color-primary-light-9",
+      "files": ["vue/packages/theme-chalk/src/markdown-editor.scss"],
       "classification": "portable"
     },
     {
@@ -31523,6 +31633,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
         "vue/packages/theme-chalk/src/spinner.scss"
       ],

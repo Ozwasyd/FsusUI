@@ -57,6 +57,12 @@ const PROVIDER_STATUS_STATES: Readonly<
   rejected: 'error',
   stale: 'stale',
   forbidden: 'forbidden',
+  missing: 'error',
+  cycle: 'error',
+  'depth-exceeded': 'error',
+  'size-exceeded': 'error',
+  'time-exceeded': 'error',
+  'mode-mismatch': 'unsupported',
 })
 
 export interface MarkdownEmbedPresentationActions {
@@ -214,6 +220,54 @@ export const resolveMarkdownEmbedPresentation = (
     state,
     target,
     version: MARKDOWN_EMBED_PRESENTATION_VERSION,
+  })
+}
+
+export interface LegacyMarkdownEmbedPresentation {
+  readonly visible: boolean
+  readonly title: string | null
+  readonly mode: MarkdownEmbedMode
+  readonly status: MarkdownEmbedProviderStatus
+  readonly card: false
+  readonly hasNestedScroll: false
+  readonly tabStop: false
+  readonly actions: readonly ('source-reveal' | 'open-source' | 'retry' | 'copy')[]
+  readonly excerpt: string
+  readonly error?: true
+}
+
+export const sanitizeEmbedExcerpt = (excerpt?: string): string => {
+  if (!excerpt) return ''
+  return excerpt
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .replace(/javascript:[^\s"'>]+/gi, '')
+    .trim()
+}
+
+export const presentMarkdownEmbed = (
+  result: MarkdownEmbedResult,
+): LegacyMarkdownEmbedPresentation => {
+  const state = PROVIDER_STATUS_STATES[result.status]
+  const excerpt = sanitizeEmbedExcerpt(result.excerpt)
+  return Object.freeze({
+    visible: true,
+    title: result.title ?? result.target,
+    mode: result.mode,
+    status: result.status,
+    card: false as const,
+    hasNestedScroll: false as const,
+    tabStop: false as const,
+    actions:
+      state === 'error' || state === 'stale' || state === 'forbidden'
+        ? (['source-reveal', 'retry', 'open-source', 'copy'] as const)
+        : (['source-reveal', 'open-source', 'copy'] as const),
+    excerpt,
+    error: state === 'error' || state === 'stale' || state === 'forbidden'
+      ? (true as const)
+      : undefined,
   })
 }
 

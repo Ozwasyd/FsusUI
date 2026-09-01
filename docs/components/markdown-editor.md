@@ -309,6 +309,35 @@ non-composition input 可继续编辑。窗口外仍会拒绝 `isComposing` 或
 `insertCompositionText` 标记的孤立旧 payload；迟到 `compositionend` 后的即时
 commit 也不会越过当前受控值。
 
+## Search and consumer-resolved embeds
+
+`Ctrl/Cmd+F` and `Ctrl/Cmd+H` open the editor-owned find or replace surface.
+The active query is rerun after every accepted transaction and controlled
+document reset. Match identity remains bound to the current document revision;
+stale or deleted reveal results trigger a fresh search instead of restoring an
+old source range. Source and Live use a non-interactive range overlay, while
+Live/Split/Preview renderer text uses the CSS Custom Highlight API when the
+browser supports it. Neither path wraps renderer HTML or changes Markdown
+source, selection ownership, line wrapping, body width, or scroll-container
+identity.
+
+`embed-provider` is the consumer-owned resolution boundary for valid
+`::embed[...]` projection nodes. The editor supplies an identity-, revision-,
+node-, target-, mode-, and version-bound request. It commits only a matching
+result and treats late or mismatched results as stale. Provider excerpts are
+rendered as escaped text, never `innerHTML`; the directive remains the only host
+source/history authority. Source mode displays the exact directive. Live keeps
+the textarea as its only input surface and places the controlled read-only embed
+regions below it; Split and Preview interleave those regions with the normal
+Markdown renderer. The regions expose source reveal, exact-Markdown copy, delete,
+open-source, and applicable retry actions without an iframe, nested editor,
+nested scroll surface, or permanent embed tab stop.
+
+`embed-open-source(target, mode)` and `embed-retry(target, mode)` leave target
+resolution, authorization, navigation, and retry policy with the consumer.
+Delete and source selection remain editor transactions/selections. Provider
+result height changes use the existing editor body as the only scroll owner.
+
 ## Web language tools
 
 Source 与 Live 的同一个 textarea 会绑定 browser spellcheck、autocorrect、dictation、
@@ -340,38 +369,41 @@ context menu、语音服务、辅助技术或 OS IME 设备证据。完整 nativ
 
 ## Events
 
-| 事件名             | 说明                                                               |
-| ------------------ | ------------------------------------------------------------------ |
-| update:modelValue  | 已接受的公开内容更新                                               |
-| change             | 与 `update:modelValue` 相同的公开内容更新                          |
-| transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction       |
-| selection-change   | revision 与 grapheme-safe、direction-preserving selection          |
-| history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units                  |
-| command            | toolbar command 已通过 dispatcher 执行                             |
-| mode-change        | 编辑模式切换                                                       |
-| save               | 保存事件                                                           |
-| submit             | 提交事件                                                           |
-| upload-image       | 实际 picker/paste/drop 文件组成的 attachment batch provider intent |
-| render-complete    | preview renderer 完成                                              |
-| render-error       | preview renderer 失败                                              |
-| features-activated | preview feature activation 完成                                    |
+| 事件名             | 说明                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| update:modelValue  | 已接受的公开内容更新                                         |
+| change             | 与 `update:modelValue` 相同的公开内容更新                    |
+| transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction |
+| selection-change   | revision 与 grapheme-safe、direction-preserving selection    |
+| history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units            |
+| command            | toolbar command 已通过 dispatcher 执行                       |
+| mode-change        | 编辑模式切换                                                 |
+| save               | 保存事件                                                     |
+| submit             | 提交事件                                                     |
+| upload-image       | 上传图片事件                                                 |
+| render-complete    | preview renderer 完成                                        |
+| render-error       | preview renderer 失败                                        |
+| features-activated | preview feature activation 完成                              |
+| embed-open-source  | consumer 应打开指定 target/mode 的来源                       |
+| embed-retry        | consumer 应重新解析指定 target/mode                          |
 
 ## Attributes
 
-| 属性名            | 说明                                         | 类型                                         | 默认值   |
-| ----------------- | -------------------------------------------- | -------------------------------------------- | -------- |
-| model-value       | 唯一公开 Markdown 内容 authority             | `string`                                     | `''`     |
-| default-mode      | 初始编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'` | `source` |
-| mode              | 受控编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'` | —        |
-| chrome            | 外围区域与根表面变体                         | `'framed' \| 'embedded' \| 'minimal'`        | `framed` |
-| placeholder       | 文本域占位文本                               | `string`                                     | `''`     |
-| commands          | toolbar command model                        | `MarkdownEditorCommand[]`                    | 内置命令 |
-| readonly          | Read-only; blocks input and mutation methods | `boolean`                                    | `false`  |
-| disabled          | 禁用输入与全部 mutation method               | `boolean`                                    | `false`  |
-| loading           | 标记 busy 并冻结输入与全部 mutation method   | `boolean`                                    | `false`  |
-| preview-base-url  | preview renderer 的基础 URL                  | `string \| null`                             | `null`   |
-| preview-csp-nonce | preview renderer 的 CSP nonce                | `string \| null`                             | `null`   |
-| preview-features  | preview renderer 的 feature activation 开关  | `MarkdownFeatureActivationFeatureOptions`    | —        |
+| 属性名            | 说明                                        | 类型                                      | 默认值   |
+| ----------------- | ------------------------------------------- | ----------------------------------------- | -------- |
+| model-value       | 唯一公开 Markdown 内容 authority            | `string`                                  | `''`     |
+| default-mode      | 初始编辑模式                                | `'source' \| 'live' \| 'split' \| 'preview'` | `source` |
+| mode              | 受控编辑模式                                | `'source' \| 'live' \| 'split' \| 'preview'` | — |
+| chrome            | 外围区域与根表面变体                        | `'framed' \| 'embedded' \| 'minimal'`     | `framed` |
+| placeholder       | 文本域占位文本                              | `string`                                  | `''`     |
+| commands          | toolbar command model                       | `MarkdownEditorCommand[]`                 | 内置命令 |
+| readonly          | Read-only; blocks input and mutation methods     | `boolean`                                 | `false`  |
+| disabled          | 禁用输入与全部 mutation method              | `boolean`                                 | `false`  |
+| loading           | 标记 busy 并冻结输入与全部 mutation method  | `boolean`                                 | `false`  |
+| preview-base-url  | preview renderer 的基础 URL                 | `string \| null`                          | `null`   |
+| preview-csp-nonce | preview renderer 的 CSP nonce               | `string \| null`                          | `null`   |
+| preview-features  | preview renderer 的 feature activation 开关 | `MarkdownFeatureActivationFeatureOptions` | —        |
+| embed-provider    | consumer-owned、revision-bound embed resolver | `MarkdownEmbedProvider`                    | —        |
 | min-rows          | 编辑区最小行数                               | `number`                                     | `12`     |
 | spellcheck        | Browser spellcheck capability                | `'auto' \| 'enabled' \| 'disabled' \| boolean` | `auto`   |
 | lang              | Optional BCP-47 language hint                 | `string`                                     | —        |

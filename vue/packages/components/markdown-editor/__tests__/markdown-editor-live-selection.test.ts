@@ -147,12 +147,12 @@ describe('markdown live selection and atomic primitive', () => {
     const fixtures: Record<string, string> = {
       attachment: '![file](pending://a)',
       code: '```\ncode\n```\n',
-      embed: '::embed[target="doc" mode="article"]\n',
       footnote: 'See [^1]\n',
       image: '![alt](img.png)\n',
       latex: '$$\nx\n$$\n',
       mermaid: '```mermaid\ngraph TD\n```\n',
       table: '| h |\n| --- |\n| c |\n',
+      embed: '::embed[target="note" mode="article"]\n',
     }
     for (const kind of MARKDOWN_ATOMIC_NODE_KINDS) {
       const source = fixtures[kind]!

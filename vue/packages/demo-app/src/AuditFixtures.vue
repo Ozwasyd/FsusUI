@@ -330,6 +330,112 @@
       </output>
     </section>
 
+    <section
+      v-if="markdownSearchEmbedFixture"
+      data-testid="markdown-search-embed-fixture"
+      v-bind="{
+        'data-document-epoch': String(markdownSearchEmbedEpoch),
+      }"
+    >
+      <div aria-label="Markdown search and embed fixture controls">
+        <button
+          v-for="mode in markdownSearchEmbedModes"
+          :key="mode"
+          type="button"
+          :data-testid="`markdown-search-embed-mode-${mode}`"
+          @click="markdownSearchEmbedMode = mode"
+        >
+          {{ mode }}
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-open-find"
+          @click="markdownSearchEmbedEditor?.openSearch(false)"
+        >
+          Open find
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-open-replace"
+          @click="markdownSearchEmbedEditor?.openSearch(true)"
+        >
+          Open replace
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-switch-document"
+          @click="switchMarkdownSearchEmbedDocument"
+        >
+          Switch document
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-resolve-failure"
+          @click="markdownSearchEmbedResolveFailure = true"
+        >
+          Resolve failed embed on retry
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-load-performance"
+          @click="loadMarkdownSearchPerformanceFixture"
+        >
+          Load 100k / 10000 matches
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-reset"
+          @click="resetMarkdownSearchEmbedFixture"
+        >
+          Reset fixture
+        </button>
+      </div>
+      <el-markdown-editor
+        :key="`markdown-search-embed-${markdownSearchEmbedEpoch}`"
+        ref="markdownSearchEmbedEditor"
+        v-model="markdownSearchEmbedValue"
+        :embed-provider="markdownSearchEmbedProvider"
+        :interaction-profile="
+          markdownSearchEmbedTouch ? 'touch' : 'keyboard'
+        "
+        :min-rows="10"
+        :mode="markdownSearchEmbedMode"
+        :show-actions="false"
+        v-bind="{ 'data-testid': 'markdown-search-embed-editor' }"
+        @embed-open-source="
+          (target, mode) =>
+            (markdownSearchEmbedLastOpen = `${target}:${mode}`)
+        "
+        @embed-retry="
+          (target, mode) =>
+            (markdownSearchEmbedLastRetry = `${target}:${mode}`)
+        "
+        @history-change="markdownSearchEmbedHistory = $event"
+        @selection-change="markdownSearchEmbedSelection = $event"
+      />
+      <output data-testid="markdown-search-embed-value">
+        {{ markdownSearchEmbedValue }}
+      </output>
+      <output data-testid="markdown-search-embed-mode">
+        {{ markdownSearchEmbedMode }}
+      </output>
+      <output data-testid="markdown-search-embed-request">
+        {{ JSON.stringify(markdownSearchEmbedLastRequest) }}
+      </output>
+      <output data-testid="markdown-search-embed-open">
+        {{ markdownSearchEmbedLastOpen }}
+      </output>
+      <output data-testid="markdown-search-embed-retry">
+        {{ markdownSearchEmbedLastRetry }}
+      </output>
+      <output data-testid="markdown-search-embed-history">
+        {{ JSON.stringify(markdownSearchEmbedHistory) }}
+      </output>
+      <output data-testid="markdown-search-embed-selection">
+        {{ JSON.stringify(markdownSearchEmbedSelection) }}
+      </output>
+    </section>
+
     <div class="audit-grid">
       <AuditCard name="FixedSizeList" :state="auditState">
         <div class="audit-virtual-frame audit-virtual-frame--list">
@@ -1893,11 +1999,14 @@ import {
   ElTypedConfirmField,
 } from '../../element-plus'
 import type {
+  MarkdownEmbedProvider,
+  MarkdownEmbedRequest,
   MarkdownAttachmentBatchIntent,
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryState,
   MarkdownEditorInstance,
   MarkdownEditorLocaleTextOverride,
+  MarkdownEditorMode,
   MarkdownEditorSelectionEvent,
   MarkdownEditorTransactionEvent,
 } from '../../element-plus'
@@ -2033,6 +2142,15 @@ const markdownEditorTransactionFixture =
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownSearchEmbedFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownSearchEmbed') ===
+    '1'
+const markdownSearchEmbedTouch =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get(
+    'markdownSearchEmbedTouch',
+  ) === '1'
 const markdownCommandSurfacesFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownCommandSurfaces') ===
@@ -2341,6 +2459,127 @@ const dispatchStaleMarkdownReplacement = () => {
 
 const loadLargeMarkdownDocument = () => {
   markdownTransactionValue.value = '界'.repeat(100_000)
+}
+
+const markdownSearchEmbedModes = [
+  'source',
+  'live',
+  'split',
+  'preview',
+] as const satisfies readonly MarkdownEditorMode[]
+const markdownSearchEmbedInitialValue = [
+  '# Search and embed review',
+  '',
+  'alpha café 😀 אב alpha',
+  '',
+  '::embed[target="safe-doc" mode="article"]',
+  '',
+  '::embed[target="missing-doc" mode="heading"]',
+  '',
+  '::embed[target="forbidden-doc" mode="block"]',
+  '',
+  '::embed[target="cycle-doc" mode="article"]',
+  '',
+  '::embed[target="depth-doc" mode="heading"]',
+  '',
+  '::embed[target="mismatch-doc" mode="block"]',
+  '',
+  '::embed[target="pending-doc" mode="block"]',
+  '',
+  '::embed[target="stale-doc" mode="article"]',
+  '',
+  'Trailing alpha content.',
+].join('\n')
+const markdownSearchEmbedEditor = ref<MarkdownEditorInstance>()
+const markdownSearchEmbedValue = ref(markdownSearchEmbedInitialValue)
+const markdownSearchEmbedMode = ref<MarkdownEditorMode>('source')
+const markdownSearchEmbedEpoch = ref(1)
+const markdownSearchEmbedResolveFailure = ref(false)
+const markdownSearchEmbedLastRequest = ref<MarkdownEmbedRequest | null>(null)
+const markdownSearchEmbedLastOpen = ref('')
+const markdownSearchEmbedLastRetry = ref('')
+const markdownSearchEmbedHistory = ref<MarkdownEditorHistoryState>({
+  canRedo: false,
+  canUndo: false,
+  redoDepth: 0,
+  retainedUnits: 0,
+  undoDepth: 0,
+})
+const markdownSearchEmbedSelection = ref<MarkdownEditorSelectionEvent | null>(
+  null,
+)
+const markdownSearchEmbedProvider: MarkdownEmbedProvider = async (request) => {
+  markdownSearchEmbedLastRequest.value = request
+  const localFailureStatus = {
+    'cycle-doc': 'cycle',
+    'depth-doc': 'depth-exceeded',
+    'forbidden-doc': 'forbidden',
+    'mismatch-doc': 'mode-mismatch',
+  } as const
+  const failureStatus =
+    localFailureStatus[request.target as keyof typeof localFailureStatus]
+  if (failureStatus) {
+    return Object.freeze({
+      ...request,
+      status: failureStatus,
+    })
+  }
+  if (request.target === 'pending-doc') {
+    return Object.freeze({
+      ...request,
+      status: 'pending' as const,
+    })
+  }
+  if (request.target === 'stale-doc') {
+    return Object.freeze({
+      ...request,
+      excerpt: 'This stale payload must not render.',
+      revision: request.revision + 1,
+      status: 'resolved' as const,
+      title: 'Stale payload',
+    })
+  }
+  if (
+    request.target === 'missing-doc' &&
+    !markdownSearchEmbedResolveFailure.value
+  ) {
+    return Object.freeze({
+      ...request,
+      status: 'missing' as const,
+    })
+  }
+  return Object.freeze({
+    ...request,
+    excerpt:
+      request.target === 'missing-doc'
+        ? 'Recovered heading after an explicit retry.'
+        : 'Resolved excerpt with <strong>literal provider markup</strong> and a long line that verifies wrapping without a nested scroll surface.',
+    status: 'resolved' as const,
+    title:
+      request.target === 'missing-doc'
+        ? 'Recovered heading'
+        : 'Safe consumer document',
+  })
+}
+const switchMarkdownSearchEmbedDocument = () => {
+  markdownSearchEmbedEpoch.value += 1
+  markdownSearchEmbedLastRequest.value = null
+  markdownSearchEmbedLastOpen.value = ''
+  markdownSearchEmbedLastRetry.value = ''
+}
+const loadMarkdownSearchPerformanceFixture = () => {
+  const exactMatches = 'hit '.repeat(10_000)
+  markdownSearchEmbedValue.value = `${exactMatches}${'界'.repeat(
+    Math.max(0, 100_000 - exactMatches.length),
+  )}`
+}
+const resetMarkdownSearchEmbedFixture = () => {
+  markdownSearchEmbedValue.value = markdownSearchEmbedInitialValue
+  markdownSearchEmbedMode.value = 'source'
+  markdownSearchEmbedResolveFailure.value = false
+  markdownSearchEmbedLastOpen.value = ''
+  markdownSearchEmbedLastRetry.value = ''
+  markdownSearchEmbedEpoch.value += 1
 }
 
 const boundaryText =
