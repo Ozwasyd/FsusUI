@@ -1,9 +1,14 @@
 import fs from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import process from 'node:process'
 
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
 const workflow = fs.readFileSync('.github/workflows/_quality.yml', 'utf8')
+const platformVerifier = fs.readFileSync(
+  'scripts/dotnet-platform-verify.mjs',
+  'utf8',
+)
 
 const job = (source, name) =>
   source.match(
@@ -154,6 +159,29 @@ for (const [name, fragment] of [
 }
 if (!scripts['governance:check']?.includes('check:dotnet-matrix')) {
   failures.push('governance:check must include check:dotnet-matrix')
+}
+for (const fragment of [
+  'FSUS_DOTNET_MAX_CPU_COUNT',
+  "'--max-cpu-count'",
+  "'--disable-parallel'",
+  '`--maxcpucount:${maxCpuCount}`',
+  'restoreDisableParallel: true',
+]) {
+  if (!platformVerifier.includes(fragment))
+    failures.push(`platform verifier must include ${fragment}`)
+}
+const invalidConcurrency = spawnSync(
+  process.execPath,
+  ['scripts/dotnet-platform-verify.mjs', '--max-cpu-count', '0'],
+  { encoding: 'utf8' },
+)
+if (
+  invalidConcurrency.status === 0 ||
+  !`${invalidConcurrency.stdout}${invalidConcurrency.stderr}`.includes(
+    '--max-cpu-count must be a positive integer',
+  )
+) {
+  failures.push('platform verifier must reject invalid concurrency overrides')
 }
 
 if (failures.length > 0) {

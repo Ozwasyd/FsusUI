@@ -109,6 +109,22 @@ public class FsusProductPrimitiveFamilyTests
     Assert.True(detail.WasCopied);
     Assert.Equal(AutomationControlType.List, AutomationProperties.GetControlTypeOverride(metrics));
 
+    var disabledDetail = new FsusCopyableDetail
+    {
+      Label = "Disabled trace id",
+      Value = "disabled-123",
+      IsDisabled = true,
+    };
+    disabledDetail.ApplyViewport(390);
+
+    Assert.False(disabledDetail.IsEnabled);
+    Assert.True(disabledDetail.IsDisabled);
+    Assert.Contains("fsus-disabled", disabledDetail.Classes);
+    Assert.Contains("fsus-mobile", disabledDetail.Classes);
+    Assert.Equal(string.Empty, disabledDetail.Copy());
+    Assert.False(disabledDetail.WasCopied);
+    Assert.Contains("disabled", AutomationProperties.GetItemStatus(disabledDetail));
+
     _ = new FsusKpiGroup();
     _ = new FsusKeyValueGrid();
     _ = new FsusKeyValueItem("region", "Region", "Global");
@@ -164,6 +180,12 @@ public class FsusProductPrimitiveFamilyTests
     Assert.Contains("fsus|FsusInboxLayout", theme);
     Assert.Contains("FsusThemeProductPrimitiveSurfaceBrush", theme);
     Assert.Contains("FsusMotionDurationEffective", theme);
+    Assert.Contains("fsus|FsusCopyableDetail.fsus-mobile", theme);
+    Assert.Contains("MinWidth\" Value=\"40", theme);
+    Assert.Contains("MinHeight\" Value=\"44", theme);
+    Assert.Contains("fsus|FsusCopyableDetail:focus", theme);
+    Assert.Contains("fsus|FsusCopyableDetail:disabled", theme);
+    Assert.Contains("Opacity\" Value=\"1", theme);
 
     var rootTheme = ReadTheme("FsusTheme.axaml");
     Assert.Contains("Controls/ProductPrimitives.axaml", rootTheme);

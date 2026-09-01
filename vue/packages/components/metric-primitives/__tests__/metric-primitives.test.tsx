@@ -155,4 +155,27 @@ describe('metric primitives', () => {
     expect(wrapper.emitted('copy')?.[0]).toEqual(['technical-detail-001'])
     expect(wrapper.find('.el-copyable-detail__feedback').text()).toBe('Copied')
   })
+
+  test('copyable detail preserves native disabled semantics and does not copy', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+
+    const wrapper = mount(ElCopyableDetail, {
+      props: {
+        value: 'technical-detail-disabled',
+        label: 'Copy unavailable detail',
+        disabled: true,
+      },
+    })
+
+    expect(wrapper.classes()).toContain('is-disabled')
+    expect(wrapper.find('button').attributes('disabled')).toBeDefined()
+    await wrapper.find('button').trigger('click')
+    expect(writeText).not.toHaveBeenCalled()
+    expect(wrapper.emitted('copy')).toBeUndefined()
+    expect(wrapper.emitted('copy-error')).toBeUndefined()
+  })
 })

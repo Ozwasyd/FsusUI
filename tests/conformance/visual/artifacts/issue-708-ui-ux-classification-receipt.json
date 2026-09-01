@@ -1,0 +1,127 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "Avalonia global theme resources",
+    "Avalonia icon default theme resource"
+  ],
+  "uiDecisionClass": "prescribed",
+  "verificationClass": "ux-system",
+  "requiredAuthorities": [
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84"
+    },
+    {
+      "id": "visual-workflow",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+    },
+    {
+      "id": "theme-tokens",
+      "path": "docs/theme/tokens.md",
+      "digest": "427a399416b901d39dc4545bd8337b153378cdeeb5ceff73419b61d308b5a0dd"
+    },
+    {
+      "id": "token-spec",
+      "path": "spec/tokens/README.md",
+      "digest": "fdf27f2ad6d153acd5d0abfafd13f3106708fe4df31490f5ebed80c8061e5650"
+    },
+    {
+      "id": "theme-customization",
+      "path": "docs/theme/customization.md",
+      "digest": "298ff4b6078a9b5043e65703338cf03342e9a3577dbe7e3a1b0b1bd3c686260e"
+    },
+    {
+      "id": "avalonia-index",
+      "path": "docs/avalonia/README.md",
+      "digest": "069c6efa2e44f775544bb037cd550a0edbdd8ca98a4e40bfc473f6a1bb0d9f74"
+    },
+    {
+      "id": "avalonia-installation",
+      "path": "docs/avalonia/installation.md",
+      "digest": "a6c145d58f581481afff720f38463e1fbd6222e55f4cc3fd6bf7cbe814a71245"
+    },
+    {
+      "id": "platform-differences",
+      "path": "docs/avalonia/platform-differences.md",
+      "digest": "2f8f9071f47aa6e233f0a5dd7f7a1afb549a099882e48c46a3b1880f73b987c9"
+    },
+    {
+      "id": "api-stability",
+      "path": "docs/api-stability.md",
+      "digest": "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "f31c6041d99bbd7746c4f3ca97232f3527dee41b",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "c22f322c6f3fd639d1e0fca29d43b5afd9a5655cdc1945688ff9a5ed75663239",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "dd69cff8ea632491619dfcd077c6e1d6b919d85a",
+  "candidateDigest": "88b196ce936df624833ad0a8e459393eb4fe914312ef6a10935d17de53cb77f4",
+  "stateEvidenceMatrix": [
+    {
+      "state": "built-in-light",
+      "viewport": "desktop-960x540",
+      "theme": "light",
+      "evidenceDigest": "2778ac74e1b4705a6db0f8f79a63ca6d6ac210ef8ee9b8cf1677dc85c6ded49f"
+    },
+    {
+      "state": "built-in-dark",
+      "viewport": "desktop-960x540",
+      "theme": "dark",
+      "evidenceDigest": "677bf7ea53ab2d0b841cc85b31d42ffaa4ae430de54ca539c9d5dadcc4029909"
+    },
+    {
+      "state": "complete-custom-palette",
+      "viewport": "desktop-960x540",
+      "theme": "light",
+      "evidenceDigest": "974d75c45c8051a5c2157058b8bc7ce52fb0b54e09d5e6d5a41e69f1aec4330b"
+    },
+    {
+      "state": "partial-custom-with-dark-fallback",
+      "viewport": "desktop-960x540",
+      "theme": "dark",
+      "evidenceDigest": "1ba0b68807a5ca6820940f49a9cfba8bcde7550355c7a1900811755362cb77c1"
+    },
+    {
+      "state": "built-in-high-contrast-precedence",
+      "viewport": "desktop-960x540",
+      "theme": "dark",
+      "evidenceDigest": "e8d59809dc3ada3131cd0c87768e84a013f60368674748db0177e0e8d87d09cb"
+    }
+  ],
+  "inScope": [
+    "one optional public Avalonia palette record with nullable background, surface, raised-surface, text, muted-text, border, and icon IBrush overrides",
+    "per-field built-in light and dark fallback plus complete built-in high-contrast precedence applied by FsusThemeManager",
+    "runtime DynamicResource refresh across shell, editor, tree, picker, read-only, text, border, and icon resources",
+    "public API and semantic baselines, nearest docs, tests, production-control rendered evidence, AOT fixture, and preview-minor changeset"
+  ],
+  "outOfScope": [
+    "new canonical tokens or a second palette authority",
+    "selection brush behavior tracked by issue 669",
+    "consumer-specific theme menus, editor stylesheets, persistence, or layout changes",
+    "changes to accent, density, motion, typography, or unrelated component behavior"
+  ],
+  "classificationEvidenceDigest": "5d50c6f26435700c32ef5c13cfb8462368e6a9185311bbbe51f630bc712d9918",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "50f642eeb3cc708049fe0a1326b6ea02e87b247168b809061facdee2fb09172d"
+}

@@ -1,0 +1,125 @@
+{
+  "embedRegions": [
+    {
+      "actions": [
+        "Source Reveal",
+        "Open Source",
+        "Copy",
+        "Select Node",
+        "Delete"
+      ],
+      "label": "Embed safe-doc (article)",
+      "role": "region",
+      "status": "resolved",
+      "tabIndex": null
+    },
+    {
+      "actions": [
+        "Source Reveal",
+        "Retry",
+        "Open Source",
+        "Copy",
+        "Select Node",
+        "Delete"
+      ],
+      "label": "Embed missing-doc (heading)",
+      "role": "region",
+      "status": "missing",
+      "tabIndex": null
+    },
+    {
+      "actions": [
+        "Source Reveal",
+        "Retry",
+        "Open Source",
+        "Copy",
+        "Select Node",
+        "Delete"
+      ],
+      "label": "Embed forbidden-doc (block)",
+      "role": "region",
+      "status": "forbidden",
+      "tabIndex": null
+    },
+    {
+      "actions": [
+        "Source Reveal",
+        "Retry",
+        "Open Source",
+        "Copy",
+        "Select Node",
+        "Delete"
+      ],
+      "label": "Embed cycle-doc (article)",
+      "role": "region",
+      "status": "cycle",
+      "tabIndex": null
+    },
+    {
+      "actions": [
+        "Source Reveal",
+        "Retry",
+        "Open Source",
+        "Copy",
+        "Select Node",
+        "Delete"
+      ],
+      "label": "Embed depth-doc (heading)",
+      "role": "region",
+      "status": "depth-exceeded",
+      "tabIndex": null
+    },
+    {
+      "actions": [
+        "Source Reveal",
+        "Retry",
+        "Open Source",
+        "Copy",
+        "Select Node",
+        "Delete"
+      ],
+      "label": "Embed mismatch-doc (block)",
+      "role": "region",
+      "status": "mode-mismatch",
+      "tabIndex": null
+    },
+    {
+      "actions": [
+        "Source Reveal",
+        "Open Source",
+        "Copy",
+        "Select Node",
+        "Delete"
+      ],
+      "label": "Embed pending-doc (block)",
+      "role": "region",
+      "status": "pending",
+      "tabIndex": null
+    },
+    {
+      "actions": [
+        "Source Reveal",
+        "Retry",
+        "Open Source",
+        "Copy",
+        "Select Node",
+        "Delete"
+      ],
+      "label": "Embed stale-doc (article)",
+      "role": "region",
+      "status": "stale",
+      "tabIndex": null
+    }
+  ],
+  "search": {
+    "label": "Find in document",
+    "queryLabel": "Find in document",
+    "status": "1 of 3"
+  },
+  "simulation": {
+    "screenReader": "DOM role/name/status projection",
+    "softKeyboard": "visualViewport resize",
+    "touch": "touchstart plus public click activation",
+    "zoom": "CSS zoom 200%"
+  }
+}

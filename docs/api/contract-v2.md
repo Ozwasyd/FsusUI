@@ -14,17 +14,18 @@ explicit or when semantic drift is hidden.
 
 ## Artifacts
 
-| Artifact | Path | Role |
-| --- | --- | --- |
-| Registry | `spec/components/contracts/v2/contract-v2.json` | Generated, committed, verified |
-| Gate | `spec/components/contracts/v2/markdown-editor-gate.json` | MarkdownEditor blocking state |
-| Runtime projection | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
-| Runtime projection docs | `docs/api/markdown-runtime-projection.md` | Consumer-facing runtime API |
-| Editor input | `spec/components/contracts/v2/markdown-editor-input.json` | Unique #327–#331 input pipeline and acceptance exports |
-| Editor input docs | `docs/api/markdown-editor-input.md` | Consumer-facing input contract |
-| Generator + comparator | `scripts/contract-v2.mjs` | `generate` / `--check` / exported validators |
-| Mutation fixtures | `tests/fixtures/contract-v2/` | Kill-fixtures for every forbidden pattern |
-| Tests | `tests/contract-v2.test.mjs` | `node --test` suite |
+| Artifact                | Path                                                            | Role                                                                             |
+| ----------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Registry                | `spec/components/contracts/v2/contract-v2.json`                 | Generated, committed, verified                                                   |
+| Gate                    | `spec/components/contracts/v2/markdown-editor-gate.json`        | MarkdownEditor blocking state                                                    |
+| Runtime projection      | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
+| Runtime projection docs | `docs/api/markdown-runtime-projection.md`                       | Consumer-facing runtime API                                                      |
+| Interaction trace docs  | `docs/api/markdown-interaction-trace.md`                        | Real-browser Web trace schema and Contract V2 binding                            |
+| Editor input            | `spec/components/contracts/v2/markdown-editor-input.json`       | Unique #327–#331 input pipeline and acceptance exports                           |
+| Editor input docs       | `docs/api/markdown-editor-input.md`                             | Consumer-facing input contract                                                   |
+| Generator + comparator  | `scripts/contract-v2.mjs`                                       | `generate` / `--check` / exported validators                                     |
+| Mutation fixtures       | `tests/fixtures/contract-v2/`                                   | Kill-fixtures for every forbidden pattern                                        |
+| Tests                   | `tests/contract-v2.test.mjs`                                    | `node --test` suite                                                              |
 
 ## Generation
 
@@ -45,12 +46,12 @@ generator either finds a real Avalonia member (name-equality after the narrow
 `Is/Can/Has` + `Changed` + kebab normalization) or explicitly records a gap.
 Each member carries exactly one status:
 
-| Status | Meaning |
-| --- | --- |
+| Status              | Meaning                                                                                       |
+| ------------------- | --------------------------------------------------------------------------------------------- |
 | `aligned-candidate` | Real member exists on both sides with no detected type/default/nullability/enum/payload drift |
-| `partial` | Real member exists on both sides but semantic drift or non-comparable typing was detected |
-| `missing` | No real counterpart member exists on the other platform |
-| `web-only` | Explicit web-only registration with governance |
+| `partial`           | Real member exists on both sides but semantic drift or non-comparable typing was detected     |
+| `missing`           | No real counterpart member exists on the other platform                                       |
+| `web-only`          | Explicit web-only registration with governance                                                |
 
 A member with a status other than `aligned-candidate` must carry governance
 (`reason`, `owner`, `testPolicy`, `reviewPolicy`). Every required member must

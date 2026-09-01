@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process'
-import path from 'node:path'
-import { pathToFileURL } from 'node:url'
 import {
   countUnitTestFiles,
   formatCapacitySummary,
@@ -95,19 +93,7 @@ const heapSettings = disabled
     }
   : buildNodeOptions()
 
-const nodeOptions = heapSettings.nodeOptions
-  ? [heapSettings.nodeOptions]
-  : []
-const usesTokenPipeline = [command, ...args].some((argument) =>
-  String(argument).replaceAll('\\', '/').endsWith('scripts/token-pipeline.mjs'),
-)
-if (usesTokenPipeline) {
-  const hook = pathToFileURL(
-    path.join(import.meta.dirname, 'avalonia-token-shadow-hook.mjs'),
-  ).href
-  nodeOptions.push(`--import=${hook}`)
-}
-
+const nodeOptions = heapSettings.nodeOptions ? [heapSettings.nodeOptions] : []
 const env = {
   ...process.env,
   NODE_OPTIONS: nodeOptions.join(' ').trim(),

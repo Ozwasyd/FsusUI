@@ -3,9 +3,9 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 40,
-    "passed": 40,
-    "allowedByOverride": 2
+    "total": 48,
+    "passed": 48,
+    "allowedByOverride": 3
   },
   "comparisons": [
     {
@@ -1266,6 +1266,261 @@
         "textBaseline": 0.6999999999999993,
         "screenshotDiffPercent": 0.012,
         "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "avatar-vue-parity-web-avalonia",
+      "component": "display-primitives",
+      "state": "circle-square-fallback-64",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.fill.base",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/avatar-vue-parity.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/avatar-vue-parity-web-avalonia.json",
+      "deltas": {
+        "geometry": 0,
+        "colorDelta": 0,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0,
+        "screenshotDiffPercent": 0.0009,
+        "perceptualDelta": 0.004
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "check-tag-vue-parity-web-avalonia",
+      "component": "selection-controls",
+      "state": "checked-unchecked-pair",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.action.primary",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/check-tag-vue-parity.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/check-tag-vue-parity-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.20000000000000284,
+        "colorDelta": 0,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0,
+        "screenshotDiffPercent": 0.0112,
+        "perceptualDelta": 0.034
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "checkbox-button-vue-parity-web-avalonia",
+      "component": "selection-controls",
+      "state": "checked-unchecked-disabled-triple",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.surface.base",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/checkbox-button-vue-parity.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/checkbox-button-vue-parity-web-avalonia.json",
+      "deltas": {
+        "geometry": 1.0999999999999943,
+        "colorDelta": 0,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0,
+        "screenshotDiffPercent": 0.0089,
+        "perceptualDelta": 0.016
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "collapse-vue-parity-web-avalonia",
+      "component": "navigation-primitives",
+      "state": "first-expanded-disabled-third",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.surface.base",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/collapse-vue-parity.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/collapse-vue-parity-web-avalonia.json",
+      "deltas": {
+        "geometry": 1,
+        "colorDelta": 0,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0,
+        "screenshotDiffPercent": 0.0083,
+        "perceptualDelta": 0.011
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "markdown-editor-vue-parity-web-avalonia",
+      "component": "markdown-editor",
+      "state": "source-surface-short-doc",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "text.editor.surface",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/markdown-editor-vue-parity.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/markdown-editor-vue-parity-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.4000000000000057,
+        "colorDelta": 0,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0,
+        "screenshotDiffPercent": 0.001,
+        "perceptualDelta": 0.091
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [
+        {
+          "metric": "perceptualDelta",
+          "delta": 0.091,
+          "threshold": 0.08,
+          "overrideId": "visual-markdown-source-surface-002"
+        }
+      ],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "icon-text-vue-parity-web-avalonia",
+      "component": "icon-text",
+      "state": "six-type-link-row",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.action.primary",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-text-vue-parity.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/icon-text-vue-parity-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8999999999999986,
+        "colorDelta": 0,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0,
+        "screenshotDiffPercent": 0.000531,
+        "perceptualDelta": 0.071
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "layout-vue-parity-web-avalonia",
+      "component": "layout-primitives",
+      "state": "row-4-col-span6-gutter20",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.fill.light",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/layout-vue-parity.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/layout-vue-parity-web-avalonia.json",
+      "deltas": {
+        "geometry": 0,
+        "colorDelta": 0,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0,
+        "screenshotDiffPercent": 0.000086,
+        "perceptualDelta": 0.03
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "divider-vue-parity-web-avalonia",
+      "component": "display-primitives",
+      "state": "titled-plus-plain",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.border.lighter",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/divider-vue-parity.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/divider-vue-parity-web-avalonia.json",
+      "deltas": {
+        "geometry": 0,
+        "colorDelta": 0,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0,
+        "screenshotDiffPercent": 0.000076,
+        "perceptualDelta": 0.007
       },
       "thresholds": {
         "geometry": 1.5,

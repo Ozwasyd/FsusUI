@@ -35,6 +35,7 @@ describe('markdown embed consumer provider', () => {
       version: 2,
     })
     expect(stale.status).toBe('stale')
+    expect(stale.title).toBeUndefined()
     const report = evaluateMarkdownEmbedProviderMutations(request)
     for (const mutation of report.mutations) {
       expect(mutation.accepted).toBe(false)
@@ -58,4 +59,3 @@ describe('markdown embed consumer provider', () => {
     expect(otherDoc.requestId).not.toBe(request.requestId)
   })
 })
-

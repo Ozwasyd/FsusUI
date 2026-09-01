@@ -104,7 +104,7 @@ public class FsusMarkdownEditorTransactionTests
   }
 
   [Fact]
-  public void MutationFixturesKillNativeUndoDualAuthorityBareOffsetAndCrossDocument()
+  public void MutationFixturesKillTransactionAndForbiddenProjectionSubstitutes()
   {
     var report = FsusMarkdownEditorTransactionStore.EvaluateMutations();
     Assert.All(report, mutation =>
@@ -113,7 +113,50 @@ public class FsusMarkdownEditorTransactionTests
       Assert.False(mutation.Equivalent);
     });
     Assert.Equal(
-      ["native-undo-dual-authority", "bare-offset", "cross-document"],
+      [
+        "native-undo-dual-authority",
+        "bare-offset",
+        "cross-document",
+        "second-parser",
+        "webview",
+        "per-block-textbox",
+        "full-rebuild",
+      ],
       report.Select(mutation => mutation.Kind).ToArray());
+  }
+
+  [Fact]
+  public void FailedAndStaleTransactionsPreserveRawUnicodeAndIdentity()
+  {
+    const string source = "\uFEFF# 标题\r\n😀 مرحبا";
+    var identity = new FsusMarkdownDocumentIdentity("projection", 3);
+    var editor = new FsusMarkdownEditor
+    {
+      Document = source,
+      DocumentIdentity = identity,
+    };
+
+    var malformed = editor.Dispatch(
+      new FsusMarkdownEditorTransaction([new FsusMarkdownEditorChange(-1, 1, "x")]));
+    var accepted = editor.Dispatch(
+      new FsusMarkdownEditorTransaction(
+        [new FsusMarkdownEditorChange(source.Length, source.Length, "!")],
+        Selection: new FsusMarkdownEditorSelection(source.Length + 1, source.Length + 1)));
+    var stale = editor.Dispatch(
+      new FsusMarkdownEditorTransaction(
+        [new FsusMarkdownEditorChange(0, 0, "x")],
+        ExpectedRevision: 0));
+
+    Assert.False(malformed.Accepted);
+    Assert.Equal("invalid-change", malformed.Reason);
+    Assert.True(accepted.Accepted);
+    Assert.False(stale.Accepted);
+    Assert.Equal("stale-revision", stale.Reason);
+    Assert.Equal(source + "!", editor.Document);
+    Assert.Same(identity, editor.DocumentIdentity);
+    Assert.Equal(identity, editor.TransactionStore.Identity);
+    Assert.Equal(
+      new FsusMarkdownEditorSelection(source.Length + 1, source.Length + 1),
+      editor.TransactionStore.Selection);
   }
 }

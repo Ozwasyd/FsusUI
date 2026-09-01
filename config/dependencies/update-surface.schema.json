@@ -230,7 +230,7 @@
       ],
       "properties": {
         "automerge": {
-          "const": false
+          "const": true
         },
         "majorEnabled": {
           "const": true

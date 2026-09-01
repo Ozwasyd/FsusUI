@@ -185,24 +185,51 @@
       v-if="markdownEditorTransactionFixture && markdownEditorMountReady"
       data-testid="markdown-editor-transaction-fixture"
       :data-markdown-editor-probe-id="markdownEditorProbeId"
+      :dir="markdownCommandDirection"
     >
       <el-markdown-editor
         ref="markdownTransactionEditor"
         v-model="markdownTransactionValue"
         v-bind="markdownPasteGateAttributes"
+        :document-identity="{
+          epoch: 1,
+          id: `markdown-command-${markdownContextualSurface ?? 'default'}`,
+        }"
         :default-mode="
           markdownPasteGate === 'preview-only' ? 'preview' : 'source'
         "
         :disabled="markdownPasteGate === 'disabled'"
+        :locale-text="markdownCommandLocaleText"
+        :interaction-profile="markdownEditorInteractionProfile"
         :min-rows="6"
+        :mobile-layout="markdownCommandMobileLayout"
         :show-actions="false"
         :show-mode-switcher="false"
+        :status-density="markdownCommandStatusDensity"
+        :surfaces="
+          markdownCommandSurfacesFixture
+            ? {
+                commandPalette: true,
+                selectionToolbar: true,
+                slashMenu: true,
+              }
+            : undefined
+        "
         data-markdown-input-authority="transaction-store"
         @history-change="markdownTransactionHistory = $event"
         @selection-change="markdownTransactionSelection = $event"
         @transaction="recordMarkdownTransaction"
+        @upload-image="recordMarkdownAttachmentBatch"
       />
       <div aria-label="Markdown transaction controls">
+        <button
+          v-if="markdownCommandSurfacesFixture"
+          type="button"
+          data-testid="markdown-open-command-palette"
+          @click="markdownTransactionEditor?.openCommandPalette()"
+        >
+          Open command palette
+        </button>
         <button
           type="button"
           data-testid="markdown-programmatic"
@@ -259,6 +286,29 @@
         >
           Load 100k document
         </button>
+        <button
+          type="button"
+          data-testid="markdown-attachment-progress"
+          :disabled="!markdownAttachmentBatch"
+          @click="progressMarkdownAttachmentFixture"
+        >
+          Attachment progress
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-attachment-resolve"
+          :disabled="!markdownAttachmentBatch"
+          @click="resolveMarkdownAttachmentFixture"
+        >
+          Resolve attachment
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-load-figure"
+          @click="loadMarkdownFigureFixture"
+        >
+          Load image figure
+        </button>
       </div>
       <output data-testid="markdown-editor-value">
         {{ markdownTransactionValue.length }}
@@ -274,6 +324,115 @@
       </output>
       <output data-testid="markdown-editor-selection">
         {{ JSON.stringify(markdownTransactionSelection) }}
+      </output>
+      <output data-testid="markdown-attachment-batch">
+        {{ JSON.stringify(markdownAttachmentBatchSnapshot) }}
+      </output>
+    </section>
+
+    <section
+      v-if="markdownSearchEmbedFixture"
+      data-testid="markdown-search-embed-fixture"
+      v-bind="{
+        'data-document-epoch': String(markdownSearchEmbedEpoch),
+      }"
+    >
+      <div aria-label="Markdown search and embed fixture controls">
+        <button
+          v-for="mode in markdownSearchEmbedModes"
+          :key="mode"
+          type="button"
+          :data-testid="`markdown-search-embed-mode-${mode}`"
+          @click="markdownSearchEmbedMode = mode"
+        >
+          {{ mode }}
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-open-find"
+          @click="markdownSearchEmbedEditor?.openSearch(false)"
+        >
+          Open find
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-open-replace"
+          @click="markdownSearchEmbedEditor?.openSearch(true)"
+        >
+          Open replace
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-switch-document"
+          @click="switchMarkdownSearchEmbedDocument"
+        >
+          Switch document
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-resolve-failure"
+          @click="markdownSearchEmbedResolveFailure = true"
+        >
+          Resolve failed embed on retry
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-load-performance"
+          @click="loadMarkdownSearchPerformanceFixture"
+        >
+          Load 100k / 10000 matches
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-search-embed-reset"
+          @click="resetMarkdownSearchEmbedFixture"
+        >
+          Reset fixture
+        </button>
+      </div>
+      <el-markdown-editor
+        :key="`markdown-search-embed-${markdownSearchEmbedEpoch}`"
+        ref="markdownSearchEmbedEditor"
+        v-model="markdownSearchEmbedValue"
+        :embed-provider="markdownSearchEmbedProvider"
+        :interaction-profile="
+          markdownSearchEmbedTouch ? 'touch' : 'keyboard'
+        "
+        :min-rows="10"
+        :mode="markdownSearchEmbedMode"
+        :show-actions="false"
+        v-bind="{ 'data-testid': 'markdown-search-embed-editor' }"
+        @embed-open-source="
+          (target, mode) =>
+            (markdownSearchEmbedLastOpen = `${target}:${mode}`)
+        "
+        @embed-retry="
+          (target, mode) =>
+            (markdownSearchEmbedLastRetry = `${target}:${mode}`)
+        "
+        @history-change="markdownSearchEmbedHistory = $event"
+        @selection-change="markdownSearchEmbedSelection = $event"
+      />
+      <output data-testid="markdown-search-embed-value">
+        {{ markdownSearchEmbedValue }}
+      </output>
+      <output data-testid="markdown-search-embed-mode">
+        {{ markdownSearchEmbedMode }}
+      </output>
+      <output data-testid="markdown-search-embed-request">
+        {{ JSON.stringify(markdownSearchEmbedLastRequest) }}
+      </output>
+      <output data-testid="markdown-search-embed-open">
+        {{ markdownSearchEmbedLastOpen }}
+      </output>
+      <output data-testid="markdown-search-embed-retry">
+        {{ markdownSearchEmbedLastRetry }}
+      </output>
+      <output data-testid="markdown-search-embed-history">
+        {{ JSON.stringify(markdownSearchEmbedHistory) }}
+      </output>
+      <output data-testid="markdown-search-embed-selection">
+        {{ JSON.stringify(markdownSearchEmbedSelection) }}
       </output>
     </section>
 
@@ -1895,9 +2054,14 @@ import {
   ElTypedConfirmField,
 } from '../../element-plus'
 import type {
+  MarkdownEmbedProvider,
+  MarkdownEmbedRequest,
+  MarkdownAttachmentBatchIntent,
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryState,
   MarkdownEditorInstance,
+  MarkdownEditorLocaleTextOverride,
+  MarkdownEditorMode,
   MarkdownEditorSelectionEvent,
   MarkdownEditorTransactionEvent,
 } from '../../element-plus'
@@ -2036,6 +2200,135 @@ const markdownWritingAidsFixture =
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownSearchEmbedFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownSearchEmbed') ===
+    '1'
+const markdownSearchEmbedTouch =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get(
+    'markdownSearchEmbedTouch',
+  ) === '1'
+const markdownCommandSurfacesFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownCommandSurfaces') ===
+    '1'
+const markdownContextualSurface =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownContextual')
+    : null
+const markdownCommandLocale =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownLocale')
+    : null
+const markdownCommandDirection =
+  markdownCommandLocale === 'ar' || markdownCommandLocale === 'he'
+    ? 'rtl'
+    : 'ltr'
+const markdownCommandStatusDensity =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownStatus') ===
+    'detailed'
+    ? 'detailed'
+    : typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).get('markdownStatus') ===
+          'none'
+      ? 'none'
+      : 'minimal'
+const markdownCommandMobileLayout =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownMobile') ===
+    'compact'
+    ? 'compact'
+    : 'standard'
+const markdownCommandLocaleText = computed<
+  MarkdownEditorLocaleTextOverride | undefined
+>(() => {
+  if (!markdownCommandLocale) return undefined
+  const prefix =
+    markdownCommandLocale === 'long'
+      ? 'A deliberately extended localization fixture that preserves every semantic label'
+      : markdownCommandLocale.toUpperCase()
+  const label = (value: string) => `${prefix} ${value}`
+  return {
+    commandGroups: {
+      block: label('block'),
+      format: label('format'),
+      insert: label('insert'),
+    },
+    commandPalette: {
+      empty: label('empty'),
+      results: (count: number) => label(`${count} results`),
+      searchPlaceholder: label('search commands'),
+      title: label('command palette'),
+    },
+    commands: {
+      bold: label('bold'),
+      code: label('code'),
+      heading: label('heading'),
+      image: label('image'),
+      italic: label('italic'),
+      link: label('link'),
+      quote: label('quote'),
+    },
+    contextual: {
+      anchorId: label('anchor ID'),
+      apply: label('apply'),
+      cancel: label('cancel'),
+      copy: label('copy'),
+      destination: label('destination'),
+      editAnchor: label('edit anchor'),
+      editLink: label('edit link'),
+      invalidAnchor: label('invalid anchor'),
+      insertAnchor: label('insert anchor'),
+      label: label('label'),
+      open: label('open'),
+      removeAnchor: label('remove anchor'),
+      removeLink: label('remove link'),
+      sourceReveal: label('reveal source'),
+      title: label('title'),
+      unsafeUrl: label('unsafe URL'),
+    },
+    editorAria: label('Markdown editor'),
+    metrics: {
+      bytes: label('bytes'),
+      characters: label('characters'),
+      column: label('column'),
+      line: label('line'),
+      lines: label('lines'),
+      selected: label('selected'),
+      words: label('words'),
+    },
+    states: {
+      disabled: label('disabled'),
+      empty: label('empty'),
+      loading: label('loading'),
+      readonly: label('readonly'),
+    },
+    overflow: label('format tools'),
+    overflowAria: (count: number) => label(`${count} format tools`),
+    pasteAsMarkdown: {
+      title: label('paste as Markdown'),
+    },
+    surfaces: {
+      commandPending: label('command pending'),
+      commandRejected: label('command rejected'),
+      selectionToolbar: label('selection toolbar'),
+      slashMenu: label('slash menu'),
+    },
+    textarea: {
+      live: label('live editor'),
+      source: label('source editor'),
+    },
+  }
+})
+const markdownEditorInteractionProfile =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get(
+    'markdownEditorInteractionProfile',
+  ) === 'keyboard'
+    ? ('keyboard' as const)
+    : undefined
 const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
@@ -2160,7 +2453,15 @@ const revealMissingMarkdownHeading = () => {
   markdownRevealStatus.value = `missing:${status}`
 }
 const markdownTransactionValue = ref(
-  markdownEditorImeFixture ? '' : 'A😀éאב\n- 列表',
+  markdownEditorImeFixture
+    ? ''
+    : markdownContextualSurface === 'link'
+      ? '[Docs](https://old.test "Title")'
+      : markdownContextualSurface === 'anchor'
+        ? 'Paragraph ^intro'
+        : markdownCommandSurfacesFixture
+          ? '/bol'
+          : 'A😀éאב\n- 列表',
 )
 const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({
   canRedo: false,
@@ -2173,6 +2474,27 @@ const markdownLastTransaction = ref<MarkdownEditorTransactionEvent | null>(null)
 const markdownTransactionSelection = ref<MarkdownEditorSelectionEvent | null>(
   null,
 )
+const markdownAttachmentBatch = ref<MarkdownAttachmentBatchIntent | null>(null)
+const markdownAttachmentBatchSnapshot = computed(() => {
+  const batch = markdownAttachmentBatch.value
+  if (!batch) return null
+  return {
+    anchor: batch.anchor,
+    batchId: batch.batchId,
+    items: batch.items.map(
+      ({ byteLength, itemId, kind, mimeType, name, order }) => ({
+        byteLength,
+        itemId,
+        kind,
+        mimeType,
+        name,
+        order,
+      }),
+    ),
+    revision: batch.revision,
+    sourceKind: batch.sourceKind,
+  }
+})
 const markdownTransactionRevision = computed(
   () => markdownLastTransaction.value?.revision ?? 0,
 )
@@ -2180,6 +2502,49 @@ let markdownPlaceholderRevision: number | undefined
 
 const recordMarkdownTransaction = (event: MarkdownEditorTransactionEvent) => {
   markdownLastTransaction.value = event
+}
+
+const recordMarkdownAttachmentBatch = (
+  batch: MarkdownAttachmentBatchIntent,
+) => {
+  markdownAttachmentBatch.value = batch
+}
+
+const progressMarkdownAttachmentFixture = () => {
+  const batch = markdownAttachmentBatch.value
+  const item = batch?.items[0]
+  if (!batch || !item) return
+  markdownTransactionEditor.value?.applyAttachmentResult({
+    batchId: batch.batchId,
+    itemId: item.itemId,
+    ratio: 0.5,
+    status: 'progress',
+  })
+}
+
+const resolveMarkdownAttachmentFixture = () => {
+  const batch = markdownAttachmentBatch.value
+  const item = batch?.items[0]
+  if (!batch || !item) return
+  markdownTransactionEditor.value?.applyAttachmentResult({
+    batchId: batch.batchId,
+    documentIdentity: batch.documentIdentity,
+    itemId: item.itemId,
+    payload: {
+      alt: 'Resolved attachment',
+      href: '/fixtures/resolved-attachment.png',
+      markdownKind: 'image',
+      mimeType: item.mimeType,
+      name: item.name,
+    },
+    revision: batch.revision,
+    status: 'resolved',
+  })
+}
+
+const loadMarkdownFigureFixture = () => {
+  markdownTransactionValue.value =
+    '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]'
 }
 
 const insertMarkdownFixture = () => {
@@ -2237,6 +2602,127 @@ const dispatchStaleMarkdownReplacement = () => {
 
 const loadLargeMarkdownDocument = () => {
   markdownTransactionValue.value = '界'.repeat(100_000)
+}
+
+const markdownSearchEmbedModes = [
+  'source',
+  'live',
+  'split',
+  'preview',
+] as const satisfies readonly MarkdownEditorMode[]
+const markdownSearchEmbedInitialValue = [
+  '# Search and embed review',
+  '',
+  'alpha café 😀 אב alpha',
+  '',
+  '::embed[target="safe-doc" mode="article"]',
+  '',
+  '::embed[target="missing-doc" mode="heading"]',
+  '',
+  '::embed[target="forbidden-doc" mode="block"]',
+  '',
+  '::embed[target="cycle-doc" mode="article"]',
+  '',
+  '::embed[target="depth-doc" mode="heading"]',
+  '',
+  '::embed[target="mismatch-doc" mode="block"]',
+  '',
+  '::embed[target="pending-doc" mode="block"]',
+  '',
+  '::embed[target="stale-doc" mode="article"]',
+  '',
+  'Trailing alpha content.',
+].join('\n')
+const markdownSearchEmbedEditor = ref<MarkdownEditorInstance>()
+const markdownSearchEmbedValue = ref(markdownSearchEmbedInitialValue)
+const markdownSearchEmbedMode = ref<MarkdownEditorMode>('source')
+const markdownSearchEmbedEpoch = ref(1)
+const markdownSearchEmbedResolveFailure = ref(false)
+const markdownSearchEmbedLastRequest = ref<MarkdownEmbedRequest | null>(null)
+const markdownSearchEmbedLastOpen = ref('')
+const markdownSearchEmbedLastRetry = ref('')
+const markdownSearchEmbedHistory = ref<MarkdownEditorHistoryState>({
+  canRedo: false,
+  canUndo: false,
+  redoDepth: 0,
+  retainedUnits: 0,
+  undoDepth: 0,
+})
+const markdownSearchEmbedSelection = ref<MarkdownEditorSelectionEvent | null>(
+  null,
+)
+const markdownSearchEmbedProvider: MarkdownEmbedProvider = async (request) => {
+  markdownSearchEmbedLastRequest.value = request
+  const localFailureStatus = {
+    'cycle-doc': 'cycle',
+    'depth-doc': 'depth-exceeded',
+    'forbidden-doc': 'forbidden',
+    'mismatch-doc': 'mode-mismatch',
+  } as const
+  const failureStatus =
+    localFailureStatus[request.target as keyof typeof localFailureStatus]
+  if (failureStatus) {
+    return Object.freeze({
+      ...request,
+      status: failureStatus,
+    })
+  }
+  if (request.target === 'pending-doc') {
+    return Object.freeze({
+      ...request,
+      status: 'pending' as const,
+    })
+  }
+  if (request.target === 'stale-doc') {
+    return Object.freeze({
+      ...request,
+      excerpt: 'This stale payload must not render.',
+      revision: request.revision + 1,
+      status: 'resolved' as const,
+      title: 'Stale payload',
+    })
+  }
+  if (
+    request.target === 'missing-doc' &&
+    !markdownSearchEmbedResolveFailure.value
+  ) {
+    return Object.freeze({
+      ...request,
+      status: 'missing' as const,
+    })
+  }
+  return Object.freeze({
+    ...request,
+    excerpt:
+      request.target === 'missing-doc'
+        ? 'Recovered heading after an explicit retry.'
+        : 'Resolved excerpt with <strong>literal provider markup</strong> and a long line that verifies wrapping without a nested scroll surface.',
+    status: 'resolved' as const,
+    title:
+      request.target === 'missing-doc'
+        ? 'Recovered heading'
+        : 'Safe consumer document',
+  })
+}
+const switchMarkdownSearchEmbedDocument = () => {
+  markdownSearchEmbedEpoch.value += 1
+  markdownSearchEmbedLastRequest.value = null
+  markdownSearchEmbedLastOpen.value = ''
+  markdownSearchEmbedLastRetry.value = ''
+}
+const loadMarkdownSearchPerformanceFixture = () => {
+  const exactMatches = 'hit '.repeat(10_000)
+  markdownSearchEmbedValue.value = `${exactMatches}${'界'.repeat(
+    Math.max(0, 100_000 - exactMatches.length),
+  )}`
+}
+const resetMarkdownSearchEmbedFixture = () => {
+  markdownSearchEmbedValue.value = markdownSearchEmbedInitialValue
+  markdownSearchEmbedMode.value = 'source'
+  markdownSearchEmbedResolveFailure.value = false
+  markdownSearchEmbedLastOpen.value = ''
+  markdownSearchEmbedLastRetry.value = ''
+  markdownSearchEmbedEpoch.value += 1
 }
 
 const boundaryText =

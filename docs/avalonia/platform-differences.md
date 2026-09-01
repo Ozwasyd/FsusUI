@@ -27,14 +27,35 @@ Every accepted override below is backed by `spec/platform-overrides/`.
 | web-browser-font-baseline-001           | text              | Browser and Skia line metrics are compared by content order, wrapping intent, and accessible names.                      |
 | visual-token-color-001                  | button            | Tokenized color variance must not change state meaning, contrast intent, or token role semantics.                        |
 | visual-text-baseline-001                | text              | Text baselines may vary within the shared visual threshold.                                                              |
+| visual-markdown-source-surface-002      | markdown-editor   | Dense CJK source text may rasterize with sub-pixel glyph placement differences; structure, wrapping, and token colors must match.                                                        |
 
 ## Native Adapter Classifications
 
 | Component area                                                  | Classification | Shared contract                                                                                                                                                            | Native boundary                                                                                                                                                                     |
 | --------------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MarkdownEditor transaction, selection, history, and composition | native-adapter | Preserve ordered non-overlapping changes, revision rejection, bounded change/inverse history, selection direction, external reset, and one composition-complete undo unit. | Web uses textarea UTF-16 offsets and DOM composition events; Avalonia must map native text/IME APIs to the same public semantics without exposing DOM or a private editor instance. |
+| CodeEditor input, coordinates, history, and composition          | native-adapter | Preserve UTF-16 offsets, one-based line/column conversion, identity-isolated history, explicit external/user change origins, and one composition-complete undo unit.         | Avalonia uses one native `TextBox` as the IME, clipboard, and input owner while the bounded FsusUI presentation draws Markdown source highlighting and line numbers.            |
 | ShortcutRecorder key capture and display                        | native-adapter | Preserve strongly typed key combinations, stable serialization string, cancellation, clearing, and collision detection.                                                    | macOS displays Command/Option symbols while Windows/Linux displays Ctrl/Alt text; underlying key codes and serialized semantics remain stable.                                      |
-| NativeMenu and platform roles                                   | native-adapter | Unified command model for native menus, command palette, and dock menus with synchronous enabled and gesture update.                                                      | macOS application menu and dock menu roles degrade gracefully on Windows and Linux; platform-standard File/Edit/View/Window/Help ordering is preserved.                             |
+| NativeMenu and platform roles                                   | native-adapter | Unified command model for native menus, command palette, and dock menus with synchronous enabled and gesture update.                                                      | macOS registers the Services submenu through Avalonia's native exporter and sends declared application/window actions through the responder chain; those roles degrade gracefully on Windows and Linux, where platform-standard File/Edit/View/Window/Help ordering is preserved. |
+| WebView context, spelling, developer tools, and PDF export      | native-adapter | Preserve typed context requests, edit commands, capability discovery, the debug-only developer-tools result, caller-owned streams, tagged-PDF proof, and hierarchical clickable outline semantics. | Applications select the embedded-browser backend. Private developer-tool hooks, engine selectors, and native print-setting objects remain inside that backend; consumers do not use reflection or engine types. |
+| Desktop title bar and document cycling                          | native-adapter | Preserve typed title/path/status/actions, drag/no-drag regions, window actions and state, and forward/reverse document cycling.                                           | Windows/Linux can use embedded window buttons; macOS hosts retaining native traffic lights hide embedded buttons. Meta maps to Command while Control remains the neutral fallback.   |
+
+## Desktop Shell Window Behavior
+
+[`docs/avalonia/components/desktop-shell.md`](components/desktop-shell.md)
+defines the public activity rail, document tabs, and title-bar APIs. Window
+decoration and fullscreen animation remain native:
+
+- Windows uses extended-client-area composition and may replace focus resources
+  in high contrast.
+- macOS consumers that retain native traffic lights hide the embedded window
+  controls; Meta represents the Command modifier for document cycling.
+- Linux support depends on the current X11/Wayland compositor accepting
+  extended-client-area drag and requested window state.
+
+These host differences do not change typed action events, selected/dirty
+automation state, contextual-pane width bounds, or the no-drag attached
+property. They do not introduce a third theme preset or an unregistered token.
 
 ## Documentation Rule
 

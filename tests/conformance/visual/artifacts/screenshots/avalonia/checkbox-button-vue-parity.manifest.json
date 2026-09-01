@@ -1,0 +1,34 @@
+{
+  "component": "checkbox-button",
+  "runner": "headless-skia",
+  "screenshot": "/mnt/dev-cache/lyuaoss/FsusUI-chain-markdown-command-surfaces/tests/conformance/visual/artifacts/screenshots/avalonia/checkbox-button-vue-parity.png",
+  "surfaceBounds": [
+    0,
+    0,
+    360,
+    88
+  ],
+  "controlBounds": [
+    {
+      "name": "FsusCheckboxButton",
+      "x": 24,
+      "y": 24,
+      "width": 89,
+      "height": 40
+    },
+    {
+      "name": "FsusCheckboxButton",
+      "x": 121,
+      "y": 24,
+      "width": 106,
+      "height": 40
+    },
+    {
+      "name": "FsusCheckboxButton",
+      "x": 235,
+      "y": 24,
+      "width": 91,
+      "height": 40
+    }
+  ]
+}

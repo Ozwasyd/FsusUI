@@ -1,0 +1,55 @@
+{
+  "component": "icon-text",
+  "runner": "headless-skia",
+  "screenshot": "/mnt/dev-cache/lyuaoss/FsusUI-chain-markdown-command-surfaces/tests/conformance/visual/artifacts/screenshots/avalonia/icon-text-vue-parity.png",
+  "surfaceBounds": [
+    0,
+    0,
+    420,
+    68
+  ],
+  "controlBounds": [
+    {
+      "name": "FsusLink",
+      "x": 0,
+      "y": 0,
+      "width": 56,
+      "height": 68
+    },
+    {
+      "name": "FsusLink",
+      "x": 68,
+      "y": 0,
+      "width": 61,
+      "height": 68
+    },
+    {
+      "name": "FsusLink",
+      "x": 141,
+      "y": 0,
+      "width": 60,
+      "height": 68
+    },
+    {
+      "name": "FsusLink",
+      "x": 213,
+      "y": 0,
+      "width": 63,
+      "height": 68
+    },
+    {
+      "name": "FsusLink",
+      "x": 288,
+      "y": 0,
+      "width": 55,
+      "height": 68
+    },
+    {
+      "name": "FsusLink",
+      "x": 355,
+      "y": 0,
+      "width": 34,
+      "height": 68
+    }
+  ]
+}

@@ -259,6 +259,42 @@ public static class FsusTokens
     public static Color ColorStatusDangerColor => Color.Parse(ColorStatusDangerValue);
     public static SolidColorBrush ColorStatusDangerBrush => new(ColorStatusDangerColor);
 
+    public const string ComponentLinkSuccessColorName = "component.link.success.color";
+    public const string ComponentLinkSuccessColorResourceKey = "FsusComponentLinkSuccessColor";
+    public const string ComponentLinkSuccessColorValue = "#16A34A";
+    public const string ComponentLinkSuccessColorDarkResourceKey = "FsusComponentLinkSuccessColorDark";
+    public const string ComponentLinkSuccessColorDarkValue = "#22C55E";
+    public const string ComponentLinkSuccessColorBrushResourceKey = "FsusComponentLinkSuccessColorBrush";
+    public static Color ComponentLinkSuccessColorColor => Color.Parse(ComponentLinkSuccessColorValue);
+    public static SolidColorBrush ComponentLinkSuccessColorBrush => new(ComponentLinkSuccessColorColor);
+
+    public const string ComponentLinkWarningColorName = "component.link.warning.color";
+    public const string ComponentLinkWarningColorResourceKey = "FsusComponentLinkWarningColor";
+    public const string ComponentLinkWarningColorValue = "#D97706";
+    public const string ComponentLinkWarningColorDarkResourceKey = "FsusComponentLinkWarningColorDark";
+    public const string ComponentLinkWarningColorDarkValue = "#F59E0B";
+    public const string ComponentLinkWarningColorBrushResourceKey = "FsusComponentLinkWarningColorBrush";
+    public static Color ComponentLinkWarningColorColor => Color.Parse(ComponentLinkWarningColorValue);
+    public static SolidColorBrush ComponentLinkWarningColorBrush => new(ComponentLinkWarningColorColor);
+
+    public const string ComponentLinkDangerColorName = "component.link.danger.color";
+    public const string ComponentLinkDangerColorResourceKey = "FsusComponentLinkDangerColor";
+    public const string ComponentLinkDangerColorValue = "#D92D20";
+    public const string ComponentLinkDangerColorDarkResourceKey = "FsusComponentLinkDangerColorDark";
+    public const string ComponentLinkDangerColorDarkValue = "#F97066";
+    public const string ComponentLinkDangerColorBrushResourceKey = "FsusComponentLinkDangerColorBrush";
+    public static Color ComponentLinkDangerColorColor => Color.Parse(ComponentLinkDangerColorValue);
+    public static SolidColorBrush ComponentLinkDangerColorBrush => new(ComponentLinkDangerColorColor);
+
+    public const string ComponentLinkInfoColorName = "component.link.info.color";
+    public const string ComponentLinkInfoColorResourceKey = "FsusComponentLinkInfoColor";
+    public const string ComponentLinkInfoColorValue = "#A1A1AA";
+    public const string ComponentLinkInfoColorDarkResourceKey = "FsusComponentLinkInfoColorDark";
+    public const string ComponentLinkInfoColorDarkValue = "#71717A";
+    public const string ComponentLinkInfoColorBrushResourceKey = "FsusComponentLinkInfoColorBrush";
+    public static Color ComponentLinkInfoColorColor => Color.Parse(ComponentLinkInfoColorValue);
+    public static SolidColorBrush ComponentLinkInfoColorBrush => new(ComponentLinkInfoColorColor);
+
     public const string BrushSurfaceBaseName = "brush.surface.base";
     public const string BrushSurfaceBaseResourceKey = "FsusBrushSurfaceBase";
     public const string BrushSurfaceBaseValue = "#FFFFFF";
@@ -426,31 +462,31 @@ public static class FsusTokens
 
     public const string ShadowPanelLightName = "shadow.panel.light";
     public const string ShadowPanelLightResourceKey = "FsusShadowPanelLight";
-    public const string ShadowPanelLightValue = "0 8px 24px rgba(15, 23, 42, 0.05)";
+    public const string ShadowPanelLightValue = "0 8 24 #0D0F172A";
     public const string ShadowPanelLightDarkResourceKey = "FsusShadowPanelLightDark";
-    public const string ShadowPanelLightDarkValue = "0 8px 24px rgba(0, 0, 0, 0.28)";
-    public static BoxShadows ShadowPanelLightBoxShadows => BoxShadows.Parse("0 8px 24px rgba(15, 23, 42, 0.05)");
+    public const string ShadowPanelLightDarkValue = "0 8 24 #47000000";
+    public static BoxShadows ShadowPanelLightBoxShadows => BoxShadows.Parse("0 8 24 #0D0F172A");
 
     public const string ShadowPanelLighterName = "shadow.panel.lighter";
     public const string ShadowPanelLighterResourceKey = "FsusShadowPanelLighter";
-    public const string ShadowPanelLighterValue = "0 2px 8px rgba(15, 23, 42, 0.04)";
+    public const string ShadowPanelLighterValue = "0 2 8 #0A0F172A";
     public const string ShadowPanelLighterDarkResourceKey = "FsusShadowPanelLighterDark";
-    public const string ShadowPanelLighterDarkValue = "0 2px 8px rgba(0, 0, 0, 0.24)";
-    public static BoxShadows ShadowPanelLighterBoxShadows => BoxShadows.Parse("0 2px 8px rgba(15, 23, 42, 0.04)");
+    public const string ShadowPanelLighterDarkValue = "0 2 8 #3D000000";
+    public static BoxShadows ShadowPanelLighterBoxShadows => BoxShadows.Parse("0 2 8 #0A0F172A");
 
     public const string ShadowPanelDarkName = "shadow.panel.dark";
     public const string ShadowPanelDarkResourceKey = "FsusShadowPanelDark";
-    public const string ShadowPanelDarkValue = "0 16px 40px rgba(15, 23, 42, 0.1)";
+    public const string ShadowPanelDarkValue = "0 16 40 #1A0F172A";
     public const string ShadowPanelDarkDarkResourceKey = "FsusShadowPanelDarkDark";
-    public const string ShadowPanelDarkDarkValue = "0 16px 40px rgba(0, 0, 0, 0.36)";
-    public static BoxShadows ShadowPanelDarkBoxShadows => BoxShadows.Parse("0 16px 40px rgba(15, 23, 42, 0.1)");
+    public const string ShadowPanelDarkDarkValue = "0 16 40 #5C000000";
+    public static BoxShadows ShadowPanelDarkBoxShadows => BoxShadows.Parse("0 16 40 #1A0F172A");
 
     public const string ShadowFloatingName = "shadow.floating";
     public const string ShadowFloatingResourceKey = "FsusShadowFloating";
-    public const string ShadowFloatingValue = "0 12px 32px rgba(15, 23, 42, 0.08)";
+    public const string ShadowFloatingValue = "0 12 32 #140F172A";
     public const string ShadowFloatingDarkResourceKey = "FsusShadowFloatingDark";
-    public const string ShadowFloatingDarkValue = "0 12px 32px rgba(0, 0, 0, 0.36)";
-    public static BoxShadows ShadowFloatingBoxShadows => BoxShadows.Parse("0 12px 32px rgba(15, 23, 42, 0.08)");
+    public const string ShadowFloatingDarkValue = "0 12 32 #5C000000";
+    public static BoxShadows ShadowFloatingBoxShadows => BoxShadows.Parse("0 12 32 #140F172A");
 
     public const string OpacityDisabledContentName = "opacity.disabled.content";
     public const string OpacityDisabledContentResourceKey = "FsusOpacityDisabledContent";

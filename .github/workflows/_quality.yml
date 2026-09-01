@@ -155,6 +155,8 @@ jobs:
   dotnet-package:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      candidate-digest: ${{ steps.candidate.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -170,7 +172,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-sdk-${{ hashFiles('dotnet/global.json') }}-
       - name: Build and verify the unique NuGet candidate
-        run: node scripts/dotnet-package-verify.mjs
+        id: candidate
+        run: |
+          node scripts/dotnet-package-verify.mjs
+          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: dotnet-nuget-candidate
@@ -186,6 +191,50 @@ jobs:
           group: ${{ inputs.group }}
           status: ${{ job.status }}
           artifacts: nuget-candidate=dotnet/artifacts
+
+  avalonia-aot-linux:
+    needs: dotnet-package
+    uses: ./.github/workflows/_avalonia-aot-leaf.yml
+    with:
+      group: ${{ inputs.group }}
+      candidate-artifact: dotnet-nuget-candidate
+      candidate-digest: ${{ needs.dotnet-package.outputs.candidate-digest }}
+      commit-sha: ${{ github.sha }}
+      rid: linux-x64
+
+  avalonia-aot:
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - dotnet-package
+      - avalonia-aot-linux
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: avalonia-aot-leaf-linux-x64
+          path: .avalonia-aot-leaves
+      - name: Aggregate required and optional Native AOT leaves
+        run: >-
+          node scripts/avalonia-aot-native.mjs aggregate
+          --leaf-dir .avalonia-aot-leaves
+          --out .avalonia-aot-readiness/manifest.json
+          --commit-sha "$GITHUB_SHA"
+          --candidate-digest '${{ needs.dotnet-package.outputs.candidate-digest }}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-aot-readiness
+          path: .avalonia-aot-readiness
+          retention-days: 7
+      - name: Record Avalonia Native AOT readiness leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: avalonia-aot
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
+          artifacts: avalonia-aot=.avalonia-aot-readiness
 
   typecheck:
     runs-on: ubuntu-latest
@@ -606,36 +655,69 @@ jobs:
       - build-package
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Plan consumer matrix impact
+        id: consumer-impact
+        run: >-
+          node scripts/consumer-matrix-impact.mjs
+          --base '${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}'
+          --output .consumer-matrix/impact-plan.json
       - uses: pnpm/action-setup@v4
+        if: steps.consumer-impact.outputs.run == 'true'
         with:
           version: 10.33.0
       - uses: actions/setup-node@v4
+        if: steps.consumer-impact.outputs.run == 'true'
         with:
           node-version: 22.14.0
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
+      - if: steps.consumer-impact.outputs.run == 'true'
+        run: pnpm install --frozen-lockfile
       - name: Use release npm toolchain
+        if: steps.consumer-impact.outputs.run == 'true'
         run: npm install -g npm@^11.5.1
       - uses: actions/download-artifact@v4
+        if: steps.consumer-impact.outputs.run == 'true'
         with:
           name: fsusui-npm-candidate
           path: .npm-candidate
       - name: Verify immutable npm candidate and package smoke
+        if: steps.consumer-impact.outputs.run == 'true'
         run: |
           pnpm run package:candidate:verify -- --tarball .npm-candidate/fsusui-npm-candidate.tgz
           digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
           test "${digest}" = "${{ needs.build-package.outputs.candidate-digest }}"
-      - name: Run cold consumer install against candidate
-        run: pnpm test:consumer-install -- .npm-candidate/fsusui-npm-candidate.tgz
-      - name: Record consumer install leaf result
+      - name: Run consumer matrix negative fixtures
+        if: steps.consumer-impact.outputs.run == 'true'
+        run: pnpm test:consumer-matrix:fixtures
+      - name: Run cold consumer matrix against candidate
+        if: steps.consumer-impact.outputs.run == 'true'
+        run: >-
+          pnpm test:consumer-matrix --
+          --candidate .npm-candidate/fsusui-npm-candidate.tgz
+          --output .consumer-matrix/receipts
+      - name: Record auditable no-package-impact skip
+        if: steps.consumer-impact.outputs.run != 'true'
+        run: echo "Consumer matrix skipped with ${{ steps.consumer-impact.outputs.reason }}"
+      - name: Upload consumer matrix receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: consumer-matrix-${{ inputs.group }}
+          path: .consumer-matrix
+          if-no-files-found: error
+          retention-days: 30
+      - name: Record consumer matrix leaf result
         if: always()
         uses: ./.github/actions/readiness-manifest
         with:
           gate: consumer-install
           group: ${{ inputs.group }}
           status: ${{ job.status }}
-          artifacts: npm-candidate=.npm-candidate
+          dimensions: matrix-action=${{ steps.consumer-impact.outputs.run == 'true' && 'run' || 'skip' }}
+          artifacts: consumer-matrix=.consumer-matrix
 
   build-demo:
     runs-on: ubuntu-latest
@@ -779,6 +861,7 @@ jobs:
       - static-quality
       - dotnet-platform
       - dotnet-package
+      - avalonia-aot
       - typecheck
       - unit
       - coverage
@@ -835,6 +918,7 @@ jobs:
       - static-quality
       - dotnet-platform
       - dotnet-package
+      - avalonia-aot
       - typecheck
       - unit
       - coverage
@@ -884,6 +968,7 @@ jobs:
       - static-quality
       - dotnet-platform
       - dotnet-package
+      - avalonia-aot
       - typecheck
       - unit
       - coverage

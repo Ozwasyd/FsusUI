@@ -23,6 +23,7 @@ export const MARKDOWN_LIVE_LAYOUT_TRIGGERS = Object.freeze([
   'latex-result',
   'shiki-result',
   'attachment-result',
+  'embed-result',
   'projection-worker-commit',
   'block-height-change',
   'virtual-mount',

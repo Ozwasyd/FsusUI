@@ -5,10 +5,10 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "6a1d39118081ea8e8f68f649a7b36bd104bbcf18176a908dbd3f1edf49fa893f",
+    "hash": "fd74d00b2fb302744448223f13a8aba0cda5afbfeafd9644eb9f456d09026c64",
     "packageVersion": "1.5.1",
-    "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
-    "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
+    "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
+    "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c"
   },
   "changeClassifications": [
     "patch",
@@ -4362,6 +4362,12 @@
       "props": [
         {
           "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabled",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9734,7 +9740,19 @@
           "required": false
         },
         {
+          "name": "documentIdentity",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "editorProfile",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "embedProvider",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9747,6 +9765,12 @@
         },
         {
           "name": "interactionProfile",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "lang",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9794,6 +9818,12 @@
           "required": false
         },
         {
+          "name": "nativeWritingTools",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "placeholder",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -9819,6 +9849,12 @@
         },
         {
           "name": "primaryCommandKeys",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "readonly",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9855,6 +9891,12 @@
         },
         {
           "name": "showSubmitAction",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "spellcheck",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9916,6 +9958,14 @@
           "payload": "vue-source"
         },
         {
+          "name": "embed-open-source",
+          "payload": "vue-source"
+        },
+        {
+          "name": "embed-retry",
+          "payload": "vue-source"
+        },
+        {
           "name": "features-activated",
           "payload": "vue-source"
         },
@@ -9965,6 +10015,18 @@
       ],
       "exposed": [
         {
+          "name": "applyAttachmentResult",
+          "signature": "vue-source"
+        },
+        {
+          "name": "closeCommandPalette",
+          "signature": "vue-source"
+        },
+        {
+          "name": "closeSearch",
+          "signature": "vue-source"
+        },
+        {
           "name": "dispatchTransaction",
           "signature": "vue-source"
         },
@@ -9973,7 +10035,31 @@
           "signature": "vue-source"
         },
         {
+          "name": "openCommandPalette",
+          "signature": "vue-source"
+        },
+        {
+          "name": "openSearch",
+          "signature": "vue-source"
+        },
+        {
           "name": "redo",
+          "signature": "vue-source"
+        },
+        {
+          "name": "searchNavigate",
+          "signature": "vue-source"
+        },
+        {
+          "name": "searchReplaceAll",
+          "signature": "vue-source"
+        },
+        {
+          "name": "searchReplaceCurrent",
+          "signature": "vue-source"
+        },
+        {
+          "name": "searchUi",
           "signature": "vue-source"
         },
         {
@@ -10087,6 +10173,12 @@
         },
         {
           "name": "initialRender",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "loadingText",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -22318,6 +22410,12 @@
       "props": [
         {
           "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabled",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false

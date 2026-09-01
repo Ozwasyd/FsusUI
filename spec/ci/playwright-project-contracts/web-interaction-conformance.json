@@ -1,0 +1,9 @@
+{
+  "suiteId": "web-interaction-conformance",
+  "config": "vue/playwright.conformance-interaction.config.ts",
+  "projects": [
+    { "name": "chromium", "dimensions": { "browser": "chromium" } },
+    { "name": "firefox", "dimensions": { "browser": "firefox" } },
+    { "name": "webkit", "dimensions": { "browser": "webkit" } }
+  ]
+}

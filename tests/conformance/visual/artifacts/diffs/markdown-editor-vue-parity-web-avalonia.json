@@ -1,0 +1,38 @@
+{
+  "id": "markdown-editor-vue-parity-web-avalonia",
+  "component": "markdown-editor",
+  "state": "source-surface-short-doc",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "text.editor.surface",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/markdown-editor-vue-parity.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/markdown-editor-vue-parity-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.4000000000000057,
+    "colorDelta": 0,
+    "radius": 0,
+    "spacing": 0,
+    "textBaseline": 0,
+    "screenshotDiffPercent": 0.001,
+    "perceptualDelta": 0.091
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [
+    {
+      "metric": "perceptualDelta",
+      "delta": 0.091,
+      "threshold": 0.08,
+      "overrideId": "visual-markdown-source-surface-002"
+    }
+  ],
+  "passed": true,
+  "failures": []
+}

@@ -1,9 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import { fileURLToPath } from 'node:url'
-
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+import {
+  currentIdentity,
+  readAlignment,
+  root,
+} from './avalonia-stable-readiness-lib.mjs'
 
 const read = (relativePath) =>
   fs.readFileSync(path.join(root, relativePath), 'utf8')
@@ -200,6 +202,23 @@ const runFixtureChecks = (spec) => {
 
 try {
   const spec = readJson('spec/ci/avalonia-stable-readiness.json')
+  const alignment = readAlignment(
+    '.tmp/conformance-v2/alignment.json',
+    currentIdentity(),
+  )
+  const derivedFamilies = alignment.consumers?.galleryStableFamilies ?? []
+  const missingStableFamilies = spec.requiredStableComponentFamilies.filter(
+    (family) => !derivedFamilies.includes(family),
+  )
+  const derivedReleaseReady = missingStableFamilies.length === 0
+  if (
+    alignment.consumers?.nugetStableEligible !== derivedReleaseReady ||
+    alignment.consumers?.releaseReady !== derivedReleaseReady
+  ) {
+    throw new Error(
+      'Avalonia stable readiness consumers do not match derived alignment',
+    )
+  }
   runFixtureChecks(spec)
 
   const packageJson = readJson('package.json')
@@ -230,7 +249,11 @@ try {
     'avalonia stable release evidence',
   )
   validateStableEvidenceBundle(spec)
-  console.log('Avalonia stable readiness check passed.')
+  console.log(
+    missingStableFamilies.length === 0
+      ? 'Avalonia stable readiness check passed: release eligible.'
+      : `Avalonia stable readiness check passed: release blocked by ${missingStableFamilies.length} derived alignment gaps.`,
+  )
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)
   process.exitCode = 1

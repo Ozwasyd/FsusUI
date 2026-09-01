@@ -33,7 +33,13 @@ public class FsusThemeManagerTests
     Assert.Equal(FsusDensity.Compact, resolved.Density);
     Assert.Equal(FsusMotionMode.Disabled, resolved.MotionMode);
     AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#000000");
+    AssertBrush(resources, "FsusThemeTreeSurfaceBrush", "#000000");
     AssertBrush(resources, FsusThemeResourceKeys.FocusBrush, "#FF00AA");
+    AssertBrush(
+      resources,
+      FsusTokens.ColorActionPrimaryBrushResourceKey,
+      "#FF00AA"
+    );
     AssertBrush(
       resources,
       FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultResourceKey,
@@ -49,6 +55,152 @@ public class FsusThemeManagerTests
       TimeSpan.FromMilliseconds(1),
       resources[FsusThemeResourceKeys.MotionDurationEffective]
     );
+  }
+
+  [Fact]
+  public void ApplyRefreshesColorActionPrimaryBrushForVariantPalettes()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#2A599C");
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#EEF3FA");
+
+    manager.Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Dark });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#4B79CC");
+    AssertBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey,
+      "#4B79CC"
+    );
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#243043");
+
+    manager.Apply(resources, new FsusThemeOptions { HighContrast = true });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#FFFF00");
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#1F2937");
+  }
+
+  [Fact]
+  public void ApplyUpdatesTreeSurfaceForRuntimeDarkThemeChanges()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions { Variant = FsusThemeVariant.Dark });
+
+    AssertBrush(resources, "FsusThemeTreeSurfaceBrush", "#1B2433");
+    AssertBrush(resources, FsusThemeResourceKeys.TextEditorSurfaceBrush, "#1B2433");
+  }
+
+  [Fact]
+  public void ApplyUsesPaletteOverridesWithPerFieldVariantFallbacks()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+    var iconBrush = new LinearGradientBrush
+    {
+      GradientStops =
+      {
+        new GradientStop(Color.Parse("#ABCDEF"), 0),
+        new GradientStop(Color.Parse("#123456"), 1),
+      },
+    };
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions
+      {
+        Variant = FsusThemeVariant.Dark,
+        Palette = new FsusThemePaletteOptions
+        {
+          Background = new SolidColorBrush(Color.Parse("#102030")),
+          Text = new SolidColorBrush(Color.Parse("#F0E0D0")),
+          Icon = iconBrush,
+        },
+      }
+    );
+
+    AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#102030");
+    AssertBrush(resources, FsusThemeResourceKeys.SurfaceBrush, "#171F2C");
+    AssertBrush(resources, FsusThemeResourceKeys.SurfaceRaisedBrush, "#1F2937");
+    AssertBrush(resources, FsusThemeResourceKeys.TextBrush, "#F0E0D0");
+    AssertBrush(resources, FsusThemeResourceKeys.MutedTextBrush, "#B6C0CF");
+    AssertBrush(resources, FsusThemeResourceKeys.BorderBrush, "#394657");
+    Assert.Same(iconBrush, resources[FsusThemeResourceKeys.IconBrush]);
+  }
+
+  [Fact]
+  public void ApplyRoutesSurfaceOverridesThroughExistingShellAndComponentAliases()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions
+      {
+        Variant = FsusThemeVariant.Dark,
+        Palette = new FsusThemePaletteOptions
+        {
+          Surface = new SolidColorBrush(Color.Parse("#123456")),
+          SurfaceRaised = new SolidColorBrush(Color.Parse("#234567")),
+        },
+      }
+    );
+
+    foreach (var resourceKey in SpecializedSurfaceResourceKeys)
+    {
+      AssertBrush(resources, resourceKey, "#123456");
+    }
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#234567");
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions { Variant = FsusThemeVariant.Dark }
+    );
+
+    foreach (var resourceKey in SpecializedSurfaceResourceKeys)
+    {
+      AssertBrush(resources, resourceKey, "#1B2433");
+    }
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#243043");
+  }
+
+  [Fact]
+  public void ApplyKeepsHighContrastPaletteAheadOfCustomPalette()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions
+      {
+        HighContrast = true,
+        Palette = new FsusThemePaletteOptions
+        {
+          Surface = new SolidColorBrush(Color.Parse("#101010")),
+          Border = new SolidColorBrush(Color.Parse("#00FFFF")),
+        },
+      }
+    );
+
+    AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#000000");
+    AssertBrush(resources, FsusThemeResourceKeys.SurfaceBrush, "#000000");
+    AssertBrush(resources, FsusThemeResourceKeys.TextBrush, "#FFFFFF");
+    AssertBrush(resources, FsusThemeResourceKeys.BorderBrush, "#FFFFFF");
+    AssertBrush(resources, FsusThemeResourceKeys.IconBrush, "#FFFFFF");
+    foreach (var resourceKey in SpecializedSurfaceResourceKeys)
+    {
+      AssertBrush(resources, resourceKey, "#000000");
+    }
+    AssertBrush(resources, FsusThemeResourceKeys.ValuePickerTrackBrush, "#1F2937");
   }
 
   [Fact]
@@ -147,4 +299,21 @@ public class FsusThemeManagerTests
     var brush = Assert.IsType<SolidColorBrush>(resources[key]);
     Assert.Equal(Color.Parse(color), brush.Color);
   }
+
+  private static readonly string[] SpecializedSurfaceResourceKeys =
+  [
+    "FsusThemePickerSurfaceBrush",
+    "FsusThemeDateTimeSurfaceBrush",
+    "FsusThemeUploadSurfaceBrush",
+    "FsusThemeDataDisplaySurfaceBrush",
+    "FsusThemeMediaSurfaceBrush",
+    "FsusThemeDataTableSurfaceBrush",
+    "FsusThemeVirtualizationSurfaceBrush",
+    "FsusThemeTreeSurfaceBrush",
+    "FsusThemeTextViewerSurfaceBrush",
+    FsusThemeResourceKeys.TextEditorSurfaceBrush,
+    "FsusThemePublicShellSurfaceBrush",
+    "FsusThemeProductPrimitiveSurfaceBrush",
+    "FsusThemePerceptionChallengeSurfaceBrush",
+  ];
 }

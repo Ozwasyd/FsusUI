@@ -41,6 +41,8 @@ Required workflow artifacts:
 - `fsusui-npm-candidate` (tarball, SHA-256 sidecar, and candidate manifest)
 - `dotnet-platform-{linux,windows,macos}`
 - `dotnet-nuget-candidate`
+- `avalonia-aot-leaf-linux-x64`
+- `avalonia-aot-readiness`
 - `avalonia-screenshots-*`
 - `avalonia-generated-artifacts`
 - `avalonia-stable-evidence`
@@ -53,3 +55,10 @@ unpacking `avalonia-stable-evidence` and running
 `pnpm ci:readiness:check --fixtures <unpacked-readiness-root>`. The explicit
 local `pnpm verify:stable` command remains available when a developer wants to
 execute all stable checks again; it is not the CI readiness implementation.
+
+Native AOT readiness consumes the unique `dotnet-nuget-candidate` without
+packing again. Its required leaf is a matching-host `linux-x64` publish and
+direct final-binary run. The aggregator only validates leaf manifests and does
+not restore, pack, publish, or execute the application. `win-x64` and
+`osx-arm64` are optional off-host leaves; absence must be recorded and must not
+be rewritten as platform support.
