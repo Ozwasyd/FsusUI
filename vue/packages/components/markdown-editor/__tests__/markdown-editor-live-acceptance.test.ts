@@ -12,7 +12,8 @@ const editorVue = readFileSync(
 
 describe('markdown editor leftover live acceptance', () => {
   it('keeps the live host as one editable source textarea and hides decorations', () => {
-    expect(editorVue).toMatch(/Markdown editor live editing surface/)
+    expect(editorVue).toMatch(/:aria-label="textareaAriaLabel"/)
+    expect(editorVue).toMatch(/localeText\.value\.textarea\.live/)
     expect(editorVue).toMatch(/aria-hidden="true"/)
     expect(editorVue).toMatch(/data-markdown-live-decorations/)
     expect(editorVue).not.toMatch(/<section[^>]*aria-live/)

@@ -358,7 +358,10 @@ describe('MarkdownRenderer.vue', () => {
     )
 
     const wrapper = mount(MarkdownRenderer, {
-      props: { content: '# Loading' },
+      props: {
+        content: '# Loading',
+        loadingText: 'Chargement du Markdown',
+      },
     })
 
     await vi.advanceTimersByTimeAsync(20)
@@ -366,6 +369,9 @@ describe('MarkdownRenderer.vue', () => {
 
     expect(wrapper.attributes('aria-busy')).toBe('true')
     expect(wrapper.find('[data-markdown-renderer-loading]').exists()).toBe(true)
+    expect(wrapper.find('.markdown-renderer__loading-text').text()).toBe(
+      'Chargement du Markdown',
+    )
 
     resolveFull?.(fsusOk(makeResult('# Loading', '<h1>Loading</h1>')))
     await flushPromises()

@@ -137,18 +137,12 @@ test('keeps CSS colors as RRGGBBAA and renders Avalonia colors as AARRGGBB', () 
     },
   ])
 
-  assert.match(
-    output.webCss,
-    /--fsus-primitive-color-alpha-600: #11223344;/,
-  )
+  assert.match(output.webCss, /--fsus-primitive-color-alpha-600: #11223344;/)
   assert.match(
     output.webCss,
     /\[data-fsus-theme="dark"\][\s\S]*--fsus-primitive-color-alpha-600: #AABBCCDD;/,
   )
-  assert.match(
-    output.webCss,
-    /--fsus-component-overlay-scrim: #00000099;/,
-  )
+  assert.match(output.webCss, /--fsus-component-overlay-scrim: #00000099;/)
 
   assert.match(
     output.avaloniaXaml,
@@ -162,27 +156,15 @@ test('keeps CSS colors as RRGGBBAA and renders Avalonia colors as AARRGGBB', () 
     output.avaloniaXaml,
     /<Color x:Key="FsusComponentOverlayScrim">#99000000<\/Color>/,
   )
-  assert.match(
-    output.csharp,
-    /PrimitiveColorAlpha600Value = "#44112233";/,
-  )
-  assert.match(
-    output.csharp,
-    /PrimitiveColorAlpha600DarkValue = "#DDAABBCC";/,
-  )
-  assert.match(
-    output.csharp,
-    /ComponentOverlayScrimValue = "#99000000";/,
-  )
+  assert.match(output.csharp, /PrimitiveColorAlpha600Value = "#44112233";/)
+  assert.match(output.csharp, /PrimitiveColorAlpha600DarkValue = "#DDAABBCC";/)
+  assert.match(output.csharp, /ComponentOverlayScrimValue = "#99000000";/)
 
   assert.match(
     output.avaloniaXaml,
     /<Color x:Key="FsusPrimitiveColorBlue600">#2A599C<\/Color>/,
   )
-  assert.match(
-    output.csharp,
-    /PrimitiveColorBlue600Value = "#2A599C";/,
-  )
+  assert.match(output.csharp, /PrimitiveColorBlue600Value = "#2A599C";/)
 })
 
 test('converts embedded 8-digit shadow colors for Avalonia and leaves 6-digit colors unchanged', () => {
@@ -208,19 +190,19 @@ test('converts embedded 8-digit shadow colors for Avalonia and leaves 6-digit co
   )
   assert.match(
     output.avaloniaXaml,
-    /<BoxShadows x:Key="FsusShadowFixtureAlpha">0 4px 12px #44112233, inset 0 0 0 1px #ABCDEF<\/BoxShadows>/,
+    /<BoxShadows x:Key="FsusShadowFixtureAlpha">0 4 12 #44112233, inset 0 0 0 1 #ABCDEF<\/BoxShadows>/,
   )
   assert.match(
     output.csharp,
-    /ShadowFixtureAlphaValue = "0 4px 12px #44112233, inset 0 0 0 1px #ABCDEF";/,
+    /ShadowFixtureAlphaValue = "0 4 12 #44112233, inset 0 0 0 1 #ABCDEF";/,
   )
   assert.match(
     output.csharp,
-    /BoxShadows\.Parse\("0 4px 12px #44112233, inset 0 0 0 1px #ABCDEF"\)/,
+    /BoxShadows\.Parse\("0 4 12 #44112233, inset 0 0 0 1 #ABCDEF"\)/,
   )
   assert.match(
     output.csharp,
-    /ShadowFixtureAlphaDarkValue = "0 8px 24px #DDAABBCC";/,
+    /ShadowFixtureAlphaDarkValue = "0 8 24 #DDAABBCC";/,
   )
 })
 
@@ -239,10 +221,7 @@ test('defines the overlay scrim as 60 percent black in CSS and Avalonia', () => 
     'utf8',
   )
   const avaloniaXaml = fs.readFileSync(
-    path.join(
-      root,
-      'dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml',
-    ),
+    path.join(root, 'dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml'),
     'utf8',
   )
   const csharp = fs.readFileSync(

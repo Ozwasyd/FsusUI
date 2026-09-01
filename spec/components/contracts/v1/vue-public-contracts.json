@@ -5,9 +5,9 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "81198347eee76b958cc39dfbe7b3b1877a125520fbf480b415578d8a82adc8d4",
+    "hash": "fcd979b3d79a9a85e4ea6b08b789fca58ef6fadd7bb1edaeca40585a800e3767",
     "packageVersion": "1.5.1",
-    "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
+    "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c"
   },
   "changeClassifications": [
@@ -10005,11 +10005,19 @@
           "signature": "vue-source"
         },
         {
+          "name": "closeCommandPalette",
+          "signature": "vue-source"
+        },
+        {
           "name": "dispatchTransaction",
           "signature": "vue-source"
         },
         {
           "name": "insertMarkdownAtCursor",
+          "signature": "vue-source"
+        },
+        {
+          "name": "openCommandPalette",
           "signature": "vue-source"
         },
         {
@@ -10127,6 +10135,12 @@
         },
         {
           "name": "initialRender",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "loadingText",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false

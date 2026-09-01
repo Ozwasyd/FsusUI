@@ -28,6 +28,10 @@ export const markdownRendererProps = buildProps({
     type: [String, Number] as PropType<string | number | null>,
     default: null,
   },
+  loadingText: {
+    type: String,
+    default: 'Rendering markdown...',
+  },
   initialRender: {
     type: Object as PropType<MarkdownSafeRenderResult | null>,
     default: null,

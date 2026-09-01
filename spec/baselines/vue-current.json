@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "3837751f4474088e953d9bc9a6f77da726e4672a",
+    "commitSha": "94f27160b1681ca6a34bef7b8ea81ec2e8c82c7e",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
-    "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
+    "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "3223235f07d91bd62ab7b88084784669c1a30841e1f94e5a46d2a0ef8de1b971",
+    "inputTreeHash": "8b2fbc2da64efd27610c3641abeeebaef797b9460c536f81655d174eec167e62",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "5ab5756b7fe3ae67f27590bb1f6dc98bbd2676a17072fba3ec36f11a0f834c60"
+    "outputHash": "ca158c3113dff0337e597ffb66d825a7a4ce136290dda0026a7ee1be899aed97"
   },
   "summary": {
     "componentModules": 93,
@@ -20,7 +20,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 482,
+    "cssVariables": 486,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -11060,8 +11060,10 @@
       ],
       "exposed": [
         "applyAttachmentResult",
+        "closeCommandPalette",
         "dispatchTransaction",
         "insertMarkdownAtCursor",
+        "openCommandPalette",
         "redo",
         "undo"
       ],
@@ -11100,8 +11102,7 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "expression",
-              "sourceHash": "b1ac4ded467282039b6812765914d78aaf09c61357460318b1eeebaf1360baf4"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11176,8 +11177,7 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "expression",
-              "sourceHash": "0c3c9da9090af2f3d5abf85fe4d16089e5003acb63a77f133a05ddfd8f1d3873"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11389,8 +11389,7 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "expression",
-              "sourceHash": "2968093feca443c24116a2a1f9bd69b43c074a4c5257099618b28cec90492948"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11493,8 +11492,7 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "expression",
-              "sourceHash": "cfc15051a6dd0136bee28f5b717bc886c658f75188c89ae1f44492778daa03db"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11722,6 +11720,11 @@
             "returnType": null
           },
           {
+            "name": "closeCommandPalette",
+            "parameters": [],
+            "returnType": null
+          },
+          {
             "name": "dispatchTransaction",
             "parameters": [
               {
@@ -11749,6 +11752,11 @@
                 "rest": false
               }
             ],
+            "returnType": null
+          },
+          {
+            "name": "openCommandPalette",
+            "parameters": [],
             "returnType": null
           },
           {
@@ -11783,6 +11791,7 @@
         "cspNonce",
         "features",
         "initialRender",
+        "loadingText",
         "mode",
         "trustedHtmlFactory",
         "trustedScriptUrlFactory"
@@ -11891,6 +11900,19 @@
             "default": {
               "kind": "null",
               "value": null
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "loadingText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Rendering markdown..."
             },
             "required": false,
             "readonly": false
@@ -31824,6 +31846,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/image-viewer.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/select-dropdown.scss"
       ],
       "classification": "portable"
@@ -32554,6 +32577,26 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-component-link-danger-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-info-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-success-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-warning-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-component-material-overlay-blur",
       "files": [
         "vue/packages/theme-chalk/src/generated/tokens.css",
@@ -32685,6 +32728,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/radio-button.scss",
@@ -32714,6 +32758,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
@@ -34121,6 +34166,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/select-dropdown-v2.scss"
@@ -34330,6 +34376,7 @@
         "vue/packages/theme-chalk/src/date-picker/picker.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/tree-select.scss"

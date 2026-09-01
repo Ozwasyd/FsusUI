@@ -98,6 +98,22 @@
   <SolidColorBrush x:Key="FsusColorFocusRingDarkBrush" Color="#4B79CC" />
   <Color x:Key="FsusColorStatusDanger">#D92D20</Color>
   <SolidColorBrush x:Key="FsusColorStatusDangerBrush" Color="#D92D20" />
+  <Color x:Key="FsusComponentLinkSuccessColor">#16A34A</Color>
+  <SolidColorBrush x:Key="FsusComponentLinkSuccessColorBrush" Color="#16A34A" />
+  <Color x:Key="FsusComponentLinkSuccessColorDark">#22C55E</Color>
+  <SolidColorBrush x:Key="FsusComponentLinkSuccessColorDarkBrush" Color="#22C55E" />
+  <Color x:Key="FsusComponentLinkWarningColor">#D97706</Color>
+  <SolidColorBrush x:Key="FsusComponentLinkWarningColorBrush" Color="#D97706" />
+  <Color x:Key="FsusComponentLinkWarningColorDark">#F59E0B</Color>
+  <SolidColorBrush x:Key="FsusComponentLinkWarningColorDarkBrush" Color="#F59E0B" />
+  <Color x:Key="FsusComponentLinkDangerColor">#D92D20</Color>
+  <SolidColorBrush x:Key="FsusComponentLinkDangerColorBrush" Color="#D92D20" />
+  <Color x:Key="FsusComponentLinkDangerColorDark">#F97066</Color>
+  <SolidColorBrush x:Key="FsusComponentLinkDangerColorDarkBrush" Color="#F97066" />
+  <Color x:Key="FsusComponentLinkInfoColor">#A1A1AA</Color>
+  <SolidColorBrush x:Key="FsusComponentLinkInfoColorBrush" Color="#A1A1AA" />
+  <Color x:Key="FsusComponentLinkInfoColorDark">#71717A</Color>
+  <SolidColorBrush x:Key="FsusComponentLinkInfoColorDarkBrush" Color="#71717A" />
   <SolidColorBrush x:Key="FsusBrushSurfaceBase" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusBrushSurfaceRaised" Color="#F7F7F8" />
   <x:Double x:Key="FsusTypographyBodyMdSize">14</x:Double>

@@ -30947,6 +30947,70 @@
           "isStatic": true
         },
         {
+          "name": "ComponentLinkDangerColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "ComponentLinkDangerColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "ComponentLinkInfoColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "ComponentLinkInfoColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "ComponentLinkSuccessColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "ComponentLinkSuccessColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "ComponentLinkWarningColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "ComponentLinkWarningColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
           "name": "ComponentMaterialOverlayBlurDouble",
           "type": "System.Double",
           "nullable": false,

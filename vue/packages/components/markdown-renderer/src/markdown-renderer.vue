@@ -21,7 +21,7 @@
       role="status"
     >
       <span class="markdown-renderer__loading-spinner" aria-hidden="true" />
-      <span class="markdown-renderer__loading-text">Rendering markdown...</span>
+      <span class="markdown-renderer__loading-text">{{ loadingText }}</span>
       <span
         v-for="index in 4"
         :key="index"

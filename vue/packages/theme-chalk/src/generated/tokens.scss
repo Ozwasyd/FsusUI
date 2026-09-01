@@ -47,6 +47,14 @@ $fsus-color-border-extra-light-dark: #1D1D20;
 $fsus-color-focus-ring: #2A599C;
 $fsus-color-focus-ring-dark: #4B79CC;
 $fsus-color-status-danger: #D92D20;
+$fsus-component-link-success-color: #16A34A;
+$fsus-component-link-success-color-dark: #22C55E;
+$fsus-component-link-warning-color: #D97706;
+$fsus-component-link-warning-color-dark: #F59E0B;
+$fsus-component-link-danger-color: #D92D20;
+$fsus-component-link-danger-color-dark: #F97066;
+$fsus-component-link-info-color: #A1A1AA;
+$fsus-component-link-info-color-dark: #71717A;
 $fsus-brush-surface-base: #FFFFFF;
 $fsus-brush-surface-raised: #F7F7F8;
 $fsus-typography-body-md-size: 14px;
@@ -181,6 +189,10 @@ $fsus-tokens: (
   'color.border.extra.light': #F7F7F8,
   'color.focus.ring': #2A599C,
   'color.status.danger': #D92D20,
+  'component.link.success.color': #16A34A,
+  'component.link.warning.color': #D97706,
+  'component.link.danger.color': #D92D20,
+  'component.link.info.color': #A1A1AA,
   'brush.surface.base': #FFFFFF,
   'brush.surface.raised': #F7F7F8,
   'typography.body.md.size': 14px,

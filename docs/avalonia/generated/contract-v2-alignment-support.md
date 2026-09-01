@@ -349,7 +349,10 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistory` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryChangedEventArgs` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryEntrySnapshot` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistorySnapshot` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryState` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryStepSnapshot` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorMode` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorPositionMap` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection` | `avalonia-extra` |

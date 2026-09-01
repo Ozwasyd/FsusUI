@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+} from '../../../wasm/markdown-runtime'
 import { defaultMarkdownEditorCommands, type MarkdownEditorCommandContext } from '../src/markdown-editor'
 import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
 import {
@@ -105,8 +109,21 @@ describe('markdown follow-on contracts', () => {
     const found = searchMarkdownEditorCommands(defaultMarkdownEditorCommands, context(), 'bol')
     expect(found.some((command) => command.key === 'bold')).toBe(true)
     expect(groupMarkdownEditorCommands(defaultMarkdownEditorCommands).size).toBeGreaterThan(0)
-    expect(resolveMarkdownSlashQuery('see /bol', 8)).toBe('bol')
-    expect(resolveMarkdownSlashQuery('https://x', 9)).toBeNull()
+    const projection = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('/bol'),
+      { epoch: 1, id: 'doc' },
+    )
+    expect(
+      resolveMarkdownSlashQuery('/bol', 4, { projection }),
+    ).toBe('bol')
+    expect(
+      resolveMarkdownSlashQuery('https://x', 9, {
+        projection: stabilizeMarkdownEditorProjection(
+          createMarkdownEditorProjection('https://x'),
+          { epoch: 1, id: 'doc' },
+        ),
+      }),
+    ).toBeNull()
     expect(
       resolveMarkdownSelectionToolbarPlacement({ start: 1, end: 4 }, 3, 3).visible,
     ).toBe(true)

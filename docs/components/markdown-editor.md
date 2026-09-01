@@ -168,18 +168,63 @@ different-document 不得复用。unknown token、数字码、`write`/`ok` 别�
 所有 command surface 消费同一 `MarkdownEditorCommand` registry。Command 使用稳定
 `key`、`label`、`group`、受控 icon token、shortcut 和 presentation targets；
 `when(context)` 决定是否呈现，`enabled(context)` 决定是否可执行。Shortcut 冲突
-必须显式失败，不能由数组顺序决定。
+必须显式失败，不能由数组顺序决定。Registry 在任何 surface 渲染前拒绝重复/空
+key、空 group、未注册 icon、归一化后冲突的 shortcut，以及旧 `apply` 执行入口。
+
+`documentIdentity="{ id, epoch }"` 由 consumer 在文档切换时替换，即使新旧
+`modelValue` 相同也必须替换 identity。Identity 变化会取消 pending command、关闭
+临时 command surface、清除旧 undo/redo，并以当前受控 `modelValue` 开始新文档；
+迟到的旧文档异步结果不能提交。
 
 Command context 只公开 document identity、revision、selection、mode、read-only
 状态、syntax projection、position map、abort signal 与 transaction dispatcher。
 Command 不得解析 Markdown、查询 rendered DOM、访问 textarea/editor instance，或
 保存裸 selection offset 自行猜测 rebase。Syntax/node/range 事实由 editor
-projection 提供；内容修改通过 transaction dispatcher 完成。
+projection 提供；内容修改通过 transaction dispatcher 完成。Position map 使用
+[`createMarkdownAnchorMap`](../api/markdown-runtime-projection.md) 的
+`remapRange` 语义累计每个已提交 revision，明确区分 `mapped`、`partial` 与
+`deleted`，不会按字符串长度差修正裸 offset。Stable syntax identity 在原位编辑、
+移动与 mode 切换时保留；document epoch 或 projection id 失效时 fail closed。
 
 `run(context)` 可以同步或异步返回受控 transaction result。异步 command 的结果在
 document epoch 变化、abort 或 anchor 删除后不得提交；consumer 负责以自己的反馈
 组件展示错误，command 本身不调用 toast。Toolbar、keyboard、palette、slash 和
 selection presentation 共享同一 key、可用状态与 pending/result authority。
+
+`surfaces.commandPalette`、`surfaces.selectionToolbar` 与
+`surfaces.slashMenu` 是 opt-in presentation。Palette 搜索只读取 command 的
+`label`、`description` 与 `keywords`，显示文案来自
+`localeText.commandPalette`。Selection toolbar 与 slash menu 的 `Esc` 会关闭当前
+surface、恢复 source focus，并保留 source、selection 与 history。Slash trigger 由当前
+projection/input context 校验；执行时 trigger range 与 command result 合并为同一个
+revision-bound transaction，因此不会先删除 trigger 再提交 stale command result。
+Slash 不从 keydown、rendered DOM 或 regex 猜测 syntax；URL、code、math、escaped
+slash、RTL 普通文本与 composition-active 输入不会打开 surface。
+
+内置 `link-properties`、`anchor-properties` 与 `anchor-insert` command 同样来自
+registry snapshot；显式 insert 与已有 anchor 的 edit 使用不同本地化 command 文案，
+但进入同一受控 anchor property surface。
+前者只读取 projection 给出的 stable link node、content/marker/full ranges，并在
+这些 projection-owned ranges 内编辑 label、destination 与 title；remove 保留原始
+label bytes，open 继续使用 Markdown URL authority。后者显式 insert/edit/remove/copy
+block anchor，ID 不自动生成；projection id 失效、duplicate/invalid ID 或 stale
+revision 都拒绝 transaction。两个 contextual surface 通过公开 anchor-map identity
+声明定位，不要求 consumer 传 DOM selector/ref；source reveal、取消和成功提交都恢复
+同一 source selection/focus。
+
+Command pending/abort/stale 由 editor command session 统一管理。异步 result 仅在原
+document identity、epoch 与 revision 仍为 current 时提交；外部 reset 或组件卸载会 abort
+pending session。`statusDensity="none"` 只隐藏可见 footer，不会隐藏 degraded/fatal
+capability 的 `aria-live` announcement；该 announcement 通过
+`localeText.capabilityAnnouncement` 本地化。
+
+`localeText` 是 editor-owned 可见文案的唯一 override authority，包括 modes、
+内置 commands、command group、actions、palette、selection/slash/contextual surface、textarea 名称、
+capability/result 状态与 status 指标标签。Extension command 的 `label`、
+`title`、`description` 仍由 extension 自己提供；自定义 group key 应通过
+`localeText.commandGroups` 提供可见名称。`statusDensity="minimal"` 只显示
+字符与词数；`detailed` 使用 definition list 显示行/列、行数、字符、词、选区与
+可选字节数；普通输入不会把这些指标逐键写入 `aria-live`。
 
 ## Paste as Markdown
 
