@@ -40,13 +40,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "080e18500da5ad46cf825baa8f5827de3dc88bc9",
+    "revision": "cd4158d98980750eb25266599a2667e70b72c2f8",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "d1bdfd98f887edd4924f9be64de7091542fa67dad9feead04eb5978fa0694bcf",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "8f376089accc817663152c8d825b41b4de3d944d",
-  "candidateDigest": "1d8e465ad4b296933ad38844e4c94b84517b0c32b071c323aedc94ca4fd238bb",
+  "candidateSha": "e3fa86e05c8b320d465b735aa04fc83ea50df154",
+  "candidateDigest": "e1da709e87ff3864559ae69e95738c778b41575040dfac3e43aa410b5e5c0482",
   "stateEvidenceMatrix": [
     {
       "state": "source reveal and focus presentation",
@@ -81,5 +81,5 @@
   "classificationEvidenceDigest": "bbb6af932bf41252e254cf284f17633c36367c0494e226d7775f99a530af6fd1",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "f008d52c2e7cd5935ec0f5ef9be0acf982eaa49a960a5cbb88d4d3feab34feb2"
+  "receiptDigest": "2814f61b3df70b7abb1b3bd998972882f034f9d9bd63d861295ed7c1078d46f3"
 }
