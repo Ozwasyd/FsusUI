@@ -32,6 +32,8 @@ const makeContext = (
   dispatch: {
     dispatch: () => ({
       accepted: true,
+      beforeRevision: 0,
+      documentIdentity: { epoch: 1, id: 'embed-doc' },
       history: {
         canRedo: false,
         canUndo: false,

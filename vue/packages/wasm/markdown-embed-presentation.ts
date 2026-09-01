@@ -57,6 +57,12 @@ const PROVIDER_STATUS_STATES: Readonly<
   rejected: 'error',
   stale: 'stale',
   forbidden: 'forbidden',
+  missing: 'error',
+  cycle: 'error',
+  'depth-exceeded': 'error',
+  'size-exceeded': 'error',
+  'time-exceeded': 'error',
+  'mode-mismatch': 'unsupported',
 })
 
 export interface MarkdownEmbedPresentationActions {

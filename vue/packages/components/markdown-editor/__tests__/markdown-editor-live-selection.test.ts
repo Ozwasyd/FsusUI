@@ -147,7 +147,6 @@ describe('markdown live selection and atomic primitive', () => {
     const fixtures: Record<string, string> = {
       attachment: '![file](pending://a)',
       code: '```\ncode\n```\n',
-      embed: '::embed[target="doc" mode="article"]\n',
       footnote: 'See [^1]\n',
       image: '![alt](img.png)\n',
       latex: '$$\nx\n$$\n',
