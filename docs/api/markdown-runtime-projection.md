@@ -17,6 +17,27 @@ This document is the consumer-facing contract for tracking parents #273,
 
 WASM internals under `@ozwasyd/element-plus/es/wasm/*` stay unsupported.
 
+## Native host consumption
+
+The canonical native target is a .NET binding over the same C++ Markdown
+runtime that produces the Web WASM module. Its native packaging is not part of
+the current release, and the C++ ABI, generated WASM, and Emscripten glue remain
+internal implementation details.
+
+Until that binding ships, an Avalonia host uses the sanctioned
+`IFsusMarkdownProjectionProducer` bridge. The bridge adapts output already
+produced by this canonical runtime; it is not permission to add a C# parser,
+regex range reconstruction, WebView, or HTML round trip. Both the interim
+bridge and future native binding use the same versioned
+`FsusMarkdownProjectionProduction` envelope, so the editor-side consumption
+path does not change on upgrade.
+
+The machine authority for contract version, span tiling, semantic vocabulary,
+identity tombstones, invalidation, and upgrade behavior is
+[`spec/avalonia/markdown-projection-producer-contract.json`](../../spec/avalonia/markdown-projection-producer-contract.json).
+Frozen positive and negative cases live in
+[`spec/avalonia/markdown-projection-producer-vectors.json`](../../spec/avalonia/markdown-projection-producer-vectors.json).
+
 ## Consumer APIs
 
 | Tracking parent | Shipped function                                                                                                       | Reads                                                                |
@@ -26,7 +47,7 @@ WASM internals under `@ozwasyd/element-plus/es/wasm/*` stay unsupported.
 | #277 search     | `searchMarkdownRawSource` / `searchMarkdownStableProjection` / `planMarkdownReplaceCurrent` / `planMarkdownReplaceAll` | raw UTF-16 matches, `syn:` hits, and source replace transactions     |
 | #278 technical  | `createMarkdownTechnicalEntries`                                                                                       | `code`, `latex`, `mermaid`                                           |
 | #279 properties | `createMarkdownPropertyEntries`                                                                                        | `link`, `image`                                                      |
-| #290 embed      | `parseMarkdownEmbedLine` / `collectMarkdownEmbedNodes`                                                                 | `embed` projection nodes                                             |
+| #290 embed      | `parseMarkdownEmbedLine` / `collectMarkdownEmbedNodes` / `resolveMarkdownEmbedPresentation` / `evaluateMarkdownEmbedAcceptance` | `embed` projection nodes and the controlled presentation contract |
 | #314 caption    | `parseMarkdownCaptionLine` / `collectMarkdownCaptionNodes` / `renderMarkdownCaptionFigure`                             | `caption` projection nodes and safe `figure`/`figcaption`            |
 | #289 anchor     | `parseMarkdownAnchorMarker` / `collectMarkdownAnchorNodes`                                                             | `anchor` projection nodes                                            |
 | #291 import     | `importMarkdownClipboardSnapshot` / `convertMarkdownHtmlImportSnapshot`                                                | explicit clipboard snapshot → import tree → Markdown and loss report |
@@ -109,6 +130,29 @@ also pass the source transaction as `change` when repeated equal syntax makes
 position alone ambiguous. Identity state contains allocator metadata only; it
 does not persist source or parser nodes as a second content model.
 
+## Embed presentation contract
+
+`resolveMarkdownEmbedPresentation` maps a provider or budget outcome to a
+frozen presentation. `mode` (`article` | `heading` | `block`) is a semantic
+label only and never a visual variant; the layout stays single-column with no
+nested scroll. Resolved content is inert text routed through the unique
+Markdown runtime (`renderVia: "markdown-runtime"`), never HTML
+(`html: null`), never a second editor, and never an iframe surface. Provider
+output never expands the host source: the source contract stays the exact
+directive.
+
+The accessibility contract exposes target mode, status, and the
+`enter-source` open-source operation with `tabStop: false`. Stale, forbidden,
+missing, and cycle/depth/size/time failures map to actionable states with
+retry; `unsupported` states keep only open-source.
+
+`evaluateMarkdownEmbedEditorAcceptance` composes the editor surface, the
+shared #335 atomic primitive (caret, copy, delete, undo, focus return), and
+the shared #336 `embed-result` height trigger into one versioned report.
+`evaluateMarkdownEmbedAcceptance` is the #391 aggregate: grammar, budgets
+(direct/indirect cycle, depth, size, time), the security corpus, provider
+cache/identity lifecycle, 1000-node scale, and the mutation fixture set.
+
 ## Acceptance gate
 
 `evaluateMarkdownProjectionAcceptance` composes those APIs and rejects stale
@@ -128,3 +172,4 @@ duration, task id, invalidated ranges, retained identities, and heap deltas.
 - replacing every id after an ordinary edit or reusing ids across documents
 - using a normalized LF offset on a CRLF raw string
 - committing a stale Worker result or a deleted anchor
+- claiming a consumer parser as the canonical native projection runtime

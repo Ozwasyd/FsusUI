@@ -4,5 +4,5 @@
   "blocked": true,
   "blockedBy": [340, 341, 342, 343],
   "requiredStatus": "partial",
-  "reason": "FsusMarkdownEditor transaction, selection, history, and position mapping are implemented; live projection, IME, and AutomationPeer remain partial/blocked."
+  "reason": "FsusMarkdownEditor transaction, native Source/Live projection, selection, history, and position mapping are implemented; Split/Preview, complete native IME acceptance, and AutomationPeer remain partial/blocked."
 }

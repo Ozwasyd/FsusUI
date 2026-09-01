@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { loadMarkdownOwnerPlan } from './markdown-playwright-plan.mjs'
@@ -36,6 +42,7 @@ export async function verifyMarkdownOwnerReceipts(
   plan,
   options = {},
 ) {
+  const logPrefix = options.logPrefix ?? 'playwright-markdown'
   if (!plan || plan.owner !== ownerId || plan.group !== group) {
     fail('markdown owner verify requires the matching owner plan')
   }
@@ -46,11 +53,15 @@ export async function verifyMarkdownOwnerReceipts(
 
   for (const [cellId, cell] of expected) {
     const receipt = actual.get(cellId)
-    const entry = { cellId, status: receipt?.status ?? 'missing', tests: receipt?.tests ?? null }
+    const entry = {
+      cellId,
+      status: receipt?.status ?? 'missing',
+      tests: receipt?.tests ?? null,
+    }
     summary.cells.push(entry)
     if (!receipt) {
       failed = true
-      console.error(`[playwright-markdown] missing receipt for ${cellId}`)
+      console.error(`[${logPrefix}] missing receipt for ${cellId}`)
       continue
     }
     try {
@@ -76,39 +87,46 @@ export async function verifyMarkdownOwnerReceipts(
         root,
         options.evidenceDir ?? '.tmp/playwright-markdown',
         'runtime-manifests',
-        `${cell.suiteId}.json`,
+        `${options.runtimeManifestId?.(cell) ?? cell.suiteId}.json`,
       )
       if (!existsSync(manifestPath)) {
         fail(`markdown runtime manifest missing: ${manifestPath}`)
       }
       const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
       if (receipt.runtime.manifestDigest !== sha256File(manifestPath)) {
-        fail(`receipt ${cellId} runtime manifestDigest does not match current runtime`)
+        fail(
+          `receipt ${cellId} runtime manifestDigest does not match current runtime`,
+        )
       }
       if (receipt.runtime.sourceFingerprint !== manifest.sourceFingerprint) {
-        fail(`receipt ${cellId} runtime sourceFingerprint does not match current runtime`)
+        fail(
+          `receipt ${cellId} runtime sourceFingerprint does not match current runtime`,
+        )
       }
       if (manifest.fingerprintInputs && manifest.fingerprintInputs.length > 0) {
         for (const input of manifest.fingerprintInputs) {
           if (!receipt.runtime.fingerprintInputs?.includes(input)) {
-            fail(`receipt ${cellId} runtime fingerprint inputs do not match current runtime`)
+            fail(
+              `receipt ${cellId} runtime fingerprint inputs do not match current runtime`,
+            )
           }
         }
       }
       if (receipt.status !== 'success') {
         fail(`cell ${cellId} status=${receipt.status}`)
       }
+      options.validateReceipt?.(receipt, cell)
     } catch (error) {
       failed = true
       console.error(
-        `[playwright-markdown] invalid receipt ${cellId}: ${error instanceof Error ? error.message : String(error)}`,
+        `[${logPrefix}] invalid receipt ${cellId}: ${error instanceof Error ? error.message : String(error)}`,
       )
     }
   }
   for (const receipt of receipts) {
     if (!expected.has(receipt.cellId)) {
       failed = true
-      console.error(`[playwright-markdown] unexpected receipt ${receipt.cellId}`)
+      console.error(`[${logPrefix}] unexpected receipt ${receipt.cellId}`)
     }
   }
   summary.status = failed ? 'failure' : 'success'
@@ -119,24 +137,35 @@ const option = (args, name, fallback) => {
   const index = args.indexOf(`--${name}`)
   if (index >= 0) return args[index + 1]
   const prefix = `--${name}=`
-  return args.find((arg) => arg.startsWith(prefix))?.slice(prefix.length) ?? fallback
+  return (
+    args.find((arg) => arg.startsWith(prefix))?.slice(prefix.length) ?? fallback
+  )
 }
 
 async function main(argv = process.argv.slice(2)) {
   const command = argv[0]
   if (command !== 'owner-verify') {
-    fail('Usage: markdown-playwright-verify.mjs owner-verify --owner <id> --group <g> --receipts-dir <dir> [--evidence-dir <dir>] [--commit-sha <sha>] [--evidence-out <path>]')
+    fail(
+      'Usage: markdown-playwright-verify.mjs owner-verify --owner <id> --group <g> --receipts-dir <dir> [--evidence-dir <dir>] [--commit-sha <sha>] [--evidence-out <path>]',
+    )
   }
   const ownerId = option(argv, 'owner')
   const group = option(argv, 'group', 'main')
   const receiptsDir = option(argv, 'receipts-dir')
-  if (!ownerId || !receiptsDir) fail('owner-verify requires --owner and --receipts-dir')
+  if (!ownerId || !receiptsDir)
+    fail('owner-verify requires --owner and --receipts-dir')
   const plan = loadMarkdownOwnerPlan(group)
   const receipts = loadMarkdownReceiptsFromDirectory(receiptsDir)
-  const { summary, failed } = await verifyMarkdownOwnerReceipts(ownerId, group, receipts, plan, {
-    evidenceDir: option(argv, 'evidence-dir'),
-    expectedCommitSha: option(argv, 'commit-sha'),
-  })
+  const { summary, failed } = await verifyMarkdownOwnerReceipts(
+    ownerId,
+    group,
+    receipts,
+    plan,
+    {
+      evidenceDir: option(argv, 'evidence-dir'),
+      expectedCommitSha: option(argv, 'commit-sha'),
+    },
+  )
   const evidenceOut = option(argv, 'evidence-out')
   if (evidenceOut) {
     const absolute = resolve(root, evidenceOut)

@@ -185,24 +185,51 @@
       v-if="markdownEditorTransactionFixture && markdownEditorMountReady"
       data-testid="markdown-editor-transaction-fixture"
       :data-markdown-editor-probe-id="markdownEditorProbeId"
+      :dir="markdownCommandDirection"
     >
       <el-markdown-editor
         ref="markdownTransactionEditor"
         v-model="markdownTransactionValue"
         v-bind="markdownPasteGateAttributes"
+        :document-identity="{
+          epoch: 1,
+          id: `markdown-command-${markdownContextualSurface ?? 'default'}`,
+        }"
         :default-mode="
           markdownPasteGate === 'preview-only' ? 'preview' : 'source'
         "
         :disabled="markdownPasteGate === 'disabled'"
+        :locale-text="markdownCommandLocaleText"
+        :interaction-profile="markdownEditorInteractionProfile"
         :min-rows="6"
+        :mobile-layout="markdownCommandMobileLayout"
         :show-actions="false"
         :show-mode-switcher="false"
+        :status-density="markdownCommandStatusDensity"
+        :surfaces="
+          markdownCommandSurfacesFixture
+            ? {
+                commandPalette: true,
+                selectionToolbar: true,
+                slashMenu: true,
+              }
+            : undefined
+        "
         data-markdown-input-authority="transaction-store"
         @history-change="markdownTransactionHistory = $event"
         @selection-change="markdownTransactionSelection = $event"
         @transaction="recordMarkdownTransaction"
+        @upload-image="recordMarkdownAttachmentBatch"
       />
       <div aria-label="Markdown transaction controls">
+        <button
+          v-if="markdownCommandSurfacesFixture"
+          type="button"
+          data-testid="markdown-open-command-palette"
+          @click="markdownTransactionEditor?.openCommandPalette()"
+        >
+          Open command palette
+        </button>
         <button
           type="button"
           data-testid="markdown-programmatic"
@@ -259,6 +286,29 @@
         >
           Load 100k document
         </button>
+        <button
+          type="button"
+          data-testid="markdown-attachment-progress"
+          :disabled="!markdownAttachmentBatch"
+          @click="progressMarkdownAttachmentFixture"
+        >
+          Attachment progress
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-attachment-resolve"
+          :disabled="!markdownAttachmentBatch"
+          @click="resolveMarkdownAttachmentFixture"
+        >
+          Resolve attachment
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-load-figure"
+          @click="loadMarkdownFigureFixture"
+        >
+          Load image figure
+        </button>
       </div>
       <output data-testid="markdown-editor-value">
         {{ markdownTransactionValue.length }}
@@ -274,6 +324,9 @@
       </output>
       <output data-testid="markdown-editor-selection">
         {{ JSON.stringify(markdownTransactionSelection) }}
+      </output>
+      <output data-testid="markdown-attachment-batch">
+        {{ JSON.stringify(markdownAttachmentBatchSnapshot) }}
       </output>
     </section>
 
@@ -1876,9 +1929,7 @@
       <AuditCard name="ElUpload" :state="auditState">
         <el-upload action="#" :auto-upload="false" drag>
           <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-          <div class="el-upload__text">
-            Drop a file here or <em>browse</em>
-          </div>
+          <div class="el-upload__text">Drop a file here or <em>browse</em></div>
           <p data-upload-help>PNG/JPG, max 10 MB</p>
         </el-upload>
       </AuditCard>
@@ -1950,9 +2001,11 @@ import {
 import type {
   MarkdownEmbedProvider,
   MarkdownEmbedRequest,
+  MarkdownAttachmentBatchIntent,
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryState,
   MarkdownEditorInstance,
+  MarkdownEditorLocaleTextOverride,
   MarkdownEditorMode,
   MarkdownEditorSelectionEvent,
   MarkdownEditorTransactionEvent,
@@ -2098,6 +2151,126 @@ const markdownSearchEmbedTouch =
   new URLSearchParams(window.location.search).get(
     'markdownSearchEmbedTouch',
   ) === '1'
+const markdownCommandSurfacesFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownCommandSurfaces') ===
+    '1'
+const markdownContextualSurface =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownContextual')
+    : null
+const markdownCommandLocale =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownLocale')
+    : null
+const markdownCommandDirection =
+  markdownCommandLocale === 'ar' || markdownCommandLocale === 'he'
+    ? 'rtl'
+    : 'ltr'
+const markdownCommandStatusDensity =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownStatus') ===
+    'detailed'
+    ? 'detailed'
+    : typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).get('markdownStatus') ===
+          'none'
+      ? 'none'
+      : 'minimal'
+const markdownCommandMobileLayout =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownMobile') ===
+    'compact'
+    ? 'compact'
+    : 'standard'
+const markdownCommandLocaleText = computed<
+  MarkdownEditorLocaleTextOverride | undefined
+>(() => {
+  if (!markdownCommandLocale) return undefined
+  const prefix =
+    markdownCommandLocale === 'long'
+      ? 'A deliberately extended localization fixture that preserves every semantic label'
+      : markdownCommandLocale.toUpperCase()
+  const label = (value: string) => `${prefix} ${value}`
+  return {
+    commandGroups: {
+      block: label('block'),
+      format: label('format'),
+      insert: label('insert'),
+    },
+    commandPalette: {
+      empty: label('empty'),
+      results: (count: number) => label(`${count} results`),
+      searchPlaceholder: label('search commands'),
+      title: label('command palette'),
+    },
+    commands: {
+      bold: label('bold'),
+      code: label('code'),
+      heading: label('heading'),
+      image: label('image'),
+      italic: label('italic'),
+      link: label('link'),
+      quote: label('quote'),
+    },
+    contextual: {
+      anchorId: label('anchor ID'),
+      apply: label('apply'),
+      cancel: label('cancel'),
+      copy: label('copy'),
+      destination: label('destination'),
+      editAnchor: label('edit anchor'),
+      editLink: label('edit link'),
+      invalidAnchor: label('invalid anchor'),
+      insertAnchor: label('insert anchor'),
+      label: label('label'),
+      open: label('open'),
+      removeAnchor: label('remove anchor'),
+      removeLink: label('remove link'),
+      sourceReveal: label('reveal source'),
+      title: label('title'),
+      unsafeUrl: label('unsafe URL'),
+    },
+    editorAria: label('Markdown editor'),
+    metrics: {
+      bytes: label('bytes'),
+      characters: label('characters'),
+      column: label('column'),
+      line: label('line'),
+      lines: label('lines'),
+      selected: label('selected'),
+      words: label('words'),
+    },
+    states: {
+      disabled: label('disabled'),
+      empty: label('empty'),
+      loading: label('loading'),
+      readonly: label('readonly'),
+    },
+    overflow: label('format tools'),
+    overflowAria: (count: number) => label(`${count} format tools`),
+    pasteAsMarkdown: {
+      title: label('paste as Markdown'),
+    },
+    surfaces: {
+      commandPending: label('command pending'),
+      commandRejected: label('command rejected'),
+      selectionToolbar: label('selection toolbar'),
+      slashMenu: label('slash menu'),
+    },
+    textarea: {
+      live: label('live editor'),
+      source: label('source editor'),
+    },
+  }
+})
+const markdownEditorInteractionProfile =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get(
+    'markdownEditorInteractionProfile',
+  ) === 'keyboard'
+    ? ('keyboard' as const)
+    : undefined
 const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
@@ -2137,7 +2310,15 @@ if (markdownEditorDelayMount > 0) {
 }
 const markdownTransactionEditor = ref<MarkdownEditorInstance>()
 const markdownTransactionValue = ref(
-  markdownEditorImeFixture ? '' : 'A😀éאב\n- 列表',
+  markdownEditorImeFixture
+    ? ''
+    : markdownContextualSurface === 'link'
+      ? '[Docs](https://old.test "Title")'
+      : markdownContextualSurface === 'anchor'
+        ? 'Paragraph ^intro'
+        : markdownCommandSurfacesFixture
+          ? '/bol'
+          : 'A😀éאב\n- 列表',
 )
 const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({
   canRedo: false,
@@ -2150,6 +2331,27 @@ const markdownLastTransaction = ref<MarkdownEditorTransactionEvent | null>(null)
 const markdownTransactionSelection = ref<MarkdownEditorSelectionEvent | null>(
   null,
 )
+const markdownAttachmentBatch = ref<MarkdownAttachmentBatchIntent | null>(null)
+const markdownAttachmentBatchSnapshot = computed(() => {
+  const batch = markdownAttachmentBatch.value
+  if (!batch) return null
+  return {
+    anchor: batch.anchor,
+    batchId: batch.batchId,
+    items: batch.items.map(
+      ({ byteLength, itemId, kind, mimeType, name, order }) => ({
+        byteLength,
+        itemId,
+        kind,
+        mimeType,
+        name,
+        order,
+      }),
+    ),
+    revision: batch.revision,
+    sourceKind: batch.sourceKind,
+  }
+})
 const markdownTransactionRevision = computed(
   () => markdownLastTransaction.value?.revision ?? 0,
 )
@@ -2157,6 +2359,49 @@ let markdownPlaceholderRevision: number | undefined
 
 const recordMarkdownTransaction = (event: MarkdownEditorTransactionEvent) => {
   markdownLastTransaction.value = event
+}
+
+const recordMarkdownAttachmentBatch = (
+  batch: MarkdownAttachmentBatchIntent,
+) => {
+  markdownAttachmentBatch.value = batch
+}
+
+const progressMarkdownAttachmentFixture = () => {
+  const batch = markdownAttachmentBatch.value
+  const item = batch?.items[0]
+  if (!batch || !item) return
+  markdownTransactionEditor.value?.applyAttachmentResult({
+    batchId: batch.batchId,
+    itemId: item.itemId,
+    ratio: 0.5,
+    status: 'progress',
+  })
+}
+
+const resolveMarkdownAttachmentFixture = () => {
+  const batch = markdownAttachmentBatch.value
+  const item = batch?.items[0]
+  if (!batch || !item) return
+  markdownTransactionEditor.value?.applyAttachmentResult({
+    batchId: batch.batchId,
+    documentIdentity: batch.documentIdentity,
+    itemId: item.itemId,
+    payload: {
+      alt: 'Resolved attachment',
+      href: '/fixtures/resolved-attachment.png',
+      markdownKind: 'image',
+      mimeType: item.mimeType,
+      name: item.name,
+    },
+    revision: batch.revision,
+    status: 'resolved',
+  })
+}
+
+const loadMarkdownFigureFixture = () => {
+  markdownTransactionValue.value =
+    '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]'
 }
 
 const insertMarkdownFixture = () => {

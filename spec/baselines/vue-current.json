@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "cad78462a9632dde9c6854954346c2c3ba00b4b7",
+    "commitSha": "dc1a460d11fda60fe6d0c0127822be985501a1d3",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
-    "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
-    "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de",
+    "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
+    "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "8ecb3dffce2e9b9dfc5ba19108351617941acad2b9419b4b1387aac27f355cef",
+    "inputTreeHash": "3cf66ad04a2a3f22cddf55fa6acb2f97766b68bbc076706e76718ca77b688df8",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "079b6ede104c7860de7053c98b8c9aff184e5efd6f51194496e4f39adf49c2f7"
+    "outputHash": "4c35bd58ee81c1e604f70378b450ef378816aeb6f54b19adcd12f97962de3f89"
   },
   "summary": {
     "componentModules": 93,
@@ -20,7 +20,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 484,
+    "cssVariables": 488,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -5594,6 +5594,7 @@
       "classification": "portable",
       "props": [
         "copiedLabel",
+        "disabled",
         "errorLabel",
         "inline",
         "label",
@@ -5627,6 +5628,18 @@
             "default": {
               "kind": "literal",
               "value": "Copied"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
             },
             "required": false,
             "readonly": false
@@ -10990,10 +11003,12 @@
         "commands",
         "defaultMode",
         "disabled",
+        "documentIdentity",
         "editorProfile",
         "embedProvider",
         "imageActionLabel",
         "interactionProfile",
+        "lang",
         "loading",
         "localeText",
         "metrics",
@@ -11001,6 +11016,7 @@
         "mobileLayout",
         "mode",
         "modelValue",
+        "nativeWritingTools",
         "placeholder",
         "previewBaseUrl",
         "previewCspNonce",
@@ -11013,6 +11029,7 @@
         "showModeSwitcher",
         "showSaveAction",
         "showSubmitAction",
+        "spellcheck",
         "statusDensity",
         "submitActionLabel",
         "surfaces",
@@ -11045,9 +11062,12 @@
         }
       ],
       "exposed": [
+        "applyAttachmentResult",
+        "closeCommandPalette",
         "closeSearch",
         "dispatchTransaction",
         "insertMarkdownAtCursor",
+        "openCommandPalette",
         "openSearch",
         "redo",
         "searchNavigate",
@@ -11091,8 +11111,7 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "expression",
-              "sourceHash": "b1ac4ded467282039b6812765914d78aaf09c61357460318b1eeebaf1360baf4"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11136,6 +11155,18 @@
             "readonly": false
           },
           {
+            "name": "documentIdentity",
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorDocumentIdentity",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
             "name": "editorProfile",
             "runtimeType": "String",
             "semanticType": "PropType<MarkdownEditorProfile>",
@@ -11167,8 +11198,7 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "expression",
-              "sourceHash": "0c3c9da9090af2f3d5abf85fe4d16089e5003acb63a77f133a05ddfd8f1d3873"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11182,6 +11212,18 @@
             "default": {
               "kind": "literal",
               "value": "auto"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "lang",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11274,6 +11316,19 @@
             "readonly": false
           },
           {
+            "name": "nativeWritingTools",
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownNativeWritingToolsMode>",
+            "nullable": false,
+            "values": ["auto", "disabled"],
+            "default": {
+              "kind": "literal",
+              "value": "auto"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
             "name": "placeholder",
             "runtimeType": "String",
             "semanticType": null,
@@ -11355,8 +11410,7 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "expression",
-              "sourceHash": "2968093feca443c24116a2a1f9bd69b43c074a4c5257099618b28cec90492948"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11427,6 +11481,19 @@
             "readonly": false
           },
           {
+            "name": "spellcheck",
+            "runtimeType": "Array",
+            "semanticType": "PropType<MarkdownSpellcheckMode | boolean>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "auto"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
             "name": "statusDensity",
             "runtimeType": "String",
             "semanticType": "PropType<MarkdownEditorStatusDensity>",
@@ -11446,8 +11513,7 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "expression",
-              "sourceHash": "cfc15051a6dd0136bee28f5b717bc886c658f75188c89ae1f44492778daa03db"
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11689,13 +11755,30 @@
               {
                 "name": "_batch",
                 "type": "MarkdownAttachmentBatchIntent",
-                "optional": true,
+                "optional": false,
                 "rest": false
               }
             ]
           }
         ],
         "exposed": [
+          {
+            "name": "applyAttachmentResult",
+            "parameters": [
+              {
+                "name": "result",
+                "type": "MarkdownAttachmentProviderResult",
+                "optional": false,
+                "rest": false
+              }
+            ],
+            "returnType": null
+          },
+          {
+            "name": "closeCommandPalette",
+            "parameters": [],
+            "returnType": null
+          },
           {
             "name": "closeSearch",
             "parameters": [],
@@ -11729,6 +11812,11 @@
                 "rest": false
               }
             ],
+            "returnType": null
+          },
+          {
+            "name": "openCommandPalette",
+            "parameters": [],
             "returnType": null
           },
           {
@@ -11802,6 +11890,7 @@
         "cspNonce",
         "features",
         "initialRender",
+        "loadingText",
         "mode",
         "trustedHtmlFactory",
         "trustedScriptUrlFactory"
@@ -11910,6 +11999,19 @@
             "default": {
               "kind": "null",
               "value": null
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "loadingText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "Rendering markdown..."
             },
             "required": false,
             "readonly": false
@@ -25444,6 +25546,7 @@
       "classification": "portable",
       "props": [
         "copiedLabel",
+        "disabled",
         "errorLabel",
         "inline",
         "label",
@@ -25477,6 +25580,18 @@
             "default": {
               "kind": "literal",
               "value": "Copied"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
             },
             "required": false,
             "readonly": false
@@ -31713,6 +31828,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
@@ -31841,6 +31957,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/image-viewer.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/select-dropdown.scss"
       ],
       "classification": "portable"
@@ -32516,6 +32633,7 @@
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/input.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
@@ -32567,6 +32685,26 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css"
       ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-danger-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-info-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-success-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-link-warning-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
       "classification": "portable"
     },
     {
@@ -32701,6 +32839,8 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/radio-button.scss",
         "vue/packages/theme-chalk/src/upload.scss"
@@ -32730,6 +32870,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/upload.scss"
@@ -34136,6 +34277,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/select-dropdown-v2.scss"
@@ -34345,6 +34487,7 @@
         "vue/packages/theme-chalk/src/date-picker/picker.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/tree-select.scss"

@@ -102,7 +102,10 @@ assert(
 
 // Playwright owner jobs must be wired into the reusable playwright workflow.
 const pwOwners = Object.entries(ownersSpec.owners ?? {})
-assert(pwOwners.length === 5, 'playwright-owners must declare exactly five owners')
+assert(
+  pwOwners.length === 6,
+  'playwright-owners must declare exactly six owners',
+)
 for (const [ownerId, owner] of pwOwners) {
   assert(owner.gate === ownerId, `owner ${ownerId} gate must equal its id`)
   const source = job(playwrightWorkflow, ownerId)
@@ -132,7 +135,7 @@ for (const [ownerId, owner] of pwOwners) {
     `${ownerId} must wait for the PR impact plan job`,
   )
   assert(
-    !/gate:\s*visual\s*$/um.test(source),
+    !/gate:\s*visual\s*$/mu.test(source),
     `${ownerId} must not reuse the generic visual owner`,
   )
 }
@@ -176,7 +179,10 @@ for (const group of ['main', 'nightly', 'release']) {
   const groupJob = job(qualityWorkflow, group)
   const playwrightJob = job(qualityWorkflow, `${group}-playwright`)
   assert(groupJob, `quality.yml must call _quality.yml for ${group}`)
-  assert(playwrightJob, `quality.yml must call playwright workflow for ${group}`)
+  assert(
+    playwrightJob,
+    `quality.yml must call playwright workflow for ${group}`,
+  )
   assert(
     groupJob.includes(`needs: ${group}-playwright`),
     `quality.yml ${group} must wait for ${group}-playwright evidence`,

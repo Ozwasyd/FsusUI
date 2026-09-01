@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+} from '../../../wasm/markdown-runtime'
 import { defaultMarkdownEditorCommands, type MarkdownEditorCommandContext } from '../src/markdown-editor'
 import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
 import {
@@ -24,6 +28,7 @@ import {
 } from '../src/markdown-editor-surfaces'
 import { resolveMarkdownSelectionToolbarPlacement } from '../src/markdown-editor-selection-toolbar'
 import { createWritingAidsController } from '../src/markdown-editor-writing-aids'
+import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
 
 const context = (revision = 1): MarkdownEditorCommandContext => ({
   dispatch: {
@@ -84,7 +89,12 @@ describe('markdown follow-on contracts', () => {
   })
 
   it('converts sanitized HTML to markdown with a loss report', () => {
-    const result = convertSanitizedHtmlToMarkdown('<h1>Title</h1><script>x()</script><p>Hi</p>')
+    const scriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-raw-script-basic',
+    )
+    const result = convertSanitizedHtmlToMarkdown(
+      `<h1>Title</h1>${scriptAttack}<p>Hi</p>`,
+    )
     expect(result.markdown).toContain('# Title')
     expect(result.markdown).toContain('Hi')
     expect(result.markdown).not.toContain('script')
@@ -99,8 +109,21 @@ describe('markdown follow-on contracts', () => {
     const found = searchMarkdownEditorCommands(defaultMarkdownEditorCommands, context(), 'bol')
     expect(found.some((command) => command.key === 'bold')).toBe(true)
     expect(groupMarkdownEditorCommands(defaultMarkdownEditorCommands).size).toBeGreaterThan(0)
-    expect(resolveMarkdownSlashQuery('see /bol', 8)).toBe('bol')
-    expect(resolveMarkdownSlashQuery('https://x', 9)).toBeNull()
+    const projection = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('/bol'),
+      { epoch: 1, id: 'doc' },
+    )
+    expect(
+      resolveMarkdownSlashQuery('/bol', 4, { projection }),
+    ).toBe('bol')
+    expect(
+      resolveMarkdownSlashQuery('https://x', 9, {
+        projection: stabilizeMarkdownEditorProjection(
+          createMarkdownEditorProjection('https://x'),
+          { epoch: 1, id: 'doc' },
+        ),
+      }),
+    ).toBeNull()
     expect(
       resolveMarkdownSelectionToolbarPlacement({ start: 1, end: 4 }, 3, 3).visible,
     ).toBe(true)

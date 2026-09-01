@@ -7,6 +7,13 @@ public static class Program
   [STAThread]
   public static void Main(string[] args)
   {
+    if (args.Contains("--conformance-v2", StringComparer.OrdinalIgnoreCase))
+    {
+      ConformanceV2Runner.Configure(args);
+      BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+      return;
+    }
+
     if (args.Contains("--render-performance", StringComparer.OrdinalIgnoreCase))
     {
       RenderPerformanceRunner.Configure(args);
@@ -27,7 +34,7 @@ public static class Program
   public static AppBuilder BuildAvaloniaApp()
   {
     var builder = AppBuilder.Configure<App>().UsePlatformDetect();
-    if (RenderPerformanceRunner.IsConfigured &&
+    if ((RenderPerformanceRunner.IsConfigured || ConformanceV2Runner.IsConfigured) &&
         RenderPerformanceRunner.UseSoftwareRendering &&
         OperatingSystem.IsLinux())
     {

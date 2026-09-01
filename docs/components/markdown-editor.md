@@ -88,6 +88,7 @@ cursor 或产生半替换。
 const result = editor.value?.dispatchTransaction(transaction)
 editor.value?.undo()
 editor.value?.redo()
+editor.value?.applyAttachmentResult(providerResult)
 
 const inserted = editor.value?.insertMarkdownAtCursor('plain markdown')
 const placeholder = editor.value?.dispatchTransaction({
@@ -107,6 +108,10 @@ const placeholder = editor.value?.dispatchTransaction({
 - `insertMarkdownAtCursor(markdown, options?)`：保留原有 boolean 返回合同；内部仍只
   调用同一个 dispatcher。`options` 可传 `selection`、`expectedRevision` 和只读
   `metadata`；需要 revision/result 的新代码直接调用 `dispatchTransaction()`。
+- `applyAttachmentResult(result)`：把 provider 的 progress、resolved、rejected、
+  cancelled、stale 或 document-abort result 交回对应 item。组件只通过保存的
+  document/revision/item identity 和已 rebase 的 source range 提交 replacement；
+  cancelled、deleted 与 stale item 不会在当前 caret 复活。
 
 组件不公开 textarea ref、内部 store、DOM/HTML state 或第三方 editor 类型。
 `applyMarkdownEditorCommand` 与 `defaultMarkdownEditorCommands` 仍是可复用的纯
@@ -118,11 +123,11 @@ command transform；`applyMarkdownEditorCommand` 仅用于同步旧调用迁移�
 `chrome` 只控制编辑器外围区域，不改变 mode、Markdown source、selection、history、
 transaction、renderer、事件或 editor identity：
 
-| Chrome | 使用场景 | Toolbar 与 status | 根表面 |
-| --- | --- | --- | --- |
-| `framed` | 表单、设置和独立编辑器 | 默认显示 | 完整公共 token frame |
-| `embedded` | 已有 document/task surface | 保留，避免丢失 command 与状态 | 不重复根边框、圆角或 material |
-| `minimal` | consumer 自行组合 command/status | 不渲染空 toolbar/footer | 仅内容表面与必要语义 |
+| Chrome     | 使用场景                         | Toolbar 与 status             | 根表面                        |
+| ---------- | -------------------------------- | ----------------------------- | ----------------------------- |
+| `framed`   | 表单、设置和独立编辑器           | 默认显示                      | 完整公共 token frame          |
+| `embedded` | 已有 document/task surface       | 保留，避免丢失 command 与状态 | 不重复根边框、圆角或 material |
+| `minimal`  | consumer 自行组合 command/status | 不渲染空 toolbar/footer       | 仅内容表面与必要语义          |
 
 三个 chrome 变体共享同一语义区域结构，并适用于全部公共 mode。隐藏外围区域不得留下
 空 separator、不可达控件或保留高度；`embedded` 与 `minimal` 的 focus-visible
@@ -136,12 +141,12 @@ Toolbar/command surface 与 status surface 由各自的默认内容或对应 slo
 preview region，`split` 才同时呈现编辑 pane 和 renderer pane，`preview` 则只呈现
 renderer surface。
 
-| Mode | 编辑表面 | 渲染表面 | 可修改 |
-| --- | --- | --- | --- |
-| `source` | 精确源码 | 无 | 是 |
-| `live` | 同一渐进渲染编辑表面 | 内嵌于编辑表面 | 是 |
-| `split` | 编辑 pane | renderer pane | 是 |
-| `preview` | 无 | renderer surface | 否 |
+| Mode      | 编辑表面             | 渲染表面         | 可修改 |
+| --------- | -------------------- | ---------------- | ------ |
+| `source`  | 精确源码             | 无               | 是     |
+| `live`    | 同一渐进渲染编辑表面 | 内嵌于编辑表面   | 是     |
+| `split`   | 编辑 pane            | renderer pane    | 是     |
+| `preview` | 无                   | renderer surface | 否     |
 
 `live` 不是 source textarea 上覆盖第二个 preview chrome。`split` 的 separator
 只表达真实 pane 边界；`preview` 即使没有编辑表面，仍保留可访问名称和
@@ -163,18 +168,63 @@ different-document 不得复用。unknown token、数字码、`write`/`ok` 别�
 所有 command surface 消费同一 `MarkdownEditorCommand` registry。Command 使用稳定
 `key`、`label`、`group`、受控 icon token、shortcut 和 presentation targets；
 `when(context)` 决定是否呈现，`enabled(context)` 决定是否可执行。Shortcut 冲突
-必须显式失败，不能由数组顺序决定。
+必须显式失败，不能由数组顺序决定。Registry 在任何 surface 渲染前拒绝重复/空
+key、空 group、未注册 icon、归一化后冲突的 shortcut，以及旧 `apply` 执行入口。
+
+`documentIdentity="{ id, epoch }"` 由 consumer 在文档切换时替换，即使新旧
+`modelValue` 相同也必须替换 identity。Identity 变化会取消 pending command、关闭
+临时 command surface、清除旧 undo/redo，并以当前受控 `modelValue` 开始新文档；
+迟到的旧文档异步结果不能提交。
 
 Command context 只公开 document identity、revision、selection、mode、read-only
 状态、syntax projection、position map、abort signal 与 transaction dispatcher。
 Command 不得解析 Markdown、查询 rendered DOM、访问 textarea/editor instance，或
 保存裸 selection offset 自行猜测 rebase。Syntax/node/range 事实由 editor
-projection 提供；内容修改通过 transaction dispatcher 完成。
+projection 提供；内容修改通过 transaction dispatcher 完成。Position map 使用
+[`createMarkdownAnchorMap`](../api/markdown-runtime-projection.md) 的
+`remapRange` 语义累计每个已提交 revision，明确区分 `mapped`、`partial` 与
+`deleted`，不会按字符串长度差修正裸 offset。Stable syntax identity 在原位编辑、
+移动与 mode 切换时保留；document epoch 或 projection id 失效时 fail closed。
 
 `run(context)` 可以同步或异步返回受控 transaction result。异步 command 的结果在
 document epoch 变化、abort 或 anchor 删除后不得提交；consumer 负责以自己的反馈
 组件展示错误，command 本身不调用 toast。Toolbar、keyboard、palette、slash 和
 selection presentation 共享同一 key、可用状态与 pending/result authority。
+
+`surfaces.commandPalette`、`surfaces.selectionToolbar` 与
+`surfaces.slashMenu` 是 opt-in presentation。Palette 搜索只读取 command 的
+`label`、`description` 与 `keywords`，显示文案来自
+`localeText.commandPalette`。Selection toolbar 与 slash menu 的 `Esc` 会关闭当前
+surface、恢复 source focus，并保留 source、selection 与 history。Slash trigger 由当前
+projection/input context 校验；执行时 trigger range 与 command result 合并为同一个
+revision-bound transaction，因此不会先删除 trigger 再提交 stale command result。
+Slash 不从 keydown、rendered DOM 或 regex 猜测 syntax；URL、code、math、escaped
+slash、RTL 普通文本与 composition-active 输入不会打开 surface。
+
+内置 `link-properties`、`anchor-properties` 与 `anchor-insert` command 同样来自
+registry snapshot；显式 insert 与已有 anchor 的 edit 使用不同本地化 command 文案，
+但进入同一受控 anchor property surface。
+前者只读取 projection 给出的 stable link node、content/marker/full ranges，并在
+这些 projection-owned ranges 内编辑 label、destination 与 title；remove 保留原始
+label bytes，open 继续使用 Markdown URL authority。后者显式 insert/edit/remove/copy
+block anchor，ID 不自动生成；projection id 失效、duplicate/invalid ID 或 stale
+revision 都拒绝 transaction。两个 contextual surface 通过公开 anchor-map identity
+声明定位，不要求 consumer 传 DOM selector/ref；source reveal、取消和成功提交都恢复
+同一 source selection/focus。
+
+Command pending/abort/stale 由 editor command session 统一管理。异步 result 仅在原
+document identity、epoch 与 revision 仍为 current 时提交；外部 reset 或组件卸载会 abort
+pending session。`statusDensity="none"` 只隐藏可见 footer，不会隐藏 degraded/fatal
+capability 的 `aria-live` announcement；该 announcement 通过
+`localeText.capabilityAnnouncement` 本地化。
+
+`localeText` 是 editor-owned 可见文案的唯一 override authority，包括 modes、
+内置 commands、command group、actions、palette、selection/slash/contextual surface、textarea 名称、
+capability/result 状态与 status 指标标签。Extension command 的 `label`、
+`title`、`description` 仍由 extension 自己提供；自定义 group key 应通过
+`localeText.commandGroups` 提供可见名称。`statusDensity="minimal"` 只显示
+字符与词数；`detailed` 使用 definition list 显示行/列、行数、字符、词、选区与
+可选字节数；普通输入不会把这些指标逐键写入 `aria-live`。
 
 ## Paste as Markdown
 
@@ -196,14 +246,31 @@ frozen anchor stale and the command fails without rebasing or inserting at a
 guessed position. Cancel, rejection, and successful confirmation restore editor
 focus and the applicable selection.
 
+Picker、paste 与 drop 都会以实际 `File` metadata 建立同一 attachment batch；picker
+不会预先制造空文件。Drop 位置必须由 browser pointer caret 经公共 source anchor map
+映射，无法取得可靠 pointer anchor 时拒绝该 drop，而不是退回当前 selection。
 Attachment descriptors are emitted only as an identity- and revision-bound
 provider intent through `upload-image`; the editor does not perform upload I/O or
-insert clipboard data URLs. The command blocks duplicate activation while
+insert clipboard data URLs. Consumers return lifecycle updates through
+`applyAttachmentResult()`. The editor owns the undoable pending source form and
+the compact, visible pending/error actions; it never stores provider HTML or a
+consumer-private URL scheme. The command blocks duplicate activation while
 reading the clipboard and fails closed during composition, when `readonly`,
 `disabled`, or `loading` is set, and in `preview` mode. Conversion and
 sanitization remain owned by
 [Markdown editor input](../api/markdown-editor-input.md) and the existing HTML
 import boundary.
+
+When the shared projection identifies the current selection as an image, the
+editor exposes one compact property surface for alternative text, destination,
+title, and the adjacent `::caption[...]` text. Apply, source reveal, safe open,
+exact/visible copy, attachment replace, caption removal, and atomic figure
+removal are visible keyboard and touch actions with a minimum 44px target. Each
+edit uses the projection-owned raw subrange and the transaction dispatcher;
+unsafe destinations are rejected by the Markdown URL authority. The surface
+does not inspect rendered `<img>` attributes, regroup DOM, synthesize alt from
+title/caption, or provide a parser fallback when the projection has no image
+node.
 
 ## History and grouping
 
@@ -271,6 +338,35 @@ resolution, authorization, navigation, and retry policy with the consumer.
 Delete and source selection remain editor transactions/selections. Provider
 result height changes use the existing editor body as the only scroll owner.
 
+## Web language tools
+
+Source 与 Live 的同一个 textarea 会绑定 browser spellcheck、autocorrect、dictation、
+context-menu correction 与 text replacement capability。`spellcheck` 接受 `auto`、
+`enabled`、`disabled` 或相应 boolean；`lang` 提供 optional BCP-47 hint，
+`nativeWritingTools` 接受 `auto` 或 `disabled`。这些属性只配置 browser capability，
+不建立第二份 document 或拼写引擎。
+
+`insertReplacementText` 必须先建立绑定当前 document identity、revision 与 selection
+的 language-tool session，再把明确 raw UTF-16 range 转成一个 `history: 'separate'`
+transaction。每次 editor revision 或 source 更新都会刷新 Web adapter 的当前状态；
+旧 session 不会被重用或猜测 rebase。composition-active、readonly、disabled、preview
+以及 stale document/revision/selection 会 fail closed。code、URL、hidden marker 与
+atomic context 的 suppression 是局部 capability，切换 Source/Live 不会通过全局关闭
+spellcheck 规避映射。
+
+raw range、hidden marker、nested syntax、atomic node 与 visual point 均消费
+`@ozwasyd/element-plus/markdown-runtime` 的稳定 projection 与 anchor map；language
+tool adapter 不解析 Markdown，也不把 raw offset 当作 visual offset。map、projection
+或 source 不属于当前 document/revision 时 replacement 会 fail closed。
+
+Playwright Chromium、Firefox 与 WebKit 测试覆盖 production fixture 中的 replacement
+event routing、revision/session refresh、Source/Live 切换、composition interlock、
+touch 与 accessibility semantics。dictation、writing-tools、context-menu、screen-reader
+和 IME 的自动化均为可重复的本地事件/输入模拟；它验证 editor 内部
+session/selection/transaction/map 语义，但不等同于 native OS spellchecker、真实
+context menu、语音服务、辅助技术或 OS IME 设备证据。完整 native host/device matrix
+归独立验收，不由这些模拟替代。
+
 ## Events
 
 | 事件名             | 说明                                                         |
@@ -308,7 +404,10 @@ result height changes use the existing editor body as the only scroll owner.
 | preview-csp-nonce | preview renderer 的 CSP nonce               | `string \| null`                          | `null`   |
 | preview-features  | preview renderer 的 feature activation 开关 | `MarkdownFeatureActivationFeatureOptions` | —        |
 | embed-provider    | consumer-owned、revision-bound embed resolver | `MarkdownEmbedProvider`                    | —        |
-| min-rows          | 编辑区最小行数                              | `number`                                  | `12`     |
+| min-rows          | 编辑区最小行数                               | `number`                                     | `12`     |
+| spellcheck        | Browser spellcheck capability                | `'auto' \| 'enabled' \| 'disabled' \| boolean` | `auto`   |
+| lang              | Optional BCP-47 language hint                 | `string`                                     | —        |
+| native-writing-tools | Browser native writing-tools capability     | `'auto' \| 'disabled'`                       | `auto`   |
 
 ## Migration
 

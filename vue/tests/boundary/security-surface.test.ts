@@ -201,6 +201,17 @@ describe('HTML and injection boundary surface', () => {
     expect(gateway).toMatch(/LATEX_OUTPUT_POLICY/)
     expect(gateway).toMatch(/MERMAID_OUTPUT_POLICY/)
     expect(gateway).toMatch(/commitMarkdownFeatureOutput/)
+    expect(gateway.match(/trustedTypes\.createPolicy\(/gu)).toHaveLength(1)
+    expect(gateway).toMatch(
+      /const MARKDOWN_FEATURE_TRUSTED_TYPES_POLICY_NAME = 'fsusui-markdown-feature'/,
+    )
+    expect(gateway).toMatch(
+      /const markdownFeatureTrustedTypesPolicies = new WeakMap<\s*Window,/,
+    )
+    expect(gateway).not.toMatch(/\bdefaultPolicy\b/)
+    expect(gateway).not.toMatch(
+      /export\s+(?:const|function|let|var|type|interface)\s+\w*TrustedTypes/,
+    )
     expect(gateway).toMatch(/sanitizeMermaidStyleSheet/)
     expect(gateway).toMatch(/sanitizeMermaidRoot/)
     expect(wasmIndex).not.toMatch(/markdown-feature-output-gateway/)

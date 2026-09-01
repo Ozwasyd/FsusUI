@@ -9,6 +9,11 @@ Use `FsusVirtualList`, `FsusVirtualListItem`, `FsusVirtualWindow`,
 content. `FsusVirtualListItemContainer` and `FsusTableV2CellContainer` are the
 recyclable visual containers used by those controls; applications normally set
 `ItemProvider`/`CellProvider` and templates instead of constructing containers.
+Realized list containers fill the current viewport width, including after the
+list is first realized before its final mounted width is known.
+`FsusInfiniteScroll` is a non-rendering behavior helper that observes an owned
+or ancestor `ScrollViewer` and raises `Loaded` when scrolling reaches the
+configured bottom distance.
 
 ## Realization and recycling
 
@@ -42,8 +47,9 @@ through a scroll operation rather than the previous container identity.
 
 ## Vue Contract Mapping
 
-Vue virtual list and table-v2 contracts map to item identity, realized windows,
-anchor correction, table budgets, and scroll-to-index behavior.
+Vue virtual list, table-v2, and infinite-scroll contracts map to item identity,
+realized windows, anchor correction, table budgets, scroll-to-index behavior,
+and scroll-bound `Loaded` callbacks.
 
 ## Supported Platform Differences
 

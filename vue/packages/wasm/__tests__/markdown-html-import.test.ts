@@ -8,11 +8,24 @@ import {
   importMarkdownClipboardSnapshot,
   sanitizeMarkdownHtmlImport,
 } from '../markdown-html-import'
+import {
+  getMarkdownXssSourceAttackFragment,
+  getMarkdownXssSourceUrl,
+} from '../../../tests/support/markdown-xss-corpus'
 
 describe('isolated markdown HTML clipboard import', () => {
   it('parses an explicit clipboard snapshot into a tree and reports blocked active content', () => {
+    const scriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-raw-script-basic',
+    )
+    const javascriptUrl = getMarkdownXssSourceUrl(
+      'mxss-url-javascript-link',
+    )
+    const iframeAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-container-iframe-srcdoc',
+    )
     const outcome = importMarkdownClipboardSnapshot({
-      html: '<p>Hi</p><script>alert(1)</script><a href="javascript:alert(1)" onclick="x()">x</a><iframe srcdoc="<p>x"></iframe>',
+      html: `<p>Hi</p>${scriptAttack}<a href="${javascriptUrl}" onclick="x()">x</a>${iframeAttack}`,
       plain: 'Hi',
       sourceApplication: 'Word',
       explicit: true,
@@ -22,7 +35,7 @@ describe('isolated markdown HTML clipboard import', () => {
     expect(outcome.tree.schemaVersion).toBe(MARKDOWN_HTML_IMPORT_SCHEMA_VERSION)
     expect(outcome.tree.importerVersion).toBe(MARKDOWN_HTML_IMPORT_IMPORTER_VERSION)
     const serialized = sanitizeMarkdownHtmlImport(
-      '<p>Hi</p><script>alert(1)</script><a href="javascript:alert(1)" onclick="x()">x</a>',
+      `<p>Hi</p>${scriptAttack}<a href="${javascriptUrl}" onclick="x()">x</a>`,
     )
     expect(serialized.html).toContain('<p>Hi</p>')
     expect(serialized.html).not.toMatch(/script/i)
@@ -79,8 +92,11 @@ describe('isolated markdown HTML clipboard import', () => {
   })
 
   it('strips style URLs, SVG, forms, and control characters from the import tree', () => {
+    const svgScriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-namespace-svg-script',
+    )
     const outcome = importMarkdownClipboardSnapshot({
-      html: '<p style="background:url(https://evil)">A\u0000B</p><svg><script>x</script></svg><form action="https://x"><input></form>',
+      html: `<p style="background:url(https://evil)">A\u0000B</p>${svgScriptAttack}<form action="https://x"><input></form>`,
       explicit: true,
     })
     expect(outcome.ok).toBe(true)
@@ -96,8 +112,14 @@ describe('isolated markdown HTML clipboard import', () => {
   })
 
   it('kills live DOM insertion, network load, script execution, auto-rich-paste, and external services', () => {
+    const scriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-raw-script-basic',
+    )
+    const javascriptUrl = getMarkdownXssSourceUrl(
+      'mxss-url-javascript-link',
+    )
     const report = evaluateMarkdownHtmlImportMutations(
-      '<script>alert(1)</script><a href="javascript:alert(1)">x</a>',
+      `${scriptAttack}<a href="${javascriptUrl}">x</a>`,
     )
     expect(report.mutations.map((mutation) => mutation.kind)).toEqual([
       'live-dom-insertion',

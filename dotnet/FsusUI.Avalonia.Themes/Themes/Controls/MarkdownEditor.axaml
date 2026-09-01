@@ -18,7 +18,7 @@
           BorderThickness="{TemplateBinding BorderThickness}"
           CornerRadius="{TemplateBinding CornerRadius}"
           Padding="{TemplateBinding Padding}">
-          <ScrollViewer>
+          <ScrollViewer Name="PART_Scroll">
             <ContentPresenter Name="PART_Content" />
           </ScrollViewer>
         </Border>

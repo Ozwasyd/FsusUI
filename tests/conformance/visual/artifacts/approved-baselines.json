@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "edf9043d5a4c6e7e92f332fcfdbfe5d7fb1dc014eb5ae158c25b0fabd475392f"
+    "sha256": "cb5f3a4f83d2ef04e1928357a8196edadf4887cba8783d2bdbf9e912da900f95"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -2421,6 +2421,486 @@
         },
         "textBaseline": 24.7
       }
+    },
+    {
+      "id": "avatar-vue-parity-web-avalonia",
+      "component": "display-primitives",
+      "fixture": {
+        "page": "visual/display-primitives",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "circle-square-fallback-64",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.fill.base",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/avatar-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 64,
+          "height": 64
+        },
+        "color": {
+          "token": "color.fill.base",
+          "lab": [96.2, 0.2, -0.5]
+        },
+        "radius": 299.5,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 16
+        },
+        "textBaseline": 46
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/avatar-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 64,
+          "height": 64
+        },
+        "color": {
+          "token": "color.fill.base",
+          "lab": [96.2, 0.2, -0.5]
+        },
+        "radius": 299.5,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 16
+        },
+        "textBaseline": 46
+      }
+    },
+    {
+      "id": "check-tag-vue-parity-web-avalonia",
+      "component": "selection-controls",
+      "fixture": {
+        "page": "visual/selection-controls",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "checked-unchecked-pair",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.action.primary",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/check-tag-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 100.8,
+          "height": 24
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [37.9, 7.8, -41.2]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 7.9
+        },
+        "textBaseline": 45
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/check-tag-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 101,
+          "height": 24
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [37.9, 7.8, -41.2]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 7.9
+        },
+        "textBaseline": 45
+      }
+    },
+    {
+      "id": "checkbox-button-vue-parity-web-avalonia",
+      "component": "selection-controls",
+      "fixture": {
+        "page": "visual/selection-controls",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "checked-unchecked-disabled-triple",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.surface.base",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/checkbox-button-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 91.1,
+          "height": 40
+        },
+        "color": {
+          "token": "color.surface.base",
+          "lab": [100, 0, 0]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 8
+        },
+        "textBaseline": 44
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/checkbox-button-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 90,
+          "height": 40
+        },
+        "color": {
+          "token": "color.surface.base",
+          "lab": [100, 0, 0]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 8
+        },
+        "textBaseline": 44
+      }
+    },
+    {
+      "id": "collapse-vue-parity-web-avalonia",
+      "component": "navigation-primitives",
+      "fixture": {
+        "page": "visual/navigation-primitives",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "first-expanded-disabled-third",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.surface.base",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/collapse-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 512,
+          "height": 152
+        },
+        "color": {
+          "token": "color.surface.base",
+          "lab": [100, 0, 0]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 0
+        },
+        "textBaseline": 45
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/collapse-vue-parity.png",
+        "geometry": {
+          "x": 24,
+          "y": 24,
+          "width": 512,
+          "height": 151
+        },
+        "color": {
+          "token": "color.surface.base",
+          "lab": [100, 0, 0]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 24,
+          "paddingY": 24,
+          "gap": 0
+        },
+        "textBaseline": 45
+      }
+    },
+    {
+      "id": "markdown-editor-vue-parity-web-avalonia",
+      "component": "markdown-editor",
+      "fixture": {
+        "page": "visual/markdown-editor",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "source-surface-short-doc",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "text.editor.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/markdown-editor-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 820,
+          "height": 185.6
+        },
+        "color": {
+          "token": "text.editor.surface",
+          "lab": [100, 0, 0]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 16,
+          "paddingY": 16,
+          "gap": 0
+        },
+        "textBaseline": 48
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/markdown-editor-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 820,
+          "height": 186
+        },
+        "color": {
+          "token": "text.editor.surface",
+          "lab": [100, 0, 0]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 16,
+          "paddingY": 16,
+          "gap": 0
+        },
+        "textBaseline": 48
+      }
+    },
+    {
+      "id": "icon-text-vue-parity-web-avalonia",
+      "component": "icon-text",
+      "fixture": {
+        "page": "visual/icon-text",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "six-type-link-row",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.action.primary",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/icon-text-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 55.1,
+          "height": 20
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [37.9, 7.8, -41.2]
+        },
+        "radius": 4,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 12
+        },
+        "textBaseline": 15
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-text-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 56,
+          "height": 20
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [37.9, 7.8, -41.2]
+        },
+        "radius": 4,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 12
+        },
+        "textBaseline": 15
+      }
+    },
+    {
+      "id": "layout-vue-parity-web-avalonia",
+      "component": "layout-primitives",
+      "fixture": {
+        "page": "visual/layout-primitives",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "row-4-col-span6-gutter20",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.fill.light",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/layout-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 290,
+          "height": 46
+        },
+        "color": {
+          "token": "color.fill.light",
+          "lab": [93.2, -0.6, -3.5]
+        },
+        "radius": 4,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 20
+        },
+        "textBaseline": 22
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/layout-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 290,
+          "height": 46
+        },
+        "color": {
+          "token": "color.fill.light",
+          "lab": [93.2, -0.6, -3.5]
+        },
+        "radius": 4,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 20
+        },
+        "textBaseline": 22
+      }
+    },
+    {
+      "id": "divider-vue-parity-web-avalonia",
+      "component": "display-primitives",
+      "fixture": {
+        "page": "visual/display-primitives",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "titled-plus-plain",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.border.lighter",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/divider-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 1
+        },
+        "color": {
+          "token": "color.border.lighter",
+          "lab": [100, 0, 0]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 15
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/divider-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 1
+        },
+        "color": {
+          "token": "color.border.lighter",
+          "lab": [100, 0, 0]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 15
+      }
     }
   ],
   "approvedComparisons": [
@@ -2663,6 +3143,54 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/locale-formatting-stable41-web-avalonia.json"
+    },
+    {
+      "id": "avatar-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/avatar-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "check-tag-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/check-tag-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "checkbox-button-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/checkbox-button-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "collapse-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/collapse-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "markdown-editor-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/markdown-editor-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "icon-text-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/icon-text-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "layout-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/layout-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "divider-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/divider-vue-parity-web-avalonia.json"
     }
   ]
 }

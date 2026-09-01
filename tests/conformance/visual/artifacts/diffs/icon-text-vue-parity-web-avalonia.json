@@ -1,0 +1,31 @@
+{
+  "id": "icon-text-vue-parity-web-avalonia",
+  "component": "icon-text",
+  "state": "six-type-link-row",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "color.action.primary",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-text-vue-parity.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/icon-text-vue-parity-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.8999999999999986,
+    "colorDelta": 0,
+    "radius": 0,
+    "spacing": 0,
+    "textBaseline": 0,
+    "screenshotDiffPercent": 0.000531,
+    "perceptualDelta": 0.071
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

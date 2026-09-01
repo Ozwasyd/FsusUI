@@ -4,9 +4,100 @@ Component ID: `markdown-editor`
 
 ## Avalonia API
 
-Use `FsusMarkdownEditor` for the public native shell. Document, identity, mode,
-chrome, locale, status density, and a command entry exist; live projection,
-IME, and AutomationPeer remain partial.
+Use `FsusMarkdownEditor` for the public native Source and Live surface.
+Document, identity, mode, chrome, locale, status density, transaction commands,
+and canonical projection commits share one native input and selection owner.
+Split/Preview, complete platform IME acceptance, and atomic-node automation
+actions remain partial. The editor itself exposes native Edit/Value automation
+semantics; its value is writable only while the control is enabled and not
+read-only, and the whole document is not a live region.
+
+## Editor page scrolling
+
+`ScrollContentFloor` adds a bottom content floor (in DIPs) so a short document
+still scrolls like an editor page; zero keeps the plain content extent.
+`ScrollPosition` reads and writes the editor page scroll offset, and
+`ScrollToSourceLine` scrolls the first visual line containing a source offset
+to the viewport top. Setting the position cancels the pending viewport-anchor
+restore so host-driven scrolling and the internal anchor restore cooperate.
+`ScrollViewportHeight` and `ScrollExtentHeight` expose the underlying metrics
+for hosts that persist per-document scroll state.
+
+## Per-document undo history
+
+The transaction store archives the undo/redo chain per document identity (up to
+`MaxRetainedDocumentHistories`, LRU evicted). Switching identities preserves
+each document's history; re-selecting a document whose content is unchanged
+restores its archived chain immediately, and re-presenting the archived content
+through an external reset goes live on the reset. Any other external reset
+value clears both the live chain and the archived chain for that identity,
+matching the Web hard-reset contract. `CaptureHistory` and `TryRestoreHistory`
+serialize per-document history entries (forward and inverse changes, merged
+steps included) so hosts can persist and restore undo state; a snapshot is only
+restorable onto a store holding the same identity and value.
+
+## Prose projection typography
+
+Live-mode projection spans are presented with fsus-prose-equivalent
+typography resolved from committed `SemanticKind` values: heading levels use
+the `prose.scss` size ladder (base+16/+8/+4/inherit) at weight 700, `strong`
+is bold, `code` uses the monospace face on the raised surface,
+`link` uses Scholarly Blue (`color.action.primary`), `quote` renders in muted
+text with a left border, and `list`/`task` items get the round bullet marker.
+Presentation is theme-driven; hosts do not reimplement text layout.
+
+## Native Source and Live projection
+
+Source mode keeps the authoritative raw source in one native `TextBox` as the
+only text input, selection, composition, and undo-command owner. Source and Live
+present through the same native Avalonia `TextLayout` viewport; Source uses an
+identity source map, while Live uses the canonical projection map. Live
+decorations never become document authority.
+
+The canonical Markdown runtime supplies a parser-neutral
+`FsusMarkdownProjectionSnapshot` through `CommitProjection`. Each snapshot is
+bound to the document identity, transaction revision, raw source, and feature
+revision. A stale document, revision, source, or feature snapshot is rejected
+without replacing the current source. `ProjectionRequested` identifies the
+exact state for which a new projection is needed.
+
+Native hosts consume that runtime through the versioned
+`IFsusMarkdownProjectionProducer` boundary. The current sanctioned
+`InterimHostBridge` adapts output produced outside .NET by
+`@ozwasyd/element-plus/markdown-runtime`; it must not parse Markdown. The future
+`CanonicalNativeBinding` will bind the same C++ runtime and keep the production
+envelope unchanged. `FsusMarkdownProjectionProducerContract.Validate` rejects
+an unknown contract version, noncanonical source-runtime identity, stale
+request binding, malformed tiling, vocabulary drift, retired identity reuse,
+or cross-document identity reuse before `CommitProjection` runs.
+
+Explicit spans are positive-length, ascending, non-overlapping raw UTF-16
+ranges. Uncovered gaps are exact current-source fallback tiles; an explicit
+`SourceFallback` also reproduces its source slice and names a reason. The
+machine vocabulary and identity/invalidation/upgrade rules are owned by
+[`spec/avalonia/markdown-projection-producer-contract.json`](../../../spec/avalonia/markdown-projection-producer-contract.json),
+with executable vectors beside it. Removed node ids remain retired for the
+document epoch. A producer swap occurs at a new epoch unless it imports the
+canonical identity allocator and tombstones.
+
+Projection spans use raw UTF-16 source ranges and stable node identities.
+`Text`, `HiddenMarker`, `Atomic`, and `SourceFallback` presentations support
+ordinary text, hidden Markdown syntax, atomic before/after caret placement, and
+localized source fallback without introducing a second Markdown parser.
+`FsusMarkdownProjectionMap` maps caret/pointer positions bidirectionally, and
+`FsusMarkdownSourceCoordinateMap` preserves the raw/normalized relationship for
+BOM, CRLF/CR, CJK, emoji, and RTL text.
+
+After an ordinary transaction, unaffected spans are remapped through the
+transaction position map and retain their identities. Invalidated gaps render
+the current raw source until the canonical owner commits the next snapshot; the
+control does not rebuild a parallel parse tree.
+
+Source/Live mode changes preserve the source line at the top of the viewport,
+then resolve its new pixel position through the active source/presentation map.
+The viewport snaps to the mapped line boundary so hidden markers and atomic
+presentations cannot introduce clipped leading glyphs or a different logical
+scroll context.
 
 ## Transaction contract
 
@@ -37,7 +128,9 @@ deletion.
 ## Vue Contract Mapping
 
 Maps the Vue markdown editor chrome/document/mode contract onto
-`FsusMarkdownEditor`. Unimplemented live/IME semantics stay `partial`.
+`FsusMarkdownEditor`. The projection snapshot is a native transport for the
+same parser-owned source ranges and stable identities; it is not an Avalonia
+Markdown parser.
 
 ## Supported Platform Differences
 
@@ -57,17 +150,37 @@ using FsusUI.Avalonia.Controls;
 
 var editor = new FsusMarkdownEditor
 {
-  Document = "# Draft",
+  Document = "**Draft**",
   DocumentIdentity = new FsusMarkdownDocumentIdentity("draft", 1),
-  Mode = FsusMarkdownEditorMode.Source,
   Chrome = FsusMarkdownEditorChrome.Framed,
   StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
 };
+
+editor.ProjectionRequested += async (_, request) =>
+{
+  var result = await FsusMarkdownProjectionProducerContract.ProduceAndCommitAsync(
+    editor,
+    canonicalProjectionProducer,
+    request);
+  if (!result.Accepted)
+  {
+    // Live remains in its current-source fallback state.
+    return;
+  }
+};
+
+editor.Mode = FsusMarkdownEditorMode.Live;
 ```
 
 ## Known Limitations
 
-Live projection, syntax-aware input, IME integration, AutomationPeer
-semantics, and visual decoration remain partial.
+Split/Preview presentation, complete syntax-specific input behavior, real
+native IME matrix acceptance, atomic-node AutomationPeer actions, and final AOT
+acceptance remain partial. When no current canonical snapshot exists, Live
+mode intentionally presents localized/current raw source fallback and reports
+`source-fallback`.
+The shipped producer contract does not include the future native shared
+library or an in-process .NET Markdown parser; hosts must provide a canonical
+runtime bridge until the native binding is packaged.
 The Vue-only paste-as-Markdown review flow does not currently map to a native
 Avalonia command.

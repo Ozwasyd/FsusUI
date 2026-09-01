@@ -1,12 +1,131 @@
+export {
+  commitMarkdownLanguageToolMutation,
+  createMarkdownLanguageToolSession,
+  resolveMarkdownLanguageToolCapability,
+  resolveMarkdownLanguageToolContextCapability,
+  type MarkdownLanguageToolCapability,
+  type MarkdownLanguageToolCommitInput,
+  type MarkdownLanguageToolCommitResult,
+  type MarkdownLanguageToolConfig,
+  type MarkdownLanguageToolReason,
+  type MarkdownLanguageToolSession,
+  type MarkdownLanguageToolSessionKind,
+  type MarkdownLanguageToolStatus,
+  type MarkdownNativeWritingToolsMode,
+  type MarkdownSpellcheckMode,
+} from './markdown-editor-language-tools'
+export {
+  bindMarkdownWebLanguageTools,
+  planMarkdownWebReplacement,
+  resolveMarkdownWebLanguageCoordinates,
+  type MarkdownWebLanguageBeforeInput,
+  type MarkdownWebLanguageController,
+  type MarkdownWebLanguageCoordinates,
+  type MarkdownWebTextareaLike,
+} from './markdown-editor-language-web'
+import type {
+  MarkdownNativeWritingToolsMode,
+  MarkdownSpellcheckMode,
+} from './markdown-editor-language-tools'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { buildProps, definePropType } from '@element-plus/utils'
 
 import type { ExtractPropTypes, PropType } from 'vue'
 import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm'
 import type { MarkdownEmbedProvider } from '../../../wasm/markdown-embed-provider'
+import type { MarkdownStableProjection } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
 import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
+export {
+  captureMarkdownAttachmentInput,
+  createMarkdownAttachmentCaptureSession,
+  createMarkdownAttachmentAtomicPresentation,
+  createMarkdownAttachmentBatch,
+  createMarkdownAttachmentRequest,
+  createMarkdownAttachmentSession,
+  commitMarkdownAttachmentResult,
+  evaluateMarkdownAttachmentAcceptance,
+  evaluateMarkdownAttachmentCaptureMutations,
+  evaluateMarkdownAttachmentMutations,
+  evaluateMarkdownAttachmentPresentationMutations,
+  markdownFromAttachmentPayload,
+  queryMarkdownAttachmentUnfinishedCount,
+  validateMarkdownAttachmentPrepublish,
+  type MarkdownAttachmentAcceptanceReport,
+  type MarkdownAttachmentAnchor,
+  type MarkdownAttachmentAtomicAction,
+  type MarkdownAttachmentAtomicPresentation,
+  type MarkdownAttachmentBatchIntent,
+  type MarkdownAttachmentCaptureContext,
+  type MarkdownAttachmentCaptureInput,
+  type MarkdownAttachmentCaptureRejection,
+  type MarkdownAttachmentCaptureResult,
+  type MarkdownAttachmentCaptureSession,
+  type MarkdownAttachmentInputFile,
+  type MarkdownAttachmentIntent,
+  type MarkdownAttachmentItemIntent,
+  type MarkdownAttachmentItemKind,
+  type MarkdownAttachmentMarkdownKind,
+  type MarkdownAttachmentMutationKind,
+  type MarkdownAttachmentPresentationMutationKind,
+  type MarkdownAttachmentProvider,
+  type MarkdownAttachmentProviderRequest,
+  type MarkdownAttachmentProviderResult,
+  type MarkdownAttachmentProviderStatus,
+  type MarkdownAttachmentQueryState,
+  type MarkdownAttachmentRange,
+  type MarkdownAttachmentSourceKind,
+} from './markdown-editor-attachment'
+export {
+  cancelMarkdownAttachmentJob,
+  createMarkdownAttachmentJob,
+  evaluateMarkdownAttachmentLifecycleMutations,
+  formatMarkdownAttachmentPendingSource,
+  planMarkdownAttachmentInsert,
+  planMarkdownAttachmentRemove,
+  planMarkdownAttachmentResolve,
+  progressMarkdownAttachmentJob,
+  rebaseMarkdownAttachmentJob,
+  retryMarkdownAttachmentJob,
+  type MarkdownAttachmentJob,
+  type MarkdownAttachmentLifecycleMutationKind,
+  type MarkdownAttachmentPhase,
+} from './markdown-editor-attachment-lifecycle'
+export {
+  decomposeMarkdownImageNode,
+  evaluateMarkdownImagePropertyMutations,
+  evaluateMarkdownPropertyMutations,
+  planMarkdownImageAltChange,
+  planMarkdownImageAltEdit,
+  planMarkdownImageAttachmentReplace,
+  planMarkdownImageDestinationEdit,
+  planMarkdownImageRemove,
+  planMarkdownImageTitleEdit,
+  planMarkdownLinkUnwrap,
+  validateMarkdownPropertyUrl,
+  type DecomposedMarkdownImageNode,
+  type DecomposedMarkdownImageSubrange,
+  type MarkdownImagePropertyMutationKind,
+} from './markdown-editor-link-image'
+export {
+  escapeCaptionText,
+  evaluateMarkdownCaptionAcceptance,
+  evaluateMarkdownCaptionAcceptanceMutations,
+  findMarkdownFigures,
+  formatMarkdownFigureExactCopy,
+  formatMarkdownFigureVisibleCopy,
+  planMarkdownCaptionEdit,
+  planMarkdownCaptionInsert,
+  planMarkdownCaptionRemove,
+  planMarkdownFigureCut,
+  planMarkdownFigureDelete,
+  planMarkdownFigureMove,
+  type MarkdownCaptionAcceptanceMutationKind,
+  type MarkdownCaptionAcceptanceReport,
+  type MarkdownFigure,
+} from './markdown-editor-caption'
+
 import type {
   MarkdownEditorHistoryState,
   MarkdownEditorDocumentIdentity,
@@ -375,8 +494,28 @@ export const resolveMarkdownEditorToolbarLimit = (
   return Math.min(6, commandCount)
 }
 
+const sortMarkdownEditorCommands = <
+  T extends {
+    readonly group?: string
+    readonly key: string
+    readonly priority?: number
+  },
+>(
+  commands: readonly T[],
+) =>
+  [...commands].sort(
+    (left, right) =>
+      (right.priority ?? 0) - (left.priority ?? 0) ||
+      (left.group ?? '').localeCompare(right.group ?? '') ||
+      left.key.localeCompare(right.key),
+  )
+
 export const resolveMarkdownEditorPrimaryCommands = <
-  T extends { readonly key: string },
+  T extends {
+    readonly group?: string
+    readonly key: string
+    readonly priority?: number
+  },
 >(
   commands: readonly T[],
   density: MarkdownEditorToolbarDensity,
@@ -384,8 +523,10 @@ export const resolveMarkdownEditorPrimaryCommands = <
 ): T[] => {
   const keySet = primaryKeys?.length ? new Set(primaryKeys) : null
   const selected = keySet
-    ? commands.filter((command) => keySet.has(command.key))
-    : [...commands]
+    ? sortMarkdownEditorCommands(
+        commands.filter((command) => keySet.has(command.key)),
+      )
+    : sortMarkdownEditorCommands(commands)
   return selected.slice(
     0,
     resolveMarkdownEditorToolbarLimit(density, selected.length),
@@ -393,7 +534,11 @@ export const resolveMarkdownEditorPrimaryCommands = <
 }
 
 export const resolveMarkdownEditorOverflowCommands = <
-  T extends { readonly key: string },
+  T extends {
+    readonly group?: string
+    readonly key: string
+    readonly priority?: number
+  },
 >(
   commands: readonly T[],
   density: MarkdownEditorToolbarDensity,
@@ -401,9 +546,11 @@ export const resolveMarkdownEditorOverflowCommands = <
 ): T[] => {
   const keySet = primaryKeys?.length ? new Set(primaryKeys) : null
   if (keySet) {
-    return commands.filter((command) => !keySet.has(command.key))
+    return sortMarkdownEditorCommands(
+      commands.filter((command) => !keySet.has(command.key)),
+    )
   }
-  return commands.slice(
+  return sortMarkdownEditorCommands(commands).slice(
     resolveMarkdownEditorToolbarLimit(density, commands.length),
   )
 }
@@ -416,6 +563,8 @@ export interface MarkdownEditorActionItem {
 }
 
 export interface MarkdownEditorCommandResult {
+  readonly focus?: 'editor' | 'surface' | 'none'
+  readonly surface?: 'anchor-properties' | 'link-properties'
   readonly transaction?: MarkdownEditorTransaction
 }
 
@@ -426,6 +575,7 @@ export type MarkdownEditorCommandLifecycleState =
   | 'rejected'
   | 'aborted'
   | 'stale'
+  | 'deleted'
 
 export type MarkdownEditorCommandIcon =
   | 'bold'
@@ -453,6 +603,8 @@ export interface MarkdownEditorLocaleText {
   readonly actions: Readonly<Record<MarkdownEditorActionKey, string>>
   readonly pasteAsMarkdown: Readonly<{
     cancel: string
+    clipboardFailed: string
+    clipboardUnavailable: string
     conversionWarnings: string
     description: string
     disabledDescriptions: Readonly<{
@@ -471,16 +623,99 @@ export interface MarkdownEditorLocaleText {
     stale: string
     title: string
   }>
+  readonly commandPalette: Readonly<{
+    empty: string
+    results: (count: number) => string
+    searchPlaceholder: string
+    title: string
+  }>
+  readonly contextual: Readonly<{
+    anchorId: string
+    apply: string
+    cancel: string
+    copy: string
+    destination: string
+    editAnchor: string
+    editLink: string
+    invalidAnchor: string
+    insertAnchor: string
+    label: string
+    open: string
+    removeAnchor: string
+    removeLink: string
+    sourceReveal: string
+    title: string
+    unsafeUrl: string
+  }>
+  readonly commandGroups: Readonly<
+    Partial<Record<'block' | 'format' | 'insert', string>> & {
+      readonly [key: string]: string | undefined
+    }
+  >
+  readonly surfaces: Readonly<{
+    selectionToolbar: string
+    slashMenu: string
+    commandPending: string
+    commandRejected: string
+  }>
+  readonly textarea: Readonly<{
+    live: string
+    source: string
+  }>
+  readonly states: Readonly<{
+    disabled: string
+    empty: string
+    loading: string
+    readonly: string
+  }>
+  readonly results: Readonly<
+    Record<
+      | 'pending'
+      | 'resolved-current'
+      | 'rejected'
+      | 'aborted'
+      | 'stale'
+      | 'deleted',
+      string
+    >
+  >
+  readonly capabilities: Readonly<
+    Record<
+      | 'supported'
+      | 'unsupported-platform'
+      | 'runtime-unavailable'
+      | 'projection-failed'
+      | 'feature-degraded'
+      | 'fatal',
+      string
+    >
+  >
+  readonly capabilityAnnouncement: (capability: string) => string
   readonly overflow: string
   readonly overflowAria: (count: number) => string
   readonly editorAria: string
   readonly modeSwitcherAria: string
-  readonly metrics: Readonly<{ characters: string; words: string }>
+  readonly metrics: Readonly<{
+    bytes: string
+    characters: string
+    column: string
+    line: string
+    lines: string
+    selected: string
+    words: string
+  }>
 }
 
-export type MarkdownEditorLocaleTextOverride = {
-  readonly [K in keyof MarkdownEditorLocaleText]?: MarkdownEditorLocaleText[K]
-}
+type MarkdownEditorLocaleDeepPartial<T> = T extends (
+  ...args: infer _Args
+) => unknown
+  ? T
+  : T extends object
+    ? { readonly [K in keyof T]?: MarkdownEditorLocaleDeepPartial<T[K]> }
+    : T
+
+export type MarkdownEditorLocaleTextOverride =
+  MarkdownEditorLocaleDeepPartial<MarkdownEditorLocaleText>
 
 export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
   Object.freeze({
@@ -491,13 +726,13 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       preview: '预览',
     }),
     commands: Object.freeze({
-      bold: 'Bold',
-      code: 'Code',
-      heading: 'Heading',
-      image: 'Insert image',
-      italic: 'Italic',
-      link: 'Link',
-      quote: 'Quote',
+      bold: '加粗',
+      code: '代码',
+      heading: '标题',
+      image: '插入图片',
+      italic: '斜体',
+      link: '链接',
+      quote: '引用',
     }),
     actions: Object.freeze({
       image: '上传图片',
@@ -505,32 +740,109 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       submit: '提交',
     }),
     pasteAsMarkdown: Object.freeze({
-      cancel: 'Cancel',
-      conversionWarnings: 'Conversion warnings',
-      description:
-        'Review the converted Markdown and source changes before importing.',
+      cancel: '取消',
+      clipboardFailed: '无法读取剪贴板。',
+      clipboardUnavailable: '当前环境无法访问剪贴板。',
+      conversionWarnings: '转换警告',
+      description: '导入前检查转换后的 Markdown 与源码变更。',
       disabledDescriptions: Object.freeze({
-        composition: 'Unavailable while text composition is active.',
-        disabled: 'Unavailable while the editor is disabled.',
-        loading: 'Unavailable while the editor is loading.',
-        previewOnly: 'Unavailable in preview only mode.',
-        readonly: 'Unavailable while the editor is readonly.',
+        composition: '文字组合输入期间不可用。',
+        disabled: '编辑器已禁用。',
+        loading: '编辑器加载期间不可用。',
+        previewOnly: '仅预览模式下不可用。',
+        readonly: '编辑器为只读状态。',
       }),
-      importMarkdown: 'Import Markdown',
-      markdownPreview: 'Markdown preview',
-      pastePlainText: 'Paste plain text',
-      sourceAfter: 'After',
-      sourceBefore: 'Before',
-      sourceDiff: 'Source diff',
-      stale: 'The document or selection changed. Review the clipboard again.',
-      title: 'Paste as Markdown',
+      importMarkdown: '导入 Markdown',
+      markdownPreview: 'Markdown 预览',
+      pastePlainText: '粘贴纯文本',
+      sourceAfter: '变更后',
+      sourceBefore: '变更前',
+      sourceDiff: '源码差异',
+      stale: '文档或选区已变化，请重新检查剪贴板。',
+      title: '粘贴为 Markdown',
     }),
+    commandPalette: Object.freeze({
+      empty: '没有匹配的命令',
+      results: (count: number) => `${count} 个命令`,
+      searchPlaceholder: '搜索命令',
+      title: '命令面板',
+    }),
+    contextual: Object.freeze({
+      anchorId: '锚点 ID',
+      apply: '应用',
+      cancel: '取消',
+      copy: '复制',
+      destination: '目标地址',
+      editAnchor: '编辑块锚点',
+      editLink: '编辑链接',
+      invalidAnchor: '锚点 ID 无效或已存在',
+      insertAnchor: '插入块锚点',
+      label: '显示文本',
+      open: '打开',
+      removeAnchor: '移除锚点',
+      removeLink: '移除链接并保留文本',
+      sourceReveal: '在源码中显示',
+      title: '标题',
+      unsafeUrl: '链接地址不安全或不受支持',
+    }),
+    commandGroups: Object.freeze({
+      block: '块',
+      format: '格式',
+      insert: '插入',
+    }),
+    surfaces: Object.freeze({
+      selectionToolbar: '选区工具',
+      slashMenu: '块插入命令',
+      commandPending: '命令执行中',
+      commandRejected: '命令执行失败',
+    }),
+    textarea: Object.freeze({
+      live: 'Markdown 实时编辑区',
+      source: 'Markdown 源码编辑区',
+    }),
+    states: Object.freeze({
+      disabled: '已禁用',
+      empty: '空文档',
+      loading: '加载中',
+      readonly: '只读',
+    }),
+    results: Object.freeze({
+      pending: '执行中',
+      'resolved-current': '已完成',
+      rejected: '执行失败',
+      aborted: '已取消',
+      stale: '结果已过期',
+      deleted: '目标已删除',
+    }),
+    capabilities: Object.freeze({
+      supported: '完整支持',
+      'unsupported-platform': '当前平台不支持',
+      'runtime-unavailable': '运行时不可用',
+      'projection-failed': '语法投影失败',
+      'feature-degraded': '部分功能降级',
+      fatal: '编辑器不可用',
+    }),
+    capabilityAnnouncement: (capability: string) => `编辑器能力：${capability}`,
     overflow: '格式工具',
     overflowAria: (count: number) => `格式工具，${count} 个工具`,
-    editorAria: 'Markdown editor',
-    modeSwitcherAria: 'Markdown mode',
-    metrics: Object.freeze({ characters: 'chars', words: 'words' }),
+    editorAria: 'Markdown 编辑器',
+    modeSwitcherAria: 'Markdown 模式',
+    metrics: Object.freeze({
+      bytes: '字节',
+      characters: '字符',
+      column: '列',
+      line: '行',
+      lines: '行数',
+      selected: '已选',
+      words: '词',
+    }),
   })
+
+export type MarkdownEditorLocaleMutationKind =
+  | 'hardcoded-copy'
+  | 'error-string-matching'
+  | 'cross-language-fallback'
+  | 'duplicate-labels'
 
 export const resolveMarkdownEditorLocaleText = (
   localeText?: MarkdownEditorLocaleTextOverride,
@@ -561,15 +873,182 @@ export const resolveMarkdownEditorLocaleText = (
       ...localeText?.pasteAsMarkdown?.disabledDescriptions,
     },
   },
+  commandPalette: {
+    ...defaultMarkdownEditorLocaleText.commandPalette,
+    ...localeText?.commandPalette,
+  },
+  commandGroups: {
+    ...defaultMarkdownEditorLocaleText.commandGroups,
+    ...localeText?.commandGroups,
+  },
+  contextual: {
+    ...defaultMarkdownEditorLocaleText.contextual,
+    ...localeText?.contextual,
+  },
+  surfaces: {
+    ...defaultMarkdownEditorLocaleText.surfaces,
+    ...localeText?.surfaces,
+  },
+  textarea: {
+    ...defaultMarkdownEditorLocaleText.textarea,
+    ...localeText?.textarea,
+  },
+  states: {
+    ...defaultMarkdownEditorLocaleText.states,
+    ...localeText?.states,
+  },
+  results: {
+    ...defaultMarkdownEditorLocaleText.results,
+    ...localeText?.results,
+  },
+  capabilities: {
+    ...defaultMarkdownEditorLocaleText.capabilities,
+    ...localeText?.capabilities,
+  },
+  capabilityAnnouncement:
+    localeText?.capabilityAnnouncement ??
+    defaultMarkdownEditorLocaleText.capabilityAnnouncement,
   overflowAria:
     localeText?.overflowAria ?? defaultMarkdownEditorLocaleText.overflowAria,
 })
 
+export const resolveMarkdownEditorCommandCopy = (
+  command: MarkdownEditorCommand,
+  localeText: MarkdownEditorLocaleText,
+) => {
+  const editorOwnedCommand = defaultMarkdownEditorCommands.includes(command)
+  const localized =
+    command.key === 'paste-as-markdown'
+      ? localeText.pasteAsMarkdown.title
+      : command.key === 'link-properties'
+        ? localeText.contextual.editLink
+        : command.key === 'anchor-insert'
+          ? localeText.contextual.insertAnchor
+          : command.key === 'anchor-properties'
+            ? localeText.contextual.editAnchor
+            : editorOwnedCommand && command.icon
+              ? localeText.commands[command.icon]
+              : command.title || command.label
+  return Object.freeze({
+    label: localized,
+    name: localized,
+    description: command.description ?? localized,
+  })
+}
+
+export const resolveMarkdownEditorCapabilityText = (
+  capability: string,
+  localeText: MarkdownEditorLocaleText,
+) =>
+  capability in localeText.capabilities
+    ? localeText.capabilities[
+        capability as keyof MarkdownEditorLocaleText['capabilities']
+      ]
+    : localeText.capabilities['feature-degraded']
+
+export const evaluateMarkdownEditorLocaleMutations = () => {
+  const override = resolveMarkdownEditorLocaleText({
+    commands: { bold: 'BOLD-L10N' },
+    contextual: { editLink: 'EDIT-LINK-L10N' },
+    modes: { source: 'SOURCE-L10N' },
+    results: {
+      aborted: 'ABORTED-L10N',
+      rejected: 'REJECTED-L10N',
+    },
+    surfaces: { slashMenu: 'SLASH-L10N' },
+  })
+  const command = defaultMarkdownEditorCommands[0]!
+  const commandCopy = resolveMarkdownEditorCommandCopy(command, override)
+  const stableRejected = override.results.rejected
+  const errorStringMutation = /cancel/iu.test(
+    'provider cancelled after returning an error',
+  )
+    ? override.results.aborted
+    : override.results.rejected
+  const duplicateLabelsMutation = Object.freeze({
+    label: commandCopy.label,
+    name: command.label,
+  })
+
+  return Object.freeze({
+    authority: defaultMarkdownEditorLocaleText,
+    mutations: Object.freeze([
+      Object.freeze({
+        kind: 'hardcoded-copy' as const,
+        equivalent:
+          override.modes.source ===
+            defaultMarkdownEditorLocaleText.modes.source ||
+          override.surfaces.slashMenu ===
+            defaultMarkdownEditorLocaleText.surfaces.slashMenu ||
+          override.contextual.editLink ===
+            defaultMarkdownEditorLocaleText.contextual.editLink,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'error-string-matching' as const,
+        equivalent: errorStringMutation === stableRejected,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'cross-language-fallback' as const,
+        equivalent:
+          override.modes.preview !==
+          defaultMarkdownEditorLocaleText.modes.preview,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'duplicate-labels' as const,
+        equivalent:
+          duplicateLabelsMutation.label === duplicateLabelsMutation.name,
+        accepted: false,
+      }),
+    ]),
+  })
+}
+
 /** Syntax is supplied by the editor projection, never derived by commands. */
 export interface MarkdownEditorSyntaxContext {
-  readonly nodeId?: string
-  readonly range?: Readonly<{ end: number; start: number }>
-  readonly type?: string
+  readonly blockIdentity: string
+  readonly contentRanges: readonly Readonly<{ end: number; start: number }>[]
+  readonly diagnosticCode: string | null
+  readonly markerRanges: readonly Readonly<{ end: number; start: number }>[]
+  readonly nodeId: string
+  readonly range: Readonly<{ end: number; start: number }>
+  readonly status: 'malformed' | 'valid'
+  readonly type: string
+}
+
+export const resolveMarkdownEditorSyntaxContext = (
+  projection: MarkdownStableProjection,
+  selection: MarkdownEditorSelection,
+): MarkdownEditorSyntaxContext | undefined => {
+  const start = Math.min(selection.start, selection.end)
+  const end = Math.max(selection.start, selection.end)
+  const nodes = projection.nodes
+    .filter((node) =>
+      start === end
+        ? node.rawRange.start <= start && node.rawRange.end >= end
+        : node.rawRange.start <= start && node.rawRange.end >= end,
+    )
+    .sort((left, right) => {
+      const span =
+        left.rawRange.end -
+        left.rawRange.start -
+        (right.rawRange.end - right.rawRange.start)
+      return span || left.id.localeCompare(right.id)
+    })
+  const node = nodes[0]
+  if (!node) return undefined
+  return Object.freeze({
+    blockIdentity: node.blockIdentity,
+    contentRanges: node.rawContentRanges,
+    diagnosticCode: node.diagnosticCode,
+    markerRanges: node.rawMarkerRanges,
+    nodeId: node.id,
+    range: node.rawRange,
+    status: node.status,
+    type: node.kind,
+  })
 }
 
 export interface MarkdownEditorCommandContext {
@@ -577,6 +1056,7 @@ export interface MarkdownEditorCommandContext {
   readonly documentIdentity: MarkdownEditorDocumentIdentity
   readonly mode: MarkdownEditorMode
   readonly positionMap?: MarkdownEditorPositionMap
+  readonly projection?: MarkdownStableProjection
   readonly readonly: boolean
   readonly revision: number
   readonly selection: MarkdownEditorSelection
@@ -593,9 +1073,15 @@ export interface MarkdownEditorCommand {
   readonly icon?: MarkdownEditorCommandIcon
   readonly shortcut?: string
   readonly title?: string
+  readonly concurrent?: boolean
+  readonly keywords?: readonly string[]
+  readonly priority?: number
   readonly presentation?: readonly MarkdownEditorCommandPresentation[]
   readonly when?: (context: MarkdownEditorCommandContext) => boolean
   readonly enabled?: (context: MarkdownEditorCommandContext) => boolean
+  readonly disabledReason?: (
+    context: MarkdownEditorCommandContext,
+  ) => string | undefined
   readonly run: (
     context: MarkdownEditorCommandContext,
   ) => MarkdownEditorCommandResult | Promise<MarkdownEditorCommandResult>
@@ -682,94 +1168,167 @@ const prefixSelectedLines = (
 export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
   {
     key: 'bold',
-    label: 'B',
+    label: 'bold',
     group: 'format',
     icon: 'bold',
+    keywords: ['bold'],
+    priority: 100,
     shortcut: 'Mod+B',
-    title: 'Bold',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '**', '**', 'text') }),
+    run: (context) => ({
+      transaction: wrapSelection(
+        context.value,
+        context.selection,
+        '**',
+        '**',
+        'text',
+      ),
+    }),
   },
   {
     key: 'italic',
-    label: 'I',
+    label: 'italic',
     group: 'format',
     icon: 'italic',
+    keywords: ['italic'],
+    priority: 90,
     shortcut: 'Mod+I',
-    title: 'Italic',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '*', '*', 'text') }),
+    run: (context) => ({
+      transaction: wrapSelection(
+        context.value,
+        context.selection,
+        '*',
+        '*',
+        'text',
+      ),
+    }),
   },
   {
     key: 'heading',
-    label: 'H',
+    label: 'heading',
     group: 'block',
     icon: 'heading',
+    keywords: ['heading'],
+    priority: 80,
     shortcut: 'Mod+Alt+H',
-    title: 'Heading',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: prefixSelectedLines(context.value, context.selection, '## ') }),
+    run: (context) => ({
+      transaction: prefixSelectedLines(context.value, context.selection, '## '),
+    }),
   },
   {
     key: 'quote',
-    label: 'Q',
+    label: 'quote',
     group: 'block',
     icon: 'quote',
-    title: 'Quote',
+    priority: 70,
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: prefixSelectedLines(context.value, context.selection, '> ') }),
+    run: (context) => ({
+      transaction: prefixSelectedLines(context.value, context.selection, '> '),
+    }),
   },
   {
     key: 'code',
-    label: '{}',
+    label: 'code',
     group: 'format',
     icon: 'code',
+    priority: 60,
     shortcut: 'Mod+E',
-    title: 'Code',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '`', '`', 'code') }),
+    run: (context) => ({
+      transaction: wrapSelection(
+        context.value,
+        context.selection,
+        '`',
+        '`',
+        'code',
+      ),
+    }),
   },
   {
     key: 'link',
-    label: 'Link',
+    label: 'link',
     group: 'insert',
     icon: 'link',
+    priority: 50,
     shortcut: 'Mod+K',
-    title: 'Link',
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '[', '](https://example.com)', 'label') }),
+    run: (context) => ({
+      transaction: wrapSelection(
+        context.value,
+        context.selection,
+        '[',
+        '](https://example.com)',
+        'label',
+      ),
+    }),
   },
   {
     key: 'image',
-    label: '图片',
+    label: 'image',
     group: 'insert',
     icon: 'image',
-    title: '插入图片',
+    priority: 40,
     when: () => true,
     enabled: () => true,
-    run: (context) => ({ transaction: wrapSelection(
+    run: (context) => ({
+      transaction: wrapSelection(
         context.value,
         context.selection,
         '![',
         '](https://example.com/image.png)',
         'alt',
-      ) }),
+      ),
+    }),
   },
   {
     key: 'paste-as-markdown',
-    label: 'Paste as Markdown',
+    label: 'paste-as-markdown',
     group: 'insert',
-    title: 'Paste as Markdown',
     presentation: ['toolbar', 'palette'],
+    priority: 10,
     when: () => true,
     enabled: () => true,
     run: () => ({}),
+  },
+  {
+    key: 'link-properties',
+    label: 'link-properties',
+    group: 'format',
+    presentation: ['selection', 'palette'],
+    priority: 45,
+    when: (context) => context.syntax?.type === 'link',
+    enabled: (context) => context.syntax?.status === 'valid',
+    run: () => ({ focus: 'surface', surface: 'link-properties' }),
+  },
+  {
+    key: 'anchor-properties',
+    label: 'anchor-properties',
+    group: 'block',
+    presentation: ['selection', 'palette'],
+    priority: 35,
+    when: (context) => context.syntax?.type === 'anchor',
+    enabled: (context) => context.syntax?.status !== 'malformed',
+    run: () => ({ focus: 'surface', surface: 'anchor-properties' }),
+  },
+  {
+    key: 'anchor-insert',
+    label: 'anchor-insert',
+    group: 'block',
+    presentation: ['slash', 'palette'],
+    priority: 34,
+    when: (context) =>
+      context.syntax?.type !== 'anchor' &&
+      context.selection.start === context.selection.end,
+    enabled: (context) => context.syntax?.status !== 'malformed',
+    run: () => ({ focus: 'surface', surface: 'anchor-properties' }),
   },
 ]
 
@@ -781,22 +1340,41 @@ export const isMarkdownEditorCommandVisible = (
 export const isMarkdownEditorCommandEnabled = (
   command: MarkdownEditorCommand,
   context: MarkdownEditorCommandContext,
-) => !context.readonly && !context.signal.aborted && (command.enabled?.(context) ?? true)
+) =>
+  !context.readonly &&
+  !context.signal.aborted &&
+  (command.enabled?.(context) ?? true)
 
 export const getMarkdownEditorCommand = (
-  commands: readonly MarkdownEditorCommand[], key: string,
+  commands: readonly MarkdownEditorCommand[],
+  key: string,
 ) => commands.find((command) => command.key === key)
 
 export const filterMarkdownEditorCommands = (
-  commands: readonly MarkdownEditorCommand[], context: MarkdownEditorCommandContext,
+  commands: readonly MarkdownEditorCommand[],
+  context: MarkdownEditorCommandContext,
   presentation?: MarkdownEditorCommandPresentation,
-) => commands.filter((command) => isMarkdownEditorCommandVisible(command, context) && (!presentation || !command.presentation || command.presentation.includes(presentation)))
+) =>
+  commands.filter(
+    (command) =>
+      isMarkdownEditorCommandVisible(command, context) &&
+      (!presentation ||
+        !command.presentation ||
+        command.presentation.includes(presentation)),
+  )
 
 export const resolveMarkdownEditorShortcut = (
-  commands: readonly MarkdownEditorCommand[], shortcut: string,
+  commands: readonly MarkdownEditorCommand[],
+  shortcut: string,
 ) => {
-  const matches = commands.filter((command) => command.shortcut?.toLowerCase() === shortcut.toLowerCase())
-  if (matches.length > 1) throw new Error(`Markdown editor shortcut conflict: ${shortcut}`)
+  const normalizedShortcut = shortcut.replace(/\s+/gu, '').toLowerCase()
+  const matches = commands.filter(
+    (command) =>
+      command.shortcut?.replace(/\s+/gu, '').toLowerCase() ===
+      normalizedShortcut,
+  )
+  if (matches.length > 1)
+    throw new Error(`Markdown editor shortcut conflict: ${shortcut}`)
   return matches[0]
 }
 
@@ -804,7 +1382,11 @@ export const runMarkdownEditorCommand = async (
   command: MarkdownEditorCommand,
   context: MarkdownEditorCommandContext,
 ) => {
-  if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return undefined
+  if (
+    !isMarkdownEditorCommandVisible(command, context) ||
+    !isMarkdownEditorCommandEnabled(command, context)
+  )
+    return undefined
   return await command.run(context)
 }
 
@@ -812,6 +1394,10 @@ export const markdownEditorProps = buildProps({
   modelValue: {
     type: String,
     default: '',
+  },
+  documentIdentity: {
+    type: definePropType<MarkdownEditorDocumentIdentity>(Object),
+    default: undefined,
   },
   defaultMode: {
     type: String as PropType<MarkdownEditorMode>,
@@ -893,7 +1479,7 @@ export const markdownEditorProps = buildProps({
   },
   imageActionLabel: {
     type: String,
-    default: defaultMarkdownEditorLocaleText.actions.image,
+    default: undefined,
   },
   showSaveAction: {
     type: Boolean,
@@ -901,7 +1487,7 @@ export const markdownEditorProps = buildProps({
   },
   saveActionLabel: {
     type: String,
-    default: defaultMarkdownEditorLocaleText.actions.save,
+    default: undefined,
   },
   showSubmitAction: {
     type: Boolean,
@@ -909,7 +1495,7 @@ export const markdownEditorProps = buildProps({
   },
   submitActionLabel: {
     type: String,
-    default: defaultMarkdownEditorLocaleText.actions.submit,
+    default: undefined,
   },
   actionOverflowKeys: {
     type: definePropType<readonly MarkdownEditorActionKey[]>(Array),
@@ -925,7 +1511,7 @@ export const markdownEditorProps = buildProps({
   },
   commandOverflowLabel: {
     type: String,
-    default: defaultMarkdownEditorLocaleText.overflow,
+    default: undefined,
   },
   mobileLayout: {
     type: String as PropType<MarkdownEditorMobileLayout>,
@@ -952,6 +1538,19 @@ export const markdownEditorProps = buildProps({
     type: Number,
     default: 12,
   },
+  spellcheck: {
+    type: [String, Boolean] as PropType<MarkdownSpellcheckMode | boolean>,
+    default: 'auto',
+  },
+  lang: {
+    type: String,
+    default: undefined,
+  },
+  nativeWritingTools: {
+    type: String as PropType<MarkdownNativeWritingToolsMode>,
+    values: ['auto', 'disabled'],
+    default: 'auto',
+  },
 } as const)
 
 export const markdownEditorEmits = {
@@ -959,10 +1558,13 @@ export const markdownEditorEmits = {
   [CHANGE_EVENT]: (value: string) => typeof value === 'string',
   command: (command: MarkdownEditorCommand) => Boolean(command?.key),
   'mode-change': (mode: MarkdownEditorMode) =>
-    mode === 'source' || mode === 'live' || mode === 'split' || mode === 'preview',
+    mode === 'source' ||
+    mode === 'live' ||
+    mode === 'split' ||
+    mode === 'preview',
   save: (value: string) => typeof value === 'string',
   submit: (value: string) => typeof value === 'string',
-  'upload-image': (_batch?: MarkdownAttachmentBatchIntent) => true,
+  'upload-image': (_batch: MarkdownAttachmentBatchIntent) => true,
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,

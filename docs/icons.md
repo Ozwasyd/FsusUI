@@ -75,6 +75,17 @@ pnpm run icons:check
 pnpm run icons:lint
 ```
 
+## File Type Resolution (Avalonia)
+
+`FsusUI.Avalonia.Icons` ships `FsusFileTypeIcon`, an Avalonia resolver that
+maps a file name or extension to a semantic file icon key
+(`FsusIconFileText`, `FsusIconFileMarkdown`, `FsusIconFileCode`,
+`FsusIconFileData`, `FsusIconFileImage`, `FsusIconFileArchive`,
+`FsusIconFileDocument`) with a stable `FsusIconFile` fallback for unknown
+types. Tree rows should keep the visible file name as the accessible name and
+treat the resolved icon as decorative; icons inherit the row foreground in
+light, dark, and high-contrast themes.
+
 ## Generation Workflow
 
 SVG source files live in `vue/packages/icons-svg/*.svg`. Vue icon components are

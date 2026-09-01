@@ -32,6 +32,16 @@ export const getMarkdownXssSourceAttackFragment = (id: string) => {
   return separator < 0 ? source : source.slice(separator + 2)
 }
 
+export const getMarkdownXssSourceUrl = (id: string) => {
+  const source = getMarkdownXssSource(id)
+  const destinationStart = source.lastIndexOf('](')
+  const destinationEnd = source.lastIndexOf(')')
+  if (destinationStart < 0 || destinationEnd <= destinationStart + 2) {
+    throw new Error(`markdown_xss_source_url_missing:${id}`)
+  }
+  return source.slice(destinationStart + 2, destinationEnd)
+}
+
 export function getMarkdownXssFeatureOutput(
   id: `mxss-feature-mermaid-${string}`,
 ): MermaidFeatureRenderOutput

@@ -1,11 +1,23 @@
 import { describe, expect, it } from 'vitest'
 
+import { getMarkdownXssSourceAttackFragment } from '../../../tests/support/markdown-xss-corpus'
 import {
   evaluateMarkdownCaptionRendererMutations,
   renderMarkdownCaptionFigure,
 } from '../markdown-caption-renderer'
 
 describe('markdown caption figure renderer', () => {
+  it('rejects the canonical raw-script corpus payload as caption syntax', () => {
+    const scriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-raw-script-basic',
+    )
+    expect(
+      renderMarkdownCaptionFigure(
+        `![photo](a.png)\n::caption[${scriptAttack}]\n`,
+      ),
+    ).toEqual([])
+  })
+
   it('emits safe figure/figcaption from parser groups without copying alt or title', () => {
     const source = '![photo](a.png "unused")\n::caption[hello & world]\n'
     const [figure] = renderMarkdownCaptionFigure(source)

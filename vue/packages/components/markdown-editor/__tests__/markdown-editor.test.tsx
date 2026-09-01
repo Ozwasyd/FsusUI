@@ -6,16 +6,19 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import {
   defaultMarkdownEditorCommands,
+  markdownEditorEmits,
   markdownLiveCapabilities,
   resolveMarkdownLiveCapability,
   runMarkdownEditorCommand,
 } from '../src/markdown-editor'
 import type {
+  MarkdownEditorCommand,
   MarkdownEditorInstance,
   MarkdownEditorProps,
   MarkdownEditorSelection,
   MarkdownEditorTransactionEvent,
 } from '../src/markdown-editor'
+import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
   // Synthetic composition events in this suite are not native-IME evidence.
@@ -28,23 +31,42 @@ describe('MarkdownEditor', () => {
     expectTypeOf<MarkdownEditorProps>().not.toHaveProperty(removedCapability)
   })
 
+  it('requires an attachment batch for every upload-image emission', () => {
+    expect(markdownEditorEmits['upload-image'].length).toBe(1)
+  })
+
   it('runs built-in selection commands through the public context contract', async () => {
     const bold = defaultMarkdownEditorCommands.find(
       (item) => item.key === 'bold',
     )
     if (!bold) throw new Error('missing bold command')
 
-    await expect(runMarkdownEditorCommand(bold, {
-      dispatch: { dispatch: () => { throw new Error('not expected in command construction') } },
-      documentIdentity: { epoch: 1, id: 'test-document' },
-      mode: 'source',
-      readonly: false,
-      revision: 1,
-      selection: { direction: 'forward', start: 5, end: 13 },
-      signal: new AbortController().signal,
-      syntax: { range: { start: 5, end: 13 }, type: 'paragraph' },
-      value: 'edit markdown',
-    })).resolves.toEqual({
+    await expect(
+      runMarkdownEditorCommand(bold, {
+        dispatch: {
+          dispatch: () => {
+            throw new Error('not expected in command construction')
+          },
+        },
+        documentIdentity: { epoch: 1, id: 'test-document' },
+        mode: 'source',
+        readonly: false,
+        revision: 1,
+        selection: { direction: 'forward', start: 5, end: 13 },
+        signal: new AbortController().signal,
+        syntax: {
+          blockIdentity: 'block:0',
+          contentRanges: [],
+          diagnosticCode: null,
+          markerRanges: [],
+          nodeId: 'paragraph:0',
+          range: { start: 5, end: 13 },
+          status: 'valid',
+          type: 'paragraph',
+        },
+        value: 'edit markdown',
+      }),
+    ).resolves.toEqual({
       transaction: expect.objectContaining({
         expectedRevision: undefined,
         selection: { direction: 'forward', start: 7, end: 15 },
@@ -75,6 +97,7 @@ describe('MarkdownEditor', () => {
 
   it('keeps secondary commands inside an expandable overflow menu', async () => {
     const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
       props: {
         modelValue: 'initial',
       },
@@ -95,6 +118,17 @@ describe('MarkdownEditor', () => {
         .findAll('.el-markdown-editor__command'),
     ).toHaveLength(2)
 
+    const firstOverflowCommand = wrapper.find(
+      '.el-markdown-editor__command-tray .el-markdown-editor__command',
+    )
+    ;(firstOverflowCommand.element as HTMLButtonElement).focus()
+    await wrapper
+      .find('.el-markdown-editor__command-tray')
+      .trigger('keydown', { key: 'Escape' })
+    await nextTick()
+    expect(document.activeElement).toBe(more.element)
+
+    await more.trigger('click')
     await wrapper
       .find('.el-markdown-editor__command-tray .el-markdown-editor__command')
       .trigger('click')
@@ -104,6 +138,7 @@ describe('MarkdownEditor', () => {
     expect(wrapper.find('.el-markdown-editor__command-tray').exists()).toBe(
       false,
     )
+    wrapper.unmount()
   })
 
   it('lets consumers choose primary commands and compact mobile behavior', async () => {
@@ -123,7 +158,7 @@ describe('MarkdownEditor', () => {
       wrapper
         .findAll('.el-markdown-editor__commands > .el-markdown-editor__command')
         .map((item) => item.text()),
-    ).toEqual(['H', 'Link'])
+    ).toEqual(['标题', '链接'])
 
     const more = wrapper.find('.el-markdown-editor__command-more')
     expect(more.text()).toContain('更多格式')
@@ -167,6 +202,14 @@ describe('MarkdownEditor', () => {
     if (!uploadButton) throw new Error('missing upload action in command tray')
 
     await uploadButton.trigger('click')
+    const picker = wrapper.find<HTMLInputElement>(
+      '.el-markdown-editor__attachment-picker',
+    )
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['image'], 'diagram.png', { type: 'image/png' })],
+    })
+    await picker.trigger('change')
     expect(wrapper.emitted('upload-image')).toHaveLength(1)
     expect(wrapper.find('.el-markdown-editor__command-tray').exists()).toBe(
       false,
@@ -258,7 +301,7 @@ describe('MarkdownEditor', () => {
   it('exposes save, submit, upload, and preview shell events', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: {
-        defaultMode: 'preview',
+        defaultMode: 'split',
         modelValue: '# Preview',
       },
       global: {
@@ -281,6 +324,14 @@ describe('MarkdownEditor', () => {
       wrapper.findAll('.el-markdown-editor__action').map((item) => item.text()),
     ).toEqual(['上传图片', '保存', '提交'])
     await wrapper.findAll('.el-markdown-editor__action')[0].trigger('click')
+    const picker = wrapper.find<HTMLInputElement>(
+      '.el-markdown-editor__attachment-picker',
+    )
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['image'], 'preview.png', { type: 'image/png' })],
+    })
+    await picker.trigger('change')
     await wrapper.findAll('.el-markdown-editor__action')[1].trigger('click')
     await wrapper.findAll('.el-markdown-editor__action')[2].trigger('click')
 
@@ -288,8 +339,127 @@ describe('MarkdownEditor', () => {
       html: '# Preview',
     })
     expect(wrapper.emitted('upload-image')).toHaveLength(1)
-    expect(wrapper.emitted('save')?.[0]).toEqual(['# Preview'])
-    expect(wrapper.emitted('submit')?.[0]).toEqual(['# Preview'])
+    expect(wrapper.emitted('save')?.[0]).toEqual([
+      '# Preview![Uploading preview.png...]()',
+    ])
+    expect(wrapper.emitted('submit')?.[0]).toEqual([
+      '# Preview![Uploading preview.png...]()',
+    ])
+  })
+
+  it('renders attachment lifecycle state and commits provider results through the exposed adapter', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: { modelValue: 'Draft: ' },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    textarea.setSelectionRange(7, 7)
+
+    const picker = wrapper.find<HTMLInputElement>(
+      '.el-markdown-editor__attachment-picker',
+    )
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['report'], 'report.pdf', { type: 'application/pdf' })],
+    })
+    await picker.trigger('change')
+
+    const batch = wrapper.emitted('upload-image')?.[0]?.[0] as {
+      batchId: string
+      documentIdentity: { id: string; epoch: number }
+      items: readonly { itemId: string }[]
+      revision: number
+    }
+    const itemId = batch.items[0]!.itemId
+    expect(wrapper.find('.el-markdown-editor__attachment').text()).toContain(
+      'report.pdf',
+    )
+
+    expect(
+      wrapper.vm.applyAttachmentResult({
+        status: 'progress',
+        batchId: batch.batchId,
+        itemId,
+        ratio: 0.51,
+      }),
+    ).toBe(true)
+    await nextTick()
+    expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
+      'report.pdf: 50% uploaded',
+    )
+
+    expect(
+      wrapper.vm.applyAttachmentResult({
+        status: 'resolved',
+        batchId: batch.batchId,
+        itemId,
+        documentIdentity: batch.documentIdentity,
+        revision: batch.revision,
+        payload: {
+          markdownKind: 'file',
+          href: 'https://cdn.example/report.pdf',
+          mimeType: 'application/pdf',
+          name: 'report.pdf',
+        },
+      }),
+    ).toBe(true)
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(
+      'Draft: [report.pdf](https://cdn.example/report.pdf)',
+    )
+    expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
+      'report.pdf upload complete',
+    )
+  })
+
+  it('edits active image and caption subranges through the compact property surface', async () => {
+    const source =
+      '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]'
+    const wrapper = mount(MarkdownEditor, {
+      props: { modelValue: 'seed' },
+    })
+    await wrapper.setProps({ modelValue: source })
+    await nextTick()
+    const textarea = wrapper.find('textarea')
+    ;(textarea.element as HTMLTextAreaElement).setSelectionRange(5, 5)
+    await textarea.trigger('select')
+    await nextTick()
+
+    const properties = wrapper.find('.el-markdown-editor__media-properties')
+    expect(properties.exists()).toBe(true)
+    const field = (label: string) => {
+      const owner = properties
+        .findAll('label')
+        .find((candidate) => candidate.text().startsWith(label))
+      if (!owner) throw new Error(`missing ${label} image property`)
+      return owner.find('input')
+    }
+
+    await field('Destination').setValue(
+      getMarkdownXssSourceUrl('mxss-url-javascript-link'),
+    )
+    await properties.find('button[type="submit"]').trigger('submit')
+    expect(properties.find('[role="alert"]').text()).toContain('blocked-scheme')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    await field('Alternative text').setValue('可访问 alt 😀')
+    await field('Destination').setValue('/safe/new.png')
+    await field('Title').setValue('updated title')
+    await field('Caption').setValue('更新说明 😀 RTL אב')
+    await properties.find('button[type="submit"]').trigger('submit')
+    await nextTick()
+    const edited =
+      '![可访问 alt 😀](/safe/new.png "updated title")\n::caption[更新说明 😀 RTL אב]'
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(edited)
+
+    const removeImage = properties
+      .findAll('button')
+      .find((button) => button.text() === 'Remove image')
+    if (!removeImage) throw new Error('missing remove image action')
+    await removeImage.trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('')
+    wrapper.vm.undo()
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(edited)
   })
 
   it('supports controlled mode, action visibility, disabled state, and cursor insertion', async () => {
@@ -450,6 +620,71 @@ describe('MarkdownEditor', () => {
       reason: 'no-history',
       value: '外部重置',
     })
+  })
+
+  it('cancels pending commands and clears history when document identity changes', async () => {
+    let commandSignal: AbortSignal | undefined
+    let resolveCommand: (() => void) | undefined
+    const pending = new Promise<void>((resolvePromise) => {
+      resolveCommand = resolvePromise
+    })
+    const command: MarkdownEditorCommand = {
+      group: 'test',
+      key: 'pending-command',
+      label: 'Pending command',
+      presentation: ['toolbar'],
+      run: async (context) => {
+        commandSignal = context.signal
+        await pending
+        return {
+          transaction: {
+            changes: [{ from: 0, insert: 'late', to: 0 }],
+            history: 'separate',
+            origin: 'command',
+          },
+        }
+      },
+    }
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        commands: [command],
+        documentIdentity: { epoch: 1, id: 'document-a' },
+        modelValue: 'A',
+      },
+    })
+    ;(wrapper.find('textarea').element as HTMLTextAreaElement).setSelectionRange(
+      1,
+      1,
+    )
+    expect(wrapper.vm.insertMarkdownAtCursor('B')).toBe(true)
+    const commandButton = wrapper.find('.el-markdown-editor__command')
+    await commandButton.trigger('click')
+    expect(commandSignal?.aborted).toBe(false)
+    expect(commandButton.attributes('disabled')).toBeDefined()
+    const pendingDescription = commandButton.attributes('aria-describedby')
+    expect(pendingDescription).toBeTruthy()
+    expect(wrapper.find(`#${pendingDescription}`).text()).toBe('执行中')
+
+    await wrapper.setProps({
+      documentIdentity: { epoch: 1, id: 'document-b' },
+      modelValue: 'A',
+    })
+    expect(commandSignal?.aborted).toBe(true)
+    expect(wrapper.find(`#${pendingDescription}`).text()).toBe('已取消')
+    expect(wrapper.vm.undo()).toMatchObject({
+      accepted: false,
+      reason: 'no-history',
+      value: 'A',
+    })
+    expect(wrapper.vm.insertMarkdownAtCursor('C')).toBe(true)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['AC'])
+
+    resolveCommand?.()
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['AC'])
+    expect(
+      (wrapper.find('textarea').element as HTMLTextAreaElement).value,
+    ).toBe('AC')
   })
 
   it('keeps public external transactions synchronized through v-model', async () => {
@@ -781,6 +1016,37 @@ describe('MarkdownEditor', () => {
     expect(wrapper.vm.undo()).toMatchObject({ value: '粘贴' })
   })
 
+  it('maps attachment drops from the browser pointer caret through the source anchor map', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: { modelValue: 'abcd' },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    Object.defineProperty(document, 'caretPositionFromPoint', {
+      configurable: true,
+      value: () => ({ offset: 2, offsetNode: textarea }),
+    })
+    const drop = new Event('drop', { bubbles: true, cancelable: true })
+    Object.defineProperties(drop, {
+      clientX: { value: 10 },
+      clientY: { value: 10 },
+      dataTransfer: {
+        value: {
+          files: [new File(['image'], 'drop.png', { type: 'image/png' })],
+          getData: () => '',
+          types: ['Files'],
+        },
+      },
+    })
+    textarea.dispatchEvent(drop)
+    await nextTick()
+
+    expect(drop.defaultPrevented).toBe(true)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(
+      'ab![Uploading drop.png...]()cd',
+    )
+    Reflect.deleteProperty(document, 'caretPositionFromPoint')
+  })
+
   it('pastes mixed MIME once as plain text and ignores the follow-up input event', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: {
@@ -816,7 +1082,9 @@ describe('MarkdownEditor', () => {
       ?.map(([event]) => event as MarkdownEditorTransactionEvent)
       .filter((event) => event.accepted)
     expect(accepted?.map((event) => event.value)).toEqual(['plain'])
-    expect(accepted?.map((event) => event.transaction.origin)).toEqual(['paste'])
+    expect(accepted?.map((event) => event.transaction.origin)).toEqual([
+      'paste',
+    ])
   })
 
   it('rejects public mutations while loading without changing the optimistic value', async () => {
@@ -863,17 +1131,23 @@ describe('MarkdownEditor', () => {
         },
       })
 
-      expect(wrapper.classes()).toContain(`el-markdown-editor--chrome-${chrome}`)
+      expect(wrapper.classes()).toContain(
+        `el-markdown-editor--chrome-${chrome}`,
+      )
       expect(wrapper.findAll('[role="region"]')).toHaveLength(1)
-      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
 
       if (chrome === 'minimal') {
-        expect(wrapper.find('.el-markdown-editor__toolbar').exists()).toBe(false)
+        expect(wrapper.find('.el-markdown-editor__toolbar').exists()).toBe(
+          false,
+        )
         expect(wrapper.find('.el-markdown-editor__status').exists()).toBe(false)
       }
 
       if (chrome === 'embedded') {
-        expect(wrapper.classes()).not.toContain('el-markdown-editor--surface-card')
+        expect(wrapper.classes()).not.toContain(
+          'el-markdown-editor--surface-card',
+        )
       }
     },
   )
@@ -899,17 +1173,19 @@ describe('MarkdownEditor', () => {
 
       const root = wrapper.element
       expect(wrapper.classes()).toContain(`el-markdown-editor--${mode}`)
-      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
 
       await wrapper.setProps({ chrome: 'minimal' })
       expect(wrapper.element).toBe(root)
-      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
 
       const textarea = wrapper.find('textarea')
       expect(textarea.exists()).toBe(true)
       if (mode === 'preview') {
         expect(textarea.isVisible()).toBe(false)
-        expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(true)
+        expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(
+          true,
+        )
       } else {
         expect(textarea.isVisible()).toBe(true)
         expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(
@@ -947,9 +1223,11 @@ describe('MarkdownEditor', () => {
     for (const mode of ['live', 'split', 'preview', 'source'] as const) {
       await wrapper.setProps({ mode })
       expect(wrapper.find('textarea').element).toBe(textarea)
-      expect(wrapper.find('[data-markdown-surface-owner]').attributes(
-        'data-markdown-surface-owner',
-      )).toBe('source-textarea')
+      expect(
+        wrapper
+          .find('[data-markdown-surface-owner]')
+          .attributes('data-markdown-surface-owner'),
+      ).toBe('source-textarea')
     }
 
     expect(wrapper.vm.undo()).toMatchObject({
@@ -957,7 +1235,9 @@ describe('MarkdownEditor', () => {
       value: '# Stable',
     })
     expect(revision).toBeGreaterThan(0)
-    expect(wrapper.find('[data-markdown-live-decorations]').exists()).toBe(false)
+    expect(wrapper.find('[data-markdown-live-decorations]').exists()).toBe(
+      false,
+    )
     await wrapper.setProps({ mode: 'live' })
     expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(false)
     expect(wrapper.find('textarea').isVisible()).toBe(true)
@@ -975,14 +1255,18 @@ describe('MarkdownEditor', () => {
     const caret = 'intro ***nested*** tail'.indexOf('nested')
     element.setSelectionRange(caret, caret)
     await textarea.trigger('select')
-    expect(wrapper.find('[data-markdown-reveal-state]').attributes(
-      'data-markdown-reveal-state',
-    )).toBe('caret-inside')
+    expect(
+      wrapper
+        .find('[data-markdown-reveal-state]')
+        .attributes('data-markdown-reveal-state'),
+    ).toBe('caret-inside')
     const before = wrapper.emitted('update:modelValue')?.length ?? 0
     await textarea.trigger('keydown', { key: 'Escape' })
-    expect(wrapper.find('[data-markdown-reveal-state]').attributes(
-      'data-markdown-reveal-state',
-    )).toBe('inactive')
+    expect(
+      wrapper
+        .find('[data-markdown-reveal-state]')
+        .attributes('data-markdown-reveal-state'),
+    ).toBe('inactive')
     expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(before)
     expect(element.value).toBe('intro ***nested*** tail')
   })
@@ -1000,9 +1284,11 @@ describe('MarkdownEditor', () => {
     element.setSelectionRange(image, image)
     await textarea.trigger('keydown', { key: 'ArrowRight' })
     expect(element.selectionStart).toBe('go ![alt](img.png)'.length)
-    expect(wrapper.find('[data-markdown-atomic-kind]').attributes(
-      'data-markdown-atomic-kind',
-    )).toBe('image')
+    expect(
+      wrapper
+        .find('[data-markdown-atomic-kind]')
+        .attributes('data-markdown-atomic-kind'),
+    ).toBe('image')
     await textarea.trigger('keydown', { key: 'Backspace' })
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('go  on')
   })
@@ -1019,15 +1305,17 @@ describe('MarkdownEditor', () => {
       },
     })
     await nextTick()
-    const decorations = wrapper.findAll('[data-markdown-live-decorations] [data-node-id]')
+    const decorations = wrapper.findAll(
+      '[data-markdown-live-decorations] [data-node-id]',
+    )
     expect(decorations.length).toBeGreaterThan(0)
     expect(decorations.length).toBeLessThanOrEqual(96)
     const textarea = wrapper.find('textarea')
     await textarea.trigger('wheel')
     expect(
-      wrapper.find('[data-markdown-layout-action]').attributes(
-        'data-markdown-layout-action',
-      ),
+      wrapper
+        .find('[data-markdown-layout-action]')
+        .attributes('data-markdown-layout-action'),
     ).toBe('yield')
   })
 
@@ -1085,9 +1373,11 @@ describe('MarkdownEditor', () => {
         props: { chrome, modelValue: 'focus contract' },
       })
 
-      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
       expect(wrapper.find('textarea').attributes('aria-label')).toBeTruthy()
-      expect(wrapper.classes()).not.toContain('el-markdown-editor--surface-card')
+      expect(wrapper.classes()).not.toContain(
+        'el-markdown-editor--surface-card',
+      )
     },
   )
 })
@@ -1095,7 +1385,10 @@ describe('MarkdownEditor', () => {
 describe('MarkdownEditor command contract migration', () => {
   it('does not retain the legacy apply(value, selection) command execution path', () => {
     const source = readFileSync(
-      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.ts'),
+      resolve(
+        process.cwd(),
+        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+      ),
       'utf8',
     )
 
@@ -1105,11 +1398,17 @@ describe('MarkdownEditor command contract migration', () => {
 
   it('removes the write mode alias from the public component contract', () => {
     const component = readFileSync(
-      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.vue'),
+      resolve(
+        process.cwd(),
+        'vue/packages/components/markdown-editor/src/markdown-editor.vue',
+      ),
       'utf8',
     )
     const model = readFileSync(
-      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.ts'),
+      resolve(
+        process.cwd(),
+        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+      ),
       'utf8',
     )
     const liveContract = readFileSync(
@@ -1123,7 +1422,9 @@ describe('MarkdownEditor command contract migration', () => {
     expect(component).not.toMatch(/mode-write|--write|is-write/)
     expect(model).not.toMatch(/['\"]write['\"]/)
     expect(liveContract).not.toMatch(/['\"]write['\"]/)
-    expect(liveContract).toMatch(/['\"]source['\"]\s*\|\s*['\"]live['\"]\s*\|\s*['\"]split['\"]\s*\|\s*['\"]preview['\"]/)
+    expect(liveContract).toMatch(
+      /['\"]source['\"]\s*\|\s*['\"]live['\"]\s*\|\s*['\"]split['\"]\s*\|\s*['\"]preview['\"]/,
+    )
   })
 
   it('resolves only the six frozen live capability tokens with document identity', () => {

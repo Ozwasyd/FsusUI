@@ -69,6 +69,43 @@ public sealed class FsusMarkdownEditorHistoryChangedEventArgs(
 
 public sealed record FsusMarkdownEditorShellMutation(string Kind, bool Equivalent, bool Accepted);
 
+/// <summary>
+/// One reversible step inside a history entry. Merged input entries carry
+/// multiple steps that must be inverted in reverse order during undo.
+/// </summary>
+public sealed record FsusMarkdownEditorHistoryStepSnapshot(
+  IReadOnlyList<FsusMarkdownEditorChange> Changes,
+  IReadOnlyList<FsusMarkdownEditorChange> Inverse);
+
+/// <summary>
+/// Serializable per-document history entry. Forward and inverse changes are
+/// retained exactly like the Web editor's history entries so a host may persist
+/// and restore undo state across editor instances.
+/// </summary>
+public sealed record FsusMarkdownEditorHistoryEntrySnapshot(
+  string BeforeValue,
+  FsusMarkdownEditorSelection BeforeSelection,
+  FsusMarkdownEditorSelection AfterSelection,
+  string History,
+  string MergeDirection,
+  string Origin,
+  int RetainedUnits,
+  IReadOnlyList<FsusMarkdownEditorHistoryStepSnapshot> Steps,
+  long TimestampMilliseconds);
+
+/// <summary>
+/// Immutable history snapshot of one document identity. Captured by
+/// <see cref="FsusMarkdownEditorTransactionStore.CaptureHistory"/> and restored
+/// with <see cref="FsusMarkdownEditorTransactionStore.TryRestoreHistory"/>.
+/// </summary>
+public sealed record FsusMarkdownEditorHistorySnapshot(
+  FsusMarkdownDocumentIdentity Identity,
+  string Value,
+  int Revision,
+  FsusMarkdownEditorSelection Selection,
+  IReadOnlyList<FsusMarkdownEditorHistoryEntrySnapshot> Undo,
+  IReadOnlyList<FsusMarkdownEditorHistoryEntrySnapshot> Redo);
+
 public sealed class FsusMarkdownEditorHistory
 {
   private readonly FsusMarkdownEditorTransactionStore store;
@@ -191,6 +228,116 @@ public sealed class FsusMarkdownEditorTransactionStore
     undo.Clear();
     redo.Clear();
     BreakMergeGroup();
+  }
+
+  /// <summary>
+  /// Captures the current undo/redo history together with the value, revision,
+  /// and selection it applies to. The snapshot is only restorable onto a store
+  /// holding the same identity and value.
+  /// </summary>
+  public FsusMarkdownEditorHistorySnapshot CaptureHistory()
+  {
+    return new(
+      Identity,
+      Value,
+      Revision,
+      Selection,
+      undo.Select(ToSnapshot).ToArray(),
+      redo.Select(ToSnapshot).ToArray());
+
+    static FsusMarkdownEditorHistoryEntrySnapshot ToSnapshot(HistoryEntry entry) =>
+      new(
+        entry.BeforeValue,
+        entry.BeforeSelection,
+        entry.AfterSelection,
+        entry.History,
+        entry.MergeDirection,
+        entry.Origin,
+        entry.RetainedUnits,
+        entry.Steps
+          .Select(step => new FsusMarkdownEditorHistoryStepSnapshot(step.Changes, step.Inverse))
+          .ToArray(),
+        entry.TimestampMilliseconds);
+  }
+
+  /// <summary>
+  /// Restores a snapshot captured from a store holding the same identity and
+  /// value. Returns false and leaves the store untouched when the identity or
+  /// the value drifted, or when the snapshot is malformed; a stale chain must
+  /// never be applied to a different external value.
+  /// </summary>
+  public bool TryRestoreHistory(FsusMarkdownEditorHistorySnapshot snapshot)
+  {
+    ArgumentNullException.ThrowIfNull(snapshot);
+    if (!Identity.Equals(snapshot.Identity) ||
+      !string.Equals(Value, snapshot.Value, StringComparison.Ordinal) ||
+      snapshot.Undo is null ||
+      snapshot.Redo is null)
+    {
+      return false;
+    }
+
+    var restoredUndo = new List<HistoryEntry>(snapshot.Undo.Count);
+    foreach (var entry in snapshot.Undo)
+    {
+      if (FromSnapshot(entry) is not HistoryEntry history)
+      {
+        return false;
+      }
+      restoredUndo.Add(history);
+    }
+    var restoredRedo = new List<HistoryEntry>(snapshot.Redo.Count);
+    foreach (var entry in snapshot.Redo)
+    {
+      if (FromSnapshot(entry) is not HistoryEntry history)
+      {
+        return false;
+      }
+      restoredRedo.Add(history);
+    }
+
+    undo.Clear();
+    undo.AddRange(restoredUndo);
+    redo.Clear();
+    redo.AddRange(restoredRedo);
+    Revision = Math.Max(Revision, Math.Max(0, snapshot.Revision));
+    if (snapshot.Selection is not null)
+    {
+      Selection = Normalize(Value, snapshot.Selection) ?? Selection;
+    }
+    BreakMergeGroup();
+    return true;
+
+    static HistoryEntry? FromSnapshot(FsusMarkdownEditorHistoryEntrySnapshot entry)
+    {
+      if (entry is null ||
+        entry.BeforeValue is null ||
+        entry.Steps is null ||
+        entry.Steps.Count == 0 ||
+        entry.Steps.Any(step => step is null ||
+          step.Changes is null ||
+          step.Inverse is null ||
+          step.Changes.Count == 0 ||
+          step.Changes.Count != step.Inverse.Count) ||
+        !IsOneOf(entry.History, "merge", "separate") ||
+        !IsOneOf(entry.MergeDirection, "backward", "forward", "none") ||
+        !IsOneOf(entry.Origin, "input", "command", "paste", "drop", "programmatic", "external"))
+      {
+        return null;
+      }
+      return new(
+        entry.BeforeValue,
+        entry.BeforeSelection,
+        entry.AfterSelection,
+        entry.History,
+        entry.MergeDirection,
+        entry.Origin,
+        entry.RetainedUnits,
+        entry.Steps
+          .Select(step => new HistoryStep(step.Changes, step.Inverse))
+          .ToArray(),
+        entry.TimestampMilliseconds);
+    }
   }
 
   public void Reset(string value)
@@ -364,7 +511,9 @@ public sealed class FsusMarkdownEditorTransactionStore
     return Accept(beforeRevision, FsusMarkdownEditorPositionMap.Compose(stages));
   }
 
-  public static IReadOnlyList<FsusMarkdownEditorShellMutation> EvaluateMutations()
+  public static IReadOnlyList<FsusMarkdownEditorShellMutation> EvaluateMutations(
+    FsusMarkdownEditorTransactionStore? first = null,
+    FsusMarkdownEditorTransactionStore? second = null)
   {
     var identity = new FsusMarkdownDocumentIdentity("doc-a", 1);
 
@@ -383,19 +532,20 @@ public sealed class FsusMarkdownEditorTransactionStore
         ExpectedRevision: 0,
         DocumentIdentity: identity)).Accepted;
 
-    var crossDocumentStore = new FsusMarkdownEditorTransactionStore(identity, "ab");
-    crossDocumentStore.SwitchDocument(new FsusMarkdownDocumentIdentity("doc-b", 1), "ab");
+    var crossDocumentStore = second ??
+      new FsusMarkdownEditorTransactionStore(new FsusMarkdownDocumentIdentity("doc-b", 1), "ab");
     var crossed = crossDocumentStore.Dispatch(
       new FsusMarkdownEditorTransaction(
         [new FsusMarkdownEditorChange(2, 2, "!")],
         ExpectedRevision: 0,
-        DocumentIdentity: identity)).Accepted;
+        DocumentIdentity: first?.Identity ?? identity)).Accepted;
 
     return
     [
       new("native-undo-dual-authority", nativeDual, nativeDual),
       new("bare-offset", bareOffset, bareOffset),
       new("cross-document", crossed, crossed),
+      .. FsusMarkdownProjectionArchitecture.EvaluateMutations(),
     ];
   }
 
