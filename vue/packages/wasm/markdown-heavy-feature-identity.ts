@@ -49,7 +49,9 @@ export const createMarkdownHeavyFeatureProjectionTracker =
     let previousDocument: Readonly<{ epoch: number; id: string }> | null = null
 
     return Object.freeze({
-      project(input) {
+      project(
+        input: Parameters<MarkdownHeavyFeatureProjectionTracker['project']>[0],
+      ) {
         if (!Number.isInteger(input.documentEpoch)) return null
         const documentIdentity = Object.freeze({
           epoch: input.documentEpoch as number,
