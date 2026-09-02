@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import { validatePackageAlignmentBinding } from './avalonia-stable-readiness-lib.mjs'
 
 const option = (name, fallback) => {
   const index = process.argv.indexOf(name)
@@ -59,10 +60,25 @@ if (
     packageManifest.contractV2Alignment?.alignmentHash ?? '',
   ) ||
   !Array.isArray(packageManifest.contractV2Alignment?.stableContractIds) ||
-  !Number.isInteger(packageManifest.contractV2Alignment?.governedGapCount)
+  !Number.isInteger(packageManifest.contractV2Alignment?.governedGapCount) ||
+  !/^[0-9a-f]{64}$/u.test(
+    packageManifest.contractV2Alignment?.artifactSha256 ?? '',
+  )
 ) {
   throw new Error('Package manifest Contract V2 alignment binding is invalid.')
 }
+const packagedAlignmentPath = path.join(
+  path.dirname(packageManifestPath),
+  packageManifest.contractV2Alignment.artifact,
+)
+if (!fs.existsSync(packagedAlignmentPath))
+  throw new Error('Package manifest Contract V2 alignment artifact is missing.')
+const packagedAlignmentBytes = fs.readFileSync(packagedAlignmentPath)
+validatePackageAlignmentBinding(
+  packageManifest.contractV2Alignment,
+  packagedAlignmentBytes,
+  { candidate: packageManifest.commitSha },
+)
 const packageRoot = path.join(evidenceRoot, 'package', 'nuget')
 const aggregate = createHash('sha256')
 for (const candidate of packageManifest.packages) {

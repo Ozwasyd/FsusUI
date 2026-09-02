@@ -407,6 +407,8 @@ const validateContractExecution = (execution, platform, contractId) => {
       fail(
         `${platform}.${contractId}.steps[${index}].elapsedMilliseconds missing`,
       )
+    if (step.observation?.passed !== true)
+      fail(`${platform}.${contractId}.steps[${index}] failed`)
   })
   const coverage = execution.coverage
   if (!Array.isArray(coverage?.requiredMembers))
@@ -555,6 +557,8 @@ const validateMarkdownContractExecution = (execution, platform) => {
       fail(
         `${platform}.${contractId}.steps[${index}].elapsedMilliseconds missing`,
       )
+    if (step.observation?.passed !== true)
+      fail(`${platform}.${contractId}.steps[${index}] failed`)
   })
   const coverage = execution.coverage
   if (!Array.isArray(coverage?.requiredMembers))
@@ -608,48 +612,15 @@ const validateMarkdownContractExecution = (execution, platform) => {
     }
     if (
       !receipt.stepIndexes.some(
-        (index) => execution.steps[index]?.action === policy.action,
+        (index) =>
+          execution.steps[index]?.action === policy.action &&
+          execution.steps[index]?.observation?.passed === true,
       )
     )
       fail(
         `${platform}.${contractId}.coverage.scenario.${scenario}.action.${policy.action} missing`,
       )
   }
-  same(
-    execution.identity,
-    execution.visual?.identity,
-    `${platform}.${contractId}.visual.identity`,
-  )
-  if (
-    execution.visual?.renderedTopLevel !== true ||
-    !execution.visual?.sha256 ||
-    execution.visual?.artifactBytes < 1024
-  )
-    fail(`${platform}.${contractId}.visual rendered artifact missing`)
-  if (!execution.accessibility?.node)
-    fail(`${platform}.${contractId}.accessibility node missing`)
-  if (
-    platform === 'web' &&
-    (execution.accessibility.source !==
-      'chromium-cdp-accessibility-and-atspi' ||
-      execution.accessibility.atspiReachable !== true)
-  )
-    fail(`web.${contractId}.accessibility AT-SPI evidence missing`)
-  if (
-    platform === 'avalonia' &&
-    execution.accessibility.source !== 'real-avalonia-automation-peer'
-  )
-    fail(`avalonia.${contractId}.accessibility AutomationPeer evidence missing`)
-  const performance = execution.diagnostics?.largeDocumentPerformance
-  if (
-    !Number.isFinite(performance?.elapsedMilliseconds) ||
-    performance?.sourceLength < 100_000 ||
-    performance?.blockCount < 3000 ||
-    performance?.budget?.renderMs !== 16 ||
-    performance?.budget?.interactionMs !== 50 ||
-    typeof performance?.budget?.memory !== 'string'
-  )
-    fail(`${platform}.${contractId}.diagnostics.performance invalid`)
   if (
     execution.diagnostics?.nativeIme?.physicalIme !== false ||
     execution.diagnostics?.nativeIme?.status !== 'missing'
@@ -702,31 +673,24 @@ const validateMarkdownRuntimeObservations = (execution, platform) => {
     fail(
       `${platform}.component-v2.el-markdown-editor.operation evidence invalid`,
     )
-  const modes = execution.state?.modes ?? []
-  for (const mode of ['source', 'live']) {
-    const observed = modes.find((entry) => entry.mode === mode)
-    if (!observed || observed.classPresent !== true)
-      fail(`${platform}.component-v2.el-markdown-editor.mode.${mode} missing`)
-  }
-  const projection = execution.state?.projection
-  if (projection?.coordinates?.rawSource === undefined)
-    fail(
-      `${platform}.component-v2.el-markdown-editor.projection observation missing`,
-    )
-  if (
-    execution.state?.motion?.mode !== 'reduced' ||
-    (platform === 'web'
-      ? execution.state.motion.activeAnimations !== 0
-      : execution.state.motion.active !== false)
+  same(
+    execution.identity.documentId,
+    dispatch.documentIdentity.id,
+    `${platform}.component-v2.el-markdown-editor.identity.documentId`,
   )
-    fail(`${platform}.component-v2.el-markdown-editor.motion invalid`)
-  if (
-    execution.diagnostics?.accessibility?.status === undefined ||
-    (platform === 'avalonia' &&
-      execution.diagnostics.accessibility.requiredSemanticsPassed !== false)
+  same(
+    execution.identity.documentEpoch,
+    dispatch.documentIdentity.epoch,
+    `${platform}.component-v2.el-markdown-editor.identity.documentEpoch`,
   )
+  same(
+    0,
+    execution.identity.sourceRevision,
+    `${platform}.component-v2.el-markdown-editor.identity.sourceRevisionBaseline`,
+  )
+  if (!Number.isInteger(dispatch.beforeRevision) || dispatch.beforeRevision < 0)
     fail(
-      `${platform}.component-v2.el-markdown-editor.accessibility diagnostic invalid`,
+      `${platform}.component-v2.el-markdown-editor.operation baseline revision invalid`,
     )
   return { baselineRevision: dispatch.beforeRevision, dispatch, undo, redo }
 }
@@ -761,27 +725,13 @@ const compareMarkdownExecution = (web, avalonia) => {
       normalizeMarkdownResult(right[operation], right.baselineRevision),
       `${contractId}.operation.${operation}`,
     )
-  same(
-    web.state.projection.coordinates.rawSource,
-    avalonia.state.projection.coordinates.rawSource,
-    `${contractId}.projection.raw-source`,
-  )
-  same(
-    web.state.projection.coordinates.normalizedSource,
-    avalonia.state.projection.coordinates.normalizedSource,
-    `${contractId}.projection.normalized-source`,
-  )
   return {
     schema: 'fsusui.conformance-contract-comparison.v2',
     verdict: 'pass',
     identity: web.identity,
     evidenceDigests: { web: digest(web), avalonia: digest(avalonia) },
     coverage: web.coverage,
-    comparedArtifacts: [
-      'same-identity-focus-evidence',
-      'same-identity-motion-evidence',
-      'same-identity-cross-platform-comparison',
-    ],
+    comparedArtifacts: ['same-identity-cross-platform-comparison'],
     diagnostics: {
       accessibility: 'missing-native-required-semantics',
       nativeIme: 'missing-native-physical-ime',

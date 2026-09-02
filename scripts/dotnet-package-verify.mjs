@@ -5,6 +5,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import {
+  createPackageAlignmentBinding,
   currentIdentity,
   readStableConsumerAuthority,
 } from './avalonia-stable-readiness-lib.mjs'
@@ -20,8 +21,11 @@ fs.rmSync(path.dirname(manifestPath), { recursive: true, force: true })
 fs.mkdirSync(nugetRoot, { recursive: true })
 
 const { alignment } = readStableConsumerAuthority({
-  expected: currentIdentity(),
+  expected: currentIdentity({ requireCleanPackageInputs: true }),
 })
+const alignmentArtifact = fs.readFileSync(
+  path.join(root, '.tmp/conformance-v2/alignment.json'),
+)
 
 run('dotnet', ['restore', 'dotnet/FsusUI.Avalonia.slnx'])
 run('dotnet', [
@@ -75,15 +79,16 @@ const manifest = {
       encoding: 'utf8',
     }).trim(),
   candidateSha256: candidateHash.digest('hex'),
-  contractV2Alignment: {
-    candidate: alignment.identity.candidate,
-    contractHash: alignment.identity.contractHash,
-    alignmentHash: alignment.identity.alignmentHash,
-    stableContractIds: alignment.stable,
-    governedGapCount: alignment.gaps.length,
-  },
+  contractV2Alignment: createPackageAlignmentBinding(
+    alignment,
+    alignmentArtifact,
+  ),
   packages,
 }
 fs.mkdirSync(path.dirname(manifestPath), { recursive: true })
+fs.writeFileSync(
+  path.join(path.dirname(manifestPath), 'contract-v2-alignment.json'),
+  alignmentArtifact,
+)
 fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
 console.log(`[dotnet-package] candidate-sha256=${manifest.candidateSha256}`)

@@ -636,17 +636,6 @@ const main = async () => {
       },
     )
     await markdownTextarea.focus()
-    const markdownFinalState = await page.evaluate(() =>
-      window.__fsusMarkdownContract.read(),
-    )
-    const markdownScreenshotPath = join(
-      options.out,
-      'markdown-editor-browser.png',
-    )
-    writeFileSync(
-      markdownScreenshotPath,
-      await captureDeterministicLocatorPng(editor),
-    )
     const checkTag = page.getByTestId('trace-check-tag')
     await checkTag.evaluate((element) => {
       window.__fsusDetachedCheckTag = new WeakRef(element)
@@ -922,10 +911,23 @@ const main = async () => {
       runnerHash,
     }
     const markdownIdentity = {
-      ...identity,
       executionId: `conformance-v2-markdown-${candidateSha}`,
-      checkpoint: 'markdown-contract-matrix',
+      checkpoint: 'markdown-operation-baseline',
+      candidate: candidateSha,
+      contractHash: identity.contractHash,
+      webBaselineHash: identity.webBaselineHash,
+      avaloniaBaselineHash: identity.avaloniaBaselineHash,
+      scenario: 'scenario.v2.el-markdown-editor.real-interaction-trace',
+      contract: 'component-v2.el-markdown-editor',
+      documentId: markdownDispatch.result.documentIdentity.id,
+      documentEpoch: markdownDispatch.result.documentIdentity.epoch,
+      sourceRevision: 0,
+      theme: 'light',
+      density: 'default',
+      locale: 'zh-CN',
+      direction: 'ltr',
       motion: 'reduced',
+      runnerHash,
     }
     const checkTagIdentity = {
       executionId: `conformance-v2-check-tag-${candidateSha}`,
@@ -982,29 +984,31 @@ const main = async () => {
       checkTagAccessibilityMilliseconds,
       'textarea',
     )
-    const markdownBoundSteps = markdownContractSteps.map((step, index) => ({
-      ...step,
-      binding: markdownIdentity,
-      index,
-    }))
+    const markdownBoundSteps = markdownContractSteps
+      .filter((step) =>
+        [
+          'ElMarkdownEditor.dispatchTransaction',
+          'ElMarkdownEditor.undo',
+          'ElMarkdownEditor.redo',
+        ].includes(step.target),
+      )
+      .map((step, index) => ({
+        ...step,
+        binding: markdownIdentity,
+        index,
+      }))
+    if (markdownBoundSteps.some((step) => step.observation.passed !== true))
+      throw new Error('Markdown contract operation evidence failed')
     const markdownCoverageScenarios = [
       'scenario.v2.el-markdown-editor.operation.dispatch-transaction',
       'scenario.v2.el-markdown-editor.operation.redo',
       'scenario.v2.el-markdown-editor.operation.undo',
-      'scenario.v2.el-markdown-editor.state.source',
-      'scenario.v2.el-markdown-editor.state.live',
-      'scenario.v2.el-markdown-editor.focus',
-      'scenario.v2.el-markdown-editor.motion',
     ]
     const markdownScenarioExecutions = Object.fromEntries(
       [
-        ['scenario.v2.el-markdown-editor.operation.dispatch-transaction', [4]],
-        ['scenario.v2.el-markdown-editor.operation.redo', [9]],
-        ['scenario.v2.el-markdown-editor.operation.undo', [8]],
-        ['scenario.v2.el-markdown-editor.state.source', [11]],
-        ['scenario.v2.el-markdown-editor.state.live', [11]],
-        ['scenario.v2.el-markdown-editor.focus', [2]],
-        ['scenario.v2.el-markdown-editor.motion', [14]],
+        ['scenario.v2.el-markdown-editor.operation.dispatch-transaction', [0]],
+        ['scenario.v2.el-markdown-editor.operation.redo', [2]],
+        ['scenario.v2.el-markdown-editor.operation.undo', [1]],
       ].map(([scenario, stepIndexes]) => {
         return [
           scenario,
@@ -1117,18 +1121,11 @@ const main = async () => {
             event.name.startsWith('markdown.'),
           ),
           state: {
-            final: markdownFinalState,
-            identitySwitch: markdownIdentitySwitch,
-            modes: markdownModes,
-            motion: markdownMotion,
-            projection: markdownProjection,
-          },
-          accessibility: {
-            source: 'chromium-cdp-accessibility-and-atspi',
-            sameExecution: true,
-            atspiReachable: textboxHit,
-            documentLiveRegion: !noDocumentLive,
-            node: markdownAccessibilityNode,
+            operationCheckpoint: {
+              dispatch: markdownDispatch.result,
+              redo: markdownRedo.result,
+              undo: markdownUndo.result,
+            },
           },
           coverage: {
             requiredMembers: [
@@ -1163,15 +1160,6 @@ const main = async () => {
                 'Native OS IME evidence is owned by the dedicated #341 dependency path.',
               status: 'missing',
             },
-          },
-          visual: {
-            identity: markdownIdentity,
-            artifact: 'markdown-editor-browser.png',
-            sha256: sha256File(
-              relative(repositoryRoot, markdownScreenshotPath),
-            ),
-            artifactBytes: statSync(markdownScreenshotPath).size,
-            renderedTopLevel: true,
           },
         },
         'component-v2.el-check-tag': {

@@ -14,10 +14,48 @@ const stableJson = (value) => `${JSON.stringify(value, null, 2)}\n`
 const digest = (value) =>
   crypto
     .createHash('sha256')
-    .update(typeof value === 'string' ? value : stableJson(value))
+    .update(
+      typeof value === 'string' || ArrayBuffer.isView(value)
+        ? value
+        : stableJson(value),
+    )
     .digest('hex')
 
-export const currentIdentity = () => {
+const packageInputPaths = [
+  'dotnet',
+  'NuGet.config',
+  'package.json',
+  'pnpm-lock.yaml',
+  'scripts/avalonia-stable-readiness-lib.mjs',
+  'scripts/check-avalonia-nuget-stable.mjs',
+  'scripts/check-nuget-metadata.mjs',
+  'scripts/check-nuget-package-smoke.mjs',
+  'scripts/dotnet-package-verify.mjs',
+  'spec/avalonia',
+  'spec/components/contracts/v2/contract-v2.json',
+]
+
+export const assertCleanPackageInputs = () => {
+  const status = spawnSync(
+    'git',
+    [
+      'status',
+      '--porcelain',
+      '--untracked-files=all',
+      '--',
+      ...packageInputPaths,
+    ],
+    { cwd: root, encoding: 'utf8' },
+  )
+  if (status.status !== 0 || status.stdout.trim()) {
+    throw new Error(
+      `Avalonia package inputs must match the exact committed candidate: ${status.stdout.trim() || status.stderr.trim()}`,
+    )
+  }
+}
+
+export const currentIdentity = ({ requireCleanPackageInputs = false } = {}) => {
+  if (requireCleanPackageInputs) assertCleanPackageInputs()
   const gitHead = spawnSync('git', ['rev-parse', 'HEAD'], {
     cwd: root,
     encoding: 'utf8',
@@ -291,3 +329,41 @@ export const validateNugetPackageAlignment = (
   stablePublication
     ? requireNugetStableRelease(alignment)
     : evaluateStableRelease(alignment)
+
+export const createPackageAlignmentBinding = (alignment, artifactBytes) => ({
+  candidate: alignment.identity.candidate,
+  contractHash: alignment.identity.contractHash,
+  alignmentHash: alignment.identity.alignmentHash,
+  stableContractIds: alignment.stable,
+  governedGapCount: alignment.gaps.length,
+  artifact: 'contract-v2-alignment.json',
+  artifactBytes: artifactBytes.length,
+  artifactSha256: digest(artifactBytes),
+})
+
+export const validatePackageAlignmentBinding = (
+  binding,
+  artifactBytes,
+  { candidate },
+) => {
+  const alignment = JSON.parse(artifactBytes)
+  if (
+    binding?.artifact !== 'contract-v2-alignment.json' ||
+    binding.candidate !== candidate ||
+    alignment.identity?.candidate !== candidate ||
+    artifactBytes.length !== binding.artifactBytes ||
+    digest(artifactBytes) !== binding.artifactSha256 ||
+    alignment.identity?.contractHash !== binding.contractHash ||
+    alignment.identity?.alignmentHash !== alignmentHash(alignment) ||
+    alignment.identity.alignmentHash !== binding.alignmentHash ||
+    JSON.stringify(alignment.stable) !==
+      JSON.stringify(binding.stableContractIds) ||
+    alignment.gaps?.length !== binding.governedGapCount
+  ) {
+    throw new Error(
+      'Package manifest Contract V2 alignment artifact is stale or tampered.',
+    )
+  }
+  evaluateStableRelease(alignment)
+  return alignment
+}

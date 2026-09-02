@@ -138,9 +138,9 @@ const validateCommonMetadata = (content) => {
   )
   assert(
     xmlValue(content, 'PackageReleaseNotes')?.includes(
-      'Stable Avalonia package candidate',
+      'Avalonia package candidate',
     ),
-    'Directory.Build.props release notes must describe stable Avalonia package validation',
+    'Directory.Build.props release notes must describe Avalonia package validation',
   )
 }
 
@@ -270,7 +270,7 @@ const validateNuspec = (packageInfo, packagePath) => {
     )
   }
   assert(
-    nuspec.includes('Stable Avalonia package candidate'),
+    nuspec.includes('Avalonia package candidate'),
     `${packageInfo.id} nuspec release notes are stale`,
   )
 
@@ -482,7 +482,7 @@ export const check = ({ stablePublication = false } = {}) => {
 
   record('Contract V2 alignment', () => {
     const { alignment } = readStableConsumerAuthority({
-      expected: currentIdentity(),
+      expected: currentIdentity({ requireCleanPackageInputs: true }),
     })
     validateNugetPackageAlignment(alignment, { stablePublication })
   })

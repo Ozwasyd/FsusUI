@@ -197,6 +197,7 @@ jobs:
           path: |
             dotnet/artifacts/nuget
             dotnet/artifacts/package/manifest.json
+            dotnet/artifacts/package/contract-v2-alignment.json
           retention-days: 7
       - name: Record unique NuGet candidate leaf result
         if: always()

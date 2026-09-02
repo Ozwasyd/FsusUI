@@ -5,6 +5,15 @@ import process from 'node:process'
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
 const workflow = fs.readFileSync('.github/workflows/_quality.yml', 'utf8')
+const callerWorkflow = fs.readFileSync('.github/workflows/quality.yml', 'utf8')
+const stablePackageAudit = fs.readFileSync(
+  'docs/releases/evidence/avalonia-stable/package-audit.md',
+  'utf8',
+)
+const stableConsumerInstall = fs.readFileSync(
+  'docs/releases/evidence/avalonia-stable/consumer-install.md',
+  'utf8',
+)
 const platformVerifier = fs.readFileSync(
   'scripts/dotnet-platform-verify.mjs',
   'utf8',
@@ -144,6 +153,25 @@ const validate = (source) => {
 }
 
 const failures = validate(workflow)
+const callerPackageJob = job(callerWorkflow, 'pr-avalonia-aot-candidate')
+if (
+  !callerPackageJob.includes('pnpm run conformance:v2') ||
+  callerPackageJob.indexOf('pnpm run conformance:v2') >
+    callerPackageJob.indexOf('node scripts/dotnet-package-verify.mjs')
+) {
+  failures.push(
+    'quality.yml package caller must produce exact Contract V2 alignment before packaging',
+  )
+}
+for (const [file, content] of [
+  ['package-audit.md', stablePackageAudit],
+  ['consumer-install.md', stableConsumerInstall],
+]) {
+  if (!content.includes('pnpm run dotnet:stable-package'))
+    failures.push(`${file} must use the zero-gap stable evidence gate`)
+  if (content.includes('node scripts/check-avalonia-nuget-stable.mjs'))
+    failures.push(`${file} must not bypass the stable evidence alias`)
+}
 for (const fixture of [
   'tests/fixtures/dotnet-matrix/package-in-platform.yml',
   'tests/fixtures/dotnet-matrix/governance-in-platform.yml',

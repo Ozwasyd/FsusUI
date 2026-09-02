@@ -298,6 +298,57 @@ const cases = [
       'dotnet-package must produce exact Contract V2 alignment before packaging',
   },
   {
+    id: 'nuget-caller-alignment-producer-removed-mutated',
+    file: '.github/workflows/quality.yml',
+    inject: () =>
+      mutateText(
+        '.github/workflows/quality.yml',
+        '          xvfb-run -a pnpm run conformance:v2\n',
+        '',
+      ),
+    command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
+    expected:
+      'quality.yml package caller must produce exact Contract V2 alignment before packaging',
+  },
+  {
+    id: 'nuget-stable-evidence-doc-bypass-mutated',
+    file: 'docs/releases/evidence/avalonia-stable/package-audit.md',
+    inject: () =>
+      mutateText(
+        'docs/releases/evidence/avalonia-stable/package-audit.md',
+        'pnpm run dotnet:stable-package',
+        'node scripts/check-avalonia-nuget-stable.mjs',
+      ),
+    command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
+    expected: 'package-audit.md must use the zero-gap stable evidence gate',
+  },
+  {
+    id: 'nuget-dirty-package-input-mutated',
+    file: 'dotnet/Directory.Build.props',
+    inject: () =>
+      mutateText(
+        'dotnet/Directory.Build.props',
+        'Avalonia package candidate.',
+        'Dirty Avalonia package candidate.',
+      ),
+    command: [process.execPath, ['scripts/check-avalonia-nuget-stable.mjs']],
+    expected: 'Avalonia package inputs must match the exact committed candidate',
+  },
+  {
+    id: 'nuget-alignment-artifact-integrity-mutated',
+    file: 'scripts/avalonia-stable-readiness-lib.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/avalonia-stable-readiness-lib.mjs',
+        `artifactBytes.length !== binding.artifactBytes ||
+    digest(artifactBytes) !== binding.artifactSha256 ||`,
+        `false ||
+    false ||`,
+      ),
+    command: ['node', ['--test', 'tests/conformance-v2-evidence.test.mjs']],
+    expected: 'Missing expected exception',
+  },
+  {
     id: 'nuget-publish-block-mutated',
     file: 'scripts/avalonia-stable-readiness-lib.mjs',
     inject: () =>

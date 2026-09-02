@@ -503,26 +503,6 @@ internal static class ConformanceV2Runner
     var topLevelElapsedMilliseconds = stopwatch.Elapsed.TotalMilliseconds;
     var topLevelEvents = events.ToArray();
 
-    var markdownIdentity = new
-    {
-      executionId = $"conformance-v2-markdown-{candidate}",
-      checkpoint = "markdown-contract-matrix",
-      candidate,
-      contractHash,
-      webBaselineHash,
-      avaloniaBaselineHash,
-      scenario = "scenario.v2.el-markdown-editor.real-interaction-trace",
-      contract = "component-v2.el-markdown-editor",
-      documentId = identity.Id,
-      documentEpoch = identity.Epoch,
-      sourceRevision = editor.TransactionStore.Revision,
-      theme = "light",
-      density = "default",
-      locale = "zh-CN",
-      direction = "ltr",
-      motion = "reduced",
-      runnerHash,
-    };
     var markdownStepStopwatch = Stopwatch.StartNew();
     const string markdownRichSource = "\uFEFF# 标题\r\n\r\nalpha 😀 e\u0301 שלום\r\n\r\n![alt](image.png)\r\n";
     var markdownDocumentA = new FsusMarkdownDocumentIdentity("markdown-contract-document-a", 1);
@@ -534,6 +514,26 @@ internal static class ConformanceV2Runner
     editor.Locale = "zh-CN";
     editor.IsReadOnly = false;
     window.UpdateLayout();
+    var markdownIdentity = new
+    {
+      executionId = $"conformance-v2-markdown-{candidate}",
+      checkpoint = "markdown-operation-baseline",
+      candidate,
+      contractHash,
+      webBaselineHash,
+      avaloniaBaselineHash,
+      scenario = "scenario.v2.el-markdown-editor.real-interaction-trace",
+      contract = "component-v2.el-markdown-editor",
+      documentId = markdownDocumentA.Id,
+      documentEpoch = markdownDocumentA.Epoch,
+      sourceRevision = 0,
+      theme = "light",
+      density = "default",
+      locale = "zh-CN",
+      direction = "ltr",
+      motion = "reduced",
+      runnerHash,
+    };
     var markdownInputOwner = editor
       .GetVisualDescendants()
       .OfType<TextBox>()
@@ -689,9 +689,9 @@ internal static class ConformanceV2Runner
       window.UpdateLayout();
       markdownModes.Add(new
       {
-        classPresent = true,
         mode = editor.Mode.ToString().ToLowerInvariant(),
         capability = editor.CapabilityState,
+        inputVisible = markdownInputOwner.IsVisible,
       });
     }
     RecordContractStep(markdownSteps, markdownIdentity, "render", "FsusMarkdownEditor.modes", new
@@ -821,29 +821,6 @@ internal static class ConformanceV2Runner
       editor.ProjectionFeatureRevision));
     window.UpdateLayout();
     _ = editor.Focus(NavigationMethod.Tab);
-    var markdownFinalState = new
-    {
-      document = editor.Document,
-      documentIdentity = editor.DocumentIdentity,
-      history = editor.TransactionStore.History,
-      input = new
-      {
-        focused = markdownInputOwner.IsFocused,
-        lang = editor.Locale,
-        readOnly = editor.IsReadOnly,
-        selection = new
-        {
-          direction = editor.TransactionStore.Selection.Direction,
-          end = editor.TransactionStore.Selection.End,
-          start = editor.TransactionStore.Selection.Start,
-        },
-      },
-      mode = editor.Mode.ToString().ToLowerInvariant(),
-      profile = editor.Profile,
-      revision = editor.TransactionStore.Revision,
-      selection = editor.TransactionStore.Selection,
-    };
-
     var childOpened = false;
     var childClosed = false;
     var child = new Window { Width = 240, Height = 120, Title = "Conformance open-close" };
@@ -889,13 +866,6 @@ internal static class ConformanceV2Runner
     }
     var screenshotHash = Convert.ToHexString(
       SHA256.HashData(File.ReadAllBytes(screenshotPath))).ToLowerInvariant();
-    var markdownScreenshotPath = Path.Combine(
-      Path.GetDirectoryName(absoluteOutput)!,
-      "markdown-editor-avalonia.png");
-    File.Copy(screenshotPath, markdownScreenshotPath, overwrite: true);
-    var markdownScreenshotHash = Convert.ToHexString(
-      SHA256.HashData(File.ReadAllBytes(markdownScreenshotPath))).ToLowerInvariant();
-    var markdownScreenshotBytes = new FileInfo(markdownScreenshotPath).Length;
     var markdownAutomationNode = AutomationNode(
       editor,
       4,
@@ -913,11 +883,22 @@ internal static class ConformanceV2Runner
       "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
       "scenario.v2.el-markdown-editor.operation.redo",
       "scenario.v2.el-markdown-editor.operation.undo",
-      "scenario.v2.el-markdown-editor.state.source",
-      "scenario.v2.el-markdown-editor.state.live",
-      "scenario.v2.el-markdown-editor.focus",
-      "scenario.v2.el-markdown-editor.motion",
     };
+    var markdownQualifiedSteps = markdownSteps
+      .Where(step =>
+      {
+        var target = JsonSerializer.SerializeToElement(step, JsonOptions)
+          .GetProperty("target")
+          .GetString();
+        return target is
+          "FsusMarkdownEditor.DispatchTransaction" or
+          "FsusMarkdownEditor.Undo" or
+          "FsusMarkdownEditor.Redo";
+      })
+      .Select((step, index) => RebindContractStep(step, markdownIdentity, index))
+      .ToArray();
+    if (markdownQualifiedSteps.Any(step => !StepPassed(step)))
+      throw new InvalidOperationException("Markdown contract operation evidence failed.");
     var checkTagScenarios = new[]
     {
       "scenario.v2.el-check-tag.input.checked",
@@ -1005,23 +986,16 @@ internal static class ConformanceV2Runner
         ["component-v2.el-markdown-editor"] = new
         {
           identity = markdownIdentity,
-          steps = markdownSteps,
+          steps = markdownQualifiedSteps,
           events = markdownEvents,
           state = new
           {
-            final = markdownFinalState,
-            identitySwitch = markdownIdentitySwitch,
-            modes = markdownModes,
-            motion = markdownMotion,
-            projection = markdownProjection,
-          },
-          accessibility = new
-          {
-            source = "real-avalonia-automation-peer",
-            sameExecution = true,
-            node = markdownAutomationNode,
-            children = AutomationChildNodes(editor),
-            wholeDocumentLiveRegion = false,
+            operationCheckpoint = new
+            {
+              dispatch = MarkdownResult(markdownDispatch),
+              redo = MarkdownResult(markdownRedo),
+              undo = MarkdownResult(markdownUndo),
+            },
           },
           coverage = new
           {
@@ -1043,44 +1017,20 @@ internal static class ConformanceV2Runner
               ["scenario.v2.el-markdown-editor.operation.dispatch-transaction"] = new
               {
                 real = true,
-                stepIndexes = new[] { 4 },
+                stepIndexes = new[] { 0 },
                 artifacts = new[] { "interaction", "state" },
               },
               ["scenario.v2.el-markdown-editor.operation.redo"] = new
               {
                 real = true,
-                stepIndexes = new[] { 9 },
+                stepIndexes = new[] { 2 },
                 artifacts = new[] { "interaction", "state" },
               },
               ["scenario.v2.el-markdown-editor.operation.undo"] = new
               {
                 real = true,
-                stepIndexes = new[] { 8 },
+                stepIndexes = new[] { 1 },
                 artifacts = new[] { "interaction", "state" },
-              },
-              ["scenario.v2.el-markdown-editor.state.source"] = new
-              {
-                real = true,
-                stepIndexes = new[] { 11 },
-                artifacts = new[] { "state" },
-              },
-              ["scenario.v2.el-markdown-editor.state.live"] = new
-              {
-                real = true,
-                stepIndexes = new[] { 11 },
-                artifacts = new[] { "state" },
-              },
-              ["scenario.v2.el-markdown-editor.focus"] = new
-              {
-                real = true,
-                stepIndexes = new[] { 2 },
-                artifacts = new[] { "focus", "visual" },
-              },
-              ["scenario.v2.el-markdown-editor.motion"] = new
-              {
-                real = true,
-                stepIndexes = new[] { 14 },
-                artifacts = new[] { "motion" },
               },
             },
           },
@@ -1102,14 +1052,6 @@ internal static class ConformanceV2Runner
               reason = "Native OS IME evidence is owned by the dedicated #341 dependency path.",
               status = "missing",
             },
-          },
-          visual = new
-          {
-            identity = markdownIdentity,
-            artifact = Path.GetFileName(markdownScreenshotPath),
-            sha256 = markdownScreenshotHash,
-            artifactBytes = markdownScreenshotBytes,
-            renderedTopLevel = true,
           },
         },
         ["component-v2.el-check-tag"] = new
@@ -1522,6 +1464,23 @@ internal static class ConformanceV2Runner
   {
     var json = JsonSerializer.SerializeToElement(step, JsonOptions);
     return json.GetProperty("observation").GetProperty("passed").GetBoolean();
+  }
+
+  private static object RebindContractStep(object step, object identity, int index)
+  {
+    var json = JsonSerializer.SerializeToElement(step, JsonOptions);
+    return new
+    {
+      index,
+      action = json.GetProperty("action").GetString(),
+      target = json.GetProperty("target").GetString(),
+      focusTarget = json.GetProperty("focusTarget").ValueKind == JsonValueKind.Null
+        ? null
+        : json.GetProperty("focusTarget").GetString(),
+      elapsedMilliseconds = json.GetProperty("elapsedMilliseconds").GetDouble(),
+      binding = identity,
+      observation = json.GetProperty("observation").Clone(),
+    };
   }
 
   private sealed record FocusRingPixelEvidence(

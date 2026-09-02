@@ -10,7 +10,7 @@ dotnet build dotnet/FsusUI.Avalonia.slnx --configuration Release
 dotnet pack dotnet/FsusUI.Avalonia.slnx --no-build --configuration Release -o dotnet/artifacts/nuget
 node scripts/check-nuget-metadata.mjs
 node scripts/check-nuget-package-smoke.mjs
-node scripts/check-avalonia-nuget-stable.mjs
+pnpm run dotnet:stable-package
 ```
 
 Results:

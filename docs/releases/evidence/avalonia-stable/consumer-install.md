@@ -10,7 +10,7 @@ It references packed packages from `dotnet/artifacts/nuget` and does not use
 Local RC command:
 
 ```bash
-node scripts/check-avalonia-nuget-stable.mjs
+pnpm run dotnet:stable-package
 ```
 
 Result: restore, build, and `--smoke` run passed against the locally packed

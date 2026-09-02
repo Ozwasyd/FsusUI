@@ -17,6 +17,7 @@ import {
 
 import {
   alignmentHash as stableReadinessAlignmentHash,
+  createPackageAlignmentBinding,
   currentIdentity as stableReadinessCurrentIdentity,
   deriveReleaseScopeFamilies,
   deriveStableConsumers,
@@ -24,6 +25,7 @@ import {
   readAlignment as stableReadinessReadAlignment,
   readStableConsumerAuthority,
   requireNugetStableRelease,
+  validatePackageAlignmentBinding,
   validateNugetPackageAlignment,
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
 
@@ -207,6 +209,29 @@ test('stable readiness accepts governed product gaps but rejects leakage and for
     validateNugetPackageAlignment(ready, { stablePublication: true }),
     { alignmentGapCount: 0, missingReleaseFamilies: [], releaseReady: true },
   )
+  ready.schema = 'fsusui.alignment.v2'
+  ready.identity = {
+    candidate: 'a'.repeat(40),
+    contractHash: 'b'.repeat(64),
+  }
+  ready.identity.alignmentHash = stableReadinessAlignmentHash(ready)
+  const sealedArtifact = Buffer.from(`${JSON.stringify(ready)}\n`)
+  const binding = createPackageAlignmentBinding(ready, sealedArtifact)
+  assert.deepEqual(
+    validatePackageAlignmentBinding(binding, sealedArtifact, {
+      candidate: ready.identity.candidate,
+    }),
+    ready,
+  )
+  assert.throws(
+    () =>
+      validatePackageAlignmentBinding(
+        binding,
+        Buffer.concat([sealedArtifact, Buffer.from(' ')]),
+        { candidate: ready.identity.candidate },
+      ),
+    /stale or tampered/u,
+  )
 })
 
 test('evidence rejects headless and fixture-only paths', () => {
@@ -261,6 +286,29 @@ test('derive comparison validation rejects stale identity and tampered evidence'
   )
   const comparison = compareEvidence(web, avalonia)
   const expected = { ...comparison.identity }
+
+  const failedMarkdownStep = structuredClone(web)
+  failedMarkdownStep.contractExecutions[
+    'component-v2.el-markdown-editor'
+  ].steps[0].observation.passed = false
+  assert.throws(
+    () => compareEvidence(failedMarkdownStep, avalonia),
+    /component-v2\.el-markdown-editor\.steps\[0\] failed/u,
+  )
+
+  const spoofedMarkdownIdentity = structuredClone(web)
+  const spoofedExecution =
+    spoofedMarkdownIdentity.contractExecutions[
+      'component-v2.el-markdown-editor'
+    ]
+  spoofedExecution.identity.documentId = 'runner-authored-document'
+  for (const step of spoofedExecution.steps) {
+    step.binding.documentId = 'runner-authored-document'
+  }
+  assert.throws(
+    () => compareEvidence(spoofedMarkdownIdentity, avalonia),
+    /identity\.documentId mismatch/u,
+  )
 
   assert.throws(
     () => compareEvidence(web, avalonia, {}),
