@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createMarkdownHeavyFeatureLifecycle,
-  evaluateMarkdownHeavyFeatureLifecycleMutations,
   type MarkdownHeavyFeatureIdentity,
   type MarkdownHeavyFeatureKind,
 } from '../use-markdown-heavy-feature-lifecycle'
-import { evaluateMarkdownHeavyFeatureAdapterResourceMutations } from '../../wasm/markdown-heavy-feature-resource'
+import { evaluateMarkdownHeavyFeatureLifecycleMutations } from '../use-markdown-heavy-feature-lifecycle/mutations'
+import { evaluateMarkdownHeavyFeatureAdapterResourceMutations } from '../../wasm/markdown-heavy-feature-resource-mutations'
 
 const identity = (
   kind: MarkdownHeavyFeatureKind,
