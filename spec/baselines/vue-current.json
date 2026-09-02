@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "6aff4c767aaea53dfb39b61d894dc487bc8ad007",
+    "commitSha": "bca3287270ef09909f46a002ac71d6cf260c491a",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "3cf66ad04a2a3f22cddf55fa6acb2f97766b68bbc076706e76718ca77b688df8",
+    "inputTreeHash": "b511e7afa0119522c6acbbe92ba467bc985d0ae0f1e3afced5aa1dc1fa8f1fa5",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "c84b89cea809034c17a78088cdcab2aef6ca00385d898c0e52666dc835120612"
+    "outputHash": "bd5e100b003c2b25b5af5a4d6ae7aa0f7d13f34456df5be06d031dc72f9d6e15"
   },
   "summary": {
     "componentModules": 93,
@@ -11006,6 +11006,7 @@
         "documentIdentity",
         "editorProfile",
         "embedProvider",
+        "focusExemptions",
         "imageActionLabel",
         "interactionProfile",
         "lang",
@@ -11036,6 +11037,7 @@
         "textareaId",
         "textareaName",
         "toolbarDensity",
+        "writingAids",
         "writingPlaceholder"
       ],
       "emits": [
@@ -11070,11 +11072,14 @@
         "openCommandPalette",
         "openSearch",
         "redo",
+        "revealHeading",
+        "revealSourceRange",
         "searchNavigate",
         "searchReplaceAll",
         "searchReplaceCurrent",
         "searchUi",
-        "undo"
+        "undo",
+        "writingAidsController"
       ],
       "semantic": {
         "props": [
@@ -11183,6 +11188,18 @@
             "name": "embedProvider",
             "runtimeType": "Function",
             "semanticType": "MarkdownEmbedProvider",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "focusExemptions",
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorFocusExemptions",
             "nullable": false,
             "values": null,
             "default": {
@@ -11569,6 +11586,18 @@
             "readonly": false
           },
           {
+            "name": "writingAids",
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorWritingAidsOptions",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
             "name": "writingPlaceholder",
             "runtimeType": "String",
             "semanticType": null,
@@ -11837,6 +11866,42 @@
             "returnType": null
           },
           {
+            "name": "revealHeading",
+            "parameters": [
+              {
+                "name": "nodeId",
+                "type": "string",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "options",
+                "type": "Parameters<typeof revealHeadingOutline>[4]",
+                "optional": true,
+                "rest": false
+              }
+            ],
+            "returnType": null
+          },
+          {
+            "name": "revealSourceRange",
+            "parameters": [
+              {
+                "name": "range",
+                "type": "{ start: number; end: number }",
+                "optional": false,
+                "rest": false
+              },
+              {
+                "name": "options",
+                "type": "Parameters<typeof revealSourceRangeOutline>[2]",
+                "optional": true,
+                "rest": false
+              }
+            ],
+            "returnType": null
+          },
+          {
             "name": "searchNavigate",
             "parameters": [
               {
@@ -11865,6 +11930,11 @@
           },
           {
             "name": "undo",
+            "parameters": [],
+            "returnType": null
+          },
+          {
+            "name": "writingAidsController",
             "parameters": [],
             "returnType": null
           }

@@ -387,6 +387,28 @@ context menu、语音服务、辅助技术或 OS IME 设备证据。完整 nativ
 | embed-open-source  | consumer 应打开指定 target/mode 的来源                       |
 | embed-retry        | consumer 应重新解析指定 target/mode                          |
 
+## Outline and writing aids
+
+`revealHeading(nodeId)` 与 `revealSourceRange(range)` 使用当前 document identity、
+revision 与 projection。成功时组件会挂载目标所在的 live virtual window、恢复 source
+selection、聚焦唯一 textarea input owner，并把目标滚入视口；stale、deleted、
+unsupported 或 missing target 不移动 selection、focus、scroll 或 history。
+
+`writing-aids` 只在调用方显式启用后生效：
+
+- `focus` 仅用于 `editor-profile="prose"` 的可编辑表面。它从同一 projection 与
+  selection 识别当前 block，以文字透明度降低非当前 block 的强调，不隐藏、不模糊，
+  也不创建第二个可编辑 DOM owner。Search、diagnostic、property、attachment 与
+  atomic node 可由 projection exemption 保持可读。
+- `typewriter` 只在普通 input 或显式 outline/search navigation 后定位；selection
+  change 本身不滚动。wheel、touch、scrollbar、selection drag 与 composition 会暂停
+  自动定位，后续 input 或显式 navigation 才恢复。默认 anchor 是 upper-third；
+  `writingAids.typewriterAnchor = 'center'` 必须显式选择。Reduced motion 保留定位但
+  禁用平滑滚动。
+
+Focus layer 是 `aria-hidden` 的 presentation，textarea 继续单独拥有 input、selection、
+clipboard、focus 與 IME。两个 writing aid 都不修改 Markdown source 或 history。
+
 ## Attributes
 
 | 属性名            | 说明                                        | 类型                                      | 默认值   |
@@ -397,6 +419,9 @@ context menu、语音服务、辅助技术或 OS IME 设备证据。完整 nativ
 | chrome            | 外围区域与根表面变体                        | `'framed' \| 'embedded' \| 'minimal'`     | `framed` |
 | placeholder       | 文本域占位文本                              | `string`                                  | `''`     |
 | commands          | toolbar command model                       | `MarkdownEditorCommand[]`                 | 内置命令 |
+| writing-aids      | prose focus 与 typewriter opt-in             | `MarkdownEditorWritingAidsOptions`        | —        |
+| focus-exemptions  | Focus mode 中保持清晰的 source node 状态     | `MarkdownEditorFocusExemptions`          | —        |
+| editor-profile    | markdown 或 prose 写作表面                   | `'markdown' \| 'prose'`                  | markdown |
 | readonly          | Read-only; blocks input and mutation methods     | `boolean`                                 | `false`  |
 | disabled          | 禁用输入与全部 mutation method              | `boolean`                                 | `false`  |
 | loading           | 标记 busy 并冻结输入与全部 mutation method  | `boolean`                                 | `false`  |

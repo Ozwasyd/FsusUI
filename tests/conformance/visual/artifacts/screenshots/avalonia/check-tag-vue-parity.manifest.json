@@ -1,7 +1,7 @@
 {
   "component": "check-tag",
   "runner": "headless-skia",
-  "screenshot": "/mnt/dev-cache/lyuaoss/FsusUI-chain-markdown-command-surfaces/tests/conformance/visual/artifacts/screenshots/avalonia/check-tag-vue-parity.png",
+  "screenshot": "/mnt/dev-cache/lyuaoss/FsusUI-writing-aids-outline/tests/conformance/visual/artifacts/screenshots/avalonia/check-tag-vue-parity.png",
   "surfaceBounds": [
     1,
     0,

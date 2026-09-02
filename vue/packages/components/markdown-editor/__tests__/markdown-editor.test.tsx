@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
+import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
 import {
   defaultMarkdownEditorCommands,
   markdownEditorEmits,
@@ -1459,5 +1460,195 @@ describe('MarkdownEditor command contract migration', () => {
         revision: 4,
       }),
     ).toThrow(/missing identity/i)
+  })
+})
+
+describe('MarkdownEditor writing-aids integration', () => {
+  it('renders focus presentation and makes outline reveal select, focus, and scroll the textarea', async () => {
+    const source =
+      '# Intro\n\nFirst paragraph.\n\n## Details\n\nSecond paragraph.\n'
+    const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
+      props: {
+        editorProfile: 'prose',
+        modelValue: source,
+        writingAids: { focus: true, typewriter: true },
+      },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    const scrollTo = vi.fn()
+    Object.defineProperty(textarea, 'clientHeight', {
+      configurable: true,
+      value: 320,
+    })
+    Object.defineProperty(textarea, 'scrollTo', {
+      configurable: true,
+      value: scrollTo,
+    })
+
+    await nextTick()
+    expect(wrapper.find('.el-markdown-editor__focus-layer').exists()).toBe(true)
+    expect(wrapper.findAll('.is-dimmed').length).toBeGreaterThan(0)
+    expect(wrapper.attributes('data-markdown-focus-enabled')).toBe('true')
+
+    const model = createMarkdownOutlineModel(source, {
+      epoch: 0,
+      id: wrapper.attributes('data-markdown-instance'),
+    })
+    const target = model.items[1]!
+    expect(
+      (wrapper.vm as MarkdownEditorInstance).revealHeading(target.nodeId),
+    ).toBe('success')
+    await nextTick()
+    await nextTick()
+
+    expect(textarea.selectionStart).toBe(target.sourceRange.start)
+    expect(document.activeElement).toBe(textarea)
+    expect(scrollTo).toHaveBeenCalled()
+    expect(wrapper.attributes('data-markdown-focus-active-block')).toBe(
+      target.nodeId,
+    )
+
+    wrapper.unmount()
+  })
+
+  it('wires manual scroll and composition into the public writing-aids controller', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        editorProfile: 'prose',
+        modelValue: 'line one\nline two',
+        writingAids: { typewriter: true },
+      },
+    })
+    const textarea = wrapper.find('textarea')
+
+    await nextTick()
+    await Promise.resolve()
+    await textarea.trigger('scroll')
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe(
+      'user-scroll-suspended',
+    )
+
+    await textarea.trigger('compositionstart')
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe(
+      'composition-suspended',
+    )
+    await textarea.trigger('compositionend', { data: '' })
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe('idle')
+
+    await textarea.trigger('keydown', { key: 'PageDown' })
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe(
+      'user-scroll-suspended',
+    )
+  })
+
+  it('fails closed without moving selection, focus, scroll, or history for missing and stale reveals', async () => {
+    const source = '# Intro\n\nBody\n'
+    const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
+      props: {
+        editorProfile: 'prose',
+        modelValue: source,
+        writingAids: { focus: true, typewriter: true },
+      },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    const scrollTo = vi.fn()
+    Object.defineProperty(textarea, 'scrollTo', {
+      configurable: true,
+      value: scrollTo,
+    })
+    textarea.setSelectionRange(source.length, source.length, 'none')
+    const instance = wrapper.vm as MarkdownEditorInstance
+    const historyBefore = instance.writingAidsController.state
+
+    expect(instance.revealHeading('missing-node')).toBe('not-found')
+    expect(
+      instance.revealSourceRange(
+        { start: 0, end: 2 },
+        {
+          expected: {
+            documentIdentity: { id: 'other-document', epoch: 0 },
+            revision: 0,
+          },
+        },
+      ),
+    ).toBe('stale')
+    await nextTick()
+
+    expect(textarea.selectionStart).toBe(source.length)
+    expect(textarea.selectionEnd).toBe(source.length)
+    expect(scrollTo).not.toHaveBeenCalled()
+    expect(instance.writingAidsController.state).toBe(historyBefore)
+    wrapper.unmount()
+  })
+
+  it('reports a deleted stable heading identity without falling back to a same-title sibling', async () => {
+    const source = '# Same\n\nBody\n\n# Same\n\nTail\n'
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        editorProfile: 'prose',
+        modelValue: source,
+        writingAids: { focus: true },
+      },
+    })
+    await nextTick()
+    const identity = {
+      epoch: 0,
+      id: wrapper.attributes('data-markdown-instance'),
+    }
+    const model = createMarkdownOutlineModel(source, identity)
+    const deletedId = model.items[1]!.nodeId
+
+    await wrapper.setProps({ modelValue: '# Same\n\nBody\n\nTail\n' })
+    await nextTick()
+    await nextTick()
+
+    expect(
+      (wrapper.vm as MarkdownEditorInstance).revealHeading(deletedId),
+    ).toBe('deleted')
+    expect(
+      (wrapper.vm as MarkdownEditorInstance).revealHeading(
+        model.items[0]!.nodeId,
+      ),
+    ).toBe('success')
+  })
+
+  it('renders Focus exemptions, disables Focus in preview, and suspends Typewriter on PageDown', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        editorProfile: 'prose',
+        modelValue: '# Intro\n\nFirst.\n\nSecond.\n',
+        writingAids: { focus: true, typewriter: true },
+      },
+    })
+    await nextTick()
+    const dimmed = wrapper.find(
+      '.el-markdown-editor__focus-layer .is-dimmed[data-node-id]',
+    )
+    const exemptNodeId = dimmed.attributes('data-node-id')
+    expect(exemptNodeId).toBeTruthy()
+
+    await wrapper.setProps({
+      focusExemptions: { searchMatches: [exemptNodeId] },
+    })
+    expect(wrapper.find(`[data-node-id="${exemptNodeId}"]`).classes()).toContain(
+      'is-exempt',
+    )
+    expect(
+      wrapper.find(`[data-node-id="${exemptNodeId}"]`).classes(),
+    ).not.toContain('is-dimmed')
+
+    await wrapper.find('textarea').trigger('keydown', { key: 'PageDown' })
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe(
+      'user-scroll-suspended',
+    )
+
+    await wrapper.setProps({ mode: 'preview' })
+    await nextTick()
+    expect(wrapper.attributes('data-markdown-focus-enabled')).toBe('false')
+    expect(wrapper.find('.el-markdown-editor__focus-layer').exists()).toBe(
+      false,
+    )
   })
 })

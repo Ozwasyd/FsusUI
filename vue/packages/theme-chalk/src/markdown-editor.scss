@@ -338,8 +338,10 @@
 
   @include e(body) {
     display: grid;
+    position: relative;
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
+    overflow: hidden;
   }
 
   @include m(split) {
@@ -369,6 +371,11 @@
   }
 
   @include e(textarea) {
+    position: relative;
+    z-index: 1;
+    grid-area: 1 / 1;
+    box-sizing: border-box;
+    max-width: 100%;
     min-width: 0;
     resize: vertical;
     border: 0;
@@ -376,6 +383,7 @@
     padding: 16px;
     background: getCssVar('bg-color');
     color: getCssVar('text-color', 'primary');
+    scrollbar-gutter: stable;
     font: inherit;
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
@@ -384,6 +392,58 @@
 
     &:focus-visible {
       @include a11y-focus-ring(2px);
+    }
+  }
+
+  @include e(focus-layer) {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    grid-area: 1 / 1;
+    min-width: 0;
+    min-height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 16px;
+    pointer-events: none;
+    background: getCssVar('bg-color');
+    color: getCssVar('text-color', 'primary');
+    scrollbar-color: transparent transparent;
+    scrollbar-gutter: stable;
+    font: inherit;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    &::-webkit-scrollbar,
+    &::-webkit-scrollbar-thumb,
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    @include when(dimmed) {
+      opacity: 0.72;
+    }
+  }
+
+  @include when(focus-mode) {
+    @include e(textarea) {
+      background: transparent;
+      color: transparent;
+
+      &::placeholder {
+        color: getCssVar('text-color', 'placeholder');
+      }
+
+      &::selection {
+        background: var(--fsus-state-selected-bg);
+        color: getCssVar('text-color', 'primary');
+      }
     }
   }
 
@@ -517,6 +577,27 @@
       }
     }
 
+    @include e(focus-layer) {
+      justify-self: center;
+      width: min(100%, 74ch);
+      min-height: clamp(
+        30rem,
+        calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
+        68rem
+      );
+      padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
+      background: getCssVar('fill-color', 'blank');
+      font-family:
+        getCssVar('font-family'),
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        sans-serif;
+      font-size: 18px;
+      line-height: 1.84;
+      letter-spacing: 0;
+    }
+
     @include e(preview) {
       padding: clamp(1.25rem, 3vw, 2.5rem);
       line-height: 1.78;
@@ -525,6 +606,14 @@
     @include e(status) {
       gap: 8px 14px;
       background: getCssVar('bg-color');
+    }
+  }
+
+  @include when(focus-mode) {
+    @include e(textarea) {
+      &:focus-visible {
+        background: transparent;
+      }
     }
   }
 
@@ -605,6 +694,18 @@
       }
 
       @include e(textarea) {
+        width: 100%;
+        min-height: clamp(
+          24rem,
+          calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 15rem),
+          52rem
+        );
+        padding: 1.25rem 1rem 1.75rem;
+        font-size: 17px;
+        line-height: 1.78;
+      }
+
+      @include e(focus-layer) {
         width: 100%;
         min-height: clamp(
           24rem,

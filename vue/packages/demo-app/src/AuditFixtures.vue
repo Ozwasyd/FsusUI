@@ -436,6 +436,61 @@
       </output>
     </section>
 
+    <section
+      v-if="markdownWritingAidsFixture"
+      :dir="markdownWritingAidsDirection"
+      data-testid="markdown-writing-aids-fixture"
+    >
+      <div
+        data-testid="markdown-writing-aids-nested-scroll"
+        style="max-height: 38rem; overflow: auto"
+      >
+        <el-markdown-editor
+          ref="markdownWritingAidsEditor"
+          v-model="markdownWritingAidsValue"
+          editor-profile="prose"
+          :mode="markdownWritingAidsMode"
+          :min-rows="12"
+          :show-actions="false"
+          :show-mode-switcher="false"
+          :writing-aids="{ focus: true, typewriter: true }"
+        />
+      </div>
+      <button
+        type="button"
+        data-testid="markdown-reveal-details"
+        @click="revealMarkdownDetails"
+      >
+        Reveal details
+      </button>
+      <button
+        type="button"
+        data-testid="markdown-reveal-virtual"
+        @click="revealVirtualMarkdownDetails"
+      >
+        Reveal virtual details
+      </button>
+      <button
+        type="button"
+        data-testid="markdown-reveal-missing"
+        @click="revealMissingMarkdownHeading"
+      >
+        Reveal missing heading
+      </button>
+      <button
+        v-for="mode in markdownWritingAidsModes"
+        :key="mode"
+        type="button"
+        :data-testid="`markdown-mode-${mode}`"
+        @click="markdownWritingAidsMode = mode"
+      >
+        {{ mode }}
+      </button>
+      <output data-testid="markdown-reveal-status">{{
+        markdownRevealStatus
+      }}</output>
+    </section>
+
     <div class="audit-grid">
       <AuditCard name="FixedSizeList" :state="auditState">
         <div class="audit-virtual-frame audit-virtual-frame--list">
@@ -2139,6 +2194,9 @@ const markdownEditorTransactionFixture =
   new URLSearchParams(window.location.search).get(
     'markdownEditorTransaction',
   ) === '1'
+const markdownWritingAidsFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownWritingAids') === '1'
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
@@ -2309,6 +2367,91 @@ if (markdownEditorDelayMount > 0) {
   }, markdownEditorDelayMount)
 }
 const markdownTransactionEditor = ref<MarkdownEditorInstance>()
+const markdownWritingAidsEditor = ref<MarkdownEditorInstance>()
+const markdownWritingAidsModes = ['source', 'live', 'split', 'preview'] as const
+const markdownWritingAidsMode = ref<'source' | 'live' | 'split' | 'preview'>(
+  'source',
+)
+const markdownWritingAidsDirection =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownDirection') === 'rtl'
+    ? 'rtl'
+    : 'ltr'
+const markdownWritingAidsHeadingCount =
+  typeof window === 'undefined'
+    ? 0
+    : Math.min(
+        10_000,
+        Math.max(
+          0,
+          Number(
+            new URLSearchParams(window.location.search).get(
+              'markdownHeadingCount',
+            ) ?? 0,
+          ),
+        ),
+      )
+const markdownWritingAidsValue = ref(
+  [
+    '# Writing session',
+    ...Array.from(
+      { length: markdownWritingAidsHeadingCount },
+      (_, index) => `## Section ${index + 1}`,
+    ),
+    ...Array.from(
+      { length: 18 },
+      (_, index) =>
+        `Paragraph ${index + 1} keeps the document realistic and scrollable.`,
+    ),
+    '::embed[target="details" mode="block"]',
+    'The selected section remains readable while surrounding blocks stay present.',
+  ].join('\n\n'),
+)
+const markdownRevealStatus = ref('idle')
+const markdownWritingAidsMarker = '::embed[target="details" mode="block"]'
+const revealMarkdownDetails = () => {
+  const start = markdownWritingAidsValue.value.indexOf(
+    markdownWritingAidsMarker,
+  )
+  const status =
+    markdownWritingAidsEditor.value?.revealSourceRange({
+      start,
+      end: start + markdownWritingAidsMarker.length,
+    }) ?? 'missing-method'
+  markdownRevealStatus.value = `${start}:${status}`
+}
+const revealVirtualMarkdownDetails = () => {
+  const start = markdownWritingAidsValue.value.indexOf(
+    markdownWritingAidsMarker,
+  )
+  const documentId =
+    document
+      .querySelector(
+        '[data-testid="markdown-writing-aids-fixture"] [data-markdown-instance]',
+      )
+      ?.getAttribute('data-markdown-instance') ?? 'missing-document'
+  const nodeId = 'fixture:virtual:details'
+  const status =
+    markdownWritingAidsEditor.value?.revealHeading(nodeId, {
+      virtualTarget: {
+        anchorId: nodeId,
+        documentIdentity: { id: documentId, epoch: 0 },
+        identity: documentId,
+        range: {
+          start,
+          end: start + markdownWritingAidsMarker.length,
+        },
+        virtual: true,
+      },
+    }) ?? 'missing-method'
+  markdownRevealStatus.value = `virtual:${status}`
+}
+const revealMissingMarkdownHeading = () => {
+  const status =
+    markdownWritingAidsEditor.value?.revealHeading('fixture:missing:heading') ??
+    'missing-method'
+  markdownRevealStatus.value = `missing:${status}`
+}
 const markdownTransactionValue = ref(
   markdownEditorImeFixture
     ? ''
