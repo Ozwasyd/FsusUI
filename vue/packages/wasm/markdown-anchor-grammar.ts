@@ -40,7 +40,23 @@ export interface MarkdownAnchorInvalidNode {
 export type MarkdownAnchorNode = MarkdownAnchorValidNode | MarkdownAnchorInvalidNode
 
 const INLINE_CAPABLE = /^(#{1,6}\s+\S|\s*\S)/
-const FENCE_OR_TABLE = /^(```|:::|\|)/
+const FENCE_DELIMITER = /^\s{0,3}(`{3,}|~{3,})/
+const LATEX_DELIMITER = /^\s{0,3}\$\$/
+const CONTAINER_OPEN = /^\s{0,3}:::\S/
+const REGISTERED_ATOMIC_LINE = /^\s{0,3}::[a-z][a-z0-9-]*\[/
+const TABLE_ROW = /^\s*\|/
+
+/**
+ * A following-line anchor belongs to the block closed by the previous line.
+ * Fenced code, LaTeX, `:::` containers, table rows, and single-line registered
+ * directives are the atomic owners named by the fixed grammar.
+ */
+const isAtomicOwnerLine = (text: string) =>
+  FENCE_DELIMITER.test(text) ||
+  LATEX_DELIMITER.test(text) ||
+  /^\s{0,3}:::/.test(text) ||
+  TABLE_ROW.test(text) ||
+  REGISTERED_ATOMIC_LINE.test(text)
 
 const fail = (
   start: number,
@@ -69,6 +85,70 @@ const splitLines = (source: string) => {
     offset = newline + 1
   }
   return lines
+}
+
+type AnchorLine = ReturnType<typeof splitLines>[number]
+
+const closesFence = (delimiter: string, text: string) => {
+  const match = /^\s{0,3}(`{3,}|~{3,})\s*$/.exec(text)
+  return (
+    match !== null &&
+    match[1]![0] === delimiter[0] &&
+    match[1]!.length >= delimiter.length
+  )
+}
+
+const nextClose = (
+  lines: readonly AnchorLine[],
+  from: number,
+  closes: (text: string) => boolean,
+) => {
+  for (let index = from; index < lines.length; index += 1) {
+    if (closes(lines[index]!.text)) return index
+  }
+  return -1
+}
+
+/**
+ * Lines inside a fenced code, LaTeX, or `:::` container block are literal
+ * source: a `^id` there is content, never an anchor and never a diagnostic.
+ * An unclosed fence runs to the end of the document as CommonMark requires;
+ * an unclosed `$$` or `:::name` keeps line-based scanning because the block
+ * itself is already reported malformed by the projection parser.
+ */
+const markAtomicRegionLines = (lines: readonly AnchorLine[]) => {
+  const inside = new Array<boolean>(lines.length).fill(false)
+  let index = 0
+  while (index < lines.length) {
+    const text = lines[index]!.text
+    const fence = FENCE_DELIMITER.exec(text)
+    if (fence) {
+      const close = nextClose(lines, index + 1, (line) =>
+        closesFence(fence[1]!, line),
+      )
+      const last = close === -1 ? lines.length - 1 : close
+      for (let cursor = index; cursor <= last; cursor += 1) inside[cursor] = true
+      index = last + 1
+      continue
+    }
+    const closer = LATEX_DELIMITER.test(text)
+      ? /^\s{0,3}\$\$\s*$/
+      : CONTAINER_OPEN.test(text)
+        ? /^\s{0,3}:::\s*$/
+        : undefined
+    if (closer) {
+      const close = nextClose(lines, index + 1, (line) => closer.test(line))
+      if (close !== -1) {
+        for (let cursor = index; cursor <= close; cursor += 1) {
+          inside[cursor] = true
+        }
+        index = close + 1
+        continue
+      }
+    }
+    index += 1
+  }
+  return inside
 }
 
 export const parseMarkdownAnchorMarker = (
@@ -105,10 +185,18 @@ export const collectMarkdownAnchorNodes = (
   source: string,
 ): readonly MarkdownAnchorNode[] => {
   const lines = splitLines(source)
+  const insideAtomic = markAtomicRegionLines(lines)
   const nodes: MarkdownAnchorNode[] = []
   const seen = new Map<string, number>()
+  const hasPrecedingBlock = (index: number) => {
+    for (let cursor = index - 1; cursor >= 0; cursor -= 1) {
+      if (lines[cursor]!.text.trim() !== '') return true
+    }
+    return false
+  }
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index]!
+    if (insideAtomic[index]) continue
     if (line.text.startsWith('^') && line.text !== '^') {
       const parsed = parseMarkdownAnchorMarker(line.text, line.start)
       if (!parsed) continue
@@ -118,18 +206,25 @@ export const collectMarkdownAnchorNodes = (
       }
       const previous = index === 0 ? undefined : lines[index - 1]
       if (!previous || previous.text.trim() === '') {
-        nodes.push(
-          fail(line.start, line.end, 'anchor-orphan', 'following-line anchors need an owning block'),
-        )
-        continue
-      }
-      if (!FENCE_OR_TABLE.test(previous.text) && previous.text.trim() !== '```') {
-        const gap = previous.text.trim() === ''
+        const gap = previous !== undefined && hasPrecedingBlock(index)
         nodes.push(
           fail(
             line.start,
             line.end,
-            gap ? 'anchor-cross-gap' : 'anchor-placement',
+            gap ? 'anchor-cross-gap' : 'anchor-orphan',
+            gap
+              ? 'exclusive-line anchors must directly follow their owning block'
+              : 'following-line anchors need an owning block',
+          ),
+        )
+        continue
+      }
+      if (!isAtomicOwnerLine(previous.text)) {
+        nodes.push(
+          fail(
+            line.start,
+            line.end,
+            'anchor-placement',
             'exclusive-line anchors belong to fenced/table/atomic blocks',
           ),
         )
