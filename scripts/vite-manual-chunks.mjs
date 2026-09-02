@@ -147,6 +147,20 @@ const isMarkdownHeavyFeatureIsolatedClient = (id) =>
     id,
   )
 
+const isMarkdownHeavyFeatureResource = (id) =>
+  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-resource\.(?:[cm]?[jt]sx?)$/u.test(
+    id,
+  )
+
+const markdownHeavyFeatureIsolatedAdapterModules =
+  '(?:markdown-heavy-feature-isolated-lazy|markdown-heavy-feature-frame-scheduler)'
+
+const isMarkdownHeavyFeatureIsolatedAdapter = (id) =>
+  new RegExp(
+    `/(?:vue/packages/wasm|node_modules/@element-plus/wasm|node_modules/@ozwasyd/element-plus/es/wasm)/(?:${markdownHeavyFeatureIsolatedAdapterModules})\\.(?:[cm]?[jt]sx?)$`,
+    'u',
+  ).test(id)
+
 const isMarkdownHeavyFeatureIdentity = (id) =>
   /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-identity\.(?:[cm]?[jt]sx?)$/u.test(
     id,
@@ -176,10 +190,24 @@ export const resolveFsusViteManualChunk = (
     return 'fsus-markdown-heavy-isolated-client'
   }
 
-  if (
-    isMarkdownHeavyFeatureIdentity(id) ||
-    isMarkdownHeavyFeatureIdentityDependency(id)
-  ) {
+  if (isMarkdownHeavyFeatureResource(id)) {
+    return 'fsus-markdown-heavy-resource'
+  }
+
+  if (isMarkdownHeavyFeatureIsolatedAdapter(id)) {
+    return 'fsus-markdown-heavy-isolated-adapter'
+  }
+
+  if (isMarkdownHeavyFeatureIdentity(id)) {
+    return 'fsus-markdown-heavy-identity'
+  }
+
+  // Grouping the projection chain into the dynamically imported identity chunk
+  // is only safe when nothing eager reaches it. The consumer Markdown entry does
+  // not, but the full demo also loads the editor, which imports the chain
+  // eagerly; grouping it there makes fsus-ui and the identity chunk mutually
+  // dependent and the resulting circular chunk throws before the app mounts.
+  if (consumerProfile && isMarkdownHeavyFeatureIdentityDependency(id)) {
     return 'fsus-markdown-heavy-identity'
   }
 

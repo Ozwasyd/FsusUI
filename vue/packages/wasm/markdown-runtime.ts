@@ -28,11 +28,9 @@ import type {
   MarkdownFeatureOutputCommitOptions,
   MarkdownFeatureOutputKind,
 } from './markdown-feature-output-gateway'
-import {
-  assertMarkdownHeavyFeatureAdapterResourceBridge,
-  createMarkdownHeavyFeatureAdapterResourceBridge,
-  type MarkdownHeavyFeatureIsolatedRenderFactory,
-  type MarkdownHeavyFeatureIsolatedRenderRequest,
+import type {
+  MarkdownHeavyFeatureIsolatedRenderFactory,
+  MarkdownHeavyFeatureIsolatedRenderRequest,
 } from './markdown-heavy-feature-resource'
 import type {
   FsusErrorCode,
@@ -1541,6 +1539,10 @@ const activateHeavyFeature = async (input: {
       identity.featureKind,
     ].join(':'),
   })
+  const {
+    assertMarkdownHeavyFeatureAdapterResourceBridge,
+    createMarkdownHeavyFeatureAdapterResourceBridge,
+  } = await import('./markdown-heavy-feature-resource')
   const resourceBridge = assertMarkdownHeavyFeatureAdapterResourceBridge(
     createMarkdownHeavyFeatureAdapterResourceBridge(
       input.context.isolatedRenderFactory,

@@ -84,6 +84,35 @@ for (const profile of ['full', 'consumer']) {
     )
   }
 }
+const heavyResourceChunkOwner = 'fsus-markdown-heavy-resource'
+for (const profile of ['full', 'consumer']) {
+  for (const moduleId of [
+    '/workspace/vue/packages/wasm/markdown-heavy-feature-resource.ts',
+    '/workspace/node_modules/@element-plus/wasm/markdown-heavy-feature-resource.mjs',
+    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown-heavy-feature-resource.mjs',
+  ]) {
+    assert(
+      resolveFsusViteManualChunk(moduleId, { profile }) ===
+        heavyResourceChunkOwner,
+      `${profile} must isolate the exact Markdown heavy feature resource module`,
+    )
+  }
+}
+const heavyIsolatedAdapterChunkOwner = 'fsus-markdown-heavy-isolated-adapter'
+for (const profile of ['full', 'consumer']) {
+  for (const moduleId of [
+    '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-lazy.ts',
+    '/workspace/vue/packages/wasm/markdown-heavy-feature-frame-scheduler.ts',
+    '/workspace/node_modules/@element-plus/wasm/markdown-heavy-feature-isolated-lazy.mjs',
+    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown-heavy-feature-frame-scheduler.mjs',
+  ]) {
+    assert(
+      resolveFsusViteManualChunk(moduleId, { profile }) ===
+        heavyIsolatedAdapterChunkOwner,
+      `${profile} must isolate the exact Markdown heavy feature isolated adapter module ${moduleId}`,
+    )
+  }
+}
 const heavyIdentityChunkOwner = 'fsus-markdown-heavy-identity'
 for (const profile of ['full', 'consumer']) {
   for (const moduleId of [
@@ -97,25 +126,42 @@ for (const profile of ['full', 'consumer']) {
       `${profile} must isolate the exact Markdown heavy identity module`,
     )
   }
-  for (const moduleId of [
-    '/workspace/vue/packages/wasm/markdown-editor-projection.ts',
-    '/workspace/vue/packages/wasm/markdown-syntax-identity.ts',
+}
+const heavyIdentityDependencyModules = [
+  ['/workspace/vue/packages/wasm/markdown-editor-projection.ts', 'fsus-ui'],
+  ['/workspace/vue/packages/wasm/markdown-syntax-identity.ts', 'fsus-ui'],
+  [
     '/workspace/vue/packages/wasm/markdown-source-coordinate-map.ts',
-    '/workspace/vue/packages/wasm/markdown-syntax-collect.ts',
+    'fsus-ui',
+  ],
+  ['/workspace/vue/packages/wasm/markdown-syntax-collect.ts', 'fsus-ui'],
+  [
     '/workspace/vue/packages/wasm/markdown/syntax-collect.generated.ts',
-    '/workspace/vue/packages/wasm/markdown-directive-syntax.ts',
-    '/workspace/vue/packages/wasm/markdown-anchor-grammar.ts',
-    '/workspace/vue/packages/wasm/markdown-caption-directive.ts',
-    '/workspace/vue/packages/wasm/markdown-embed-directive.ts',
+    'fsus-ui',
+  ],
+  ['/workspace/vue/packages/wasm/markdown-directive-syntax.ts', 'fsus-ui'],
+  ['/workspace/vue/packages/wasm/markdown-anchor-grammar.ts', 'fsus-ui'],
+  ['/workspace/vue/packages/wasm/markdown-caption-directive.ts', 'fsus-ui'],
+  ['/workspace/vue/packages/wasm/markdown-embed-directive.ts', 'fsus-ui'],
+  [
     '/workspace/node_modules/@element-plus/wasm/markdown-editor-projection.mjs',
+    'fsus-wasm',
+  ],
+  [
     '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown/syntax-collect.generated.mjs',
-  ]) {
-    assert(
-      resolveFsusViteManualChunk(moduleId, { profile }) ===
-        heavyIdentityChunkOwner,
-      `${profile} must isolate the exact Markdown heavy identity dependency ${moduleId}`,
-    )
-  }
+    'fsus-wasm',
+  ],
+]
+for (const [moduleId, fullOwner] of heavyIdentityDependencyModules) {
+  assert(
+    resolveFsusViteManualChunk(moduleId, { profile: 'consumer' }) ===
+      heavyIdentityChunkOwner,
+    `consumer must isolate the exact Markdown heavy identity dependency ${moduleId}`,
+  )
+  assert(
+    resolveFsusViteManualChunk(moduleId, { profile: 'full' }) === fullOwner,
+    `full must keep the Markdown heavy identity dependency ${moduleId} in the ${fullOwner} eager owner so it and the identity chunk cannot cycle`,
+  )
 }
 assert(
   resolveFsusViteManualChunk(
@@ -139,6 +185,30 @@ for (const moduleId of [
   )
 }
 for (const moduleId of [
+  '/workspace/vue/packages/wasm/markdown-heavy-feature-resource-sibling.ts',
+  '/workspace/vue/packages/wasm/markdown-heavy-feature-resource.ts/child.ts',
+  '/workspace/vue/packages/wasm/markdown-heavy-feature-resource.ts?query',
+  '/workspace/vue/packages/wasm/%6darkdown-heavy-feature-resource.ts',
+  '/workspace/vue/packages/wasm/markdown-heavy-feature-resource-mutations.ts',
+]) {
+  assert(
+    resolveFsusViteManualChunk(moduleId) !== heavyResourceChunkOwner,
+    `heavy resource chunk owner must reject non-exact module id ${moduleId}`,
+  )
+}
+for (const moduleId of [
+  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-client.ts',
+  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-lazy-sibling.ts',
+  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-lazy.ts/child.ts',
+  '/workspace/vue/packages/wasm/markdown-heavy-feature-frame-scheduler.ts?query',
+  '/workspace/vue/packages/wasm/%6darkdown-heavy-feature-frame-scheduler.ts',
+]) {
+  assert(
+    resolveFsusViteManualChunk(moduleId) !== heavyIsolatedAdapterChunkOwner,
+    `isolated adapter chunk owner must reject non-exact module id ${moduleId}`,
+  )
+}
+for (const moduleId of [
   '/workspace/vue/packages/wasm/markdown-heavy-feature-identity-sibling.ts',
   '/workspace/vue/packages/wasm/markdown-heavy-feature-identity.ts/child.ts',
   '/workspace/vue/packages/wasm/markdown-heavy-feature-identity.ts?query',
@@ -149,10 +219,13 @@ for (const moduleId of [
   '/workspace/vue/packages/wasm/markdown/syntax-collect.generated.ts/child.ts',
   '/workspace/vue/packages/wasm/markdown/%73yntax-collect.generated.ts',
 ]) {
-  assert(
-    resolveFsusViteManualChunk(moduleId) !== heavyIdentityChunkOwner,
-    `heavy identity chunk owner must reject non-exact module id ${moduleId}`,
-  )
+  for (const profile of ['full', 'consumer']) {
+    assert(
+      resolveFsusViteManualChunk(moduleId, { profile }) !==
+        heavyIdentityChunkOwner,
+      `${profile} heavy identity chunk owner must reject non-exact module id ${moduleId}`,
+    )
+  }
 }
 for (const moduleId of [
   '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-client-sibling.ts',

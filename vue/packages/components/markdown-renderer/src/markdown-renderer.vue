@@ -93,8 +93,6 @@ import {
   renderMarkdownResultWithRuntime,
 } from '@element-plus/wasm'
 import { activateMarkdownHeavyFeatures } from '../../../wasm/markdown-heavy-feature-activation'
-import { scheduleMarkdownHeavyFeatureFrameContinue } from '../../../wasm/markdown-heavy-feature-frame-scheduler'
-import { createLazyMarkdownHeavyFeatureIsolatedRender } from '../../../wasm/markdown-heavy-feature-isolated-lazy'
 import { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from '../../../wasm/markdown-feature-output-gateway-version'
 import { isFsusErr, toFsusError } from '@element-plus/utils'
 import {
@@ -1004,6 +1002,36 @@ const createHeavyFeatureIdentityResolver = async (
   }
 }
 
+const createHeavyFeatureIsolatedRenderFactory =
+  async (): Promise<MarkdownHeavyFeatureIsolatedRenderFactory> => {
+    const [
+      { createLazyMarkdownHeavyFeatureIsolatedRender },
+      { scheduleMarkdownHeavyFeatureFrameContinue },
+    ] = await Promise.all([
+      import('../../../wasm/markdown-heavy-feature-isolated-lazy'),
+      import('../../../wasm/markdown-heavy-feature-frame-scheduler'),
+    ])
+    return <T,>(
+      request: Parameters<MarkdownHeavyFeatureIsolatedRenderFactory>[0],
+    ) => {
+      const handle = createLazyMarkdownHeavyFeatureIsolatedRender(
+        request,
+        props.trustedScriptUrlFactory,
+        (key, run, drop) =>
+          scheduleMarkdownHeavyFeatureFrameContinue(
+            frameScheduler,
+            key,
+            run,
+            drop,
+          ),
+      )
+      return Object.freeze({
+        ...handle,
+        promise: handle.promise as Promise<T>,
+      })
+    }
+  }
+
 const activateRenderedFeatures = async (
   result: MarkdownSafeRenderResult,
   activationRoot: ParentNode | null = rootEl.value,
@@ -1015,29 +1043,15 @@ const activateRenderedFeatures = async (
 
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
-  const resolveHeavyFeatureIdentity = hasEnabledHeavyFeature(result, features)
+  const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+  const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null
   if (signal?.aborted) return
-  const isolatedRenderFactory: MarkdownHeavyFeatureIsolatedRenderFactory = <T,>(
-    request: Parameters<MarkdownHeavyFeatureIsolatedRenderFactory>[0],
-  ) => {
-    const handle = createLazyMarkdownHeavyFeatureIsolatedRender(
-      request,
-      props.trustedScriptUrlFactory,
-      (key, run, drop) =>
-        scheduleMarkdownHeavyFeatureFrameContinue(
-          frameScheduler,
-          key,
-          run,
-          drop,
-        ),
-    )
-    return Object.freeze({
-      ...handle,
-      promise: handle.promise as Promise<T>,
-    })
-  }
+  const isolatedRenderFactory = heavyFeaturesEnabled
+    ? await createHeavyFeatureIsolatedRenderFactory()
+    : undefined
+  if (signal?.aborted) return
   const activationPromise = activateMarkdownHeavyFeatures({
     baseUrl: props.baseUrl,
     concurrency: 3,

@@ -242,6 +242,14 @@ const isMarkdownFeatureOutputGatewayModule = (key) =>
 const isMarkdownHeavyFeatureIdentityModule = (key) =>
   /\/wasm\/markdown-heavy-feature-identity\.mjs$/u.test(key)
 
+const isMarkdownHeavyFeatureResourceModule = (key) =>
+  /\/wasm\/markdown-heavy-feature-resource\.mjs$/u.test(key)
+
+const isMarkdownHeavyFeatureIsolatedAdapterModule = (key) =>
+  /\/wasm\/markdown-heavy-feature-(?:isolated-lazy|frame-scheduler)\.mjs$/u.test(
+    key,
+  ) || /^_?fsus-markdown-heavy-isolated-adapter-[^/]+\.js$/u.test(key)
+
 const findMarkdownHeavyFeatureIsolatedClientEntries = (manifest) =>
   Object.entries(manifest).filter(([, entry]) =>
     (entry.assets ?? []).some((asset) =>
@@ -545,6 +553,74 @@ function assertConsumerPerformanceGraph(graph) {
     throw new Error(
       'Consumer Markdown hydration graph no longer reaches the isolated heavy feature client through a dynamic import.',
     )
+  }
+  const heavyResourceKeys = Object.keys(graph.manifest).filter(
+    isMarkdownHeavyFeatureResourceModule,
+  )
+  if (heavyResourceKeys.length !== 1) {
+    throw new Error(
+      `Consumer graph must expose exactly one Markdown heavy feature resource module, found ${heavyResourceKeys.length}.`,
+    )
+  }
+  const heavyResourceKey = heavyResourceKeys[0]
+  const heavyResource = graph.manifest[heavyResourceKey]
+  if (!heavyResource?.isDynamicEntry) {
+    throw new Error(
+      'Consumer Markdown heavy feature resource module must remain a dynamic manifest entry.',
+    )
+  }
+  if (
+    markdownHydrationClosure.has(heavyResourceKey) ||
+    manifestClosureContainsFile(
+      graph.manifest,
+      markdownHydrationClosure,
+      heavyResource.file,
+    )
+  ) {
+    throw new Error(
+      'Consumer Markdown hydration closure eagerly contains the heavy feature adapter resource bridge.',
+    )
+  }
+  if (
+    !hasDynamicManifestPath(
+      graph.manifest,
+      markdownHydration.key,
+      heavyResourceKey,
+    )
+  ) {
+    throw new Error(
+      'Consumer Markdown hydration graph no longer reaches the heavy feature adapter resource bridge through a dynamic import.',
+    )
+  }
+  const heavyAdapterKeys = Object.keys(graph.manifest).filter(
+    isMarkdownHeavyFeatureIsolatedAdapterModule,
+  )
+  if (heavyAdapterKeys.length === 0) {
+    throw new Error(
+      'Consumer graph lost the Markdown heavy feature isolated render adapter.',
+    )
+  }
+  for (const adapterKey of heavyAdapterKeys) {
+    const adapter = graph.manifest[adapterKey]
+    if (
+      markdownHydrationClosure.has(adapterKey) ||
+      manifestClosureContainsFile(
+        graph.manifest,
+        markdownHydrationClosure,
+        adapter.file,
+      )
+    ) {
+      throw new Error(
+        `Consumer Markdown hydration closure eagerly contains the heavy feature isolated render adapter ${adapterKey}.`,
+      )
+    }
+    if (
+      !hasDynamicManifestPath(graph.manifest, markdownHydration.key, adapterKey)
+    ) {
+      throw new Error(
+        `Consumer Markdown hydration graph no longer reaches the heavy feature isolated render adapter ${adapterKey} through a dynamic import.`,
+      )
+    }
   }
   assertRatchet(
     'Consumer Markdown hydration graph',
