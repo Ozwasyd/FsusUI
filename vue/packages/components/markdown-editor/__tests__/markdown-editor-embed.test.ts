@@ -2,6 +2,10 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
+import {
+  getMarkdownXssSourceAttackFragment,
+} from '../../../../tests/support/markdown-xss-corpus'
+
 import MarkdownEditor from '../src/markdown-editor.vue'
 
 import {
@@ -91,7 +95,7 @@ describe('markdown embed safe presentation and atomic interaction', () => {
 
     const resolvedResult: MarkdownEmbedResult = {
       documentIdentity: { epoch: 1, id: 'embed-doc' },
-      excerpt: '<p>Safe summary <script>alert("xss")</script><iframe src="//evil.com"></iframe></p>',
+      excerpt: `<p>Safe summary ${getMarkdownXssSourceAttackFragment('mxss-raw-script-basic')}${getMarkdownXssSourceAttackFragment('mxss-container-iframe-srcdoc')}</p>`,
       mode: 'article',
       nodeId: 'syn:embed:0',
       requestId: 'r1',
@@ -281,7 +285,7 @@ describe('markdown embed safe presentation and atomic interaction', () => {
         defaultMode: 'preview',
         embedProvider: async (request) => ({
           ...request,
-          excerpt: 'Safe summary <script>bad()</script>',
+          excerpt: `Safe summary ${getMarkdownXssSourceAttackFragment('mxss-raw-script-basic')}`,
           status: 'resolved',
           title: 'Safe Document',
         }),
@@ -295,7 +299,7 @@ describe('markdown embed safe presentation and atomic interaction', () => {
     expect(embed.exists()).toBe(true)
     expect(embed.text()).toContain('Safe Document')
     expect(embed.text()).toContain('Safe summary')
-    expect(embed.text()).not.toContain('bad()')
+    expect(embed.text()).not.toContain('__FSUS_XSS__')
     expect(wrapper.html()).not.toContain('<script>')
     expect(embed.text()).toContain('Open Source')
 
