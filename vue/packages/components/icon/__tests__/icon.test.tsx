@@ -24,4 +24,13 @@ describe('Icon.vue', () => {
     expect(inherited.classes()).not.toContain('is-linear')
     expect(linear.classes()).toContain('is-linear')
   })
+
+  test('omits style attribute when neither size nor color is set', () => {
+    const wrapper = mount(() => (
+      <Icon>
+        <svg />
+      </Icon>
+    ))
+    expect(wrapper.element.getAttribute('style')).toBeNull()
+  })
 })
