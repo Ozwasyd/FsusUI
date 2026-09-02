@@ -1,4 +1,5 @@
 import {
+  getMarkdownEditorCommand,
   isMarkdownEditorCommandEnabled,
   isMarkdownEditorCommandVisible,
   type MarkdownEditorCommand,
@@ -24,6 +25,29 @@ const MARKDOWN_EDITOR_COMMAND_PRESENTATIONS =
     'slash',
     'toolbar',
   ])
+
+/**
+ * Command contexts carry stable document, selection, syntax, and transaction
+ * facts only. A handle to the textarea, the rendered DOM, or a third-party
+ * editor instance would let a command bypass the projection and dispatcher, so
+ * the snapshot refuses such a context instead of reading through it.
+ */
+const MARKDOWN_EDITOR_PRIVATE_EDITOR_CONTEXT_KEYS = Object.freeze([
+  '$el',
+  'cm',
+  'codemirror',
+  'dom',
+  'editor',
+  'editorInstance',
+  'editorRef',
+  'element',
+  'instance',
+  'monaco',
+  'prosemirror',
+  'textarea',
+  'textareaRef',
+  'view',
+])
 
 const normalizedShortcut = (shortcut: string) =>
   shortcut.trim().replace(/\s+/gu, '').toLowerCase()
@@ -136,6 +160,19 @@ const validateMarkdownEditorCommands = (
   }
 }
 
+const validateMarkdownEditorCommandContext = (
+  context: MarkdownEditorCommandContext,
+) => {
+  const leaked = MARKDOWN_EDITOR_PRIVATE_EDITOR_CONTEXT_KEYS.filter(
+    (key) => key in context,
+  )
+  if (leaked.length > 0) {
+    throw new Error(
+      `Markdown editor command context must not expose private editor access: ${leaked.join(', ')}`,
+    )
+  }
+}
+
 export const createMarkdownEditorCommandSnapshot = (
   commands: readonly MarkdownEditorCommand[],
   context: MarkdownEditorCommandContext,
@@ -143,6 +180,7 @@ export const createMarkdownEditorCommandSnapshot = (
     new Map(),
 ): readonly MarkdownEditorCommandSnapshotItem[] => {
   validateMarkdownEditorCommands(commands)
+  validateMarkdownEditorCommandContext(context)
 
   return Object.freeze(
     commands.map((command) => {
@@ -198,6 +236,8 @@ export type MarkdownEditorCommandMutationKind =
   | 'arbitrary-icon'
   | 'duplicate-shortcut'
   | 'apply-path'
+  | 'label-dispatch'
+  | 'private-editor-access'
 
 const snapshotIdentity = (
   snapshot: readonly MarkdownEditorCommandSnapshotItem[],
@@ -262,6 +302,22 @@ export const evaluateMarkdownEditorCommandMutations = (
     },
     value: '`unterminated',
   }
+  const relabeled = createMarkdownEditorCommandSnapshot(
+    [{ ...first, label: `${first.label} (renamed)` }],
+    context,
+  )
+  const sharedLabelCommands = [
+    { ...first, key: 'label-a', label: 'Shared label', shortcut: undefined },
+    { ...first, key: 'label-b', label: 'Shared label', shortcut: undefined },
+  ]
+  const sharedLabel = createMarkdownEditorCommandSnapshot(
+    sharedLabelCommands,
+    context,
+  )
+  const privateEditorContext = {
+    ...context,
+    textarea: { value: context.value },
+  } as unknown as MarkdownEditorCommandContext
 
   return Object.freeze({
     authority,
@@ -319,6 +375,22 @@ export const evaluateMarkdownEditorCommandMutations = (
           ],
           context,
         ),
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'label-dispatch' as const,
+        equivalent:
+          relabeled[0]?.key !== first.key ||
+          relabeled[0]?.label === first.label ||
+          sharedLabel.length !== 2 ||
+          sharedLabel.some((item) => item.label !== 'Shared label') ||
+          getMarkdownEditorCommand(sharedLabelCommands, 'label-b')?.key !==
+            'label-b',
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'private-editor-access' as const,
+        equivalent: !rejectedBySnapshot(commands, privateEditorContext),
         accepted: false,
       }),
     ]),

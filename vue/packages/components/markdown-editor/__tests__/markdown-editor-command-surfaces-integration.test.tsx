@@ -4,7 +4,10 @@ import { describe, expect, it } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
-import type { MarkdownEditorCommand } from '../src/markdown-editor'
+import type {
+  MarkdownEditorCommand,
+  MarkdownEditorMode,
+} from '../src/markdown-editor'
 
 const insertCommand: MarkdownEditorCommand = {
   group: 'insert',
@@ -477,6 +480,78 @@ describe('Markdown editor command surface integration', () => {
       document.body.querySelector('.el-markdown-editor__palette-dialog'),
     ).toBeNull()
     expect(document.activeElement).toBe(wrapper.find('textarea').element)
+    wrapper.unmount()
+  })
+
+  const paletteFacts = async (mode: MarkdownEditorMode) => {
+    const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
+      props: {
+        defaultMode: mode,
+        modelValue: '# Title',
+        surfaces: { commandPalette: true },
+      },
+    })
+    ;(wrapper.vm as unknown as { openCommandPalette: () => void }).openCommandPalette()
+    await nextTick()
+    const facts = Array.from(
+      document.body.querySelectorAll<HTMLButtonElement>(
+        '.el-markdown-editor__palette-item',
+      ),
+      (button) => ({ disabled: button.disabled, label: button.textContent?.trim() }),
+    )
+    wrapper.unmount()
+    await nextTick()
+    return facts
+  }
+
+  it('lists one command set in every mode and blocks execution in preview', async () => {
+    const authority = await paletteFacts('source')
+    expect(authority.length).toBeGreaterThan(1)
+    for (const mode of ['live', 'split'] as const) {
+      expect(await paletteFacts(mode), mode).toEqual(authority)
+    }
+    const preview = await paletteFacts('preview')
+    expect(preview.map((item) => item.label)).toEqual(
+      authority.map((item) => item.label),
+    )
+    expect(preview.every((item) => item.disabled)).toBe(true)
+
+    // The shortcut path carries no disabled attribute, so preview must still
+    // fail closed instead of mutating source.
+    const wrapper = mount(MarkdownEditor, {
+      props: { defaultMode: 'preview', modelValue: '# Title' },
+    })
+    const buttons = wrapper.findAll('.el-markdown-editor__command')
+    expect(buttons.length).toBeGreaterThan(0)
+    expect(
+      buttons.every((button) => (button.element as HTMLButtonElement).disabled),
+    ).toBe(true)
+    await wrapper.find('textarea').trigger('keydown', { ctrlKey: true, key: 'b' })
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(wrapper.emitted('command')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('renders no command surface content for an empty registry', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
+      props: {
+        commands: [],
+        modelValue: '# Title',
+        surfaces: { commandPalette: true },
+      },
+    })
+    expect(wrapper.findAll('.el-markdown-editor__command')).toHaveLength(0)
+    ;(wrapper.vm as unknown as { openCommandPalette: () => void }).openCommandPalette()
+    await nextTick()
+    expect(
+      document.body.querySelector('.el-markdown-editor__palette-dialog'),
+    ).not.toBeNull()
+    expect(
+      document.body.querySelectorAll('.el-markdown-editor__palette-item'),
+    ).toHaveLength(0)
     wrapper.unmount()
   })
 })
