@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "policy": "no-growth-ratchet",
-  "provenance": "2026-09-02 two consecutive measurements of the same locally built candidate on Node v24.18.0, zlib 1.3.1-e00f703, and Brotli 1.2.0 produced byte-identical chunk hashes and identical metrics. Startup is unchanged from the 2026-08-30 measurement: raw remains 144019 (zero growth), gzip is the reproducible local value 46365, and Brotli remains the tighter 41554 ratchet. Markdown hydration is the exact fsus-markdown + fsus-wasm + shared-runtime closure, re-measured for #641, which replaced the three separate per-feature Code/Mermaid/LaTeX activation managers with one shared heavy-feature lifecycle primitive plus its bounded versioned render cache and lifecycle metrics observation: raw 91680, gzip 32270, brotli 29271. The heavy identity projection chain, feature output gateway, adapter resource bridge, and isolated render adapter stay outside this closure behind dynamic boundaries that the consumer graph check asserts separately.",
+  "provenance": "2026-09-02 two consecutive measurements of the same locally built candidate on Node v24.18.0, zlib 1.3.1-e00f703, and Brotli 1.2.0 produced byte-identical chunk hashes and identical metrics. Startup is unchanged from the 2026-08-30 measurement: raw remains 144019 (zero growth), gzip is the reproducible local value 46365, and Brotli remains the tighter 41554 ratchet. Markdown hydration is the exact fsus-markdown + fsus-wasm + shared-runtime closure, re-measured for #641 after merging origin/main 1ac3c0c0 (#775 command registry, #776 language-tools evidence, #777 block anchor grammar) into the chain: raw remains 91680 (zero growth), npm-latest and pnpm-latest both measure gzip 32271 and brotli 29272 (+1 byte each over the pre-merge 32270/29271), and npm-peer-floor measures gzip 32277 and brotli 29303 because its pinned Vue peer floor produces a slightly different closure, so the ratchet records the cross-profile maximum. The heavy identity projection chain, feature output gateway, adapter resource bridge, and isolated render adapter stay outside this closure behind dynamic boundaries that the consumer graph check asserts separately.",
   "startup": {
     "raw": 144019,
     "gzip": 46365,
@@ -9,7 +9,7 @@
   },
   "markdownHydration": {
     "raw": 91680,
-    "gzip": 32270,
-    "brotli": 29271
+    "gzip": 32277,
+    "brotli": 29303
   }
 }
