@@ -72,7 +72,7 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
       return innerHandle?.resources().observers ?? 0
     },
     get runtimes() {
-      return innerHandle?.resources().runtimes ?? 0
+      return taskActive ? 1 : (innerHandle?.resources().runtimes ?? 0)
     },
     subscribe(listener: () => void) {
       resourceChangeListeners.add(listener)
