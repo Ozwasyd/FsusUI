@@ -7,8 +7,8 @@
   "states": [
     {
       "active": 0,
-      "codeScrollLeft": 50,
-      "codeScrollMax": 50,
+      "codeScrollLeft": 122,
+      "codeScrollMax": 122,
       "documentOverflow": 0,
       "retainedResources": 0,
       "rendererOverflow": 0,
@@ -23,14 +23,14 @@
     },
     {
       "active": 0,
-      "codeScrollLeft": 158.6666717529297,
-      "codeScrollMax": 158,
+      "codeScrollLeft": 230,
+      "codeScrollMax": 230,
       "documentOverflow": 0,
       "retainedResources": 0,
       "rendererOverflow": 0,
       "screenshot": "light-375-zoom-150.png",
       "screenshotScrollLeft": 0,
-      "screenshotScrollMax": 158,
+      "screenshotScrollMax": 230,
       "terminalTokenVisibleAtLeft": false,
       "terminalTokenVisibleAtRight": true,
       "theme": "light",
