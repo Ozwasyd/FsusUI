@@ -1,44 +1,60 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "9b3ee98504ddc8a58d8a83ba3d79525c757ad177",
+  "candidateSha": "aad8470a31cf5bf14930e7d617e8961ded8080d5",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-9b3ee98504ddc8a58d8a83ba3d79525c757ad177",
+    "executionId": "conformance-v2-check-tag-aad8470a31cf5bf14930e7d617e8961ded8080d5",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "4e1e907f7db5eb4e043ee093613ddf8dd525d2ffd47e2b6bd7a4401fe1efe361",
-    "webBaselineHash": "d95825aa119c142c0409db14db4731c527d22d53c1961edddc737b42cc4631da",
-    "avaloniaBaselineHash": "9ab83ab32d4a3784b3470f78a52df55646b90382f5e6eea23fd298b964d25441",
-    "runnerHash": "aafd49ec76d8c90e060df9684c07f9a33b8da42cb8a857499d9fa1b1d64c0df7"
+    "contractHash": "997ec9dc76d3cf80ee9644d88c7ad66abcc3efd3df02f856610a7c95c1cfcea9",
+    "webBaselineHash": "cef0d3092f35b1682d195b06f695b355858c69a23763bf29d22d3defa48485e9",
+    "avaloniaBaselineHash": "f1572e7f281431ae545347ec8422d75d9a08535a26b6ba37a403b72a946352d6",
+    "runnerHash": "733c694c9bc23466090e070303ec97f092f89c11773847453411691119697ef8"
   },
   "viewportStateMatrix": [
     {
       "platform": "web",
-      "viewport": { "width": 88, "height": 25 },
+      "viewport": {
+        "width": 88,
+        "height": 25
+      },
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "density": "default",
       "locale": "zh-CN",
       "direction": "ltr",
       "motion": "reduced",
-      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
-      "evidenceDigest": "7e4efb7b7b57ec50e4db4d756cf73ac5b9217c570318a1dc57559abb6e1436f0"
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
     },
     {
       "platform": "avalonia",
-      "viewport": { "width": 960, "height": 720 },
+      "viewport": {
+        "width": 960,
+        "height": 720
+      },
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "density": "default",
       "locale": "zh-CN",
       "direction": "ltr",
       "motion": "reduced",
-      "inputModes": ["pointer", "keyboard", "automation-peer", "reduced-motion"],
-      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "automation-peer",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -47,8 +63,8 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "7e4efb7b7b57ec50e4db4d756cf73ac5b9217c570318a1dc57559abb6e1436f0",
-      "bytes": 1481,
+      "digest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70",
+      "bytes": 1480,
       "width": 88,
       "height": 25,
       "inspected": true,
@@ -59,8 +75,8 @@
       "platform": "avalonia",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b",
-      "bytes": 10049,
+      "digest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127",
+      "bytes": 9690,
       "width": 960,
       "height": 720,
       "inspected": true,
@@ -71,28 +87,28 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "Both focused unchecked CheckTag renders show a continuous Scholarly Blue focus ring; the Avalonia pixel probe matched 164 of 180 sampled ring pixels to #2A599C within tolerance."
+      "observation": "The Web crop shows the tag enclosed by a continuous blue focus ring on a light fill, and the Avalonia window shows the same tag outlined by a solid blue ring; the recorded ring pixel probe matched 164 of 180 sampled pixels to Scholarly Blue #2A599C within tolerance."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "The Avalonia production render shows the blue focus ring with zero unexpected dark ring pixels and no black default focus adorner."
+      "observation": "Neither render shows a browser or native default black outline/adorner; the Avalonia probe recorded zero unexpected dark ring pixels and I saw no dark outline in either image."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "Both platforms show the fully readable Check tag label with focused=true, checked=false, checkbox semantics, and no checked fill."
+      "observation": "Both platforms show the full dark label \"Check tag\" on a light/white fill with no checked fill or checkmark, consistent with the observation records checked=false and focused=true on both executions."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "The ring remains inside the CheckTag bounds without clipping or overlap, and the surrounding Avalonia runner controls remain undisturbed."
+      "observation": "The ring stays inside the tag rounded-rectangle bounds with no clipping at the crop edge, no overlap with the adjacent Avalonia runner controls (\"Run action\" header, trace textbox with \"Trace start\" caret), and no visible layout shift."
     }
   ],
   "observations": [
-    "The Web production-component crop shows a continuous two-pixel blue inset focus ring and a fully readable label.",
-    "The Avalonia production full-window render shows the same focused unchecked semantic state with a restrained blue ring and no black adorner.",
-    "Native renderer and viewport scope differ, but the governed label, state, focus treatment, and reduced-motion checkpoint agree."
+    "Web artifact (88x25 production component crop, light theme): a single rounded-rectangle CheckTag with a continuous blue focus ring, pale background, and a dark centered label \"Check tag\" that is fully readable at this size; no clipping, no black default outline, no other elements in the crop.",
+    "Avalonia artifact (960x720 real non-headless window, light theme): the CheckTag renders with a white fill and a blue focus ring, alongside the harness \"Run action\" header and a trace textbox showing the \"Trace start\" caret; the tag carries the same focused-unchecked semantic as the Web render, with no black adorner, no overlap, and undisturbed surrounding controls.",
+    "Both platforms present the same focused-unchecked-after-pointer-keyboard semantics (label \"Check tag\", checked=false, focused=true, visible blue focus indicator); native renderer and viewport scope differ, so the agreement is semantic rather than pixel-geometric."
   ],
   "limitations": [
     "This review is limited to the exact light/default/zh-CN/ltr/reduced artifacts and does not claim dark, mobile, zoom, or pixel equality coverage.",

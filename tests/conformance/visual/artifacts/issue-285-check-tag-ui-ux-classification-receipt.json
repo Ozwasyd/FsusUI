@@ -34,25 +34,25 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "ad1a199272e381ad0df43f8a2b344218e3d5e259",
+    "revision": "aad8470a31cf5bf14930e7d617e8961ded8080d5",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "0301f8cf9dc78a13ad971ddb9058546ef3615b23a9a84187690342dd75061ea3",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "9b3ee98504ddc8a58d8a83ba3d79525c757ad177",
-  "candidateDigest": "e2341dde9997e55a17187e8b660bc7f3f32482847144d072f64c45b48f7c7933",
+  "candidateSha": "aad8470a31cf5bf14930e7d617e8961ded8080d5",
+  "candidateDigest": "e3f602910e02c53365159b7f55e82059d7bd946f72dfea8252f6e8f0f474420a",
   "stateEvidenceMatrix": [
     {
       "state": "focused-unchecked-after-pointer-keyboard",
       "viewport": "88x25",
       "theme": "light",
-      "evidenceDigest": "7e4efb7b7b57ec50e4db4d756cf73ac5b9217c570318a1dc57559abb6e1436f0"
+      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
     },
     {
       "state": "focused-unchecked-after-pointer-keyboard",
       "viewport": "960x720",
       "theme": "light",
-      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
+      "evidenceDigest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127"
     }
   ],
   "inScope": [
@@ -65,8 +65,8 @@
     "Pixel equality between native renderers",
     "Adjacent component redesign"
   ],
-  "classificationEvidenceDigest": "e2a5042f75f7eedd9c232013322dea4cc49e665ad6a6537d6fa9c21a1fc93fdb",
+  "classificationEvidenceDigest": "bf1cf46ccbef62abbf4f30a6bb0a0031a8607149ead79dab2eabe35e983ab126",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "a966d985396677309b29c96dc90df45c34579bbb66b607307a5aaefb8238466e"
+  "receiptDigest": "fb4cbe20418193b2fba1dda541770a2053c7ba6609292f01346b85d397cdb389"
 }
