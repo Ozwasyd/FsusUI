@@ -1,3 +1,9 @@
+import {
+  createMarkdownAnchorMap,
+  type MarkdownDocumentIdentity,
+  type MarkdownStableProjection,
+} from '../../../wasm/markdown-runtime'
+
 export type MarkdownEditorSelectionDirection = 'backward' | 'forward' | 'none'
 
 export interface MarkdownEditorSelection {
@@ -100,13 +106,25 @@ export interface MarkdownEditorMappedRange {
   readonly range?: MarkdownEditorCommandAnchor
 }
 
+export type MarkdownEditorRebasedAnchor =
+  | {
+      readonly end: number
+      readonly start: number
+      readonly status: 'mapped' | 'partial'
+    }
+  | { readonly status: 'deleted' }
+
 /** Maps command anchors through committed transactions without exposing editor internals. */
 export interface MarkdownEditorPositionMap {
   map(offset: number, association: MarkdownEditorPositionAssociation): number
   mapRange(range: MarkdownEditorCommandAnchor): MarkdownEditorMappedRange
-  rebase(
-    anchor: MarkdownEditorCommandAnchor,
-  ): MarkdownEditorCommandAnchor | undefined
+  rebase(anchor: MarkdownEditorCommandAnchor): MarkdownEditorRebasedAnchor
+}
+
+export interface MarkdownEditorPositionMapOptions {
+  readonly documentIdentity?: MarkdownDocumentIdentity
+  readonly projection?: MarkdownStableProjection
+  readonly source?: string
 }
 
 const mapMarkdownEditorOffset = (
@@ -133,6 +151,7 @@ const mapMarkdownEditorOffset = (
 
 export const createMarkdownEditorPositionMap = (
   changes: readonly MarkdownEditorChange[],
+  options: MarkdownEditorPositionMapOptions = {},
 ): MarkdownEditorPositionMap => {
   const frozenChanges = cloneChanges(changes)
   const mapRange = (
@@ -169,6 +188,19 @@ export const createMarkdownEditorPositionMap = (
       range: Object.freeze({ end: Math.max(start, end), start }),
     })
   }
+  const maximumOffset = changes.reduce(
+    (maximum, change) => Math.max(maximum, change.from, change.to),
+    0,
+  )
+  const originalSource =
+    options.source ?? '\u0000'.repeat(Math.max(maximumOffset, 1))
+  const identity = options.documentIdentity ?? {
+    id: 'markdown-position-map',
+    epoch: 0,
+  }
+  const orderedChanges = [...changes].sort(
+    (left, right) => left.from - right.from || left.to - right.to,
+  )
 
   return Object.freeze({
     map(offset: number, association: MarkdownEditorPositionAssociation) {
@@ -184,20 +216,55 @@ export const createMarkdownEditorPositionMap = (
     },
     mapRange,
     rebase(anchor: MarkdownEditorCommandAnchor) {
-      return mapRange(anchor).range
+      let source = originalSource
+      let current = Object.freeze({
+        start: anchor.start,
+        end: anchor.end,
+      })
+      let status: 'mapped' | 'partial' = 'mapped'
+      let delta = 0
+
+      for (const [index, change] of orderedChanges.entries()) {
+        const from = change.from + delta
+        const to = change.to + delta
+        const anchorMap = createMarkdownAnchorMap({
+          identity,
+          source,
+          ...(index === 0 && options.projection
+            ? { projection: options.projection }
+            : {}),
+        })
+        const remapped = anchorMap.remapRange(current, {
+          ...(from === to ? {} : { delete: [from, to] as const }),
+          ...(change.insert
+            ? { insert: { at: from, text: change.insert } }
+            : {}),
+        })
+        if (remapped.status === 'deleted') {
+          return Object.freeze({ status: 'deleted' as const })
+        }
+        if (remapped.status === 'partial') status = 'partial'
+        current = remapped.range
+        source = source.slice(0, from) + change.insert + source.slice(to)
+        delta += change.insert.length - (change.to - change.from)
+      }
+
+      return Object.freeze({
+        start: current.start,
+        end: current.end,
+        status,
+      })
     },
   })
 }
 
-export const composeMarkdownEditorPositionMaps = (
-  stages: readonly (readonly MarkdownEditorChange[])[],
+export const composeMarkdownEditorPositionMapInstances = (
+  maps: readonly MarkdownEditorPositionMap[],
 ): MarkdownEditorPositionMap => {
-  const maps = Object.freeze(
-    stages.map((changes) => createMarkdownEditorPositionMap(changes)),
-  )
+  const frozenMaps = Object.freeze([...maps])
   return Object.freeze({
     map(offset: number, association: MarkdownEditorPositionAssociation) {
-      return maps.reduce(
+      return frozenMaps.reduce(
         (mapped, positionMap) => positionMap.map(mapped, association),
         offset,
       )
@@ -208,7 +275,7 @@ export const composeMarkdownEditorPositionMaps = (
         partiallyDeleted: false,
         range: Object.freeze({ ...range }),
       })
-      for (const positionMap of maps) {
+      for (const positionMap of frozenMaps) {
         if (!mapped.range) return mapped
         const next = positionMap.mapRange(mapped.range)
         mapped = Object.freeze({
@@ -220,10 +287,32 @@ export const composeMarkdownEditorPositionMaps = (
       return mapped
     },
     rebase(anchor: MarkdownEditorCommandAnchor) {
-      return this.mapRange(anchor).range
+      let current: MarkdownEditorRebasedAnchor = {
+        ...anchor,
+        status: 'mapped',
+      }
+      let partial = false
+      for (const positionMap of frozenMaps) {
+        if (current.status === 'deleted') return current
+        current = positionMap.rebase(current)
+        if (current.status === 'partial') partial = true
+      }
+      if (current.status === 'deleted') return current
+      return Object.freeze({
+        start: current.start,
+        end: current.end,
+        status: partial ? ('partial' as const) : ('mapped' as const),
+      })
     },
   })
 }
+
+export const composeMarkdownEditorPositionMaps = (
+  stages: readonly (readonly MarkdownEditorChange[])[],
+): MarkdownEditorPositionMap =>
+  composeMarkdownEditorPositionMapInstances(
+    stages.map((changes) => createMarkdownEditorPositionMap(changes)),
+  )
 
 export interface MarkdownEditorTransactionDispatcher {
   dispatch(transaction: MarkdownEditorTransaction): MarkdownEditorDispatchResult
@@ -601,6 +690,42 @@ export class MarkdownEditorTransactionStore {
     this.#mergeBlocked = true
   }
 
+  reset(
+    value: string,
+    selection?: MarkdownEditorSelection,
+  ): MarkdownEditorStoreMutation {
+    const beforeSelection = this.selection
+    const nextSelection = normalizeMarkdownEditorSelection(
+      value,
+      selection ?? {
+        direction: 'none',
+        end: value.length,
+        start: value.length,
+      },
+    ) ?? {
+      direction: 'none' as const,
+      end: value.length,
+      start: value.length,
+    }
+    const historyChanged = this.#undo.length > 0 || this.#redo.length > 0
+    const selectionChanged = !selectionsEqual(beforeSelection, nextSelection)
+    const valueChanged = this.#value !== value
+
+    this.#value = value
+    this.#selection = nextSelection
+    this.#undo = []
+    this.#redo = []
+    this.#revision += 1
+    this.breakMergeGroup()
+
+    return Object.freeze({
+      ...this.#result(true),
+      historyChanged,
+      selectionChanged,
+      valueChanged,
+    })
+  }
+
   setSelection(selection: MarkdownEditorSelection, breakMerge = true) {
     const normalized = normalizeMarkdownEditorSelection(this.#value, selection)
     if (!normalized) return false
@@ -655,6 +780,10 @@ export class MarkdownEditorTransactionStore {
     if (!applied) return this.#result(false, 'invalid-change', beforeRevision)
     const positionMap = createMarkdownEditorPositionMap(
       frozenTransaction.changes,
+      {
+        documentIdentity: this.#documentIdentity,
+        source: this.#value,
+      },
     )
 
     const nextSelection = frozenTransaction.selection

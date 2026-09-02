@@ -1,0 +1,23 @@
+{
+  "schema": "fsusui-design-conformance.local-simulation-limitations.v1",
+  "candidateSha": "8f376089accc817663152c8d825b41b4de3d944d",
+  "productionFixture": true,
+  "actualBrowser": "Chromium",
+  "actualInputs": [
+    "pointer",
+    "keyboard",
+    "zoom"
+  ],
+  "deterministicSimulations": [
+    "390x844 mobile viewport",
+    "RTL direction",
+    "touch event dispatch",
+    "prefers-reduced-motion",
+    "Chromium accessibility-tree snapshot"
+  ],
+  "notClaimed": [
+    "physical touch hardware",
+    "real mobile browser chrome or virtual keyboard",
+    "NVDA, JAWS, VoiceOver, TalkBack or another external screen reader"
+  ]
+}

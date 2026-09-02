@@ -180,19 +180,20 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 
 ### Attributes
 
-| 属性名                     | 说明                                                                                    | 类型                                            | 默认值    |
-| -------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------- | --------- |
-| content                    | Markdown 源文本                                                                         | `string`                                        | `''`      |
-| content-version            | 可选稳定内容版本；大文档提供后可跳过主线程完整哈希，并参与 generation/cache fingerprint | `string \| number \| null`                      | `null`    |
-| initial-render             | 同源同版本且持有 runtime authority 的安全结果，用于 SSR 或可信缓存首显                  | `MarkdownSafeRenderResult \| null`              | `null`    |
-| trusted-html-factory       | 将安全 HTML 转为宿主 policy 的 `TrustedHTML`；不承担清洗职责                            | `(html: MarkdownSafeHtml) => object`            | —         |
-| trusted-script-url-factory | 将 Markdown worker URL 转为宿主 policy 的 `TrustedScriptURL`                            | `(url: URL) => unknown`                         | —         |
-| allow-latex                | 是否启用 LaTeX/MathML 输出                                                              | `boolean`                                       | `true`    |
-| allow-mermaid              | 是否启用 Mermaid 输出                                                                   | `boolean`                                       | `true`    |
-| mode                       | 渲染模式元数据                                                                          | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
-| base-url                   | 渲染元数据与 link activation 的基础 URL                                                 | `string \| null`                                | `null`    |
-| csp-nonce                  | 写入 renderer 内动态 style 的 CSP nonce                                                 | `string \| null`                                | `null`    |
-| features                   | 内建 feature activation 开关                                                            | `MarkdownFeatureActivationFeatureOptions`       | —         |
+| 属性名                     | 说明                                                                                    | 类型                                            | 默认值                  |
+| -------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------- | ----------------------- |
+| content                    | Markdown 源文本                                                                         | `string`                                        | `''`                    |
+| content-version            | 可选稳定内容版本；大文档提供后可跳过主线程完整哈希，并参与 generation/cache fingerprint | `string \| number \| null`                      | `null`                  |
+| loading-text               | 初次异步渲染期间 `role="status"` 使用的可见文案                                         | `string`                                        | `Rendering markdown...` |
+| initial-render             | 同源同版本且持有 runtime authority 的安全结果，用于 SSR 或可信缓存首显                  | `MarkdownSafeRenderResult \| null`              | `null`                  |
+| trusted-html-factory       | 将安全 HTML 转为宿主 policy 的 `TrustedHTML`；不承担清洗职责                            | `(html: MarkdownSafeHtml) => object`            | —                       |
+| trusted-script-url-factory | 将 Markdown worker URL 转为宿主 policy 的 `TrustedScriptURL`                            | `(url: URL) => unknown`                         | —                       |
+| allow-latex                | 是否启用 LaTeX/MathML 输出                                                              | `boolean`                                       | `true`                  |
+| allow-mermaid              | 是否启用 Mermaid 输出                                                                   | `boolean`                                       | `true`                  |
+| mode                       | 渲染模式元数据                                                                          | `'article' \| 'about' \| 'preview' \| 'editor'` | `article`               |
+| base-url                   | 渲染元数据与 link activation 的基础 URL                                                 | `string \| null`                                | `null`                  |
+| csp-nonce                  | 写入 renderer 内动态 style 的 CSP nonce                                                 | `string \| null`                                | `null`                  |
+| features                   | 内建 feature activation 开关                                                            | `MarkdownFeatureActivationFeatureOptions`       | —                       |
 
 ### Events
 

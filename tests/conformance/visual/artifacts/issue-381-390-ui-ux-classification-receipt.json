@@ -1,0 +1,97 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "web-markdown-editor-search-surface",
+    "web-markdown-editor-embed-surface"
+  ],
+  "uiDecisionClass": "interaction-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84"
+    },
+    {
+      "id": "visual-change",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+    },
+    {
+      "id": "markdown-runtime-projection",
+      "path": "docs/api/markdown-runtime-projection.md",
+      "digest": "3f6cc8e500619dd689316aa618f7f2bc2c4a3c35f075532380f94b6f58c09d3c"
+    },
+    {
+      "id": "markdown-editor",
+      "path": "docs/components/markdown-editor.md",
+      "digest": "8c8e20b040e65d4741cea628238fb47108384bfc2234d61abae7e986a5b1e912"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "e70fabd5e83956593bd3ca7061a6b02f01b2cefb",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "212a7e550072d491789207cf378b0f7d65ef53c3f8116b73a21ee6d8039e43cd",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "e70fabd5e83956593bd3ca7061a6b02f01b2cefb",
+  "candidateDigest": "4fe94668a881cd36b3a707e205f34552d55f48486f2ad5d9b17f1dee6db2cd34",
+  "stateEvidenceMatrix": [
+    {
+      "state": "search-preview-and-focus",
+      "viewport": "1440x1000@100%",
+      "theme": "light",
+      "evidenceDigest": "9d0e2ea25d5fc04debf835fe8b1763a2c94315c8068af0a67b0a2683154579e5"
+    },
+    {
+      "state": "controlled-live-embed-states",
+      "viewport": "1440x1000@100%",
+      "theme": "dark",
+      "evidenceDigest": "b19c8c3550778c7b89c453a82ab104720eddd13266f744b9a94f8c465c83c845"
+    },
+    {
+      "state": "controlled-embed-states",
+      "viewport": "1440x1000@100%",
+      "theme": "dark",
+      "evidenceDigest": "620146e4cbc4808c83969fb731feaa8ba7ac36b06efc7dbf8682f925cdc151bd"
+    },
+    {
+      "state": "mobile-touch-search-and-embed",
+      "viewport": "390x844@200%",
+      "theme": "dark",
+      "evidenceDigest": "809f8994a80cb36a83ba0c2863db64d8aff9026888977bf313adf1e47c8ce587"
+    }
+  ],
+  "inScope": [
+    "Keyboard-first find/replace across source, live, split, and preview modes",
+    "Revision-bound consumer embed requests and stale-result rejection",
+    "Safe controlled embed presentation without iframes, nested editors, or innerHTML",
+    "Source reveal, open-source, exact copy, retry, selection, delete, and undo",
+    "Mobile touch, screen-reader semantics, reduced motion, soft-keyboard, and 200 percent zoom"
+  ],
+  "outOfScope": [
+    "Consumer target authorization, navigation, cache, or retry policy",
+    "New Markdown search or replace algorithms",
+    "Provider business data or cross-article search",
+    "Adjacent editor chrome redesign or new visual tokens"
+  ],
+  "classificationEvidenceDigest": "79b3edd4f383da0e2b90b536316736476cf323ed378bb40a9199646e0b314309",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "57de6f1f171c38c0664fea93d5250e95f4806a80d1dc8a9dd37e3164e6a4bd12"
+}

@@ -130,18 +130,35 @@ export const planMarkdownAttachmentInsert = (
 export const rebaseMarkdownAttachmentJob = (
   job: MarkdownAttachmentJob,
   changes: readonly MarkdownEditorChange[],
+  source?: string,
 ): MarkdownAttachmentJob => {
   if (!job.range) return job
-  const rebased = createMarkdownEditorPositionMap(changes).rebase(job.range)
-  if (!rebased || rebased.start >= rebased.end) {
+  let syntheticSource = source ?? ''
+  if (!source) {
+    let minimumLength = Math.max(job.range.end, 1)
+    for (const change of [...changes].sort(
+      (left, right) => left.from - right.from || left.to - right.to,
+    )) {
+      minimumLength +=
+        change.insert.length - (change.to - change.from)
+      syntheticSource = ''.padStart(Math.max(minimumLength, change.to + 1), '\u0000')
+    }
+  }
+  const rebased = createMarkdownEditorPositionMap(changes, {
+    source: syntheticSource,
+  }).rebase(job.range)
+  if (rebased.status === 'deleted' || rebased.start >= rebased.end) {
     job.phase = 'deleted'
     job.range = Object.freeze({
-      start: rebased?.start ?? job.range.start,
-      end: rebased?.end ?? job.range.start,
+      start: rebased.status === 'deleted' ? job.range.start : rebased.start,
+      end: rebased.status === 'deleted' ? job.range.start : rebased.end,
     })
     return job
   }
-  job.range = Object.freeze(rebased)
+  job.range = Object.freeze({
+    start: rebased.start,
+    end: rebased.end,
+  })
   return job
 }
 

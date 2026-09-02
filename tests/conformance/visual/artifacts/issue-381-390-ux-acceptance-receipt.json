@@ -1,0 +1,115 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "57de6f1f171c38c0664fea93d5250e95f4806a80d1dc8a9dd37e3164e6a4bd12",
+  "candidateSha": "e70fabd5e83956593bd3ca7061a6b02f01b2cefb",
+  "candidateDigest": "4fe94668a881cd36b3a707e205f34552d55f48486f2ad5d9b17f1dee6db2cd34",
+  "verificationClass": "ux-path",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+    "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+    "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
+    "3f6cc8e500619dd689316aa618f7f2bc2c4a3c35f075532380f94b6f58c09d3c",
+    "8c8e20b040e65d4741cea628238fb47108384bfc2234d61abae7e986a5b1e912"
+  ],
+  "activeBaselineIdentityDigest": "c837b0d56cd788947fdd8b3049ebdc9351ee5f9bd1b15961466e217f42f880d3",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "d6318304dff202a6106aa7702e86b90cd5f6e2cbe8177ac72642f7491ba3a853",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "1440x1000@100%",
+      "state": "search-preview-and-focus",
+      "theme": "light",
+      "inputModes": [
+        "keyboard",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "9d0e2ea25d5fc04debf835fe8b1763a2c94315c8068af0a67b0a2683154579e5"
+    },
+    {
+      "viewport": "1440x1000@100%",
+      "state": "controlled-live-embed-states",
+      "theme": "dark",
+      "inputModes": [
+        "keyboard",
+        "pointer",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "b19c8c3550778c7b89c453a82ab104720eddd13266f744b9a94f8c465c83c845"
+    },
+    {
+      "viewport": "1440x1000@100%",
+      "state": "controlled-embed-states",
+      "theme": "dark",
+      "inputModes": [
+        "keyboard",
+        "pointer",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "620146e4cbc4808c83969fb731feaa8ba7ac36b06efc7dbf8682f925cdc151bd"
+    },
+    {
+      "viewport": "390x844@200%",
+      "state": "mobile-touch-search-and-embed",
+      "theme": "dark",
+      "inputModes": [
+        "keyboard",
+        "touch",
+        "screen-reader",
+        "reduced-motion",
+        "zoom"
+      ],
+      "evidenceDigest": "809f8994a80cb36a83ba0c2863db64d8aff9026888977bf313adf1e47c8ce587"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "search-preview-desktop-light",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-381-390/candidate-search-preview-desktop-light.png",
+      "digest": "9d0e2ea25d5fc04debf835fe8b1763a2c94315c8068af0a67b0a2683154579e5",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "live-embed-states-desktop-dark",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-381-390/candidate-live-embed-states-desktop-dark.png",
+      "digest": "b19c8c3550778c7b89c453a82ab104720eddd13266f744b9a94f8c465c83c845",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "embed-states-desktop-dark",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-381-390/candidate-embed-states-desktop-dark.png",
+      "digest": "620146e4cbc4808c83969fb731feaa8ba7ac36b06efc7dbf8682f925cdc151bd",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "mobile-dark-zoom-200",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-381-390/candidate-mobile-dark-zoom-200.png",
+      "digest": "809f8994a80cb36a83ba0c2863db64d8aff9026888977bf313adf1e47c8ce587",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "mobile-screen-reader-report",
+      "kind": "screen-reader-report",
+      "path": "tests/conformance/visual/artifacts/issue-381-390/candidate-mobile-screen-reader-report.json",
+      "digest": "a53f4b2a79f6bce65a458a3fb602ab5a3a269c5c6aa36012f0fc4eca25bcfb94",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "75e35ed9f285b8e7feb5d9174d1581559fbd7ef88a62311c0ef2f297d92dc5b2"
+}

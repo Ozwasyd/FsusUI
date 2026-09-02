@@ -174,18 +174,63 @@ authority. See the [heavy-feature lifecycle contract](../api/markdown-heavy-feat
 所有 command surface 消费同一 `MarkdownEditorCommand` registry。Command 使用稳定
 `key`、`label`、`group`、受控 icon token、shortcut 和 presentation targets；
 `when(context)` 决定是否呈现，`enabled(context)` 决定是否可执行。Shortcut 冲突
-必须显式失败，不能由数组顺序决定。
+必须显式失败，不能由数组顺序决定。Registry 在任何 surface 渲染前拒绝重复/空
+key、空 group、未注册 icon、归一化后冲突的 shortcut，以及旧 `apply` 执行入口。
+
+`documentIdentity="{ id, epoch }"` 由 consumer 在文档切换时替换，即使新旧
+`modelValue` 相同也必须替换 identity。Identity 变化会取消 pending command、关闭
+临时 command surface、清除旧 undo/redo，并以当前受控 `modelValue` 开始新文档；
+迟到的旧文档异步结果不能提交。
 
 Command context 只公开 document identity、revision、selection、mode、read-only
 状态、syntax projection、position map、abort signal 与 transaction dispatcher。
 Command 不得解析 Markdown、查询 rendered DOM、访问 textarea/editor instance，或
 保存裸 selection offset 自行猜测 rebase。Syntax/node/range 事实由 editor
-projection 提供；内容修改通过 transaction dispatcher 完成。
+projection 提供；内容修改通过 transaction dispatcher 完成。Position map 使用
+[`createMarkdownAnchorMap`](../api/markdown-runtime-projection.md) 的
+`remapRange` 语义累计每个已提交 revision，明确区分 `mapped`、`partial` 与
+`deleted`，不会按字符串长度差修正裸 offset。Stable syntax identity 在原位编辑、
+移动与 mode 切换时保留；document epoch 或 projection id 失效时 fail closed。
 
 `run(context)` 可以同步或异步返回受控 transaction result。异步 command 的结果在
 document epoch 变化、abort 或 anchor 删除后不得提交；consumer 负责以自己的反馈
 组件展示错误，command 本身不调用 toast。Toolbar、keyboard、palette、slash 和
 selection presentation 共享同一 key、可用状态与 pending/result authority。
+
+`surfaces.commandPalette`、`surfaces.selectionToolbar` 与
+`surfaces.slashMenu` 是 opt-in presentation。Palette 搜索只读取 command 的
+`label`、`description` 与 `keywords`，显示文案来自
+`localeText.commandPalette`。Selection toolbar 与 slash menu 的 `Esc` 会关闭当前
+surface、恢复 source focus，并保留 source、selection 与 history。Slash trigger 由当前
+projection/input context 校验；执行时 trigger range 与 command result 合并为同一个
+revision-bound transaction，因此不会先删除 trigger 再提交 stale command result。
+Slash 不从 keydown、rendered DOM 或 regex 猜测 syntax；URL、code、math、escaped
+slash、RTL 普通文本与 composition-active 输入不会打开 surface。
+
+内置 `link-properties`、`anchor-properties` 与 `anchor-insert` command 同样来自
+registry snapshot；显式 insert 与已有 anchor 的 edit 使用不同本地化 command 文案，
+但进入同一受控 anchor property surface。
+前者只读取 projection 给出的 stable link node、content/marker/full ranges，并在
+这些 projection-owned ranges 内编辑 label、destination 与 title；remove 保留原始
+label bytes，open 继续使用 Markdown URL authority。后者显式 insert/edit/remove/copy
+block anchor，ID 不自动生成；projection id 失效、duplicate/invalid ID 或 stale
+revision 都拒绝 transaction。两个 contextual surface 通过公开 anchor-map identity
+声明定位，不要求 consumer 传 DOM selector/ref；source reveal、取消和成功提交都恢复
+同一 source selection/focus。
+
+Command pending/abort/stale 由 editor command session 统一管理。异步 result 仅在原
+document identity、epoch 与 revision 仍为 current 时提交；外部 reset 或组件卸载会 abort
+pending session。`statusDensity="none"` 只隐藏可见 footer，不会隐藏 degraded/fatal
+capability 的 `aria-live` announcement；该 announcement 通过
+`localeText.capabilityAnnouncement` 本地化。
+
+`localeText` 是 editor-owned 可见文案的唯一 override authority，包括 modes、
+内置 commands、command group、actions、palette、selection/slash/contextual surface、textarea 名称、
+capability/result 状态与 status 指标标签。Extension command 的 `label`、
+`title`、`description` 仍由 extension 自己提供；自定义 group key 应通过
+`localeText.commandGroups` 提供可见名称。`statusDensity="minimal"` 只显示
+字符与词数；`detailed` 使用 definition list 显示行/列、行数、字符、词、选区与
+可选字节数；普通输入不会把这些指标逐键写入 `aria-live`。
 
 ## Paste as Markdown
 
@@ -270,6 +315,35 @@ non-composition input 可继续编辑。窗口外仍会拒绝 `isComposing` 或
 `insertCompositionText` 标记的孤立旧 payload；迟到 `compositionend` 后的即时
 commit 也不会越过当前受控值。
 
+## Search and consumer-resolved embeds
+
+`Ctrl/Cmd+F` and `Ctrl/Cmd+H` open the editor-owned find or replace surface.
+The active query is rerun after every accepted transaction and controlled
+document reset. Match identity remains bound to the current document revision;
+stale or deleted reveal results trigger a fresh search instead of restoring an
+old source range. Source and Live use a non-interactive range overlay, while
+Live/Split/Preview renderer text uses the CSS Custom Highlight API when the
+browser supports it. Neither path wraps renderer HTML or changes Markdown
+source, selection ownership, line wrapping, body width, or scroll-container
+identity.
+
+`embed-provider` is the consumer-owned resolution boundary for valid
+`::embed[...]` projection nodes. The editor supplies an identity-, revision-,
+node-, target-, mode-, and version-bound request. It commits only a matching
+result and treats late or mismatched results as stale. Provider excerpts are
+rendered as escaped text, never `innerHTML`; the directive remains the only host
+source/history authority. Source mode displays the exact directive. Live keeps
+the textarea as its only input surface and places the controlled read-only embed
+regions below it; Split and Preview interleave those regions with the normal
+Markdown renderer. The regions expose source reveal, exact-Markdown copy, delete,
+open-source, and applicable retry actions without an iframe, nested editor,
+nested scroll surface, or permanent embed tab stop.
+
+`embed-open-source(target, mode)` and `embed-retry(target, mode)` leave target
+resolution, authorization, navigation, and retry policy with the consumer.
+Delete and source selection remain editor transactions/selections. Provider
+result height changes use the existing editor body as the only scroll owner.
+
 ## Web language tools
 
 Source 与 Live 的同一个 textarea 会绑定 browser spellcheck、autocorrect、dictation、
@@ -301,38 +375,66 @@ context menu、语音服务、辅助技术或 OS IME 设备证据。完整 nativ
 
 ## Events
 
-| 事件名             | 说明                                                               |
-| ------------------ | ------------------------------------------------------------------ |
-| update:modelValue  | 已接受的公开内容更新                                               |
-| change             | 与 `update:modelValue` 相同的公开内容更新                          |
-| transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction       |
-| selection-change   | revision 与 grapheme-safe、direction-preserving selection          |
-| history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units                  |
-| command            | toolbar command 已通过 dispatcher 执行                             |
-| mode-change        | 编辑模式切换                                                       |
-| save               | 保存事件                                                           |
-| submit             | 提交事件                                                           |
-| upload-image       | 实际 picker/paste/drop 文件组成的 attachment batch provider intent |
-| render-complete    | preview renderer 完成                                              |
-| render-error       | preview renderer 失败                                              |
-| features-activated | preview feature activation 完成                                    |
+| 事件名             | 说明                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| update:modelValue  | 已接受的公开内容更新                                         |
+| change             | 与 `update:modelValue` 相同的公开内容更新                    |
+| transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction |
+| selection-change   | revision 与 grapheme-safe、direction-preserving selection    |
+| history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units            |
+| command            | toolbar command 已通过 dispatcher 执行                       |
+| mode-change        | 编辑模式切换                                                 |
+| save               | 保存事件                                                     |
+| submit             | 提交事件                                                     |
+| upload-image       | 上传图片事件                                                 |
+| render-complete    | preview renderer 完成                                        |
+| render-error       | preview renderer 失败                                        |
+| features-activated | preview feature activation 完成                              |
+| embed-open-source  | consumer 应打开指定 target/mode 的来源                       |
+| embed-retry        | consumer 应重新解析指定 target/mode                          |
+
+## Outline and writing aids
+
+`revealHeading(nodeId)` 与 `revealSourceRange(range)` 使用当前 document identity、
+revision 与 projection。成功时组件会挂载目标所在的 live virtual window、恢复 source
+selection、聚焦唯一 textarea input owner，并把目标滚入视口；stale、deleted、
+unsupported 或 missing target 不移动 selection、focus、scroll 或 history。
+
+`writing-aids` 只在调用方显式启用后生效：
+
+- `focus` 仅用于 `editor-profile="prose"` 的可编辑表面。它从同一 projection 与
+  selection 识别当前 block，以文字透明度降低非当前 block 的强调，不隐藏、不模糊，
+  也不创建第二个可编辑 DOM owner。Search、diagnostic、property、attachment 与
+  atomic node 可由 projection exemption 保持可读。
+- `typewriter` 只在普通 input 或显式 outline/search navigation 后定位；selection
+  change 本身不滚动。wheel、touch、scrollbar、selection drag 与 composition 会暂停
+  自动定位，后续 input 或显式 navigation 才恢复。默认 anchor 是 upper-third；
+  `writingAids.typewriterAnchor = 'center'` 必须显式选择。Reduced motion 保留定位但
+  禁用平滑滚动。
+
+Focus layer 是 `aria-hidden` 的 presentation，textarea 继续单独拥有 input、selection、
+clipboard、focus 與 IME。两个 writing aid 都不修改 Markdown source 或 history。
 
 ## Attributes
 
-| 属性名            | 说明                                         | 类型                                         | 默认值   |
-| ----------------- | -------------------------------------------- | -------------------------------------------- | -------- |
-| model-value       | 唯一公开 Markdown 内容 authority             | `string`                                     | `''`     |
-| default-mode      | 初始编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'` | `source` |
-| mode              | 受控编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'` | —        |
-| chrome            | 外围区域与根表面变体                         | `'framed' \| 'embedded' \| 'minimal'`        | `framed` |
-| placeholder       | 文本域占位文本                               | `string`                                     | `''`     |
-| commands          | toolbar command model                        | `MarkdownEditorCommand[]`                    | 内置命令 |
-| readonly          | Read-only; blocks input and mutation methods | `boolean`                                    | `false`  |
-| disabled          | 禁用输入与全部 mutation method               | `boolean`                                    | `false`  |
-| loading           | 标记 busy 并冻结输入与全部 mutation method   | `boolean`                                    | `false`  |
-| preview-base-url  | preview renderer 的基础 URL                  | `string \| null`                             | `null`   |
-| preview-csp-nonce | preview renderer 的 CSP nonce                | `string \| null`                             | `null`   |
-| preview-features  | preview renderer 的 feature activation 开关  | `MarkdownFeatureActivationFeatureOptions`    | —        |
+| 属性名            | 说明                                        | 类型                                      | 默认值   |
+| ----------------- | ------------------------------------------- | ----------------------------------------- | -------- |
+| model-value       | 唯一公开 Markdown 内容 authority            | `string`                                  | `''`     |
+| default-mode      | 初始编辑模式                                | `'source' \| 'live' \| 'split' \| 'preview'` | `source` |
+| mode              | 受控编辑模式                                | `'source' \| 'live' \| 'split' \| 'preview'` | — |
+| chrome            | 外围区域与根表面变体                        | `'framed' \| 'embedded' \| 'minimal'`     | `framed` |
+| placeholder       | 文本域占位文本                              | `string`                                  | `''`     |
+| commands          | toolbar command model                       | `MarkdownEditorCommand[]`                 | 内置命令 |
+| writing-aids      | prose focus 与 typewriter opt-in             | `MarkdownEditorWritingAidsOptions`        | —        |
+| focus-exemptions  | Focus mode 中保持清晰的 source node 状态     | `MarkdownEditorFocusExemptions`          | —        |
+| editor-profile    | markdown 或 prose 写作表面                   | `'markdown' \| 'prose'`                  | markdown |
+| readonly          | Read-only; blocks input and mutation methods     | `boolean`                                 | `false`  |
+| disabled          | 禁用输入与全部 mutation method              | `boolean`                                 | `false`  |
+| loading           | 标记 busy 并冻结输入与全部 mutation method  | `boolean`                                 | `false`  |
+| preview-base-url  | preview renderer 的基础 URL                 | `string \| null`                          | `null`   |
+| preview-csp-nonce | preview renderer 的 CSP nonce               | `string \| null`                          | `null`   |
+| preview-features  | preview renderer 的 feature activation 开关 | `MarkdownFeatureActivationFeatureOptions` | —        |
+| embed-provider    | consumer-owned、revision-bound embed resolver | `MarkdownEmbedProvider`                    | —        |
 | min-rows          | 编辑区最小行数                               | `number`                                     | `12`     |
 | spellcheck        | Browser spellcheck capability                | `'auto' \| 'enabled' \| 'disabled' \| boolean` | `auto`   |
 | lang              | Optional BCP-47 language hint                 | `string`                                     | —        |

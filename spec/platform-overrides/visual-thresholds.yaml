@@ -11,7 +11,7 @@ thresholds:
     allowedDeviation: low
     testPolicy: color-delta
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [18, 20, 24, 25]
   - id: visual-text-baseline-001
     area: visual
@@ -25,7 +25,7 @@ thresholds:
     allowedDeviation: medium
     testPolicy: text-baseline-threshold
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [18, 24, 25]
   - id: visual-markdown-source-surface-002
     area: typography

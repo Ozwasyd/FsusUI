@@ -11,7 +11,7 @@ overrides:
     allowedDeviation: low
     testPolicy: accessibility-and-visual-threshold
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [18, 24, 25]
   - id: avalonia-windows-font-rasterization-001
     area: typography
@@ -25,5 +25,5 @@ overrides:
     allowedDeviation: medium
     testPolicy: typography-baseline-threshold
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [136]
