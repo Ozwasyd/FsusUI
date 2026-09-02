@@ -142,6 +142,25 @@ const isMarkdownFeatureOutputGateway = (id) =>
     id,
   )
 
+const isMarkdownHeavyFeatureIsolatedClient = (id) =>
+  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-isolated-client\.(?:[cm]?[jt]sx?)$/u.test(
+    id,
+  )
+
+const isMarkdownHeavyFeatureIdentity = (id) =>
+  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-identity\.(?:[cm]?[jt]sx?)$/u.test(
+    id,
+  )
+
+const markdownHeavyFeatureIdentityDependencies =
+  '(?:markdown-editor-projection|markdown-syntax-identity|markdown-source-coordinate-map|markdown-syntax-collect|markdown-directive-syntax|markdown-anchor-grammar|markdown-caption-directive|markdown-embed-directive)'
+
+const isMarkdownHeavyFeatureIdentityDependency = (id) =>
+  new RegExp(
+    `/(?:vue/packages/wasm|node_modules/@element-plus/wasm|node_modules/@ozwasyd/element-plus/es/wasm)/(?:${markdownHeavyFeatureIdentityDependencies}\\.(?:[cm]?[jt]sx?)|markdown/syntax-collect\\.generated\\.(?:[cm]?[jt]sx?))$`,
+    'u',
+  ).test(id)
+
 export const resolveFsusViteManualChunk = (
   moduleId,
   { profile = 'full' } = {},
@@ -151,6 +170,17 @@ export const resolveFsusViteManualChunk = (
 
   if (isMarkdownFeatureOutputGateway(id)) {
     return 'fsus-markdown-feature-gateway'
+  }
+
+  if (isMarkdownHeavyFeatureIsolatedClient(id)) {
+    return 'fsus-markdown-heavy-isolated-client'
+  }
+
+  if (
+    isMarkdownHeavyFeatureIdentity(id) ||
+    isMarkdownHeavyFeatureIdentityDependency(id)
+  ) {
+    return 'fsus-markdown-heavy-identity'
   }
 
   if (

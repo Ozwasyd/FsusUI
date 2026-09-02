@@ -85,22 +85,17 @@ import {
 import {
   MARKDOWN_RENDERER_SURFACE_CLASSES as markdownSurfaceClasses,
   MARKDOWN_RENDERER_VERSION,
-  createMarkdownEditorProjection,
   renderMarkdownFallbackWithRuntime,
   isMarkdownRuntimeAuthorizedResult,
   normalizeMarkdownSource,
   resolveMarkdownSourceIdentity,
   renderMarkdownChunksWithRuntime,
   renderMarkdownResultWithRuntime,
-  stabilizeMarkdownEditorProjection,
 } from '@element-plus/wasm'
 import { activateMarkdownHeavyFeatures } from '../../../wasm/markdown-heavy-feature-activation'
-import {
-  createMarkdownHeavyFeatureIsolatedRender,
-  scheduleMarkdownHeavyFeatureFrameContinue,
-} from '../../../wasm/markdown-heavy-feature-isolated-client'
-import { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from '../../../wasm/markdown-feature-output-gateway'
-import { deriveMarkdownEditorChange } from '../../../wasm/markdown-syntax-identity'
+import { scheduleMarkdownHeavyFeatureFrameContinue } from '../../../wasm/markdown-heavy-feature-frame-scheduler'
+import { createLazyMarkdownHeavyFeatureIsolatedRender } from '../../../wasm/markdown-heavy-feature-isolated-lazy'
+import { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from '../../../wasm/markdown-feature-output-gateway-version'
 import { isFsusErr, toFsusError } from '@element-plus/utils'
 import {
   markdownRendererProps,
@@ -116,7 +111,6 @@ import type { FsusErrorDetail } from '@element-plus/utils'
 import type {
   MarkdownRenderChunk,
   MarkdownRenderRequest,
-  MarkdownStableProjection,
   MarkdownFeatureActivationResult,
   MarkdownFeatureThemeTokens,
   MarkdownRuntimeChunkResult,
@@ -125,6 +119,10 @@ import type {
   MarkdownSafeRenderAuthority,
   MarkdownSafeRenderResult,
 } from '@element-plus/wasm'
+import type {
+  MarkdownHeavyFeatureProjectionSnapshot,
+  MarkdownHeavyFeatureProjectionTracker,
+} from '../../../wasm/markdown-heavy-feature-identity'
 import type { ComponentPublicInstance } from 'vue'
 
 defineOptions({
@@ -288,45 +286,15 @@ let heavyLifecycleIdentitySequences: Partial<
 let heavyLifecycleProjectionNodeIds: Partial<
   Record<MarkdownHeavyFeatureKind, readonly string[]>
 > = {}
-let previousHeavyProjection: MarkdownStableProjection | undefined
-let previousHeavyProjectionDocument: Readonly<{
-  epoch: number
-  id: string
-}> | null = null
+let heavyProjectionTrackerPromise: Promise<MarkdownHeavyFeatureProjectionTracker> | null =
+  null
 
-const stabilizeHeavyProjection = (
-  source: string,
-  documentKey: string,
-  documentEpoch: number | string,
-) => {
-  if (!Number.isInteger(documentEpoch)) return null
-  const documentIdentity = {
-    epoch: documentEpoch as number,
-    id: documentKey,
-  }
-  if (
-    previousHeavyProjectionDocument?.id !== documentIdentity.id ||
-    previousHeavyProjectionDocument.epoch !== documentIdentity.epoch
-  ) {
-    previousHeavyProjection = undefined
-  }
-  const nextProjection = createMarkdownEditorProjection(source)
-  const change = previousHeavyProjection
-    ? deriveMarkdownEditorChange(
-        previousHeavyProjection.normalizedSource,
-        nextProjection.identity.normalizedSource,
-      )
-    : undefined
-  const projection = stabilizeMarkdownEditorProjection(
-    nextProjection,
-    documentIdentity,
-    previousHeavyProjection,
-    change,
-  )
-  previousHeavyProjection = projection
-  previousHeavyProjectionDocument = documentIdentity
-  return projection
-}
+const loadHeavyProjectionTracker = () =>
+  (heavyProjectionTrackerPromise ??=
+    import('../../../wasm/markdown-heavy-feature-identity').then(
+      ({ createMarkdownHeavyFeatureProjectionTracker }) =>
+        createMarkdownHeavyFeatureProjectionTracker(),
+    ))
 
 function recordHeavyLifecycleMetrics() {
   const target = rootEl.value
@@ -915,6 +883,14 @@ const resolveMarkdownFeatureOptions = () => ({
   mermaid: props.features?.mermaid ?? props.allowMermaid,
 })
 
+const hasEnabledHeavyFeature = (
+  result: MarkdownSafeRenderResult,
+  features: ReturnType<typeof resolveMarkdownFeatureOptions>,
+) =>
+  (features.codeHighlight && result.features.includes('code_block')) ||
+  (features.latex && result.features.includes('latex')) ||
+  (features.mermaid && result.features.includes('mermaid'))
+
 const resetFeatureActivation = () => {
   removeHeavyFeatureThemeListener()
   activationController?.abort()
@@ -934,7 +910,7 @@ const resetFeatureActivation = () => {
   recordHeavyLifecycleMetrics()
 }
 
-const createHeavyFeatureIdentityResolver = (
+const createHeavyFeatureIdentityResolver = async (
   result: MarkdownSafeRenderResult,
 ) => {
   const documentKey = heavyDocumentContext?.documentKey() ?? localDocumentKey
@@ -944,27 +920,19 @@ const createHeavyFeatureIdentityResolver = (
     props.contentVersion ??
     result.sourceIdentity
   heavyLifecycle.resetDocument(documentKey, documentEpoch)
-  const projection = stabilizeHeavyProjection(
-    result.rawSource,
-    documentKey,
-    documentEpoch,
-  )
+  const tracker = await loadHeavyProjectionTracker()
+  const projection: MarkdownHeavyFeatureProjectionSnapshot | null =
+    tracker.project({
+      source: result.rawSource,
+      documentKey,
+      documentEpoch,
+    })
   const resultChunks: readonly MarkdownRenderChunk[] =
     'chunks' in result && Array.isArray(result.chunks)
       ? (result.chunks as readonly MarkdownRenderChunk[])
       : []
-  const nodes = {
-    'code-highlight': projection?.nodes.filter((node) => node.kind === 'code'),
-    latex: projection?.nodes.filter((node) => node.kind === 'latex'),
-    mermaid: projection?.nodes.filter((node) => node.kind === 'mermaid'),
-  }
-  heavyLifecycleProjectionNodeIds = {
-    'code-highlight': Object.freeze(
-      (nodes['code-highlight'] ?? []).map((node) => node.id),
-    ),
-    latex: Object.freeze((nodes.latex ?? []).map((node) => node.id)),
-    mermaid: Object.freeze((nodes.mermaid ?? []).map((node) => node.id)),
-  }
+  const nodeIds = projection?.nodeIds
+  heavyLifecycleProjectionNodeIds = nodeIds ?? {}
   const cursors: Record<MarkdownHeavyFeatureKind, number> = {
     'code-highlight': 0,
     latex: 0,
@@ -991,8 +959,8 @@ const createHeavyFeatureIdentityResolver = (
             .filter((chunk) => chunk.kind === chunkKind).length
         : cursors[input.kind]
     if (unitIndex < 0) cursors[input.kind] += 1
-    const node = nodes[input.kind]?.[index]
-    if (!node?.id) return null
+    const nodeId = nodeIds?.[input.kind]?.[index]
+    if (!nodeId) return null
     const config =
       input.kind === 'mermaid'
         ? JSON.stringify({ tokens: input.tokens })
@@ -1004,7 +972,7 @@ const createHeavyFeatureIdentityResolver = (
       config,
       documentEpoch,
       documentKey,
-      nodeId: node.id,
+      nodeId,
       revision,
       theme,
     })
@@ -1027,7 +995,7 @@ const createHeavyFeatureIdentityResolver = (
       featureKind: input.kind,
       gatewayVersion: MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION,
       locale: 'locale-independent',
-      nodeId: node.id,
+      nodeId,
       rendererVersion: result.rendererVersion,
       revision,
       sourceIdentity: result.sourceIdentity,
@@ -1046,10 +1014,15 @@ const activateRenderedFeatures = async (
   if (!activationRoot || signal?.aborted) return
 
   const activationStartedAt = readPerformanceNow()
+  const features = resolveMarkdownFeatureOptions()
+  const resolveHeavyFeatureIdentity = hasEnabledHeavyFeature(result, features)
+    ? await createHeavyFeatureIdentityResolver(result)
+    : () => null
+  if (signal?.aborted) return
   const isolatedRenderFactory: MarkdownHeavyFeatureIsolatedRenderFactory = <T,>(
     request: Parameters<MarkdownHeavyFeatureIsolatedRenderFactory>[0],
   ) => {
-    const handle = createMarkdownHeavyFeatureIsolatedRender(
+    const handle = createLazyMarkdownHeavyFeatureIsolatedRender(
       request,
       props.trustedScriptUrlFactory,
       (key, run, drop) =>
@@ -1069,10 +1042,10 @@ const activateRenderedFeatures = async (
     baseUrl: props.baseUrl,
     concurrency: 3,
     cspNonce: props.cspNonce,
-    features: resolveMarkdownFeatureOptions(),
+    features,
     heavyLifecycle,
     isolatedRenderFactory,
-    resolveHeavyFeatureIdentity: createHeavyFeatureIdentityResolver(result),
+    resolveHeavyFeatureIdentity,
     root: activationRoot,
     scheduleHeavyFeatureCommit,
     signal,
@@ -1289,6 +1262,7 @@ const performRender = async () => {
     const resolvedResult = result.value
 
     await commitRenderedContent(resolvedResult.html, true)
+    emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
     await activateRenderedFeatures(resolvedResult)
     emit('render-profile', {
       engine: resolvedResult.engine,
@@ -1296,7 +1270,6 @@ const performRender = async () => {
       rendererVersion: resolvedResult.rendererVersion,
       timings: resolvedResult.timings,
     })
-    emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
     emit('render-complete', resolvedResult)
   } catch (error) {
     if (taskId !== currentTaskId) {
@@ -1305,12 +1278,12 @@ const performRender = async () => {
 
     const fallback = renderMarkdownFallbackWithRuntime(request)
     await commitRenderedContent(fallback.html, true)
+    emit('placeholders-ready', fallback.placeholders, fallback)
     await activateRenderedFeatures(fallback)
     emit(
       'render-error',
       toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
     )
-    emit('placeholders-ready', fallback.placeholders, fallback)
     emit('render-complete', fallback)
   } finally {
     if (taskId === currentTaskId) {

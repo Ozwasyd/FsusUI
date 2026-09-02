@@ -8,7 +8,8 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs'
-import { execFileSync, spawnSync } from 'node:child_process'
+import { execFileSync, spawn, spawnSync } from 'node:child_process'
+import { createServer } from 'node:net'
 import os from 'node:os'
 import path from 'node:path'
 import { performance } from 'node:perf_hooks'
@@ -67,6 +68,7 @@ const performanceBaseline = JSON.parse(
 )
 const keepConsumerFixture = process.env.FSUS_KEEP_CONSUMER_FIXTURE === '1'
 const checkpointFixturePath = process.env.FSUS_CONSUMER_FIXTURE_PATH
+const heavyFrameRuntimeDist = 'dist-heavy-frame-runtime'
 const consumerTempRoot = path.resolve(
   process.env.FSUS_CONSUMER_TMPDIR ?? os.tmpdir(),
 )
@@ -110,6 +112,10 @@ const consumerProfile = resolveConsumerProfile({
   candidatePackage: distPackage,
   name: parsedInstallArgs.profile,
 })
+const verifyHeavyFrameRuntime =
+  process.env.FSUS_CONSUMER_HEAVY_FRAME_RUNTIME === '1' ||
+  (process.env.FSUS_CONSUMER_HEAVY_FRAME_RUNTIME !== '0' &&
+    consumerProfile.name === 'pnpm-latest')
 const resultPath = process.env.FSUS_CONSUMER_RESULT
   ? path.resolve(process.env.FSUS_CONSUMER_RESULT)
   : undefined
@@ -233,6 +239,16 @@ const manifestClosureContainsFile = (manifest, closure, targetFile) =>
 const isMarkdownFeatureOutputGatewayModule = (key) =>
   /\/wasm\/markdown-feature-output-gateway\.mjs$/u.test(key)
 
+const isMarkdownHeavyFeatureIdentityModule = (key) =>
+  /\/wasm\/markdown-heavy-feature-identity\.mjs$/u.test(key)
+
+const findMarkdownHeavyFeatureIsolatedClientEntries = (manifest) =>
+  Object.entries(manifest).filter(([, entry]) =>
+    (entry.assets ?? []).some((asset) =>
+      /(?:^|\/)markdown-heavy-feature-frame-[^/]+\.mjs$/u.test(asset),
+    ),
+  )
+
 function hasDynamicManifestPath(manifest, entryKey, targetKey) {
   const visited = new Set()
   const visit = (key, crossedDynamicBoundary) => {
@@ -338,7 +354,7 @@ function reportConsumerPerformanceGraph(fixtureRoot) {
     )
   }
 
-  return { dynamic, entryKey, initial, initialKeys, manifest }
+  return { dynamic, entryKey, fixtureRoot, initial, initialKeys, manifest }
 }
 
 function assertRatchet(label, actual, baseline) {
@@ -436,6 +452,100 @@ function assertConsumerPerformanceGraph(graph) {
       'Consumer Markdown hydration graph no longer reaches the feature output gateway through a dynamic import.',
     )
   }
+  const heavyIdentityKeys = Object.keys(graph.manifest).filter(
+    isMarkdownHeavyFeatureIdentityModule,
+  )
+  if (heavyIdentityKeys.length !== 1) {
+    throw new Error(
+      `Consumer graph must expose exactly one Markdown heavy identity module, found ${heavyIdentityKeys.length}.`,
+    )
+  }
+  const heavyIdentityKey = heavyIdentityKeys[0]
+  const heavyIdentity = graph.manifest[heavyIdentityKey]
+  if (!heavyIdentity?.isDynamicEntry) {
+    throw new Error(
+      'Consumer Markdown heavy identity module must remain a dynamic manifest entry.',
+    )
+  }
+  if (
+    markdownHydrationClosure.has(heavyIdentityKey) ||
+    manifestClosureContainsFile(
+      graph.manifest,
+      markdownHydrationClosure,
+      heavyIdentity.file,
+    )
+  ) {
+    throw new Error(
+      'Consumer Markdown hydration closure eagerly contains the heavy identity projection chain.',
+    )
+  }
+  if (
+    !hasDynamicManifestPath(
+      graph.manifest,
+      markdownHydration.key,
+      heavyIdentityKey,
+    )
+  ) {
+    throw new Error(
+      'Consumer Markdown hydration graph no longer reaches the heavy identity projection chain through a dynamic import.',
+    )
+  }
+  const heavyIdentitySource = readFileSync(
+    path.join(graph.fixtureRoot, 'dist', heavyIdentity.file),
+    'utf8',
+  )
+  for (const marker of ['markdown_syntax_collect', 'syn:']) {
+    if (!heavyIdentitySource.includes(marker)) {
+      throw new Error(
+        `Consumer heavy identity chunk lost projection dependency marker ${marker}.`,
+      )
+    }
+  }
+  for (const key of markdownHydrationClosure) {
+    const file = graph.manifest[key]?.file
+    if (!file) continue
+    const source = readFileSync(
+      path.join(graph.fixtureRoot, 'dist', file),
+      'utf8',
+    )
+    if (source.includes('markdown_syntax_collect')) {
+      throw new Error(
+        `Consumer Markdown hydration file ${file} still contains the syntax collector projection chain.`,
+      )
+    }
+  }
+  const isolatedClientEntries = findMarkdownHeavyFeatureIsolatedClientEntries(
+    graph.manifest,
+  )
+  if (isolatedClientEntries.length !== 1) {
+    throw new Error(
+      `Consumer graph must expose exactly one isolated Markdown heavy feature client asset owner, found ${isolatedClientEntries.length}.`,
+    )
+  }
+  const [isolatedClientKey, isolatedClient] = isolatedClientEntries[0]
+  if (
+    markdownHydrationClosure.has(isolatedClientKey) ||
+    manifestClosureContainsFile(
+      graph.manifest,
+      markdownHydrationClosure,
+      isolatedClient.file,
+    )
+  ) {
+    throw new Error(
+      'Consumer Markdown hydration closure eagerly contains the isolated heavy feature client.',
+    )
+  }
+  if (
+    !hasDynamicManifestPath(
+      graph.manifest,
+      markdownHydration.key,
+      isolatedClientKey,
+    )
+  ) {
+    throw new Error(
+      'Consumer Markdown hydration graph no longer reaches the isolated heavy feature client through a dynamic import.',
+    )
+  }
   assertRatchet(
     'Consumer Markdown hydration graph',
     markdownHydration,
@@ -497,6 +607,331 @@ function collectFiles(root, current = root) {
     else files.push(path.relative(root, absolute).replaceAll(path.sep, '/'))
   }
   return files
+}
+
+function writeHeavyFrameRuntimeFixture() {
+  writeFileSync(
+    path.join(fixtureRoot, 'src', 'App.vue'),
+    `<script setup lang="ts">
+import { ref } from 'vue'
+
+const heavy = ref(false)
+const mounted = ref(true)
+const plainContent = '# Packed consumer idle\\n\\nNo heavy feature is active.'
+const heavyContent = [
+  '# Packed heavy feature activation',
+  '',
+  '\`\`\`ts',
+  'const packagedCode: number = 641',
+  '\`\`\`',
+  '',
+  '\`\`\`mermaid',
+  'graph TD',
+  '  packed --> frame',
+  '\`\`\`',
+  '',
+  '$$',
+  '\\\\begin{aligned}',
+  'packed &= frame + lifecycle \\\\\\\\',
+  '\\\\end{aligned}',
+  '$$',
+].join('\\n')
+</script>
+
+<template>
+  <main>
+    <button id="activate-heavy" type="button" @click="heavy = true">
+      Activate heavy features
+    </button>
+    <button id="unmount-heavy" type="button" @click="mounted = false">
+      Unmount renderer
+    </button>
+    <el-markdown-renderer
+      v-if="mounted"
+      :content="heavy ? heavyContent : plainContent"
+      :content-version="heavy ? 1 : 0"
+      :features="{ codeHighlight: true, latex: true, mermaid: true }"
+      mode="preview"
+    />
+  </main>
+</template>
+`,
+  )
+}
+
+const reserveRuntimePort = () =>
+  new Promise((resolve, reject) => {
+    const server = createServer()
+    server.once('error', reject)
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address()
+      if (!address || typeof address === 'string') {
+        server.close()
+        reject(new Error('Consumer runtime preview port was unavailable.'))
+        return
+      }
+      server.close((error) => {
+        if (error) reject(error)
+        else resolve(address.port)
+      })
+    })
+  })
+
+async function verifyPackedHeavyFrameRuntime() {
+  const { chromium } = await import('@playwright/test')
+  const port = Number(
+    process.env.FSUS_CONSUMER_RUNTIME_PORT ?? (await reserveRuntimePort()),
+  )
+  const origin = `http://127.0.0.1:${port}`
+  const runtimeManifest = JSON.parse(
+    readFileSync(
+      path.join(fixtureRoot, heavyFrameRuntimeDist, '.vite', 'manifest.json'),
+      'utf8',
+    ),
+  )
+  const isolatedClientEntries =
+    findMarkdownHeavyFeatureIsolatedClientEntries(runtimeManifest)
+  if (isolatedClientEntries.length !== 1) {
+    throw new Error(
+      `Packed runtime must expose exactly one isolated heavy feature client asset owner, found ${isolatedClientEntries.length}.`,
+    )
+  }
+  const isolatedClientFile = isolatedClientEntries[0][1].file
+  const heavyIdentityEntries = Object.entries(runtimeManifest).filter(([key]) =>
+    isMarkdownHeavyFeatureIdentityModule(key),
+  )
+  if (heavyIdentityEntries.length !== 1) {
+    throw new Error(
+      `Packed runtime must expose exactly one Markdown heavy identity module, found ${heavyIdentityEntries.length}.`,
+    )
+  }
+  const heavyIdentityFile = heavyIdentityEntries[0][1].file
+  const output = []
+  const viteCli = path.join(
+    fixtureRoot,
+    'node_modules',
+    'vite',
+    'bin',
+    'vite.js',
+  )
+  const preview = spawn(
+    process.execPath,
+    [
+      viteCli,
+      'preview',
+      '--host',
+      '127.0.0.1',
+      '--port',
+      String(port),
+      '--outDir',
+      heavyFrameRuntimeDist,
+    ],
+    {
+      cwd: fixtureRoot,
+      ...withCommandOptions(),
+      stdio: ['ignore', 'pipe', 'pipe'],
+    },
+  )
+  preview.stdout.on('data', (chunk) => output.push(String(chunk)))
+  preview.stderr.on('data', (chunk) => output.push(String(chunk)))
+
+  let browser
+  let page
+  let runtimeFailure
+  const pendingFrameRoutes = []
+  try {
+    const deadline = Date.now() + 30_000
+    while (true) {
+      if (preview.exitCode !== null) {
+        throw new Error(
+          `Consumer runtime preview exited early (${preview.exitCode}).\n${output.join('')}`,
+        )
+      }
+      try {
+        const response = await globalThis.fetch(origin)
+        if (response.ok) break
+      } catch {}
+      if (Date.now() >= deadline) {
+        throw new Error(
+          `Consumer runtime preview did not become ready.\n${output.join('')}`,
+        )
+      }
+      await new Promise((resolve) => globalThis.setTimeout(resolve, 100))
+    }
+
+    browser = await chromium.launch({ headless: true })
+    page = await browser.newPage()
+    const frameRequests = []
+    const isolatedClientRequests = []
+    const heavyIdentityRequests = []
+    let releaseFrameRoutes = false
+    const frameAssetPattern = /markdown-heavy-feature-frame-[^/]+\.mjs(?:\?|$)/u
+    page.on('request', (request) => {
+      if (
+        new globalThis.URL(request.url()).pathname.endsWith(
+          `/${isolatedClientFile}`,
+        )
+      ) {
+        isolatedClientRequests.push(request.url())
+      }
+      if (
+        new globalThis.URL(request.url()).pathname.endsWith(
+          `/${heavyIdentityFile}`,
+        )
+      ) {
+        heavyIdentityRequests.push(request.url())
+      }
+    })
+    await page.route(frameAssetPattern, async (route) => {
+      frameRequests.push(route.request().url())
+      if (releaseFrameRoutes) await route.continue()
+      else pendingFrameRoutes.push(route)
+    })
+    await page.goto(origin, { waitUntil: 'networkidle' })
+    if (frameRequests.length !== 0) {
+      throw new Error('Packed heavy feature frame loaded before activation.')
+    }
+    if (isolatedClientRequests.length !== 0) {
+      throw new Error(
+        'Packed isolated heavy feature client loaded before activation.',
+      )
+    }
+    if (heavyIdentityRequests.length !== 0) {
+      throw new Error(
+        'Packed heavy identity projection chain loaded before activation.',
+      )
+    }
+
+    const firstFrameRequest = page.waitForRequest(frameAssetPattern)
+    await page.locator('#activate-heavy').click()
+    await firstFrameRequest
+    await page.locator('[data-latex-placeholder="true"]').waitFor()
+    const pendingLatex = await page
+      .locator('[data-latex-placeholder="true"]')
+      .textContent()
+    if (!pendingLatex?.includes('packed &= frame + lifecycle')) {
+      throw new Error(
+        'Packed heavy feature LaTeX did not enter the isolated pending state.',
+      )
+    }
+    releaseFrameRoutes = true
+    await Promise.all(
+      pendingFrameRoutes.splice(0).map((route) => route.continue()),
+    )
+    await page.locator('pre[data-code-highlighted="shiki"]').waitFor()
+    await page.locator('[data-mermaid-rendered="true"] svg').waitFor()
+    await page.locator('[data-latex-rendered="katex"] .katex').waitFor()
+    await page.waitForFunction(() => {
+      const renderer = document.querySelector('[data-markdown-renderer="wasm"]')
+      const encoded = renderer?.getAttribute('data-markdown-heavy-lifecycle')
+      if (!encoded) return false
+      const metrics = JSON.parse(encoded)
+      return (
+        metrics.active === 0 &&
+        metrics.retainedResources === 0 &&
+        metrics.retainedListeners === 0 &&
+        metrics.retainedObservers === 0 &&
+        metrics.retainedRuntimes === 0 &&
+        metrics.retainedTasks === 0 &&
+        metrics.static >= 3
+      )
+    })
+    if (frameRequests.length === 0) {
+      throw new Error('Packed heavy feature activation did not load the frame.')
+    }
+    if (isolatedClientRequests.length === 0) {
+      throw new Error(
+        'Packed heavy feature activation did not load the isolated client.',
+      )
+    }
+    if (heavyIdentityRequests.length === 0) {
+      throw new Error(
+        'Packed heavy feature activation did not load the identity projection chain.',
+      )
+    }
+    for (const requestUrl of frameRequests) {
+      if (new globalThis.URL(requestUrl).origin !== origin) {
+        throw new Error(
+          `Packed heavy feature frame crossed origin: ${requestUrl}`,
+        )
+      }
+    }
+    if (
+      (await page
+        .locator(
+          'iframe[data-fsus-markdown-heavy-pending],iframe[data-fsus-markdown-heavy-work]',
+        )
+        .count()) !== 0
+    ) {
+      throw new Error(
+        'Packed heavy feature frame remained resident after settle.',
+      )
+    }
+
+    await page.locator('#unmount-heavy').click()
+    await page.waitForFunction(
+      () =>
+        !document.querySelector('[data-markdown-renderer="wasm"]') &&
+        !document.querySelector(
+          'iframe[data-fsus-markdown-heavy-pending],iframe[data-fsus-markdown-heavy-work]',
+        ),
+    )
+    console.log(
+      `Packed consumer heavy frame runtime passed: lazy=1, identityRequests=${heavyIdentityRequests.length}, clientRequests=${isolatedClientRequests.length}, frameRequests=${frameRequests.length}, code=1, mermaid=1, latex=1, sameOrigin=1, retained=0.`,
+    )
+  } catch (error) {
+    runtimeFailure = error
+  }
+  const cleanupResults = [
+    ...(await Promise.allSettled(
+      pendingFrameRoutes.splice(0).map((route) => route.abort()),
+    )),
+    ...(await Promise.allSettled([page?.close()])),
+    ...(await Promise.allSettled([browser?.close()])),
+  ]
+  const cleanupFailures = cleanupResults.flatMap((result) =>
+    result.status === 'rejected' ? [result.reason] : [],
+  )
+  if (preview.exitCode === null) {
+    const waitForExit = (timeoutMs) => {
+      if (preview.exitCode !== null) return Promise.resolve(true)
+      return new Promise((resolve) => {
+        const onExit = () => {
+          globalThis.clearTimeout(timer)
+          resolve(true)
+        }
+        const timer = globalThis.setTimeout(() => {
+          preview.off('exit', onExit)
+          resolve(false)
+        }, timeoutMs)
+        preview.once('exit', onExit)
+      })
+    }
+    const terminated = waitForExit(5_000)
+    preview.kill('SIGTERM')
+    if ((await terminated) === false) {
+      const killed = waitForExit(5_000)
+      preview.kill('SIGKILL')
+      if ((await killed) === false) {
+        cleanupFailures.push(
+          new Error('Consumer runtime preview did not terminate.'),
+        )
+      }
+    }
+  }
+  if (runtimeFailure && cleanupFailures.length > 0) {
+    throw new AggregateError(
+      [runtimeFailure, ...cleanupFailures],
+      'Consumer runtime and cleanup failed.',
+    )
+  }
+  if (runtimeFailure) throw runtimeFailure
+  if (cleanupFailures.length > 0) {
+    throw new AggregateError(
+      cleanupFailures,
+      'Consumer runtime cleanup failed.',
+    )
+  }
 }
 
 function assertDependencySingleton() {
@@ -849,6 +1284,42 @@ try {
     ssrBrowserGlobalAccess: false,
     ...artifactEvidence,
   })
+
+  if (verifyHeavyFrameRuntime) {
+    writeHeavyFrameRuntimeFixture()
+    run(
+      'node',
+      [
+        path.join(repoRoot, 'scripts', 'with-node-heap.mjs'),
+        packageManager,
+        ...execArgs('vue-tsc', ['--noEmit']),
+      ],
+      {
+        cwd: fixtureRoot,
+        env: {
+          FSUS_NODE_HEAP_PROFILE: 'typecheck',
+          NODE_OPTIONS: '',
+        },
+      },
+    )
+    const heavyFrameViteOutput = runAndCollect(
+      'node',
+      [
+        path.join(repoRoot, 'scripts', 'with-node-heap.mjs'),
+        packageManager,
+        ...execArgs('vite', ['build', '--outDir', heavyFrameRuntimeDist]),
+      ],
+      {
+        cwd: fixtureRoot,
+        env: {
+          FSUS_NODE_HEAP_PROFILE: 'build',
+          NODE_OPTIONS: '',
+        },
+      },
+    )
+    assertNoConsumerBuildWarnings(heavyFrameViteOutput)
+    await verifyPackedHeavyFrameRuntime()
+  }
 
   if (candidateTarballPath && candidateManifest) {
     const postInstallSha256 = sha256File(candidateTarballPath)

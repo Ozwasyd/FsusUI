@@ -1,7 +1,6 @@
 export type MarkdownFeatureOutputKind = 'code-highlight' | 'latex' | 'mermaid'
 
-export const MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION =
-  'markdown-feature-output-gateway@2-trusted-types'
+export { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from './markdown-feature-output-gateway-version'
 
 export type FeatureRenderOutput =
   | Readonly<{ kind: 'code-highlight'; payload: string }>

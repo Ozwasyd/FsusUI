@@ -3,6 +3,7 @@ import {
   createMarkdownHeavyFeatureIsolatedRender,
   scheduleMarkdownHeavyFeatureFrameContinue,
 } from '../markdown-heavy-feature-isolated-client'
+import { createLazyMarkdownHeavyFeatureIsolatedRender } from '../markdown-heavy-feature-isolated-lazy'
 import {
   MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
   validateMarkdownHeavyFeatureFrameContinueMessage,
@@ -20,6 +21,150 @@ const validRequest = Object.freeze({
 })
 
 describe('markdown heavy feature isolated client', () => {
+  it('loads the isolated client only for a requested heavy render', async () => {
+    let resolveClient!: (client: {
+      createMarkdownHeavyFeatureIsolatedRender: typeof createMarkdownHeavyFeatureIsolatedRender
+    }) => void
+    const loadClient = vi.fn(
+      () =>
+        new Promise<{
+          createMarkdownHeavyFeatureIsolatedRender: typeof createMarkdownHeavyFeatureIsolatedRender
+        }>((resolve) => {
+          resolveClient = resolve
+        }),
+    )
+    const innerTeardown = vi.fn()
+    const createRender = vi.fn(() =>
+      Object.freeze({
+        promise: Promise.resolve({
+          kind: 'code-highlight' as const,
+          payload: '<pre />',
+        }),
+        resources: () =>
+          Object.freeze({
+            listeners: 2,
+            observers: 0,
+            runtimes: 1,
+            tasks: 1,
+          }),
+        teardown: innerTeardown,
+      }),
+    ) as typeof createMarkdownHeavyFeatureIsolatedRender
+
+    expect(loadClient).not.toHaveBeenCalled()
+    const handle = createLazyMarkdownHeavyFeatureIsolatedRender(
+      validRequest,
+      undefined,
+      undefined,
+      loadClient,
+    )
+    expect(loadClient).toHaveBeenCalledOnce()
+    expect(handle.resources().tasks).toBe(1)
+
+    resolveClient({ createMarkdownHeavyFeatureIsolatedRender: createRender })
+    await expect(handle.promise).resolves.toEqual({
+      kind: 'code-highlight',
+      payload: '<pre />',
+    })
+    expect(createRender).toHaveBeenCalledOnce()
+    expect(handle.resources()).toMatchObject({
+      listeners: 2,
+      observers: 0,
+      runtimes: 1,
+      tasks: 1,
+    })
+    handle.teardown()
+    expect(innerTeardown).toHaveBeenCalledOnce()
+    expect(handle.resources()).toMatchObject({
+      listeners: 0,
+      observers: 0,
+      runtimes: 0,
+      tasks: 0,
+    })
+  })
+
+  it('aborts a pending client load without creating a late frame', async () => {
+    let resolveClient!: (client: {
+      createMarkdownHeavyFeatureIsolatedRender: typeof createMarkdownHeavyFeatureIsolatedRender
+    }) => void
+    const createRender = vi.fn() as unknown as typeof createMarkdownHeavyFeatureIsolatedRender
+    const handle = createLazyMarkdownHeavyFeatureIsolatedRender(
+      validRequest,
+      undefined,
+      undefined,
+      () =>
+        new Promise((resolve) => {
+          resolveClient = resolve
+        }),
+    )
+    const rejection = handle.promise.catch((error: unknown) => error)
+
+    handle.teardown()
+    await expect(rejection).resolves.toMatchObject({ name: 'AbortError' })
+    expect(handle.resources()).toMatchObject({
+      listeners: 0,
+      observers: 0,
+      runtimes: 0,
+      tasks: 0,
+    })
+
+    resolveClient({ createMarkdownHeavyFeatureIsolatedRender: createRender })
+    await Promise.resolve()
+    expect(createRender).not.toHaveBeenCalled()
+  })
+
+  it('settles rejected loads and forwards inner resource subscriptions', async () => {
+    const loadError = new Error('isolated-client-load-failed')
+    const rejected = createLazyMarkdownHeavyFeatureIsolatedRender(
+      validRequest,
+      undefined,
+      undefined,
+      () => Promise.reject(loadError),
+    )
+    await expect(rejected.promise).rejects.toBe(loadError)
+    expect(rejected.resources().tasks).toBe(0)
+
+    let notifyInner!: () => void
+    const removeInnerResourceChange = vi.fn()
+    const innerTeardown = vi.fn()
+    const pending = new Promise<never>(() => {})
+    const active = createLazyMarkdownHeavyFeatureIsolatedRender(
+      validRequest,
+      undefined,
+      undefined,
+      async () => ({
+        createMarkdownHeavyFeatureIsolatedRender: (() => ({
+          promise: pending,
+          resources: () => ({
+            listeners: 2,
+            observers: 0,
+            runtimes: 1,
+            subscribe(listener: () => void) {
+              notifyInner = listener
+              return removeInnerResourceChange
+            },
+            tasks: 1,
+          }),
+          teardown: innerTeardown,
+        })) as typeof createMarkdownHeavyFeatureIsolatedRender,
+      }),
+    )
+    const resourceChange = vi.fn()
+    const unsubscribe = active.resources().subscribe?.(resourceChange)
+    await Promise.resolve()
+    expect(resourceChange).toHaveBeenCalled()
+    resourceChange.mockClear()
+    notifyInner()
+    expect(resourceChange).toHaveBeenCalledOnce()
+
+    const rejection = active.promise.catch((error: unknown) => error)
+    active.teardown()
+    await expect(rejection).resolves.toMatchObject({ name: 'AbortError' })
+    expect(removeInnerResourceChange).toHaveBeenCalledOnce()
+    expect(innerTeardown).toHaveBeenCalledOnce()
+    unsubscribe?.()
+  })
+
   it('resolves only after the shared scheduler continues a started frame', async () => {
     class TestMessagePort {
       closed = false
