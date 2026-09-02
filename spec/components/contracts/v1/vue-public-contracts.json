@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "24c5ec4bff6e2af8637670b8ec502470ffe535a1975ac6721beede45a2fa5a53",
+    "hash": "81f6b8889719e2ab3141179f34d7768a09b4c95c25a6ed20ba62b9aa2f2d0ead",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c"
@@ -40,245 +40,10 @@
         "module": "time-picker",
         "baseline": "spec/baselines/vue-current.json"
       },
-      "props": [
-        {
-          "name": "...disabledTimeListsProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "arrowControl",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "cellClassName",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "clearIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "clearable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "dateFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "defaultTime",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "defaultValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabledDate",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "editable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "endPlaceholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "format",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "id",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "isRange",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "label",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "modelValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "name",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "placeholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperClass",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperOptions",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "prefixIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "rangeSeparator",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "readonly",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "shortcuts",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "size",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "startPlaceholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "tabindex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "timeFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "type",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "unlinkPanels",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "validateEvent",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "valueFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        }
-      ],
+      "props": [],
       "events": [],
-      "contentRegions": [
-        {
-          "name": "default",
-          "scoped": true,
-          "required": false
-        },
-        {
-          "name": "range-separator",
-          "scoped": false,
-          "required": false
-        }
-      ],
-      "exposed": [
-        {
-          "name": "focus",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleBlurInput",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleClose",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleFocusInput",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleOpen",
-          "signature": "vue-source"
-        },
-        {
-          "name": "onPick",
-          "signature": "vue-source"
-        }
-      ],
+      "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -409,6 +174,124 @@
       "events": [],
       "contentRegions": [],
       "exposed": [],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
+      "id": "component.el-affix",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "native-adapter",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "native-adapter",
+      "source": {
+        "kind": "component",
+        "name": "ElAffix",
+        "module": "affix",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [
+        {
+          "name": "offset",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "position",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "target",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "zIndex",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [
+        {
+          "name": "[CHANGE_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "scroll",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": false,
+          "required": false
+        }
+      ],
+      "exposed": [
+        {
+          "name": "update",
+          "signature": "vue-source"
+        },
+        {
+          "name": "updateRoot",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -693,7 +576,13 @@
         }
       ],
       "events": [],
-      "contentRegions": [],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": true,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -872,6 +761,10 @@
           "payload": "vue-source"
         },
         {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
           "name": "clear",
           "payload": "vue-source"
         },
@@ -880,7 +773,15 @@
           "payload": "vue-source"
         },
         {
+          "name": "input",
+          "payload": "vue-source"
+        },
+        {
           "name": "select",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -1114,6 +1015,107 @@
       },
       "performanceBudget": {
         "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
+      "id": "component.el-backtop",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "native-adapter",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "native-adapter",
+      "source": {
+        "kind": "component",
+        "name": "ElBacktop",
+        "module": "backtop",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [
+        {
+          "name": "bottom",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "right",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "target",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "visibilityHeight",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [
+        {
+          "name": "click",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": false,
+          "required": false
+        }
+      ],
+      "exposed": [],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 16,
         "interactionMs": 50,
         "memory": "no retained unbounded per-item state without virtualization budget"
       }
@@ -1508,6 +1510,12 @@
           "required": false
         },
         {
+          "name": "motion",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "nativeType",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -1559,7 +1567,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
@@ -1674,7 +1682,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
@@ -1761,6 +1769,14 @@
         },
         {
           "name": "[UPDATE_MODEL_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "input",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -1887,6 +1903,12 @@
         },
         {
           "name": "header",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "motion",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -2055,7 +2077,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
@@ -2152,7 +2174,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
@@ -2342,6 +2364,10 @@
           "payload": "vue-source"
         },
         {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
           "name": "expandChange",
           "payload": "vue-source"
         },
@@ -2351,6 +2377,10 @@
         },
         {
           "name": "removeTag",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         },
         {
@@ -2464,8 +2494,23 @@
           "required": false
         }
       ],
-      "events": [],
-      "contentRegions": [],
+      "events": [
+        {
+          "name": "close",
+          "payload": "vue-source"
+        },
+        {
+          "name": "expand-change",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": false,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -2539,6 +2584,10 @@
       "events": [
         {
           "name": "[CHANGE_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
           "payload": "vue-source"
         },
         {
@@ -2709,6 +2758,10 @@
         {
           "name": "change",
           "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
         }
       ],
       "contentRegions": [
@@ -2874,6 +2927,10 @@
         {
           "name": "change",
           "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
         }
       ],
       "contentRegions": [
@@ -3014,6 +3071,10 @@
         },
         {
           "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -3236,6 +3297,12 @@
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
+        },
+        {
+          "name": "motion",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
         }
       ],
       "events": [
@@ -3245,6 +3312,14 @@
         },
         {
           "name": "[UPDATE_MODEL_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -3747,7 +3822,15 @@
           "payload": "vue-source"
         },
         {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
           "name": "focus",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -4536,6 +4619,10 @@
           "payload": "vue-source"
         },
         {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
           "name": "finish",
           "payload": "vue-source"
         }
@@ -4806,6 +4893,10 @@
           "payload": "vue-source"
         },
         {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
           "name": "row-click",
           "payload": "vue-source"
         }
@@ -4886,25 +4977,7 @@
       },
       "props": [
         {
-          "name": "...datePickerSharedProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "cellClassName",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "selectionMode",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "showWeekNumber",
+          "name": "type",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -4912,17 +4985,18 @@
       ],
       "events": [
         {
-          "name": "minDate",
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
-      "contentRegions": [],
-      "exposed": [
+      "contentRegions": [
         {
-          "name": "focus",
-          "signature": "vue-source"
+          "name": "range-separator",
+          "scoped": false,
+          "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5111,67 +5185,56 @@
       },
       "props": [
         {
-          "name": "border",
+          "name": "align",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "column",
+          "name": "className",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "direction",
+          "name": "label",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "extra",
+          "name": "labelAlign",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "responsive",
+          "name": "labelClassName",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "scrollAriaLabel",
+          "name": "minWidth",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "size",
+          "name": "span",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "title",
+          "name": "width",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
       "events": [],
-      "contentRegions": [
-        {
-          "name": "extra",
-          "scoped": false,
-          "required": false
-        },
-        {
-          "name": "title",
-          "scoped": false,
-          "required": false
-        }
-      ],
+      "contentRegions": [],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -5654,6 +5717,12 @@
           "required": false
         },
         {
+          "name": "motion",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "openDelay",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -5711,6 +5780,10 @@
         },
         {
           "name": "opened",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -6095,12 +6168,6 @@
       },
       "props": [
         {
-          "name": "...dialogProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "direction",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -6218,31 +6285,13 @@
       },
       "props": [
         {
-          "name": "...componentMotionProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "buttonProps",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "command",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "divided",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -6266,12 +6315,6 @@
           "required": false
         },
         {
-          "name": "icon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "id",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -6290,7 +6333,7 @@
           "required": false
         },
         {
-          "name": "onKeydown",
+          "name": "motion",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -6350,12 +6393,6 @@
           "required": false
         },
         {
-          "name": "textValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "trigger",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -6368,7 +6405,20 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "command",
+          "payload": "vue-source"
+        },
+        {
+          "name": "visible-change",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "default",
@@ -6475,7 +6525,20 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "pointerleave",
+          "payload": "vue-source"
+        },
+        {
+          "name": "pointermove",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "default",
@@ -7243,7 +7306,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
@@ -7402,7 +7465,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
@@ -8297,6 +8360,71 @@
       }
     },
     {
+      "id": "component.el-infinite-scroll",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "native-adapter",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "native-adapter",
+      "source": {
+        "kind": "component",
+        "name": "ElInfiniteScroll",
+        "module": "infinite-scroll",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [],
+      "events": [],
+      "contentRegions": [],
+      "exposed": [],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
       "id": "component.el-inline-actions",
       "version": "1.0.0",
       "releaseClassification": "preview",
@@ -8609,6 +8737,10 @@
         {
           "name": "mouseleave",
           "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
         }
       ],
       "contentRegions": [
@@ -8858,7 +8990,19 @@
           "payload": "vue-source"
         },
         {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
           "name": "focus",
+          "payload": "vue-source"
+        },
+        {
+          "name": "input",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -9312,7 +9456,16 @@
       "props": [],
       "events": [],
       "contentRegions": [],
-      "exposed": [],
+      "exposed": [
+        {
+          "name": "ns",
+          "signature": "vue-source"
+        },
+        {
+          "name": "zIndex",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -9966,6 +10119,10 @@
           "payload": "vue-source"
         },
         {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
           "name": "command",
           "payload": "vue-source"
         },
@@ -10011,6 +10168,10 @@
         },
         {
           "name": "transaction",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         },
         {
@@ -10315,18 +10476,6 @@
           "required": false
         },
         {
-          "name": "collapseCloseIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "collapseOpenIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "collapseTransition",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -10345,37 +10494,7 @@
           "required": false
         },
         {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "ellipsis",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "expandCloseIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "expandOpenIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "hideTimeout",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "index",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -10393,31 +10512,7 @@
           "required": false
         },
         {
-          "name": "popperAppendToBody",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperClass",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "popperEffect",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperOffset",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "route",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -10435,25 +10530,7 @@
           "required": false
         },
         {
-          "name": "showTimeout",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "teleported",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "textColor",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "title",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -10466,10 +10543,6 @@
         }
       ],
       "events": [
-        {
-          "name": "click",
-          "payload": "vue-source"
-        },
         {
           "name": "close",
           "payload": "vue-source"
@@ -10486,11 +10559,24 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
-      "exposed": [],
+      "exposed": [
+        {
+          "name": "close",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleResize",
+          "signature": "vue-source"
+        },
+        {
+          "name": "open",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10570,12 +10656,6 @@
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
-        },
-        {
-          "name": "title",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
         }
       ],
       "events": [
@@ -10587,12 +10667,12 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
           "name": "title",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
@@ -10670,12 +10750,12 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
           "name": "title",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
@@ -10786,6 +10866,12 @@
         },
         {
           "name": "message",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "motion",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -10983,7 +11069,16 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "action",
+          "payload": "vue-source"
+        },
+        {
+          "name": "vanish",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "default",
@@ -11768,6 +11863,12 @@
           "required": false
         },
         {
+          "name": "motion",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "offset",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -11930,7 +12031,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
@@ -12014,7 +12115,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         }
       ],
@@ -12297,14 +12398,165 @@
       },
       "props": [
         {
-          "name": "size",
+          "name": "ariaLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "background",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "currentPage",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "defaultCurrentPage",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "defaultPageSize",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabled",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "hideOnSinglePage",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "layout",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "nextIcon",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "nextText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "pageCount",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "pageSize",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "pageSizes",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "pagerCount",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "popperClass",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "prevIcon",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "prevText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "responsive",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "small",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "teleported",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "total",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [],
-      "contentRegions": [],
+      "events": [
+        {
+          "name": "current-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "next-click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "prev-click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "size-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:current-page",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:page-size",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": true,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -13377,184 +13629,10 @@
         "module": "popover",
         "baseline": "spec/baselines/vue-current.json"
       },
-      "props": [
-        {
-          "name": "autoClose",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "content",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "effect",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "enterable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "hideAfter",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "offset",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "onUpdate:visible",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "persistent",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "placement",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperClass",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperOptions",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperStyle",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "showAfter",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "showArrow",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "tabindex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "teleported",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "title",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "transition",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "trigger",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "visible",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "width",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        }
-      ],
-      "events": [
-        {
-          "name": "after-enter",
-          "payload": "vue-source"
-        },
-        {
-          "name": "after-leave",
-          "payload": "vue-source"
-        },
-        {
-          "name": "before-enter",
-          "payload": "vue-source"
-        },
-        {
-          "name": "before-leave",
-          "payload": "vue-source"
-        },
-        {
-          "name": "update:visible",
-          "payload": "vue-source"
-        }
-      ],
-      "contentRegions": [
-        {
-          "name": "default",
-          "scoped": false,
-          "required": false
-        },
-        {
-          "name": "reference",
-          "scoped": false,
-          "required": false
-        }
-      ],
-      "exposed": [
-        {
-          "name": "hide",
-          "signature": "vue-source"
-        },
-        {
-          "name": "popperRef",
-          "signature": "vue-source"
-        }
-      ],
+      "props": [],
+      "events": [],
+      "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -13964,11 +14042,19 @@
           "payload": "vue-source"
         },
         {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
           "name": "search",
           "payload": "vue-source"
         },
         {
           "name": "search-focus",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         },
         {
@@ -14123,6 +14209,14 @@
         },
         {
           "name": "[UPDATE_MODEL_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -14540,6 +14634,14 @@
         },
         {
           "name": "[UPDATE_MODEL_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -15875,6 +15977,14 @@
         {
           "name": "[UPDATE_MODEL_EVENT]",
           "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
         }
       ],
       "contentRegions": [
@@ -16188,11 +16298,32 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "blur",
+          "payload": "vue-source"
+        },
+        {
+          "name": "clear",
+          "payload": "vue-source"
+        },
+        {
+          "name": "focus",
+          "payload": "vue-source"
+        },
+        {
+          "name": "remove-tag",
+          "payload": "vue-source"
+        },
+        {
+          "name": "visible-change",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
@@ -16280,26 +16411,291 @@
       },
       "props": [
         {
+          "name": "allowCreate",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "autocomplete",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "automaticDropdown",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "clearIcon",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "clearable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "collapseTags",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "collapseTagsTooltip",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "defaultFirstOption",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabled",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "effect",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "estimatedOptionHeight",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "filterMethod",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "filterable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "height",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "item",
+          "name": "id",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "style",
+          "name": "itemHeight",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "label",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "loading",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "loadingText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "maxCollapseTags",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "modelValue",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "multiple",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "multipleLimit",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "name",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "noDataText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "noMatchText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "persistent",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "placeholder",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "placement",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "popperClass",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "popperOptions",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "props",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "remote",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "remoteMethod",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "reserveKeyword",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "scrollbarAlwaysOn",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "teleported",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "validateEvent",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "valueKey",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [],
-      "contentRegions": [],
+      "events": [
+        {
+          "name": "blur",
+          "payload": "vue-source"
+        },
+        {
+          "name": "clear",
+          "payload": "vue-source"
+        },
+        {
+          "name": "focus",
+          "payload": "vue-source"
+        },
+        {
+          "name": "remove-tag",
+          "payload": "vue-source"
+        },
+        {
+          "name": "visible-change",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "empty",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "prefix",
+          "scoped": false,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -17001,6 +17397,18 @@
         },
         {
           "name": "[UPDATE_MODEL_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "input",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -17727,6 +18135,10 @@
         {
           "name": "[CHANGE_EVENT]",
           "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
         }
       ],
       "contentRegions": [
@@ -17876,11 +18288,21 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "title",
+          "scoped": true,
           "required": false
         }
       ],
-      "exposed": [],
+      "exposed": [
+        {
+          "name": "opened",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18100,6 +18522,18 @@
         {
           "name": "[UPDATE_MODEL_EVENT]",
           "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "input",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
         }
       ],
       "contentRegions": [],
@@ -18276,8 +18710,140 @@
         "module": "table",
         "baseline": "spec/baselines/vue-current.json"
       },
-      "props": [],
-      "events": [],
+      "props": [
+        {
+          "name": "context",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "fixed",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "highlight",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "rowClassName",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "rowStyle",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "store",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "stripe",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "tooltipEffect",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "tooltipOptions",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [
+        {
+          "name": "cell-click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "cell-contextmenu",
+          "payload": "vue-source"
+        },
+        {
+          "name": "cell-dblclick",
+          "payload": "vue-source"
+        },
+        {
+          "name": "cell-mouse-enter",
+          "payload": "vue-source"
+        },
+        {
+          "name": "cell-mouse-leave",
+          "payload": "vue-source"
+        },
+        {
+          "name": "current-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "expand-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "filter-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "header-click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "header-contextmenu",
+          "payload": "vue-source"
+        },
+        {
+          "name": "header-dragend",
+          "payload": "vue-source"
+        },
+        {
+          "name": "row-click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "row-contextmenu",
+          "payload": "vue-source"
+        },
+        {
+          "name": "row-dblclick",
+          "payload": "vue-source"
+        },
+        {
+          "name": "scroll",
+          "payload": "vue-source"
+        },
+        {
+          "name": "select",
+          "payload": "vue-source"
+        },
+        {
+          "name": "select-all",
+          "payload": "vue-source"
+        },
+        {
+          "name": "selection-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "sort-change",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "append",
@@ -18286,7 +18852,7 @@
         },
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
@@ -18359,13 +18925,31 @@
       },
       "props": [
         {
-          "name": "column",
+          "name": "context",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "placement",
+          "name": "fixed",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "highlight",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "rowClassName",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "rowStyle",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18377,7 +18961,19 @@
           "required": false
         },
         {
-          "name": "upDataColumn",
+          "name": "stripe",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "tooltipEffect",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "tooltipOptions",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18449,19 +19045,7 @@
       },
       "props": [
         {
-          "name": "bodyWidth",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "cache",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "cellData",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18479,31 +19063,7 @@
           "required": false
         },
         {
-          "name": "column",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "columnIndex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "columns",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "columnsStyles",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "containerStyle",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18522,12 +19082,6 @@
         },
         {
           "name": "defaultExpandedRowKeys",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "depth",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18563,19 +19117,7 @@
           "required": false
         },
         {
-          "name": "fixedHeaderData",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "footerHeight",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "getRowHeight",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18599,31 +19141,13 @@
           "required": false
         },
         {
-          "name": "headerData",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "headerHeight",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "headerIndex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "headerProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "headerWidth",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18642,12 +19166,6 @@
         },
         {
           "name": "indentSize",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "isScrolling",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18683,18 +19201,6 @@
           "required": false
         },
         {
-          "name": "onRowHeightChange",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "onRowHover",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "onRowsRendered",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -18713,12 +19219,6 @@
           "required": false
         },
         {
-          "name": "rowData",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "rowEventHandlers",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -18726,12 +19226,6 @@
         },
         {
           "name": "rowHeight",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "rowIndex",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18749,25 +19243,7 @@
           "required": false
         },
         {
-          "name": "rowWidth",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "scrollbarAlwaysOn",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "scrollbarEndGap",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "scrollbarStartGap",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18810,8 +19286,61 @@
         }
       ],
       "events": [],
-      "contentRegions": [],
-      "exposed": [],
+      "contentRegions": [
+        {
+          "name": "cell",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "empty",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "footer",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "header",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "header-cell",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "overlay",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "row",
+          "scoped": true,
+          "required": false
+        }
+      ],
+      "exposed": [
+        {
+          "name": "scrollTo",
+          "signature": "vue-source"
+        },
+        {
+          "name": "scrollToLeft",
+          "signature": "vue-source"
+        },
+        {
+          "name": "scrollToRow",
+          "signature": "vue-source"
+        },
+        {
+          "name": "scrollToTop",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18875,21 +19404,102 @@
       },
       "props": [
         {
-          "name": "tabs",
+          "name": "activeName",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "addable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "beforeLeave",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "closable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "editable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "modelValue",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "motion",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "stretch",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "tabPosition",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "type",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [],
-      "contentRegions": [],
-      "exposed": [
+      "events": [
         {
-          "name": "ref",
-          "signature": "vue-source"
+          "name": "edit",
+          "payload": "vue-source"
         },
         {
-          "name": "update",
+          "name": "tabAdd",
+          "payload": "vue-source"
+        },
+        {
+          "name": "tabChange",
+          "payload": "vue-source"
+        },
+        {
+          "name": "tabClick",
+          "payload": "vue-source"
+        },
+        {
+          "name": "tabRemove",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "addIcon",
+          "scoped": false,
+          "required": false
+        }
+      ],
+      "exposed": [
+        {
+          "name": "currentName",
           "signature": "vue-source"
         }
       ],
@@ -18987,6 +19597,12 @@
         },
         {
           "name": "hit",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "motion",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -19466,6 +20082,14 @@
         {
           "name": "[UPDATE_MODEL_EVENT]",
           "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
         }
       ],
       "contentRegions": [],
@@ -19658,243 +20282,20 @@
       },
       "props": [
         {
-          "name": "...disabledTimeListsProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "arrowControl",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "cellClassName",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "clearIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "clearable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "dateFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "defaultTime",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "defaultValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabledDate",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "editable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "endPlaceholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "format",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "id",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "isRange",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
-        },
-        {
-          "name": "label",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "modelValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "name",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "placeholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperClass",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperOptions",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "prefixIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "rangeSeparator",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "readonly",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "shortcuts",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "size",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "startPlaceholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "tabindex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "timeFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "type",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "unlinkPanels",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "validateEvent",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "valueFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
         }
       ],
-      "events": [],
-      "contentRegions": [
+      "events": [
         {
-          "name": "default",
-          "scoped": true,
-          "required": false
-        },
-        {
-          "name": "range-separator",
-          "scoped": false,
-          "required": false
+          "name": "update:modelValue",
+          "payload": "vue-source"
         }
       ],
-      "exposed": [
-        {
-          "name": "focus",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleBlurInput",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleClose",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleFocusInput",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleOpen",
-          "signature": "vue-source"
-        },
-        {
-          "name": "onPick",
-          "signature": "vue-source"
-        }
-      ],
+      "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20054,7 +20455,24 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "blur",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "focus",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [],
       "exposed": [
         {
@@ -20178,18 +20596,7 @@
         }
       ],
       "events": [],
-      "contentRegions": [
-        {
-          "name": "default",
-          "scoped": false,
-          "required": false
-        },
-        {
-          "name": "dot",
-          "scoped": false,
-          "required": false
-        }
-      ],
+      "contentRegions": [],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -20415,7 +20822,32 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "before-hide",
+          "payload": "vue-source"
+        },
+        {
+          "name": "before-show",
+          "payload": "vue-source"
+        },
+        {
+          "name": "close",
+          "payload": "vue-source"
+        },
+        {
+          "name": "hide",
+          "payload": "vue-source"
+        },
+        {
+          "name": "open",
+          "payload": "vue-source"
+        },
+        {
+          "name": "show",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "content",
@@ -20527,14 +20959,67 @@
           "required": false
         },
         {
-          "name": "...tooltipV2ArrowSpecialProps",
+          "name": "...tooltipV2ContentProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "...tooltipV2RootProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "...tooltipV2TriggerProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "alwaysOn",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "fullTransition",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "teleported",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "to",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "transitionProps",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
       "events": [],
-      "contentRegions": [],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "trigger",
+          "scoped": false,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -20704,6 +21189,22 @@
         },
         {
           "name": "[UPDATE_MODEL_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "left-check-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "right-check-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
           "payload": "vue-source"
         }
       ],
@@ -20964,7 +21465,60 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "check",
+          "payload": "vue-source"
+        },
+        {
+          "name": "check-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "current-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-collapse",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-contextmenu",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-drag-end",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-drag-enter",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-drag-leave",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-drag-over",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-drag-start",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-drop",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-expand",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "empty",
@@ -21120,37 +21674,85 @@
       },
       "props": [
         {
-          "name": "checked",
+          "name": "accordion",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "current",
+          "name": "checkOnClickNode",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "disabled",
+          "name": "checkStrictly",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "expanded",
+          "name": "currentNodeKey",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "hiddenExpandIcon",
+          "name": "data",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "indeterminate",
+          "name": "defaultCheckedKeys",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "defaultExpandedKeys",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "emptyText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "expandOnClickNode",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "filterMethod",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "height",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "highlightCurrent",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "indent",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -21162,7 +21764,13 @@
           "required": false
         },
         {
-          "name": "node",
+          "name": "perfMode",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "props",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -21176,20 +21784,129 @@
       ],
       "events": [
         {
+          "name": "[CURRENT_CHANGE]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_CHECK]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_CHECK_CHANGE]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_CLICK]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_COLLAPSE]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_CONTEXTMENU]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_EXPAND]",
+          "payload": "vue-source"
+        },
+        {
           "name": "check",
           "payload": "vue-source"
         },
         {
-          "name": "click",
+          "name": "check-change",
           "payload": "vue-source"
         },
         {
-          "name": "toggle",
+          "name": "current-change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-click",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-collapse",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-contextmenu",
+          "payload": "vue-source"
+        },
+        {
+          "name": "node-expand",
           "payload": "vue-source"
         }
       ],
       "contentRegions": [],
-      "exposed": [],
+      "exposed": [
+        {
+          "name": "collapseNode",
+          "signature": "vue-source"
+        },
+        {
+          "name": "expandNode",
+          "signature": "vue-source"
+        },
+        {
+          "name": "filter",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCheckedKeys",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCheckedNodes",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCurrentKey",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCurrentNode",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getHalfCheckedKeys",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getHalfCheckedNodes",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getNode",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setChecked",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setCheckedKeys",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setCurrentKey",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setData",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setExpandedKeys",
+          "signature": "vue-source"
+        },
+        {
+          "name": "toggleCheckbox",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22753,6 +23470,10 @@
       "events": [
         {
           "name": "[CHANGE_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "change",
           "payload": "vue-source"
         },
         {
@@ -26499,6 +27220,14 @@
         {
           "name": "[UPDATE_MODEL_EVENT]",
           "payload": "vue-source"
+        },
+        {
+          "name": "change",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
         }
       ],
       "contentRegions": [
@@ -27401,19 +28130,7 @@
       },
       "props": [
         {
-          "name": "bodyWidth",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "cache",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "cellData",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -27431,31 +28148,7 @@
           "required": false
         },
         {
-          "name": "column",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "columnIndex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "columns",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "columnsStyles",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "containerStyle",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -27474,12 +28167,6 @@
         },
         {
           "name": "defaultExpandedRowKeys",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "depth",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -27515,19 +28202,7 @@
           "required": false
         },
         {
-          "name": "fixedHeaderData",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "footerHeight",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "getRowHeight",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -27551,31 +28226,13 @@
           "required": false
         },
         {
-          "name": "headerData",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "headerHeight",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "headerIndex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "headerProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "headerWidth",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -27594,12 +28251,6 @@
         },
         {
           "name": "indentSize",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "isScrolling",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -27635,18 +28286,6 @@
           "required": false
         },
         {
-          "name": "onRowHeightChange",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "onRowHover",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "onRowsRendered",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -27665,12 +28304,6 @@
           "required": false
         },
         {
-          "name": "rowData",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "rowEventHandlers",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -27678,12 +28311,6 @@
         },
         {
           "name": "rowHeight",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "rowIndex",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -27701,25 +28328,7 @@
           "required": false
         },
         {
-          "name": "rowWidth",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
           "name": "scrollbarAlwaysOn",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "scrollbarEndGap",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "scrollbarStartGap",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -27762,268 +28371,61 @@
         }
       ],
       "events": [],
-      "contentRegions": [],
-      "exposed": [],
-      "defaults": {
-        "source": "vue-baseline",
-        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
-      },
-      "stateMachine": {
-        "initial": "default",
-        "states": ["default", "hover", "focus-visible", "active", "disabled"],
-        "transitions": {
-          "default->focus-visible": "keyboard focus enters the control",
-          "default->disabled": "disabled or unavailable state is applied"
+      "contentRegions": [
+        {
+          "name": "cell",
+          "scoped": true,
+          "required": false
         },
-        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
-      },
-      "keyboardBehavior": {
-        "focus": "platform-native focus entry must expose the same public focus state",
-        "activation": "keyboard activation follows the component accessibility role",
-        "escape": "dismiss only when the component contract exposes a dismissible surface"
-      },
-      "pointerBehavior": {
-        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
-        "hover": "hover-only affordances must have keyboard and touch alternatives"
-      },
-      "accessibilityMapping": {
-        "role": "derived from public component semantics",
-        "name": "required when the component is interactive or status-bearing",
-        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
-      },
-      "themeTokens": ["color", "typography", "space", "radius", "motion"],
-      "motionPolicy": {
-        "source": "spec/motion/README.md",
-        "reducedMotion": "must honor user reduced-motion preference"
-      },
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      }
-    },
-    {
-      "id": "component.table-v2-alignment",
-      "version": "1.0.0",
-      "releaseClassification": "preview",
-      "owner": "FsusUI Core",
-      "supportedPlatforms": {
-        "web": {
-          "status": "source",
-          "package": "@ozwasyd/element-plus"
+        {
+          "name": "empty",
+          "scoped": false,
+          "required": false
         },
-        "avalonia": {
-          "status": "native-adapter",
-          "package": "FsusUI.Avalonia"
+        {
+          "name": "footer",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "header",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "header-cell",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "overlay",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "row",
+          "scoped": true,
+          "required": false
         }
-      },
-      "changeClassification": "minor",
-      "platformClassification": "native-adapter",
-      "source": {
-        "kind": "component",
-        "name": "TableV2Alignment",
-        "module": "table-v2",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "props": [],
-      "events": [],
-      "contentRegions": [],
-      "exposed": [],
-      "defaults": {
-        "source": "vue-baseline",
-        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
-      },
-      "stateMachine": {
-        "initial": "default",
-        "states": ["default", "hover", "focus-visible", "active", "disabled"],
-        "transitions": {
-          "default->focus-visible": "keyboard focus enters the control",
-          "default->disabled": "disabled or unavailable state is applied"
+      ],
+      "exposed": [
+        {
+          "name": "scrollTo",
+          "signature": "vue-source"
         },
-        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
-      },
-      "keyboardBehavior": {
-        "focus": "platform-native focus entry must expose the same public focus state",
-        "activation": "keyboard activation follows the component accessibility role",
-        "escape": "dismiss only when the component contract exposes a dismissible surface"
-      },
-      "pointerBehavior": {
-        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
-        "hover": "hover-only affordances must have keyboard and touch alternatives"
-      },
-      "accessibilityMapping": {
-        "role": "derived from public component semantics",
-        "name": "required when the component is interactive or status-bearing",
-        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
-      },
-      "themeTokens": ["color", "typography", "space", "radius", "motion"],
-      "motionPolicy": {
-        "source": "spec/motion/README.md",
-        "reducedMotion": "must honor user reduced-motion preference"
-      },
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      }
-    },
-    {
-      "id": "component.table-v2-fixed-dir",
-      "version": "1.0.0",
-      "releaseClassification": "preview",
-      "owner": "FsusUI Core",
-      "supportedPlatforms": {
-        "web": {
-          "status": "source",
-          "package": "@ozwasyd/element-plus"
+        {
+          "name": "scrollToLeft",
+          "signature": "vue-source"
         },
-        "avalonia": {
-          "status": "native-adapter",
-          "package": "FsusUI.Avalonia"
+        {
+          "name": "scrollToRow",
+          "signature": "vue-source"
+        },
+        {
+          "name": "scrollToTop",
+          "signature": "vue-source"
         }
-      },
-      "changeClassification": "minor",
-      "platformClassification": "native-adapter",
-      "source": {
-        "kind": "component",
-        "name": "TableV2FixedDir",
-        "module": "table-v2",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "props": [],
-      "events": [],
-      "contentRegions": [],
-      "exposed": [],
-      "defaults": {
-        "source": "vue-baseline",
-        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
-      },
-      "stateMachine": {
-        "initial": "default",
-        "states": ["default", "hover", "focus-visible", "active", "disabled"],
-        "transitions": {
-          "default->focus-visible": "keyboard focus enters the control",
-          "default->disabled": "disabled or unavailable state is applied"
-        },
-        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
-      },
-      "keyboardBehavior": {
-        "focus": "platform-native focus entry must expose the same public focus state",
-        "activation": "keyboard activation follows the component accessibility role",
-        "escape": "dismiss only when the component contract exposes a dismissible surface"
-      },
-      "pointerBehavior": {
-        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
-        "hover": "hover-only affordances must have keyboard and touch alternatives"
-      },
-      "accessibilityMapping": {
-        "role": "derived from public component semantics",
-        "name": "required when the component is interactive or status-bearing",
-        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
-      },
-      "themeTokens": ["color", "typography", "space", "radius", "motion"],
-      "motionPolicy": {
-        "source": "spec/motion/README.md",
-        "reducedMotion": "must honor user reduced-motion preference"
-      },
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      }
-    },
-    {
-      "id": "component.table-v2-placeholder",
-      "version": "1.0.0",
-      "releaseClassification": "preview",
-      "owner": "FsusUI Core",
-      "supportedPlatforms": {
-        "web": {
-          "status": "source",
-          "package": "@ozwasyd/element-plus"
-        },
-        "avalonia": {
-          "status": "native-adapter",
-          "package": "FsusUI.Avalonia"
-        }
-      },
-      "changeClassification": "minor",
-      "platformClassification": "native-adapter",
-      "source": {
-        "kind": "component",
-        "name": "TableV2Placeholder",
-        "module": "table-v2",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "props": [],
-      "events": [],
-      "contentRegions": [],
-      "exposed": [],
-      "defaults": {
-        "source": "vue-baseline",
-        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
-      },
-      "stateMachine": {
-        "initial": "default",
-        "states": ["default", "hover", "focus-visible", "active", "disabled"],
-        "transitions": {
-          "default->focus-visible": "keyboard focus enters the control",
-          "default->disabled": "disabled or unavailable state is applied"
-        },
-        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
-      },
-      "keyboardBehavior": {
-        "focus": "platform-native focus entry must expose the same public focus state",
-        "activation": "keyboard activation follows the component accessibility role",
-        "escape": "dismiss only when the component contract exposes a dismissible surface"
-      },
-      "pointerBehavior": {
-        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
-        "hover": "hover-only affordances must have keyboard and touch alternatives"
-      },
-      "accessibilityMapping": {
-        "role": "derived from public component semantics",
-        "name": "required when the component is interactive or status-bearing",
-        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
-      },
-      "themeTokens": ["color", "typography", "space", "radius", "motion"],
-      "motionPolicy": {
-        "source": "spec/motion/README.md",
-        "reducedMotion": "must honor user reduced-motion preference"
-      },
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      }
-    },
-    {
-      "id": "component.table-v2-sort-order",
-      "version": "1.0.0",
-      "releaseClassification": "preview",
-      "owner": "FsusUI Core",
-      "supportedPlatforms": {
-        "web": {
-          "status": "source",
-          "package": "@ozwasyd/element-plus"
-        },
-        "avalonia": {
-          "status": "native-adapter",
-          "package": "FsusUI.Avalonia"
-        }
-      },
-      "changeClassification": "minor",
-      "platformClassification": "native-adapter",
-      "source": {
-        "kind": "component",
-        "name": "TableV2SortOrder",
-        "module": "table-v2",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "props": [],
-      "events": [],
-      "contentRegions": [],
-      "exposed": [],
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -28085,245 +28487,10 @@
         "module": "time-picker",
         "baseline": "spec/baselines/vue-current.json"
       },
-      "props": [
-        {
-          "name": "...disabledTimeListsProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "arrowControl",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "cellClassName",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "clearIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "clearable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "dateFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "defaultTime",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "defaultValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabledDate",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "editable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "endPlaceholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "format",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "id",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "isRange",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "label",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "modelValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "name",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "placeholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperClass",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperOptions",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "prefixIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "rangeSeparator",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "readonly",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "shortcuts",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "size",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "startPlaceholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "tabindex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "timeFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "type",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "unlinkPanels",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "validateEvent",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "valueFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        }
-      ],
+      "props": [],
       "events": [],
-      "contentRegions": [
-        {
-          "name": "default",
-          "scoped": true,
-          "required": false
-        },
-        {
-          "name": "range-separator",
-          "scoped": false,
-          "required": false
-        }
-      ],
-      "exposed": [
-        {
-          "name": "focus",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleBlurInput",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleClose",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleFocusInput",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleOpen",
-          "signature": "vue-source"
-        },
-        {
-          "name": "onPick",
-          "signature": "vue-source"
-        }
-      ],
+      "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -28885,32 +29052,6 @@
   ],
   "webOnlyDecisions": [
     {
-      "id": "web-only.component.el-affix",
-      "source": {
-        "kind": "component",
-        "name": "ElAffix",
-        "module": "affix",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "owner": "FsusUI Core",
-      "reviewAfter": "2026-12-31",
-      "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
-    },
-    {
-      "id": "web-only.component.el-backtop",
-      "source": {
-        "kind": "component",
-        "name": "ElBacktop",
-        "module": "backtop",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "owner": "FsusUI Core",
-      "reviewAfter": "2026-12-31",
-      "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
-    },
-    {
       "id": "web-only.component.el-collapse-transition",
       "source": {
         "kind": "component",
@@ -28920,21 +29061,23 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
-    },
-    {
-      "id": "web-only.component.el-infinite-scroll",
-      "source": {
-        "kind": "component",
-        "name": "ElInfiniteScroll",
-        "module": "infinite-scroll",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "owner": "FsusUI Core",
-      "reviewAfter": "2026-12-31",
-      "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use the native FsusCollapse public surface; Avalonia does not expose a browser transition-wrapper component.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusCollapse",
+          "members": []
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper",
@@ -28946,8 +29089,43 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use FsusTooltip, FsusPopover, FsusPopconfirm, or FsusDropdown with FsusAnchoredOverlaySurface and FsusOverlayHost.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusPopover",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusDropdown",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+          "members": []
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-arrow",
@@ -28959,8 +29137,27 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use the native anchored-overlay template and FsusAnchoredPlacement/EffectivePlacement; no public arrow primitive is exposed.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredPlacement",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": ["EffectivePlacement"]
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-content",
@@ -28972,8 +29169,35 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use FsusAnchoredOverlaySurface.OverlayContent with FsusOverlayHost, FsusOverlayEntry, and FsusOverlayOptions.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": ["OverlayContent"]
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayOptions",
+          "members": []
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-trigger",
@@ -28985,8 +29209,29 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use the native Content region with TriggerMode, TriggerClick, Open, and CloseAsync on the anchored-overlay surface.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": [
+            "Content",
+            "TriggerMode",
+            "TriggerClick",
+            "Open",
+            "CloseAsync"
+          ]
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     }
   ]
 }
