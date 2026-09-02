@@ -1,8 +1,7 @@
 <template>
   <i
     :class="[ns.b(), ns.is('linear', variant === 'linear')]"
-    :style="style"
-    v-bind="$attrs"
+    v-bind="mergedBindings"
   >
     <slot />
   </i>
@@ -22,13 +21,21 @@ defineOptions({
 const props = defineProps(iconProps)
 const ns = useNamespace('icon')
 
-const style = computed<CSSProperties>(() => {
+// A `:style` binding keeps the key present even when its value is empty, and
+// SSR then serializes a literal `style=""` attribute. An empty inline style
+// attribute violates `style-src-attr 'none'` CSP policies, so absent
+// size/color must omit the binding instead of binding an empty object.
+const style = computed<CSSProperties | null>(() => {
   const { size, color } = props
-  if (!size && !color) return {}
+  if (!size && !color) return null
 
   return {
     fontSize: isUndefined(size) ? undefined : addUnit(size),
     '--color': color,
   }
 })
+
+const mergedBindings = computed<Record<string, unknown>>(() =>
+  style.value ? { style: style.value } : {},
+)
 </script>
