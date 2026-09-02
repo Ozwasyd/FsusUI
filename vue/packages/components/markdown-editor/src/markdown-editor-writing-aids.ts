@@ -654,6 +654,121 @@ export const evaluateMarkdownTypewriterMutations = (
   })
 }
 
+export type MarkdownWritingAidsAcceptanceMutationKind =
+  | 'center-default'
+  | 'blur-focus'
+  | 'scroll-loop'
+  | 'stale-epoch-task'
+  | 'screen-reader-caret-stealing'
+
+/**
+ * Combined #441 acceptance fixture: kills the cross-mode mutants that the
+ * per-mode evaluators (#439 Focus, #440 Typewriter) do not cover alone.
+ */
+export const evaluateMarkdownWritingAidsAcceptanceMutations = (
+  focusInput: MarkdownEditorFocusInput,
+  options?: MarkdownEditorWritingAidsOptions,
+) => {
+  const resolved = resolveWritingAids(options)
+  const focusAuthority = resolveFocusState(focusInput)
+  const same = (left: unknown, right: unknown) =>
+    JSON.stringify(left) === JSON.stringify(right)
+
+  const centerDefaultEquivalent =
+    resolveWritingAids().typewriterAnchor === 'center'
+
+  const blurFocusMutation = Object.freeze({
+    ...focusAuthority,
+    presentation: Object.freeze({
+      dimmedOpacity: 0,
+      blur: true,
+      hidden: true,
+      mask: true,
+    }),
+  })
+  const blurFocusEquivalent = same(focusAuthority, blurFocusMutation)
+
+  const loopController = createWritingAidsController({
+    ...options,
+    typewriter: true,
+    typewriterAnchor: resolved.typewriterAnchor,
+  })
+  loopController.handleInput()
+  const loopSuspend = loopController.handleUserScroll() as {
+    scroll?: boolean
+  }
+  const loopEcho = loopController.handleAsyncLayoutChange() as {
+    scroll?: boolean
+  }
+  const scrollLoopEquivalent =
+    loopSuspend.scroll === true ||
+    loopEcho.scroll === true ||
+    loopController.state !== 'user-scroll-suspended'
+
+  const epochController = createWritingAidsController({
+    ...options,
+    typewriter: true,
+    documentIdentity: 'document-a',
+    documentEpoch: 1,
+    revision: 3,
+    projection: {
+      currentBlock: { id: 'block-a', sourceRange: [0, 4] },
+      caretAnchor: { blockId: 'block-a', sourceOffset: 1 },
+    },
+  })
+  epochController.handleInput()
+  epochController.updateDocument({
+    documentIdentity: 'document-b',
+    documentEpoch: 2,
+    revision: 3,
+  })
+  const staleTask = epochController.handleAsyncLayoutChange() as {
+    scroll?: boolean
+  }
+  const staleEpochTaskEquivalent =
+    staleTask.scroll === true ||
+    epochController.state !== 'idle' ||
+    epochController.currentBlock !== null
+
+  const screenReaderTargetId =
+    focusInput.exemptions?.screenReaderBrowseTargetId ?? null
+  const screenReaderController = createWritingAidsController({
+    ...options,
+    typewriter: true,
+  })
+  const screenReaderSelection = screenReaderController.handleSelectionChange() as {
+    scroll?: boolean
+  }
+  const screenReaderBlock = screenReaderTargetId
+    ? focusAuthority.blocks.find((block) => block.id === screenReaderTargetId)
+    : undefined
+  const screenReaderCaretStealingEquivalent =
+    screenReaderSelection.scroll === true ||
+    (screenReaderTargetId !== null &&
+      (!screenReaderBlock || screenReaderBlock.dimmed))
+
+  return Object.freeze({
+    resolved,
+    focusAuthority,
+    mutations: Object.freeze(
+      (
+        [
+          ['center-default', centerDefaultEquivalent],
+          ['blur-focus', blurFocusEquivalent],
+          ['scroll-loop', scrollLoopEquivalent],
+          ['stale-epoch-task', staleEpochTaskEquivalent],
+          [
+            'screen-reader-caret-stealing',
+            screenReaderCaretStealingEquivalent,
+          ],
+        ] as [MarkdownWritingAidsAcceptanceMutationKind, boolean][]
+      ).map(([kind, equivalent]) =>
+        Object.freeze({ kind, equivalent, accepted: equivalent }),
+      ),
+    ),
+  })
+}
+
 export interface MarkdownEditorWritingAidsController {
   readonly options: MarkdownEditorResolvedWritingAids
   readonly state: MarkdownEditorWritingAidsState
