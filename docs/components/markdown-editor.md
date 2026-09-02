@@ -114,9 +114,9 @@ const placeholder = editor.value?.dispatchTransaction({
   cancelled、deleted 与 stale item 不会在当前 caret 复活。
 
 组件不公开 textarea ref、内部 store、DOM/HTML state 或第三方 editor 类型。
-`applyMarkdownEditorCommand` 与 `defaultMarkdownEditorCommands` 仍是可复用的纯
-command transform；`applyMarkdownEditorCommand` 仅用于同步旧调用迁移。新代码通过
-`runMarkdownEditorCommand` 使用稳定 command context，并把 result 交给 dispatcher。
+`defaultMarkdownEditorCommands` 与 consumer commands 合并进同一个 registry，不存在
+兼容 dispatcher 或 per-surface 命令列表。新代码通过 `runMarkdownEditorCommand`
+使用稳定 command context，并把 result 交给 dispatcher。
 
 ## Chrome variants
 
@@ -173,7 +173,9 @@ authority. See the [heavy-feature lifecycle contract](../api/markdown-heavy-feat
 
 所有 command surface 消费同一 `MarkdownEditorCommand` registry。Command 使用稳定
 `key`、`label`、`group`、受控 icon token、shortcut 和 presentation targets；
-`when(context)` 决定是否呈现，`enabled(context)` 决定是否可执行。Shortcut 冲突
+`when(context)` 决定是否呈现，`enabled(context)` 决定是否可执行。`preview` mode
+没有可编辑表面，command 仍按 `when` 列出，但 `enabled` 恒为 false，任何调用路径
+（含 shortcut）都 fail-closed，不能执行。Shortcut 冲突
 必须显式失败，不能由数组顺序决定。Registry 在任何 surface 渲染前拒绝重复/空
 key、空 group、未注册 icon、归一化后冲突的 shortcut，以及旧 `apply` 执行入口。
 

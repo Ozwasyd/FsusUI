@@ -1394,11 +1394,17 @@ export const isMarkdownEditorCommandVisible = (
   context: MarkdownEditorCommandContext,
 ) => command.when?.(context) ?? true
 
+/**
+ * `preview` has no editable surface, so commands stay listed but cannot run —
+ * the same fail-closed rule the attachment, clipboard, code, language-tool, and
+ * live-selection pipelines already apply. `when` still owns presentation.
+ */
 export const isMarkdownEditorCommandEnabled = (
   command: MarkdownEditorCommand,
   context: MarkdownEditorCommandContext,
 ) =>
   !context.readonly &&
+  context.mode !== 'preview' &&
   !context.signal.aborted &&
   (command.enabled?.(context) ?? true)
 
