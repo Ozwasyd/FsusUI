@@ -83,18 +83,18 @@
   </Style>
 
   <Style Selector="fsus|FsusLink.fsus-success">
-    <Setter Property="Foreground" Value="#16A34A" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentLinkSuccessColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusLink.fsus-warning">
-    <Setter Property="Foreground" Value="#D97706" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentLinkWarningColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusLink.fsus-danger">
-    <Setter Property="Foreground" Value="#DC2626" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentLinkDangerColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusLink.fsus-info">
-    <Setter Property="Foreground" Value="#71717A" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentLinkInfoColorBrush}" />
   </Style>
 </Styles>

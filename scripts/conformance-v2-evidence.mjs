@@ -868,10 +868,14 @@ const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
 }
 const normalizeWeb = (evidence) => {
   const markdown = evidence.publicState.markdown
+  const normalizedMarkdownName = (value) =>
+    value
+      .replace(/^markdown\s*源码\s*编辑区$/iu, 'markdown editor')
+      .replace(/^markdown source$/iu, 'markdown editor')
   const node = evidence.browserAccessibility.nodes.find(
     (entry) =>
       entry.role === 'textbox' &&
-      /^markdown editor source$/i.test(entry.name ?? ''),
+      /^markdown editor$/i.test(normalizedMarkdownName(entry.name ?? '')),
   )
   if (!node) fail('web.accessibility.nodes markdown textbox missing')
   return {
@@ -887,7 +891,9 @@ const normalizeWeb = (evidence) => {
     ),
     a11y: {
       role: node.role === 'textbox' ? 'edit' : node.role,
-      name: (node.name ?? '').replace(/ source$/i, ''),
+      name: normalizedMarkdownName(node.name ?? '')
+        .replace(/ source$/i, '')
+        .toLowerCase(),
       value: node.value,
       states: {
         disabled: node.states.disabled,
@@ -917,7 +923,7 @@ const normalizeAvalonia = (evidence) => {
       .map((entry) => entry.name),
     a11y: {
       role: node.role,
-      name: node.name,
+      name: (node.name ?? '').toLowerCase(),
       value: node.value,
       states: {
         disabled: node.states.disabled,

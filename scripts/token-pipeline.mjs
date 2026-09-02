@@ -427,6 +427,22 @@ export const toAvaloniaColorSyntax = (value) =>
     (_, color) => `#${color.slice(6, 8)}${color.slice(0, 6)}`,
   )
 
+const toAvaloniaShadowSyntax = (value) =>
+  toAvaloniaColorSyntax(value)
+    .replace(
+      /\brgba\(\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+(?:\.\d+)?)\s*\)/gu,
+      (_, r, g, b, a) => {
+        const alpha = Math.round(Number(a) * 255)
+          .toString(16)
+          .padStart(2, '0')
+          .toUpperCase()
+        const channel = (value) =>
+          Number(value).toString(16).padStart(2, '0').toUpperCase()
+        return `#${alpha}${channel(r)}${channel(g)}${channel(b)}`
+      },
+    )
+    .replace(/\b(\d+)px\b/gu, '$1')
+
 const numericValue = (value) => {
   const number = Number(stripUnit(value))
   if (!Number.isFinite(number)) {
@@ -621,8 +637,11 @@ const renderAvaloniaXaml = (source, tokenMap) => {
 
   for (const token of source.tokens) {
     const key = pascalName(token.name)
+    const resolvedValue = resolveValue(token, tokenMap)
     const value = xmlEscape(
-      toAvaloniaColorSyntax(resolveValue(token, tokenMap)),
+      token.type === 'shadow'
+        ? toAvaloniaShadowSyntax(resolvedValue)
+        : toAvaloniaColorSyntax(resolvedValue),
     )
     const kind = avaloniaResourceKindForToken(token)
 
@@ -632,9 +651,17 @@ const renderAvaloniaXaml = (source, tokenMap) => {
       for (const modeName of Object.keys(token.modeValues ?? {})) {
         const modeKey = `${key}${csharpName(modeName)}`
         const modeValue = xmlEscape(
-          toAvaloniaColorSyntax(
-            resolveValue(token, tokenMap, new Set(), modeName),
-          ),
+          (() => {
+            const modeResolved = resolveValue(
+              token,
+              tokenMap,
+              new Set(),
+              modeName,
+            )
+            return token.type === 'shadow'
+              ? toAvaloniaShadowSyntax(modeResolved)
+              : toAvaloniaColorSyntax(modeResolved)
+          })(),
         )
         lines.push(`  <Color x:Key="${modeKey}">${modeValue}</Color>`)
         lines.push(
@@ -716,7 +743,11 @@ const renderAvaloniaXaml = (source, tokenMap) => {
 
 const renderCsharpAccessorLines = (token, tokenMap) => {
   const name = csharpName(token.name)
-  const value = toAvaloniaColorSyntax(resolveValue(token, tokenMap))
+  const resolvedValue = resolveValue(token, tokenMap)
+  const value =
+    token.type === 'shadow'
+      ? toAvaloniaShadowSyntax(resolvedValue)
+      : toAvaloniaColorSyntax(resolvedValue)
   const kind = avaloniaResourceKindForToken(token)
   const escapedValue = csharpEscape(value)
 
@@ -828,8 +859,11 @@ const renderCsharp = (source, tokenMap) => {
   for (const token of source.tokens) {
     const name = csharpName(token.name)
     const resourceKey = pascalName(token.name)
+    const resolvedValue = resolveValue(token, tokenMap)
     const value = csharpEscape(
-      toAvaloniaColorSyntax(resolveValue(token, tokenMap)),
+      token.type === 'shadow'
+        ? toAvaloniaShadowSyntax(resolvedValue)
+        : toAvaloniaColorSyntax(resolvedValue),
     )
     lines.push(`    public const string ${name}Name = "${token.name}";`)
     lines.push(`    public const string ${name}ResourceKey = "${resourceKey}";`)
@@ -837,9 +871,17 @@ const renderCsharp = (source, tokenMap) => {
     for (const modeName of Object.keys(token.modeValues ?? {})) {
       const suffix = csharpName(modeName)
       const modeValue = csharpEscape(
-        toAvaloniaColorSyntax(
-          resolveValue(token, tokenMap, new Set(), modeName),
-        ),
+        (() => {
+          const modeResolved = resolveValue(
+            token,
+            tokenMap,
+            new Set(),
+            modeName,
+          )
+          return token.type === 'shadow'
+            ? toAvaloniaShadowSyntax(modeResolved)
+            : toAvaloniaColorSyntax(modeResolved)
+        })(),
       )
       lines.push(
         `    public const string ${name}${suffix}ResourceKey = "${resourceKey}${suffix}";`,
@@ -1068,7 +1110,9 @@ const lintOutputSnapshots = () => {
   })) {
     const actualHash = sha256(files[relativePath])
     if (snapshot[key] !== actualHash) {
-      throw new Error(`Token output snapshot ${key} is stale`)
+      throw new Error(
+        `Token output snapshot ${key} is stale: expected=${snapshot[key]} actual=${actualHash}`,
+      )
     }
   }
 }

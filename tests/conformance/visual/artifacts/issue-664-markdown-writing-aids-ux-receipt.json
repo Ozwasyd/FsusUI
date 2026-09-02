@@ -1,0 +1,84 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "2814f61b3df70b7abb1b3bd998972882f034f9d9bd63d861295ed7c1078d46f3",
+  "candidateSha": "e3fa86e05c8b320d465b735aa04fc83ea50df154",
+  "candidateDigest": "e1da709e87ff3864559ae69e95738c778b41575040dfac3e43aa410b5e5c0482",
+  "verificationClass": "ux-path",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+    "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+    "9c2978edf8798844fbe50cdac75f647e4d2568ed6bce396c3c09e2b296cfab9e",
+    "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+  ],
+  "activeBaselineIdentityDigest": "dc551adeab30e53df0748a3b84f5cddf6d40eb154c229c2034e283452fdaa144",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "0608ef7f297869b0a9987c635e280e692516fad73c78209617ae98597f7ef1bc",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "desktop Chromium",
+      "state": "focus, explicit reveal, exact selection and source anchor",
+      "theme": "light",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "zoom"
+      ],
+      "evidenceDigest": "4052ef50689c81e3359f4238b15c9d0ee46feab112c0273f2f91119aa53acce9"
+    },
+    {
+      "viewport": "390x844 RTL Chromium simulation",
+      "state": "focus, typewriter, reduced motion and 150/200 percent zoom",
+      "theme": "dark",
+      "inputModes": [
+        "touch",
+        "screen-reader",
+        "reduced-motion",
+        "zoom"
+      ],
+      "evidenceDigest": "ab72dbeac040bf41970d4015a524bb547368dd8767786e082b202553cd2331fd"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "issue-664-writing-aids-light-desktop",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-664-writing-aids-light-desktop.png",
+      "digest": "4052ef50689c81e3359f4238b15c9d0ee46feab112c0273f2f91119aa53acce9",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-664-writing-aids-dark-mobile-zoom-200",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-664-writing-aids-dark-mobile-zoom-200.png",
+      "digest": "ab72dbeac040bf41970d4015a524bb547368dd8767786e082b202553cd2331fd",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-664-writing-aids-accessibility-tree",
+      "kind": "accessibility-tree",
+      "path": "tests/conformance/accessibility/artifacts/automation/issue-664-markdown-writing-aids-tree.txt",
+      "digest": "f2c435879591f1517d29592d8bde1dc8bda9e05d6b376eac0b4ab1db49b14bcd",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "issue-664-local-simulation-limitations",
+      "kind": "screen-reader-report",
+      "path": "tests/conformance/visual/artifacts/issue-664-markdown-writing-aids-local-simulation-limitations.json",
+      "digest": "1ae65251c37b3b5169fc23166c8dfd9ac456871cd487634970005efe110b0868",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "8b5a6366b78874d3fa396158751587d54539bd6bb0ee0ca4328cdee539568ce9"
+}

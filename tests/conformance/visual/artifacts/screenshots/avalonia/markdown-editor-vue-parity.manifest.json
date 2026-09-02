@@ -1,7 +1,7 @@
 {
   "component": "markdown-editor",
   "runner": "headless-skia",
-  "screenshot": "/Users/brevis/Desktop/repos/FsusUI/tests/conformance/visual/artifacts/screenshots/avalonia/markdown-editor-vue-parity.png",
+  "screenshot": "/mnt/dev-cache/lyuaoss/FsusUI-writing-aids-outline/tests/conformance/visual/artifacts/screenshots/avalonia/markdown-editor-vue-parity.png",
   "surfaceBounds": [
     0,
     0,

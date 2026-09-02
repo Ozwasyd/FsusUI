@@ -33,6 +33,9 @@ interface FsusAuditAttributes {
   'data-markdown-layout-smooth'?: string | boolean
   'data-markdown-live-decorations'?: string | boolean
   'data-markdown-input-authority'?: string | boolean
+  'data-markdown-anchor-id'?: string
+  'data-markdown-anchor-epoch'?: string | number
+  'data-markdown-anchor-projection'?: string
   'data-kind'?: string | boolean
   'data-node-id'?: string | boolean
   'data-role'?: string | boolean
@@ -64,6 +67,9 @@ declare module '@vue/runtime-dom' {
     'data-markdown-layout-smooth'?: string | boolean
     'data-markdown-live-decorations'?: string | boolean
     'data-markdown-input-authority'?: string | boolean
+    'data-markdown-anchor-id'?: string
+    'data-markdown-anchor-epoch'?: string | number
+    'data-markdown-anchor-projection'?: string
     'data-kind'?: string | boolean
     'data-node-id'?: string | boolean
     'data-role'?: string | boolean

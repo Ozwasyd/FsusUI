@@ -26,7 +26,7 @@
           BorderBrush="{TemplateBinding BorderBrush}"
           BorderThickness="{TemplateBinding BorderThickness}"
           Padding="{TemplateBinding Padding}"
-          CornerRadius="6">
+          CornerRadius="{DynamicResource FsusComponentButtonRadius}">
           <ContentPresenter
             Content="{TemplateBinding Content}"
             ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -48,7 +48,7 @@
   </Style>
 
   <Style Selector="fsus|FsusCheckboxButton.fsus-checked /template/ Border">
-    <Setter Property="BoxShadow" Value="0 2 8 0 #0F172A0A" />
+    <Setter Property="BoxShadow" Value="{DynamicResource FsusShadowPanelLighter}" />
   </Style>
 
   <Style Selector="fsus|FsusCheckboxButton.fsus-disabled">
