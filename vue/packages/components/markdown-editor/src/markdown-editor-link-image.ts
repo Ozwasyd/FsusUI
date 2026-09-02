@@ -10,6 +10,7 @@ import {
 } from '../../../wasm/markdown-runtime'
 import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
 import {
+  commitMarkdownAttachmentResult,
   createMarkdownAttachmentBatch,
   type MarkdownAttachmentBatchIntent,
   type MarkdownAttachmentInputFile,
@@ -640,6 +641,9 @@ export const evaluateMarkdownImagePropertyMutations = (
 ) => {
   const range = { start: 0, end: source.length }
   const decomposed = decomposeMarkdownImageNode(source, range)
+  if (!decomposed) {
+    throw new Error('Image property mutation fixture is unavailable.')
+  }
   const altEdit = planMarkdownImageAltEdit(source, range, 'new alt')
   const isWholeNodeRewrite =
     altEdit.changes.length === 1 &&
@@ -654,17 +658,103 @@ export const evaluateMarkdownImagePropertyMutations = (
     version: 1,
   })
 
+  // dom-attributes mutant: re-derive properties from rendered `<img>` attribute
+  // values. HTML attributes carry the unescaped value, so the mutant loses the
+  // raw source bytes that the projection authority preserves.
+  const escapedSource = '![CJK \\] alt](https://cdn.example/pic.png "t")'
+  const escaped = decomposeMarkdownImageNode(escapedSource, {
+    start: 0,
+    end: escapedSource.length,
+  })
+  if (!escaped) {
+    throw new Error('Escaped image mutation fixture is unavailable.')
+  }
+  const renderedAttributes = `<img alt="${escaped.alt.value}" src="${escaped.destination.value}">`
+  const domAttributeAlt = /alt="([^"]*)"/.exec(renderedAttributes)?.[1] ?? null
+
+  // ai-alt mutant: backfill an empty alt from the title or destination file
+  // name. The authority keeps alt independent and never backfills.
+  const emptyAltSource = '![](/media/sunset.png "Sunset")'
+  const emptyAlt = decomposeMarkdownImageNode(emptyAltSource, {
+    start: 0,
+    end: emptyAltSource.length,
+  })
+  if (!emptyAlt) {
+    throw new Error('Empty-alt image mutation fixture is unavailable.')
+  }
+  const backfilledAlt =
+    emptyAlt.alt.value ||
+    emptyAlt.title?.value ||
+    emptyAlt.destination.value.split('/').pop() ||
+    ''
+
+  // attachment-resurrection mutant: replay a late replace result after the
+  // image node was deleted. The lifecycle guard must reject the commit.
+  const replaceIdentity: MarkdownDocumentIdentity = {
+    id: 'image-mutation',
+    epoch: 2,
+  }
+  const replaceIntent = planMarkdownImageAttachmentReplace({
+    source,
+    imageRange: range,
+    documentIdentity: replaceIdentity,
+    revision: 6,
+    file: { name: 'late.png', mimeType: 'image/png', byteLength: 10 },
+  })
+  const lateReplace = commitMarkdownAttachmentResult({
+    documentIdentity: replaceIdentity,
+    revision: 6,
+    nodeStatus: 'deleted',
+    result: {
+      status: 'resolved',
+      batchId: replaceIntent.batchId,
+      itemId: replaceIntent.items[0]!.itemId,
+      documentIdentity: replaceIdentity,
+      revision: 6,
+      payload: {
+        markdownKind: 'image',
+        href: '/media/late.png',
+        mimeType: 'image/png',
+      },
+    },
+  })
+
   return Object.freeze({
     decomposed,
+    evidence: Object.freeze({
+      domAttributes: Object.freeze({
+        authorityAltRaw: escaped.alt.raw,
+        mutantRenderedAlt: domAttributeAlt,
+      }),
+      aiAlt: Object.freeze({
+        authorityAlt: emptyAlt.alt.value,
+        mutantBackfill: backfilledAlt,
+      }),
+      unsafePreview: Object.freeze({
+        dangerousState: unsafeUrl.state,
+        dangerousOpenAllowed: unsafeUrl.open.allowed,
+      }),
+      wholeNodeRewrite: Object.freeze({
+        altEditChangeCount: altEdit.changes.length,
+        altEditFrom: altEdit.changes[0]!.from,
+        altEditTo: altEdit.changes[0]!.to,
+        nodeStart: range.start,
+        nodeEnd: range.end,
+      }),
+      attachmentResurrection: Object.freeze({
+        mutantCommitStatus: lateReplace.status,
+        mutantCommitAccepted: lateReplace.accepted,
+      }),
+    }),
     mutations: Object.freeze([
       Object.freeze({
         kind: 'dom-attributes' as const,
-        equivalent: false,
+        equivalent: domAttributeAlt === escaped.alt.raw,
         accepted: false,
       }),
       Object.freeze({
         kind: 'ai-alt' as const,
-        equivalent: false,
+        equivalent: backfilledAlt === emptyAlt.alt.value,
         accepted: false,
       }),
       Object.freeze({
@@ -679,7 +769,7 @@ export const evaluateMarkdownImagePropertyMutations = (
       }),
       Object.freeze({
         kind: 'attachment-resurrection' as const,
-        equivalent: false,
+        equivalent: lateReplace.accepted === true,
         accepted: false,
       }),
     ]),
@@ -696,6 +786,45 @@ export const evaluateMarkdownPropertyMutations = () => {
   const node = projection.nodes.find((candidate) => candidate.kind === 'link')
   if (!node) throw new Error('Link projection mutation fixture is unavailable.')
   const authority = parseMarkdownLinkNode(source, node)
+
+  // regex-dom mutant: re-derive label/destination from the raw text with a
+  // naive regex and re-read the href from the normalized DOM anchor. The
+  // regex captures through the title boundary and the DOM normalizes the
+  // href bytes, so neither reproduces the projection ranges.
+  const titledSource = '[Docs](https://safe.test "Title")'
+  const titledProjection = stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(titledSource),
+    identity,
+  )
+  const titledNode = titledProjection.nodes.find(
+    (candidate) => candidate.kind === 'link',
+  )
+  if (!titledNode) {
+    throw new Error('Link destination mutation fixture is unavailable.')
+  }
+  const titledAuthority = parseMarkdownLinkNode(titledSource, titledNode)
+  const regexMatch = /\[([^\]]*)\]\(([^)]*)\)/.exec(titledSource)
+  const regexLabel = regexMatch?.[1] ?? null
+  const regexUrl = regexMatch?.[2] ?? null
+  const domHref = new URL(authority.url ?? '', 'https://surface.test').href
+
+  // hover-only mutant: a pointer-only surface locates the source node by
+  // searching for the hovered label text, which selects the wrong duplicate.
+  const duplicateSource = '[Docs](https://one.test) then [Docs](https://two.test)'
+  const duplicateProjection = stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(duplicateSource),
+    identity,
+  )
+  const duplicateNodes = duplicateProjection.nodes.filter(
+    (candidate) => candidate.kind === 'link',
+  )
+  const secondNode = duplicateNodes[1]
+  if (!secondNode) {
+    throw new Error('Duplicate link mutation fixture is unavailable.')
+  }
+  const hoveredAuthority = parseMarkdownLinkNode(duplicateSource, secondNode)
+  const textSearchStart = duplicateSource.indexOf(hoveredAuthority.labelText)
+
   const propertyEdit = planMarkdownLinkPropertyEdit(
     source,
     authority,
@@ -716,14 +845,48 @@ export const evaluateMarkdownPropertyMutations = () => {
     { from: 0, to: source.length, insert: 'plain text' },
   )
 
+  const deletedNodeStatus = deletedProjection.resolve(authority.nodeId).status
+
   return Object.freeze({
     authority,
+    evidence: Object.freeze({
+      regexDom: Object.freeze({
+        authorityLabelText: titledAuthority.labelText,
+        authorityUrl: titledAuthority.url,
+        authorityTitle: titledAuthority.title,
+        mutantRegexLabel: regexLabel,
+        mutantRegexUrl: regexUrl,
+        mutantDomHref: domHref,
+      }),
+      wholeNodeRewrite: Object.freeze({
+        editChangeCount: propertyEdit.changes.length,
+        editFrom: propertyEdit.changes[0]!.from,
+        authorityFullStart: authority.ranges.full.start,
+        authorityFullEnd: authority.ranges.full.end,
+      }),
+      hoverOnly: Object.freeze({
+        hoveredLabelText: hoveredAuthority.labelText,
+        authorityNodeStart: hoveredAuthority.ranges.full.start,
+        mutantTextSearchStart: textSearchStart,
+      }),
+      unsafeUrl: Object.freeze({
+        dangerousState: unsafe.state,
+        dangerousOpenAllowed: unsafe.open.allowed,
+      }),
+      staleNodeCommit: Object.freeze({
+        resolvedNodeStatus: deletedNodeStatus,
+      }),
+      staleProperty: Object.freeze({
+        plannedExpectedRevision: propertyEdit.expectedRevision,
+      }),
+    }),
     mutations: Object.freeze([
       Object.freeze({
         kind: 'regex-dom' as const,
         equivalent:
-          authority.nodeId === '' ||
-          authority.ranges.full.start === authority.ranges.label.start,
+          regexLabel === titledAuthority.labelText &&
+          regexUrl === titledAuthority.url &&
+          domHref === authority.url,
         accepted: false,
       }),
       Object.freeze({
@@ -735,7 +898,7 @@ export const evaluateMarkdownPropertyMutations = () => {
       }),
       Object.freeze({
         kind: 'hover-only' as const,
-        equivalent: authority.nodeId.length === 0,
+        equivalent: textSearchStart === hoveredAuthority.ranges.full.start,
         accepted: false,
       }),
       Object.freeze({
@@ -745,8 +908,7 @@ export const evaluateMarkdownPropertyMutations = () => {
       }),
       Object.freeze({
         kind: 'stale-node-commit' as const,
-        equivalent:
-          deletedProjection.resolve(authority.nodeId).status === 'current',
+        equivalent: deletedNodeStatus === 'current',
         accepted: false,
       }),
       Object.freeze({
