@@ -28,13 +28,13 @@
       "path": "spec/tokens/tokens.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "09262677ffabf44dc0895f434d27dec50b448ccf1d6dfceac8c60a06e001e964"
+      "digest": "5ddb82979d0ef3a574f653ac185e57fa162a11624b5fd58ec2ce3ce48e5fe5c2"
     },
     "component-contracts": {
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "2f4c5e5d205f9193f689c800bc4de0324b5e799a47a3ca56d6a7257e6cff5be6"
+      "digest": "6c411943d52e2b9c39a55016348c4a5841507e48226b096efc52b7c76456efc3"
     },
     "component-select": {
       "path": "docs/components/select.md",
@@ -82,7 +82,7 @@
       "path": "vue/packages/theme-chalk/src/dialog.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "2238cb483fd7ed38c75012a0dc75696384bb89814bb13b3c5a8410224e50c85b"
+      "digest": "212ecdb7f1d79314338ad9566b037cca7fba4299945cd8e150d22f006a94b8c1"
     }
   },
   "rules": [
