@@ -286,6 +286,7 @@
       :data-markdown-atomic-status="liveAtomic?.state || undefined"
       :data-markdown-layout-action="liveLayout.action"
       :data-markdown-layout-smooth="liveLayout.smooth ? 'true' : 'false'"
+      @scroll="handlePreviewScroll"
     >
       <pre
         v-if="writingAidsFocusState.enabled"
@@ -499,7 +500,6 @@
             :key="action.key"
             type="button"
             role="menuitem"
-            :data-group="action.group"
             :title="action.title"
             :aria-label="action.title"
             @click="runTableContextAction(action.key)"
@@ -674,7 +674,6 @@
         :features="previewFeatures"
         :loading-text="localeText.states.loading"
         mode="editor"
-        @scroll="handlePreviewScroll"
         @features-activated="emitRenderEvent('features-activated', $event)"
         @render-complete="handlePreviewRenderComplete($event)"
         @render-error="emitRenderEvent('render-error', $event)"
@@ -1391,7 +1390,6 @@ const commandsExpanded = ref(false)
 const tableMenuOpen = ref(false)
 const tableMenuRef = ref<HTMLElement | null>(null)
 const tableMenuTriggerRef = ref<HTMLButtonElement | null>(null)
-const previewRef = ref<HTMLElement | { $el?: HTMLElement } | null>(null)
 const retainedPreviewScrollLeft = ref(0)
 const visualViewportHeight = ref(0)
 const visualViewportOffsetTop = ref(0)
@@ -4697,8 +4695,12 @@ const emitRenderEvent = (
 
 const handlePreviewRenderComplete = (payload: unknown) => {
   emitRenderEvent('render-complete', payload)
-  applyTypewriterScroll('async-layout')
   restorePreviewScroll()
+  void nextTick(syncRenderedSearchHighlights)
+}
+
+const handleRendererComplete = (payload: unknown) => {
+  emitRenderEvent('render-complete', payload)
   void nextTick(syncRenderedSearchHighlights)
 }
 
