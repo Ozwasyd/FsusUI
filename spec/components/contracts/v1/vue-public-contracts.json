@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "fcd979b3d79a9a85e4ea6b08b789fca58ef6fadd7bb1edaeca40585a800e3767",
+    "hash": "24c5ec4bff6e2af8637670b8ec502470ffe535a1975ac6721beede45a2fa5a53",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c"
@@ -9752,6 +9752,18 @@
           "required": false
         },
         {
+          "name": "embedProvider",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "focusExemptions",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "imageActionLabel",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -9932,6 +9944,12 @@
           "required": false
         },
         {
+          "name": "writingAids",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "writingPlaceholder",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -9949,6 +9967,14 @@
         },
         {
           "name": "command",
+          "payload": "vue-source"
+        },
+        {
+          "name": "embed-open-source",
+          "payload": "vue-source"
+        },
+        {
+          "name": "embed-retry",
           "payload": "vue-source"
         },
         {
@@ -10009,6 +10035,10 @@
           "signature": "vue-source"
         },
         {
+          "name": "closeSearch",
+          "signature": "vue-source"
+        },
+        {
           "name": "dispatchTransaction",
           "signature": "vue-source"
         },
@@ -10021,11 +10051,43 @@
           "signature": "vue-source"
         },
         {
+          "name": "openSearch",
+          "signature": "vue-source"
+        },
+        {
           "name": "redo",
           "signature": "vue-source"
         },
         {
+          "name": "revealHeading",
+          "signature": "vue-source"
+        },
+        {
+          "name": "revealSourceRange",
+          "signature": "vue-source"
+        },
+        {
+          "name": "searchNavigate",
+          "signature": "vue-source"
+        },
+        {
+          "name": "searchReplaceAll",
+          "signature": "vue-source"
+        },
+        {
+          "name": "searchReplaceCurrent",
+          "signature": "vue-source"
+        },
+        {
+          "name": "searchUi",
+          "signature": "vue-source"
+        },
+        {
           "name": "undo",
+          "signature": "vue-source"
+        },
+        {
+          "name": "writingAidsController",
           "signature": "vue-source"
         }
       ],

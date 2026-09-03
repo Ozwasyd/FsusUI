@@ -1,3 +1,7 @@
+import {
+  collectMarkdownAnchorNodes,
+  type MarkdownAnchorValidNode,
+} from '../../../wasm/markdown-anchor-grammar'
 import type { MarkdownEditorMode } from './markdown-editor-live-contract'
 import type {
   MarkdownEditorDocumentIdentity,
@@ -211,8 +215,38 @@ export const htmlToSafePlainText = (html: string) => {
   return output.replace(/\u00a0/g, ' ')
 }
 
+/**
+ * A visible copy never carries a block anchor marker; the exact Markdown copy
+ * does. The grammar authority is the only place that decides what a marker is,
+ * so literal `^id` text inside fenced/atomic blocks survives untouched.
+ */
+const stripMarkdownAnchorMarkers = (source: string) => {
+  const markers = collectMarkdownAnchorNodes(source)
+    .filter((node): node is MarkdownAnchorValidNode => node.ok)
+    .map((node) => {
+      const start = node.ranges.marker.start
+      const end = node.ranges.marker.end
+      if (node.placement === 'line-end') {
+        return { end, start: start > 0 && source[start - 1] === ' ' ? start - 1 : start }
+      }
+      let exclusiveEnd = end
+      if (source[exclusiveEnd] === '\r') exclusiveEnd += 1
+      if (source[exclusiveEnd] === '\n') exclusiveEnd += 1
+      return { end: exclusiveEnd, start }
+    })
+    .sort((left, right) => left.start - right.start)
+  if (markers.length === 0) return source
+  let text = ''
+  let cursor = 0
+  for (const marker of markers) {
+    text += source.slice(cursor, marker.start)
+    cursor = marker.end
+  }
+  return `${text}${source.slice(cursor)}`
+}
+
 export const visibleTextFromMarkdownSource = (source: string) => {
-  let text = source.replace(INTERNAL_TOKEN, '')
+  let text = stripMarkdownAnchorMarkers(source).replace(INTERNAL_TOKEN, '')
   text = text.replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
   text = text.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
   text = text.replace(/```[^\n]*\n?([\s\S]*?)```/g, '$1')

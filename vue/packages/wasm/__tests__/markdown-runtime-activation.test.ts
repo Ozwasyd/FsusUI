@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { activateMarkdownFeatures } from '../markdown-runtime'
+import { activateMarkdownHeavyFeatures } from '../markdown-heavy-feature-activation'
+import { registerMarkdownHeavyFeatureIsolatedRenderFactory } from '../markdown-heavy-feature-resource'
+import {
+  createMarkdownHeavyFeatureLifecycle,
+  type MarkdownHeavyFeatureKind,
+} from '../../hooks/use-markdown-heavy-feature-lifecycle'
 import { getMarkdownXssFeatureOutput } from '../../../tests/support/markdown-xss-corpus'
 
 const featureModuleMocks = vi.hoisted(() => ({
@@ -87,9 +93,7 @@ describe('markdown feature activation runtime', () => {
 
     featureModuleMocks.katexLoad.mockResolvedValue(undefined)
     featureModuleMocks.mermaidRender.mockImplementation((id: string) => {
-      const output = getMarkdownXssFeatureOutput(
-        'mxss-feature-mermaid-script',
-      )
+      const output = getMarkdownXssFeatureOutput('mxss-feature-mermaid-script')
       return {
         svg: output.payload.replaceAll(output.rootId!, id),
       }
@@ -171,9 +175,7 @@ describe('markdown feature activation runtime', () => {
     featureModuleMocks.mermaidRender.mockImplementation(async (id: string) => {
       started.push('mermaid')
       await mermaid.promise
-      const output = getMarkdownXssFeatureOutput(
-        'mxss-feature-mermaid-script',
-      )
+      const output = getMarkdownXssFeatureOutput('mxss-feature-mermaid-script')
       return {
         svg: output.payload.replaceAll(output.rootId!, id),
       }
@@ -376,7 +378,7 @@ describe('markdown feature activation runtime', () => {
     root.innerHTML = [
       '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"></figure>',
       '<span class="markdown-renderer__latex" data-latex-rendered="katex"><span class="katex"></span></span>',
-      '<pre data-code-highlighted="shiki"><code class="language-ts">already highlighted</code></pre>',
+      '<pre data-code-highlighted="shiki" data-markdown-feature-language="ts" data-markdown-feature-theme="light"><code>already highlighted</code></pre>',
     ].join('')
 
     const result = await activateMarkdownFeatures({ root })
@@ -386,6 +388,113 @@ describe('markdown feature activation runtime', () => {
     expect(featureModuleMocks.mermaidRender).not.toHaveBeenCalled()
     expect(featureModuleMocks.katexRenderToString).not.toHaveBeenCalled()
     expect(featureModuleMocks.shikiCodeToHtml).not.toHaveBeenCalled()
+  })
+
+  it('mounts pre-rendered Mermaid and LaTeX through the shared zero-resource lifecycle', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    const root = document.createElement('article')
+    root.innerHTML = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-rendered="true"><svg role="img"></svg></figure>',
+      '<div class="markdown-renderer__latex" data-latex-rendered="mathml"><math></math></div>',
+    ].join('')
+    const occurrence: Record<MarkdownHeavyFeatureKind, number> = {
+      'code-highlight': 0,
+      latex: 0,
+      mermaid: 0,
+    }
+
+    const result = await activateMarkdownHeavyFeatures({
+      heavyLifecycle: lifecycle,
+      resolveHeavyFeatureIdentity: ({ kind }) => ({
+        config: 'material-only',
+        documentEpoch: 1,
+        documentKey: 'doc-a',
+        featureKind: kind,
+        gatewayVersion: 'gateway@2',
+        locale: 'locale-independent',
+        nodeId: `${kind}-${occurrence[kind]++}`,
+        rendererVersion: 'renderer@1',
+        revision: 1,
+        sourceIdentity: 'source-a',
+        theme: kind === 'latex' ? 'token-bound' : 'light',
+      }),
+      root,
+    })
+
+    expect(result).toEqual({ activated: [], errors: [] })
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 0,
+      retainedResources: 0,
+      staticNodes: 2,
+    })
+    expect(featureModuleMocks.mermaidRender).not.toHaveBeenCalled()
+    expect(featureModuleMocks.katexRenderToString).not.toHaveBeenCalled()
+  })
+
+  it('fails closed when lifecycle identity cannot be resolved', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    const root = document.createElement('article')
+    root.innerHTML =
+      '<pre><code class="language-typescript">const unresolved = true</code></pre>'
+
+    const result = await activateMarkdownHeavyFeatures({
+      heavyLifecycle: lifecycle,
+      resolveHeavyFeatureIdentity: () => null,
+      root,
+    })
+
+    expect(result).toEqual({ activated: [], errors: [] })
+    expect(root.querySelector('pre')?.dataset.codeHighlighted).toBeUndefined()
+    expect(lifecycle.metrics()).toMatchObject({
+      activations: 0,
+      cacheEntries: 0,
+      retainedResources: 0,
+    })
+    expect(featureModuleMocks.shikiCodeToHtml).not.toHaveBeenCalled()
+  })
+
+  it('re-highlights an already-mounted code node when its material theme changes', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    featureModuleMocks.shikiCodeToHtml.mockImplementation(
+      async (source, options) =>
+        `<pre class="shiki ${options.theme}"><code><span class="line">${source}</span></code></pre>`,
+    )
+    const root = document.createElement('article')
+    root.dataset.themeResolved = 'light'
+    root.innerHTML =
+      '<pre><code class="language-typescript">const themed = true</code></pre>'
+    const activate = () =>
+      activateMarkdownHeavyFeatures({
+        heavyLifecycle: lifecycle,
+        resolveHeavyFeatureIdentity: ({ kind, theme }) => ({
+          config: '{}',
+          documentEpoch: 1,
+          documentKey: 'doc-a',
+          featureKind: kind,
+          gatewayVersion: 'gateway@2',
+          locale: 'locale-independent',
+          nodeId: 'code-0',
+          rendererVersion: 'renderer@1',
+          revision: 1,
+          sourceIdentity: 'source-a',
+          theme,
+        }),
+        root,
+      })
+
+    await activate()
+    expect(root.querySelector('pre')?.dataset.markdownFeatureTheme).toBe(
+      'light',
+    )
+    root.dataset.themeResolved = 'dark'
+    await activate()
+
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledTimes(2)
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenLastCalledWith(
+      'const themed = true',
+      expect.objectContaining({ lang: 'ts', theme: 'github-dark' }),
+    )
+    expect(root.querySelector('pre')?.dataset.markdownFeatureTheme).toBe('dark')
   })
 
   it('records default adapter failures as activation errors', async () => {
@@ -495,6 +604,139 @@ describe('markdown feature activation runtime', () => {
     expect(
       root.querySelectorAll('[data-markdown-feature-activated]'),
     ).toHaveLength(5)
+  })
+
+  it('reuses immutable mixed feature output through the gateway after remount', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    const markup = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>graph TD\nA--&gt;B</code></figure>',
+      '<span class="markdown-renderer__latex" data-latex-placeholder="true"><code>x^2</code></span>',
+      '<pre><code class="language-typescript">const ok = true</code></pre>',
+    ].join('')
+    const activate = async (root: HTMLElement) => {
+      const occurrence: Record<MarkdownHeavyFeatureKind, number> = {
+        'code-highlight': 0,
+        latex: 0,
+        mermaid: 0,
+      }
+      return activateMarkdownHeavyFeatures({
+        heavyLifecycle: lifecycle,
+        resolveHeavyFeatureIdentity: ({ kind }) => {
+          const node = occurrence[kind]++
+          return {
+            config: 'default',
+            documentEpoch: 1,
+            documentKey: 'doc-a',
+            featureKind: kind,
+            gatewayVersion: 'gateway@1',
+            locale: 'en',
+            nodeId: `${kind}-${node}`,
+            rendererVersion: 'renderer@1',
+            revision: 1,
+            sourceIdentity: 'source-a',
+            theme: 'light',
+          }
+        },
+        root,
+      })
+    }
+
+    const first = document.createElement('article')
+    first.innerHTML = markup
+    await activate(first)
+    expect(lifecycle.metrics()).toMatchObject({
+      activations: 3,
+      cacheEntries: 3,
+      staticNodes: 3,
+    })
+    lifecycle.unmountRoot(first)
+
+    const second = document.createElement('article')
+    second.innerHTML = markup
+    const result = await activate(second)
+
+    expect(result.errors).toEqual([])
+    expect(lifecycle.metrics()).toMatchObject({
+      activations: 3,
+      activeNodes: 0,
+      reuses: 3,
+      staticNodes: 3,
+      teardowns: 3,
+    })
+    expect(featureModuleMocks.mermaidRender).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.katexRenderToString).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledTimes(1)
+    expect(second.querySelector('[data-mermaid-rendered="true"]')).toBeTruthy()
+    expect(second.querySelector('[data-latex-rendered="katex"]')).toBeTruthy()
+    expect(second.querySelector('[data-code-highlighted="shiki"]')).toBeTruthy()
+    expect(second.querySelector('script')).toBeNull()
+    expect(second.querySelector('[onload],[onclick],[onerror]')).toBeNull()
+  })
+
+  it('registers and tears down the real adapter task and abort listener offscreen', async () => {
+    const lifecycle = createMarkdownHeavyFeatureLifecycle()
+    let rejectRender!: (reason: unknown) => void
+    let terminated = false
+    let active = true
+    registerMarkdownHeavyFeatureIsolatedRenderFactory(<T>() => ({
+      promise: new Promise<T>((_resolve, reject) => {
+        rejectRender = reject
+      }),
+      resources: () => ({
+        listeners: active ? 2 : 0,
+        observers: 0,
+        runtimes: active ? 1 : 0,
+        tasks: active ? 1 : 0,
+      }),
+      teardown: () => {
+        if (!active) return
+        active = false
+        terminated = true
+        rejectRender(new DOMException('Aborted', 'AbortError'))
+      },
+    }))
+    const root = document.createElement('article')
+    root.innerHTML =
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>graph TD\nA--&gt;B</code></figure>'
+    const activation = activateMarkdownHeavyFeatures({
+      heavyLifecycle: lifecycle,
+      resolveHeavyFeatureIdentity: ({ kind }) => ({
+        config: 'mermaid-default',
+        documentEpoch: 1,
+        documentKey: 'doc-a',
+        featureKind: kind,
+        gatewayVersion: 'gateway@2',
+        locale: 'locale-independent',
+        nodeId: 'mermaid-0',
+        rendererVersion: 'renderer@1',
+        revision: 1,
+        sourceIdentity: 'source-a',
+        theme: 'light',
+      }),
+      root,
+    })
+
+    await vi.waitFor(() => expect(lifecycle.metrics().activeNodes).toBe(1))
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 1,
+      retainedListeners: 3,
+      retainedResources: 5,
+      retainedRuntimes: 1,
+      retainedTasks: 1,
+    })
+
+    lifecycle.unmountRoot(root)
+    expect(lifecycle.metrics()).toMatchObject({
+      activeNodes: 0,
+      retainedListeners: 0,
+      retainedResources: 0,
+      retainedTasks: 0,
+    })
+    expect(await activation).toEqual({ activated: [], errors: [] })
+    expect(terminated).toBe(true)
+    expect(featureModuleMocks.mermaidRender).not.toHaveBeenCalled()
+    expect(root.querySelector('[data-markdown-feature-activated]')).toBeNull()
+    registerMarkdownHeavyFeatureIsolatedRenderFactory(null)
   })
 
   it('keeps stable feature-kind order when concurrency is one', async () => {

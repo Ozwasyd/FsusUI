@@ -338,8 +338,10 @@
 
   @include e(body) {
     display: grid;
+    position: relative;
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
+    overflow: hidden;
   }
 
   @include m(split) {
@@ -369,6 +371,11 @@
   }
 
   @include e(textarea) {
+    position: relative;
+    z-index: 1;
+    grid-area: 1 / 1;
+    box-sizing: border-box;
+    max-width: 100%;
     min-width: 0;
     resize: vertical;
     border: 0;
@@ -376,6 +383,7 @@
     padding: 16px;
     background: getCssVar('bg-color');
     color: getCssVar('text-color', 'primary');
+    scrollbar-gutter: stable;
     font: inherit;
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
@@ -387,6 +395,58 @@
     }
   }
 
+  @include e(focus-layer) {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    grid-area: 1 / 1;
+    min-width: 0;
+    min-height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 16px;
+    pointer-events: none;
+    background: getCssVar('bg-color');
+    color: getCssVar('text-color', 'primary');
+    scrollbar-color: transparent transparent;
+    scrollbar-gutter: stable;
+    font: inherit;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    &::-webkit-scrollbar,
+    &::-webkit-scrollbar-thumb,
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    @include when(dimmed) {
+      opacity: 0.72;
+    }
+  }
+
+  @include when(focus-mode) {
+    @include e(textarea) {
+      background: transparent;
+      color: transparent;
+
+      &::placeholder {
+        color: getCssVar('text-color', 'placeholder');
+      }
+
+      &::selection {
+        background: var(--fsus-state-selected-bg);
+        color: getCssVar('text-color', 'primary');
+      }
+    }
+  }
+
   @include e(live-decorations) {
     pointer-events: none;
     position: absolute;
@@ -394,6 +454,38 @@
     height: 1px;
     overflow: hidden;
     clip: rect(0 0 0 0);
+  }
+
+  @include e(live-embeds) {
+    display: grid;
+    min-width: 0;
+    gap: var(--fsus-space-3, 12px);
+    padding: var(--fsus-space-4, 16px);
+    border-top: 1px solid getCssVar('border-color-lighter');
+    background: getCssVar('bg-color');
+  }
+
+  @include e(search-highlights) {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  @include e(search-highlight) {
+    position: absolute;
+    top: calc(16px + var(--markdown-search-line) * 1.6em);
+    inset-inline-start: calc(16px + var(--markdown-search-column) * 1ch);
+    width: calc(var(--markdown-search-length) * 1ch);
+    height: 1.6em;
+    background: color-mix(in srgb, var(--el-color-primary) 16%, transparent);
+    outline: 1px solid var(--el-color-primary-light-7);
+
+    @include when(current) {
+      background: color-mix(in srgb, var(--el-color-primary) 28%, transparent);
+      outline-color: var(--fsus-state-focus-border, var(--el-color-primary));
+    }
   }
 
   @include e(preview) {
@@ -485,6 +577,27 @@
       }
     }
 
+    @include e(focus-layer) {
+      justify-self: center;
+      width: min(100%, 74ch);
+      min-height: clamp(
+        30rem,
+        calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
+        68rem
+      );
+      padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
+      background: getCssVar('fill-color', 'blank');
+      font-family:
+        getCssVar('font-family'),
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        sans-serif;
+      font-size: 18px;
+      line-height: 1.84;
+      letter-spacing: 0;
+    }
+
     @include e(preview) {
       padding: clamp(1.25rem, 3vw, 2.5rem);
       line-height: 1.78;
@@ -493,6 +606,14 @@
     @include e(status) {
       gap: 8px 14px;
       background: getCssVar('bg-color');
+    }
+  }
+
+  @include when(focus-mode) {
+    @include e(textarea) {
+      &:focus-visible {
+        background: transparent;
+      }
     }
   }
 
@@ -573,6 +694,18 @@
       }
 
       @include e(textarea) {
+        width: 100%;
+        min-height: clamp(
+          24rem,
+          calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 15rem),
+          52rem
+        );
+        padding: 1.25rem 1rem 1.75rem;
+        font-size: 17px;
+        line-height: 1.78;
+      }
+
+      @include e(focus-layer) {
         width: 100%;
         min-height: clamp(
           24rem,
@@ -1219,4 +1352,195 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@include b(markdown-editor) {
+  @include e(search-bar) {
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    inset-inline-end: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 8px;
+    border: 1px solid getCssVar('border-color-lighter');
+    border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+    background: var(--fsus-surface-overlay, var(--el-bg-color-overlay));
+    box-shadow: var(--fsus-shadow-subtle, 0 4px 12px rgb(0 0 0 / 8%));
+    width: min(100%, 640px);
+    min-width: 0;
+    max-width: calc(100% - 16px);
+  }
+
+  @include e(search-row) {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  @include e(search-input) {
+    box-sizing: border-box;
+    flex: 1 1 160px;
+    min-width: min(120px, 100%);
+    max-width: 100%;
+    height: var(--fsus-control-height-compact, 40px);
+    padding: 0 8px;
+    border: 1px solid getCssVar('border-color');
+    border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+    background: getCssVar('bg-color');
+    color: getCssVar('text-color', 'primary');
+    font: inherit;
+    font-size: 12px;
+    outline: none;
+
+    &:focus-visible {
+      border-color: var(--fsus-state-focus-border, var(--el-color-primary));
+      @include a11y-focus-ring(
+        2px,
+        var(--fsus-radius-control, var(--el-border-radius-base))
+      );
+    }
+  }
+
+  @include e(search-count) {
+    font-size: 11px;
+    color: getCssVar('text-color', 'secondary');
+    white-space: nowrap;
+    padding: 0 4px;
+  }
+
+  @include e((search-toggle, search-nav, search-close, search-action)) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--fsus-control-height-compact, 40px);
+    height: var(--fsus-control-height-compact, 40px);
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+    background: transparent;
+    color: getCssVar('text-color', 'regular');
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: var(--fsus-state-hover-bg, var(--el-fill-color-light));
+      color: getCssVar('text-color', 'primary');
+    }
+
+    &:disabled {
+      border-color: getCssVar('disabled-border-color');
+      background: getCssVar('disabled-bg-color');
+      color: getCssVar('disabled-text-color');
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(
+        2px,
+        var(--fsus-radius-control, var(--el-border-radius-base))
+      );
+    }
+
+    @include when(active) {
+      background: getCssVar('fill-color', 'light');
+      border-color: var(--fsus-state-focus-border, var(--el-color-primary));
+      color: getCssVar('text-color', 'primary');
+    }
+  }
+}
+
+.el-markdown-embed {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px 12px;
+  border: 1px solid getCssVar('border-color-lighter');
+  border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+  background: getCssVar('fill-color', 'lighter');
+  color: getCssVar('text-color', 'primary');
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  &__mode-tag {
+    font-size: 11px;
+    padding: 1px 4px;
+    border-radius: var(--fsus-radius-control-small, 4px);
+    background: getCssVar('fill-color', 'light');
+    color: getCssVar('text-color', 'secondary');
+    text-transform: uppercase;
+  }
+
+  &__target {
+    font-family: monospace;
+    font-weight: 500;
+  }
+
+  &__status {
+    font-size: 11px;
+    color: getCssVar('color', 'warning');
+  }
+
+  &__body {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: getCssVar('text-color', 'regular');
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  &__action {
+    display: inline-flex;
+    align-items: center;
+    min-width: var(--fsus-control-height-compact, 40px);
+    min-height: var(--fsus-control-height-compact, 40px);
+    padding: 0 8px;
+    border: 1px solid getCssVar('border-color-lighter');
+    border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+    background: getCssVar('bg-color');
+    color: getCssVar('text-color', 'secondary');
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--fsus-state-hover-bg, var(--el-fill-color-light));
+      color: getCssVar('text-color', 'primary');
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(
+        2px,
+        var(--fsus-radius-control, var(--el-border-radius-base))
+      );
+    }
+  }
+}
+
+::highlight(markdown-search-match) {
+  background: var(--el-color-primary-light-9);
+}
+
+::highlight(markdown-search-current) {
+  background: var(--el-color-primary-light-7);
+  text-decoration: underline var(--fsus-state-focus-border, var(--el-color-primary));
 }

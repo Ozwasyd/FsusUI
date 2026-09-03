@@ -23,6 +23,7 @@ import {
 } from '@element-plus/build-utils'
 import { version } from '../../../../packages/element-plus/version'
 import { ElementPlusAlias } from '../plugins/element-plus-alias'
+import { MarkdownHeavyFeatureFrameUrl } from '../plugins/markdown-heavy-feature-frame'
 import {
   formatBundleFilename,
   generateExternal,
@@ -62,6 +63,9 @@ async function buildFullEntry(minify: boolean) {
         if (id === '@element-plus/wasm') return wasmSourceEntry
       },
     },
+    MarkdownHeavyFeatureFrameUrl({
+      assetFileName: 'markdown-heavy-feature-frame.mjs',
+    }),
     ElementPlusAlias(),
     ...vueMacrosPlugins,
     nodeResolve({

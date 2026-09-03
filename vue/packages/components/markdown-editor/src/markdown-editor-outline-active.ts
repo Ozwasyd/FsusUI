@@ -1,4 +1,8 @@
 import type { MarkdownEditorOutlineItem } from './markdown-editor-outline'
+import type {
+  MarkdownAnchorMap,
+  MarkdownRevealTarget,
+} from '../../../wasm/markdown-runtime'
 
 export interface MarkdownOutlineViewport {
   readonly start: number
@@ -53,7 +57,9 @@ export interface MarkdownOutlineActiveInput {
 }
 
 const sortedItems = (items: readonly MarkdownEditorOutlineItem[]) =>
-  [...items].sort((left, right) => left.sourceRange.start - right.sourceRange.start)
+  [...items].sort(
+    (left, right) => left.sourceRange.start - right.sourceRange.start,
+  )
 
 export const headingIndexAtSourceOffset = (
   items: readonly MarkdownEditorOutlineItem[],
@@ -84,7 +90,8 @@ export const resolveMarkdownOutlineNavigationOwner = (
   if (event === 'typing') return 'typing'
   if (event === 'selection-drag') return 'selection-drag'
   if (event === 'manual-scroll') return 'manual-scroll'
-  if (event === 'search' || event === 'outline' || event === 'typewriter') return event
+  if (event === 'search' || event === 'outline' || event === 'typewriter')
+    return event
   if (
     previous === 'search' ||
     previous === 'outline' ||
@@ -127,8 +134,10 @@ const causeForOwner = (
   if (owner === 'typing') return 'typing'
   if (owner === 'manual-scroll') return 'manual-scroll'
   if (owner === 'selection-drag') return 'selection-drag'
-  if (owner === 'search' || owner === 'outline' || owner === 'typewriter') return owner
-  if (input.selection && input.selection.start !== input.selection.end) return 'selection'
+  if (owner === 'search' || owner === 'outline' || owner === 'typewriter')
+    return owner
+  if (input.selection && input.selection.start !== input.selection.end)
+    return 'selection'
   if (input.caret !== undefined) return 'caret'
   return input.cause ?? 'viewport'
 }
@@ -142,12 +151,16 @@ export const resolveMarkdownOutlineActive = (
     input.previous.documentEpoch === input.documentEpoch
       ? input.previous
       : null
-  const event = input.cause ?? (input.caret !== undefined ? 'caret' : 'viewport')
-  const owner = input.owner ?? resolveMarkdownOutlineNavigationOwner(previous?.owner, event)
+  const event =
+    input.cause ?? (input.caret !== undefined ? 'caret' : 'viewport')
+  const owner =
+    input.owner ?? resolveMarkdownOutlineNavigationOwner(previous?.owner, event)
   const explicit =
     owner === 'search' || owner === 'outline' || owner === 'typewriter'
   if (explicit && previous?.headingId) {
-    const stillThere = input.items.some((item) => item.nodeId === previous.headingId)
+    const stillThere = input.items.some(
+      (item) => item.nodeId === previous.headingId,
+    )
     if (stillThere) {
       return Object.freeze({
         headingId: previous.headingId,
@@ -174,7 +187,11 @@ export const resolveMarkdownOutlineActive = (
 }
 
 export const commitMarkdownOutlineActive = (
-  current: { readonly documentId: string; readonly documentEpoch: number; readonly revision: number },
+  current: {
+    readonly documentId: string
+    readonly documentEpoch: number
+    readonly revision: number
+  },
   result: MarkdownOutlineActiveResult,
 ): MarkdownOutlineActiveResult | { readonly rejected: 'stale' } => {
   if (
@@ -202,13 +219,176 @@ export const resolveMarkdownActiveHeading = (
   return items.find((item) => item.nodeId === active.headingId) ?? null
 }
 
+export interface MarkdownOutlineRevealPlanOptions {
+  readonly expected?: {
+    readonly documentIdentity: { readonly id: string; readonly epoch: number }
+    readonly revision: number
+  }
+  readonly actual?: {
+    readonly documentIdentity: { readonly id: string; readonly epoch: number }
+    readonly revision: number
+  }
+  readonly mode?: string
+  readonly reducedMotion?: boolean
+  readonly anchorMap?: MarkdownAnchorMap
+  readonly virtualTarget?: MarkdownRevealTarget
+  readonly deletedNodeIds?: readonly string[]
+  readonly previousOutline?: readonly MarkdownEditorOutlineItem[]
+}
+
+export interface MarkdownOutlineRevealPlan {
+  readonly status: 'success' | 'deleted' | 'stale' | 'not-found' | 'unsupported'
+  readonly range?: { readonly start: number; readonly end: number }
+  readonly selection?: {
+    readonly start: number
+    readonly end: number
+    readonly direction: 'forward' | 'backward' | 'none'
+  }
+  readonly scroll: boolean
+  readonly smooth: boolean
+  readonly virtualTargetMounted: boolean
+  readonly liveRevealState?: string
+  readonly navigationOwner: MarkdownOutlineNavigationOwner
+  readonly historyMutated: false
+}
+
+const sameDocumentIdentity = (
+  left: { readonly id: string; readonly epoch: number },
+  right: { readonly id: string; readonly epoch: number },
+) => left.id === right.id && left.epoch === right.epoch
+
+const successPlan = (
+  range: { readonly start: number; readonly end: number },
+  options: MarkdownOutlineRevealPlanOptions | undefined,
+  virtualTargetMounted: boolean,
+): MarkdownOutlineRevealPlan =>
+  Object.freeze({
+    status: 'success',
+    range,
+    selection: Object.freeze({
+      start: range.start,
+      end: range.start,
+      direction: 'none' as const,
+    }),
+    scroll: true,
+    smooth: options?.reducedMotion !== true,
+    virtualTargetMounted,
+    liveRevealState: options?.mode === 'live' ? 'marker-reveal' : undefined,
+    navigationOwner: 'outline',
+    historyMutated: false,
+  })
+
 export const planMarkdownOutlineReveal = (
   items: readonly MarkdownEditorOutlineItem[],
   nodeId: string,
-): { readonly status: 'success' | 'not-found'; readonly range?: { readonly start: number; readonly end: number } } => {
+  options?: MarkdownOutlineRevealPlanOptions,
+): MarkdownOutlineRevealPlan => {
+  if (options?.expected && options?.actual) {
+    if (
+      !sameDocumentIdentity(
+        options.expected.documentIdentity,
+        options.actual.documentIdentity,
+      ) ||
+      options.expected.revision !== options.actual.revision
+    ) {
+      return Object.freeze({
+        status: 'stale',
+        scroll: false,
+        smooth: false,
+        virtualTargetMounted: false,
+        navigationOwner: 'none',
+        historyMutated: false,
+      })
+    }
+  }
+
+  if (options?.mode === 'unsupported') {
+    return Object.freeze({
+      status: 'unsupported',
+      scroll: false,
+      smooth: false,
+      virtualTargetMounted: false,
+      navigationOwner: 'none',
+      historyMutated: false,
+    })
+  }
+
+  if (options?.deletedNodeIds?.includes(nodeId)) {
+    return Object.freeze({
+      status: 'deleted',
+      scroll: false,
+      smooth: false,
+      virtualTargetMounted: false,
+      navigationOwner: 'none',
+      historyMutated: false,
+    })
+  }
+
+  if (
+    options?.previousOutline?.some((item) => item.nodeId === nodeId) &&
+    !items.some((item) => item.nodeId === nodeId)
+  ) {
+    return Object.freeze({
+      status: 'deleted',
+      scroll: false,
+      smooth: false,
+      virtualTargetMounted: false,
+      navigationOwner: 'none',
+      historyMutated: false,
+    })
+  }
+
   const item = items.find((entry) => entry.nodeId === nodeId)
-  if (!item) return { status: 'not-found' }
-  return { status: 'success', range: item.sourceRange }
+  if (item) {
+    return successPlan(item.sourceRange, options, false)
+  }
+
+  if (options?.anchorMap) {
+    try {
+      const target = options.anchorMap.reveal({ anchorId: nodeId })
+      if (
+        !options.actual ||
+        sameDocumentIdentity(
+          target.documentIdentity,
+          options.actual.documentIdentity,
+        )
+      ) {
+        return successPlan(target.range, options, target.virtual)
+      }
+    } catch {
+      // Unknown identities fail closed below.
+    }
+  }
+
+  const virtualTarget = options?.virtualTarget
+  if (
+    virtualTarget?.virtual === true &&
+    virtualTarget.anchorId === nodeId &&
+    (!options?.actual ||
+      virtualTarget.identity === options.actual.documentIdentity.id) &&
+    (!options?.actual ||
+      sameDocumentIdentity(
+        virtualTarget.documentIdentity,
+        options.actual.documentIdentity,
+      )) &&
+    Number.isInteger(virtualTarget.range.start) &&
+    Number.isInteger(virtualTarget.range.end) &&
+    virtualTarget.range.start >= 0 &&
+    virtualTarget.range.end >= virtualTarget.range.start &&
+    virtualTarget.range.end <=
+      (options?.anchorMap?.source.length ?? virtualTarget.range.end)
+  ) {
+    return successPlan(virtualTarget.range, options, true)
+  }
+
+  return Object.freeze({
+    status: 'not-found',
+    scroll: false,
+    smooth: false,
+    virtualTargetMounted: false,
+    navigationOwner: 'none',
+    historyMutated: false,
+  })
 }
 
 export type MarkdownOutlineActiveMutationKind =
@@ -231,7 +411,12 @@ export const evaluateMarkdownOutlineActiveMutations = (
           viewport,
           cause: 'caret',
         })
-      : resolveMarkdownOutlineActive({ ...identity, items, viewport, cause: 'viewport' })
+      : resolveMarkdownOutlineActive({
+          ...identity,
+          items,
+          viewport,
+          cause: 'viewport',
+        })
   const clickOnly =
     items[0] !== undefined &&
     caretInSecond.headingId === items[0].nodeId &&
@@ -261,7 +446,9 @@ export const evaluateMarkdownOutlineActiveMutations = (
     ...identity,
     items,
     caret: items[0]?.sourceRange.start ?? 0,
-    viewport: items[1] ? { start: items[1].sourceRange.start, end: items[1].sourceRange.end } : viewport,
+    viewport: items[1]
+      ? { start: items[1].sourceRange.start, end: items[1].sourceRange.end }
+      : viewport,
     owner: 'typewriter',
     previous: {
       headingId: items[0]?.nodeId ?? null,
@@ -275,7 +462,9 @@ export const evaluateMarkdownOutlineActiveMutations = (
     ...identity,
     items,
     caret: items[0]?.sourceRange.start ?? 0,
-    viewport: items[1] ? { start: items[1].sourceRange.start, end: items[1].sourceRange.end } : viewport,
+    viewport: items[1]
+      ? { start: items[1].sourceRange.start, end: items[1].sourceRange.end }
+      : viewport,
     cause: 'viewport',
     owner: 'typewriter',
     previous: typewriter,

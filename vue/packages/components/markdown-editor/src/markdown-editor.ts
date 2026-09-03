@@ -31,10 +31,9 @@ import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { buildProps, definePropType } from '@element-plus/utils'
 
 import type { ExtractPropTypes, PropType } from 'vue'
-import type {
-  MarkdownFeatureActivationFeatureOptions,
-  MarkdownStableProjection,
-} from '@element-plus/wasm'
+import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm'
+import type { MarkdownEmbedProvider } from '../../../wasm/markdown-embed-provider'
+import type { MarkdownStableProjection } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
 import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
@@ -128,6 +127,10 @@ export {
 } from './markdown-editor-caption'
 
 import type {
+  MarkdownEditorFocusExemptions,
+  MarkdownEditorWritingAidsOptions,
+} from './markdown-editor-writing-aids'
+import type {
   MarkdownEditorHistoryState,
   MarkdownEditorDocumentIdentity,
   MarkdownEditorPositionMap,
@@ -156,6 +159,12 @@ export type {
   MarkdownEditorTransactionOrigin,
   MarkdownEditorTransactionRejection,
 } from './markdown-editor-transaction'
+export type {
+  MarkdownEmbedProvider,
+  MarkdownEmbedProviderStatus,
+  MarkdownEmbedRequest,
+  MarkdownEmbedResult,
+} from '../../../wasm/markdown-embed-provider'
 
 import { type MarkdownEditorMode } from './markdown-editor-live-contract'
 
@@ -391,17 +400,104 @@ export {
 } from './markdown-editor-chrome'
 export {
   createMarkdownOutlineModel,
+  createMarkdownOutlineTree,
   evaluateMarkdownOutlineMutations,
+  evaluateMarkdownOutlineRevealMutations,
   resolveMarkdownEditorOutline,
   revealHeading,
   revealSourceRange,
+  type MarkdownEditorOutlineItem,
+  type MarkdownEditorOutlineRange,
+  type MarkdownEditorRevealOptions,
+  type MarkdownEditorRevealResult,
+  type MarkdownOutlineDiagnostic,
+  type MarkdownOutlineMutationKind,
+  type MarkdownOutlineRevealMutationKind,
+  type MarkdownOutlineTreeNode,
 } from './markdown-editor-outline'
 export {
+  commitMarkdownOutlineActive,
+  evaluateMarkdownOutlineActiveMutations,
+  headingAtSourceOffset,
+  headingIndexAtSourceOffset,
+  planMarkdownOutlineReveal,
+  resolveMarkdownActiveHeading,
+  resolveMarkdownOutlineActive,
+  resolveMarkdownOutlineNavigationOwner,
+  type MarkdownOutlineActiveCause,
+  type MarkdownOutlineActiveInput,
+  type MarkdownOutlineActiveMutationKind,
+  type MarkdownOutlineActiveResult,
+  type MarkdownOutlineNavigationOwner,
+  type MarkdownOutlineRevealPlan,
+  type MarkdownOutlineRevealPlanOptions,
+  type MarkdownOutlineViewport,
+} from './markdown-editor-outline-active'
+export {
+  calculateTypewriterScrollTarget,
+  createWritingAidsController,
+  createMarkdownFocusSegments,
+  evaluateMarkdownFocusMutations,
+  evaluateMarkdownTypewriterMutations,
+  resolveFocusState,
+  resolveWritingAids,
+  type MarkdownEditorFocusBlock,
+  type MarkdownEditorFocusExemptions,
+  type MarkdownEditorFocusInput,
+  type MarkdownEditorFocusRange,
+  type MarkdownEditorFocusSegment,
+  type MarkdownEditorFocusState,
+  type MarkdownEditorResolvedWritingAids,
+  type MarkdownEditorTypewriterAnchor,
+  type MarkdownEditorTypewriterScrollInput,
+  type MarkdownEditorTypewriterScrollResult,
+  type MarkdownEditorWritingAidsController,
+  type MarkdownEditorWritingAidsOptions,
+  type MarkdownEditorWritingAidsState,
+  type MarkdownEditorWritingAidsSuspendReason,
+  type MarkdownFocusMutationKind,
+  type MarkdownTypewriterMutationKind,
+} from './markdown-editor-writing-aids'
+export {
   collectMarkdownEmbedNodes,
+  commitMarkdownEmbedHeightChange,
+  evaluateMarkdownEmbedUiMutations,
+  formatMarkdownEmbedDirective,
+  parseMarkdownEmbedLine,
+  planMarkdownEmbedEdit,
+  planMarkdownEmbedInsert,
+  planMarkdownEmbedPresentation,
+  planMarkdownEmbedRemove,
+  presentMarkdownEmbed,
+  resolveMarkdownEmbedAtomic,
+  runMarkdownEmbedAction,
   runMarkdownEmbedEdit,
   runMarkdownEmbedInsert,
   runMarkdownEmbedRemove,
+  type MarkdownEmbedActionKind,
+  type MarkdownEmbedActionResult,
+  type MarkdownEmbedPresentationPlan,
+  type MarkdownEmbedPresentationStatus,
+  type MarkdownEmbedUiMutationKind,
 } from './markdown-editor-embed'
+export {
+  dispatchMarkdownSearchKeydown,
+  evaluateMarkdownSearchUiMutations,
+  executeMarkdownSearchSession,
+  resolveMarkdownSearchHighlights,
+  resolveMarkdownSearchNavigation,
+  resolveMarkdownSearchUi,
+  revealMarkdownSearchMatch,
+  type MarkdownSearchHighlightItem,
+  type MarkdownSearchHighlightResult,
+  type MarkdownSearchKeyAction,
+  type MarkdownSearchNavigationResult,
+  type MarkdownSearchRevealResult,
+  type MarkdownSearchRevealStatus,
+  type MarkdownSearchUiAria,
+  type MarkdownSearchUiOptions,
+  type MarkdownSearchUiState,
+} from './markdown-editor-search-ui'
 export {
   MARKDOWN_INPUT_ACCEPTANCE_CONTEXTS,
   MARKDOWN_INPUT_ACCEPTANCE_MODES,
@@ -1298,11 +1394,17 @@ export const isMarkdownEditorCommandVisible = (
   context: MarkdownEditorCommandContext,
 ) => command.when?.(context) ?? true
 
+/**
+ * `preview` has no editable surface, so commands stay listed but cannot run —
+ * the same fail-closed rule the attachment, clipboard, code, language-tool, and
+ * live-selection pipelines already apply. `when` still owns presentation.
+ */
 export const isMarkdownEditorCommandEnabled = (
   command: MarkdownEditorCommand,
   context: MarkdownEditorCommandContext,
 ) =>
   !context.readonly &&
+  context.mode !== 'preview' &&
   !context.signal.aborted &&
   (command.enabled?.(context) ?? true)
 
@@ -1396,6 +1498,14 @@ export const markdownEditorProps = buildProps({
   surfaces: {
     type: definePropType<MarkdownEditorSurfaceOptions>(Object),
     default: () => ({ toolbar: true }),
+  },
+  writingAids: {
+    type: definePropType<MarkdownEditorWritingAidsOptions>(Object),
+    default: undefined,
+  },
+  focusExemptions: {
+    type: definePropType<MarkdownEditorFocusExemptions>(Object),
+    default: undefined,
   },
   placeholder: {
     type: String,
@@ -1491,6 +1601,10 @@ export const markdownEditorProps = buildProps({
     type: Object as PropType<MarkdownFeatureActivationFeatureOptions>,
     default: undefined,
   },
+  embedProvider: {
+    type: definePropType<MarkdownEmbedProvider>(Function),
+    default: undefined,
+  },
   minRows: {
     type: Number,
     default: 12,
@@ -1525,6 +1639,10 @@ export const markdownEditorEmits = {
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,
+  'embed-open-source': (target: string, mode: string) =>
+    typeof target === 'string' && typeof mode === 'string',
+  'embed-retry': (target: string, mode: string) =>
+    typeof target === 'string' && typeof mode === 'string',
   transaction: (event: MarkdownEditorTransactionEvent) =>
     typeof event?.accepted === 'boolean' &&
     typeof event.revision === 'number' &&

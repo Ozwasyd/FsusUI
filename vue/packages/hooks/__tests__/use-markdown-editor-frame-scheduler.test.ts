@@ -147,11 +147,15 @@ describe('createMarkdownEditorFrameScheduler', () => {
       requestFrame: frames.requestFrame,
     })
 
-    for (let index = 0; index < 20; index += 1) {
-      scheduler.scheduleMutate(`task-${index}`, () => undefined)
-    }
+    const accepted = Array.from({ length: 20 }, (_, index) =>
+      scheduler.scheduleMutate(`task-${index}`, () => undefined),
+    )
 
     const metrics = scheduler.metrics()
+    expect(accepted).toEqual([
+      ...Array.from({ length: 8 }, () => true),
+      ...Array.from({ length: 12 }, () => false),
+    ])
     expect(metrics.pendingTasks).toBe(8)
     expect(metrics.overflowDroppedTasks).toBe(12)
     frames.runFrame()
@@ -167,6 +171,9 @@ describe('createMarkdownEditorFrameScheduler', () => {
 
     scheduler.schedule({ key: 'pending', mutate: () => (ran += 1) })
     scheduler.dispose()
+    expect(
+      scheduler.schedule({ key: 'after-dispose', mutate: () => (ran += 1) }),
+    ).toBe(false)
     frames.runFrame()
 
     expect(ran).toBe(0)

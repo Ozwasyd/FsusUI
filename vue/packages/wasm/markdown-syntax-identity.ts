@@ -14,6 +14,58 @@ export interface MarkdownSyntaxIdentityChange {
   readonly insert: string
 }
 
+const isSplitSurrogateBoundary = (value: string, offset: number) => {
+  if (offset <= 0 || offset >= value.length) return false
+  const previous = value.charCodeAt(offset - 1)
+  const next = value.charCodeAt(offset)
+  return (
+    previous >= 0xd800 && previous <= 0xdbff && next >= 0xdc00 && next <= 0xdfff
+  )
+}
+
+export const deriveMarkdownEditorChange = (
+  previous: string,
+  next: string,
+): MarkdownSyntaxIdentityChange | undefined => {
+  if (previous === next) return undefined
+
+  let prefix = 0
+  const prefixLimit = Math.min(previous.length, next.length)
+  while (prefix < prefixLimit && previous[prefix] === next[prefix]) {
+    prefix += 1
+  }
+  if (
+    isSplitSurrogateBoundary(previous, prefix) ||
+    isSplitSurrogateBoundary(next, prefix)
+  ) {
+    prefix -= 1
+  }
+
+  let previousSuffix = previous.length
+  let nextSuffix = next.length
+  while (
+    previousSuffix > prefix &&
+    nextSuffix > prefix &&
+    previous[previousSuffix - 1] === next[nextSuffix - 1]
+  ) {
+    previousSuffix -= 1
+    nextSuffix -= 1
+  }
+  if (
+    isSplitSurrogateBoundary(previous, previousSuffix) ||
+    isSplitSurrogateBoundary(next, nextSuffix)
+  ) {
+    previousSuffix += 1
+    nextSuffix += 1
+  }
+
+  return Object.freeze({
+    from: prefix,
+    insert: next.slice(prefix, nextSuffix),
+    to: previousSuffix,
+  })
+}
+
 export interface MarkdownSyntaxIdentityState {
   readonly nextOrdinalByKind: Readonly<Record<string, number>>
 }

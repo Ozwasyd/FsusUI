@@ -1,6 +1,6 @@
 <template>
   <section
-    v-bind="$attrs"
+    v-bind="rootAttrs"
     ref="rootElementRef"
     :class="[
       ns.b(),
@@ -11,15 +11,149 @@
       ns.m(`interaction-${interactionProfile}`),
       ns.m(`toolbar-${effectiveToolbarDensity}`),
       ns.is('commands-expanded', commandsExpanded),
+      ns.is('focus-mode', writingAidsFocusState.enabled),
+      ns.is('typewriter-mode', resolvedWritingAids.typewriter),
     ]"
     role="region"
+    tabindex="-1"
     :aria-label="localeText.editorAria"
     :data-markdown-instance="commandTrayId"
     data-markdown-scroll-container="body"
     :style="editorStyle"
   >
+    <div
+      v-if="searchUiState.open"
+      :class="[
+        ns.e('search-bar'),
+        ns.is('compact', true),
+        ns.is('replace', searchUiState.replaceOpen),
+      ]"
+      role="search"
+      :aria-label="searchUiState.aria.ariaLabel"
+    >
+      <div :class="ns.e('search-row')">
+        <input
+          ref="searchQueryInputRef"
+          v-model="searchQuery"
+          type="text"
+          :class="ns.e('search-input')"
+          placeholder="Find"
+          :aria-label="searchUiState.aria.queryAriaLabel"
+          data-testid="markdown-search-query"
+          @input="handleSearchQueryInput"
+          @keydown="handleSearchInputKeydown"
+        />
+        <span
+          :class="ns.e('search-count')"
+          role="status"
+          :aria-live="searchUiState.aria.statusAriaLive"
+          data-testid="markdown-search-count"
+        >
+          {{ searchUiState.statusText }}
+        </span>
+        <button
+          type="button"
+          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'plain-case')]"
+          aria-label="Match Case"
+          title="Match Case"
+          @click="toggleSearchMode('plain-case')"
+        >
+          Aa
+        </button>
+        <button
+          type="button"
+          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'whole-word')]"
+          aria-label="Match Whole Word"
+          title="Match Whole Word"
+          @click="toggleSearchMode('whole-word')"
+        >
+          &#92;b
+        </button>
+        <button
+          type="button"
+          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'regex')]"
+          aria-label="Use Regular Expression"
+          title="Use Regular Expression"
+          @click="toggleSearchMode('regex')"
+        >
+          .*
+        </button>
+        <button
+          type="button"
+          :class="ns.e('search-nav')"
+          :disabled="!searchMatches.length"
+          aria-label="Previous match"
+          title="Previous match"
+          data-testid="markdown-search-prev"
+          @click="searchNavigate('previous')"
+        >
+          ↑
+        </button>
+        <button
+          type="button"
+          :class="ns.e('search-nav')"
+          :disabled="!searchMatches.length"
+          aria-label="Next match"
+          title="Next match"
+          data-testid="markdown-search-next"
+          @click="searchNavigate('next')"
+        >
+          ↓
+        </button>
+        <button
+          type="button"
+          :class="[ns.e('search-toggle'), ns.is('active', searchUiState.replaceOpen)]"
+          aria-label="Toggle Replace"
+          title="Toggle Replace"
+          @click="toggleSearchReplace"
+        >
+          ⇄
+        </button>
+        <button
+          type="button"
+          :class="ns.e('search-close')"
+          aria-label="Close search"
+          title="Close search"
+          data-testid="markdown-search-close"
+          @click="closeSearch"
+        >
+          ×
+        </button>
+      </div>
+      <div v-if="searchUiState.replaceOpen" :class="ns.e('search-row')">
+        <input
+          ref="searchReplaceInputRef"
+          v-model="searchReplaceText"
+          type="text"
+          :class="ns.e('search-input')"
+          placeholder="Replace"
+          :aria-label="searchUiState.aria.replaceAriaLabel"
+          data-testid="markdown-search-replace"
+          @keydown="handleSearchReplaceKeydown"
+        />
+        <button
+          type="button"
+          :class="ns.e('search-action')"
+          :disabled="!searchMatches.length || editingBlocked"
+          data-testid="markdown-search-replace-current"
+          @click="searchReplaceCurrent"
+        >
+          Replace
+        </button>
+        <button
+          type="button"
+          :class="ns.e('search-action')"
+          :disabled="!searchMatches.length || editingBlocked"
+          data-testid="markdown-search-replace-all"
+          @click="searchReplaceAll"
+        >
+          Replace All
+        </button>
+      </div>
+    </div>
     <header
       v-if="chromeRegions.toolbar && surfaceOptions.toolbar"
+      ref="toolbarRef"
       :class="ns.e('toolbar')"
     >
       <div :class="ns.e('commands')">
@@ -153,6 +287,20 @@
       :data-markdown-layout-action="liveLayout.action"
       :data-markdown-layout-smooth="liveLayout.smooth ? 'true' : 'false'"
     >
+      <pre
+        v-if="writingAidsFocusState.enabled"
+        ref="focusLayerRef"
+        :class="ns.e('focus-layer')"
+        aria-hidden="true"
+      ><span
+          v-for="segment in focusSegments"
+          :key="segment.key"
+          :class="[
+            ns.is('dimmed', segment.dimmed),
+            ns.is('exempt', segment.exempt),
+          ]"
+          :data-node-id="segment.nodeId"
+        >{{ segment.text }}</span></pre>
       <textarea
         :id="textareaId"
         ref="textareaRef"
@@ -191,6 +339,8 @@
         @input="handleInput"
         @keydown="handleKeydown"
         @paste="handlePaste"
+        @pointerdown="handleSelectionDragStart"
+        @pointerup="handleSelectionDragEnd"
         @scroll="handleLayoutScroll"
         @select="handleSelectionMove"
         @touchmove="handleLayoutTouch"
@@ -332,7 +482,109 @@
           :data-role="decoration.role"
         />
       </div>
+      <div
+        v-if="currentMode === 'live' && embedPresentationSegments.length"
+        :class="ns.e('live-embeds')"
+        aria-label="Embedded content"
+        role="region"
+      >
+        <section
+          v-for="segment in embedPresentationSegments"
+          :key="`live:${segment.key}`"
+          class="el-markdown-embed"
+          :aria-label="segment.plan.accessibility.name"
+          role="region"
+        >
+          <header class="el-markdown-embed__header">
+            <span class="el-markdown-embed__target">{{
+              segment.plan.title
+            }}</span>
+            <span class="el-markdown-embed__mode-tag">{{
+              segment.plan.mode
+            }}</span>
+            <span class="el-markdown-embed__status" role="status">{{
+              segment.plan.status
+            }}</span>
+          </header>
+          <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
+            {{ segment.plan.excerpt }}
+          </p>
+          <div class="el-markdown-embed__actions">
+            <button
+              v-for="action in segment.plan.allowedActions"
+              :key="action"
+              type="button"
+              class="el-markdown-embed__action"
+              @click="handleEmbedAction(segment, action)"
+            >
+              {{ embedActionLabel(action) }}
+            </button>
+          </div>
+        </section>
+      </div>
+      <div
+        v-if="visibleSearchHighlights.length"
+        :class="ns.e('search-highlights')"
+        aria-hidden="true"
+      >
+        <span
+          v-for="highlight in visibleSearchHighlights"
+          :key="`search:${highlight.range.start}:${highlight.range.end}`"
+          :class="[
+            ns.e('search-highlight'),
+            ns.is('current', highlight.current),
+          ]"
+          :style="searchHighlightStyle(highlight.range)"
+        />
+      </div>
 
+      <div
+        v-if="liveSurface.rendererVisible && embedRenderSegments.length > 1"
+        ref="previewRendererRef"
+        :class="ns.e('preview')"
+      >
+        <template v-for="segment in embedRenderSegments" :key="segment.key">
+          <el-markdown-renderer
+            v-if="segment.kind === 'markdown' && segment.content"
+            :base-url="previewBaseUrl"
+            :content="segment.content"
+            :csp-nonce="previewCspNonce"
+            :features="previewFeatures"
+            mode="editor"
+            @features-activated="emitRenderEvent('features-activated', $event)"
+            @render-complete="handleRendererComplete($event)"
+            @render-error="emitRenderEvent('render-error', $event)"
+          />
+          <section
+            v-else-if="segment.kind === 'embed'"
+            class="el-markdown-embed"
+            :aria-label="segment.plan.accessibility.name"
+            role="region"
+          >
+            <header class="el-markdown-embed__header">
+              <span class="el-markdown-embed__target">{{ segment.plan.title }}</span>
+              <span class="el-markdown-embed__mode-tag">{{ segment.plan.mode }}</span>
+              <span class="el-markdown-embed__status" role="status">{{ segment.plan.status }}</span>
+            </header>
+            <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
+              {{ segment.plan.excerpt }}
+            </p>
+            <div class="el-markdown-embed__actions">
+              <button
+                v-for="action in segment.plan.allowedActions"
+                :key="action"
+                type="button"
+                class="el-markdown-embed__action"
+                @click="handleEmbedAction(segment, action)"
+              >
+                {{ embedActionLabel(action) }}
+              </button>
+            </div>
+          </section>
+        </template>
+      </div>
+
+      <template v-if="atomicActionNodes.length">
       <div
         v-for="atomicNode in atomicActionNodes"
         :key="atomicNode.id"
@@ -366,9 +618,11 @@
           Edit source
         </button>
       </div>
+      </template>
 
       <el-markdown-renderer
-        v-if="liveSurface.rendererVisible"
+        v-else-if="liveSurface.rendererVisible && embedRenderSegments.length <= 1"
+        ref="previewRendererRef"
         :class="ns.e('preview')"
         :base-url="previewBaseUrl"
         :content="editorValue"
@@ -377,7 +631,7 @@
         :loading-text="localeText.states.loading"
         mode="editor"
         @features-activated="emitRenderEvent('features-activated', $event)"
-        @render-complete="emitRenderEvent('render-complete', $event)"
+        @render-complete="handleRendererComplete($event)"
         @render-error="emitRenderEvent('render-error', $event)"
       />
     </div>
@@ -792,6 +1046,7 @@ import {
   reactive,
   ref,
   triggerRef,
+  useAttrs,
   useId,
   watch,
 } from 'vue'
@@ -802,9 +1057,11 @@ import {
   useMarkdownEditorFrameScheduler,
   useNamespace,
 } from '@element-plus/hooks'
+import { provideMarkdownHeavyFeatureDocumentContext } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import {
   createMarkdownAnchorMap,
   createMarkdownEditorProjection,
+  type MarkdownStableProjection,
   stabilizeMarkdownEditorProjection,
 } from '../../../wasm/markdown-runtime'
 import {
@@ -962,6 +1219,18 @@ import {
   type MarkdownLiveSelectionMotion,
 } from './markdown-editor-live-selection'
 import {
+  calculateMarkdownSourceAnchorY,
+  createMarkdownFocusSegments,
+  createWritingAidsController,
+  type MarkdownEditorWritingAidsController,
+} from './markdown-editor-writing-aids'
+import {
+  createMarkdownOutlineModelFromProjection,
+  revealHeading as revealHeadingOutline,
+  revealSourceRange as revealSourceRangeOutline,
+} from './markdown-editor-outline'
+import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
+import {
   resolveMarkdownLiveLayoutStability,
   resolveMarkdownLiveVirtualWindow,
   type MarkdownLiveLayoutGesture,
@@ -971,7 +1240,36 @@ import {
 } from './markdown-editor-live-layout'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
-import type { MarkdownStableProjection } from '../../../wasm/markdown-runtime'
+import {
+  dispatchMarkdownSearchKeydown,
+  executeMarkdownSearchSession,
+  resolveMarkdownSearchNavigation,
+  resolveMarkdownSearchUi,
+  revealMarkdownSearchMatch,
+  type MarkdownSearchUiState,
+  resolveMarkdownSearchHighlights,
+} from './markdown-editor-search-ui'
+import {
+  planMarkdownReplaceAll,
+  planMarkdownReplaceCurrentInSet,
+} from '../../../wasm/markdown-replace'
+import type { MarkdownSearchMatch, MarkdownSearchMode } from '../../../wasm/markdown-search-model'
+import type { MarkdownSearchTask } from '../../../wasm/markdown-search-worker'
+import {
+  collectMarkdownEmbedNodes,
+  planMarkdownEmbedPresentation,
+  runMarkdownEmbedAction,
+  type MarkdownEmbedActionKind,
+  type MarkdownEmbedPresentationPlan,
+  type MarkdownEmbedValidNode,
+} from './markdown-editor-embed'
+import {
+  commitMarkdownEmbedResult,
+  createMarkdownEmbedRequest,
+  forgetMarkdownEmbedRequest,
+  type MarkdownEmbedResult,
+} from '../../../wasm/markdown-embed-provider'
+
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -981,6 +1279,7 @@ defineOptions({
 const props = defineProps(markdownEditorProps)
 const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
+const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const frameScheduler = useMarkdownEditorFrameScheduler({
   onFrameEnd: (metrics) => {
@@ -1028,6 +1327,8 @@ const pasteAsMarkdownTitleId = `${useId()}-paste-as-markdown-title`
 const pasteAsMarkdownHelpId = `${useId()}-paste-as-markdown-help`
 const commandsExpanded = ref(false)
 const visualViewportHeight = ref(0)
+const visualViewportOffsetTop = ref(0)
+const toolbarRef = ref<HTMLElement | null>(null)
 const inputDisabled = computed(() => props.disabled || props.loading)
 const editingBlocked = computed(() => props.readonly || inputDisabled.value)
 const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
@@ -1072,9 +1373,88 @@ const transactionStore = new MarkdownEditorTransactionStore(
   initialSelection,
   documentIdentity,
 )
+provideMarkdownHeavyFeatureDocumentContext({
+  documentEpoch: () => transactionStore.documentIdentity.epoch,
+  documentKey: () => transactionStore.documentIdentity.id,
+  revision: () => transactionStore.revision,
+})
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)
+const writingAidsController: MarkdownEditorWritingAidsController =
+  createWritingAidsController({
+    writingAids: props.writingAids,
+    editorProfile: props.editorProfile,
+    readonly: props.readonly,
+    disabled: props.disabled,
+    source: transactionStore.value,
+    selection: transactionStore.selection,
+  })
+const resolvedWritingAids = computed(() => writingAidsController.options)
+const writingAidsState = ref(writingAidsController.state)
+const writingAidsFocusState = ref(writingAidsController.focusState!)
+const writingAidsDataAttrs = computed(() => ({
+  'data-markdown-focus-active-block':
+    writingAidsFocusState.value.activeBlockId || undefined,
+  'data-markdown-focus-enabled': writingAidsFocusState.value.enabled
+    ? 'true'
+    : 'false',
+  'data-markdown-writing-aids-state': writingAidsState.value,
+}))
+const rootAttrs = computed(() => ({ ...attrs, ...writingAidsDataAttrs.value }))
+const focusLayerRef = ref<HTMLElement | null>(null)
+const syncFocusLayerScroll = (scrollTop: number) => {
+  if (focusLayerRef.value) focusLayerRef.value.scrollTop = scrollTop
+}
+const focusSegments = computed(() => {
+  return createMarkdownFocusSegments(
+    editorValue.value,
+    writingAidsFocusState.value,
+  )
+})
+const refreshWritingAidsDocument = () => {
+  let projection: MarkdownStableProjection | undefined
+  const focusNeedsProjection =
+    props.writingAids?.focus === true &&
+    props.editorProfile === 'prose' &&
+    !props.readonly &&
+    !props.disabled &&
+    currentMode.value !== 'preview'
+  if (focusNeedsProjection) {
+    try {
+      projection = editorProjection.value
+    } catch {
+      projection = undefined
+    }
+  }
+  const selection = transactionStore.selection
+  const caret =
+    selection.direction === 'backward' ? selection.start : selection.end
+  const currentBlock = projection?.nodes.find(
+    (node) => node.rawRange.start <= caret && caret <= node.rawRange.end,
+  )
+  writingAidsController.updateDocument({
+    currentBlock,
+    caretAnchor: currentBlock
+      ? Object.freeze({ blockId: currentBlock.id, sourceOffset: caret })
+      : null,
+    disabled: props.disabled,
+    documentEpoch: documentIdentity.epoch,
+    documentIdentity,
+    editorProfile: props.editorProfile,
+    focusExemptions: props.focusExemptions,
+    mode: currentMode.value,
+    projection,
+    readonly: props.readonly,
+    revision: transactionStore.revision,
+    selection,
+    source: transactionStore.value,
+    writingAids: props.writingAids,
+  })
+  writingAidsFocusState.value = writingAidsController.focusState!
+  writingAidsState.value = writingAidsController.state
+  writingAidsController.handleProjectionChange()
+}
 let previousEditorProjection: MarkdownStableProjection | undefined
 let previousEditorProjectionSource = ''
 const editorProjection = computed(() => {
@@ -1363,6 +1743,11 @@ const liveLayout = ref<MarkdownLiveLayoutPlan>(
 )
 let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
 let restoringViewport = false
+let restoringTypewriter = false
+let typewriterLayoutAdjustment = false
+let typewriterLayoutFrame: number | undefined
+let textareaLayoutHeight = 0
+let textareaLayoutWidth = 0
 let viewportRestoreCurrentScrollTop = 0
 let viewportRestoreNextScrollTop: number | null = null
 const liveDecorations = computed(() => {
@@ -1471,11 +1856,150 @@ const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
     layoutGesture.value = null
   }, 200)
 }
-const handleLayoutWheel = () => markLayoutGesture('wheel')
-const handleLayoutTouch = () => markLayoutGesture('touch')
+const suspendTypewriterForUserScroll = () => {
+  writingAidsController.handleUserScroll()
+  writingAidsState.value = writingAidsController.state
+}
+const settleTypewriterLayout = () => {
+  if (typewriterLayoutFrame !== undefined) {
+    cancelAnimationFrame(typewriterLayoutFrame)
+  }
+  typewriterLayoutAdjustment = true
+  let remainingFrames = 3
+  const settle = () => {
+    const textarea = textareaRef.value
+    if (!textarea || !resolvedWritingAids.value.typewriter) {
+      typewriterLayoutAdjustment = false
+      typewriterLayoutFrame = undefined
+      return
+    }
+    textareaLayoutHeight = textarea.clientHeight
+    textareaLayoutWidth = textarea.clientWidth
+    applyTypewriterScroll('async-layout')
+    remainingFrames -= 1
+    if (remainingFrames > 0) {
+      typewriterLayoutFrame = requestAnimationFrame(settle)
+      return
+    }
+    typewriterLayoutAdjustment = false
+    typewriterLayoutFrame = undefined
+  }
+  typewriterLayoutFrame = requestAnimationFrame(settle)
+}
+const handleLayoutWheel = () => {
+  suspendTypewriterForUserScroll()
+  markLayoutGesture('wheel')
+}
+const handleLayoutTouch = () => {
+  suspendTypewriterForUserScroll()
+  markLayoutGesture('touch')
+}
 const handleLayoutScroll = () => {
-  if (restoringSelection || restoringViewport) return
+  const textarea = textareaRef.value
+  if (textarea) syncFocusLayerScroll(textarea.scrollTop)
+  if (restoringSelection || restoringViewport || restoringTypewriter) return
+  if (
+    textarea &&
+    (textarea.clientHeight !== textareaLayoutHeight ||
+      textarea.clientWidth !== textareaLayoutWidth)
+  ) {
+    textareaLayoutHeight = textarea.clientHeight
+    textareaLayoutWidth = textarea.clientWidth
+    settleTypewriterLayout()
+    return
+  }
+  if (typewriterLayoutAdjustment) return
+  suspendTypewriterForUserScroll()
   markLayoutGesture('scrollbar')
+}
+const cssLength = (element: HTMLElement, property: string) => {
+  const value = Number.parseFloat(
+    window.getComputedStyle(element).getPropertyValue(property),
+  )
+  return Number.isFinite(value) ? value : 0
+}
+let typewriterTextContext:
+  | OffscreenCanvasRenderingContext2D
+  | null
+  | undefined
+const sourceAnchorY = (textarea: HTMLTextAreaElement, lineHeight: number) => {
+  if (typeof OffscreenCanvas === 'undefined') return undefined
+  if (typewriterTextContext === undefined) {
+    typewriterTextContext = new OffscreenCanvas(1, 1).getContext('2d')
+  }
+  if (!typewriterTextContext) return undefined
+  const style = window.getComputedStyle(textarea)
+  typewriterTextContext.font = style.font
+  const inlineSize =
+    textarea.clientWidth -
+    cssLength(textarea, 'padding-inline-start') -
+    cssLength(textarea, 'padding-inline-end')
+  return calculateMarkdownSourceAnchorY({
+    caretSourceOffset: transactionStore.selection.end,
+    inlineSize,
+    lineHeight,
+    measureTextWidth: (text) =>
+      typewriterTextContext?.measureText(text).width ?? 0,
+    paddingBlockStart: cssLength(textarea, 'padding-block-start'),
+    source: transactionStore.value,
+  })
+}
+const applyTypewriterScroll = (
+  trigger: 'input' | 'explicit-navigation' | 'async-layout' = 'input',
+) => {
+  if (!resolvedWritingAids.value.typewriter || isComposing.value) return
+  const textarea = textareaRef.value
+  if (!textarea) return
+  const response =
+    trigger === 'explicit-navigation'
+      ? writingAidsController.handleExplicitNavigation()
+      : trigger === 'async-layout'
+        ? writingAidsController.handleAsyncLayoutChange()
+        : writingAidsController.handleInput()
+  writingAidsState.value = writingAidsController.state
+  if (response.scroll !== true) return
+  const lineHeight =
+    Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
+  const target = writingAidsController.calculateScroll({
+    caretSourceOffset: transactionStore.selection.end,
+    lineHeight,
+    source: transactionStore.value,
+    stickyToolbarHeight: toolbarRef.value?.getBoundingClientRect().height,
+    safeAreaInsetBottom: cssLength(
+      textarea,
+      '--el-markdown-editor-safe-area-inset-bottom',
+    ),
+    safeAreaInsetTop: cssLength(
+      textarea,
+      '--el-markdown-editor-safe-area-inset-top',
+    ),
+    sourceAnchorY: sourceAnchorY(textarea, lineHeight),
+    reducedMotion: reducedMotionRequested(),
+    viewportHeight: textarea.clientHeight,
+    visualViewportHeight: visualViewportHeight.value || undefined,
+    visualViewportOffsetTop: visualViewportOffsetTop.value || undefined,
+  })
+  restoringTypewriter = true
+  if (typeof textarea.scrollTo === 'function') {
+    const scrollTop = Math.min(
+      target.scrollTop,
+      Math.max(0, textarea.scrollHeight - textarea.clientHeight),
+    )
+    textarea.scrollTo({
+      behavior:
+        trigger === 'async-layout' ? 'auto' : target.smooth ? 'smooth' : 'auto',
+      top: scrollTop,
+    })
+    requestAnimationFrame(() => {
+      syncFocusLayerScroll(textarea.scrollTop)
+    })
+  } else {
+    textarea.scrollTop = target.scrollTop
+    syncFocusLayerScroll(target.scrollTop)
+  }
+  requestAnimationFrame(() => {
+    restoringTypewriter = false
+  })
 }
 const refreshLiveReveal = (
   extras: {
@@ -1785,6 +2309,10 @@ const dispatchEditorOperation = (
     emit(CHANGE_EVENT, result.value)
     refreshLiveWindow('input')
   }
+  if (result.accepted) {
+    refreshWritingAidsDocument()
+    if (result.value !== previousValue) applyTypewriterScroll()
+  }
   if (result.accepted) syncLanguageToolsState()
   if (
     result.accepted &&
@@ -1965,6 +2493,7 @@ watch(
   ([mode, defaultMode]) => {
     transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
+    refreshWritingAidsDocument()
     syncLanguageToolsState()
   },
 )
@@ -2022,6 +2551,18 @@ watch(
       },
     })
   },
+)
+
+watch(
+  [
+    () => props.writingAids,
+    () => props.editorProfile,
+    () => props.focusExemptions,
+    () => props.readonly,
+    () => props.disabled,
+  ],
+  () => refreshWritingAidsDocument(),
+  { deep: true },
 )
 
 const metricsSession = createMarkdownEditorMetricsSession(props.metrics)
@@ -2799,6 +3340,39 @@ let viewportTrigger: MarkdownLiveLayoutTrigger | null = null
 const updateVisualViewportHeight = () => {
   if (typeof window === 'undefined') return
 
+  const previous = visualViewportHeight.value
+  visualViewportHeight.value =
+    window.visualViewport?.height || window.innerHeight || 0
+  visualViewportOffsetTop.value = window.visualViewport?.offsetTop || 0
+  const trigger =
+    previous > 0 && visualViewportHeight.value + 80 < previous
+      ? 'soft-keyboard'
+      : 'visual-viewport'
+  applyLiveLayout(trigger)
+  applyTypewriterScroll('async-layout')
+}
+
+let typewriterResizeObserver: ResizeObserver | undefined
+const refreshTypewriterResizeObserver = () => {
+  typewriterResizeObserver?.disconnect()
+  typewriterResizeObserver = undefined
+  const textarea = textareaRef.value
+  if (
+    props.writingAids?.typewriter !== true ||
+    !textarea ||
+    typeof ResizeObserver === 'undefined'
+  )
+    return
+  textareaLayoutHeight = textarea.clientHeight
+  textareaLayoutWidth = textarea.clientWidth
+  typewriterResizeObserver = new ResizeObserver(() => {
+    textareaLayoutHeight = textarea.clientHeight
+    textareaLayoutWidth = textarea.clientWidth
+    applyTypewriterScroll('async-layout')
+    settleTypewriterLayout()
+  })
+  typewriterResizeObserver.observe(textarea)
+
   frameScheduler.schedule({
     key: 'visual-viewport-read',
     measure: () => {
@@ -2843,7 +3417,9 @@ onMounted(() => {
     syncLanguageToolsState()
   }
   refreshLiveWindow('initial')
+  refreshWritingAidsDocument()
   updateVisualViewportHeight()
+  refreshTypewriterResizeObserver()
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
   window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
   window.addEventListener('resize', updateVisualViewportHeight)
@@ -2856,6 +3432,15 @@ onBeforeUnmount(() => {
   attachmentBatches.clear()
   attachmentItems.clear()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
+  if (typewriterLayoutFrame !== undefined) {
+    cancelAnimationFrame(typewriterLayoutFrame)
+  }
+  typewriterResizeObserver?.disconnect()
+  cssHighlightRegistry()?.delete('markdown-search-match')
+  cssHighlightRegistry()?.delete('markdown-search-current')
+  embedResolutionGeneration += 1
+  for (const requestId of pendingEmbedRequests) forgetMarkdownEmbedRequest(requestId)
+  pendingEmbedRequests.clear()
   if (typeof window === 'undefined') return
 
   window.visualViewport?.removeEventListener(
@@ -2868,6 +3453,11 @@ onBeforeUnmount(() => {
   )
   window.removeEventListener('resize', updateVisualViewportHeight)
 })
+
+watch(
+  () => props.writingAids?.typewriter,
+  () => refreshTypewriterResizeObserver(),
+)
 
 const handleBeforeInput = (event: InputEvent) => {
   syncLanguageToolsState()
@@ -2987,6 +3577,8 @@ const handleCompositionStart = () => {
   })
   syncNativeComposing()
   if (editingBlocked.value || !nativeMachine.composing) return
+  writingAidsController.handleCompositionStart()
+  writingAidsState.value = writingAidsController.state
   transactionStore.breakMergeGroup()
   captureSelection()
   beforeInputSnapshot = undefined
@@ -3009,6 +3601,8 @@ const handleCompositionEnd = (event: CompositionEvent) => {
     value: target.value,
   })
   syncNativeComposing()
+  writingAidsController.handleCompositionEnd()
+  writingAidsState.value = writingAidsController.state
   beforeInputSnapshot = undefined
   pendingClipboardIdentity = undefined
   pendingInputOrigin = undefined
@@ -3196,6 +3790,9 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshWritingAidsDocument()
+  writingAidsController.handleSelectionChange()
+  writingAidsState.value = writingAidsController.state
   syncLanguageToolsState()
   if (currentMode.value === 'live') {
     const selection = transactionStore.selection
@@ -3211,9 +3808,21 @@ const handleSelectionMove = () => {
   refreshLiveReveal()
 }
 
+const handleSelectionDragStart = () => {
+  if (isComposing.value) return
+  writingAidsController.handleSelectionDragStart()
+  writingAidsState.value = writingAidsController.state
+}
+
+const handleSelectionDragEnd = () => {
+  writingAidsController.handleSelectionDragEnd()
+  writingAidsState.value = writingAidsController.state
+}
+
 const handlePointerReveal = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshWritingAidsDocument()
   if (currentMode.value === 'live') {
     applyLiveSelectionMotion('pointer-click', {
       pointerOffset: transactionStore.selection.start,
@@ -3598,6 +4207,7 @@ const setMode = (mode: MarkdownEditorMode) => {
   })
   transactionStore.setSelection(retained.selection, false)
   currentMode.value = nextMode
+  refreshWritingAidsDocument()
   emit('mode-change', nextMode)
   void restoreTextareaSelection(retained.selection, false)
   applyLiveLayout('mode-switch')
@@ -3708,18 +4318,575 @@ const emitRenderEvent = (
 ) => {
   if (event === 'features-activated') {
     emit('features-activated', payload)
+    applyTypewriterScroll('async-layout')
     return
   }
   if (event === 'render-complete') {
     emit('render-complete', payload)
+    applyTypewriterScroll('async-layout')
     return
   }
   emit('render-error', payload)
 }
 
-const handleKeydown = (event: KeyboardEvent) => {
-  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
+const handleRendererComplete = (payload: unknown) => {
+  emitRenderEvent('render-complete', payload)
+  void nextTick(syncRenderedSearchHighlights)
+}
 
+const searchUiState = ref<MarkdownSearchUiState>(resolveMarkdownSearchUi(false, '', 0))
+const searchQuery = ref('')
+const searchReplaceText = ref('')
+const searchMatches = ref<readonly MarkdownSearchMatch[]>([])
+const searchCurrentIndex = ref<number | null>(null)
+const searchMode = ref<MarkdownSearchMode>('plain')
+const searchTask = ref<MarkdownSearchTask | null>(null)
+const searchQueryInputRef = ref<HTMLInputElement | null>(null)
+const searchReplaceInputRef = ref<HTMLInputElement | null>(null)
+const previewRendererRef = ref<HTMLElement | { $el?: HTMLElement } | null>(null)
+
+const searchHighlights = computed(() =>
+  resolveMarkdownSearchHighlights({
+    currentIndex: searchCurrentIndex.value,
+    matches: searchMatches.value,
+    mode: currentMode.value,
+    source: editorValue.value,
+  }),
+)
+const MAX_RENDERED_SEARCH_HIGHLIGHTS = 256
+const renderedSearchHighlights = computed(() => {
+  const items = searchHighlights.value.items
+  if (items.length <= MAX_RENDERED_SEARCH_HIGHLIGHTS) return items
+  const current = Math.max(0, searchCurrentIndex.value ?? 0)
+  const half = Math.floor(MAX_RENDERED_SEARCH_HIGHLIGHTS / 2)
+  const start = Math.min(
+    Math.max(0, current - half),
+    items.length - MAX_RENDERED_SEARCH_HIGHLIGHTS,
+  )
+  return items.slice(start, start + MAX_RENDERED_SEARCH_HIGHLIGHTS)
+})
+const visibleSearchHighlights = computed(() =>
+  searchUiState.value.open && liveSurface.value.inputVisible
+    ? renderedSearchHighlights.value
+    : [],
+)
+
+const searchHighlightStyle = (range: { readonly start: number; readonly end: number }) => {
+  const source = editorValue.value
+  const lineStart = source.lastIndexOf('\n', Math.max(0, range.start - 1)) + 1
+  const line = source.slice(0, lineStart).split('\n').length - 1
+  const column = range.start - lineStart
+  const lineEnd = source.indexOf('\n', range.start)
+  const visibleEnd = lineEnd < 0 ? range.end : Math.min(range.end, lineEnd)
+  return {
+    '--markdown-search-column': String(column),
+    '--markdown-search-length': String(Math.max(1, visibleEnd - range.start)),
+    '--markdown-search-line': String(line),
+  }
+}
+
+type CssHighlightRegistry = {
+  delete(name: string): boolean
+  set(name: string, value: unknown): unknown
+}
+
+const cssHighlightRegistry = () =>
+  (globalThis.CSS as typeof CSS & { highlights?: CssHighlightRegistry } | undefined)
+    ?.highlights
+
+const renderedSearchRanges = (root: HTMLElement, needles: readonly string[]) => {
+  const owner = root.ownerDocument
+  const walker = owner.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  const textNodes: Text[] = []
+  let node = walker.nextNode()
+  while (node) {
+    if (node instanceof Text && node.data) textNodes.push(node)
+    node = walker.nextNode()
+  }
+  const nextOffsets = new Map<Text, number>()
+  const ranges: Array<Range | null> = []
+  for (const needle of needles) {
+    if (!needle || needle.includes('\n')) {
+      ranges.push(null)
+      continue
+    }
+    let matched: Range | null = null
+    for (const textNode of textNodes) {
+      const index = textNode.data.indexOf(needle, nextOffsets.get(textNode) ?? 0)
+      if (index < 0) continue
+      const range = owner.createRange()
+      range.setStart(textNode, index)
+      range.setEnd(textNode, index + needle.length)
+      nextOffsets.set(textNode, index + needle.length)
+      matched = range
+      break
+    }
+    ranges.push(matched)
+  }
+  return ranges
+}
+
+const syncRenderedSearchHighlights = () => {
+  const registry = cssHighlightRegistry()
+  if (!registry) return
+  registry.delete('markdown-search-match')
+  registry.delete('markdown-search-current')
+  if (!searchUiState.value.open || !searchMatches.value.length) return
+  const candidate = previewRendererRef.value
+  const root = candidate instanceof HTMLElement ? candidate : candidate?.$el
+  if (!(root instanceof HTMLElement)) return
+  const renderedItems = renderedSearchHighlights.value
+  const needles = renderedItems.map(({ match }) =>
+    editorValue.value.slice(match.range.start, match.range.end),
+  )
+  const ranges = renderedSearchRanges(root, needles)
+  const HighlightCtor = (globalThis as typeof globalThis & {
+    Highlight?: new (...ranges: Range[]) => unknown
+  }).Highlight
+  const visibleRanges = ranges.filter((range): range is Range => Boolean(range))
+  if (!HighlightCtor || !visibleRanges.length) return
+  registry.set('markdown-search-match', new HighlightCtor(...visibleRanges))
+  const current = renderedItems.findIndex(({ current }) => current)
+  if (current >= 0 && ranges[current]) {
+    registry.set('markdown-search-current', new HighlightCtor(ranges[current]))
+  }
+}
+
+type MarkdownEmbedRenderSegment =
+  | { readonly content: string; readonly key: string; readonly kind: 'markdown' }
+  | {
+      readonly key: string
+      readonly kind: 'embed'
+      readonly node: MarkdownEmbedValidNode
+      readonly plan: MarkdownEmbedPresentationPlan
+      readonly result?: MarkdownEmbedResult
+    }
+
+const embedResults = ref<ReadonlyMap<string, MarkdownEmbedResult>>(new Map())
+let embedResolutionGeneration = 0
+const pendingEmbedRequests = new Set<string>()
+const embedRequestVersions = new Map<string, number>()
+const embedNodeId = (node: MarkdownEmbedValidNode) =>
+  `embed:${node.ranges.full.start}:${node.target}:${node.mode}`
+const embedNodes = computed(() =>
+  collectMarkdownEmbedNodes(editorValue.value).filter(
+    (node): node is MarkdownEmbedValidNode => node.ok,
+  ),
+)
+
+const resolveEmbedNode = async (
+  node: MarkdownEmbedValidNode,
+  generation: number,
+) => {
+  const provider = props.embedProvider
+  if (!provider) return
+  const nodeId = embedNodeId(node)
+  const version = (embedRequestVersions.get(nodeId) ?? 0) + 1
+  embedRequestVersions.set(nodeId, version)
+  const request = createMarkdownEmbedRequest({
+    documentIdentity,
+    mode: node.mode,
+    nodeId,
+    revision: transactionStore.revision,
+    target: node.target,
+    version,
+  })
+  pendingEmbedRequests.add(request.requestId)
+  const pending: MarkdownEmbedResult = Object.freeze({
+    ...request,
+    status: 'pending' as const,
+  })
+  embedResults.value = new Map(embedResults.value).set(nodeId, pending)
+  let result: MarkdownEmbedResult
+  try {
+    result = await provider(request)
+  } catch {
+    result = Object.freeze({ ...request, status: 'rejected' as const })
+  } finally {
+    pendingEmbedRequests.delete(request.requestId)
+    forgetMarkdownEmbedRequest(request.requestId)
+  }
+  if (generation !== embedResolutionGeneration) return
+  const committed = commitMarkdownEmbedResult(request, result)
+  embedResults.value = new Map(embedResults.value).set(nodeId, committed)
+}
+
+const refreshEmbedPresentations = () => {
+  const generation = ++embedResolutionGeneration
+  const activeIds = new Set(embedNodes.value.map(embedNodeId))
+  embedResults.value = new Map(
+    [...embedResults.value].filter(([nodeId]) => activeIds.has(nodeId)),
+  )
+  for (const nodeId of embedRequestVersions.keys()) {
+    if (!activeIds.has(nodeId)) embedRequestVersions.delete(nodeId)
+  }
+  for (const node of embedNodes.value) void resolveEmbedNode(node, generation)
+}
+
+const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(() => {
+  const segments: MarkdownEmbedRenderSegment[] = []
+  let offset = 0
+  for (const node of embedNodes.value) {
+    segments.push({
+      content: editorValue.value.slice(offset, node.ranges.full.start),
+      key: `markdown:${offset}`,
+      kind: 'markdown',
+    })
+    const result = embedResults.value.get(embedNodeId(node))
+    segments.push({
+      key: embedNodeId(node),
+      kind: 'embed',
+      node,
+      plan: planMarkdownEmbedPresentation(node, result),
+      result,
+    })
+    offset = node.ranges.full.end
+  }
+  if (!segments.length) {
+    return [{ content: editorValue.value, key: 'markdown:all', kind: 'markdown' }]
+  }
+  segments.push({
+    content: editorValue.value.slice(offset),
+    key: `markdown:${offset}`,
+    kind: 'markdown',
+  })
+  return Object.freeze(segments)
+})
+const embedPresentationSegments = computed(() =>
+  embedRenderSegments.value.filter(
+    (
+      segment,
+    ): segment is Extract<
+      MarkdownEmbedRenderSegment,
+      { readonly kind: 'embed' }
+    > => segment.kind === 'embed',
+  ),
+)
+
+const embedActionLabel = (action: MarkdownEmbedActionKind) =>
+  action
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+
+const markdownCommandContext = () => ({
+  dispatch: { dispatch: dispatchTransaction },
+  documentIdentity,
+  mode: currentMode.value,
+  readonly: editingBlocked.value,
+  revision: transactionStore.revision,
+  selection: captureSelection(false),
+  signal: new AbortController().signal,
+  value: transactionStore.value,
+})
+
+const handleEmbedAction = async (
+  segment: Extract<MarkdownEmbedRenderSegment, { readonly kind: 'embed' }>,
+  action: MarkdownEmbedActionKind,
+) => {
+  const result = runMarkdownEmbedAction(
+    markdownCommandContext(),
+    segment.node,
+    action,
+    segment.result,
+  )
+  if (result.action === 'delete') {
+    dispatchTransaction(result.transaction)
+    return
+  }
+  if (
+    result.action === 'source-reveal' ||
+    result.action === 'caret-before' ||
+    result.action === 'caret-after' ||
+    result.action === 'select-node'
+  ) {
+    if (currentMode.value === 'preview') setMode('source')
+    transactionStore.setSelection(result.selection, false)
+    await restoreTextareaSelection(result.selection)
+    return
+  }
+  if (result.action === 'copy') {
+    await navigator.clipboard?.writeText(result.exactMarkdown)
+    return
+  }
+  if (result.action === 'retry') {
+    emit('embed-retry', result.target, result.mode)
+    void resolveEmbedNode(segment.node, embedResolutionGeneration)
+    return
+  }
+  emit('embed-open-source', result.target, result.mode)
+}
+
+const updateSearchState = () => {
+  searchUiState.value = resolveMarkdownSearchUi(
+    searchUiState.value.open,
+    searchQuery.value,
+    searchMatches.value.length,
+    {
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+      replaceOpen: searchUiState.value.replaceOpen,
+      replaceText: searchReplaceText.value,
+    },
+  )
+}
+
+const runSearch = () => {
+  if (!searchQuery.value) {
+    searchMatches.value = []
+    searchCurrentIndex.value = null
+    updateSearchState()
+    return
+  }
+  const session = executeMarkdownSearchSession({
+    documentEpoch: documentIdentity.epoch,
+    documentId: documentIdentity.id,
+    mode: searchMode.value,
+    previousTask: searchTask.value ?? undefined,
+    queryText: searchQuery.value,
+    revision: transactionStore.revision,
+    source: transactionStore.value,
+  })
+  searchTask.value = session.task
+  searchMatches.value = session.execution.matches
+  searchCurrentIndex.value = session.execution.matches.length > 0 ? 0 : null
+  updateSearchState()
+}
+
+const openSearch = (replace = false) => {
+  searchUiState.value = resolveMarkdownSearchUi(
+    true,
+    searchQuery.value,
+    searchMatches.value.length,
+    {
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+      replaceOpen: replace,
+      replaceText: searchReplaceText.value,
+    },
+  )
+  if (searchQuery.value) {
+    runSearch()
+  }
+  nextTick(() => {
+    if (replace && searchReplaceInputRef.value) {
+      searchReplaceInputRef.value.focus()
+    } else if (searchQueryInputRef.value) {
+      searchQueryInputRef.value.focus()
+    }
+  })
+}
+
+const closeSearch = () => {
+  searchUiState.value = resolveMarkdownSearchUi(
+    false,
+    searchQuery.value,
+    searchMatches.value.length,
+    {
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+      replaceOpen: false,
+      replaceText: searchReplaceText.value,
+    },
+  )
+  if (currentMode.value === 'preview') {
+    rootElementRef.value?.focus()
+  } else if (textareaRef.value) {
+    textareaRef.value.focus()
+  }
+}
+
+const toggleSearchMode = (mode: MarkdownSearchMode) => {
+  searchMode.value = searchMode.value === mode ? 'plain' : mode
+  runSearch()
+}
+
+const toggleSearchReplace = () => {
+  searchUiState.value = resolveMarkdownSearchUi(
+    searchUiState.value.open,
+    searchQuery.value,
+    searchMatches.value.length,
+    {
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+      replaceOpen: !searchUiState.value.replaceOpen,
+      replaceText: searchReplaceText.value,
+    },
+  )
+}
+
+const searchNavigate = (direction: 'next' | 'previous') => {
+  const result = resolveMarkdownSearchNavigation(
+    searchMatches.value,
+    searchCurrentIndex.value,
+    direction,
+  )
+  if (result.match) {
+    const reveal = revealMarkdownSearchMatch({
+      currentMode: currentMode.value,
+      documentIdentity,
+      match: result.match,
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    })
+    if (reveal.status === 'stale' || reveal.status === 'deleted') {
+      runSearch()
+      return reveal.status
+    }
+    if (reveal.status !== 'success') return reveal.status
+    searchCurrentIndex.value = result.nextIndex
+    updateSearchState()
+    if (!reveal.suspended && currentMode.value !== 'preview') {
+      void restoreTextareaSelection({
+        direction: 'none',
+        end: result.match.range.end,
+        start: result.match.range.start,
+      })
+    }
+    void nextTick(syncRenderedSearchHighlights)
+    return reveal.status
+  }
+  return 'not-found' as const
+}
+
+const handleSearchQueryInput = () => {
+  runSearch()
+}
+
+const handleSearchInputKeydown = (event: KeyboardEvent) => {
+  const action = dispatchMarkdownSearchKeydown({
+    altKey: event.altKey,
+    ctrlKey: event.ctrlKey,
+    key: event.key,
+    metaKey: event.metaKey,
+    shiftKey: event.shiftKey,
+    targetIsInput: true,
+  })
+  if (action === 'next-match') {
+    event.preventDefault()
+    searchNavigate('next')
+  } else if (action === 'prev-match') {
+    event.preventDefault()
+    searchNavigate('previous')
+  } else if (action === 'close') {
+    event.preventDefault()
+    closeSearch()
+  }
+}
+
+const handleSearchReplaceKeydown = (event: KeyboardEvent) => {
+  const action = dispatchMarkdownSearchKeydown({
+    altKey: event.altKey,
+    ctrlKey: event.ctrlKey,
+    key: event.key,
+    metaKey: event.metaKey,
+    shiftKey: event.shiftKey,
+    targetIsReplaceInput: true,
+  })
+  if (action === 'replace-current') {
+    event.preventDefault()
+    searchReplaceCurrent()
+  } else if (action === 'replace-all') {
+    event.preventDefault()
+    searchReplaceAll()
+  } else if (action === 'close') {
+    event.preventDefault()
+    closeSearch()
+  }
+}
+
+const searchReplaceCurrent = () => {
+  if (searchCurrentIndex.value === null || !searchMatches.value.length) return
+  const plan = planMarkdownReplaceCurrentInSet(
+    {
+      documentEpoch: documentIdentity.epoch,
+      documentId: documentIdentity.id,
+      query: { mode: searchMode.value, queryVersion: 1, text: searchQuery.value },
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    },
+    searchMatches.value,
+    searchCurrentIndex.value,
+    searchReplaceText.value,
+  )
+  if ('changes' in plan) {
+    dispatchTransaction({
+      changes: [...plan.changes],
+      expectedRevision: transactionStore.revision,
+      history: 'separate',
+      origin: 'command',
+      selection: plan.selection,
+    })
+    runSearch()
+  }
+}
+
+const searchReplaceAll = () => {
+  if (!searchMatches.value.length) return
+  const plan = planMarkdownReplaceAll(
+    {
+      documentEpoch: documentIdentity.epoch,
+      documentId: documentIdentity.id,
+      query: { mode: searchMode.value, queryVersion: 1, text: searchQuery.value },
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    },
+    searchMatches.value,
+    searchReplaceText.value,
+  )
+  if ('changes' in plan) {
+    dispatchTransaction({
+      changes: [...plan.changes],
+      expectedRevision: transactionStore.revision,
+      history: 'separate',
+      origin: 'command',
+      selection: plan.selection,
+    })
+    runSearch()
+  }
+}
+
+watch(
+  [editorValue, editorRevision, () => props.embedProvider],
+  refreshEmbedPresentations,
+  { immediate: true },
+)
+
+watch(
+  [editorValue, editorRevision, currentMode],
+  () => {
+    if (searchUiState.value.open && searchQuery.value) runSearch()
+  },
+)
+
+watch(
+  [searchMatches, searchCurrentIndex, () => searchUiState.value.open, currentMode],
+  () => void nextTick(syncRenderedSearchHighlights),
+  { flush: 'post' },
+)
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && searchUiState.value.open) {
+    event.preventDefault()
+    closeSearch()
+    return
+  }
+  const searchAction = dispatchMarkdownSearchKeydown({
+    ctrlKey: event.ctrlKey,
+    key: event.key,
+    metaKey: event.metaKey,
+    shiftKey: event.shiftKey,
+  })
+  if (searchAction === 'open-find' || searchAction === 'open-replace') {
+    event.preventDefault()
+    openSearch(searchAction === 'open-replace')
+    return
+  }
+  if (event.key === 'PageUp' || event.key === 'PageDown') {
+    suspendTypewriterForUserScroll()
+  }
+
+  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
   if (activeSlashTrigger.value && slashCommands.value.length) {
     if (event.key === 'Escape') {
       event.preventDefault()
@@ -4139,13 +5306,142 @@ const insertMarkdownAtCursor = (
   }).accepted
 }
 
+const commitRevealSelection = async (
+  range: { start: number; end: number },
+  smooth: boolean,
+) => {
+  const selection = Object.freeze({
+    direction: 'none' as const,
+    end: range.start,
+    start: range.start,
+  })
+  transactionStore.setSelection(selection, true)
+  refreshLiveWindow('feature')
+  refreshWritingAidsDocument()
+  await restoreTextareaSelection(selection)
+  const textarea = textareaRef.value
+  if (!textarea) return
+  textarea.focus()
+  if (resolvedWritingAids.value.typewriter) {
+    applyTypewriterScroll('explicit-navigation')
+    return
+  }
+  const lineHeight =
+    Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
+  const line =
+    transactionStore.value.slice(0, range.start).split('\n').length - 1
+  const top = Math.max(0, line * lineHeight - textarea.clientHeight / 3)
+  if (typeof textarea.scrollTo === 'function') {
+    const scrollTop = Math.min(
+      top,
+      Math.max(0, textarea.scrollHeight - textarea.clientHeight),
+    )
+    textarea.scrollTo({ behavior: smooth ? 'smooth' : 'auto', top: scrollTop })
+    requestAnimationFrame(() => {
+      syncFocusLayerScroll(textarea.scrollTop)
+    })
+  } else {
+    textarea.scrollTop = top
+    syncFocusLayerScroll(top)
+  }
+}
+
+const currentOutlineContext = () => {
+  const projection = editorProjection.value
+  return {
+    anchorMap: createMarkdownAnchorMap({
+      identity: documentIdentity,
+      projection,
+      source: transactionStore.value,
+    }),
+    model: projection
+      ? createMarkdownOutlineModelFromProjection(
+          transactionStore.value,
+          projection,
+        )
+      : { items: [], projection: undefined },
+  }
+}
+
+const reducedMotionRequested = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+
+const revealHeading = (
+  nodeId: string,
+  options?: Parameters<typeof revealHeadingOutline>[4],
+) => {
+  const { anchorMap, model } = currentOutlineContext()
+  const actual = {
+    documentIdentity,
+    revision: transactionStore.revision,
+  }
+  const expected = options?.expected ?? actual
+  const status = revealHeadingOutline(model.items, nodeId, expected, actual, {
+    ...options,
+    anchorMap,
+    projection: model.projection,
+  })
+  if (status !== 'success') return status
+  const plan = planMarkdownOutlineReveal(model.items, nodeId, {
+    ...options,
+    actual,
+    anchorMap,
+    expected,
+    mode: currentMode.value,
+    reducedMotion: options?.reducedMotion ?? reducedMotionRequested(),
+  })
+  if (plan.status !== 'success' || !plan.range) return plan.status
+  void commitRevealSelection(plan.range, plan.smooth)
+  return 'success'
+}
+
+const revealSourceRange = (
+  range: { start: number; end: number },
+  options?: Parameters<typeof revealSourceRangeOutline>[2],
+) => {
+  if (
+    range.start < 0 ||
+    range.end < range.start ||
+    range.end > transactionStore.value.length
+  ) {
+    return 'not-found'
+  }
+  const { anchorMap, model } = currentOutlineContext()
+  const actual = {
+    documentIdentity,
+    revision: transactionStore.revision,
+  }
+  const guarded = revealSourceRangeOutline(model.items, range, {
+    ...options,
+    actual,
+    anchorMap,
+    expected: options?.expected ?? actual,
+    mode: options?.mode ?? currentMode.value,
+    sourceLength: transactionStore.value.length,
+  })
+  if (guarded !== 'success') return guarded
+  const smooth = !(options?.reducedMotion ?? reducedMotionRequested())
+  void commitRevealSelection(range, smooth)
+  return 'success'
+}
+
 defineExpose({
+  closeSearch,
   closeCommandPalette,
   applyAttachmentResult,
   dispatchTransaction,
   insertMarkdownAtCursor,
+  openSearch,
   openCommandPalette,
   redo,
+  searchNavigate,
+  searchReplaceAll,
+  searchReplaceCurrent,
+  searchUi: searchUiState,
   undo,
+  revealHeading,
+  revealSourceRange,
+  writingAidsController,
 })
 </script>

@@ -1,7 +1,7 @@
 {
   "component": "avatar",
   "runner": "headless-skia",
-  "screenshot": "/mnt/dev-cache/lyuaoss/FsusUI-chain-markdown-command-surfaces/tests/conformance/visual/artifacts/screenshots/avalonia/avatar-vue-parity.png",
+  "screenshot": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/heavy-feature-lifecycle/tests/conformance/visual/artifacts/screenshots/avalonia/avatar-vue-parity.png",
   "surfaceBounds": [
     0,
     0,

@@ -201,7 +201,9 @@ const cases = [
       'name-value-state-drift',
       (value) =>
         (value.browserAccessibility.nodes.find(
-          (node) => node.role === 'textbox',
+          (node) =>
+            node.role === 'textbox' &&
+            /^markdown\s*源码\s*编辑区$/iu.test(node.name ?? ''),
         ).name = 'Fixture name'),
       'web.accessibility.nodes markdown textbox missing',
     ],

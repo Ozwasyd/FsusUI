@@ -62,10 +62,13 @@ const unpublishedWorkspaceDependencyNames = new Set([
 ])
 const wasmRuntimeArtifacts = [
   'dist/ep_wasm.wasm',
+  'dist/markdown-heavy-feature-frame.mjs',
   'es/wasm/ep_wasm.mjs',
+  'es/wasm/markdown-heavy-feature-frame.mjs',
   'es/wasm/dist/ep_wasm.mjs',
   'es/wasm/dist/ep_wasm.wasm',
   'lib/wasm/ep_wasm.mjs',
+  'lib/wasm/markdown-heavy-feature-frame.mjs',
   'lib/wasm/dist/ep_wasm.mjs',
   'lib/wasm/dist/ep_wasm.wasm',
   'dist/markdown_basic.js',
@@ -516,6 +519,68 @@ function assertWasmRuntimeArtifacts(rootDir) {
   }
 }
 
+function assertMarkdownHeavyFeatureFrameArtifacts(rootDir) {
+  const frameArtifacts = [
+    'dist/markdown-heavy-feature-frame.mjs',
+    'es/wasm/markdown-heavy-feature-frame.mjs',
+    'lib/wasm/markdown-heavy-feature-frame.mjs',
+  ]
+  const contents = frameArtifacts.map((artifact) =>
+    readFileSync(path.join(rootDir, artifact), 'utf8'),
+  )
+  for (const [index, content] of contents.entries()) {
+    const artifact = frameArtifacts[index]
+    if (!content.includes('fsus-markdown-heavy-feature-frame@1')) {
+      throw new Error(`${artifact}: missing heavy feature frame scope`)
+    }
+    if (
+      content.includes('sourceMappingURL') ||
+      content.includes('?worker') ||
+      content.includes('.worker.ts') ||
+      content.includes('import.meta.url')
+    ) {
+      throw new Error(`${artifact}: contains an unresolved runtime reference`)
+    }
+  }
+
+  if (!contents.every((content) => content === contents[0])) {
+    throw new Error(
+      'Markdown heavy feature frame asset must be byte-identical across dist, es, and lib.',
+    )
+  }
+
+  const builtUrlContracts = [
+    {
+      file: 'es/_virtual/_element-plus_markdown-heavy-feature-frame-url.mjs',
+      pattern:
+        /new URL\(['"]\.\.\/wasm\/markdown-heavy-feature-frame\.mjs['"],\s*import\.meta\.url\)\.href/u,
+    },
+    {
+      file: 'lib/_virtual/_element-plus_markdown-heavy-feature-frame-url.js',
+      pattern: /\.\.\/wasm\/markdown-heavy-feature-frame\.mjs/u,
+    },
+    {
+      file: 'dist/index.full.mjs',
+      pattern:
+        /new URL\(['"]markdown-heavy-feature-frame\.mjs['"],\s*import\.meta\.url\)\.href/u,
+    },
+    {
+      file: 'dist/index.full.js',
+      pattern: /markdown-heavy-feature-frame\.mjs/u,
+    },
+  ]
+
+  for (const { file, pattern } of builtUrlContracts) {
+    const filePath = path.join(rootDir, file)
+    if (!existsSync(filePath)) {
+      throw new Error(`${file}: missing heavy feature frame URL owner`)
+    }
+    if (!pattern.test(readFileSync(filePath, 'utf8'))) {
+      throw new Error(`${file}: heavy feature frame URL contract drifted`)
+    }
+  }
+}
+
 function isSelfReferenceCandidate(filePath) {
   return selfReferenceFileExtensions.some((extension) => {
     return filePath.endsWith(extension)
@@ -853,6 +918,7 @@ if (strict) {
   )
   assertDistArtifactShape(distRoot)
   assertWasmRuntimeArtifacts(distRoot)
+  assertMarkdownHeavyFeatureFrameArtifacts(distRoot)
   stripSourceMappingUrlReferences(distRoot)
   prunedSourceMaps = pruneSourceMaps(distRoot)
   rewrittenWorkerReferences = rewriteWorkerRuntimeReferences(distRoot)
