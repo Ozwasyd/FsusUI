@@ -11,6 +11,16 @@
         "start": 5
       },
       "source": "hello world",
+      "projection": {
+        "nodes": [
+          {
+            "end": 11,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -46,6 +56,16 @@
         "start": 5
       },
       "source": "hello",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -81,6 +101,16 @@
         "start": 5
       },
       "source": "hello world",
+      "projection": {
+        "nodes": [
+          {
+            "end": 11,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "shift-enter",
@@ -116,6 +146,16 @@
         "start": 2
       },
       "source": "hello",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "backspace",
@@ -151,6 +191,16 @@
         "start": 2
       },
       "source": "hello",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "delete",
@@ -186,6 +236,16 @@
         "start": 2
       },
       "source": "hello",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "tab",
@@ -206,6 +266,16 @@
         "start": 0
       },
       "source": "abc",
+      "projection": {
+        "nodes": [
+          {
+            "end": 3,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "backspace",
@@ -226,6 +296,16 @@
         "start": 3
       },
       "source": "abc",
+      "projection": {
+        "nodes": [
+          {
+            "end": 3,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "delete",
@@ -246,6 +326,16 @@
         "start": 0
       },
       "source": "hello world",
+      "projection": {
+        "nodes": [
+          {
+            "end": 11,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -281,6 +371,16 @@
         "start": 7
       },
       "source": "# Title",
+      "projection": {
+        "nodes": [
+          {
+            "end": 7,
+            "id": "syn:editor:0:heading:0",
+            "kind": "heading",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -316,6 +416,16 @@
         "start": 2
       },
       "source": "# Title",
+      "projection": {
+        "nodes": [
+          {
+            "end": 7,
+            "id": "syn:editor:0:heading:0",
+            "kind": "heading",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "backspace",
@@ -336,6 +446,16 @@
         "start": 6
       },
       "source": "- item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -371,6 +491,16 @@
         "start": 2
       },
       "source": "- ",
+      "projection": {
+        "nodes": [
+          {
+            "end": 2,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -406,6 +536,16 @@
         "start": 6
       },
       "source": "- item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "tab",
@@ -441,6 +581,16 @@
         "start": 8
       },
       "source": "  - item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 8,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "shift-tab",
@@ -476,6 +626,16 @@
         "start": 2
       },
       "source": "- item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "backspace",
@@ -511,6 +671,16 @@
         "start": 10
       },
       "source": "- [ ] todo",
+      "projection": {
+        "nodes": [
+          {
+            "end": 10,
+            "id": "syn:editor:0:task:0",
+            "kind": "task",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -546,6 +716,16 @@
         "start": 6
       },
       "source": "- [ ] ",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:task:0",
+            "kind": "task",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -581,6 +761,16 @@
         "start": 8
       },
       "source": "> quoted",
+      "projection": {
+        "nodes": [
+          {
+            "end": 8,
+            "id": "syn:editor:0:quote:0",
+            "kind": "quote",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -616,6 +806,16 @@
         "start": 2
       },
       "source": "> ",
+      "projection": {
+        "nodes": [
+          {
+            "end": 2,
+            "id": "syn:editor:0:quote:0",
+            "kind": "quote",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -651,6 +851,16 @@
         "start": 2
       },
       "source": "> quoted",
+      "projection": {
+        "nodes": [
+          {
+            "end": 8,
+            "id": "syn:editor:0:quote:0",
+            "kind": "quote",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "backspace",
@@ -686,6 +896,16 @@
         "start": 15
       },
       "source": "```js\nconst a = 1\n```",
+      "projection": {
+        "nodes": [
+          {
+            "end": 21,
+            "id": "syn:editor:0:code:0",
+            "kind": "code",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -721,6 +941,16 @@
         "start": 15
       },
       "source": "```js\nconst a = 1\n```",
+      "projection": {
+        "nodes": [
+          {
+            "end": 21,
+            "id": "syn:editor:0:code:0",
+            "kind": "code",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "tab",
@@ -756,6 +986,16 @@
         "start": 12
       },
       "source": "| a | b |\n| - | - |\n| 1 | 2 |",
+      "projection": {
+        "nodes": [
+          {
+            "end": 29,
+            "id": "syn:editor:0:table:0",
+            "kind": "table",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -776,6 +1016,22 @@
         "start": 11
       },
       "source": "text ![alt](u) more",
+      "projection": {
+        "nodes": [
+          {
+            "end": 19,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          },
+          {
+            "end": 14,
+            "id": "syn:editor:0:image:0",
+            "kind": "image",
+            "start": 5
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -812,6 +1068,16 @@
         "start": 6
       },
       "source": "- item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -833,6 +1099,16 @@
         "start": 0
       },
       "source": "a\nb\nc",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "tab",
@@ -868,6 +1144,16 @@
         "start": 0
       },
       "source": "  a\n  b\n  c",
+      "projection": {
+        "nodes": [
+          {
+            "end": 11,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "shift-tab",
@@ -903,6 +1189,16 @@
         "start": 2
       },
       "source": "你好世界",
+      "projection": {
+        "nodes": [
+          {
+            "end": 4,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -938,6 +1234,16 @@
         "start": 8
       },
       "source": "👨‍👩‍👧",
+      "projection": {
+        "nodes": [
+          {
+            "end": 8,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "backspace",
@@ -973,6 +1279,16 @@
         "start": 1
       },
       "source": "éx",
+      "projection": {
+        "nodes": [
+          {
+            "end": 3,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "delete",
@@ -1008,6 +1324,16 @@
         "start": 5
       },
       "source": "שלום עולם",
+      "projection": {
+        "nodes": [
+          {
+            "end": 9,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",
@@ -1043,6 +1369,16 @@
         "start": 5
       },
       "source": "﻿a\r\nb",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
       "expected": {
         "intent": {
           "key": "enter",

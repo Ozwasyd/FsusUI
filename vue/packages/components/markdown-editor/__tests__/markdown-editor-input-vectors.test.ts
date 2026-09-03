@@ -1,6 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import {
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+} from '../../../wasm/markdown-runtime'
 import { resolveMarkdownClipboardPaste } from '../src/markdown-editor-clipboard'
 import { resolveMarkdownBlockInputIntent } from '../src/markdown-editor-input-intent'
 import { createMarkdownEditorNativeEventMachine } from '../src/markdown-editor-native-event'
@@ -288,10 +292,25 @@ const compositionScenarios: readonly CompositionScenario[] = [
   },
 ]
 
+const blockProjectionFor = (source: string) =>
+  stabilizeMarkdownEditorProjection(createMarkdownEditorProjection(source), {
+    epoch: 0,
+    id: 'editor',
+  })
+
+const blockProjectionNodes = (source: string) =>
+  blockProjectionFor(source).nodes.map((node) => ({
+    end: node.rawRange.end,
+    id: node.id,
+    kind: node.kind,
+    start: node.rawRange.start,
+  }))
+
 const runBlock = (scenario: BlockScenario) =>
   resolveMarkdownBlockInputIntent({
     composing: scenario.composing,
     key: scenario.key,
+    projection: blockProjectionFor(scenario.source),
     selection: scenario.selection,
     source: scenario.source,
   })
@@ -384,6 +403,7 @@ const produce = () => ({
   contract: 'markdown-editor-input@2026-08-15',
   blockInput: blockScenarios.map((scenario) => ({
     ...scenario,
+    projection: { nodes: blockProjectionNodes(scenario.source) },
     expected: serialize(runBlock(scenario)),
   })),
   pairInput: pairScenarios.map((scenario) => ({
