@@ -19,10 +19,15 @@ export const usePopperContentDOM = (
   const { nextZIndex } = useZIndex()
   const ns = useNamespace('popper')
 
-  const contentAttrs = computed(() => ({
-    ...unref(attributes).popper,
-    'data-allow-mismatch': 'style',
-  }))
+  const contentAttrs = computed(() => {
+    const attrs: Record<string, unknown> = {
+      ...unref(attributes).popper,
+    }
+    if (props.allowMismatch) {
+      attrs['data-allow-mismatch'] = 'style'
+    }
+    return attrs
+  })
   const contentZIndex = ref<number>(
     isNumber(props.zIndex) ? props.zIndex : nextZIndex()
   )
