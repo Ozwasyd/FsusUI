@@ -1,7 +1,6 @@
 .markdown-renderer {
   position: relative;
   min-width: 0;
-  container-type: inline-size;
   overflow-anchor: none;
 }
 
@@ -90,7 +89,6 @@
 }
 
 .markdown-renderer__virtual-unit {
-  contain: layout style paint;
   overflow-anchor: none;
 }
 
