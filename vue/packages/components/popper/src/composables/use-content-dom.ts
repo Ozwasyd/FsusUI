@@ -19,6 +19,9 @@ export const usePopperContentDOM = (
   const { nextZIndex } = useZIndex()
   const ns = useNamespace('popper')
 
+  // FsusBlog #771: the Vue hydration-mismatch suppression marker leaks into
+  // every consumer bundle and violates zero-residue gates that treat it as a
+  // retired suppression token, so it is opt-in via `allowMismatch`.
   const contentAttrs = computed(() => {
     const attrs: Record<string, unknown> = {
       ...unref(attributes).popper,

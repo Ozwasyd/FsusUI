@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
+
 import { commitMarkdownAttachmentResult } from '../src/markdown-editor-attachment'
 import {
   evaluateMarkdownImagePropertyMutations,
@@ -171,11 +173,12 @@ describe('Issue #445: Link/image property editor acceptance mutations', () => {
     expect(safe.state).toBe('valid-external')
     expect(safe.open.allowed).toBe(true)
 
-    const dangerous = validateMarkdownPropertyUrl('javascript:alert(1)', {
+    const dangerousScheme = getMarkdownXssSourceUrl('mxss-url-javascript-link')
+    const dangerous = validateMarkdownPropertyUrl(dangerousScheme, {
       documentEpoch: 1,
       revision: 1,
       nodeId: 'node:1',
-      value: 'javascript:alert(1)',
+      value: dangerousScheme,
       version: 1,
     })
     expect(dangerous.state).toBe('blocked-scheme')

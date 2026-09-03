@@ -204,7 +204,7 @@
         :min-rows="6"
         :mobile-layout="markdownCommandMobileLayout"
         :show-actions="false"
-        :show-mode-switcher="false"
+        :show-mode-switcher="markdownLanguageToolsFixture"
         :status-density="markdownCommandStatusDensity"
         :surfaces="
           markdownCommandSurfacesFixture
@@ -453,7 +453,7 @@
           :min-rows="12"
           :show-actions="false"
           :show-mode-switcher="false"
-          :writing-aids="{ focus: true, typewriter: true }"
+          :writing-aids="markdownWritingAidsOptions"
         />
       </div>
       <button
@@ -2194,9 +2194,26 @@ const markdownEditorTransactionFixture =
   new URLSearchParams(window.location.search).get(
     'markdownEditorTransaction',
   ) === '1'
+const markdownLanguageToolsFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownLanguageTools') ===
+    '1'
 const markdownWritingAidsFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownWritingAids') === '1'
+const markdownWritingAidsCombo =
+  typeof window === 'undefined'
+    ? 'both'
+    : new URLSearchParams(window.location.search).get(
+        'markdownWritingAidsCombo',
+      ) ?? 'both'
+const markdownWritingAidsOptions = {
+  focus:
+    markdownWritingAidsCombo === 'focus' || markdownWritingAidsCombo === 'both',
+  typewriter:
+    markdownWritingAidsCombo === 'typewriter' ||
+    markdownWritingAidsCombo === 'both',
+}
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'

@@ -86,6 +86,15 @@ describe('<ElPopperContent />', () => {
       expect(wrapper.vm.contentStyle[2]).toEqual({})
     })
 
+    it('emits data-allow-mismatch only when allowMismatch is opt-in', async () => {
+      wrapper = mountContent({
+        allowMismatch: true,
+      }) as unknown as VueWrapper<PopperContentInstance>
+      await nextTick()
+
+      expect(wrapper.attributes('data-allow-mismatch')).toBe('style')
+    })
+
     it('should be able to be pure and themed', async () => {
       wrapper = mountContent() as unknown as VueWrapper<PopperContentInstance>
       await nextTick()
