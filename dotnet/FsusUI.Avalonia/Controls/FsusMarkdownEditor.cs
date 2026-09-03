@@ -104,7 +104,7 @@ public class FsusMarkdownEditor : TemplatedControl
   private ContentPresenter? contentPresenter;
   private ScrollViewer? scrollViewer;
   private Grid? nativeSurface;
-  private TextBox? inputOwner;
+  internal TextBox? inputOwner;
   private FsusMarkdownEditorProjectionView? projectionView;
   private bool synchronizingDocument;
   private bool synchronizingInput;
@@ -351,19 +351,6 @@ public class FsusMarkdownEditor : TemplatedControl
     var previousSelection = store.Selection;
     var previousHistory = store.History;
     var result = operation();
-    if (transaction.Origin == "external")
-    {
-      nativeMachine.Apply(new FsusMarkdownNativeEventInput
-      {
-        Kind = FsusMarkdownNativeEventKind.ExternalReset,
-        DocumentIdentity = transaction.DocumentIdentity ?? store.Identity,
-        CurrentIdentity = store.Identity,
-        Revision = result.Revision,
-        Value = result.Value,
-        Selection = result.Selection,
-        ExpectedRevision = transaction.ExpectedRevision,
-      });
-    }
     if (result.Accepted && transaction.Origin == "external" && transaction.ExternalUpdate == "reset")
     {
       // An external hard reset terminates the live undo chain. When the reset
@@ -471,6 +458,10 @@ public class FsusMarkdownEditor : TemplatedControl
     inputOwner.PointerPressed += OnInputPointerPressed;
     inputOwner.PointerMoved += OnInputPointerMoved;
     inputOwner.PointerReleased += OnInputPointerReleased;
+    this.AddHandler(
+      InputElement.GotFocusEvent,
+      OnSelfGotFocus,
+      RoutingStrategies.Bubble);
     inputOwner.AddHandler(
       TextInputMethodClientRequestedEvent,
       OnInputMethodClientRequested,
@@ -508,7 +499,7 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       SetCurrentValue(CapabilityStateProperty, capability);
     }
-    if (Mode == FsusMarkdownEditorMode.Live && projection.RequiresRefresh)
+    if (Mode != FsusMarkdownEditorMode.Preview && projection.RequiresRefresh)
     {
       var requestKey =
         $"{store.Identity.Id}\u001F{store.Identity.Epoch}\u001F{store.Revision}" +
@@ -704,6 +695,17 @@ public class FsusMarkdownEditor : TemplatedControl
     Dispatcher.UIThread.Post(Restore);
   }
 
+  private void OnSelfGotFocus(object? sender, FocusChangedEventArgs args)
+  {
+    if (inputOwner is null || !ReferenceEquals(args.Source, this))
+    {
+      return;
+    }
+    // Shell focus (programmatic Focus, tab navigation, chrome clicks) must
+    // land in the native input owner or the text pipeline never runs.
+    inputOwner.Focus();
+  }
+
   private void OnInputTextChanged(object? sender, TextChangedEventArgs args)
   {
     if (synchronizingInput || inputOwner is null)
@@ -817,7 +819,9 @@ public class FsusMarkdownEditor : TemplatedControl
       // The end event is applied when that commit lands
       // (OnInputPreviewTextInput), or flushed as a cancel on the next
       // observed input event. No timers: the contract forbids timeout dedup.
-      if (nativeMachine.Composing)
+      // A composition that was aborted by a document switch also keeps the
+      // pending end so its late commit is rejected as orphaned.
+      if (nativeMachine.Composing || nativeMachine.Phase is FsusMarkdownNativePhase.Aborted or FsusMarkdownNativePhase.Draining)
       {
         pendingCompositionEnd = true;
       }
@@ -917,10 +921,26 @@ public class FsusMarkdownEditor : TemplatedControl
     }
     if (pendingCompositionEnd)
     {
-      // The IME cleared the preedit and committed this text in the same turn.
-      // Apply the end event with the committed data, let the machine dedup
-      // the native insertion, and dispatch exactly one commit transaction.
+      // The IME cleared the preedit and the commit text follows in the same
+      // turn — unless the composition was aborted by a document switch, in
+      // which case the late commit is orphaned and must be dropped.
       pendingCompositionEnd = false;
+      if (nativeMachine.Phase is FsusMarkdownNativePhase.Aborted or FsusMarkdownNativePhase.Draining)
+      {
+        nativeMachine.Apply(new FsusMarkdownNativeEventInput
+        {
+          Kind = FsusMarkdownNativeEventKind.CompositionEnd,
+          Data = inserted,
+          Value = store.Value,
+          PreviousValue = store.Value,
+          Revision = store.Revision,
+          Selection = store.Selection,
+          DocumentIdentity = store.Identity,
+          CurrentIdentity = store.Identity,
+        });
+        args.Handled = true;
+        return;
+      }
       var endPlan = nativeMachine.Apply(new FsusMarkdownNativeEventInput
       {
         Kind = FsusMarkdownNativeEventKind.CompositionEnd,
@@ -991,7 +1011,10 @@ public class FsusMarkdownEditor : TemplatedControl
     // text-changed pipeline dispatches the raw source transaction.
   }
 
-  private async Task HandlePasteAsync(string origin)
+  private async Task HandlePasteAsync(string origin) =>
+    await HandlePasteCoreAsync(origin);
+
+  internal async Task HandlePasteCoreAsync(string origin)
   {
     var topLevel = TopLevel.GetTopLevel(this);
     if (topLevel?.Clipboard is null)
@@ -1162,6 +1185,16 @@ public class FsusMarkdownEditor : TemplatedControl
   public IReadOnlyList<FsusMarkdownNativeTraceEntry> NativeTrace => nativeMachine.Trace;
 
   public string NativePhase => FsusMarkdownNativeEventMachine.PhaseToken(nativeMachine.Phase);
+
+  /// <summary>
+  /// Provenance of the captured native input evidence. The default marks
+  /// headless runs as synthetic; only the real Linux IME harness (X11/ibus or
+  /// Wayland text-input) may overwrite it, and alignment evidence produced
+  /// from synthetic runs must never be presented as real IME evidence.
+  /// </summary>
+  public string NativeInputProvenance { get; set; } = "headless-synthetic";
+
+  internal FsusMarkdownEditorTransactionStore Store => store;
 
   private void OnInputPointerPressed(object? sender, PointerPressedEventArgs args)
   {
