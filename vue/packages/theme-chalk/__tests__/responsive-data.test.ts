@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { compile } from 'sass'
@@ -27,6 +28,21 @@ describe('responsive data component contracts', () => {
     expect(css).toContain('@container (max-width: 559px)')
     expect(css).toContain('overflow-wrap: anywhere;')
     expect(css).toContain('width: 22px;')
+  })
+
+  test('Descriptions dist artifact preserves container queries and keeps stack hidden by default', () => {
+    const distCssPath = path.resolve(dirname, '../dist/el-descriptions.css')
+    if (existsSync(distCssPath)) {
+      const distCss = readFileSync(distCssPath, 'utf8')
+      expect(distCss).toContain('@container (max-width: 559px)')
+      const withoutContainerQuery = distCss.replace(
+        /@container[^{]+\{[\s\S]*?\}\}/g,
+        '',
+      )
+      expect(withoutContainerQuery).not.toContain(
+        '.el-descriptions--responsive-auto .el-descriptions__stack',
+      )
+    }
   })
 
   test('Table preserves hidden columns in flat row details or explicit scroll', () => {
