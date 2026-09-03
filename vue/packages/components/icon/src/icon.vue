@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, mergeProps, useAttrs } from 'vue'
 import { addUnit, isUndefined } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import { iconProps } from './icon'
@@ -19,6 +19,7 @@ defineOptions({
   inheritAttrs: false,
 })
 const props = defineProps(iconProps)
+const attrs = useAttrs()
 const ns = useNamespace('icon')
 
 // A `:style` binding keeps the key present even when its value is empty, and
@@ -35,7 +36,9 @@ const style = computed<CSSProperties | null>(() => {
   }
 })
 
+// $attrs must go through `mergeProps` (not a plain spread) so consumer class
+// and style entries concatenate with the internal bindings.
 const mergedBindings = computed<Record<string, unknown>>(() =>
-  style.value ? { style: style.value } : {},
+  mergeProps(style.value ? { style: style.value } : {}, attrs)
 )
 </script>

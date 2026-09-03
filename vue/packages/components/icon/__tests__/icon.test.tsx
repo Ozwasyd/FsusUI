@@ -25,6 +25,27 @@ describe('Icon.vue', () => {
     expect(wrapper.element.hasAttribute('style')).toBe(false)
   })
 
+  test('forwards consumer attrs and merges class/style with internal bindings', () => {
+    const withoutStyle = mount(() => (
+      <Icon aria-hidden="true" data-test="icon" class="consumer">
+        icon
+      </Icon>
+    ))
+    expect(withoutStyle.attributes('aria-hidden')).toBe('true')
+    expect(withoutStyle.attributes('data-test')).toBe('icon')
+    expect(withoutStyle.classes()).toContain('el-icon')
+    expect(withoutStyle.classes()).toContain('consumer')
+
+    const withStyle = mount(() => (
+      <Icon size={18} class="consumer" style={{ color: 'red' }}>
+        icon
+      </Icon>
+    ))
+    expect(withStyle.classes()).toContain('consumer')
+    expect(withStyle.attributes('style')).toContain('font-size: 18px')
+    expect(withStyle.attributes('style')).toContain('color: red')
+  })
+
   test('scopes line icon geometry only through the explicit variant', () => {
     const inherited = mount(() => (
       <Icon>
