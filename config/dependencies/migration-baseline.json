@@ -4,7 +4,7 @@
   "createdAt": "2026-08-09T02:20:00.000Z",
   "files": {
     "pnpm-lock.yaml": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
-    "package.json": "075bd07790ecb6cebe4f985c83711c8a213f63b8bfc2daa42360e564e2e69c0d",
+    "package.json": "f47ee30ac5fccd607947c899048c8be83b40c3364bd25a6a7098669e9bebaac3",
     "vue/packages/element-plus/package.json": "e869928c42ed32578ebbc269e1fb66293a85a64324f484ce7dc142afae9e884c",
     "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
