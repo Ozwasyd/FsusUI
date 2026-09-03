@@ -1057,6 +1057,7 @@ import {
   useMarkdownEditorFrameScheduler,
   useNamespace,
 } from '@element-plus/hooks'
+import { provideMarkdownHeavyFeatureDocumentContext } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import {
   createMarkdownAnchorMap,
   createMarkdownEditorProjection,
@@ -1372,6 +1373,11 @@ const transactionStore = new MarkdownEditorTransactionStore(
   initialSelection,
   documentIdentity,
 )
+provideMarkdownHeavyFeatureDocumentContext({
+  documentEpoch: () => transactionStore.documentIdentity.epoch,
+  documentKey: () => transactionStore.documentIdentity.id,
+  revision: () => transactionStore.revision,
+})
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)

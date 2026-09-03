@@ -15,6 +15,7 @@ import {
   writeBundles,
 } from '../utils'
 import { ElementPlusAlias } from '../plugins/element-plus-alias'
+import { MarkdownHeavyFeatureFrameUrl } from '../plugins/markdown-heavy-feature-frame'
 import { buildConfigEntries, target } from '../build-info'
 
 import type { OutputOptions } from 'rollup'
@@ -57,6 +58,9 @@ export const buildModules = async () => {
           if (id === '@element-plus/wasm') return wasmSourceEntry
         },
       },
+      MarkdownHeavyFeatureFrameUrl({
+        assetFileName: 'wasm/markdown-heavy-feature-frame.mjs',
+      }),
       ElementPlusAlias(),
       ...vueMacrosPlugins,
       json(),

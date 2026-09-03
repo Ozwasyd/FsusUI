@@ -71,18 +71,22 @@ export interface MarkdownEditorFrameSchedulerMetrics {
 }
 
 export interface MarkdownEditorFrameScheduler {
-  schedule: (task: MarkdownEditorFrameTask) => void
+  schedule: (task: MarkdownEditorFrameTask) => boolean
   scheduleMeasure: (
     key: string,
     run: () => void,
     guard?: () => boolean,
-  ) => void
-  scheduleMutate: (key: string, run: () => void, guard?: () => boolean) => void
+  ) => boolean
+  scheduleMutate: (
+    key: string,
+    run: () => void,
+    guard?: () => boolean,
+  ) => boolean
   schedulePostPaint: (
     key: string,
     run: () => void,
     guard?: () => boolean,
-  ) => void
+  ) => boolean
   cancel: (key: string) => void
   cancelAll: () => void
   metrics: () => MarkdownEditorFrameSchedulerMetrics
@@ -125,7 +129,9 @@ export const createMarkdownEditorFrameScheduler = (
   const requestFrame = options.requestFrame ?? defaultRequestFrame
   const cancelFrame = options.cancelFrame ?? defaultCancelFrame
   const now =
-    options.now ?? (() => (typeof performance === 'undefined' ? Date.now() : performance.now()))
+    options.now ??
+    (() =>
+      typeof performance === 'undefined' ? Date.now() : performance.now())
   const maxQueuedTasks = options.maxQueuedTasks ?? DEFAULT_MAX_QUEUED_TASKS
 
   const entries = new Map<string, FrameTaskEntry>()
@@ -237,14 +243,14 @@ export const createMarkdownEditorFrameScheduler = (
   }
 
   const schedule = (task: MarkdownEditorFrameTask) => {
-    if (disposed) return
+    if (disposed) return false
     if (
       entries.size >= maxQueuedTasks &&
       !entries.has(task.key) &&
       !runningPhase
     ) {
       overflowDroppedTasks += 1
-      return
+      return false
     }
     if (
       task.measure &&
@@ -261,6 +267,7 @@ export const createMarkdownEditorFrameScheduler = (
     }
     entries.set(task.key, { started: false, task })
     requestNextFrame()
+    return true
   }
 
   const cancel = (key: string) => {

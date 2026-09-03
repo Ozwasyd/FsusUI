@@ -532,48 +532,7 @@ export const applyMarkdownEditorChanges = (
   }
 }
 
-export const deriveMarkdownEditorChange = (
-  previous: string,
-  next: string,
-): MarkdownEditorChange | undefined => {
-  if (previous === next) return undefined
-
-  let prefix = 0
-  const prefixLimit = Math.min(previous.length, next.length)
-  while (prefix < prefixLimit && previous[prefix] === next[prefix]) {
-    prefix += 1
-  }
-  if (
-    isSplitSurrogateBoundary(previous, prefix) ||
-    isSplitSurrogateBoundary(next, prefix)
-  ) {
-    prefix -= 1
-  }
-
-  let previousSuffix = previous.length
-  let nextSuffix = next.length
-  while (
-    previousSuffix > prefix &&
-    nextSuffix > prefix &&
-    previous[previousSuffix - 1] === next[nextSuffix - 1]
-  ) {
-    previousSuffix -= 1
-    nextSuffix -= 1
-  }
-  if (
-    isSplitSurrogateBoundary(previous, previousSuffix) ||
-    isSplitSurrogateBoundary(next, nextSuffix)
-  ) {
-    previousSuffix += 1
-    nextSuffix += 1
-  }
-
-  return {
-    from: prefix,
-    insert: next.slice(prefix, nextSuffix),
-    to: previousSuffix,
-  }
-}
+export { deriveMarkdownEditorChange } from '../../../wasm/markdown-syntax-identity'
 
 const selectionsEqual = (
   first: MarkdownEditorResolvedSelection,
