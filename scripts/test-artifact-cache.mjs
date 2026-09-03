@@ -68,6 +68,8 @@ export const artifactGroups = {
       {
         id: 'bundle',
         fingerprintPath: 'vue/packages/wasm/dist/.artifact-fingerprint',
+        artifactDigestPath:
+          'vue/packages/wasm/dist/.bundle-artifact-content-digest',
         artifactFiles: wasmBundleArtifacts,
         inputPatterns: [
           'vue/packages/wasm/package.json',
@@ -162,6 +164,25 @@ export async function writeFingerprint(relativePath, value) {
   await writeFile(file, `${value}\n`)
 }
 
+export async function hashArtifactFiles(artifactFiles) {
+  const hash = createHash('sha256')
+  for (const relativePath of [...artifactFiles].sort()) {
+    hash.update(posixPath(relativePath))
+    hash.update('\0')
+    hash.update(await readFile(resolveArtifact(relativePath)))
+    hash.update('\0')
+  }
+  return hash.digest('hex')
+}
+
+export async function writeArtifactDigest(fingerprint) {
+  if (!fingerprint.artifactDigestPath) return
+  await writeFingerprint(
+    fingerprint.artifactDigestPath,
+    await hashArtifactFiles(fingerprint.artifactFiles),
+  )
+}
+
 export async function getMissingArtifacts(artifactFiles) {
   const missing = []
   for (const file of artifactFiles) {
@@ -175,6 +196,13 @@ export async function inspectFingerprint(fingerprint) {
   const { files, hash } = await hashInputPatterns(fingerprint.inputPatterns)
   const cachedFingerprint = await readFingerprint(fingerprint.fingerprintPath)
   const missingArtifacts = await getMissingArtifacts(fingerprint.artifactFiles)
+  const cachedArtifactDigest = fingerprint.artifactDigestPath
+    ? await readFingerprint(fingerprint.artifactDigestPath)
+    : null
+  const currentArtifactDigest =
+    fingerprint.artifactDigestPath && missingArtifacts.length === 0
+      ? await hashArtifactFiles(fingerprint.artifactFiles)
+      : null
   const staleReasons = []
 
   if (missingArtifacts.length > 0) {
@@ -191,12 +219,22 @@ export async function inspectFingerprint(fingerprint) {
     staleReasons.push(`${fingerprint.id} artifact fingerprint changed`)
   }
 
+  if (fingerprint.artifactDigestPath) {
+    if (cachedArtifactDigest === null) {
+      staleReasons.push(`${fingerprint.id} artifact content digest is missing`)
+    } else if (cachedArtifactDigest !== currentArtifactDigest) {
+      staleReasons.push(`${fingerprint.id} artifact content digest changed`)
+    }
+  }
+
   return {
     id: fingerprint.id,
     fingerprintPath: fingerprint.fingerprintPath,
     files,
     currentFingerprint: hash,
     cachedFingerprint,
+    cachedArtifactDigest,
+    currentArtifactDigest,
     missingArtifacts,
     staleReasons,
     fresh: staleReasons.length === 0,

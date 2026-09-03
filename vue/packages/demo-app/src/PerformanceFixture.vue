@@ -59,7 +59,9 @@
       :content-version="markdownContentVersion"
       :allow-latex="true"
       :allow-mermaid="true"
-      mode="article"
+      :features="markdownFeatures"
+      :mode="markdownMode"
+      :trusted-script-url-factory="markdownTrustedScriptUrlFactory"
       class="performance-scroll-target performance-markdown"
       @features-activated="captureMarkdownFeatureActivation"
       @render-profile="captureWasmProfile"
@@ -125,11 +127,15 @@ import {
   getFsusRenderPipelineDiagnosticsSnapshot,
   useFsusRenderScheduler,
 } from '@element-plus/hooks'
+import { provideMarkdownHeavyFeatureDocumentContext } from '../../hooks/use-markdown-heavy-feature-lifecycle'
+import { createMarkdownHeavyFeatureIsolatedRender } from '../../wasm/markdown-heavy-feature-isolated-client'
 import { createWasmSortController } from '@element-plus/components/table/src/composables/use-wasm-sort'
 import {
   MARKDOWN_FEATURE_ACTIVATION_SCENARIO,
+  MARKDOWN_HEAVY_LIFECYCLE_SCENARIO,
   MarkdownFeatureActivationSequence,
   createMarkdownFeatureActivationSource,
+  createMarkdownHeavyLifecycleSource,
   hasCompleteMarkdownFeatureActivation,
 } from './markdown-feature-performance'
 
@@ -154,10 +160,46 @@ const tableRevision = ref(0)
 const pipelineRevision = ref(0)
 const markdownActivationRevision = ref(0)
 const completedMarkdownActivationRevision = ref(0)
+const markdownDocumentEpoch = ref(1)
+const markdownDocumentKey = ref('heavy-document-a')
+const markdownHeavyLifecycleRevision = ref(1)
+const markdownHeavyLifecycleSourcePrefix = ref('')
+const markdownFeatures = ref({
+  codeHighlight: true,
+  latex: true,
+  mermaid: true,
+})
+const markdownMode = ref<'about' | 'article' | 'editor' | 'preview'>('article')
+let markdownTrustedScriptUrlPolicy:
+  | { createScriptURL: (value: string) => unknown }
+  | undefined
+const markdownTrustedScriptUrlFactory = (moduleUrl: URL) => {
+  const trustedTypes = (
+    globalThis as typeof globalThis & {
+      trustedTypes?: {
+        createPolicy: (
+          name: string,
+          rules: { createScriptURL: (value: string) => string },
+        ) => { createScriptURL: (value: string) => unknown }
+      }
+    }
+  ).trustedTypes
+  if (!trustedTypes) return moduleUrl
+  markdownTrustedScriptUrlPolicy ??= trustedTypes.createPolicy(
+    'fsus-markdown-heavy-feature-fixture',
+    { createScriptURL: (value) => value },
+  )
+  return markdownTrustedScriptUrlPolicy.createScriptURL(moduleUrl.href)
+}
 const markdownFeatureActivationSequence =
   new MarkdownFeatureActivationSequence()
 const tablePipeline = createWasmSortController('performance-fixture')
 const renderScheduler = useFsusRenderScheduler()
+provideMarkdownHeavyFeatureDocumentContext({
+  documentEpoch: () => markdownDocumentEpoch.value,
+  documentKey: () => markdownDocumentKey.value,
+  revision: () => markdownContentVersion.value ?? 'unversioned',
+})
 const virtualList = ref<{ scrollTo: (offset: number) => void } | null>(null)
 const virtualGrid = ref<{
   scrollTo: (position: { scrollLeft: number; scrollTop: number }) => void
@@ -245,6 +287,9 @@ const markdown = computed(() => {
       markdownActivationRevision.value,
     )
   }
+  if (props.scenario === MARKDOWN_HEAVY_LIFECYCLE_SCENARIO) {
+    return `${markdownHeavyLifecycleSourcePrefix.value}${createMarkdownHeavyLifecycleSource()}`
+  }
   const target = Math.max(1024, props.size)
   const paragraph =
     '## Rendering fixture\n\nParagraph with **bold**, `code`, [link](https://example.com), and 中文文本.\n\n'
@@ -253,7 +298,9 @@ const markdown = computed(() => {
 const markdownContentVersion = computed(() =>
   props.scenario === MARKDOWN_FEATURE_ACTIVATION_SCENARIO
     ? `feature-activation-${markdownActivationRevision.value}`
-    : null,
+    : props.scenario === MARKDOWN_HEAVY_LIFECYCLE_SCENARIO
+      ? `heavy-lifecycle-${markdownHeavyLifecycleRevision.value}`
+      : null,
 )
 
 type PerformanceFixtureApi = {
@@ -281,6 +328,32 @@ type PerformanceFixtureApi = {
     parseMs: number
     transferMs: number
   } | null
+  markdownHeavyLifecycleTransition: (input: {
+    codeHighlight: boolean
+    documentEpoch: number
+    documentKey: string
+    latex?: boolean
+    mermaid?: boolean
+    revision?: number
+    sourcePrefix?: string
+    theme: 'dark' | 'light'
+  }) => Promise<void>
+  markdownHeavyLifecycleAbortProbe: () => Promise<{
+    after: Readonly<{
+      listeners: number
+      observers: number
+      runtimes: number
+      tasks: number
+    }>
+    before: Readonly<{
+      listeners: number
+      observers: number
+      runtimes: number
+      tasks: number
+    }>
+    remainingFrames: number
+    started: boolean
+  }>
   wasmProbe: () => Promise<{
     startupMs: number
     computeMs: number
@@ -294,6 +367,86 @@ type PerformanceFixtureApi = {
     } | null
   }>
 }
+
+const markdownHeavyLifecycleTransition: PerformanceFixtureApi['markdownHeavyLifecycleTransition'] =
+  async (input) => {
+    ready.value = 'false'
+    markdownDocumentEpoch.value = input.documentEpoch
+    markdownDocumentKey.value = input.documentKey
+    if (input.revision !== undefined) {
+      markdownHeavyLifecycleRevision.value = input.revision
+    }
+    if (input.sourcePrefix !== undefined) {
+      markdownHeavyLifecycleSourcePrefix.value = input.sourcePrefix
+    }
+    markdownFeatures.value = {
+      codeHighlight: input.codeHighlight,
+      latex: input.latex ?? true,
+      mermaid: input.mermaid ?? true,
+    }
+    document.documentElement.classList.toggle('dark', input.theme === 'dark')
+    document.documentElement.classList.toggle('light', input.theme === 'light')
+    document.documentElement.dataset.themeMode = input.theme
+    document.documentElement.dataset.themeResolved = input.theme
+    document.documentElement.style.colorScheme = input.theme
+    document.documentElement.dispatchEvent(
+      new CustomEvent('fsus:theme-change', {
+        detail: { mode: input.theme, resolved: input.theme },
+      }),
+    )
+    await nextTick()
+  }
+
+const markdownHeavyLifecycleAbortProbe: PerformanceFixtureApi['markdownHeavyLifecycleAbortProbe'] =
+  async () => {
+    const handle = createMarkdownHeavyFeatureIsolatedRender({
+      kind: 'code-highlight',
+      language: 'ts',
+      source: Array.from(
+        { length: 20_000 },
+        (_, index) => `const heavy_${index}: number = ${index}`,
+      ).join('\n'),
+      theme: document.documentElement.classList.contains('dark')
+        ? 'dark'
+        : 'light',
+      tokens: {},
+    })
+    const findStarted = () =>
+      document.querySelector('iframe[data-fsus-markdown-heavy-work]')
+    let resolveStarted!: (value: boolean) => void
+    const startedPromise = new Promise<boolean>((resolve) => {
+      resolveStarted = resolve
+    })
+    const observer = new MutationObserver(() => {
+      if (findStarted()) resolveStarted(true)
+    })
+    if (findStarted()) resolveStarted(true)
+    else {
+      observer.observe(document.body, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+      })
+    }
+    const started = await Promise.race([
+      startedPromise,
+      handle.promise.then(
+        () => false,
+        () => false,
+      ),
+    ])
+    observer.disconnect()
+    const before = handle.resources()
+    handle.teardown()
+    await handle.promise.catch(() => undefined)
+    return Object.freeze({
+      after: handle.resources(),
+      before,
+      remainingFrames: document.querySelectorAll('iframe[aria-hidden="true"]')
+        .length,
+      started,
+    })
+  }
 
 const createBurstWorker = () => {
   const source = `
@@ -587,6 +740,13 @@ const captureMarkdownRenderComplete = () => {
 
 const captureMarkdownRenderError = (error: unknown) => {
   ready.value = 'error'
+  const message =
+    error && typeof error === 'object' && 'message' in error
+      ? String(error.message)
+      : String(error)
+  document
+    .querySelector('[data-performance-scenario]')
+    ?.setAttribute('data-performance-error', message)
   markdownFeatureActivationSequence.fail(error)
 }
 
@@ -645,6 +805,8 @@ onMounted(async () => {
   window.__FSUSUI_PERFORMANCE_FIXTURE__ = {
     act,
     dataPipelineProbe,
+    markdownHeavyLifecycleAbortProbe,
+    markdownHeavyLifecycleTransition,
     markdownPhaseProbe,
     workerPoolBurstProbe,
     workerProbe,
@@ -659,6 +821,7 @@ onBeforeUnmount(() => {
     new Error('markdown_feature_activation_fixture_unmounted'),
   )
   tablePipeline.dispose()
+  document.documentElement.classList.remove('dark')
   delete window.__FSUSUI_PERFORMANCE_FIXTURE__
 })
 </script>
@@ -666,6 +829,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .performance-fixture {
   box-sizing: border-box;
+  max-width: 100%;
   min-height: 720px;
   padding: 24px;
   width: 1024px;

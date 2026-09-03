@@ -1,0 +1,27 @@
+{
+  "component": "markdown-editor",
+  "runner": "headless-skia",
+  "screenshot": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/heavy-feature-lifecycle/tests/conformance/visual/artifacts/screenshots/avalonia/markdown-editor-vue-parity.png",
+  "surfaceBounds": [
+    0,
+    0,
+    820,
+    186
+  ],
+  "controlBounds": [
+    {
+      "name": "FsusMarkdownEditor",
+      "x": 0,
+      "y": 0,
+      "width": 820,
+      "height": 186
+    },
+    {
+      "name": "FsusMarkdownEditorProjectionView",
+      "x": 17,
+      "y": 17,
+      "width": 786,
+      "height": 176
+    }
+  ]
+}

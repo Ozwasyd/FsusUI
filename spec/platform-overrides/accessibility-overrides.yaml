@@ -11,5 +11,5 @@ overrides:
     allowedDeviation: none
     testPolicy: accessibility-contract
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [18, 23, 24, 25]

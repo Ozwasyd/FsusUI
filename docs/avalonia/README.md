@@ -35,10 +35,13 @@ contracts to Avalonia controls.
 - [Tree](components/tree.md)
 - [Text viewer](components/text-viewer.md)
 - [Text editor](components/text-editor.md)
+- [Code editor](components/code-editor.md)
 - [Public shell](components/public-shell.md)
+- [Desktop shell](components/desktop-shell.md)
 - [Product primitives](components/product-primitives.md)
 - [Perception challenge](components/perception-challenge.md)
 - [Locale formatting](components/locale-formatting.md)
+- [WebView adapter](components/webview-adapter.md)
 
 ## Verification
 
@@ -61,3 +64,16 @@ The second command packs the three FsusUI packages, restores the consumer from
 an isolated local-only source, publishes a self-contained RID-specific native
 executable, and runs that executable directly against a real Avalonia window
 and dispatcher. It does not define the component scenario registry.
+
+The stable component-family source in
+[`spec/ci/avalonia-stable-readiness.json`](../../spec/ci/avalonia-stable-readiness.json)
+also owns the required Native AOT scenario set. Use
+`node scripts/avalonia-aot-native.mjs check-scenarios`,
+`node scripts/avalonia-aot-native.mjs check-workflows`, and
+`node --test tests/avalonia-aot-native.test.mjs` to
+verify registry coverage, report and manifest identity, negative fixtures, and
+workflow tiering. The required native release axis is `linux-x64`; the current
+support evidence does not claim `win-x64` or `osx-arm64` when those optional
+off-host leaves are absent. Until issue #343's required capability is complete,
+the native report records `FsusMarkdownEditor` as partial instead of adding it
+to the stable-required scenario set.

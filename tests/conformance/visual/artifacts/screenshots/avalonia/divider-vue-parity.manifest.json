@@ -1,0 +1,27 @@
+{
+  "component": "divider",
+  "runner": "headless-skia",
+  "screenshot": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/heavy-feature-lifecycle/tests/conformance/visual/artifacts/screenshots/avalonia/divider-vue-parity.png",
+  "surfaceBounds": [
+    0,
+    0,
+    1240,
+    150
+  ],
+  "controlBounds": [
+    {
+      "name": "FsusDivider",
+      "x": 10,
+      "y": 0,
+      "width": 1220,
+      "height": 28
+    },
+    {
+      "name": "FsusDivider",
+      "x": 10,
+      "y": 68,
+      "width": 1220,
+      "height": 1
+    }
+  ]
+}

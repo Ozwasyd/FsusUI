@@ -12,16 +12,26 @@ export interface CssRuleEntry {
  * cross-rule false positives (e.g. one rule contributes `12px`, an unrelated
  * rule contributes `border: 1px solid`).
  */
-export const collectCssRules = (page: Page): Promise<CssRuleEntry[]> =>
-  page.evaluate(() => {
+export const collectCssRules = (
+  page: Page,
+  selectorIncludes: readonly string[] = [],
+): Promise<CssRuleEntry[]> =>
+  page.evaluate((requiredSelectors) => {
     const entries: Array<{ selectorText: string; cssText: string }> = []
     const walk = (rules: CSSRuleList): void => {
       for (const rule of Array.from(rules)) {
         if (rule instanceof CSSStyleRule) {
-          entries.push({
-            selectorText: rule.selectorText,
-            cssText: rule.cssText,
-          })
+          if (
+            requiredSelectors.length === 0 ||
+            requiredSelectors.some((selector) =>
+              rule.selectorText.includes(selector),
+            )
+          ) {
+            entries.push({
+              selectorText: rule.selectorText,
+              cssText: rule.cssText,
+            })
+          }
         } else if ('cssRules' in rule) {
           walk((rule as CSSMediaRule).cssRules)
         }
@@ -35,4 +45,4 @@ export const collectCssRules = (page: Page): Promise<CssRuleEntry[]> =>
       }
     }
     return entries
-  })
+  }, selectorIncludes)

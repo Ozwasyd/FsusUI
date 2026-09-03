@@ -142,6 +142,39 @@ const isMarkdownFeatureOutputGateway = (id) =>
     id,
   )
 
+const isMarkdownHeavyFeatureIsolatedClient = (id) =>
+  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-isolated-client\.(?:[cm]?[jt]sx?)$/u.test(
+    id,
+  )
+
+const isMarkdownHeavyFeatureResource = (id) =>
+  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-resource\.(?:[cm]?[jt]sx?)$/u.test(
+    id,
+  )
+
+const markdownHeavyFeatureIsolatedAdapterModules =
+  '(?:markdown-heavy-feature-isolated-lazy|markdown-heavy-feature-frame-scheduler)'
+
+const isMarkdownHeavyFeatureIsolatedAdapter = (id) =>
+  new RegExp(
+    `/(?:vue/packages/wasm|node_modules/@element-plus/wasm|node_modules/@ozwasyd/element-plus/es/wasm)/(?:${markdownHeavyFeatureIsolatedAdapterModules})\\.(?:[cm]?[jt]sx?)$`,
+    'u',
+  ).test(id)
+
+const isMarkdownHeavyFeatureIdentity = (id) =>
+  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-identity\.(?:[cm]?[jt]sx?)$/u.test(
+    id,
+  )
+
+const markdownHeavyFeatureIdentityDependencies =
+  '(?:markdown-editor-projection|markdown-syntax-identity|markdown-source-coordinate-map|markdown-syntax-collect|markdown-directive-syntax|markdown-anchor-grammar|markdown-caption-directive|markdown-embed-directive)'
+
+const isMarkdownHeavyFeatureIdentityDependency = (id) =>
+  new RegExp(
+    `/(?:vue/packages/wasm|node_modules/@element-plus/wasm|node_modules/@ozwasyd/element-plus/es/wasm)/(?:${markdownHeavyFeatureIdentityDependencies}\\.(?:[cm]?[jt]sx?)|markdown/syntax-collect\\.generated\\.(?:[cm]?[jt]sx?))$`,
+    'u',
+  ).test(id)
+
 export const resolveFsusViteManualChunk = (
   moduleId,
   { profile = 'full' } = {},
@@ -151,6 +184,31 @@ export const resolveFsusViteManualChunk = (
 
   if (isMarkdownFeatureOutputGateway(id)) {
     return 'fsus-markdown-feature-gateway'
+  }
+
+  if (isMarkdownHeavyFeatureIsolatedClient(id)) {
+    return 'fsus-markdown-heavy-isolated-client'
+  }
+
+  if (isMarkdownHeavyFeatureResource(id)) {
+    return 'fsus-markdown-heavy-resource'
+  }
+
+  if (isMarkdownHeavyFeatureIsolatedAdapter(id)) {
+    return 'fsus-markdown-heavy-isolated-adapter'
+  }
+
+  if (isMarkdownHeavyFeatureIdentity(id)) {
+    return 'fsus-markdown-heavy-identity'
+  }
+
+  // Grouping the projection chain into the dynamically imported identity chunk
+  // is only safe when nothing eager reaches it. The consumer Markdown entry does
+  // not, but the full demo also loads the editor, which imports the chain
+  // eagerly; grouping it there makes fsus-ui and the identity chunk mutually
+  // dependent and the resulting circular chunk throws before the app mounts.
+  if (consumerProfile && isMarkdownHeavyFeatureIdentityDependency(id)) {
+    return 'fsus-markdown-heavy-identity'
   }
 
   if (

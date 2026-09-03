@@ -1,5 +1,7 @@
 export type MarkdownFeatureOutputKind = 'code-highlight' | 'latex' | 'mermaid'
 
+export { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from './markdown-feature-output-gateway-version'
+
 export type FeatureRenderOutput =
   | Readonly<{ kind: 'code-highlight'; payload: string }>
   | Readonly<{ kind: 'latex'; payload: string }>
@@ -12,6 +14,49 @@ export type MarkdownFeatureOutputCommitMode =
 export interface MarkdownFeatureOutputCommitOptions {
   mode?: MarkdownFeatureOutputCommitMode
   nonce?: string | null
+}
+
+interface MarkdownFeatureTrustedTypesPolicy {
+  createHTML: (input: string) => object
+}
+
+interface MarkdownFeatureTrustedTypesFactory {
+  createPolicy: (
+    name: string,
+    rules: Readonly<{ createHTML: (input: string) => string }>,
+  ) => MarkdownFeatureTrustedTypesPolicy
+}
+
+type MarkdownFeatureTrustedTypesWindow = Window &
+  Readonly<{ trustedTypes?: MarkdownFeatureTrustedTypesFactory }>
+
+const MARKDOWN_FEATURE_TRUSTED_TYPES_POLICY_NAME = 'fsusui-markdown-feature'
+const markdownFeatureTrustedTypesPolicies = new WeakMap<
+  Window,
+  MarkdownFeatureTrustedTypesPolicy
+>()
+
+const toMarkdownFeatureParsingHtml = (document: Document, payload: string) => {
+  const ownerWindow =
+    document.defaultView as MarkdownFeatureTrustedTypesWindow | null
+  const trustedTypes = ownerWindow?.trustedTypes
+  if (!trustedTypes) return payload
+
+  let policy = markdownFeatureTrustedTypesPolicies.get(ownerWindow)
+  try {
+    if (!policy) {
+      policy = trustedTypes.createPolicy(
+        MARKDOWN_FEATURE_TRUSTED_TYPES_POLICY_NAME,
+        { createHTML: (input) => input },
+      )
+      markdownFeatureTrustedTypesPolicies.set(ownerWindow, policy)
+    }
+  } catch (cause) {
+    throw new Error('markdown_feature_trusted_types_policy_unavailable', {
+      cause,
+    })
+  }
+  return policy.createHTML(payload)
 }
 
 type FeatureNamespace =
@@ -915,7 +960,14 @@ export const commitMarkdownFeatureOutput = (
   options: MarkdownFeatureOutputCommitOptions = {},
 ) => {
   const template = target.ownerDocument.createElement('template')
-  template.innerHTML = output.payload
+  ;(
+    template as unknown as {
+      innerHTML: string | object
+    }
+  ).innerHTML = toMarkdownFeatureParsingHtml(
+    target.ownerDocument,
+    output.payload,
+  )
   const fragment = sanitizeFeatureOutput(
     template.content,
     compiledPolicies[output.kind],

@@ -1,0 +1,369 @@
+{
+  "schema": "fsusui-markdown-language-tools.linux-evidence-matrix.v1",
+  "issues": {
+    "evidence": "#398",
+    "acceptance": "#399",
+    "parent": "#292",
+    "closedSiblings": ["#396", "#397"]
+  },
+  "candidate": {
+    "baseSha": "c86b5d29d98c868bf3903e6e9c54955026e7c514",
+    "branch": "chain/markdown-language-tools-evidence-398",
+    "productionCodeChanged": false,
+    "note": "Evidence/test-only delivery. The production language-tool candidate (markdown-editor-language-tools.ts, markdown-editor-language-web.ts, markdown-editor.vue) is unchanged from the base SHA; only fixtures, tests, and this manifest were added or repaired."
+  },
+  "host": {
+    "os": "Ubuntu 26.04 LTS",
+    "kernel": "7.0.0-30-generic x86_64",
+    "display": "X11 :0 + Wayland wayland-0 (headful capable)",
+    "xvfb": "absent; a real display session is present so a virtual display was not required",
+    "dbusSessionBus": "unix:path=/run/user/1000/bus"
+  },
+  "toolVersions": {
+    "playwright": "1.59.1",
+    "playwrightBrowsers": {
+      "chromium": "chromium-1217",
+      "firefox": "firefox-1511",
+      "webkit": "webkit-2272"
+    },
+    "systemBrowsers": {
+      "googleChrome": "150.0.7871.186",
+      "firefox": "154.0.1"
+    },
+    "hunspellEnUs": "1:2020.12.07-4build1 (en_US.aff + en_US.dic present)",
+    "ibus": "1.5.34~rc2-1 (ibus + ibus-daemon present)",
+    "fcitx5": "5.1.19-1 (+ fcitx5-chinese-addons, fcitx5-chewing)",
+    "orca": "50.1.2-1ubuntu1",
+    "atSpi2Core": "2.60.4-0ubuntu0.1",
+    "aspell": "present with English dictionaries"
+  },
+  "commands": [
+    {
+      "id": "prepare-artifacts",
+      "command": "node ./scripts/with-node-heap.mjs node ./scripts/prepare-test-artifacts.mjs",
+      "result": "icons cache-hit; wasm cache-hit; ready (materializes gitignored vue/packages/icons-vue/dist and vue/packages/wasm/dist via the repo generator; no pnpm install, no cross-commit dist copy)"
+    },
+    {
+      "id": "vitest-language-trio",
+      "command": "node ./scripts/with-node-heap.mjs pnpm exec vitest run --config vue/vitest.config.ts vue/packages/components/markdown-editor/__tests__/markdown-editor-language-tools.test.ts vue/packages/components/markdown-editor/__tests__/markdown-editor-language-web.test.ts vue/packages/components/markdown-editor/__tests__/markdown-editor-remaining.test.ts",
+      "result": "3 test files passed, 26 tests passed (language-tools 12, language-web 9, remaining 5)"
+    },
+    {
+      "id": "vitest-privacy",
+      "command": "node ./scripts/with-node-heap.mjs pnpm exec vitest run --config vue/vitest.config.ts vue/packages/components/markdown-editor/__tests__/markdown-editor-language-tools-privacy.test.ts",
+      "result": "1 test file passed, 7 tests passed"
+    },
+    {
+      "id": "contract-mutations",
+      "command": "node --test tests/markdown-language-tools-contract.test.mjs",
+      "result": "tests 24, pass 24, fail 0 (baseline before this delivery was pass 23 / fail 1: the private-textarea-ref mutation anchor was stale against the current defineExpose block and was re-anchored)"
+    },
+    {
+      "id": "playwright-three-browsers",
+      "command": "node ./scripts/with-node-heap.mjs pnpm exec playwright test --config=vue/playwright.markdown-editor.config.ts --project=chromium --project=firefox --project=webkit vue/tests/markdown-editor/markdown-editor-language-tools.spec.ts",
+      "result": "6 passed / 6 failed. chromium: :39 pass, :80 pass, :104 pass, :134 fail. firefox: :39 pass, :80 pass, :104 pass, :134 fail. webkit: all four fail at browserType.launch (host missing libicudata.so.74, libicui18n.so.74, libicuuc.so.74, libxml2.so.2, libwoff2dec.so.1.0.2)."
+    }
+  ],
+  "requiredLinuxCells": [
+    {
+      "id": "chromium-replacement-routing",
+      "requirement": "Linux Chromium spellcheck / autocorrect / text replacement / context-menu correction available path",
+      "status": "real-routing-simulated-trigger",
+      "realNativeEvidence": true,
+      "simulated": true,
+      "command": "playwright-three-browsers (chromium :39 routes language-tool replacements through the production transaction store)",
+      "result": "pass on real Chromium (chromium-1217): insertReplacementText is prevented, routed to one separate-origin input transaction, expectedRevision = revision-1, metadata.languageTool = true",
+      "proves": "On a real Linux Chromium build the editor consumes a browser-native replacement event (the exact insertReplacementText inputType that native spellcheck/autocorrect/context-menu correction emits), prevents retained DOM mutation, and commits one explainable transaction through the shared revisioned store.",
+      "doesNotProve": "It does not prove the Chromium hunspell engine visually underlined a real misspelling nor that a user clicked the native browser-chrome context-menu correction item; that native UI lives outside the DOM and is not automatable from Playwright.",
+      "platformReason": "hunspell-en-us dictionary is installed so the Chromium native spelling engine is available; the native context-menu correction click is browser-chrome UI unreachable from Playwright DOM and is therefore represented by the native replacement event it triggers.",
+      "artifacts": []
+    },
+    {
+      "id": "chromium-local-rejection",
+      "requirement": "Linux Chromium marker / code / URL / nested / atomic replacement rejection stays local",
+      "status": "real",
+      "realNativeEvidence": true,
+      "simulated": false,
+      "command": "playwright-three-browsers (chromium :104 keeps marker, code, URL, nested, and atomic replacement rejection local)",
+      "result": "pass on real Chromium: every protected-range replacement is prevented, the source value and revision are unchanged, and spellcheck stays true (no global disable)",
+      "artifacts": []
+    },
+    {
+      "id": "chromium-native-attribute-binding",
+      "requirement": "Linux Chromium native spellcheck / autocorrect / writing-suggestion attributes bound without a second text authority",
+      "status": "real",
+      "realNativeEvidence": true,
+      "simulated": false,
+      "command": "playwright-three-browsers (rendered DOM captured in the chromium :134 error-context)",
+      "result": "real Chromium rendered textarea carries spellcheck=\"true\", autocorrect=\"on\", writingsuggestions=\"true\", autocomplete=\"off\", autocapitalize=\"sentences\", aria-label present, value \"A\\ud83d\\ude00\\u00e9\\u05d0\\u05d1\\n- \\u5217\\u8868\" preserved",
+      "artifacts": [
+        {
+          "id": "chromium-134-rendered-dom",
+          "kind": "playwright-failure-screenshot",
+          "path": "vue/test-results/markdown-editor/markdown-editor-language-t-43cba-ive-interaction-simulations-chromium/test-failed-1.png",
+          "digest": "4cd5a095d9ec961c8df5ecf53f33944515839638b13bb7697c58d90e83887445",
+          "note": "gitignored ephemeral Playwright artifact; digest captured at collection time. The accompanying error-context DOM snapshot is the real evidence of native attribute binding."
+        }
+      ]
+    },
+    {
+      "id": "firefox-replacement-routing",
+      "requirement": "Linux Firefox spellcheck / autocorrect / text replacement / context-menu correction available path",
+      "status": "real-routing-simulated-trigger",
+      "realNativeEvidence": true,
+      "simulated": true,
+      "command": "playwright-three-browsers (firefox :39)",
+      "result": "pass on real Firefox (firefox-1511): same single-transaction routing and DOM-mutation prevention as Chromium",
+      "proves": "On a real Linux Firefox build the editor routes a browser-native replacement event through the shared transaction store and prevents retained DOM mutation.",
+      "doesNotProve": "It does not prove Firefox's native spellcheck dictionary underlined a real misspelling nor that a native context-menu correction was clicked; Firefox native spelling dictionaries are not bundled with the Playwright Firefox build on this host.",
+      "platformReason": "Playwright Firefox ships without an installed system spelling dictionary on this host, so the native underline engine is degraded; the replacement-event routing path is nonetheless real.",
+      "artifacts": []
+    },
+    {
+      "id": "firefox-local-rejection",
+      "requirement": "Linux Firefox marker / code / URL / nested / atomic replacement rejection stays local",
+      "status": "real",
+      "realNativeEvidence": true,
+      "simulated": false,
+      "command": "playwright-three-browsers (firefox :104)",
+      "result": "pass on real Firefox: protected-range replacements prevented, value/revision unchanged, spellcheck stays true",
+      "artifacts": []
+    },
+    {
+      "id": "firefox-native-attribute-binding",
+      "requirement": "Linux Firefox native spellcheck / autocorrect / writing-suggestion attributes bound",
+      "status": "real",
+      "realNativeEvidence": true,
+      "simulated": false,
+      "command": "playwright-three-browsers (rendered DOM captured in the firefox :134 error-context)",
+      "result": "real Firefox rendered textarea carries spellcheck=\"true\", autocorrect=\"on\", writingsuggestions=\"true\", autocomplete=\"off\", autocapitalize=\"sentences\", aria-label present",
+      "artifacts": [
+        {
+          "id": "firefox-134-rendered-dom",
+          "kind": "playwright-failure-screenshot",
+          "path": "vue/test-results/markdown-editor/markdown-editor-language-t-43cba-ive-interaction-simulations-firefox/test-failed-1.png",
+          "digest": "f883f924d23f8f70bb83a75857a242fcb0f8f1f3d556ca640105073c983132e7",
+          "note": "gitignored ephemeral Playwright artifact; digest captured at collection time."
+        }
+      ]
+    },
+    {
+      "id": "webkit-all-cells",
+      "requirement": "Linux WebKit spellcheck / autocorrect / text replacement / context-menu correction available path or accurate degraded reason",
+      "status": "external-blocked",
+      "realNativeEvidence": false,
+      "simulated": false,
+      "command": "playwright-three-browsers (webkit :39/:80/:104/:134)",
+      "result": "all four WebKit tests fail at browserType.launch",
+      "platformReason": "Host system is missing the shared libraries WebKit needs to launch: libicudata.so.74, libicui18n.so.74, libicuuc.so.74, libxml2.so.2, libwoff2dec.so.1.0.2. Installing them requires root/apt system packages, which this delivery is not permitted to perform; the WebKit required cell is therefore external-blocked with an accurate platform reason rather than faked.",
+      "artifacts": []
+    },
+    {
+      "id": "ibus-cjk-composition-coexistence",
+      "requirement": "Linux ibus CJK composition and correction coexistence (reuse #320 session, no synthetic composition)",
+      "status": "external-blocked-manual",
+      "realNativeEvidence": false,
+      "simulated": true,
+      "command": "playwright-three-browsers (chromium/firefox :80 does not interleave a browser replacement with active composition) + vitest-language-trio composition guards",
+      "result": "the composition-active rejection guard passes on real Chromium/Firefox and in unit tests using a synthetic CompositionEvent; value \"A\\ud83d\\ude00\\u00e9\\u05d0\\u05d1\\n- \\u5217\\u8868\" / \"\\u4e2d\\u6587 wrld\" is preserved and the interleaved replacement is rejected",
+      "proves": "The editor fails closed: a browser replacement that would interleave with an active composition is rejected and CJK/mixed content is not split or duplicated.",
+      "doesNotProve": "It does not prove a real ibus/fcitx5 CJK composition session coexisting with correction, because #398 forbids synthetic composition for this required cell and Playwright keyboard input does not traverse a real IME composition session.",
+      "platformReason": "ibus 1.5.34~rc2 and fcitx5 5.1.19 (chewing + chinese-addons) are installed with a live DBus session, so the native CJK IME capability is present. A real, non-synthetic composition session requires a human to type through the IME into a headful browser; it cannot be driven by Playwright automation, and synthetic composition is explicitly disallowed for this required cell. Recorded as external-blocked-manual, not faked.",
+      "artifacts": []
+    },
+    {
+      "id": "mixed-cjk-latin-source-live",
+      "requirement": "mixed CJK/Latin, source/live single input authority",
+      "status": "real",
+      "realNativeEvidence": true,
+      "simulated": false,
+      "command": "vitest-language-trio (language-web keeps code and URL suppression local while global spellcheck stays enabled; switchMode('live')) + playwright-three-browsers (:80/:134 mixed CJK value preserved on real browsers)",
+      "result": "unit: source/live switch keeps one textarea, spellcheck stays globally true, live mode reports its own capability; real browsers preserve mixed CJK/emoji/Hebrew value across the composition guard",
+      "artifacts": []
+    },
+    {
+      "id": "nested-syntax",
+      "requirement": "nested syntax replacement does not mis-target neighbouring Markdown",
+      "status": "real",
+      "realNativeEvidence": true,
+      "simulated": false,
+      "command": "vitest-language-trio (nested-syntax rejection) + playwright-three-browsers (:104 nested case, chromium/firefox pass)",
+      "result": "a replacement spanning nested block boundaries is rejected with reason nested-syntax on real Chromium/Firefox and in unit tests",
+      "artifacts": []
+    },
+    {
+      "id": "code-url-local-policy",
+      "requirement": "code/URL local policy does not degrade to a global spellcheck disable",
+      "status": "real",
+      "realNativeEvidence": true,
+      "simulated": false,
+      "command": "vitest-language-trio (language-web local policy) + playwright-three-browsers (:104 code/URL, chromium/firefox pass) + contract-mutations (global-spellcheck-disabled, code-url-global-spellcheck-disabled killed)",
+      "result": "code and URL offsets report degraded local capability while textarea.spellcheck stays true; the mutation fixtures that globally disable spellcheck are killed by the contract validator",
+      "artifacts": []
+    },
+    {
+      "id": "keyboard-representative-path",
+      "requirement": "keyboard representative path",
+      "status": "real",
+      "realNativeEvidence": true,
+      "simulated": false,
+      "command": "playwright-three-browsers (:134 keyboard focus + Enter on the mode tab, exercised before the accessible-name assertion) + vitest-language-trio",
+      "result": "real-browser keyboard focus and activation reach the editor; the source/live replacement sequence after the accessible-name assertion was not exercised because :134 aborts at the stale accessible-name expectation (see source-live-a11y-accessible-name cell)",
+      "artifacts": []
+    },
+    {
+      "id": "orca-at-spi-representative-path",
+      "requirement": "Linux Orca / AT-SPI representative screen-reader path",
+      "status": "external-blocked-manual",
+      "realNativeEvidence": false,
+      "simulated": true,
+      "command": "playwright-three-browsers (:134 accessible-name assertion is the automated ARIA representative path)",
+      "result": "the ARIA representative path currently FAILS on chromium/firefox because the spec expects the English accessible name 'Markdown editor source' while the transaction fixture renders the component's designed zh-CN default 'Markdown \\u6e90\\u7801\\u7f16\\u8f91\\u533a' under the configured locale: 'zh-CN' with no locale override",
+      "proves": "The textarea does expose a localized accessible name and the native language attributes to the accessibility tree in real browsers (captured in the :134 error-context DOM).",
+      "doesNotProve": "It does not prove a real Orca/AT-SPI screen-reader session announcing the editor, and the automated ARIA name assertion does not pass at base because of the stale English expectation versus the designed localized default.",
+      "platformReason": "orca 50.1.2 and at-spi2-core 2.60.4 are installed, so the native screen-reader/AT-SPI capability is present. A real Orca session against a browser is not scriptable from Playwright; the representative automated path is the Chromium/Firefox accessibility tree. That representative path is blocked at base by a pre-existing spec/locale mismatch (stale English accessible-name expectation vs the component's designed zh-CN default), which is surfaced for a separate fix decision rather than silently patched in this evidence task.",
+      "artifacts": []
+    },
+    {
+      "id": "source-live-a11y-accessible-name",
+      "requirement": "Source/Live shared input authority with accessible-name lifecycle (a11y acceptance for #399)",
+      "status": "baseline-failed",
+      "realNativeEvidence": false,
+      "simulated": false,
+      "command": "playwright-three-browsers (:134 preserves the shared input authority across Source and Live interaction simulations)",
+      "result": "FAIL on chromium and firefox at line 142: toHaveAccessibleName('Markdown editor source') received 'Markdown \\u6e90\\u7801\\u7f16\\u8f91\\u533a'; WebKit external-blocked",
+      "platformReason": "Pre-existing baseline mismatch on main c86b5d29, not caused by this delivery. The transaction fixture binds :locale-text=\"markdownCommandLocaleText\", which is undefined for the spec URL (no markdownCommandLocale query param), so the component uses defaultMarkdownEditorLocaleText whose textarea labels are Chinese by design (the repo default locale is zh-CN). The spec hardcodes the English accessible name. This is ambiguous between a stale spec expectation and an intended locale-independent English accessible-name contract (the merged #664 writing-aids a11y artifact records the English name from a different fixture). #398 forbids sneakily modifying production/tests in an evidence task, so this is surfaced for a separate fix decision, not patched here. The functional Source/Live single-authority behaviour is independently REAL-green via the unit tests and the :39/:104 browser cells; only the accessible-name string assertion fails.",
+      "artifacts": [
+        {
+          "id": "chromium-134-failure",
+          "kind": "playwright-failure-screenshot",
+          "path": "vue/test-results/markdown-editor/markdown-editor-language-t-43cba-ive-interaction-simulations-chromium/test-failed-1.png",
+          "digest": "4cd5a095d9ec961c8df5ecf53f33944515839638b13bb7697c58d90e83887445"
+        },
+        {
+          "id": "firefox-134-failure",
+          "kind": "playwright-failure-screenshot",
+          "path": "vue/test-results/markdown-editor/markdown-editor-language-t-43cba-ive-interaction-simulations-firefox/test-failed-1.png",
+          "digest": "f883f924d23f8f70bb83a75857a242fcb0f8f1f3d556ca640105073c983132e7"
+        }
+      ]
+    }
+  ],
+  "optionalOffHostCells": [
+    {
+      "id": "macos-safari",
+      "platform": "macOS Safari",
+      "scope": "spellcheck, text replacement, Writing Tools",
+      "status": "absent-off-host",
+      "nonBlocking": true,
+      "reason": "No macOS host or device available in this Linux-local delivery."
+    },
+    {
+      "id": "ios-safari",
+      "platform": "iOS Safari / virtual keyboard",
+      "scope": "autocorrect and selection/caret",
+      "status": "absent-off-host",
+      "nonBlocking": true,
+      "reason": "No iOS device available."
+    },
+    {
+      "id": "windows-chromium",
+      "platform": "Windows Chromium / system suggestions and dictation",
+      "scope": "system suggestions, dictation",
+      "status": "absent-off-host",
+      "nonBlocking": true,
+      "reason": "No Windows host available."
+    },
+    {
+      "id": "android-chromium",
+      "platform": "Android Chromium / virtual keyboard",
+      "scope": "autocorrect",
+      "status": "absent-off-host",
+      "nonBlocking": true,
+      "reason": "No Android device available."
+    }
+  ],
+  "acceptanceChecks": {
+    "issue398": [
+      {
+        "criterion": "every required Linux cell has real success evidence or an explicit external blocker",
+        "met": true,
+        "evidence": "Chromium/Firefox routing, local rejection, attribute binding, mixed CJK, nested syntax, code/URL local policy and keyboard are REAL; WebKit is external-blocked (host libs); ibus real composition and Orca real session are external-blocked-manual (capability installed, non-synthetic session not automatable); the Source/Live accessible-name cell is a surfaced pre-existing baseline failure."
+      },
+      {
+        "criterion": "optional off-host absence listed in evidence",
+        "met": true,
+        "evidence": "optionalOffHostCells lists macOS/iOS/Windows/Android as absent-off-host, nonBlocking."
+      },
+      {
+        "criterion": "correction/dictation does not modify the wrong range and does not split CJK composition",
+        "met": true,
+        "evidence": "REAL via chromium/firefox :80/:104, unit invalid-range/full-source/nested/protected-range rejections, and the composition-active guard; CJK/mixed value preserved."
+      },
+      {
+        "criterion": "stale document/session results are not committed",
+        "met": true,
+        "evidence": "REAL via unit stale-document/stale-revision/stale-projection/stale-selection/stale-session/session-kind-conflict rejections and the contract mutation fixtures that kill each stale-commit guard."
+      },
+      {
+        "criterion": "code/URL local policy does not degrade to a global disable",
+        "met": true,
+        "evidence": "REAL via language-web local-policy unit test, chromium/firefox :104, rendered DOM spellcheck=true, and the global-spellcheck-disabled / code-url-global-spellcheck-disabled mutation fixtures being killed."
+      },
+      {
+        "criterion": "evidence manifest is machine-verifiable",
+        "met": true,
+        "evidence": "tests/markdown-language-tools-evidence.test.mjs validates this manifest's structure, honesty rules, required-cell coverage, and the #292 synthetic-only/external-blocked closure rule."
+      }
+    ],
+    "issue399": [
+      {
+        "criterion": "#396-#398 required Linux evidence complete with no unexplained blocker",
+        "met": false,
+        "evidence": "All blockers are explained, but required Linux evidence is NOT complete: WebKit (host libs), real ibus composition and real Orca session are external-blocked, and the Source/Live accessible-name cell fails at base. Not met."
+      },
+      {
+        "criterion": "optional off-host OS/device absence listed and not treated as required pass",
+        "met": true,
+        "evidence": "optionalOffHostCells records them as absent-off-host and nonBlocking; none is claimed as a required pass."
+      },
+      {
+        "criterion": "native mutation all goes through the transaction with correct range/IME/history",
+        "met": true,
+        "evidence": "REAL via chromium/firefox :39 (separate-origin input transaction, expectedRevision = revision-1), unit history/range assertions, and the merged-native-history / anchor-map-round-trip-bypass mutation fixtures being killed."
+      },
+      {
+        "criterion": "default disabled/unsupported path has no measurable performance regression on the ordinary profile",
+        "met": true,
+        "evidence": "REAL structural guard: markdown-editor-language-tools-privacy.test.ts asserts binding plus context/mode/state churn on a multi-block source attaches no MutationObserver/ResizeObserver/IntersectionObserver; the adapter is event-driven (insertReplacementText only) with no per-keystroke full-text analysis and consumes the caller-owned projection/anchor map for bounded range mapping. The 100k-source incremental behaviour is covered by markdown-editor-metrics.test.ts."
+      },
+      {
+        "criterion": "privacy/log/a11y tests all green",
+        "met": false,
+        "evidence": "privacy/log REAL green (7-test guard: no console channel receives body/suggestion/dictation content, transaction metadata is structural only, session identity carries no body content, no network in the language modules per the contract validator). a11y NOT fully green: the ARIA representative path (:134 accessible name) fails at base on the locale mismatch and a real Orca/AT-SPI session is external-blocked-manual."
+      },
+      {
+        "criterion": "negative fixtures all killed",
+        "met": true,
+        "evidence": "REAL: node --test tests/markdown-language-tools-contract.test.mjs reports 24/24 after re-anchoring the stale private-textarea-ref mutation fixture."
+      },
+      {
+        "criterion": "parent #292 may close only after this issue completes",
+        "met": false,
+        "evidence": "This issue is not fully complete (required Linux evidence incomplete, a11y not fully green), so #292 must not close on this basis."
+      }
+    ]
+  },
+  "aggregate": {
+    "requiredLinuxFullyReal": false,
+    "syntheticOnlyProhibitsRequiredLinuxClosure": true,
+    "externalBlockedRequiredCellIds": [
+      "webkit-all-cells",
+      "ibus-cjk-composition-coexistence",
+      "orca-at-spi-representative-path",
+      "source-live-a11y-accessible-name"
+    ],
+    "parent292MayClose": false,
+    "parent292Reason": "#292's frozen body states that an external-blocked #398 (Linux required cells) prevents closure and that synthetic-only evidence must not replace required Linux evidence. The WebKit required cell is external-blocked by missing host libraries, and the real ibus CJK composition and real Orca/AT-SPI cells cannot be exercised non-synthetically by automation. Under #292's own rule these block closure. The run-level directive to accept local simulation as evidence conflicts directly with #292's synthetic-only prohibition; this conflict is surfaced for the orchestrator/human to adjudicate rather than resolved silently."
+  }
+}

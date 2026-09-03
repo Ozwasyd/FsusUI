@@ -1,2414 +1,4512 @@
 {
-  "schemaVersion": 1,
-  "artifactRoot": "tests/conformance/visual/artifacts",
-  "thresholds": {
-    "samePlatform": {
-      "geometry": 0.25,
-      "colorDelta": 0.5,
-      "radius": 0.2,
-      "spacing": 0.25,
-      "textBaseline": 0.4,
-      "screenshotDiffPercent": 0.002,
-      "perceptualDelta": 0.02
-    },
-    "crossPlatform": {
-      "geometry": 1.5,
-      "colorDelta": 1.4,
-      "radius": 0.75,
-      "spacing": 1,
-      "textBaseline": 1,
-      "screenshotDiffPercent": 0.015,
-      "perceptualDelta": 0.08
-    },
-    "levels": {
-      "low": {
-        "geometry": 1,
-        "colorDelta": 1.2,
-        "radius": 0.5,
-        "spacing": 0.75,
-        "textBaseline": 0.8,
-        "screenshotDiffPercent": 0.01,
-        "perceptualDelta": 0.05
-      },
-      "medium": {
-        "geometry": 2,
-        "colorDelta": 2,
-        "radius": 1,
-        "spacing": 1.25,
-        "textBaseline": 1.5,
-        "screenshotDiffPercent": 0.02,
-        "perceptualDelta": 0.1
-      },
-      "high": {
-        "geometry": 3,
-        "colorDelta": 3,
-        "radius": 1.5,
-        "spacing": 2,
-        "textBaseline": 2,
-        "screenshotDiffPercent": 0.04,
-        "perceptualDelta": 0.16
-      }
-    }
+ "schemaVersion": 1,
+ "artifactRoot": "tests/conformance/visual/artifacts",
+ "thresholds": {
+  "samePlatform": {
+   "geometry": 0.25,
+   "colorDelta": 0.5,
+   "radius": 0.2,
+   "spacing": 0.25,
+   "textBaseline": 0.4,
+   "screenshotDiffPercent": 0.002,
+   "perceptualDelta": 0.02
   },
-  "comparisons": [
-    {
-      "id": "button-primary-web-rerun",
-      "component": "button",
-      "mode": "samePlatform",
-      "token": "color.brand.primary",
-      "fixture": {
-        "page": "visual/button",
-        "theme": "light",
-        "density": "default",
-        "variant": "primary",
-        "size": "md",
-        "state": "enabled",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "enabled"
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-baseline.png",
-        "geometry": { "x": 24, "y": 32, "width": 96, "height": 40 },
-        "color": { "token": "color.brand.primary", "lab": [54.1, 12.2, -41.4] },
-        "radius": 6,
-        "spacing": { "paddingX": 16, "paddingY": 8, "gap": 8 },
-        "textBaseline": 25.2
-      },
-      "candidate": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-rerun.png",
-        "geometry": { "x": 24, "y": 32.1, "width": 96, "height": 40 },
-        "color": { "token": "color.brand.primary", "lab": [54.2, 12.1, -41.3] },
-        "radius": 6,
-        "spacing": { "paddingX": 16, "paddingY": 8, "gap": 8 },
-        "textBaseline": 25.25
-      },
-      "screenshotDiffPercent": 0.001,
-      "perceptualDelta": 0.01
+  "crossPlatform": {
+   "geometry": 1.5,
+   "colorDelta": 1.4,
+   "radius": 0.75,
+   "spacing": 1,
+   "textBaseline": 1,
+   "screenshotDiffPercent": 0.015,
+   "perceptualDelta": 0.08
+  },
+  "levels": {
+   "low": {
+    "geometry": 1,
+    "colorDelta": 1.2,
+    "radius": 0.5,
+    "spacing": 0.75,
+    "textBaseline": 0.8,
+    "screenshotDiffPercent": 0.01,
+    "perceptualDelta": 0.05
+   },
+   "medium": {
+    "geometry": 2,
+    "colorDelta": 2,
+    "radius": 1,
+    "spacing": 1.25,
+    "textBaseline": 1.5,
+    "screenshotDiffPercent": 0.02,
+    "perceptualDelta": 0.1
+   },
+   "high": {
+    "geometry": 3,
+    "colorDelta": 3,
+    "radius": 1.5,
+    "spacing": 2,
+    "textBaseline": 2,
+    "screenshotDiffPercent": 0.04,
+    "perceptualDelta": 0.16
+   }
+  }
+ },
+ "comparisons": [
+  {
+   "id": "button-primary-web-rerun",
+   "component": "button",
+   "mode": "samePlatform",
+   "token": "color.brand.primary",
+   "fixture": {
+    "page": "visual/button",
+    "theme": "light",
+    "density": "default",
+    "variant": "primary",
+    "size": "md",
+    "state": "enabled",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "enabled"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-baseline.png",
+    "geometry": {
+     "x": 24,
+     "y": 32,
+     "width": 96,
+     "height": 40
     },
-    {
-      "id": "button-primary-web-avalonia",
-      "component": "button",
-      "mode": "crossPlatform",
-      "token": "color.brand.primary",
-      "fixture": {
-        "page": "visual/button",
-        "theme": "dark",
-        "density": "compact",
-        "variant": "primary",
-        "size": "sm",
-        "state": "hover",
-        "locale": "en-US",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-dark-compact.png",
-        "geometry": { "x": 20, "y": 28, "width": 84, "height": 34 },
-        "color": { "token": "color.brand.primary", "lab": [49.6, 11.7, -38.9] },
-        "radius": 5,
-        "spacing": { "paddingX": 12, "paddingY": 6, "gap": 6 },
-        "textBaseline": 21.8
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-primary-dark-compact.png",
-        "geometry": { "x": 20.8, "y": 28.5, "width": 84.4, "height": 34.2 },
-        "color": { "token": "color.brand.primary", "lab": [50, 12, -39.2] },
-        "radius": 5.5,
-        "spacing": { "paddingX": 12.5, "paddingY": 6.5, "gap": 6 },
-        "textBaseline": 22.4
-      },
-      "screenshotDiffPercent": 0.011,
-      "perceptualDelta": 0.06
+    "color": {
+     "token": "color.brand.primary",
+     "lab": [
+      54.1,
+      12.2,
+      -41.4
+     ]
     },
-    {
-      "id": "button-stable-variants-web-avalonia",
-      "component": "button",
-      "mode": "crossPlatform",
-      "token": "color.button.stable-variants",
-      "fixture": {
-        "page": "visual/button",
-        "theme": "light",
-        "density": "default",
-        "variant": "stable-variants",
-        "size": "md",
-        "state": "enabled-loading-disabled",
-        "locale": "en-US",
-        "direction": "ltr",
-        "motionMode": "enabled"
-      },
-      "coverage": {
-        "variants": [
-          "default",
-          "primary",
-          "success",
-          "warning",
-          "danger",
-          "info",
-          "text",
-          "link",
-          "plain"
-        ],
-        "sizes": ["sm", "md", "lg"],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-stable-variants.png",
-        "geometry": { "x": 24, "y": 32, "width": 360, "height": 184 },
-        "color": {
-          "token": "color.button.stable-variants",
-          "lab": [50, 6, -20]
-        },
-        "radius": 6,
-        "spacing": { "paddingX": 16, "paddingY": 8, "gap": 8 },
-        "textBaseline": 25.2
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-stable-variants.png",
-        "geometry": { "x": 24.7, "y": 32.5, "width": 360.8, "height": 184.4 },
-        "color": {
-          "token": "color.button.stable-variants",
-          "lab": [50.4, 6.2, -20.3]
-        },
-        "radius": 6.4,
-        "spacing": { "paddingX": 16.5, "paddingY": 8.4, "gap": 8.5 },
-        "textBaseline": 25.8
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 6,
+    "spacing": {
+     "paddingX": 16,
+     "paddingY": 8,
+     "gap": 8
     },
-    {
-      "id": "button-group-borders-web-avalonia",
-      "component": "button-group",
-      "mode": "crossPlatform",
-      "token": "border.button.group",
-      "fixture": {
-        "page": "visual/button-group",
-        "theme": "dark",
-        "density": "compact",
-        "variant": "primary",
-        "size": "sm",
-        "state": "enabled-disabled-mixed",
-        "locale": "en-US",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-group-borders.png",
-        "geometry": { "x": 20, "y": 28, "width": 178, "height": 34 },
-        "color": { "token": "border.button.group", "lab": [48, 10, -37] },
-        "radius": 5,
-        "spacing": { "paddingX": 12, "paddingY": 6, "gap": 0 },
-        "textBaseline": 21.8
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-group-borders.png",
-        "geometry": { "x": 20.5, "y": 28.4, "width": 178.6, "height": 34.2 },
-        "color": { "token": "border.button.group", "lab": [48.4, 10.2, -37.3] },
-        "radius": 5.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 6.2, "gap": 0 },
-        "textBaseline": 22.2
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 25.2
+   },
+   "candidate": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-rerun.png",
+    "geometry": {
+     "x": 24,
+     "y": 32.1,
+     "width": 96,
+     "height": 40
     },
-    {
-      "id": "text-baseline-registered-override",
-      "component": "text",
-      "mode": "crossPlatform",
-      "token": "typography.body.baseline",
-      "overrideId": "visual-text-baseline-001",
-      "fixture": {
-        "page": "visual/text",
-        "theme": "light",
-        "density": "spacious",
-        "variant": "body",
-        "size": "md",
-        "state": "default",
-        "locale": "zh-CN",
-        "direction": "rtl",
-        "motionMode": "disabled"
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-body-zh-rtl.png",
-        "geometry": { "x": 16, "y": 18, "width": 220, "height": 28 },
-        "color": { "token": "typography.body.color", "lab": [23, 0, -2] },
-        "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 0 },
-        "textBaseline": 18
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-body-zh-rtl.png",
-        "geometry": { "x": 16.5, "y": 18.4, "width": 220.5, "height": 28.5 },
-        "color": { "token": "typography.body.color", "lab": [23.4, 0.1, -2.2] },
-        "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 0 },
-        "textBaseline": 19.2
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "color.brand.primary",
+     "lab": [
+      54.2,
+      12.1,
+      -41.3
+     ]
     },
-    {
-      "id": "icon-alignment-stable17-web-avalonia",
-      "component": "icon",
-      "mode": "crossPlatform",
-      "token": "icon.size.md",
-      "fixture": {
-        "page": "visual/icon",
-        "theme": "light",
-        "density": "default",
-        "variant": "search-warning-row",
-        "size": "md",
-        "state": "enabled",
-        "locale": "en-US",
-        "direction": "ltr",
-        "motionMode": "enabled"
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/icon-alignment-stable17.png",
-        "geometry": { "x": 24, "y": 32, "width": 128, "height": 40 },
-        "color": { "token": "icon.size.md", "lab": [25, 1, -3] },
-        "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 8 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-alignment-stable17.png",
-        "geometry": { "x": 24.4, "y": 32.3, "width": 128.5, "height": 40.4 },
-        "color": { "token": "icon.size.md", "lab": [25.3, 1.1, -3.1] },
-        "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 8.3 },
-        "textBaseline": 24.4
-      },
-      "screenshotDiffPercent": 0.009,
-      "perceptualDelta": 0.04
+    "radius": 6,
+    "spacing": {
+     "paddingX": 16,
+     "paddingY": 8,
+     "gap": 8
     },
-    {
-      "id": "text-link-baseline-stable17-web-avalonia",
-      "component": "text",
-      "mode": "crossPlatform",
-      "token": "typography.body.baseline",
-      "fixture": {
-        "page": "visual/text-link",
-        "theme": "light",
-        "density": "default",
-        "variant": "body-link-monospace",
-        "size": "md",
-        "state": "enabled-truncated",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-link-baseline-stable17.png",
-        "geometry": { "x": 20, "y": 24, "width": 260, "height": 48 },
-        "color": { "token": "typography.body.color", "lab": [23, 0, -2] },
-        "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 2, "gap": 10 },
-        "textBaseline": 26
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-link-baseline-stable17.png",
-        "geometry": { "x": 20.5, "y": 24.4, "width": 260.6, "height": 48.5 },
-        "color": { "token": "typography.body.color", "lab": [23.4, 0.1, -2.2] },
-        "radius": 0,
-        "spacing": { "paddingX": 0, "paddingY": 2.2, "gap": 10.4 },
-        "textBaseline": 26.6
-      },
-      "screenshotDiffPercent": 0.011,
-      "perceptualDelta": 0.05
+    "textBaseline": 25.25
+   },
+   "screenshotDiffPercent": 0.001,
+   "perceptualDelta": 0.01
+  },
+  {
+   "id": "button-primary-web-avalonia",
+   "component": "button",
+   "mode": "crossPlatform",
+   "token": "color.brand.primary",
+   "fixture": {
+    "page": "visual/button",
+    "theme": "dark",
+    "density": "compact",
+    "variant": "primary",
+    "size": "sm",
+    "state": "hover",
+    "locale": "en-US",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-dark-compact.png",
+    "geometry": {
+     "x": 20,
+     "y": 28,
+     "width": 84,
+     "height": 34
     },
-    {
-      "id": "input-family-stable18-web-avalonia",
-      "component": "input",
-      "mode": "crossPlatform",
-      "token": "input.surface.states",
-      "fixture": {
-        "page": "visual/input-family",
-        "theme": "light",
-        "density": "default",
-        "variant": "input-textarea-states",
-        "size": "md",
-        "state": "enabled-invalid-readonly-disabled-clearable",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "enabled"
-      },
-      "coverage": {
-        "states": [
-          "enabled",
-          "focus-visible",
-          "invalid",
-          "readonly",
-          "disabled",
-          "clearable",
-          "composition"
-        ],
-        "densities": ["compact", "default", "spacious"],
-        "controls": ["FsusInput", "FsusTextarea"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/input-family-stable18.png",
-        "geometry": { "x": 24, "y": 28, "width": 360, "height": 214 },
-        "color": { "token": "input.surface.states", "lab": [92, 0, -3] },
-        "radius": 6,
-        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 10 },
-        "textBaseline": 24.5
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/input-family-stable18.png",
-        "geometry": { "x": 24.6, "y": 28.4, "width": 360.7, "height": 214.5 },
-        "color": { "token": "input.surface.states", "lab": [92.4, 0.1, -3.2] },
-        "radius": 6.4,
-        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 10.5 },
-        "textBaseline": 25.1
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "color.brand.primary",
+     "lab": [
+      49.6,
+      11.7,
+      -38.9
+     ]
     },
-    {
-      "id": "input-number-stable18-web-avalonia",
-      "component": "input-number",
-      "mode": "crossPlatform",
-      "token": "input.number.spin",
-      "fixture": {
-        "page": "visual/input-number",
-        "theme": "dark",
-        "density": "compact",
-        "variant": "spin-min-max",
-        "size": "sm",
-        "state": "enabled-invalid-disabled",
-        "locale": "en-US",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "states": ["enabled", "focus-visible", "invalid", "disabled"],
-        "constraints": ["min", "max", "step"],
-        "densities": ["compact", "default", "spacious"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/input-number-stable18.png",
-        "geometry": { "x": 20, "y": 28, "width": 168, "height": 34 },
-        "color": { "token": "input.number.spin", "lab": [49, 2, -14] },
-        "radius": 5,
-        "spacing": { "paddingX": 8, "paddingY": 4, "gap": 4 },
-        "textBaseline": 21.8
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/input-number-stable18.png",
-        "geometry": { "x": 20.4, "y": 28.3, "width": 168.5, "height": 34.3 },
-        "color": { "token": "input.number.spin", "lab": [49.4, 2.2, -14.2] },
-        "radius": 5.4,
-        "spacing": { "paddingX": 8.3, "paddingY": 4.2, "gap": 4.4 },
-        "textBaseline": 22.3
-      },
-      "screenshotDiffPercent": 0.011,
-      "perceptualDelta": 0.05
+    "radius": 5,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 6,
+     "gap": 6
     },
-    {
-      "id": "selection-controls-stable19-web-avalonia",
-      "component": "selection-controls",
-      "mode": "crossPlatform",
-      "token": "selection.controls.states",
-      "fixture": {
-        "page": "visual/selection-controls",
-        "theme": "light",
-        "density": "default",
-        "variant": "checkbox-radio-switch",
-        "size": "md",
-        "state": "checked-unchecked-indeterminate-disabled-loading",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "enabled"
-      },
-      "coverage": {
-        "controls": [
-          "FsusCheckbox",
-          "FsusCheckboxGroup",
-          "FsusRadio",
-          "FsusRadioGroup",
-          "FsusSwitch"
-        ],
-        "states": [
-          "checked",
-          "unchecked",
-          "indeterminate",
-          "disabled",
-          "loading",
-          "focus-visible"
-        ],
-        "densities": ["compact", "default", "spacious"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/selection-controls-stable19.png",
-        "geometry": { "x": 24, "y": 28, "width": 360, "height": 220 },
-        "color": { "token": "selection.controls.states", "lab": [52, 6, -22] },
-        "radius": 6,
-        "spacing": { "paddingX": 8, "paddingY": 4, "gap": 6 },
-        "textBaseline": 24.5
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/selection-controls-stable19.png",
-        "geometry": { "x": 24.6, "y": 28.5, "width": 360.7, "height": 220.6 },
-        "color": {
-          "token": "selection.controls.states",
-          "lab": [52.4, 6.2, -22.3]
-        },
-        "radius": 6.4,
-        "spacing": { "paddingX": 8.4, "paddingY": 4.3, "gap": 6.4 },
-        "textBaseline": 25
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 21.8
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-primary-dark-compact.png",
+    "geometry": {
+     "x": 20.8,
+     "y": 28.5,
+     "width": 84.4,
+     "height": 34.2
     },
-    {
-      "id": "form-stable20-web-avalonia",
-      "component": "form",
-      "mode": "crossPlatform",
-      "token": "form.layout.validation",
-      "fixture": {
-        "page": "visual/form",
-        "theme": "light",
-        "density": "default",
-        "variant": "label-positions-validation",
-        "size": "md",
-        "state": "required-invalid-disabled-long-cjk",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "enabled"
-      },
-      "coverage": {
-        "controls": [
-          "FsusForm",
-          "FsusFormItem",
-          "FsusInput",
-          "FsusCheckbox",
-          "FsusRadio",
-          "FsusSwitch"
-        ],
-        "labelPositions": ["left", "right", "top"],
-        "states": ["required", "validating", "success", "error", "disabled"],
-        "content": ["long-label", "cjk-label", "help-text", "error-message"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/form-stable20.png",
-        "geometry": { "x": 24, "y": 28, "width": 420, "height": 324 },
-        "color": { "token": "form.layout.validation", "lab": [51, 7, -19] },
-        "radius": 6,
-        "spacing": { "paddingX": 12, "paddingY": 6, "gap": 12 },
-        "textBaseline": 24.5
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/form-stable20.png",
-        "geometry": { "x": 24.6, "y": 28.5, "width": 420.7, "height": 324.6 },
-        "color": {
-          "token": "form.layout.validation",
-          "lab": [51.3, 7.2, -19.2]
-        },
-        "radius": 6.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 6.3, "gap": 12.5 },
-        "textBaseline": 25
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "color.brand.primary",
+     "lab": [
+      50,
+      12,
+      -39.2
+     ]
     },
-    {
-      "id": "display-primitives-stable21-web-avalonia",
-      "component": "display-primitives",
-      "mode": "crossPlatform",
-      "token": "display.primitives.states",
-      "fixture": {
-        "page": "visual/display-primitives",
-        "theme": "high-contrast",
-        "density": "spacious",
-        "variant": "card-tag-alert-progress-empty-result",
-        "size": "md",
-        "state": "selected-removable-dismissible-progress-reduced-empty-result",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "disabled"
-      },
-      "coverage": {
-        "controls": [
-          "FsusCard",
-          "FsusDivider",
-          "FsusTag",
-          "FsusBadge",
-          "FsusAlert",
-          "FsusProgress",
-          "FsusSkeleton",
-          "FsusEmpty",
-          "FsusResult"
-        ],
-        "states": [
-          "selected-card",
-          "removable-tag",
-          "dismissible-alert",
-          "progress-values",
-          "skeleton-reduced-motion",
-          "empty-action",
-          "result-variants"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/display-primitives-stable21.png",
-        "geometry": { "x": 24, "y": 28, "width": 460, "height": 390 },
-        "color": { "token": "display.primitives.states", "lab": [54, 5, -18] },
-        "radius": 12,
-        "spacing": { "paddingX": 20, "paddingY": 20, "gap": 12 },
-        "textBaseline": 25
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/display-primitives-stable21.png",
-        "geometry": { "x": 24.7, "y": 28.6, "width": 460.8, "height": 390.7 },
-        "color": {
-          "token": "display.primitives.states",
-          "lab": [54.4, 5.2, -18.3]
-        },
-        "radius": 12.5,
-        "spacing": { "paddingX": 20.5, "paddingY": 20.4, "gap": 12.5 },
-        "textBaseline": 25.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 5.5,
+    "spacing": {
+     "paddingX": 12.5,
+     "paddingY": 6.5,
+     "gap": 6
     },
-    {
-      "id": "layout-primitives-stable22-web-avalonia",
-      "component": "layout-primitives",
-      "mode": "crossPlatform",
-      "token": "layout.primitives.geometry",
-      "overrideId": "avalonia-layout-panel-measure-001",
-      "fixture": {
-        "page": "visual/layout-primitives",
-        "theme": "dark",
-        "density": "compact",
-        "variant": "space-row-col-container-scrollbar-visual-hidden",
-        "size": "md",
-        "state": "wrapping-nested-responsive-scroll-hidden-label",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusSpace",
-          "FsusRow",
-          "FsusCol",
-          "FsusContainer",
-          "FsusHeader",
-          "FsusAside",
-          "FsusMain",
-          "FsusFooter",
-          "FsusScrollbar",
-          "FsusVisualHidden"
-        ],
-        "states": [
-          "wrapping",
-          "nested-containers",
-          "responsive-breakpoints",
-          "long-content",
-          "keyboard-scroll",
-          "pointer-scroll",
-          "screen-reader-only-label"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/layout-primitives-stable22.png",
-        "geometry": { "x": 20, "y": 28, "width": 480, "height": 360 },
-        "color": { "token": "layout.primitives.geometry", "lab": [48, 4, -16] },
-        "radius": 12,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/layout-primitives-stable22.png",
-        "geometry": { "x": 20.8, "y": 28.7, "width": 480.9, "height": 360.8 },
-        "color": {
-          "token": "layout.primitives.geometry",
-          "lab": [48.4, 4.2, -16.3]
-        },
-        "radius": 12.5,
-        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
-        "textBaseline": 25.2
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 22.4
+   },
+   "screenshotDiffPercent": 0.011,
+   "perceptualDelta": 0.06
+  },
+  {
+   "id": "button-stable-variants-web-avalonia",
+   "component": "button",
+   "mode": "crossPlatform",
+   "token": "color.button.stable-variants",
+   "fixture": {
+    "page": "visual/button",
+    "theme": "light",
+    "density": "default",
+    "variant": "stable-variants",
+    "size": "md",
+    "state": "enabled-loading-disabled",
+    "locale": "en-US",
+    "direction": "ltr",
+    "motionMode": "enabled"
+   },
+   "coverage": {
+    "variants": [
+     "default",
+     "primary",
+     "success",
+     "warning",
+     "danger",
+     "info",
+     "text",
+     "link",
+     "plain"
+    ],
+    "sizes": [
+     "sm",
+     "md",
+     "lg"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-stable-variants.png",
+    "geometry": {
+     "x": 24,
+     "y": 32,
+     "width": 360,
+     "height": 184
     },
-    {
-      "id": "navigation-primitives-stable23-web-avalonia",
-      "component": "navigation-primitives",
-      "mode": "crossPlatform",
-      "token": "navigation.active.indicator",
-      "fixture": {
-        "page": "visual/navigation-primitives",
-        "theme": "light",
-        "density": "default",
-        "variant": "tabs-menu-breadcrumb-header-steps",
-        "size": "md",
-        "state": "selected-disabled-collapsed-nested-current-error",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "enabled"
-      },
-      "coverage": {
-        "controls": [
-          "FsusTabs",
-          "FsusTabPane",
-          "FsusMenu",
-          "FsusMenuItem",
-          "FsusSubMenu",
-          "FsusMenuItemGroup",
-          "FsusBreadcrumb",
-          "FsusBreadcrumbItem",
-          "FsusPageHeader",
-          "FsusSteps",
-          "FsusStep"
-        ],
-        "states": [
-          "selected-tabs",
-          "disabled-tab",
-          "nested-menu",
-          "collapsed-menu",
-          "current-breadcrumb",
-          "page-header-back",
-          "step-process",
-          "step-error"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/navigation-primitives-stable23.png",
-        "geometry": { "x": 24, "y": 28, "width": 520, "height": 360 },
-        "color": {
-          "token": "navigation.active.indicator",
-          "lab": [49, 6, -18]
-        },
-        "radius": 6,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/navigation-primitives-stable23.png",
-        "geometry": { "x": 24.7, "y": 28.6, "width": 520.8, "height": 360.7 },
-        "color": {
-          "token": "navigation.active.indicator",
-          "lab": [49.4, 6.2, -18.3]
-        },
-        "radius": 6.4,
-        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "color.button.stable-variants",
+     "lab": [
+      50,
+      6,
+      -20
+     ]
     },
-    {
-      "id": "modal-panel-stable24-web-avalonia",
-      "component": "modal-panel",
-      "mode": "crossPlatform",
-      "token": "overlay.dialog.surface",
-      "fixture": {
-        "page": "visual/modal-panel",
-        "theme": "dark",
-        "density": "compact",
-        "variant": "dialog-drawer-message-box",
-        "size": "md",
-        "state": "modal-dangerous-loading-nested-guarded",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusDialog",
-          "FsusDrawer",
-          "FsusMessageBox",
-          "FsusOverlayHost"
-        ],
-        "states": [
-          "open",
-          "loading",
-          "dangerous",
-          "blocked-close",
-          "nested-dialog",
-          "focus-restored",
-          "keyboard-close",
-          "message-box-confirm-cancel"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/modal-panel-stable24.png",
-        "geometry": { "x": 24, "y": 28, "width": 520, "height": 420 },
-        "color": {
-          "token": "overlay.dialog.surface",
-          "lab": [42, 4, -14]
-        },
-        "radius": 12,
-        "spacing": { "paddingX": 20, "paddingY": 20, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/modal-panel-stable24.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 520.9, "height": 420.8 },
-        "color": {
-          "token": "overlay.dialog.surface",
-          "lab": [42.4, 4.2, -14.3]
-        },
-        "radius": 12.5,
-        "spacing": { "paddingX": 20.5, "paddingY": 20.4, "gap": 12.5 },
-        "textBaseline": 24.8
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 6,
+    "spacing": {
+     "paddingX": 16,
+     "paddingY": 8,
+     "gap": 8
     },
-    {
-      "id": "anchored-overlay-stable25-web-avalonia",
-      "component": "anchored-overlay",
-      "mode": "crossPlatform",
-      "token": "overlay.anchored.surface",
-      "fixture": {
-        "page": "visual/anchored-overlay",
-        "theme": "high-contrast",
-        "density": "spacious",
-        "variant": "tooltip-popover-popconfirm-dropdown",
-        "size": "md",
-        "state": "hover-focus-click-selected-disabled-confirmed-flipped",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "disabled"
-      },
-      "coverage": {
-        "controls": [
-          "FsusTooltip",
-          "FsusPopover",
-          "FsusPopconfirm",
-          "FsusDropdown",
-          "FsusDropdownMenu",
-          "FsusDropdownItem",
-          "FsusOverlayHost"
-        ],
-        "placements": [
-          "top-start",
-          "top-end",
-          "right-start",
-          "right-end",
-          "bottom-start",
-          "bottom-end",
-          "left-start",
-          "left-end"
-        ],
-        "states": [
-          "hover-trigger",
-          "focus-trigger",
-          "click-trigger",
-          "keyboard-open",
-          "disabled-item",
-          "selected-item",
-          "confirmed",
-          "boundary-flipped"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/anchored-overlay-stable25.png",
-        "geometry": { "x": 24, "y": 28, "width": 560, "height": 380 },
-        "color": {
-          "token": "overlay.anchored.surface",
-          "lab": [46, 5, -17]
-        },
-        "radius": 12,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 8 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/anchored-overlay-stable25.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 560.9, "height": 380.8 },
-        "color": {
-          "token": "overlay.anchored.surface",
-          "lab": [46.4, 5.2, -17.3]
-        },
-        "radius": 12.5,
-        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 8.5 },
-        "textBaseline": 24.8
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 25.2
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-stable-variants.png",
+    "geometry": {
+     "x": 24.7,
+     "y": 32.5,
+     "width": 360.8,
+     "height": 184.4
     },
-    {
-      "id": "service-helper-stable26-web-avalonia",
-      "component": "service-helper",
-      "mode": "crossPlatform",
-      "token": "service.helper.surface",
-      "fixture": {
-        "page": "visual/service-helper",
-        "theme": "light",
-        "density": "default",
-        "variant": "message-notification-loading-affix-backtop",
-        "size": "md",
-        "state": "grouped-closed-loading-affixed-visible-keyboard",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusMessageToast",
-          "FsusNotification",
-          "FsusLoadingOverlay",
-          "FsusAffix",
-          "FsusBacktop"
-        ],
-        "states": [
-          "message-grouped",
-          "notification-placement",
-          "manual-close",
-          "loading-scope",
-          "affix-threshold",
-          "backtop-visible",
-          "keyboard-activate"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/service-helper-stable26.png",
-        "geometry": { "x": 24, "y": 28, "width": 540, "height": 360 },
-        "color": {
-          "token": "service.helper.surface",
-          "lab": [50, 5, -15]
-        },
-        "radius": 12,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/service-helper-stable26.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 540.9, "height": 360.8 },
-        "color": {
-          "token": "service.helper.surface",
-          "lab": [50.4, 5.2, -15.3]
-        },
-        "radius": 12.5,
-        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
-        "textBaseline": 24.8
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "color.button.stable-variants",
+     "lab": [
+      50.4,
+      6.2,
+      -20.3
+     ]
     },
-    {
-      "id": "picker-stable27-web-avalonia",
-      "component": "picker",
-      "mode": "crossPlatform",
-      "token": "picker.surface",
-      "fixture": {
-        "page": "visual/picker",
-        "theme": "light",
-        "density": "default",
-        "variant": "select-v2-autocomplete-cascader",
-        "size": "md",
-        "state": "filtered-multiple-remote-virtualized-cascader-selected",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "system"
-      },
-      "coverage": {
-        "controls": [
-          "FsusSelect",
-          "FsusSelectV2",
-          "FsusOption",
-          "FsusOptionGroup",
-          "FsusAutocomplete",
-          "FsusCascader",
-          "FsusCascaderPanel"
-        ],
-        "states": [
-          "single-selection",
-          "multiple-tags",
-          "filtering",
-          "remote-loading",
-          "disabled-option",
-          "grouped-options",
-          "virtualized-list",
-          "cascader-path"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/picker-stable27.png",
-        "geometry": { "x": 24, "y": 28, "width": 620, "height": 420 },
-        "color": {
-          "token": "picker.surface",
-          "lab": [54, 4, -13]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/picker-stable27.png",
-        "geometry": { "x": 24.7, "y": 28.8, "width": 620.8, "height": 420.8 },
-        "color": {
-          "token": "picker.surface",
-          "lab": [54.4, 4.2, -13.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 6.4,
+    "spacing": {
+     "paddingX": 16.5,
+     "paddingY": 8.4,
+     "gap": 8.5
     },
-    {
-      "id": "date-time-calendar-stable28-grid-web-avalonia",
-      "component": "date-time",
-      "mode": "crossPlatform",
-      "token": "date.time.surface",
-      "fixture": {
-        "page": "visual/date-time/calendar",
-        "theme": "light",
-        "density": "default",
-        "variant": "calendar-grid",
-        "size": "md",
-        "state": "selected-range-disabled-keyboard",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "system"
-      },
-      "coverage": {
-        "controls": ["FsusCalendar"],
-        "states": [
-          "date-selection",
-          "range-selection",
-          "disabled-date",
-          "keyboard-navigation",
-          "locale-format"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-calendar-stable28-grid.png",
-        "geometry": { "x": 24, "y": 28, "width": 360, "height": 320 },
-        "color": {
-          "token": "date.time.surface",
-          "lab": [55, 3, -11]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 8 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-calendar-stable28-grid.png",
-        "geometry": { "x": 24.7, "y": 28.8, "width": 360.8, "height": 320.7 },
-        "color": {
-          "token": "date.time.surface",
-          "lab": [55.3, 3.1, -11.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 8.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 25.8
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "button-group-borders-web-avalonia",
+   "component": "button-group",
+   "mode": "crossPlatform",
+   "token": "border.button.group",
+   "fixture": {
+    "page": "visual/button-group",
+    "theme": "dark",
+    "density": "compact",
+    "variant": "primary",
+    "size": "sm",
+    "state": "enabled-disabled-mixed",
+    "locale": "en-US",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-group-borders.png",
+    "geometry": {
+     "x": 20,
+     "y": 28,
+     "width": 178,
+     "height": 34
     },
-    {
-      "id": "date-time-picker-stable28-panel-web-avalonia",
-      "component": "date-time",
-      "mode": "crossPlatform",
-      "token": "date.time.surface",
-      "fixture": {
-        "page": "visual/date-time/picker-panel",
-        "theme": "light",
-        "density": "default",
-        "variant": "date-time-picker-panel",
-        "size": "md",
-        "state": "date-shortcut-time-range-clearable",
-        "locale": "en-US",
-        "direction": "ltr",
-        "motionMode": "system"
-      },
-      "coverage": {
-        "controls": [
-          "FsusDatePicker",
-          "FsusTimePicker",
-          "FsusTimeSelect",
-          "FsusCalendar"
-        ],
-        "states": [
-          "display-text",
-          "value-binding",
-          "clearable",
-          "shortcuts",
-          "disabled-time",
-          "time-range"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-panel.png",
-        "geometry": { "x": 24, "y": 28, "width": 520, "height": 360 },
-        "color": {
-          "token": "date.time.surface",
-          "lab": [55, 3, -11]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-panel.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 520.8, "height": 360.8 },
-        "color": {
-          "token": "date.time.surface",
-          "lab": [55.3, 3.2, -11.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
-        "textBaseline": 24.8
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "border.button.group",
+     "lab": [
+      48,
+      10,
+      -37
+     ]
     },
-    {
-      "id": "date-time-picker-stable28-compact-web-avalonia",
-      "component": "date-time",
-      "mode": "crossPlatform",
-      "token": "date.time.surface",
-      "fixture": {
-        "page": "visual/date-time/compact",
-        "theme": "light",
-        "density": "compact",
-        "variant": "date-time-compact-density",
-        "size": "sm",
-        "state": "compact-calendar-time-select",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusDatePicker",
-          "FsusTimePicker",
-          "FsusTimeSelect",
-          "FsusCalendar"
-        ],
-        "states": [
-          "compact-density",
-          "reduced-motion",
-          "selected-date",
-          "selected-time"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-compact.png",
-        "geometry": { "x": 24, "y": 28, "width": 480, "height": 300 },
-        "color": {
-          "token": "date.time.surface",
-          "lab": [55, 3, -11]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 8 },
-        "textBaseline": 22
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-compact.png",
-        "geometry": { "x": 24.7, "y": 28.7, "width": 480.8, "height": 300.7 },
-        "color": {
-          "token": "date.time.surface",
-          "lab": [55.3, 3.2, -11.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 8.4 },
-        "textBaseline": 22.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 5,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 6,
+     "gap": 0
     },
-    {
-      "id": "value-picker-stable29-light-default-web-avalonia",
-      "component": "value-picker",
-      "mode": "crossPlatform",
-      "token": "value.picker.track",
-      "fixture": {
-        "page": "visual/value-picker",
-        "theme": "light",
-        "density": "default",
-        "variant": "slider-rate-color-picker",
-        "size": "md",
-        "state": "marks-half-rating-alpha-presets",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "system"
-      },
-      "coverage": {
-        "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
-        "states": [
-          "keyboard-step",
-          "pointer-drag",
-          "marks",
-          "half-rating",
-          "alpha",
-          "preset-colors"
-        ],
-        "themes": ["light"],
-        "densities": ["default"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-light-default.png",
-        "geometry": { "x": 24, "y": 28, "width": 520, "height": 300 },
-        "color": {
-          "token": "value.picker.track",
-          "lab": [58, 2, -12]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-light-default.png",
-        "geometry": { "x": 24.7, "y": 28.7, "width": 520.8, "height": 300.8 },
-        "color": {
-          "token": "value.picker.track",
-          "lab": [58.3, 2.1, -12.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 21.8
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-group-borders.png",
+    "geometry": {
+     "x": 20.5,
+     "y": 28.4,
+     "width": 178.6,
+     "height": 34.2
     },
-    {
-      "id": "value-picker-stable29-dark-spacious-web-avalonia",
-      "component": "value-picker",
-      "mode": "crossPlatform",
-      "token": "value.picker.track",
-      "fixture": {
-        "page": "visual/value-picker",
-        "theme": "dark",
-        "density": "spacious",
-        "variant": "slider-rate-color-picker",
-        "size": "lg",
-        "state": "disabled-clearable-alpha",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "system"
-      },
-      "coverage": {
-        "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
-        "states": [
-          "disabled-state",
-          "clearable-color",
-          "alpha",
-          "automation-value"
-        ],
-        "themes": ["dark"],
-        "densities": ["spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-dark-spacious.png",
-        "geometry": { "x": 24, "y": 28, "width": 560, "height": 330 },
-        "color": {
-          "token": "value.picker.track",
-          "lab": [29, 2, -11]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 14, "paddingY": 10, "gap": 14 },
-        "textBaseline": 26
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-dark-spacious.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 560.8, "height": 330.8 },
-        "color": {
-          "token": "value.picker.track",
-          "lab": [29.3, 2.1, -11.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 14.4, "paddingY": 10.3, "gap": 14.4 },
-        "textBaseline": 26.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "border.button.group",
+     "lab": [
+      48.4,
+      10.2,
+      -37.3
+     ]
     },
-    {
-      "id": "value-picker-stable29-high-contrast-compact-web-avalonia",
-      "component": "value-picker",
-      "mode": "crossPlatform",
-      "token": "value.picker.track",
-      "fixture": {
-        "page": "visual/value-picker",
-        "theme": "high-contrast",
-        "density": "compact",
-        "variant": "slider-rate-color-picker",
-        "size": "sm",
-        "state": "keyboard-only-focused",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
-        "states": [
-          "keyboard-step",
-          "focus-visible",
-          "invalid-form",
-          "compact-density"
-        ],
-        "themes": ["high-contrast"],
-        "densities": ["compact"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-high-contrast-compact.png",
-        "geometry": { "x": 24, "y": 28, "width": 500, "height": 280 },
-        "color": {
-          "token": "value.picker.track",
-          "lab": [18, 0, -6]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 8 },
-        "textBaseline": 22
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-high-contrast-compact.png",
-        "geometry": { "x": 24.8, "y": 28.7, "width": 500.8, "height": 280.8 },
-        "color": {
-          "token": "value.picker.track",
-          "lab": [18.2, 0.1, -6.1]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 8.4 },
-        "textBaseline": 22.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 5.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 6.2,
+     "gap": 0
     },
-    {
-      "id": "upload-transfer-stable30-web-avalonia",
-      "component": "upload-transfer",
-      "mode": "crossPlatform",
-      "token": "upload.transfer.surface",
-      "fixture": {
-        "page": "visual/upload-transfer",
-        "theme": "light",
-        "density": "default",
-        "variant": "upload-queue-transfer-dual-list",
-        "size": "md",
-        "state": "progress-error-retry-filtered-keyboard-virtualized",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "system"
-      },
-      "coverage": {
-        "controls": ["FsusUpload", "FsusTransfer"],
-        "states": [
-          "queued",
-          "uploading",
-          "error",
-          "retry",
-          "remove-confirm",
-          "filtered",
-          "move-left-right",
-          "keyboard-selection",
-          "large-list"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/upload-transfer-stable30.png",
-        "geometry": { "x": 24, "y": 28, "width": 680, "height": 420 },
-        "color": {
-          "token": "upload.transfer.surface",
-          "lab": [56, 2, -12]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/upload-transfer-stable30.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 680.8, "height": 420.8 },
-        "color": {
-          "token": "upload.transfer.surface",
-          "lab": [56.3, 2.1, -12.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 22.2
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "text-baseline-registered-override",
+   "component": "text",
+   "mode": "crossPlatform",
+   "token": "typography.body.baseline",
+   "overrideId": "visual-text-baseline-001",
+   "fixture": {
+    "page": "visual/text",
+    "theme": "light",
+    "density": "spacious",
+    "variant": "body",
+    "size": "md",
+    "state": "default",
+    "locale": "zh-CN",
+    "direction": "rtl",
+    "motionMode": "disabled"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-body-zh-rtl.png",
+    "geometry": {
+     "x": 16,
+     "y": 18,
+     "width": 220,
+     "height": 28
     },
-    {
-      "id": "data-display-stable31-web-avalonia",
-      "component": "data-display",
-      "mode": "crossPlatform",
-      "token": "data.display.surface",
-      "fixture": {
-        "page": "visual/data-display",
-        "theme": "light",
-        "density": "default",
-        "variant": "pagination-descriptions-timeline-statistic-countdown",
-        "size": "md",
-        "state": "paged-bordered-alternate-formatted-countdown",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "system"
-      },
-      "coverage": {
-        "controls": [
-          "FsusPagination",
-          "FsusPaginationBar",
-          "FsusDescriptions",
-          "FsusTimeline",
-          "FsusStatistic",
-          "FsusCountdown"
-        ],
-        "states": [
-          "page-change",
-          "page-size",
-          "descriptions-layout",
-          "timeline-placement",
-          "statistic-format",
-          "countdown-complete"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-display-stable31.png",
-        "geometry": { "x": 24, "y": 28, "width": 680, "height": 420 },
-        "color": {
-          "token": "data.display.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-display-stable31.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 680.8, "height": 420.8 },
-        "color": {
-          "token": "data.display.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "typography.body.color",
+     "lab": [
+      23,
+      0,
+      -2
+     ]
     },
-    {
-      "id": "data-display-stable31-compact-web-avalonia",
-      "component": "data-display",
-      "mode": "crossPlatform",
-      "token": "data.display.surface",
-      "fixture": {
-        "page": "visual/data-display-compact",
-        "theme": "light",
-        "density": "compact",
-        "variant": "compact-data-display",
-        "size": "sm",
-        "state": "responsive-single-column-timing-safe",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusPagination",
-          "FsusDescriptions",
-          "FsusTimeline",
-          "FsusStatistic",
-          "FsusCountdown"
-        ],
-        "states": [
-          "compact-density",
-          "responsive-layout",
-          "disabled-pagination",
-          "deterministic-clock"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-display-stable31-compact.png",
-        "geometry": { "x": 24, "y": 28, "width": 560, "height": 340 },
-        "color": {
-          "token": "data.display.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 8 },
-        "textBaseline": 22
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-display-stable31-compact.png",
-        "geometry": { "x": 24.7, "y": 28.7, "width": 560.8, "height": 340.8 },
-        "color": {
-          "token": "data.display.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 8.4 },
-        "textBaseline": 22.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 0,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 0
     },
-    {
-      "id": "media-decorative-stable32-web-avalonia",
-      "component": "media-decorative",
-      "mode": "crossPlatform",
-      "token": "media.surface",
-      "fixture": {
-        "page": "visual/media-decorative",
-        "theme": "light",
-        "density": "default",
-        "variant": "image-viewer-carousel-watermark",
-        "size": "md",
-        "state": "loaded-error-preview-gallery-reduced-motion-watermark",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusImage",
-          "FsusImageViewer",
-          "FsusCarousel",
-          "FsusCarouselItem",
-          "FsusWatermark"
-        ],
-        "states": [
-          "image-loaded",
-          "image-error",
-          "preview-open",
-          "gallery-keyboard",
-          "reduced-motion",
-          "watermark-tiling"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/media-decorative-stable32.png",
-        "geometry": { "x": 24, "y": 28, "width": 680, "height": 420 },
-        "color": {
-          "token": "media.surface",
-          "lab": [55, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/media-decorative-stable32.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 680.8, "height": 420.8 },
-        "color": {
-          "token": "media.surface",
-          "lab": [55.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 18
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-body-zh-rtl.png",
+    "geometry": {
+     "x": 16.5,
+     "y": 18.4,
+     "width": 220.5,
+     "height": 28.5
     },
-    {
-      "id": "data-table-stable33-web-avalonia",
-      "component": "data-table",
-      "mode": "crossPlatform",
-      "token": "data.table.surface",
-      "fixture": {
-        "page": "visual/data-table",
-        "theme": "light",
-        "density": "default",
-        "variant": "sortable-selectable-virtualized-grid",
-        "size": "lg",
-        "state": "sorted-selected-fixed-columns-loading-empty-error",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": ["FsusTable", "FsusDataTable"],
-        "states": [
-          "sorted",
-          "selected",
-          "expanded",
-          "fixed-columns",
-          "virtualized",
-          "loading",
-          "empty",
-          "error"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-table-stable33.png",
-        "geometry": { "x": 24, "y": 28, "width": 760, "height": 460 },
-        "color": {
-          "token": "data.table.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-table-stable33.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 760.8, "height": 460.8 },
-        "color": {
-          "token": "data.table.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "typography.body.color",
+     "lab": [
+      23.4,
+      0.1,
+      -2.2
+     ]
     },
-    {
-      "id": "virtualization-stable34-web-avalonia",
-      "component": "virtualization",
-      "mode": "crossPlatform",
-      "token": "virtualization.surface",
-      "fixture": {
-        "page": "visual/virtualization",
-        "theme": "light",
-        "density": "default",
-        "variant": "virtual-list-auto-resizer-table-v2",
-        "size": "lg",
-        "state": "fixed-variable-anchor-recycle-async-cancel-two-axis",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": ["FsusVirtualList", "FsusAutoResizer", "FsusTableV2"],
-        "states": [
-          "fixed-size",
-          "variable-size",
-          "anchor-correction",
-          "recycling",
-          "async-cancel",
-          "two-axis-virtualized"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/virtualization-stable34.png",
-        "geometry": { "x": 24, "y": 28, "width": 780, "height": 460 },
-        "color": {
-          "token": "virtualization.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/virtualization-stable34.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 780.8, "height": 460.8 },
-        "color": {
-          "token": "virtualization.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 0,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 0
     },
-    {
-      "id": "tree-stable35-web-avalonia",
-      "component": "tree",
-      "mode": "crossPlatform",
-      "token": "tree.surface",
-      "fixture": {
-        "page": "visual/tree",
-        "theme": "light",
-        "density": "default",
-        "variant": "tree-v2-tree-select-tree-table",
-        "size": "lg",
-        "state": "expanded-selected-checked-lazy-filtered-virtualized-overlay-tree-table",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusTree",
-          "FsusTreeV2",
-          "FsusTreeSelect",
-          "FsusTreeTable"
-        ],
-        "states": [
-          "expanded",
-          "selected",
-          "checked",
-          "lazy-loaded",
-          "filtered",
-          "virtualized",
-          "overlay-open",
-          "tree-table"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/tree-stable35.png",
-        "geometry": { "x": 24, "y": 28, "width": 780, "height": 480 },
-        "color": {
-          "token": "tree.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/tree-stable35.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 780.8, "height": 480.8 },
-        "color": {
-          "token": "tree.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 19.2
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "icon-alignment-stable17-web-avalonia",
+   "component": "icon",
+   "mode": "crossPlatform",
+   "token": "icon.size.md",
+   "fixture": {
+    "page": "visual/icon",
+    "theme": "light",
+    "density": "default",
+    "variant": "search-warning-row",
+    "size": "md",
+    "state": "enabled",
+    "locale": "en-US",
+    "direction": "ltr",
+    "motionMode": "enabled"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/icon-alignment-stable17.png",
+    "geometry": {
+     "x": 24,
+     "y": 32,
+     "width": 128,
+     "height": 40
     },
-    {
-      "id": "text-viewer-stable36-web-avalonia",
-      "component": "text-viewer",
-      "mode": "crossPlatform",
-      "token": "text.viewer.surface",
-      "fixture": {
-        "page": "visual/text-viewer",
-        "theme": "light",
-        "density": "default",
-        "variant": "structured-mixed-language-long-content",
-        "size": "lg",
-        "state": "heading-paragraph-list-code-keyboard-virtualized-cancelable",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": ["FsusTextViewer"],
-        "states": [
-          "structured-blocks",
-          "mixed-language",
-          "keyboard-focus",
-          "virtualized",
-          "canceled-render"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-viewer-stable36.png",
-        "geometry": { "x": 24, "y": 28, "width": 700, "height": 440 },
-        "color": {
-          "token": "text.viewer.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-viewer-stable36.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 700.8, "height": 440.8 },
-        "color": {
-          "token": "text.viewer.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "icon.size.md",
+     "lab": [
+      25,
+      1,
+      -3
+     ]
     },
-    {
-      "id": "text-editor-stable37-web-avalonia",
-      "component": "text-editor",
-      "mode": "crossPlatform",
-      "token": "text.editor.surface",
-      "fixture": {
-        "page": "visual/text-editor",
-        "theme": "light",
-        "density": "default",
-        "variant": "split-preview-document-editing",
-        "size": "lg",
-        "state": "selection-ime-paste-undo-redo-preview-scroll-sync",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": ["FsusTextEditor", "FsusTextViewer"],
-        "states": [
-          "typing",
-          "selection",
-          "composition",
-          "paste",
-          "undo-redo",
-          "split-preview",
-          "preview-synced"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-editor-stable37.png",
-        "geometry": { "x": 24, "y": 28, "width": 840, "height": 520 },
-        "color": {
-          "token": "text.editor.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-editor-stable37.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 840.8, "height": 520.8 },
-        "color": {
-          "token": "text.editor.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 0,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 8
     },
-    {
-      "id": "public-shell-stable38-web-avalonia",
-      "component": "public-shell",
-      "mode": "crossPlatform",
-      "token": "public.shell.surface",
-      "fixture": {
-        "page": "visual/public-shell",
-        "theme": "light",
-        "density": "default",
-        "variant": "blog-header-responsive-collection-theme-toggle",
-        "size": "lg",
-        "state": "desktop-mobile-active-nav-localized-labels-manager-theme-toggle",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusPublicShell",
-          "FsusSiteHeader",
-          "FsusThemeModeToggle",
-          "FsusResponsiveCollection"
-        ],
-        "states": [
-          "desktop-header",
-          "mobile-header",
-          "active-navigation",
-          "theme-mode",
-          "responsive-collection",
-          "long-localized-labels"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/public-shell-stable38.png",
-        "geometry": { "x": 0, "y": 0, "width": 960, "height": 640 },
-        "color": {
-          "token": "public.shell.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 0,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 16 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/public-shell-stable38.png",
-        "geometry": { "x": 0.8, "y": 0.8, "width": 960.8, "height": 640.8 },
-        "color": {
-          "token": "public.shell.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 0.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 16.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-alignment-stable17.png",
+    "geometry": {
+     "x": 24.4,
+     "y": 32.3,
+     "width": 128.5,
+     "height": 40.4
     },
-    {
-      "id": "settings-primitives-stable39-web-avalonia",
-      "component": "settings-primitives",
-      "mode": "crossPlatform",
-      "token": "product.primitive.surface",
-      "fixture": {
-        "page": "visual/settings-primitives",
-        "theme": "light",
-        "density": "compact",
-        "variant": "section-nav-danger-confirm",
-        "size": "lg",
-        "state": "empty-loading-error-dense-mobile-keyboard-long-text",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusSettingsSection",
-          "FsusSettingsSectionNav",
-          "FsusDangerZone",
-          "FsusTypedConfirmField"
-        ],
-        "states": [
-          "empty",
-          "loading",
-          "error",
-          "dense",
-          "mobile",
-          "keyboard",
-          "long-text"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/settings-primitives-stable39.png",
-        "geometry": { "x": 24, "y": 28, "width": 860, "height": 520 },
-        "color": {
-          "token": "product.primitive.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/settings-primitives-stable39.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 860.8, "height": 520.8 },
-        "color": {
-          "token": "product.primitive.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "icon.size.md",
+     "lab": [
+      25.3,
+      1.1,
+      -3.1
+     ]
     },
-    {
-      "id": "metric-primitives-stable39-web-avalonia",
-      "component": "metric-primitives",
-      "mode": "crossPlatform",
-      "token": "product.primitive.surface",
-      "fixture": {
-        "page": "visual/metric-primitives",
-        "theme": "dark",
-        "density": "default",
-        "variant": "metric-distribution-kpi-diagnostics-copy",
-        "size": "lg",
-        "state": "empty-loading-error-dense-mobile-keyboard-long-text",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusMetricList",
-          "FsusDistributionList",
-          "FsusKpiGroup",
-          "FsusDiagnosticsList",
-          "FsusCopyableDetail"
-        ],
-        "states": [
-          "empty",
-          "loading",
-          "error",
-          "dense",
-          "mobile",
-          "keyboard",
-          "long-text"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/metric-primitives-stable39.png",
-        "geometry": { "x": 24, "y": 28, "width": 860, "height": 520 },
-        "color": {
-          "token": "product.primitive.surface",
-          "lab": [42, 0, -8]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/metric-primitives-stable39.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 860.8, "height": 520.8 },
-        "color": {
-          "token": "product.primitive.surface",
-          "lab": [42.3, 0.1, -8.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "radius": 0,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 8.3
     },
-    {
-      "id": "inbox-primitives-stable39-web-avalonia",
-      "component": "inbox-primitives",
-      "mode": "crossPlatform",
-      "token": "product.primitive.surface",
-      "fixture": {
-        "page": "visual/inbox-primitives",
-        "theme": "light",
-        "density": "spacious",
-        "variant": "layout-split-thread-composer-empty",
-        "size": "lg",
-        "state": "empty-loading-error-dense-mobile-keyboard-long-text",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusInboxLayout",
-          "FsusConversationList",
-          "FsusThreadPanel",
-          "FsusMessageTimeline",
-          "FsusReplyComposerShell"
-        ],
-        "states": [
-          "empty",
-          "loading",
-          "error",
-          "dense",
-          "mobile",
-          "keyboard",
-          "long-text"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/inbox-primitives-stable39.png",
-        "geometry": { "x": 24, "y": 28, "width": 900, "height": 560 },
-        "color": {
-          "token": "product.primitive.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/inbox-primitives-stable39.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 900.8, "height": 560.8 },
-        "color": {
-          "token": "product.primitive.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "textBaseline": 24.4
+   },
+   "screenshotDiffPercent": 0.009,
+   "perceptualDelta": 0.04
+  },
+  {
+   "id": "text-link-baseline-stable17-web-avalonia",
+   "component": "text",
+   "mode": "crossPlatform",
+   "token": "typography.body.baseline",
+   "fixture": {
+    "page": "visual/text-link",
+    "theme": "light",
+    "density": "default",
+    "variant": "body-link-monospace",
+    "size": "md",
+    "state": "enabled-truncated",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-link-baseline-stable17.png",
+    "geometry": {
+     "x": 20,
+     "y": 24,
+     "width": 260,
+     "height": 48
     },
-    {
-      "id": "perception-challenge-stable40-web-avalonia",
-      "component": "perception-challenge",
-      "mode": "crossPlatform",
-      "token": "perception.challenge.surface",
-      "fixture": {
-        "page": "visual/perception-challenge",
-        "theme": "light",
-        "density": "default",
-        "variant": "text-localization-micro-interaction",
-        "size": "lg",
-        "state": "success-failure-retry-loading-disabled-localized-keyboard-long-prompt",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": [
-          "FsusPerceptionChallenge",
-          "FsusTextTaskChallenge",
-          "FsusLocalizationChallenge",
-          "FsusMicroInteractionChallenge"
-        ],
-        "states": [
-          "success",
-          "failure",
-          "retry",
-          "loading",
-          "disabled",
-          "localized",
-          "keyboard-only",
-          "long-prompt"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-challenge-stable40.png",
-        "geometry": { "x": 24, "y": 28, "width": 760, "height": 420 },
-        "color": {
-          "token": "perception.challenge.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-challenge-stable40.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 760.8, "height": 420.8 },
-        "color": {
-          "token": "perception.challenge.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
+    "color": {
+     "token": "typography.body.color",
+     "lab": [
+      23,
+      0,
+      -2
+     ]
     },
-    {
-      "id": "perception-character-challenge-conformance-web-avalonia",
-      "component": "perception-character-challenge",
-      "mode": "crossPlatform",
-      "token": "perception.challenge.surface",
-      "fixture": {
-        "page": "visual/character-challenge-conformance",
-        "theme": "light-dark-high-contrast-forced-colors",
-        "density": "default",
-        "variant": "raster-audio-unavailable-alternative",
-        "size": "desktop-mobile-zoom-200-400",
-        "state": "loading-ready-verifying-retryable-reissue-expired-unavailable-disabled",
-        "locale": "mixed-cjk-latin-long-copy",
-        "direction": "ltr",
-        "motionMode": "enabled-reduced"
-      },
-      "coverage": {
-        "controls": ["FsusPerceptionCharacterChallenge"],
-        "states": [
-          "loading",
-          "ready",
-          "verifying",
-          "retryable",
-          "reissue",
-          "expired",
-          "unavailable",
-          "disabled"
-        ],
-        "media": [
-          "visual-raster",
-          "audio",
-          "unavailable-alternative",
-          "replacement-release"
-        ],
-        "viewports": ["desktop", "mobile", "zoom-200", "zoom-400"],
-        "themes": ["light", "dark", "high-contrast", "forced-colors"],
-        "motionModes": ["enabled", "reduced"],
-        "accessibility": [
-          "labels",
-          "error-association",
-          "live-region-owner",
-          "focus-order",
-          "non-autoplay",
-          "visible-focus"
-        ]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-character-challenge-conformance.png"
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-conformance.png"
-      },
-      "evidenceManifest": "tests/conformance/visual/artifacts/perception-character-challenge-render-manifest.json"
+    "radius": 0,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 2,
+     "gap": 10
     },
-    {
-      "id": "locale-formatting-stable41-web-avalonia",
-      "component": "locale-formatting",
-      "mode": "crossPlatform",
-      "token": "locale.formatting.surface",
-      "fixture": {
-        "page": "visual/locale-formatting",
-        "theme": "light",
-        "density": "compact",
-        "variant": "long-localized-labels-compact-density",
-        "size": "lg",
-        "state": "english-simplified-chinese-fallback-date-number-direction",
-        "locale": "zh-CN",
-        "direction": "ltr",
-        "motionMode": "reduced"
-      },
-      "coverage": {
-        "controls": ["FsusAvaloniaLocaleProvider", "FsusLocalizedText"],
-        "states": [
-          "english",
-          "simplified-chinese",
-          "missing-key-fallback",
-          "date-format",
-          "number-format",
-          "layout-direction",
-          "long-labels"
-        ],
-        "themes": ["light", "dark", "high-contrast"],
-        "densities": ["compact", "default", "spacious"],
-        "motionModes": ["system", "enabled", "reduced", "disabled"]
-      },
-      "baseline": {
-        "platform": "web",
-        "runner": "playwright",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/locale-formatting-stable41.png",
-        "geometry": { "x": 24, "y": 28, "width": 780, "height": 360 },
-        "color": {
-          "token": "locale.formatting.surface",
-          "lab": [56, 2, -10]
-        },
-        "radius": 8,
-        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
-        "textBaseline": 24
-      },
-      "candidate": {
-        "platform": "avalonia",
-        "runner": "headless-skia",
-        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/locale-formatting-stable41.png",
-        "geometry": { "x": 24.8, "y": 28.8, "width": 780.8, "height": 360.8 },
-        "color": {
-          "token": "locale.formatting.surface",
-          "lab": [56.3, 2.1, -10.2]
-        },
-        "radius": 8.4,
-        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
-        "textBaseline": 24.7
-      },
-      "screenshotDiffPercent": 0.012,
-      "perceptualDelta": 0.05
-    }
-  ]
+    "textBaseline": 26
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-link-baseline-stable17.png",
+    "geometry": {
+     "x": 20.5,
+     "y": 24.4,
+     "width": 260.6,
+     "height": 48.5
+    },
+    "color": {
+     "token": "typography.body.color",
+     "lab": [
+      23.4,
+      0.1,
+      -2.2
+     ]
+    },
+    "radius": 0,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 2.2,
+     "gap": 10.4
+    },
+    "textBaseline": 26.6
+   },
+   "screenshotDiffPercent": 0.011,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "input-family-stable18-web-avalonia",
+   "component": "input",
+   "mode": "crossPlatform",
+   "token": "input.surface.states",
+   "fixture": {
+    "page": "visual/input-family",
+    "theme": "light",
+    "density": "default",
+    "variant": "input-textarea-states",
+    "size": "md",
+    "state": "enabled-invalid-readonly-disabled-clearable",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "enabled"
+   },
+   "coverage": {
+    "states": [
+     "enabled",
+     "focus-visible",
+     "invalid",
+     "readonly",
+     "disabled",
+     "clearable",
+     "composition"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "controls": [
+     "FsusInput",
+     "FsusTextarea"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/input-family-stable18.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 360,
+     "height": 214
+    },
+    "color": {
+     "token": "input.surface.states",
+     "lab": [
+      92,
+      0,
+      -3
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 10,
+     "paddingY": 6,
+     "gap": 10
+    },
+    "textBaseline": 24.5
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/input-family-stable18.png",
+    "geometry": {
+     "x": 24.6,
+     "y": 28.4,
+     "width": 360.7,
+     "height": 214.5
+    },
+    "color": {
+     "token": "input.surface.states",
+     "lab": [
+      92.4,
+      0.1,
+      -3.2
+     ]
+    },
+    "radius": 6.4,
+    "spacing": {
+     "paddingX": 10.4,
+     "paddingY": 6.3,
+     "gap": 10.5
+    },
+    "textBaseline": 25.1
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "input-number-stable18-web-avalonia",
+   "component": "input-number",
+   "mode": "crossPlatform",
+   "token": "input.number.spin",
+   "fixture": {
+    "page": "visual/input-number",
+    "theme": "dark",
+    "density": "compact",
+    "variant": "spin-min-max",
+    "size": "sm",
+    "state": "enabled-invalid-disabled",
+    "locale": "en-US",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "states": [
+     "enabled",
+     "focus-visible",
+     "invalid",
+     "disabled"
+    ],
+    "constraints": [
+     "min",
+     "max",
+     "step"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/input-number-stable18.png",
+    "geometry": {
+     "x": 20,
+     "y": 28,
+     "width": 168,
+     "height": 34
+    },
+    "color": {
+     "token": "input.number.spin",
+     "lab": [
+      49,
+      2,
+      -14
+     ]
+    },
+    "radius": 5,
+    "spacing": {
+     "paddingX": 8,
+     "paddingY": 4,
+     "gap": 4
+    },
+    "textBaseline": 21.8
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/input-number-stable18.png",
+    "geometry": {
+     "x": 20.4,
+     "y": 28.3,
+     "width": 168.5,
+     "height": 34.3
+    },
+    "color": {
+     "token": "input.number.spin",
+     "lab": [
+      49.4,
+      2.2,
+      -14.2
+     ]
+    },
+    "radius": 5.4,
+    "spacing": {
+     "paddingX": 8.3,
+     "paddingY": 4.2,
+     "gap": 4.4
+    },
+    "textBaseline": 22.3
+   },
+   "screenshotDiffPercent": 0.011,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "selection-controls-stable19-web-avalonia",
+   "component": "selection-controls",
+   "mode": "crossPlatform",
+   "token": "selection.controls.states",
+   "fixture": {
+    "page": "visual/selection-controls",
+    "theme": "light",
+    "density": "default",
+    "variant": "checkbox-radio-switch",
+    "size": "md",
+    "state": "checked-unchecked-indeterminate-disabled-loading",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "enabled"
+   },
+   "coverage": {
+    "controls": [
+     "FsusCheckbox",
+     "FsusCheckboxGroup",
+     "FsusRadio",
+     "FsusRadioGroup",
+     "FsusSwitch"
+    ],
+    "states": [
+     "checked",
+     "unchecked",
+     "indeterminate",
+     "disabled",
+     "loading",
+     "focus-visible"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/selection-controls-stable19.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 360,
+     "height": 220
+    },
+    "color": {
+     "token": "selection.controls.states",
+     "lab": [
+      52,
+      6,
+      -22
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 8,
+     "paddingY": 4,
+     "gap": 6
+    },
+    "textBaseline": 24.5
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/selection-controls-stable19.png",
+    "geometry": {
+     "x": 24.6,
+     "y": 28.5,
+     "width": 360.7,
+     "height": 220.6
+    },
+    "color": {
+     "token": "selection.controls.states",
+     "lab": [
+      52.4,
+      6.2,
+      -22.3
+     ]
+    },
+    "radius": 6.4,
+    "spacing": {
+     "paddingX": 8.4,
+     "paddingY": 4.3,
+     "gap": 6.4
+    },
+    "textBaseline": 25
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "form-stable20-web-avalonia",
+   "component": "form",
+   "mode": "crossPlatform",
+   "token": "form.layout.validation",
+   "fixture": {
+    "page": "visual/form",
+    "theme": "light",
+    "density": "default",
+    "variant": "label-positions-validation",
+    "size": "md",
+    "state": "required-invalid-disabled-long-cjk",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "enabled"
+   },
+   "coverage": {
+    "controls": [
+     "FsusForm",
+     "FsusFormItem",
+     "FsusInput",
+     "FsusCheckbox",
+     "FsusRadio",
+     "FsusSwitch"
+    ],
+    "labelPositions": [
+     "left",
+     "right",
+     "top"
+    ],
+    "states": [
+     "required",
+     "validating",
+     "success",
+     "error",
+     "disabled"
+    ],
+    "content": [
+     "long-label",
+     "cjk-label",
+     "help-text",
+     "error-message"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/form-stable20.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 420,
+     "height": 324
+    },
+    "color": {
+     "token": "form.layout.validation",
+     "lab": [
+      51,
+      7,
+      -19
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 6,
+     "gap": 12
+    },
+    "textBaseline": 24.5
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/form-stable20.png",
+    "geometry": {
+     "x": 24.6,
+     "y": 28.5,
+     "width": 420.7,
+     "height": 324.6
+    },
+    "color": {
+     "token": "form.layout.validation",
+     "lab": [
+      51.3,
+      7.2,
+      -19.2
+     ]
+    },
+    "radius": 6.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 6.3,
+     "gap": 12.5
+    },
+    "textBaseline": 25
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "display-primitives-stable21-web-avalonia",
+   "component": "display-primitives",
+   "mode": "crossPlatform",
+   "token": "display.primitives.states",
+   "fixture": {
+    "page": "visual/display-primitives",
+    "theme": "high-contrast",
+    "density": "spacious",
+    "variant": "card-tag-alert-progress-empty-result",
+    "size": "md",
+    "state": "selected-removable-dismissible-progress-reduced-empty-result",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "disabled"
+   },
+   "coverage": {
+    "controls": [
+     "FsusCard",
+     "FsusDivider",
+     "FsusTag",
+     "FsusBadge",
+     "FsusAlert",
+     "FsusProgress",
+     "FsusSkeleton",
+     "FsusEmpty",
+     "FsusResult"
+    ],
+    "states": [
+     "selected-card",
+     "removable-tag",
+     "dismissible-alert",
+     "progress-values",
+     "skeleton-reduced-motion",
+     "empty-action",
+     "result-variants"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/display-primitives-stable21.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 460,
+     "height": 390
+    },
+    "color": {
+     "token": "display.primitives.states",
+     "lab": [
+      54,
+      5,
+      -18
+     ]
+    },
+    "radius": 12,
+    "spacing": {
+     "paddingX": 20,
+     "paddingY": 20,
+     "gap": 12
+    },
+    "textBaseline": 25
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/display-primitives-stable21.png",
+    "geometry": {
+     "x": 24.7,
+     "y": 28.6,
+     "width": 460.8,
+     "height": 390.7
+    },
+    "color": {
+     "token": "display.primitives.states",
+     "lab": [
+      54.4,
+      5.2,
+      -18.3
+     ]
+    },
+    "radius": 12.5,
+    "spacing": {
+     "paddingX": 20.5,
+     "paddingY": 20.4,
+     "gap": 12.5
+    },
+    "textBaseline": 25.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "layout-primitives-stable22-web-avalonia",
+   "component": "layout-primitives",
+   "mode": "crossPlatform",
+   "token": "layout.primitives.geometry",
+   "overrideId": "avalonia-layout-panel-measure-001",
+   "fixture": {
+    "page": "visual/layout-primitives",
+    "theme": "dark",
+    "density": "compact",
+    "variant": "space-row-col-container-scrollbar-visual-hidden",
+    "size": "md",
+    "state": "wrapping-nested-responsive-scroll-hidden-label",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusSpace",
+     "FsusRow",
+     "FsusCol",
+     "FsusContainer",
+     "FsusHeader",
+     "FsusAside",
+     "FsusMain",
+     "FsusFooter",
+     "FsusScrollbar",
+     "FsusVisualHidden"
+    ],
+    "states": [
+     "wrapping",
+     "nested-containers",
+     "responsive-breakpoints",
+     "long-content",
+     "keyboard-scroll",
+     "pointer-scroll",
+     "screen-reader-only-label"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/layout-primitives-stable22.png",
+    "geometry": {
+     "x": 20,
+     "y": 28,
+     "width": 480,
+     "height": 360
+    },
+    "color": {
+     "token": "layout.primitives.geometry",
+     "lab": [
+      48,
+      4,
+      -16
+     ]
+    },
+    "radius": 12,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/layout-primitives-stable22.png",
+    "geometry": {
+     "x": 20.8,
+     "y": 28.7,
+     "width": 480.9,
+     "height": 360.8
+    },
+    "color": {
+     "token": "layout.primitives.geometry",
+     "lab": [
+      48.4,
+      4.2,
+      -16.3
+     ]
+    },
+    "radius": 12.5,
+    "spacing": {
+     "paddingX": 12.5,
+     "paddingY": 8.4,
+     "gap": 12.5
+    },
+    "textBaseline": 25.2
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "navigation-primitives-stable23-web-avalonia",
+   "component": "navigation-primitives",
+   "mode": "crossPlatform",
+   "token": "navigation.active.indicator",
+   "fixture": {
+    "page": "visual/navigation-primitives",
+    "theme": "light",
+    "density": "default",
+    "variant": "tabs-menu-breadcrumb-header-steps",
+    "size": "md",
+    "state": "selected-disabled-collapsed-nested-current-error",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "enabled"
+   },
+   "coverage": {
+    "controls": [
+     "FsusTabs",
+     "FsusTabPane",
+     "FsusMenu",
+     "FsusMenuItem",
+     "FsusSubMenu",
+     "FsusMenuItemGroup",
+     "FsusBreadcrumb",
+     "FsusBreadcrumbItem",
+     "FsusPageHeader",
+     "FsusSteps",
+     "FsusStep"
+    ],
+    "states": [
+     "selected-tabs",
+     "disabled-tab",
+     "nested-menu",
+     "collapsed-menu",
+     "current-breadcrumb",
+     "page-header-back",
+     "step-process",
+     "step-error"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/navigation-primitives-stable23.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 520,
+     "height": 360
+    },
+    "color": {
+     "token": "navigation.active.indicator",
+     "lab": [
+      49,
+      6,
+      -18
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/navigation-primitives-stable23.png",
+    "geometry": {
+     "x": 24.7,
+     "y": 28.6,
+     "width": 520.8,
+     "height": 360.7
+    },
+    "color": {
+     "token": "navigation.active.indicator",
+     "lab": [
+      49.4,
+      6.2,
+      -18.3
+     ]
+    },
+    "radius": 6.4,
+    "spacing": {
+     "paddingX": 12.5,
+     "paddingY": 8.4,
+     "gap": 12.5
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "modal-panel-stable24-web-avalonia",
+   "component": "modal-panel",
+   "mode": "crossPlatform",
+   "token": "overlay.dialog.surface",
+   "fixture": {
+    "page": "visual/modal-panel",
+    "theme": "dark",
+    "density": "compact",
+    "variant": "dialog-drawer-message-box",
+    "size": "md",
+    "state": "modal-dangerous-loading-nested-guarded",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusDialog",
+     "FsusDrawer",
+     "FsusMessageBox",
+     "FsusOverlayHost"
+    ],
+    "states": [
+     "open",
+     "loading",
+     "dangerous",
+     "blocked-close",
+     "nested-dialog",
+     "focus-restored",
+     "keyboard-close",
+     "message-box-confirm-cancel"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/modal-panel-stable24.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 520,
+     "height": 420
+    },
+    "color": {
+     "token": "overlay.dialog.surface",
+     "lab": [
+      42,
+      4,
+      -14
+     ]
+    },
+    "radius": 12,
+    "spacing": {
+     "paddingX": 20,
+     "paddingY": 20,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/modal-panel-stable24.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.7,
+     "width": 520.9,
+     "height": 420.8
+    },
+    "color": {
+     "token": "overlay.dialog.surface",
+     "lab": [
+      42.4,
+      4.2,
+      -14.3
+     ]
+    },
+    "radius": 12.5,
+    "spacing": {
+     "paddingX": 20.5,
+     "paddingY": 20.4,
+     "gap": 12.5
+    },
+    "textBaseline": 24.8
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "anchored-overlay-stable25-web-avalonia",
+   "component": "anchored-overlay",
+   "mode": "crossPlatform",
+   "token": "overlay.anchored.surface",
+   "fixture": {
+    "page": "visual/anchored-overlay",
+    "theme": "high-contrast",
+    "density": "spacious",
+    "variant": "tooltip-popover-popconfirm-dropdown",
+    "size": "md",
+    "state": "hover-focus-click-selected-disabled-confirmed-flipped",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "disabled"
+   },
+   "coverage": {
+    "controls": [
+     "FsusTooltip",
+     "FsusPopover",
+     "FsusPopconfirm",
+     "FsusDropdown",
+     "FsusDropdownMenu",
+     "FsusDropdownItem",
+     "FsusOverlayHost"
+    ],
+    "placements": [
+     "top-start",
+     "top-end",
+     "right-start",
+     "right-end",
+     "bottom-start",
+     "bottom-end",
+     "left-start",
+     "left-end"
+    ],
+    "states": [
+     "hover-trigger",
+     "focus-trigger",
+     "click-trigger",
+     "keyboard-open",
+     "disabled-item",
+     "selected-item",
+     "confirmed",
+     "boundary-flipped"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/anchored-overlay-stable25.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 560,
+     "height": 380
+    },
+    "color": {
+     "token": "overlay.anchored.surface",
+     "lab": [
+      46,
+      5,
+      -17
+     ]
+    },
+    "radius": 12,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 8
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/anchored-overlay-stable25.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.7,
+     "width": 560.9,
+     "height": 380.8
+    },
+    "color": {
+     "token": "overlay.anchored.surface",
+     "lab": [
+      46.4,
+      5.2,
+      -17.3
+     ]
+    },
+    "radius": 12.5,
+    "spacing": {
+     "paddingX": 12.5,
+     "paddingY": 8.4,
+     "gap": 8.5
+    },
+    "textBaseline": 24.8
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "service-helper-stable26-web-avalonia",
+   "component": "service-helper",
+   "mode": "crossPlatform",
+   "token": "service.helper.surface",
+   "fixture": {
+    "page": "visual/service-helper",
+    "theme": "light",
+    "density": "default",
+    "variant": "message-notification-loading-affix-backtop",
+    "size": "md",
+    "state": "grouped-closed-loading-affixed-visible-keyboard",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusMessageToast",
+     "FsusNotification",
+     "FsusLoadingOverlay",
+     "FsusAffix",
+     "FsusBacktop"
+    ],
+    "states": [
+     "message-grouped",
+     "notification-placement",
+     "manual-close",
+     "loading-scope",
+     "affix-threshold",
+     "backtop-visible",
+     "keyboard-activate"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/service-helper-stable26.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 540,
+     "height": 360
+    },
+    "color": {
+     "token": "service.helper.surface",
+     "lab": [
+      50,
+      5,
+      -15
+     ]
+    },
+    "radius": 12,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/service-helper-stable26.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.7,
+     "width": 540.9,
+     "height": 360.8
+    },
+    "color": {
+     "token": "service.helper.surface",
+     "lab": [
+      50.4,
+      5.2,
+      -15.3
+     ]
+    },
+    "radius": 12.5,
+    "spacing": {
+     "paddingX": 12.5,
+     "paddingY": 8.4,
+     "gap": 12.5
+    },
+    "textBaseline": 24.8
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "picker-stable27-web-avalonia",
+   "component": "picker",
+   "mode": "crossPlatform",
+   "token": "picker.surface",
+   "fixture": {
+    "page": "visual/picker",
+    "theme": "light",
+    "density": "default",
+    "variant": "select-v2-autocomplete-cascader",
+    "size": "md",
+    "state": "filtered-multiple-remote-virtualized-cascader-selected",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "system"
+   },
+   "coverage": {
+    "controls": [
+     "FsusSelect",
+     "FsusSelectV2",
+     "FsusOption",
+     "FsusOptionGroup",
+     "FsusAutocomplete",
+     "FsusCascader",
+     "FsusCascaderPanel"
+    ],
+    "states": [
+     "single-selection",
+     "multiple-tags",
+     "filtering",
+     "remote-loading",
+     "disabled-option",
+     "grouped-options",
+     "virtualized-list",
+     "cascader-path"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/picker-stable27.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 620,
+     "height": 420
+    },
+    "color": {
+     "token": "picker.surface",
+     "lab": [
+      54,
+      4,
+      -13
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 10
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/picker-stable27.png",
+    "geometry": {
+     "x": 24.7,
+     "y": 28.8,
+     "width": 620.8,
+     "height": 420.8
+    },
+    "color": {
+     "token": "picker.surface",
+     "lab": [
+      54.4,
+      4.2,
+      -13.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 10.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "date-time-calendar-stable28-grid-web-avalonia",
+   "component": "date-time",
+   "mode": "crossPlatform",
+   "token": "date.time.surface",
+   "fixture": {
+    "page": "visual/date-time/calendar",
+    "theme": "light",
+    "density": "default",
+    "variant": "calendar-grid",
+    "size": "md",
+    "state": "selected-range-disabled-keyboard",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "system"
+   },
+   "coverage": {
+    "controls": [
+     "FsusCalendar"
+    ],
+    "states": [
+     "date-selection",
+     "range-selection",
+     "disabled-date",
+     "keyboard-navigation",
+     "locale-format"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-calendar-stable28-grid.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 360,
+     "height": 320
+    },
+    "color": {
+     "token": "date.time.surface",
+     "lab": [
+      55,
+      3,
+      -11
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 8
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-calendar-stable28-grid.png",
+    "geometry": {
+     "x": 24.7,
+     "y": 28.8,
+     "width": 360.8,
+     "height": 320.7
+    },
+    "color": {
+     "token": "date.time.surface",
+     "lab": [
+      55.3,
+      3.1,
+      -11.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 8.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "date-time-picker-stable28-panel-web-avalonia",
+   "component": "date-time",
+   "mode": "crossPlatform",
+   "token": "date.time.surface",
+   "fixture": {
+    "page": "visual/date-time/picker-panel",
+    "theme": "light",
+    "density": "default",
+    "variant": "date-time-picker-panel",
+    "size": "md",
+    "state": "date-shortcut-time-range-clearable",
+    "locale": "en-US",
+    "direction": "ltr",
+    "motionMode": "system"
+   },
+   "coverage": {
+    "controls": [
+     "FsusDatePicker",
+     "FsusTimePicker",
+     "FsusTimeSelect",
+     "FsusCalendar"
+    ],
+    "states": [
+     "display-text",
+     "value-binding",
+     "clearable",
+     "shortcuts",
+     "disabled-time",
+     "time-range"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-panel.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 520,
+     "height": 360
+    },
+    "color": {
+     "token": "date.time.surface",
+     "lab": [
+      55,
+      3,
+      -11
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 10
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-panel.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.7,
+     "width": 520.8,
+     "height": 360.8
+    },
+    "color": {
+     "token": "date.time.surface",
+     "lab": [
+      55.3,
+      3.2,
+      -11.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 10.4
+    },
+    "textBaseline": 24.8
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "date-time-picker-stable28-compact-web-avalonia",
+   "component": "date-time",
+   "mode": "crossPlatform",
+   "token": "date.time.surface",
+   "fixture": {
+    "page": "visual/date-time/compact",
+    "theme": "light",
+    "density": "compact",
+    "variant": "date-time-compact-density",
+    "size": "sm",
+    "state": "compact-calendar-time-select",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusDatePicker",
+     "FsusTimePicker",
+     "FsusTimeSelect",
+     "FsusCalendar"
+    ],
+    "states": [
+     "compact-density",
+     "reduced-motion",
+     "selected-date",
+     "selected-time"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-compact.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 480,
+     "height": 300
+    },
+    "color": {
+     "token": "date.time.surface",
+     "lab": [
+      55,
+      3,
+      -11
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 10,
+     "paddingY": 6,
+     "gap": 8
+    },
+    "textBaseline": 22
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-compact.png",
+    "geometry": {
+     "x": 24.7,
+     "y": 28.7,
+     "width": 480.8,
+     "height": 300.7
+    },
+    "color": {
+     "token": "date.time.surface",
+     "lab": [
+      55.3,
+      3.2,
+      -11.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 10.4,
+     "paddingY": 6.3,
+     "gap": 8.4
+    },
+    "textBaseline": 22.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "value-picker-stable29-light-default-web-avalonia",
+   "component": "value-picker",
+   "mode": "crossPlatform",
+   "token": "value.picker.track",
+   "fixture": {
+    "page": "visual/value-picker",
+    "theme": "light",
+    "density": "default",
+    "variant": "slider-rate-color-picker",
+    "size": "md",
+    "state": "marks-half-rating-alpha-presets",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "system"
+   },
+   "coverage": {
+    "controls": [
+     "FsusSlider",
+     "FsusRate",
+     "FsusColorPicker"
+    ],
+    "states": [
+     "keyboard-step",
+     "pointer-drag",
+     "marks",
+     "half-rating",
+     "alpha",
+     "preset-colors"
+    ],
+    "themes": [
+     "light"
+    ],
+    "densities": [
+     "default"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-light-default.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 520,
+     "height": 300
+    },
+    "color": {
+     "token": "value.picker.track",
+     "lab": [
+      58,
+      2,
+      -12
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-light-default.png",
+    "geometry": {
+     "x": 24.7,
+     "y": 28.7,
+     "width": 520.8,
+     "height": 300.8
+    },
+    "color": {
+     "token": "value.picker.track",
+     "lab": [
+      58.3,
+      2.1,
+      -12.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 12.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "value-picker-stable29-dark-spacious-web-avalonia",
+   "component": "value-picker",
+   "mode": "crossPlatform",
+   "token": "value.picker.track",
+   "fixture": {
+    "page": "visual/value-picker",
+    "theme": "dark",
+    "density": "spacious",
+    "variant": "slider-rate-color-picker",
+    "size": "lg",
+    "state": "disabled-clearable-alpha",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "system"
+   },
+   "coverage": {
+    "controls": [
+     "FsusSlider",
+     "FsusRate",
+     "FsusColorPicker"
+    ],
+    "states": [
+     "disabled-state",
+     "clearable-color",
+     "alpha",
+     "automation-value"
+    ],
+    "themes": [
+     "dark"
+    ],
+    "densities": [
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-dark-spacious.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 560,
+     "height": 330
+    },
+    "color": {
+     "token": "value.picker.track",
+     "lab": [
+      29,
+      2,
+      -11
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 14,
+     "paddingY": 10,
+     "gap": 14
+    },
+    "textBaseline": 26
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-dark-spacious.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 560.8,
+     "height": 330.8
+    },
+    "color": {
+     "token": "value.picker.track",
+     "lab": [
+      29.3,
+      2.1,
+      -11.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 14.4,
+     "paddingY": 10.3,
+     "gap": 14.4
+    },
+    "textBaseline": 26.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "value-picker-stable29-high-contrast-compact-web-avalonia",
+   "component": "value-picker",
+   "mode": "crossPlatform",
+   "token": "value.picker.track",
+   "fixture": {
+    "page": "visual/value-picker",
+    "theme": "high-contrast",
+    "density": "compact",
+    "variant": "slider-rate-color-picker",
+    "size": "sm",
+    "state": "keyboard-only-focused",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusSlider",
+     "FsusRate",
+     "FsusColorPicker"
+    ],
+    "states": [
+     "keyboard-step",
+     "focus-visible",
+     "invalid-form",
+     "compact-density"
+    ],
+    "themes": [
+     "high-contrast"
+    ],
+    "densities": [
+     "compact"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-high-contrast-compact.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 500,
+     "height": 280
+    },
+    "color": {
+     "token": "value.picker.track",
+     "lab": [
+      18,
+      0,
+      -6
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 10,
+     "paddingY": 6,
+     "gap": 8
+    },
+    "textBaseline": 22
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-high-contrast-compact.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.7,
+     "width": 500.8,
+     "height": 280.8
+    },
+    "color": {
+     "token": "value.picker.track",
+     "lab": [
+      18.2,
+      0.1,
+      -6.1
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 10.4,
+     "paddingY": 6.3,
+     "gap": 8.4
+    },
+    "textBaseline": 22.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "upload-transfer-stable30-web-avalonia",
+   "component": "upload-transfer",
+   "mode": "crossPlatform",
+   "token": "upload.transfer.surface",
+   "fixture": {
+    "page": "visual/upload-transfer",
+    "theme": "light",
+    "density": "default",
+    "variant": "upload-queue-transfer-dual-list",
+    "size": "md",
+    "state": "progress-error-retry-filtered-keyboard-virtualized",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "system"
+   },
+   "coverage": {
+    "controls": [
+     "FsusUpload",
+     "FsusTransfer"
+    ],
+    "states": [
+     "queued",
+     "uploading",
+     "error",
+     "retry",
+     "remove-confirm",
+     "filtered",
+     "move-left-right",
+     "keyboard-selection",
+     "large-list"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/upload-transfer-stable30.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 680,
+     "height": 420
+    },
+    "color": {
+     "token": "upload.transfer.surface",
+     "lab": [
+      56,
+      2,
+      -12
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/upload-transfer-stable30.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 680.8,
+     "height": 420.8
+    },
+    "color": {
+     "token": "upload.transfer.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -12.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 12.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "data-display-stable31-web-avalonia",
+   "component": "data-display",
+   "mode": "crossPlatform",
+   "token": "data.display.surface",
+   "fixture": {
+    "page": "visual/data-display",
+    "theme": "light",
+    "density": "default",
+    "variant": "pagination-descriptions-timeline-statistic-countdown",
+    "size": "md",
+    "state": "paged-bordered-alternate-formatted-countdown",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "system"
+   },
+   "coverage": {
+    "controls": [
+     "FsusPagination",
+     "FsusPaginationBar",
+     "FsusDescriptions",
+     "FsusTimeline",
+     "FsusStatistic",
+     "FsusCountdown"
+    ],
+    "states": [
+     "page-change",
+     "page-size",
+     "descriptions-layout",
+     "timeline-placement",
+     "statistic-format",
+     "countdown-complete"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-display-stable31.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 680,
+     "height": 420
+    },
+    "color": {
+     "token": "data.display.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-display-stable31.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 680.8,
+     "height": 420.8
+    },
+    "color": {
+     "token": "data.display.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 12.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "data-display-stable31-compact-web-avalonia",
+   "component": "data-display",
+   "mode": "crossPlatform",
+   "token": "data.display.surface",
+   "fixture": {
+    "page": "visual/data-display-compact",
+    "theme": "light",
+    "density": "compact",
+    "variant": "compact-data-display",
+    "size": "sm",
+    "state": "responsive-single-column-timing-safe",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusPagination",
+     "FsusDescriptions",
+     "FsusTimeline",
+     "FsusStatistic",
+     "FsusCountdown"
+    ],
+    "states": [
+     "compact-density",
+     "responsive-layout",
+     "disabled-pagination",
+     "deterministic-clock"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-display-stable31-compact.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 560,
+     "height": 340
+    },
+    "color": {
+     "token": "data.display.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 10,
+     "paddingY": 6,
+     "gap": 8
+    },
+    "textBaseline": 22
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-display-stable31-compact.png",
+    "geometry": {
+     "x": 24.7,
+     "y": 28.7,
+     "width": 560.8,
+     "height": 340.8
+    },
+    "color": {
+     "token": "data.display.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 10.4,
+     "paddingY": 6.3,
+     "gap": 8.4
+    },
+    "textBaseline": 22.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "media-decorative-stable32-web-avalonia",
+   "component": "media-decorative",
+   "mode": "crossPlatform",
+   "token": "media.surface",
+   "fixture": {
+    "page": "visual/media-decorative",
+    "theme": "light",
+    "density": "default",
+    "variant": "image-viewer-carousel-watermark",
+    "size": "md",
+    "state": "loaded-error-preview-gallery-reduced-motion-watermark",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusImage",
+     "FsusImageViewer",
+     "FsusCarousel",
+     "FsusCarouselItem",
+     "FsusWatermark"
+    ],
+    "states": [
+     "image-loaded",
+     "image-error",
+     "preview-open",
+     "gallery-keyboard",
+     "reduced-motion",
+     "watermark-tiling"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/media-decorative-stable32.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 680,
+     "height": 420
+    },
+    "color": {
+     "token": "media.surface",
+     "lab": [
+      55,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/media-decorative-stable32.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 680.8,
+     "height": 420.8
+    },
+    "color": {
+     "token": "media.surface",
+     "lab": [
+      55.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 12.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "data-table-stable33-web-avalonia",
+   "component": "data-table",
+   "mode": "crossPlatform",
+   "token": "data.table.surface",
+   "fixture": {
+    "page": "visual/data-table",
+    "theme": "light",
+    "density": "default",
+    "variant": "sortable-selectable-virtualized-grid",
+    "size": "lg",
+    "state": "sorted-selected-fixed-columns-loading-empty-error",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusTable",
+     "FsusDataTable"
+    ],
+    "states": [
+     "sorted",
+     "selected",
+     "expanded",
+     "fixed-columns",
+     "virtualized",
+     "loading",
+     "empty",
+     "error"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-table-stable33.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 760,
+     "height": 460
+    },
+    "color": {
+     "token": "data.table.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 10
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-table-stable33.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 760.8,
+     "height": 460.8
+    },
+    "color": {
+     "token": "data.table.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 10.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "virtualization-stable34-web-avalonia",
+   "component": "virtualization",
+   "mode": "crossPlatform",
+   "token": "virtualization.surface",
+   "fixture": {
+    "page": "visual/virtualization",
+    "theme": "light",
+    "density": "default",
+    "variant": "virtual-list-auto-resizer-table-v2",
+    "size": "lg",
+    "state": "fixed-variable-anchor-recycle-async-cancel-two-axis",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusVirtualList",
+     "FsusAutoResizer",
+     "FsusTableV2"
+    ],
+    "states": [
+     "fixed-size",
+     "variable-size",
+     "anchor-correction",
+     "recycling",
+     "async-cancel",
+     "two-axis-virtualized"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/virtualization-stable34.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 780,
+     "height": 460
+    },
+    "color": {
+     "token": "virtualization.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 10
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/virtualization-stable34.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 780.8,
+     "height": 460.8
+    },
+    "color": {
+     "token": "virtualization.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 10.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "tree-stable35-web-avalonia",
+   "component": "tree",
+   "mode": "crossPlatform",
+   "token": "tree.surface",
+   "fixture": {
+    "page": "visual/tree",
+    "theme": "light",
+    "density": "default",
+    "variant": "tree-v2-tree-select-tree-table",
+    "size": "lg",
+    "state": "expanded-selected-checked-lazy-filtered-virtualized-overlay-tree-table",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusTree",
+     "FsusTreeV2",
+     "FsusTreeSelect",
+     "FsusTreeTable"
+    ],
+    "states": [
+     "expanded",
+     "selected",
+     "checked",
+     "lazy-loaded",
+     "filtered",
+     "virtualized",
+     "overlay-open",
+     "tree-table"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/tree-stable35.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 780,
+     "height": 480
+    },
+    "color": {
+     "token": "tree.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 10
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/tree-stable35.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 780.8,
+     "height": 480.8
+    },
+    "color": {
+     "token": "tree.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 10.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "text-viewer-stable36-web-avalonia",
+   "component": "text-viewer",
+   "mode": "crossPlatform",
+   "token": "text.viewer.surface",
+   "fixture": {
+    "page": "visual/text-viewer",
+    "theme": "light",
+    "density": "default",
+    "variant": "structured-mixed-language-long-content",
+    "size": "lg",
+    "state": "heading-paragraph-list-code-keyboard-virtualized-cancelable",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusTextViewer"
+    ],
+    "states": [
+     "structured-blocks",
+     "mixed-language",
+     "keyboard-focus",
+     "virtualized",
+     "canceled-render"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-viewer-stable36.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 700,
+     "height": 440
+    },
+    "color": {
+     "token": "text.viewer.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 10
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-viewer-stable36.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 700.8,
+     "height": 440.8
+    },
+    "color": {
+     "token": "text.viewer.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 10.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "text-editor-stable37-web-avalonia",
+   "component": "text-editor",
+   "mode": "crossPlatform",
+   "token": "text.editor.surface",
+   "fixture": {
+    "page": "visual/text-editor",
+    "theme": "light",
+    "density": "default",
+    "variant": "split-preview-document-editing",
+    "size": "lg",
+    "state": "selection-ime-paste-undo-redo-preview-scroll-sync",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusTextEditor",
+     "FsusTextViewer"
+    ],
+    "states": [
+     "typing",
+     "selection",
+     "composition",
+     "paste",
+     "undo-redo",
+     "split-preview",
+     "preview-synced"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-editor-stable37.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 840,
+     "height": 520
+    },
+    "color": {
+     "token": "text.editor.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 10
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-editor-stable37.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 840.8,
+     "height": 520.8
+    },
+    "color": {
+     "token": "text.editor.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 10.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "public-shell-stable38-web-avalonia",
+   "component": "public-shell",
+   "mode": "crossPlatform",
+   "token": "public.shell.surface",
+   "fixture": {
+    "page": "visual/public-shell",
+    "theme": "light",
+    "density": "default",
+    "variant": "blog-header-responsive-collection-theme-toggle",
+    "size": "lg",
+    "state": "desktop-mobile-active-nav-localized-labels-manager-theme-toggle",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusPublicShell",
+     "FsusSiteHeader",
+     "FsusThemeModeToggle",
+     "FsusResponsiveCollection"
+    ],
+    "states": [
+     "desktop-header",
+     "mobile-header",
+     "active-navigation",
+     "theme-mode",
+     "responsive-collection",
+     "long-localized-labels"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/public-shell-stable38.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 960,
+     "height": 640
+    },
+    "color": {
+     "token": "public.shell.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 0,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 16
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/public-shell-stable38.png",
+    "geometry": {
+     "x": 0.8,
+     "y": 0.8,
+     "width": 960.8,
+     "height": 640.8
+    },
+    "color": {
+     "token": "public.shell.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 0.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 16.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "settings-primitives-stable39-web-avalonia",
+   "component": "settings-primitives",
+   "mode": "crossPlatform",
+   "token": "product.primitive.surface",
+   "fixture": {
+    "page": "visual/settings-primitives",
+    "theme": "light",
+    "density": "compact",
+    "variant": "section-nav-danger-confirm",
+    "size": "lg",
+    "state": "empty-loading-error-dense-mobile-keyboard-long-text",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusSettingsSection",
+     "FsusSettingsSectionNav",
+     "FsusDangerZone",
+     "FsusTypedConfirmField"
+    ],
+    "states": [
+     "empty",
+     "loading",
+     "error",
+     "dense",
+     "mobile",
+     "keyboard",
+     "long-text"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/settings-primitives-stable39.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 860,
+     "height": 520
+    },
+    "color": {
+     "token": "product.primitive.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/settings-primitives-stable39.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 860.8,
+     "height": 520.8
+    },
+    "color": {
+     "token": "product.primitive.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 12.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "metric-primitives-stable39-web-avalonia",
+   "component": "metric-primitives",
+   "mode": "crossPlatform",
+   "token": "product.primitive.surface",
+   "fixture": {
+    "page": "visual/metric-primitives",
+    "theme": "dark",
+    "density": "default",
+    "variant": "metric-distribution-kpi-diagnostics-copy",
+    "size": "lg",
+    "state": "empty-loading-error-dense-mobile-keyboard-long-text",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusMetricList",
+     "FsusDistributionList",
+     "FsusKpiGroup",
+     "FsusDiagnosticsList",
+     "FsusCopyableDetail"
+    ],
+    "states": [
+     "empty",
+     "loading",
+     "error",
+     "dense",
+     "mobile",
+     "keyboard",
+     "long-text"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/metric-primitives-stable39.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 860,
+     "height": 520
+    },
+    "color": {
+     "token": "product.primitive.surface",
+     "lab": [
+      42,
+      0,
+      -8
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/metric-primitives-stable39.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 860.8,
+     "height": 520.8
+    },
+    "color": {
+     "token": "product.primitive.surface",
+     "lab": [
+      42.3,
+      0.1,
+      -8.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 12.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "inbox-primitives-stable39-web-avalonia",
+   "component": "inbox-primitives",
+   "mode": "crossPlatform",
+   "token": "product.primitive.surface",
+   "fixture": {
+    "page": "visual/inbox-primitives",
+    "theme": "light",
+    "density": "spacious",
+    "variant": "layout-split-thread-composer-empty",
+    "size": "lg",
+    "state": "empty-loading-error-dense-mobile-keyboard-long-text",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusInboxLayout",
+     "FsusConversationList",
+     "FsusThreadPanel",
+     "FsusMessageTimeline",
+     "FsusReplyComposerShell"
+    ],
+    "states": [
+     "empty",
+     "loading",
+     "error",
+     "dense",
+     "mobile",
+     "keyboard",
+     "long-text"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/inbox-primitives-stable39.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 900,
+     "height": 560
+    },
+    "color": {
+     "token": "product.primitive.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/inbox-primitives-stable39.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 900.8,
+     "height": 560.8
+    },
+    "color": {
+     "token": "product.primitive.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 12.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "perception-challenge-stable40-web-avalonia",
+   "component": "perception-challenge",
+   "mode": "crossPlatform",
+   "token": "perception.challenge.surface",
+   "fixture": {
+    "page": "visual/perception-challenge",
+    "theme": "light",
+    "density": "default",
+    "variant": "text-localization-micro-interaction",
+    "size": "lg",
+    "state": "success-failure-retry-loading-disabled-localized-keyboard-long-prompt",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusPerceptionChallenge",
+     "FsusTextTaskChallenge",
+     "FsusLocalizationChallenge",
+     "FsusMicroInteractionChallenge"
+    ],
+    "states": [
+     "success",
+     "failure",
+     "retry",
+     "loading",
+     "disabled",
+     "localized",
+     "keyboard-only",
+     "long-prompt"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-challenge-stable40.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 760,
+     "height": 420
+    },
+    "color": {
+     "token": "perception.challenge.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 12
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-challenge-stable40.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 760.8,
+     "height": 420.8
+    },
+    "color": {
+     "token": "perception.challenge.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 12.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "perception-character-challenge-conformance-web-avalonia",
+   "component": "perception-character-challenge",
+   "mode": "crossPlatform",
+   "token": "perception.challenge.surface",
+   "fixture": {
+    "page": "visual/character-challenge-conformance",
+    "theme": "light-dark-high-contrast-forced-colors",
+    "density": "default",
+    "variant": "raster-audio-unavailable-alternative",
+    "size": "desktop-mobile-zoom-200-400",
+    "state": "loading-ready-verifying-retryable-reissue-expired-unavailable-disabled",
+    "locale": "mixed-cjk-latin-long-copy",
+    "direction": "ltr",
+    "motionMode": "enabled-reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusPerceptionCharacterChallenge"
+    ],
+    "states": [
+     "loading",
+     "ready",
+     "verifying",
+     "retryable",
+     "reissue",
+     "expired",
+     "unavailable",
+     "disabled"
+    ],
+    "media": [
+     "visual-raster",
+     "audio",
+     "unavailable-alternative",
+     "replacement-release"
+    ],
+    "viewports": [
+     "desktop",
+     "mobile",
+     "zoom-200",
+     "zoom-400"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast",
+     "forced-colors"
+    ],
+    "motionModes": [
+     "enabled",
+     "reduced"
+    ],
+    "accessibility": [
+     "labels",
+     "error-association",
+     "live-region-owner",
+     "focus-order",
+     "non-autoplay",
+     "visible-focus"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-character-challenge-conformance.png"
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-conformance.png"
+   },
+   "evidenceManifest": "tests/conformance/visual/artifacts/perception-character-challenge-render-manifest.json"
+  },
+  {
+   "id": "locale-formatting-stable41-web-avalonia",
+   "component": "locale-formatting",
+   "mode": "crossPlatform",
+   "token": "locale.formatting.surface",
+   "fixture": {
+    "page": "visual/locale-formatting",
+    "theme": "light",
+    "density": "compact",
+    "variant": "long-localized-labels-compact-density",
+    "size": "lg",
+    "state": "english-simplified-chinese-fallback-date-number-direction",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "coverage": {
+    "controls": [
+     "FsusAvaloniaLocaleProvider",
+     "FsusLocalizedText"
+    ],
+    "states": [
+     "english",
+     "simplified-chinese",
+     "missing-key-fallback",
+     "date-format",
+     "number-format",
+     "layout-direction",
+     "long-labels"
+    ],
+    "themes": [
+     "light",
+     "dark",
+     "high-contrast"
+    ],
+    "densities": [
+     "compact",
+     "default",
+     "spacious"
+    ],
+    "motionModes": [
+     "system",
+     "enabled",
+     "reduced",
+     "disabled"
+    ]
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/locale-formatting-stable41.png",
+    "geometry": {
+     "x": 24,
+     "y": 28,
+     "width": 780,
+     "height": 360
+    },
+    "color": {
+     "token": "locale.formatting.surface",
+     "lab": [
+      56,
+      2,
+      -10
+     ]
+    },
+    "radius": 8,
+    "spacing": {
+     "paddingX": 12,
+     "paddingY": 8,
+     "gap": 10
+    },
+    "textBaseline": 24
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/locale-formatting-stable41.png",
+    "geometry": {
+     "x": 24.8,
+     "y": 28.8,
+     "width": 780.8,
+     "height": 360.8
+    },
+    "color": {
+     "token": "locale.formatting.surface",
+     "lab": [
+      56.3,
+      2.1,
+      -10.2
+     ]
+    },
+    "radius": 8.4,
+    "spacing": {
+     "paddingX": 12.4,
+     "paddingY": 8.3,
+     "gap": 10.4
+    },
+    "textBaseline": 24.7
+   },
+   "screenshotDiffPercent": 0.012,
+   "perceptualDelta": 0.05
+  },
+  {
+   "id": "avatar-vue-parity-web-avalonia",
+   "component": "display-primitives",
+   "mode": "crossPlatform",
+   "token": "color.fill.base",
+   "fixture": {
+    "page": "visual/display-primitives",
+    "theme": "light",
+    "density": "default",
+    "variant": "vue-parity",
+    "size": "md",
+    "state": "circle-square-fallback-64",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/avatar-vue-parity.png",
+    "geometry": {
+     "x": 24,
+     "y": 24,
+     "width": 64,
+     "height": 64
+    },
+    "color": {
+     "token": "color.fill.base",
+     "lab": [
+      96.2,
+      0.2,
+      -0.5
+     ]
+    },
+    "radius": 299.5,
+    "spacing": {
+     "paddingX": 24,
+     "paddingY": 24,
+     "gap": 16
+    },
+    "textBaseline": 46
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/avatar-vue-parity.png",
+    "geometry": {
+     "x": 24,
+     "y": 24,
+     "width": 64,
+     "height": 64
+    },
+    "color": {
+     "token": "color.fill.base",
+     "lab": [
+      96.2,
+      0.2,
+      -0.5
+     ]
+    },
+    "radius": 299.5,
+    "spacing": {
+     "paddingX": 24,
+     "paddingY": 24,
+     "gap": 16
+    },
+    "textBaseline": 46
+   },
+   "screenshotDiffPercent": 0.0009,
+   "perceptualDelta": 0.004
+  },
+  {
+   "id": "check-tag-vue-parity-web-avalonia",
+   "component": "selection-controls",
+   "mode": "crossPlatform",
+   "token": "color.action.primary",
+   "fixture": {
+    "page": "visual/selection-controls",
+    "theme": "light",
+    "density": "default",
+    "variant": "vue-parity",
+    "size": "md",
+    "state": "checked-unchecked-pair",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/check-tag-vue-parity.png",
+    "geometry": {
+     "x": 24,
+     "y": 24,
+     "width": 100.8,
+     "height": 24
+    },
+    "color": {
+     "token": "color.action.primary",
+     "lab": [
+      37.9,
+      7.8,
+      -41.2
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 24,
+     "paddingY": 24,
+     "gap": 7.9
+    },
+    "textBaseline": 45
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/check-tag-vue-parity.png",
+    "geometry": {
+     "x": 24,
+     "y": 24,
+     "width": 101,
+     "height": 24
+    },
+    "color": {
+     "token": "color.action.primary",
+     "lab": [
+      37.9,
+      7.8,
+      -41.2
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 24,
+     "paddingY": 24,
+     "gap": 7.9
+    },
+    "textBaseline": 45
+   },
+   "screenshotDiffPercent": 0.0112,
+   "perceptualDelta": 0.034
+  },
+  {
+   "id": "checkbox-button-vue-parity-web-avalonia",
+   "component": "selection-controls",
+   "mode": "crossPlatform",
+   "token": "color.surface.base",
+   "fixture": {
+    "page": "visual/selection-controls",
+    "theme": "light",
+    "density": "default",
+    "variant": "vue-parity",
+    "size": "md",
+    "state": "checked-unchecked-disabled-triple",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/checkbox-button-vue-parity.png",
+    "geometry": {
+     "x": 24,
+     "y": 24,
+     "width": 91.1,
+     "height": 40
+    },
+    "color": {
+     "token": "color.surface.base",
+     "lab": [
+      100,
+      0,
+      0
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 24,
+     "paddingY": 24,
+     "gap": 8
+    },
+    "textBaseline": 44
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/checkbox-button-vue-parity.png",
+    "geometry": {
+     "x": 24,
+     "y": 24,
+     "width": 90,
+     "height": 40
+    },
+    "color": {
+     "token": "color.surface.base",
+     "lab": [
+      100,
+      0,
+      0
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 24,
+     "paddingY": 24,
+     "gap": 8
+    },
+    "textBaseline": 44
+   },
+   "screenshotDiffPercent": 0.0089,
+   "perceptualDelta": 0.016
+  },
+  {
+   "id": "collapse-vue-parity-web-avalonia",
+   "component": "navigation-primitives",
+   "mode": "crossPlatform",
+   "token": "color.surface.base",
+   "fixture": {
+    "page": "visual/navigation-primitives",
+    "theme": "light",
+    "density": "default",
+    "variant": "vue-parity",
+    "size": "md",
+    "state": "first-expanded-disabled-third",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/collapse-vue-parity.png",
+    "geometry": {
+     "x": 24,
+     "y": 24,
+     "width": 512,
+     "height": 152
+    },
+    "color": {
+     "token": "color.surface.base",
+     "lab": [
+      100,
+      0,
+      0
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 24,
+     "paddingY": 24,
+     "gap": 0
+    },
+    "textBaseline": 45
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/collapse-vue-parity.png",
+    "geometry": {
+     "x": 24,
+     "y": 24,
+     "width": 512,
+     "height": 151
+    },
+    "color": {
+     "token": "color.surface.base",
+     "lab": [
+      100,
+      0,
+      0
+     ]
+    },
+    "radius": 6,
+    "spacing": {
+     "paddingX": 24,
+     "paddingY": 24,
+     "gap": 0
+    },
+    "textBaseline": 45
+   },
+   "screenshotDiffPercent": 0.0083,
+   "perceptualDelta": 0.011
+  },
+  {
+   "id": "markdown-editor-vue-parity-web-avalonia",
+   "component": "markdown-editor",
+   "mode": "crossPlatform",
+   "token": "text.editor.surface",
+   "fixture": {
+    "page": "visual/markdown-editor",
+    "theme": "light",
+    "density": "default",
+    "variant": "vue-parity",
+    "size": "md",
+    "state": "source-surface-short-doc",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/markdown-editor-vue-parity.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 820,
+     "height": 185.6
+    },
+    "color": {
+     "token": "text.editor.surface",
+     "lab": [
+      100,
+      0,
+      0
+     ]
+    },
+    "radius": 0,
+    "spacing": {
+     "paddingX": 16,
+     "paddingY": 16,
+     "gap": 0
+    },
+    "textBaseline": 48
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/markdown-editor-vue-parity.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 820,
+     "height": 186
+    },
+    "color": {
+     "token": "text.editor.surface",
+     "lab": [
+      100,
+      0,
+      0
+     ]
+    },
+    "radius": 0,
+    "spacing": {
+     "paddingX": 16,
+     "paddingY": 16,
+     "gap": 0
+    },
+    "textBaseline": 48
+   },
+   "screenshotDiffPercent": 0.001,
+   "perceptualDelta": 0.091,
+   "overrideId": "visual-markdown-source-surface-002"
+  },
+  {
+   "id": "icon-text-vue-parity-web-avalonia",
+   "component": "icon-text",
+   "mode": "crossPlatform",
+   "token": "color.action.primary",
+   "fixture": {
+    "page": "visual/icon-text",
+    "theme": "light",
+    "density": "default",
+    "variant": "vue-parity",
+    "size": "md",
+    "state": "six-type-link-row",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/icon-text-vue-parity.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 55.1,
+     "height": 20
+    },
+    "color": {
+     "token": "color.action.primary",
+     "lab": [
+      37.9,
+      7.8,
+      -41.2
+     ]
+    },
+    "radius": 4,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 12
+    },
+    "textBaseline": 15.0
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-text-vue-parity.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 56,
+     "height": 20
+    },
+    "color": {
+     "token": "color.action.primary",
+     "lab": [
+      37.9,
+      7.8,
+      -41.2
+     ]
+    },
+    "radius": 4,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 12
+    },
+    "textBaseline": 15.0
+   },
+   "screenshotDiffPercent": 0.000531,
+   "perceptualDelta": 0.071
+  },
+  {
+   "id": "layout-vue-parity-web-avalonia",
+   "component": "layout-primitives",
+   "mode": "crossPlatform",
+   "token": "color.fill.light",
+   "fixture": {
+    "page": "visual/layout-primitives",
+    "theme": "light",
+    "density": "default",
+    "variant": "vue-parity",
+    "size": "md",
+    "state": "row-4-col-span6-gutter20",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/layout-vue-parity.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 290,
+     "height": 46
+    },
+    "color": {
+     "token": "color.fill.light",
+     "lab": [
+      93.2,
+      -0.6,
+      -3.5
+     ]
+    },
+    "radius": 4,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 20
+    },
+    "textBaseline": 22.0
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/layout-vue-parity.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 290,
+     "height": 46
+    },
+    "color": {
+     "token": "color.fill.light",
+     "lab": [
+      93.2,
+      -0.6,
+      -3.5
+     ]
+    },
+    "radius": 4,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 20
+    },
+    "textBaseline": 22.0
+   },
+   "screenshotDiffPercent": 8.6e-05,
+   "perceptualDelta": 0.03
+  },
+  {
+   "id": "divider-vue-parity-web-avalonia",
+   "component": "display-primitives",
+   "mode": "crossPlatform",
+   "token": "color.border.lighter",
+   "fixture": {
+    "page": "visual/display-primitives",
+    "theme": "light",
+    "density": "default",
+    "variant": "vue-parity",
+    "size": "md",
+    "state": "titled-plus-plain",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motionMode": "reduced"
+   },
+   "baseline": {
+    "platform": "web",
+    "runner": "playwright",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/web/divider-vue-parity.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 1200,
+     "height": 1
+    },
+    "color": {
+     "token": "color.border.lighter",
+     "lab": [
+      100,
+      0,
+      0
+     ]
+    },
+    "radius": 0,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 0
+    },
+    "textBaseline": 15.0
+   },
+   "candidate": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/divider-vue-parity.png",
+    "geometry": {
+     "x": 0,
+     "y": 0,
+     "width": 1200,
+     "height": 1
+    },
+    "color": {
+     "token": "color.border.lighter",
+     "lab": [
+      100,
+      0,
+      0
+     ]
+    },
+    "radius": 0,
+    "spacing": {
+     "paddingX": 0,
+     "paddingY": 0,
+     "gap": 0
+    },
+    "textBaseline": 15.0
+   },
+   "screenshotDiffPercent": 7.6e-05,
+   "perceptualDelta": 0.007
+  }
+ ]
 }

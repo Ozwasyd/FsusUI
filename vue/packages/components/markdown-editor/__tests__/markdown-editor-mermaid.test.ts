@@ -32,7 +32,11 @@ describe('markdown mermaid preview', () => {
     )
     expect(plan.request?.featureKind).toBe('mermaid')
     expect(plan.classification.verdict).toBe('valid')
-    expect(plan.chrome).toEqual({ card: false, terminal: false, toolbar: false })
+    expect(plan.chrome).toEqual({
+      card: false,
+      terminal: false,
+      toolbar: false,
+    })
     expect(plan.accessibility.tabStop).toBe(false)
     const committed = commitMarkdownMermaidPreview({
       output: {
@@ -99,6 +103,27 @@ describe('markdown mermaid preview', () => {
       source: 'plain paragraph\n',
     })
     expect(deleted.state).toBe('deleted')
+
+    const retry = planMarkdownMermaidPreview({
+      documentIdentity: identity,
+      intent: 'retry',
+      source: validSource,
+    })
+    expect(retry).toMatchObject({
+      action: 'pending',
+      sourceUnchanged: true,
+    })
+    expect(retry.request).not.toBeNull()
+    const cancel = planMarkdownMermaidPreview({
+      documentIdentity: identity,
+      intent: 'cancel',
+      source: validSource,
+    })
+    expect(cancel).toMatchObject({
+      action: 'cancel',
+      sourceUnchanged: true,
+    })
+    expect(cancel.request).toBeNull()
   })
 
   it('rejects XSS mermaid payloads and does not rewrite source', () => {
@@ -124,13 +149,14 @@ describe('markdown mermaid preview', () => {
   })
 
   it('restores height from the source anchor and shares identity across modes', () => {
-    const modes = (['source', 'live', 'split', 'preview'] as const).map((mode) =>
-      planMarkdownMermaidPreview({
-        documentIdentity: identity,
-        mode,
-        revision: 2,
-        source: validSource,
-      }),
+    const modes = (['source', 'live', 'split', 'preview'] as const).map(
+      (mode) =>
+        planMarkdownMermaidPreview({
+          documentIdentity: identity,
+          mode,
+          revision: 2,
+          source: validSource,
+        }),
     )
     expect(new Set(modes.map((plan) => plan.node?.nodeId)).size).toBe(1)
     expect(modes[0]?.height.scrollIntoView).toBe(false)
@@ -142,7 +168,9 @@ describe('markdown mermaid preview', () => {
       source: invalidSource,
     })
     expect(reveal.action).toBe('source-reveal')
-    expect(reveal.diagnostic?.range.end).toBeGreaterThan(reveal.diagnostic!.range.start)
+    expect(reveal.diagnostic?.range.end).toBeGreaterThan(
+      reveal.diagnostic!.range.start,
+    )
   })
 
   it('kills innerHTML, stale commits, whole-editor failure, and auto-rewrite', () => {

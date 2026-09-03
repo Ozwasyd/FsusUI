@@ -31,8 +31,85 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
   </Style>
 
+  <Style Selector="fsus|FsusNotification">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          CornerRadius="{TemplateBinding CornerRadius}"
+          Padding="{TemplateBinding Padding}">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
+              <TextBlock
+                Name="PART_TitleText"
+                Text="{TemplateBinding Title}"
+                TextWrapping="Wrap"
+                FontWeight="SemiBold"
+                FontSize="{DynamicResource FsusTypographyBodyMdSize}" />
+              <TextBlock
+                Name="PART_MessageText"
+                Text="{TemplateBinding Message}"
+                TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel
+              Grid.Column="1"
+              Orientation="Horizontal"
+              Spacing="4"
+              VerticalAlignment="Top">
+              <fsus:FsusButton
+                Name="PART_ActionButton"
+                Classes="fsus-inline-action"
+                Command="{TemplateBinding ActionCommand}"
+                Content="{TemplateBinding ActionLabel}" />
+              <Button Name="PART_DismissButton" Padding="6,2" Background="Transparent" BorderThickness="0" Content="&#xD7;" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusNotification:not(.fsus-has-action) /template/ fsus|FsusButton#PART_ActionButton">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusNotification:not(.fsus-has-title) /template/ TextBlock#PART_TitleText">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusNotification:not(.fsus-has-message) /template/ TextBlock#PART_MessageText">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusNotification.fsus-closed">
+    <Setter Property="Opacity" Value="0" />
+  </Style>
+
   <Style Selector="fsus|FsusLoadingOverlay">
     <Setter Property="Background" Value="{DynamicResource FsusThemeLoadingBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusLoadingIndicator">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Ellipse Name="PART_Arc" Stroke="{DynamicResource FsusColorActionPrimaryBrush}" StrokeThickness="2" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusLoadingIndicator.fsus-idle">
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusLoadingIndicator.fsus-active.fsus-motion-reduced">
+    <Setter Property="Opacity" Value="0.55" />
   </Style>
 
   <Style Selector="fsus|FsusAffix">

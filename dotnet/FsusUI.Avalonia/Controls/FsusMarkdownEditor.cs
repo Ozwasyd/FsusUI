@@ -1,4 +1,7 @@
 using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Presenters;
@@ -71,8 +74,27 @@ public class FsusMarkdownEditor : TemplatedControl
   public static readonly StyledProperty<long> ProjectionFeatureRevisionProperty =
     AvaloniaProperty.Register<FsusMarkdownEditor, long>(nameof(ProjectionFeatureRevision));
 
+  /// <summary>
+  /// Extra scrollable content floor below the editor surface, in DIPs. When
+  /// greater than zero the content area stretches to at least viewport height
+  /// plus this floor, so a short document still scrolls like an editor page.
+  /// Zero keeps the plain extent of the content.
+  /// </summary>
+  public static readonly StyledProperty<double> ScrollContentFloorProperty =
+    AvaloniaProperty.Register<FsusMarkdownEditor, double>(nameof(ScrollContentFloor));
+
+  /// <summary>
+  /// Maximum number of per-document histories retained while a host switches
+  /// documents on one editor instance. The least recently used archive is
+  /// evicted first; each archive obeys the same history budget as a live
+  /// store.
+  /// </summary>
+  public const int MaxRetainedDocumentHistories = 8;
+
   private FsusMarkdownEditorTransactionStore store =
     new(new FsusMarkdownDocumentIdentity("doc", 0));
+  private readonly Dictionary<FsusMarkdownDocumentIdentity, FsusMarkdownEditorHistorySnapshot> archivedHistories = new();
+  private readonly List<FsusMarkdownDocumentIdentity> archivedHistoryOrder = [];
   private FsusMarkdownSourceCoordinateMap sourceCoordinates =
     FsusMarkdownSourceCoordinateMap.Create(string.Empty);
   private FsusMarkdownProjectionMap sourceProjectionMap =
@@ -85,6 +107,7 @@ public class FsusMarkdownEditor : TemplatedControl
   private FsusMarkdownEditorProjectionView? projectionView;
   private bool synchronizingDocument;
   private bool synchronizingInput;
+  private double lastAppliedContentFloor = double.NaN;
   private string? lastProjectionRequestKey;
   private int? livePointerAnchor;
   private long scrollRestoreGeneration;
@@ -94,7 +117,13 @@ public class FsusMarkdownEditor : TemplatedControl
     FsusComponentClasses.SetBaseClasses(this, "fsus-markdown-editor");
     Focusable = true;
     SetCurrentValue(CapabilityStateProperty, "aligned");
+    AutomationProperties.SetAccessibilityView(this, AccessibilityView.Control);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Edit);
+    AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Off);
   }
+
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new MarkdownEditorAutomationPeer(this);
 
   public FsusMarkdownEditorTransactionStore TransactionStore => store;
 
@@ -173,6 +202,7 @@ public class FsusMarkdownEditor : TemplatedControl
   {
     base.OnApplyTemplate(e);
     var previousPresenter = contentPresenter;
+    var previousScrollViewer = scrollViewer;
     contentPresenter = e.NameScope.Find<ContentPresenter>("PART_Content");
     scrollViewer = e.NameScope.Find<ScrollViewer>("PART_Scroll");
     if (previousPresenter is not null &&
@@ -181,7 +211,18 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       previousPresenter.Content = null;
     }
+    if (previousScrollViewer is not null && previousScrollViewer != scrollViewer)
+    {
+      previousScrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
+    }
+    if (scrollViewer is not null)
+    {
+      scrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
+      scrollViewer.LayoutUpdated += OnScrollLayoutUpdated;
+    }
+    lastAppliedContentFloor = double.NaN;
     BuildNativeSurface();
+    UpdateScrollContentFloor();
     UpdateNativeSurface();
   }
 
@@ -191,7 +232,7 @@ public class FsusMarkdownEditor : TemplatedControl
     if (change.Property == DocumentIdentityProperty)
     {
       var identity = DocumentIdentity ?? new FsusMarkdownDocumentIdentity("doc", 0);
-      store = new FsusMarkdownEditorTransactionStore(identity, Document);
+      SwitchStore(identity);
       sourceCoordinates = FsusMarkdownSourceCoordinateMap.Create(Document);
       sourceProjectionMap = new(Document, []);
       projection.Reset();
@@ -220,6 +261,11 @@ public class FsusMarkdownEditor : TemplatedControl
       lastProjectionRequestKey = null;
       UpdateNativeSurface();
     }
+    else if (change.Property == ScrollContentFloorProperty)
+    {
+      lastAppliedContentFloor = double.NaN;
+      UpdateScrollContentFloor();
+    }
     else if (change.Property == IsReadOnlyProperty ||
       change.Property == ForegroundProperty ||
       change.Property == FontFamilyProperty ||
@@ -237,10 +283,50 @@ public class FsusMarkdownEditor : TemplatedControl
     var identity = DocumentIdentity ?? new FsusMarkdownDocumentIdentity("doc", 0);
     if (!store.Identity.Equals(identity))
     {
-      store = new FsusMarkdownEditorTransactionStore(identity, Document);
+      SwitchStore(identity);
       sourceCoordinates = FsusMarkdownSourceCoordinateMap.Create(Document);
       sourceProjectionMap = new(Document, []);
     }
+  }
+
+  /// <summary>
+  /// Archives the current document history and swaps to the store for the
+  /// requested identity, restoring an archived history when the incoming
+  /// document content is unchanged since it was archived. A mismatched value
+  /// drops the archived chain: stale undo entries must never act on a new
+  /// external value.
+  /// </summary>
+  private void SwitchStore(FsusMarkdownDocumentIdentity identity)
+  {
+    if (store.History.UndoDepth > 0 || store.History.RedoDepth > 0)
+    {
+      archivedHistories[store.Identity] = store.CaptureHistory();
+      archivedHistoryOrder.Remove(store.Identity);
+      archivedHistoryOrder.Add(store.Identity);
+      while (archivedHistoryOrder.Count > MaxRetainedDocumentHistories)
+      {
+        var evicted = archivedHistoryOrder[0];
+        archivedHistoryOrder.RemoveAt(0);
+        _ = archivedHistories.Remove(evicted);
+      }
+    }
+    else
+    {
+      _ = archivedHistories.Remove(store.Identity);
+      archivedHistoryOrder.Remove(store.Identity);
+    }
+
+    var next = new FsusMarkdownEditorTransactionStore(identity, Document);
+    if (archivedHistories.TryGetValue(identity, out var snapshot) &&
+      snapshot.Value == Document &&
+      next.TryRestoreHistory(snapshot))
+    {
+      // Content-first host flow: the document value already matches the
+      // archived one, so the history becomes live immediately.
+      _ = archivedHistories.Remove(identity);
+      archivedHistoryOrder.Remove(identity);
+    }
+    store = next;
   }
 
   private FsusMarkdownEditorDispatchResult Execute(
@@ -251,6 +337,26 @@ public class FsusMarkdownEditor : TemplatedControl
     var previousSelection = store.Selection;
     var previousHistory = store.History;
     var result = operation();
+    if (result.Accepted && transaction.Origin == "external" && transaction.ExternalUpdate == "reset")
+    {
+      // An external hard reset terminates the live undo chain. When the reset
+      // re-presents the archived content of the same identity (host flow:
+      // identity first, then document value), it is a document re-selection
+      // and the archived history goes live; any other value is a genuine hard
+      // reset and must also invalidate the archived chain for the identity.
+      if (archivedHistories.TryGetValue(store.Identity, out var archived) &&
+        archived.Value == result.Value &&
+        store.TryRestoreHistory(archived))
+      {
+        _ = archivedHistories.Remove(store.Identity);
+        archivedHistoryOrder.Remove(store.Identity);
+      }
+      else
+      {
+        _ = archivedHistories.Remove(store.Identity);
+        archivedHistoryOrder.Remove(store.Identity);
+      }
+    }
     if (result.Accepted && result.Value != previousValue)
     {
       sourceCoordinates = FsusMarkdownSourceCoordinateMap.Create(result.Value);
@@ -432,8 +538,87 @@ public class FsusMarkdownEditor : TemplatedControl
     projectionView.Update(
       presentationText,
       presentationMap,
-      store.Selection);
+      store.Selection,
+      live ? projection.Snapshot?.Spans : null);
     RestoreViewportSourceAnchor(sourceAnchor, preservedHorizontalOffset);
+  }
+
+  private void OnScrollLayoutUpdated(object? sender, EventArgs args)
+  {
+    UpdateScrollContentFloor();
+  }
+
+  private void UpdateScrollContentFloor()
+  {
+    if (contentPresenter is null || scrollViewer is null)
+    {
+      return;
+    }
+    if (ScrollContentFloor <= 0)
+    {
+      if (!double.IsNaN(lastAppliedContentFloor))
+      {
+        contentPresenter.MinHeight = double.NaN;
+        lastAppliedContentFloor = double.NaN;
+      }
+      return;
+    }
+    var viewportHeight = scrollViewer.Viewport.Height;
+    if (viewportHeight <= 0)
+    {
+      viewportHeight = scrollViewer.Bounds.Height;
+    }
+    if (viewportHeight <= 0)
+    {
+      return;
+    }
+    var floor = viewportHeight + ScrollContentFloor;
+    if (double.IsNaN(lastAppliedContentFloor) ||
+      Math.Abs(floor - lastAppliedContentFloor) > 0.5)
+    {
+      contentPresenter.MinHeight = floor;
+      lastAppliedContentFloor = floor;
+    }
+  }
+
+  /// <summary>
+  /// Programmatic scroll position of the editor page. The setter applies the
+  /// offset immediately when the template is applied and cancels pending
+  /// viewport-anchor restores so host-driven scrolling and the internal
+  /// anchor restore cooperate instead of fighting.
+  /// </summary>
+  public Vector ScrollPosition
+  {
+    get => scrollViewer?.Offset ?? default;
+    set
+    {
+      if (scrollViewer is not null)
+      {
+        scrollRestoreGeneration++;
+        scrollViewer.Offset = value;
+      }
+    }
+  }
+
+  public double ScrollViewportHeight => scrollViewer?.Viewport.Height ?? 0;
+
+  public double ScrollExtentHeight => scrollViewer?.Extent.Height ?? 0;
+
+  /// <summary>
+  /// Scrolls the editor page so the first visual line containing the requested
+  /// source offset sits at the viewport top. Returns false when the projection
+  /// surface is not ready; the caller can retry after the projection commits.
+  /// </summary>
+  public bool ScrollToSourceLine(int sourceOffset)
+  {
+    if (projectionView is null || scrollViewer is null)
+    {
+      return false;
+    }
+    var top = projectionView.GetVisualLineTopForSource(sourceOffset);
+    scrollRestoreGeneration++;
+    scrollViewer.Offset = new Vector(scrollViewer.Offset.X, top);
+    return true;
   }
 
   private int? CaptureViewportSourceAnchor()
@@ -633,7 +818,8 @@ public class FsusMarkdownEditor : TemplatedControl
       live && projection.Map is not null
         ? projection.Map
         : sourceProjectionMap,
-      store.Selection);
+      store.Selection,
+      live ? projection.Snapshot?.Spans : null);
   }
 
   private FsusMarkdownEditorTransaction OperationTransaction(string operation) =>
@@ -704,8 +890,104 @@ public class FsusMarkdownEditor : TemplatedControl
     set => SetValue(ProjectionFeatureRevisionProperty, value);
   }
 
+  public double ScrollContentFloor
+  {
+    get => GetValue(ScrollContentFloorProperty);
+    set => SetValue(ScrollContentFloorProperty, value);
+  }
+
   public bool TryRunCommand(string commandKey)
   {
     return !string.IsNullOrWhiteSpace(commandKey) && !IsReadOnly && IsEnabled;
+  }
+
+  private sealed class MarkdownEditorAutomationPeer(FsusMarkdownEditor owner)
+    : ControlAutomationPeer(owner), IValueProvider
+  {
+    private FsusMarkdownEditor Editor => (FsusMarkdownEditor)Owner;
+
+    public bool IsReadOnly => Editor.IsReadOnly;
+
+    public string Value => Editor.Document;
+
+    public void SetValue(string? value)
+    {
+      if (Editor.IsReadOnly || !Editor.IsEnabled)
+      {
+        throw new InvalidOperationException("The Markdown editor cannot accept edits.");
+      }
+      Editor.Document = value ?? string.Empty;
+    }
+
+    protected override IReadOnlyList<AutomationPeer>? GetChildrenCore()
+    {
+      var atomicSpans = Editor.projection.Snapshot?.Spans
+        .Where(span => span.Kind == FsusMarkdownProjectionSpanKind.Atomic)
+        .ToArray() ?? [];
+      if (atomicSpans.Length == 0)
+      {
+        return null;
+      }
+
+      var peers = new List<AutomationPeer>(atomicSpans.Length * 3);
+      foreach (var span in atomicSpans)
+      {
+        peers.Add(AtomicActionPeer(span, "enter-before", span.SourceRange.Start));
+        peers.Add(AtomicActionPeer(span, "enter-after", span.SourceRange.End));
+        peers.Add(AtomicActionPeer(span, "edit-source", span.SourceRange.Start));
+      }
+      return peers;
+    }
+
+    private AutomationPeer AtomicActionPeer(
+      FsusMarkdownProjectionSpan span,
+      string action,
+      int sourceOffset)
+    {
+      var control = new AtomicActionControl(Editor, sourceOffset)
+      {
+        Focusable = false,
+        IsHitTestVisible = false,
+      };
+      AutomationProperties.SetAccessibilityView(control, AccessibilityView.Control);
+      AutomationProperties.SetControlTypeOverride(control, AutomationControlType.Button);
+      AutomationProperties.SetName(
+        control,
+        $"{span.SemanticKind ?? "atomic"} {action}");
+      AutomationProperties.SetHelpText(control, span.DisplayText);
+      AutomationProperties.SetItemStatus(control, action);
+      return new AtomicActionAutomationPeer(control, span.DisplayText);
+    }
+  }
+
+  private sealed class AtomicActionControl(
+    FsusMarkdownEditor editor,
+    int sourceOffset) : Control
+  {
+    public void Invoke()
+    {
+      var previous = editor.store.Selection;
+      var next = new FsusMarkdownEditorSelection(sourceOffset, sourceOffset);
+      if (editor.store.SetSelection(next) && editor.store.Selection != previous)
+      {
+        editor.SelectionChange?.Invoke(editor, new(editor.store.Revision, editor.store.Selection));
+        editor.UpdateProjectionSelection();
+      }
+      _ = editor.Focus();
+    }
+  }
+
+  private sealed class AtomicActionAutomationPeer(
+    AtomicActionControl owner,
+    string value) : ControlAutomationPeer(owner), IInvokeProvider, IValueProvider
+  {
+    public bool IsReadOnly => true;
+
+    public string Value => value;
+
+    public void Invoke() => owner.Invoke();
+
+    public void SetValue(string? value) =>
+      throw new InvalidOperationException("Atomic Markdown actions are read-only.");
   }
 }

@@ -13,10 +13,19 @@
   <ItemGroup>
     <ProjectReference Include="..\FsusUI.Avalonia.Demo\FsusUI.Avalonia.Demo.csproj" />
     <ProjectReference Include="..\FsusUI.Avalonia\FsusUI.Avalonia.csproj" />
+    <ProjectReference Include="..\FsusUI.Avalonia.Icons\FsusUI.Avalonia.Icons.csproj" />
     <ProjectReference Include="..\FsusUI.Avalonia.Themes\FsusUI.Avalonia.Themes.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\tests\fixtures\avalonia-webview\TestWebViewPdfDocument.cs" Link="Fixtures\TestWebViewPdfDocument.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResources Include="Assets/Fonts/*.ttf" />
   </ItemGroup>
 </Project>

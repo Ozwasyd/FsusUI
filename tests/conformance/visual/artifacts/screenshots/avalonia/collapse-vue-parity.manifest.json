@@ -1,0 +1,41 @@
+{
+  "component": "collapse",
+  "runner": "headless-skia",
+  "screenshot": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/heavy-feature-lifecycle/tests/conformance/visual/artifacts/screenshots/avalonia/collapse-vue-parity.png",
+  "surfaceBounds": [
+    1,
+    0,
+    560,
+    206
+  ],
+  "controlBounds": [
+    {
+      "name": "FsusCollapse",
+      "x": 24,
+      "y": 24,
+      "width": 512,
+      "height": 158
+    },
+    {
+      "name": "FsusCollapseItem",
+      "x": 24,
+      "y": 24,
+      "width": 512,
+      "height": 100
+    },
+    {
+      "name": "FsusCollapseItem",
+      "x": 24,
+      "y": 124,
+      "width": 512,
+      "height": 52
+    },
+    {
+      "name": "FsusCollapseItem",
+      "x": 24,
+      "y": 176,
+      "width": 512,
+      "height": 52
+    }
+  ]
+}

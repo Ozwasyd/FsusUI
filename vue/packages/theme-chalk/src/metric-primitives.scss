@@ -70,12 +70,12 @@
 
 @include b(kpi-group) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
   gap: 12px;
   min-width: 0;
 
   @include m(compact) {
-    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(128px, 100%), 1fr));
     gap: 8px;
   }
 }
@@ -164,7 +164,7 @@
   min-width: 0;
   min-height: 48px;
   padding: 9px 12px;
-  border-right: 1px solid getCssVar('border-color-lighter');
+  border-inline-end: 1px solid getCssVar('border-color-lighter');
   border-bottom: 1px solid getCssVar('border-color-lighter');
   background: transparent;
 
@@ -209,7 +209,6 @@
       font-family: var(--el-font-family-monospace, monospace);
     }
   }
-
 }
 
 @include b(status-summary) {
@@ -270,32 +269,93 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 8px;
+
+    > :where(button, a[href], [role='button']) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: var(--fsus-control-height-compact, 40px);
+      min-height: var(--fsus-control-height-compact, 40px);
+      opacity: 1;
+
+      &:focus-visible {
+        box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+          var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        outline: none;
+      }
+
+      &:where(:disabled, [aria-disabled='true'], .is-disabled) {
+        cursor: not-allowed;
+        opacity: 1;
+      }
+
+      &:where([aria-pressed='true'], [aria-selected='true']) {
+        background: getCssVar('fill-color', 'light');
+        border-color: getCssVar('color-primary');
+        color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        opacity: 1;
+      }
+    }
+
+    > .#{$namespace}-button.#{$namespace}-button {
+      min-width: var(--fsus-control-height-compact, 40px);
+      min-height: var(--fsus-control-height-compact, 40px);
+    }
+
+    > :where(button, a[href], [role='button']):not(
+        .#{$namespace}-button
+      ):hover:not(:disabled, [aria-disabled='true'], .is-disabled) {
+      color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+    }
+  }
+
+  // Tone markers stay narrow (3px inline-start) so success/warning/danger
+  // never form a large tinted border or background; status text remains the
+  // non-color signal.
+  @include m(info) {
+    border-inline-start: 3px solid
+      color-mix(
+        in srgb,
+        getCssVar('color-info') 34%,
+        getCssVar('border-color-lighter')
+      );
+    padding-inline-start: 9px;
   }
 
   @include m(success) {
-    border-color: color-mix(
-      in srgb,
-      getCssVar('color-success') 30%,
-      getCssVar('border-color-lighter')
-    );
+    border-inline-start: 3px solid
+      color-mix(
+        in srgb,
+        getCssVar('color-success') 34%,
+        getCssVar('border-color-lighter')
+      );
+    padding-inline-start: 9px;
   }
 
   @include m(warning) {
-    border-left: 3px solid
-      color-mix(in srgb, getCssVar("color-warning") 34%, getCssVar("border-color-lighter"));
-    padding-left: 9px;
+    border-inline-start: 3px solid
+      color-mix(
+        in srgb,
+        getCssVar('color-warning') 34%,
+        getCssVar('border-color-lighter')
+      );
+    padding-inline-start: 9px;
   }
 
   @include m(danger) {
-    border-left: 3px solid
-      color-mix(in srgb, getCssVar("color-danger") 34%, getCssVar("border-color-lighter"));
-    padding-left: 9px;
+    border-inline-start: 3px solid
+      color-mix(
+        in srgb,
+        getCssVar('color-danger') 34%,
+        getCssVar('border-color-lighter')
+      );
+    padding-inline-start: 9px;
   }
 }
 
 @include b(diagnostics-list) {
   display: grid;
-  gap: 10px;
+  gap: 0;
   min-width: 0;
 }
 
@@ -303,9 +363,14 @@
   display: grid;
   gap: 8px;
   min-width: 0;
+  padding-block: 10px;
+
+  & + & {
+    border-top: 1px solid getCssVar('border-color-lighter');
+  }
 
   @include m(compact) {
-    padding: 10px;
+    padding-block: 8px;
   }
 
   @include e(summary) {
@@ -351,6 +416,44 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 8px;
+
+    > :where(button, a[href], [role='button']) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: var(--fsus-control-height-compact, 40px);
+      min-height: var(--fsus-control-height-compact, 40px);
+      opacity: 1;
+
+      &:focus-visible {
+        box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+          var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        outline: none;
+      }
+
+      &:where(:disabled, [aria-disabled='true'], .is-disabled) {
+        cursor: not-allowed;
+        opacity: 1;
+      }
+
+      &:where([aria-pressed='true'], [aria-selected='true']) {
+        background: getCssVar('fill-color', 'light');
+        border-color: getCssVar('color-primary');
+        color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        opacity: 1;
+      }
+    }
+
+    > .#{$namespace}-button.#{$namespace}-button {
+      min-width: var(--fsus-control-height-compact, 40px);
+      min-height: var(--fsus-control-height-compact, 40px);
+    }
+
+    > :where(button, a[href], [role='button']):not(
+        .#{$namespace}-button
+      ):hover:not(:disabled, [aria-disabled='true'], .is-disabled) {
+      color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+    }
   }
 
   @include e(detail) {
@@ -358,12 +461,29 @@
   }
 
   @include e(detail-toggle) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
     width: fit-content;
+    min-width: var(--fsus-control-height-compact, 40px);
+    min-height: var(--fsus-control-height-compact, 40px);
+    padding-inline: 4px;
     color: getCssVar('text-color', 'secondary');
     cursor: pointer;
     font-size: 12px;
     font-weight: 500;
     line-height: 1.45;
+    opacity: 1;
+
+    &:hover {
+      color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+    }
+
+    &:focus-visible {
+      box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      outline: none;
+    }
   }
 
   @include e(detail-body) {
@@ -376,16 +496,44 @@
     overflow-wrap: anywhere;
   }
 
+  @include m(info) {
+    border-inline-start: 3px solid
+      color-mix(
+        in srgb,
+        getCssVar('color-info') 34%,
+        getCssVar('border-color-lighter')
+      );
+    padding-inline-start: 9px;
+  }
+
+  @include m(success) {
+    border-inline-start: 3px solid
+      color-mix(
+        in srgb,
+        getCssVar('color-success') 34%,
+        getCssVar('border-color-lighter')
+      );
+    padding-inline-start: 9px;
+  }
+
   @include m(warning) {
-    border-left: 3px solid
-      color-mix(in srgb, getCssVar("color-warning") 34%, getCssVar("border-color-lighter"));
-    padding-left: 9px;
+    border-inline-start: 3px solid
+      color-mix(
+        in srgb,
+        getCssVar('color-warning') 34%,
+        getCssVar('border-color-lighter')
+      );
+    padding-inline-start: 9px;
   }
 
   @include m(danger) {
-    border-left: 3px solid
-      color-mix(in srgb, getCssVar("color-danger") 34%, getCssVar("border-color-lighter"));
-    padding-left: 9px;
+    border-inline-start: 3px solid
+      color-mix(
+        in srgb,
+        getCssVar('color-danger') 34%,
+        getCssVar('border-color-lighter')
+      );
+    padding-inline-start: 9px;
   }
 }
 
@@ -414,7 +562,11 @@
   }
 
   @include e(button) {
-    min-height: 40px;
+    // Desktop inline-action contract: >= 40px visible target (40px compact
+    // control height). The mobile >= 44px floor lives in the shared media
+    // block below.
+    min-width: var(--fsus-control-height-compact, 40px);
+    min-height: var(--fsus-control-height-compact, 40px);
     padding: 0 10px;
     border: 1px solid getCssVar('border-color');
     border-radius: var(--fsus-radius-control-small, 6px);
@@ -424,11 +576,26 @@
     font: inherit;
     font-size: 12px;
     font-weight: 500;
+    opacity: 1;
 
     &:focus-visible {
-      border-color: var(--fsus-scholarly-blue, getCssVar("color-primary"));
-      box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--fsus-scholarly-blue, getCssVar("color-primary"));
+      border-color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue, getCssVar('color-primary'));
       outline: none;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: getCssVar('border-color', 'dark');
+      background: getCssVar('fill-color', 'light');
+    }
+
+    &:disabled {
+      border-color: getCssVar('border-color', 'light');
+      background: getCssVar('fill-color', 'light');
+      color: getCssVar('text-color', 'disabled');
+      cursor: not-allowed;
+      opacity: 1;
     }
   }
 
@@ -444,6 +611,10 @@
     .#{$namespace}-copyable-detail__value {
       font-family: var(--el-font-family-monospace, monospace);
     }
+  }
+
+  @include when(disabled) {
+    opacity: 1;
   }
 }
 
@@ -466,5 +637,23 @@
 
   .#{$namespace}-distribution-bar-row__bar {
     grid-column: 1 / -1;
+  }
+
+  // Mobile inline-action contract: >= 44px targets for copy buttons and any
+  // inline action composed into metric actions regions. The doubled button
+  // class out-specifies the theme-layer `.is-text` / `.is-link` min-height
+  // reset, which loads after this sheet.
+  .#{$namespace}-copyable-detail__button,
+  .#{$namespace}-diagnostics-item__detail-toggle,
+  .#{$namespace}-status-summary__actions
+    > :where(button, a[href], [role='button']),
+  .#{$namespace}-diagnostics-item__actions
+    > :where(button, a[href], [role='button']),
+  .#{$namespace}-status-summary__actions
+    > .#{$namespace}-button.#{$namespace}-button,
+  .#{$namespace}-diagnostics-item__actions
+    > .#{$namespace}-button.#{$namespace}-button {
+    min-width: var(--fsus-control-height, 44px);
+    min-height: var(--fsus-control-height, 44px);
   }
 }

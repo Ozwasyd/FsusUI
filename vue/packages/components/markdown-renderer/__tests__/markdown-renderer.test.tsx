@@ -15,13 +15,13 @@ import MarkdownRenderer from '../src/markdown-renderer.vue'
 import { resolveMarkdownWorkerScriptUrl } from '../src/markdown-renderer'
 import {
   MARKDOWN_RENDERER_VERSION,
-  activateMarkdownFeatures,
   renderMarkdownFallbackWithRuntime,
   renderMarkdownChunksWithRuntime,
   renderMarkdownHtmlWithRuntime,
   renderMarkdownResultWithRuntime,
   resolveMarkdownSourceIdentity,
 } from '@element-plus/wasm'
+import { activateMarkdownHeavyFeatures } from '../../../wasm/markdown-heavy-feature-activation'
 import { createFsusError, fsusErr, fsusOk } from '@element-plus/utils'
 import type {
   MarkdownRuntimeHtmlResult,
@@ -56,20 +56,6 @@ vi.mock('@element-plus/wasm', async () => {
 
   return {
     ...actual,
-    activateMarkdownFeatures: vi.fn(
-      async (
-        options: Parameters<typeof runtime.activateMarkdownFeatures>[0],
-      ) =>
-        runtime.activateMarkdownFeatures({
-          ...options,
-          features: {
-            ...options.features,
-            codeHighlight: false,
-            latex: false,
-            mermaid: false,
-          },
-        }),
-    ),
     isMarkdownRuntimeAuthorizedResult: (value: unknown) =>
       runtime.isMarkdownRuntimeAuthorizedResult(value) ||
       (typeof value === 'object' &&
@@ -84,10 +70,35 @@ vi.mock('@element-plus/wasm', async () => {
   }
 })
 
+vi.mock('../../../wasm/markdown-heavy-feature-activation', async () => {
+  const runtime = await vi.importActual<
+    typeof import('../../../wasm/markdown-runtime')
+  >('../../../wasm/markdown-runtime')
+  return {
+    activateMarkdownHeavyFeatures: vi.fn(
+      async (
+        options: Parameters<
+          typeof import('../../../wasm/markdown-heavy-feature-activation').activateMarkdownHeavyFeatures
+        >[0],
+      ) =>
+        runtime.activateMarkdownFeatures({
+          ...options,
+          features: {
+            ...options.features,
+            codeHighlight: false,
+            latex: false,
+            mermaid: false,
+          },
+        }),
+    ),
+  }
+})
+
 const renderMarkdownChunks = vi.mocked(renderMarkdownChunksWithRuntime)
 const renderMarkdownHtml = vi.mocked(renderMarkdownHtmlWithRuntime)
 const renderMarkdownResult = vi.mocked(renderMarkdownResultWithRuntime)
-const activateFeatures = vi.mocked(activateMarkdownFeatures)
+const activateFeatures = vi.mocked(activateMarkdownHeavyFeatures)
+const activateFeaturesDefault = activateFeatures.getMockImplementation()
 
 const makeTimings = () => ({
   initMs: 0,
@@ -293,6 +304,9 @@ describe('MarkdownRenderer.vue', () => {
     renderMarkdownHtml.mockReset()
     renderMarkdownResult.mockReset()
     activateFeatures.mockClear()
+    if (activateFeaturesDefault) {
+      activateFeatures.mockImplementation(activateFeaturesDefault)
+    }
     renderMarkdownHtml.mockImplementation(async (request) =>
       fsusOk(
         makeHtmlResult(
@@ -358,7 +372,10 @@ describe('MarkdownRenderer.vue', () => {
     )
 
     const wrapper = mount(MarkdownRenderer, {
-      props: { content: '# Loading' },
+      props: {
+        content: '# Loading',
+        loadingText: 'Chargement du Markdown',
+      },
     })
 
     await vi.advanceTimersByTimeAsync(20)
@@ -366,6 +383,9 @@ describe('MarkdownRenderer.vue', () => {
 
     expect(wrapper.attributes('aria-busy')).toBe('true')
     expect(wrapper.find('[data-markdown-renderer-loading]').exists()).toBe(true)
+    expect(wrapper.find('.markdown-renderer__loading-text').text()).toBe(
+      'Chargement du Markdown',
+    )
 
     resolveFull?.(fsusOk(makeResult('# Loading', '<h1>Loading</h1>')))
     await flushPromises()
@@ -460,10 +480,7 @@ describe('MarkdownRenderer.vue', () => {
     const stale = mount(MarkdownRenderer, {
       props: {
         content: '# Current',
-        initialRender: makeResult(
-          '# Stale',
-          rawImageSource,
-        ),
+        initialRender: makeResult('# Stale', rawImageSource),
       },
     })
     const source = '# Current'
@@ -479,10 +496,7 @@ describe('MarkdownRenderer.vue', () => {
         render: () =>
           h(MarkdownRenderer, {
             content: '# Current',
-            initialRender: makeResult(
-              '# Stale',
-              rawImageSource,
-            ),
+            initialRender: makeResult('# Stale', rawImageSource),
           }),
       }),
     )
@@ -599,6 +613,37 @@ describe('MarkdownRenderer.vue', () => {
         features: expect.objectContaining({ mermaid: false }),
       }),
     )
+  })
+
+  test('invalidates feature output on shared theme change and removes the listener on unmount', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    const html =
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>graph LR\nA--&gt;B</code></figure>'
+    renderMarkdownResult.mockResolvedValue(fsusOk(makeResult(source, html)))
+    activateFeatures.mockResolvedValue({
+      activated: [{ count: 1, kind: 'mermaid' }],
+      errors: [],
+    })
+    const wrapper = mount(MarkdownRenderer, { props: { content: source } })
+    await flushRenderer()
+    const initialCalls = renderMarkdownResult.mock.calls.length
+
+    document.documentElement.dispatchEvent(
+      new CustomEvent('fsus:theme-change', {
+        detail: { mode: 'dark', resolved: 'dark' },
+      }),
+    )
+    await flushRenderer()
+    expect(renderMarkdownResult).toHaveBeenCalledTimes(initialCalls + 1)
+
+    wrapper.unmount()
+    document.documentElement.dispatchEvent(
+      new CustomEvent('fsus:theme-change', {
+        detail: { mode: 'light', resolved: 'light' },
+      }),
+    )
+    await flushRenderer()
+    expect(renderMarkdownResult).toHaveBeenCalledTimes(initialCalls + 1)
   })
 
   test('keeps the scroll anchor when the full result changes html', async () => {
@@ -773,9 +818,7 @@ describe('MarkdownRenderer.vue', () => {
     const source = `${'# Staged large\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
     const chunks = Array.from({ length: 70 }, (_, index) => ({
       estimatedSize: 48,
-      html: safeHtml(
-        index === 0 ? '<h1>Staged</h1>' : `<p>Chunk ${index}</p>`,
-      ),
+      html: safeHtml(index === 0 ? '<h1>Staged</h1>' : `<p>Chunk ${index}</p>`),
       htmlEndOffset: (index + 1) * 16,
       htmlStartOffset: index * 16,
       key: `md-${index}-${index * 16}`,

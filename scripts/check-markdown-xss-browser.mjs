@@ -12,6 +12,23 @@ const corpus = JSON.parse(
   ),
 )
 const port = Number(process.env.FSUS_MARKDOWN_XSS_PORT ?? 5191)
+// Hosts without a launchable engine (e.g. webkit on newer glibc/ICU) can run
+// the remaining engines by listing them; unset keeps the default full matrix.
+const browserTypes = { chromium, firefox, webkit }
+const requestedBrowsers = (
+  process.env.FSUS_MARKDOWN_XSS_BROWSERS ?? 'chromium,firefox,webkit'
+)
+  .split(',')
+  .map((name) => name.trim())
+  .filter((name) => name.length > 0)
+for (const name of requestedBrowsers) {
+  if (!(name in browserTypes)) {
+    throw new Error(`[markdown-xss] unknown browser engine: ${name}`)
+  }
+}
+const skippedBrowsers = Object.keys(browserTypes).filter(
+  (name) => !requestedBrowsers.includes(name),
+)
 const baseUrl = `http://127.0.0.1:${port}`
 const contentTypes = new Map([
   ['.css', 'text/css'],
@@ -264,12 +281,16 @@ const runBrowser = async (name, browserType) => {
   }
 }
 
+for (const name of skippedBrowsers) {
+  console.log(
+    `[markdown-xss] browser skipped engine=${name} reason=FSUS_MARKDOWN_XSS_BROWSERS`,
+  )
+}
+
 try {
-  await Promise.all([
-    runBrowser('chromium', chromium),
-    runBrowser('firefox', firefox),
-    runBrowser('webkit', webkit),
-  ])
+  await Promise.all(
+    requestedBrowsers.map((name) => runBrowser(name, browserTypes[name])),
+  )
 } finally {
   await new Promise((resolvePromise, reject) => {
     server.close((error) => {

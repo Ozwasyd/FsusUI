@@ -19,12 +19,20 @@
     </Setter>
   </Style>
 
-  <Style Selector="fsus|FsusImage.fsus-error">
+  <Style Selector="fsus|FsusImage.fsus-error, fsus|FsusImageViewer.fsus-error">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
   </Style>
 
-  <Style Selector="fsus|FsusImage.fsus-loaded">
+  <Style Selector="fsus|FsusImage.fsus-loaded, fsus|FsusImageViewer.fsus-loaded">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusImageViewer.fsus-panning">
+    <Setter Property="Cursor" Value="SizeAll" />
+  </Style>
+
+  <Style Selector="fsus|FsusImageViewer.fsus-loading">
+    <Setter Property="Opacity" Value="0.75" />
   </Style>
 
   <Style Selector="fsus|FsusImageViewer.fsus-open">

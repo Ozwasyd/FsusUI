@@ -1,0 +1,27 @@
+{
+  "component": "check-tag",
+  "runner": "headless-skia",
+  "screenshot": "/home/lyuaoss/\u684C\u9762/repos/FsusUI-issue-worktrees/heavy-feature-lifecycle/tests/conformance/visual/artifacts/screenshots/avalonia/check-tag-vue-parity.png",
+  "surfaceBounds": [
+    1,
+    0,
+    320,
+    72
+  ],
+  "controlBounds": [
+    {
+      "name": "FsusCheckTag",
+      "x": 24,
+      "y": 24,
+      "width": 101,
+      "height": 24
+    },
+    {
+      "name": "FsusCheckTag",
+      "x": 133,
+      "y": 24,
+      "width": 115,
+      "height": 24
+    }
+  ]
+}

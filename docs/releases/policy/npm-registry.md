@@ -143,7 +143,7 @@ Current evidence is recorded in `docs/releases/evidence/npm-public-preview/packa
 The public candidate must pass a fresh fixture install from the generated tarball:
 
 ```bash
-pnpm test:consumer-install -- dist/npm-candidate/fsusui-npm-candidate.tgz
+pnpm test:consumer-matrix -- --candidate dist/npm-candidate/fsusui-npm-candidate.tgz
 ```
 
 The fixture must verify:
@@ -164,7 +164,7 @@ Release package verification uses one immutable candidate:
 ```bash
 pnpm package:candidate:build
 pnpm package:candidate:verify dist/npm-candidate/fsusui-npm-candidate.tgz
-pnpm test:consumer-install -- dist/npm-candidate/fsusui-npm-candidate.tgz
+pnpm test:consumer-matrix -- --candidate dist/npm-candidate/fsusui-npm-candidate.tgz
 ```
 
 The adjacent candidate manifest records the source commit, package identity,

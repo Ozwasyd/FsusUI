@@ -67,6 +67,14 @@ Enter, Space, pointer activation, and the automation Invoke pattern raise
 publishes an accessible name, help text, polite live status, and distinct
 ready, drag-over, accepted, rejected, disabled, loading, and error statuses.
 
+Window-level drag routing can drive the same drag-over visual state through
+`SetExternalDragOver(bool)` for proxy surfaces that do not receive the routed
+drag events themselves, such as a centered overlay with `IsHitTestVisible`
+set to `false` while the window root stays the single drop target. Entering
+and leaving mirrors the routed drag-over state and raises no drop or browse
+events; the external state resets when the zone becomes disabled, enters
+loading, processes a drop, or detaches from the visual tree.
+
 ## Known Limitations
 
 The control does not perform network upload or file reading by itself; product

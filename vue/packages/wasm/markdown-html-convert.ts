@@ -87,17 +87,25 @@ const decodeEntities = (value: string) =>
   value.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (whole, body: string) => {
     if (body[0] === '#') {
       const hex = body[1] === 'x' || body[1] === 'X'
-      const code = Number.parseInt(hex ? body.slice(2) : body.slice(1), hex ? 16 : 10)
+      const code = Number.parseInt(
+        hex ? body.slice(2) : body.slice(1),
+        hex ? 16 : 10,
+      )
       if (Number.isFinite(code) && code > 31) return String.fromCodePoint(code)
       return ''
     }
     return ENTITIES[body.toLowerCase()] ?? whole
   })
 
-const loss = (kind: MarkdownHtmlLossKind, code: string, detail?: string): MarkdownHtmlLoss =>
+const loss = (
+  kind: MarkdownHtmlLossKind,
+  code: string,
+  detail?: string,
+): MarkdownHtmlLoss =>
   Object.freeze({ kind, code, ...(detail ? { detail } : {}) })
 
-const isSafeUrl = (value: string) => classifyMarkdownUrl(value).startsWith('valid-')
+const isSafeUrl = (value: string) =>
+  classifyMarkdownUrl(value).startsWith('valid-')
 
 const escapeMd = (value: string) => value.replace(/([\\`*_[\]#])/g, '\\$1')
 
@@ -109,15 +117,20 @@ type Context = {
   now: () => number
   budget: { readonly maxNodes: number; readonly maxMs: number }
   task?: MarkdownHtmlImportTask
+  rejected?: 'budget-nodes' | 'budget-time'
   listKind?: 'ul' | 'ol'
   listIndex: number
   quote: number
   pre: boolean
 }
 
-const timedOut = (ctx: Context) => (ctx.now() - ctx.started) > ctx.budget.maxMs
+const timedOut = (ctx: Context) => ctx.now() - ctx.started > ctx.budget.maxMs
 
-const convertChildren = (nodes: readonly MarkdownHtmlImportNode[], ctx: Context, sep = ''): string => {
+const convertChildren = (
+  nodes: readonly MarkdownHtmlImportNode[],
+  ctx: Context,
+  sep = '',
+): string => {
   const parts: string[] = []
   for (const node of nodes) {
     const piece = convertNode(node, ctx)
@@ -126,10 +139,20 @@ const convertChildren = (nodes: readonly MarkdownHtmlImportNode[], ctx: Context,
   return parts.join(sep)
 }
 
-const inline = (nodes: readonly MarkdownHtmlImportNode[], ctx: Context): string =>
+const inline = (
+  nodes: readonly MarkdownHtmlImportNode[],
+  ctx: Context,
+): string =>
   nodes
     .map((node) => {
-      if (node.type === 'element' && (node.tag === 'p' || node.tag === 'div' || node.tag === 'span')) {
+      if (node.type === 'element' && node.tag === 'p') {
+        return inline(node.children, ctx)
+      }
+      if (
+        node.type === 'element' &&
+        (node.tag === 'div' || node.tag === 'span')
+      ) {
+        ctx.losses.push(loss('flattened', `wrapper:${node.tag}`))
         return inline(node.children, ctx)
       }
       return convertNode(node, ctx)
@@ -144,15 +167,43 @@ const prefixLines = (text: string, prefix: string) =>
     .map((line) => (line.length ? `${prefix}${line}` : prefix.trimEnd()))
     .join('\n')
 
+const containsBlockContent = (nodes: readonly MarkdownHtmlImportNode[]) =>
+  nodes.some(
+    (node) =>
+      node.type === 'element' &&
+      /^(?:p|div|h[1-6]|blockquote|pre|ul|ol|table|figure|figcaption)$/.test(
+        node.tag,
+      ),
+  )
+
+const formattedInline = (
+  marker: string,
+  nodes: readonly MarkdownHtmlImportNode[],
+  ctx: Context,
+) => {
+  const rendered = `${marker}${inline(nodes, ctx).trim()}${marker}`
+  return containsBlockContent(nodes) ? `${rendered}\n\n` : rendered
+}
+
 const convertNode = (node: MarkdownHtmlImportNode, ctx: Context): string => {
   if (ctx.task?.cancelled) return ''
-  if (timedOut(ctx) || ctx.nodes > ctx.budget.maxNodes) return ''
+  if (timedOut(ctx)) {
+    ctx.rejected ??= 'budget-time'
+    return ''
+  }
+  if (ctx.nodes >= ctx.budget.maxNodes) {
+    ctx.rejected ??= 'budget-nodes'
+    return ''
+  }
   ctx.nodes += 1
   if (node.type === 'text') {
     const decoded = decodeEntities(node.value)
     return ctx.pre ? decoded : escapeMd(decoded.replace(/\s+/g, ' '))
   }
-  const mapped = MARKDOWN_HTML_CONVERSION_MAP[node.tag as keyof typeof MARKDOWN_HTML_CONVERSION_MAP]
+  const mapped =
+    MARKDOWN_HTML_CONVERSION_MAP[
+      node.tag as keyof typeof MARKDOWN_HTML_CONVERSION_MAP
+    ]
   if (!mapped) {
     ctx.losses.push(loss('unsupported', `tag:${node.tag}`))
     return inline(node.children, ctx)
@@ -169,7 +220,9 @@ const convertNode = (node: MarkdownHtmlImportNode, ctx: Context): string => {
     case 'span':
     case 'figure':
       ctx.losses.push(loss('flattened', `wrapper:${node.tag}`))
-      return node.tag === 'span' ? inline(node.children, ctx) : `${convertChildren(node.children, ctx)}\n`
+      return node.tag === 'span'
+        ? inline(node.children, ctx)
+        : `${convertChildren(node.children, ctx)}\n`
     case 'u':
       ctx.losses.push(loss('flattened', 'underline'))
       return inline(node.children, ctx)
@@ -182,12 +235,12 @@ const convertNode = (node: MarkdownHtmlImportNode, ctx: Context): string => {
       return `${'#'.repeat(Number(node.tag[1]))} ${inline(node.children, ctx).trim()}\n\n`
     case 'strong':
     case 'b':
-      return `**${inline(node.children, ctx).trim()}**`
+      return formattedInline('**', node.children, ctx)
     case 'em':
     case 'i':
-      return `*${inline(node.children, ctx).trim()}*`
+      return formattedInline('*', node.children, ctx)
     case 's':
-      return `~~${inline(node.children, ctx).trim()}~~`
+      return formattedInline('~~', node.children, ctx)
     case 'code':
       if (ctx.pre) return inline(node.children, ctx)
       return `\`${inline(node.children, ctx).replace(/`/g, '')}\``
@@ -237,7 +290,8 @@ const convertNode = (node: MarkdownHtmlImportNode, ctx: Context): string => {
       const previous = ctx.listKind
       const previousIndex = ctx.listIndex
       ctx.listKind = node.tag
-      ctx.listIndex = node.tag === 'ol' ? Number(node.attrs.start ?? '1') || 1 : 0
+      ctx.listIndex =
+        node.tag === 'ol' ? Number(node.attrs.start ?? '1') || 1 : 0
       const body = convertChildren(node.children, ctx).replace(/\n+$/, '')
       ctx.listKind = previous
       ctx.listIndex = previousIndex
@@ -285,7 +339,10 @@ const convertNode = (node: MarkdownHtmlImportNode, ctx: Context): string => {
   }
 }
 
-const collectRows = (table: MarkdownHtmlImportNode, ctx: Context): string[][] => {
+const collectRows = (
+  table: MarkdownHtmlImportNode,
+  ctx: Context,
+): string[][] => {
   if (table.type !== 'element') return []
   const rows: string[][] = []
   const visit = (node: MarkdownHtmlImportNode) => {
@@ -293,8 +350,12 @@ const collectRows = (table: MarkdownHtmlImportNode, ctx: Context): string[][] =>
     if (node.tag === 'tr') {
       rows.push(
         node.children
-          .filter((child): child is Extract<MarkdownHtmlImportNode, { type: 'element' }> =>
-            child.type === 'element' && (child.tag === 'td' || child.tag === 'th'),
+          .filter(
+            (
+              child,
+            ): child is Extract<MarkdownHtmlImportNode, { type: 'element' }> =>
+              child.type === 'element' &&
+              (child.tag === 'td' || child.tag === 'th'),
           )
           .map((cell) => inline(cell.children, ctx).trim()),
       )
@@ -306,10 +367,13 @@ const collectRows = (table: MarkdownHtmlImportNode, ctx: Context): string[][] =>
   return rows
 }
 
-const fromFindings = (findings: readonly MarkdownHtmlImportFinding[]): MarkdownHtmlLoss[] =>
+const fromFindings = (
+  findings: readonly MarkdownHtmlImportFinding[],
+): MarkdownHtmlLoss[] =>
   findings.map((item) => {
     const code = item.code === 'dangerous-scheme' ? 'unsafe-url' : item.code
-    if (item.kind === 'unsupported') return loss('unsupported', code, item.detail)
+    if (item.kind === 'unsupported')
+      return loss('unsupported', code, item.detail)
     return loss('removed', code, item.detail)
   })
 
@@ -339,15 +403,16 @@ export const convertMarkdownHtmlImportTree = (
     .trim()
   if (ctx.task?.cancelled) {
     ctx.losses.push(loss('removed', 'cancelled'))
-  } else if (timedOut(ctx)) {
-    ctx.losses.push(loss('removed', 'budget-time'))
+  } else if (ctx.rejected || timedOut(ctx)) {
+    ctx.losses.push(loss('removed', ctx.rejected ?? 'budget-time'))
   }
   return Object.freeze({
     markdown: markdown.length ? `${markdown}\n` : '',
     losses: Object.freeze(ctx.losses.slice()),
     attachments: Object.freeze(ctx.attachments.slice()),
     mappingVersion: MARKDOWN_HTML_CONVERSION_VERSION,
-    importerVersion: tree.importerVersion || MARKDOWN_HTML_IMPORT_IMPORTER_VERSION,
+    importerVersion:
+      tree.importerVersion || MARKDOWN_HTML_IMPORT_IMPORTER_VERSION,
   })
 }
 
@@ -399,12 +464,17 @@ export const evaluateMarkdownHtmlConversionMutations = (html: string) => {
         kind: 'silent-loss' as const,
         equivalent:
           math.markdown === authority.markdown &&
-          !math.losses.some((item) => item.code.includes('math') || item.code.includes('tag:math')),
+          !math.losses.some(
+            (item) =>
+              item.code.includes('math') || item.code.includes('tag:math'),
+          ),
         accepted: false,
       }),
       Object.freeze({
         kind: 'unsafe-url' as const,
-        equivalent: /javascript:|data:image/i.test(authority.markdown + unsafe.markdown),
+        equivalent: /javascript:|data:image/i.test(
+          authority.markdown + unsafe.markdown,
+        ),
         accepted: false,
       }),
       Object.freeze({

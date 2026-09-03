@@ -12,7 +12,7 @@ overrides:
     allowedDeviation: low
     testPolicy: contract-and-accessibility
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [18, 23, 24, 25]
   - id: avalonia-icon-streamgeometry-001
     area: visual
@@ -26,7 +26,7 @@ overrides:
     allowedDeviation: low
     testPolicy: icon-alignment-threshold
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [18, 24, 25, 26]
   - id: avalonia-layout-panel-measure-001
     area: visual
@@ -41,7 +41,7 @@ overrides:
     allowedDeviation: medium
     testPolicy: layout-geometry-threshold
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [151]
   - id: avalonia-date-time-native-picker-001
     area: behavior
@@ -56,5 +56,5 @@ overrides:
     allowedDeviation: low
     testPolicy: contract-visual-and-accessibility
     owner: fsusui-core
-    reviewAfter: 2026-09-01
+    reviewAfter: 2026-12-01
     linkedIssues: [157]

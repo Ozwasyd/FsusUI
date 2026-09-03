@@ -471,12 +471,84 @@ jobs:
           playwright-receipts: .readiness/receipts/visual-runtime-reuse
           playwright-plan: ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
 
+  playwright-conformance:
+    needs: playwright-pr-impact-plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Restore Playwright browser cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
+      - name: Restore icons test artifact cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+      - name: Restore WASM test artifact cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps firefox
+      - run: pnpm exec playwright install --with-deps webkit
+      - name: Run playwright conformance owner policy check
+        run: node scripts/check-playwright-conformance-owner-policy.mjs
+      - uses: actions/download-artifact@v4
+        if: inputs.group == 'pr'
+        with:
+          name: playwright-pr-impact-plan
+          path: .tmp/playwright-impact
+      - name: Run playwright conformance owner cells
+        run: >-
+          node scripts/conformance-playwright-owner-run.mjs
+          --owner playwright-conformance
+          --group ${{ inputs.group }}
+          --impact-plan ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
+          --evidence-dir .tmp/playwright-conformance
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-conformance-evidence-${{ inputs.group }}
+          path: |
+            .tmp/playwright-conformance
+            .readiness/receipts/playwright-conformance
+          retention-days: 14
+      - name: Record playwright conformance leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: playwright-conformance
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
+          playwright-receipts: .readiness/receipts/playwright-conformance
+          playwright-plan: ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
+
   playwright-pr-readiness:
     if: always() && inputs.group == 'pr'
     needs:
       - playwright-pr-impact-plan
       - playwright-layout
       - playwright-markdown
+      - playwright-conformance
       - playwright-motion
       - playwright-boundary
       - visual-runtime-reuse

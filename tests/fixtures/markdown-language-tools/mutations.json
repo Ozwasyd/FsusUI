@@ -1,0 +1,163 @@
+[
+  {
+    "name": "cloud-fallback",
+    "file": "core",
+    "find": "export const commitMarkdownLanguageToolMutation = (",
+    "replace": "fetch('https://spell.example.invalid')\nexport const commitMarkdownLanguageToolMutation = (",
+    "expectError": "cloud or network fallback is forbidden"
+  },
+  {
+    "name": "consumer-owned-projection",
+    "file": "core",
+    "find": "import {",
+    "replace": "import { createMarkdownEditorProjection } from '../../../wasm/markdown-runtime'\nimport {",
+    "expectError": "consume caller-owned projection and anchor authority"
+  },
+  {
+    "name": "dom-value-authority",
+    "file": "web",
+    "find": "const applyAttributes = () => {",
+    "replace": "const applyAttributes = () => {\n    textarea.value = currentSource",
+    "expectError": "DOM value must not become authority"
+  },
+  {
+    "name": "global-spellcheck-disabled",
+    "file": "web",
+    "find": "textarea.spellcheck = base.spellcheck",
+    "replace": "textarea.spellcheck = false",
+    "expectError": "must not globally disable spellcheck"
+  },
+  {
+    "name": "raw-offset-as-visual-authority",
+    "file": "web",
+    "find": "rawOffset: clamped,",
+    "replace": "rawOffset: clamped,\n    visualOffset: clamped,",
+    "expectError": "raw offsets must not be reused as visual authority"
+  },
+  {
+    "name": "retained-browser-dom-mutation",
+    "file": "web",
+    "find": "event.preventDefault?.()",
+    "replace": "void event.preventDefault",
+    "expectError": "must prevent retained DOM mutation"
+  },
+  {
+    "name": "private-textarea-ref",
+    "file": "vue",
+    "find": "defineExpose({\n  closeSearch,",
+    "replace": "defineExpose({\n  textareaRef,\n  closeSearch,",
+    "expectError": "private editor or DOM refs must not be exposed"
+  },
+  {
+    "name": "stale-revision-commit",
+    "file": "core",
+    "find": "if (input.currentRevision !== input.revision) {",
+    "replace": "if (false) {",
+    "expectError": "stale revision rejection guard is required"
+  },
+  {
+    "name": "stale-projection-commit",
+    "file": "core",
+    "find": "if (input.projectionRevision !== input.currentRevision) {",
+    "replace": "if (false) {",
+    "expectError": "stale projection rejection guard is required"
+  },
+  {
+    "name": "stale-selection-commit",
+    "file": "core",
+    "find": "if (!sameSelection(input.currentSelection, input.session.selection)) {",
+    "replace": "if (false) {",
+    "expectError": "stale selection rejection guard is required"
+  },
+  {
+    "name": "session-kind-interleave",
+    "file": "core",
+    "find": "if (input.session.kind !== input.kind) {",
+    "replace": "if (false) {",
+    "expectError": "session kind conflict rejection guard is required"
+  },
+  {
+    "name": "ime-interleave",
+    "file": "core",
+    "find": "): MarkdownLanguageToolCommitResult => {\n  if (input.isComposing) {",
+    "replace": "): MarkdownLanguageToolCommitResult => {\n  if (false) {",
+    "expectError": "IME interleave rejection guard is required"
+  },
+  {
+    "name": "dom-html-authority",
+    "file": "core",
+    "find": "if (input.rawHtml !== undefined) {",
+    "replace": "if (false) {",
+    "expectError": "DOM authority rejection guard is required"
+  },
+  {
+    "name": "full-source-replacement",
+    "file": "core",
+    "find": "input.from === 0 &&",
+    "replace": "false &&",
+    "expectError": "unexplained full-source replacement rejection guard is required"
+  },
+  {
+    "name": "merged-native-history",
+    "file": "core",
+    "find": "history: 'separate' as const,",
+    "replace": "history: 'merge' as const,",
+    "expectError": "requires separate input history"
+  },
+  {
+    "name": "stale-session-commit",
+    "file": "core",
+    "find": "if (!input.session.active || input.session.revision !== input.revision) {",
+    "replace": "if (false) {",
+    "expectError": "stale session rejection guard is required"
+  },
+  {
+    "name": "code-url-global-spellcheck-disabled",
+    "file": "web",
+    "find": "textarea.spellcheck = baseCapability().spellcheck",
+    "replace": "textarea.spellcheck = false",
+    "expectError": "must not globally disable spellcheck"
+  },
+  {
+    "name": "second-input-pipeline",
+    "file": "web",
+    "find": "commitMarkdownLanguageToolMutation(input)",
+    "replace": "Object.freeze({ accepted: true })",
+    "expectError": "must use the language-tool transaction adapter"
+  },
+  {
+    "name": "context-capability-bypass",
+    "file": "web",
+    "find": "if (unavailableReason) return rejected(unavailableReason)",
+    "replace": "if (false) return rejected(unavailableReason)",
+    "expectError": "must enforce current context and tool capability"
+  },
+  {
+    "name": "mapped-target-as-current-selection",
+    "file": "web",
+    "find": "kind,\n        currentSelection,",
+    "replace": "kind,\n        targetSelection,",
+    "expectError": "must not replace current selection authority"
+  },
+  {
+    "name": "inferred-projection-revision",
+    "file": "web",
+    "find": "? options.projectionRevision\n    : undefined",
+    "replace": "? (options.projectionRevision ?? currentRevision)\n    : undefined",
+    "expectError": "must be supplied by the projection session owner"
+  },
+  {
+    "name": "stale-anchor-map-source",
+    "file": "core",
+    "find": "if (input.anchorMap.source !== input.source) {",
+    "replace": "if (false) {",
+    "expectError": "stale anchor map rejection guard is required"
+  },
+  {
+    "name": "anchor-map-round-trip-bypass",
+    "file": "core",
+    "find": "input.anchorMap.visualAnchorToSourceSelection(visual)",
+    "replace": "({ anchor: input.from, focus: input.to })",
+    "expectError": "must consume the canonical anchor map"
+  }
+]

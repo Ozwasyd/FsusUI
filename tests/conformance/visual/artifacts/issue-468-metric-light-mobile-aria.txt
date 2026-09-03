@@ -1,0 +1,105 @@
+- heading "Metric Composition Acceptance" [level=2]
+- heading "MetricList" [level=3]
+- list:
+  - listitem:
+    - text: Active Users
+    - strong: 12,847
+  - listitem:
+    - text: Avg Session
+    - strong: 4m 32s
+  - listitem:
+    - text: Bounce Rate
+    - strong: 23.4%
+  - listitem:
+    - text: 请求延迟
+    - strong: 22 毫秒
+    - text: 第 75 百分位 58 个样本
+  - listitem:
+    - text: زمن الاستجابة
+    - strong: ٢٢ مللي ثانية
+    - text: المئين ٧٥ ٥٨ عينة
+  - listitem:
+    - text: Service availability over the trailing thirty-day reporting window
+    - strong: 99.999%
+    - text: Objective 99.95% 43,200 samples
+- heading "KpiGroup" [level=3]
+- list:
+  - listitem:
+    - text: Total Revenue
+    - strong: $847,230
+  - listitem:
+    - text: Conversion
+    - strong: 3.2%
+- heading "DistributionList" [level=3]
+- list:
+  - listitem: 1 Direct 245
+  - listitem: 2 Referral 106
+- heading "KeyValueGrid" [level=3]
+- term: State
+- definition: Ready
+- term: Queue
+- definition: 0 / 0
+- term: Region
+- definition: us-east-1
+- term: Authority
+- definition: · Runtime
+- heading "StatusSummary" [level=3]
+- article: Deployment Stable 2026-08-27 10:30 Production checks completed successfully.
+- article:
+  - text: Deployment sync Healthy 2026-06-14 20:30
+  - button "Inspect"
+  - button "History"
+  - button "Pinned" [pressed]
+- article: Quota watchdog Over limit 2026-06-15 02:12
+- article: Index refresh In progress 2026-06-15 02:14
+- heading "DiagnosticsList" [level=3]
+- list:
+  - listitem:
+    - strong: Memory usage
+    - paragraph: 75% of allocated memory consumed.
+    - text: warning - 17:48:11 - 3 times
+    - button "Retry"
+    - link "Open log":
+      - /url: "#diagnostic-memory-log"
+    - group: Details memory-node:sample-0001
+  - listitem:
+    - strong: Disk space
+    - paragraph: 98% full — immediate action required.
+    - text: danger - 17:49:03 - current
+    - group:
+      - text: Details
+      - list:
+        - listitem:
+          - strong: Primary volume
+          - paragraph: Cleanup queued.
+        - listitem:
+          - strong: Archive volume
+          - paragraph: Capacity remains available.
+  - listitem:
+    - strong: Index refresh
+    - paragraph: Background refresh is still running.
+    - text: info - 17:49:30
+  - listitem:
+    - strong: Replica status
+    - paragraph: All replicas are synchronized.
+    - text: success - 17:50:00
+- paragraph: No diagnostics
+- paragraph: No diagnostic events are available.
+- list:
+  - listitem:
+    - strong: Loading diagnostics
+    - paragraph: Recent diagnostic events are being loaded.
+- heading "DiagnosticsList (RTL)" [level=3]
+- list:
+  - listitem:
+    - strong: diagnostic.event
+    - paragraph: Recent event summary supplied by the product.
+    - text: warning - 17:48:11 - 3 times
+    - code: diagnostic-node:runCheck:sample-0001
+    - button "Copy detail"
+    - group: Details
+- heading "CopyableDetail" [level=3]
+- code: sk-proj-abc123def456
+- button "Copy detail"
+- code: sk-proj-disabled
+- button "Copy unavailable detail" [disabled]

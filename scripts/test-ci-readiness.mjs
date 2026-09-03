@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -7,23 +8,21 @@ import {
   loadPlaywrightImpactPlan,
 } from './playwright-impact-filter.mjs'
 import {
+  sha256Path,
   validatePlaywrightPrReadiness,
   validateReadiness,
 } from './ci-readiness-contract.mjs'
 
-const fixtureRoot = path.resolve('tests/fixtures/ci-readiness/valid')
+const sourceFixtureRoot = path.resolve('tests/fixtures/ci-readiness/valid')
 const cases = JSON.parse(
   fs.readFileSync('tests/fixtures/ci-readiness/invalid-cases.json', 'utf8'),
 )
-const prFixtureRoot = path.resolve('tests/fixtures/ci-readiness/pr-valid')
-const prSkipFixtureRoot = path.resolve(
+const sourcePrFixtureRoot = path.resolve('tests/fixtures/ci-readiness/pr-valid')
+const sourcePrSkipFixtureRoot = path.resolve(
   'tests/fixtures/ci-readiness/pr-skip-valid',
 )
 const prCases = JSON.parse(
-  fs.readFileSync(
-    'tests/fixtures/ci-readiness/pr-invalid-cases.json',
-    'utf8',
-  ),
+  fs.readFileSync('tests/fixtures/ci-readiness/pr-invalid-cases.json', 'utf8'),
 )
 const load = (root) =>
   fs
@@ -36,6 +35,256 @@ const load = (root) =>
         fs.readFileSync(path.join(root, 'manifests', file), 'utf8'),
       ),
     }))
+
+const hashContent = (file) =>
+  createHash('sha256').update(fs.readFileSync(file)).digest('hex')
+const hashValue = (value) => createHash('sha256').update(value).digest('hex')
+const writeJson = (file, value) => {
+  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`)
+}
+const recomputePlanDigest = (plan) => {
+  const contract = {}
+  for (const key of Object.keys(plan).sort()) {
+    if (key === 'planDigest' || key === 'generatedAt') continue
+    contract[key] = plan[key]
+  }
+  return hashValue(JSON.stringify(contract))
+}
+const addConformanceFixtures = (sourceRoot, { decision = 'run' } = {}) => {
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'fsusui-conformance-fixture-'),
+  )
+  fs.cpSync(sourceRoot, root, { recursive: true })
+  const planFile = path.join(root, 'plan.json')
+  let planDigest
+  if (fs.existsSync(planFile)) {
+    const plan = JSON.parse(fs.readFileSync(planFile, 'utf8'))
+    plan.decisions.push({
+      suiteId: 'web-interaction-conformance',
+      decision,
+      reasonCode:
+        decision === 'run' ? 'suite-source-changed' : 'documentation-only',
+      reason: `fixture ${decision} decision`,
+      cells:
+        decision === 'run'
+          ? [
+              'web-interaction-conformance/chromium',
+              'web-interaction-conformance/firefox',
+              'web-interaction-conformance/webkit',
+            ]
+          : [],
+      matchedRoots:
+        decision === 'run'
+          ? ['vue/packages/components/button/src/button.vue']
+          : [],
+    })
+    plan.planDigest = recomputePlanDigest(plan)
+    planDigest = plan.planDigest
+    writeJson(planFile, plan)
+    for (const file of fs.readdirSync(path.join(root, 'manifests'))) {
+      if (!file.endsWith('.json')) continue
+      const manifestFile = path.join(root, 'manifests', file)
+      const manifest = JSON.parse(fs.readFileSync(manifestFile, 'utf8'))
+      if (manifest.playwright?.impactPlanDigest) {
+        manifest.playwright.impactPlanDigest = planDigest
+        writeJson(manifestFile, manifest)
+      }
+    }
+  }
+  const registryHash =
+    JSON.parse(
+      fs.readFileSync(
+        path.join(
+          root,
+          'manifests',
+          fs
+            .readdirSync(path.join(root, 'manifests'))
+            .find((file) => file.endsWith('.json')),
+        ),
+        'utf8',
+      ),
+    ).playwright?.registryHash ??
+    '5666d3d139e25ac93cae2b2d63b7f2f11f626b9cd0de5947c4fa1167f8ad638a'
+  if (decision === 'skip') {
+    const reportSummary =
+      'reports/playwright-conformance-web-interaction-conformance-skip.json'
+    writeJson(path.join(root, reportSummary), {
+      gate: 'playwright-conformance',
+      status: 'success',
+      decision: 'skip',
+    })
+    writeJson(
+      path.join(
+        root,
+        'manifests/playwright-conformance-web-interaction-conformance-skip.json',
+      ),
+      {
+        schemaVersion: 1,
+        workflowGroup: 'pr',
+        commitSha: 'a'.repeat(40),
+        gate: 'playwright-conformance',
+        status: 'success',
+        toolchain: { node: 'v22.0.0', playwright: '1.59.1' },
+        inputFingerprint: 'c'.repeat(64),
+        artifacts: [],
+        dimensions: {},
+        playwright: {
+          decision: 'skip',
+          suiteId: 'web-interaction-conformance',
+          registryHash,
+          impactPlanDigest: planDigest,
+          tests: { total: 0, passed: 0, failed: 0, skipped: 0 },
+        },
+        reportSummary,
+        createdAt: '2026-08-01T00:00:05.000Z',
+        run: { id: '42', attempt: '1' },
+      },
+    )
+    return root
+  }
+  const identitySources = {
+    contractHash: 'spec/components/contracts/v2/contract-v2.json',
+    vueBaselineHash: 'spec/baselines/vue-current.json',
+    scenarioRegistryHash:
+      'tests/conformance/interactions/generated/normalized-traces.json',
+    runnerHash: 'vue/tests/markdown-editor/markdown-interaction-trace.spec.ts',
+  }
+  for (const browser of ['chromium', 'firefox', 'webkit']) {
+    const cell = `web-interaction-conformance/${browser}`
+    const traceRelative = `receipts/playwright-conformance/traces/web-interaction-conformance-${browser}/0.json`
+    const receiptRelative = `receipts/playwright-conformance/web-interaction-conformance-${browser}.json`
+    const reportRelative = `receipts/playwright-conformance/reports/web-interaction-conformance-${browser}.json`
+    const reportSummary = `reports/playwright-conformance-web-interaction-conformance-${browser}.json`
+    writeJson(path.join(root, traceRelative), {
+      schema: 'fsusui.interaction.v2',
+      browser,
+      browserIdentity: { name: browser, project: browser, version: 'fixture' },
+      candidate: 'a'.repeat(40),
+      runtime: { component: 'ElButton', mount: 'vue', realBrowser: true },
+      steps: [
+        {
+          action: 'click',
+          actual: { clicked: true },
+          expected: { clicked: true },
+          passed: true,
+        },
+      ],
+    })
+    writeJson(path.join(root, reportRelative), {
+      cellId: cell,
+      status: 'success',
+    })
+    writeJson(path.join(root, reportSummary), {
+      gate: 'playwright-conformance',
+      status: 'success',
+      cellId: cell,
+    })
+    const traceSha = hashContent(path.join(root, traceRelative))
+    const browserRevision = `${browser}-fixture-revision`
+    const conformance = {
+      ...Object.fromEntries(
+        Object.entries(identitySources).map(([key, file]) => [
+          key,
+          hashContent(file),
+        ]),
+      ),
+      browserRevision,
+      representativeComponents: ['ElButton'],
+      scenarioCount: 1,
+      actionStepCount: 1,
+      traceSchema: 'fsusui.interaction.v2',
+      traceVersion: 2,
+      traceBrowsers: [browser],
+      traceCandidates: ['a'.repeat(40)],
+      traceDigest: hashValue(traceSha),
+      traces: [{ path: traceRelative, sha256: traceSha }],
+      nativeImeAutomated: false,
+      nativeImeEvidenceReferences: ['#319', '#320'],
+    }
+    writeJson(path.join(root, receiptRelative), {
+      schemaVersion: 1,
+      owner: 'playwright-conformance',
+      gate: 'playwright-conformance',
+      suiteId: 'web-interaction-conformance',
+      cellId: cell,
+      project: browser,
+      dimensions: { browser },
+      commitSha: 'a'.repeat(40),
+      workflowGroup: planDigest ? 'pr' : 'main',
+      run: { id: '42', attempt: '1' },
+      tests: { total: 1, passed: 1, failed: 0, skipped: 0 },
+      status: 'success',
+      conformance,
+    })
+    writeJson(
+      path.join(
+        root,
+        `manifests/playwright-conformance-web-interaction-conformance-${browser}.json`,
+      ),
+      {
+        schemaVersion: 1,
+        workflowGroup: planDigest ? 'pr' : 'stable',
+        commitSha: 'a'.repeat(40),
+        gate: 'playwright-conformance',
+        status: 'success',
+        toolchain: { node: 'v22.0.0', playwright: '1.59.1' },
+        inputFingerprint: 'c'.repeat(64),
+        artifacts: [
+          {
+            name: `receipt-${cell}`,
+            path: receiptRelative,
+            sha256: sha256Path(path.join(root, receiptRelative)),
+          },
+          {
+            name: `report-${cell}`,
+            path: reportRelative,
+            sha256: sha256Path(path.join(root, reportRelative)),
+          },
+          {
+            name: `trace-${cell}`,
+            path: traceRelative,
+            sha256: sha256Path(path.join(root, traceRelative)),
+          },
+        ],
+        dimensions: {},
+        playwright: {
+          decision: 'run',
+          suiteId: 'web-interaction-conformance',
+          cellId: cell,
+          dimensions: { browser },
+          registryHash,
+          ...(planDigest ? { impactPlanDigest: planDigest } : {}),
+          tests: { total: 1, passed: 1, failed: 0, skipped: 0 },
+          config: {
+            path: 'vue/playwright.conformance-interaction.config.ts',
+            sha256: sha256Path(
+              'vue/playwright.conformance-interaction.config.ts',
+            ),
+          },
+          runtime: { browser, browserRevision, runtimeMode: 'browser-product' },
+          report: {
+            path: reportRelative,
+            sha256: sha256Path(path.join(root, reportRelative)),
+          },
+          receiptPath: receiptRelative,
+          receiptDigest: sha256Path(path.join(root, receiptRelative)),
+          conformance,
+        },
+        reportSummary,
+        createdAt: '2026-08-01T00:00:05.000Z',
+        run: { id: '42', attempt: '1' },
+      },
+    )
+  }
+  return root
+}
+
+const fixtureRoot = addConformanceFixtures(sourceFixtureRoot)
+const prFixtureRoot = addConformanceFixtures(sourcePrFixtureRoot)
+const prSkipFixtureRoot = addConformanceFixtures(sourcePrSkipFixtureRoot, {
+  decision: 'skip',
+})
 const check = (root, profile = 'main', group = 'main') =>
   validateReadiness({
     manifests: load(root).map(({ file, manifest }) => ({
@@ -228,11 +477,17 @@ for (const testCase of cases) {
     })
   if (testCase.mutation === 'pw-missing-cell')
     fs.rmSync(
-      path.join(manifests, 'playwright-markdown-markdown-editor-interaction-webkit.json'),
+      path.join(
+        manifests,
+        'playwright-markdown-markdown-editor-interaction-webkit.json',
+      ),
     )
   if (testCase.mutation === 'pw-missing-safe-area-webkit')
     fs.rmSync(
-      path.join(manifests, 'playwright-boundary-visual-boundary-audit-safe-area-webkit.json'),
+      path.join(
+        manifests,
+        'playwright-boundary-visual-boundary-audit-safe-area-webkit.json',
+      ),
     )
   if (testCase.mutation === 'attempt-mix')
     mutate(root, 'visual.json', (manifest) => {
@@ -244,13 +499,9 @@ for (const testCase of cases) {
       path.join(manifests, 'playwright-motion-motion-ssr-chromium-copy.json'),
     )
   if (testCase.mutation === 'pw-wrong-dims')
-    mutate(
-      root,
-      'playwright-motion-motion-ssr-chromium.json',
-      (manifest) => {
-        manifest.playwright.dimensions = { browser: 'firefox' }
-      },
-    )
+    mutate(root, 'playwright-motion-motion-ssr-chromium.json', (manifest) => {
+      manifest.playwright.dimensions = { browser: 'firefox' }
+    })
   if (testCase.mutation === 'pw-wrong-owner')
     mutate(
       root,
@@ -332,6 +583,84 @@ for (const testCase of cases) {
   fs.rmSync(root, { recursive: true, force: true })
 }
 
+const conformanceNegativeCases = [
+  {
+    name: 'missing required Firefox cell',
+    expected: /missing playwright cell/iu,
+    change(root) {
+      fs.rmSync(
+        path.join(
+          root,
+          'manifests/playwright-conformance-web-interaction-conformance-firefox.json',
+        ),
+      )
+    },
+  },
+  {
+    name: 'copied Chromium receipt used by Firefox',
+    expected: /copied or stale conformance receipt identity/iu,
+    change(root) {
+      mutate(
+        root,
+        'playwright-conformance-web-interaction-conformance-firefox.json',
+        (manifest) => {
+          const copied =
+            'receipts/playwright-conformance/web-interaction-conformance-chromium.json'
+          manifest.playwright.receiptPath = copied
+          manifest.playwright.receiptDigest = sha256Path(
+            path.join(root, copied),
+          )
+        },
+      )
+    },
+  },
+  {
+    name: 'stale conformance source identity',
+    expected: /conformance receipt evidence mismatch|stale conformance/iu,
+    change(root) {
+      mutate(
+        root,
+        'playwright-conformance-web-interaction-conformance-chromium.json',
+        (manifest) => {
+          manifest.playwright.conformance.runnerHash = 'd'.repeat(64)
+        },
+      )
+    },
+  },
+  {
+    name: 'synthetic IME claim',
+    expected: /synthetic IME/iu,
+    change(root) {
+      mutate(
+        root,
+        'playwright-conformance-web-interaction-conformance-webkit.json',
+        (manifest) => {
+          manifest.playwright.conformance.nativeImeAutomated = true
+        },
+      )
+    },
+  },
+  {
+    name: 'zero conformance actions',
+    expected: /actionStepCount must be positive/iu,
+    change(root) {
+      mutate(
+        root,
+        'playwright-conformance-web-interaction-conformance-chromium.json',
+        (manifest) => {
+          manifest.playwright.conformance.actionStepCount = 0
+        },
+      )
+    },
+  },
+]
+for (const testCase of conformanceNegativeCases) {
+  const root = copyFixture(fixtureRoot)
+  testCase.change(root)
+  assert.throws(() => check(root), testCase.expected, testCase.name)
+  fs.rmSync(root, { recursive: true, force: true })
+}
+
 for (const testCase of prCases) {
   const root = copyFixture(prFixtureRoot)
   const manifests = path.join(root, 'manifests')
@@ -341,7 +670,10 @@ for (const testCase of prCases) {
     )
   if (testCase.mutation === 'pr-missing-skip')
     fs.rmSync(
-      path.join(manifests, 'visual-runtime-reuse-visual-runtime-reuse-skip.json'),
+      path.join(
+        manifests,
+        'visual-runtime-reuse-visual-runtime-reuse-skip.json',
+      ),
     )
   if (testCase.mutation === 'pr-skip-digest')
     mutate(
@@ -372,7 +704,10 @@ for (const testCase of prCases) {
   if (testCase.mutation === 'pr-extra-cell') {
     fs.copyFileSync(
       path.join(manifests, 'playwright-layout-geometry-smoke-chromium.json'),
-      path.join(manifests, 'playwright-boundary-visual-boundary-audit-desktop-light.json'),
+      path.join(
+        manifests,
+        'playwright-boundary-visual-boundary-audit-desktop-light.json',
+      ),
     )
     mutate(
       root,
@@ -390,7 +725,9 @@ for (const testCase of prCases) {
     )
   }
   if (testCase.mutation === 'pr-plan-digest') {
-    const plan = JSON.parse(fs.readFileSync(path.join(root, 'plan.json'), 'utf8'))
+    const plan = JSON.parse(
+      fs.readFileSync(path.join(root, 'plan.json'), 'utf8'),
+    )
     plan.planDigest =
       'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
     fs.writeFileSync(path.join(root, 'plan.json'), `${JSON.stringify(plan)}\n`)
@@ -430,5 +767,8 @@ for (const testCase of prCases) {
 }
 
 console.log(
-  `[ci-readiness-fixtures] profiles=3 invalid=${cases.length} pr-invalid=${prCases.length} pr-valid=2 identity-mix=1 impact-filter=1`,
+  `[ci-readiness-fixtures] profiles=3 invalid=${cases.length} conformance-invalid=${conformanceNegativeCases.length} pr-invalid=${prCases.length} pr-valid=2 identity-mix=1 impact-filter=1`,
 )
+
+for (const root of [fixtureRoot, prFixtureRoot, prSkipFixtureRoot])
+  fs.rmSync(root, { recursive: true, force: true })

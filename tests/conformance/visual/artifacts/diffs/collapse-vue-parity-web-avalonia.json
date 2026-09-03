@@ -1,0 +1,31 @@
+{
+  "id": "collapse-vue-parity-web-avalonia",
+  "component": "navigation-primitives",
+  "state": "first-expanded-disabled-third",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "color.surface.base",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/collapse-vue-parity.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/collapse-vue-parity-web-avalonia.json",
+  "deltas": {
+    "geometry": 1,
+    "colorDelta": 0,
+    "radius": 0,
+    "spacing": 0,
+    "textBaseline": 0,
+    "screenshotDiffPercent": 0.0083,
+    "perceptualDelta": 0.011
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "issue": 699,
+  "generatedBy": "FsusImageViewerHeadlessTests.ImageViewerRealHeadlessSkiaRendersLightDarkDpiAndZoomStates",
+  "outputRoot": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "productionFixture": true,
+    "limitations": "Local deterministic headless rendering; no physical display or operating-system assistive technology is claimed."
+  },
+  "states": [
+    "default-loaded",
+    "wheel-zoomed",
+    "drag-panning-captured-size-all-cursor",
+    "source-reset",
+    "viewport-clipped"
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "dpi": [
+    96,
+    144
+  ],
+  "captures": [
+    {
+      "File": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-image-viewer-light-96dpi.png",
+      "Sha256": "ca704c7d7ab30d59b18a8a53b8b17220308a4fa6ea9d7f3f409476de864239b7",
+      "PixelSize": {
+        "Width": 640,
+        "Height": 680
+      },
+      "Theme": "light",
+      "Dpi": 96,
+      "State": "default-wheel-zoomed-drag-captured-size-all-source-reset-viewport-clipped"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-image-viewer-light-144dpi.png",
+      "Sha256": "5110c9851301782293958bd019363920c9cbe3ce8d129db7826cf08548801b3b",
+      "PixelSize": {
+        "Width": 960,
+        "Height": 1020
+      },
+      "Theme": "light",
+      "Dpi": 144,
+      "State": "default-wheel-zoomed-drag-captured-size-all-source-reset-viewport-clipped"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-image-viewer-dark-96dpi.png",
+      "Sha256": "be80ee003ff9a816ec8ae5008383deac38215ee7552788487c53184d7c836159",
+      "PixelSize": {
+        "Width": 640,
+        "Height": 680
+      },
+      "Theme": "dark",
+      "Dpi": 96,
+      "State": "default-wheel-zoomed-drag-captured-size-all-source-reset-viewport-clipped"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/issue-699/issue-699-image-viewer-render/issue-699-image-viewer-dark-144dpi.png",
+      "Sha256": "6d2b832c9f5bf2b754a82381540482593e832de26ac9f8e7af0687a097109cc5",
+      "PixelSize": {
+        "Width": 960,
+        "Height": 1020
+      },
+      "Theme": "dark",
+      "Dpi": 144,
+      "State": "default-wheel-zoomed-drag-captured-size-all-source-reset-viewport-clipped"
+    }
+  ]
+}

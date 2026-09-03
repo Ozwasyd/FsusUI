@@ -24,6 +24,86 @@
     <Setter Property="Padding" Value="{DynamicResource FsusComponentDialogPadding}" />
   </Style>
 
+  <Style Selector="fsus|FsusDialog:not(.fsus-has-legacy-content)">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          CornerRadius="{TemplateBinding CornerRadius}"
+          Padding="{TemplateBinding Padding}">
+          <Grid RowDefinitions="Auto,*,Auto">
+            <ContentPresenter
+              Name="PART_HeaderPresenter"
+              Grid.Row="0"
+              Content="{TemplateBinding Title}"
+              FontWeight="SemiBold"
+              FontSize="{DynamicResource FsusTypographyBodyMdSize}" />
+            <ContentPresenter
+              Name="PART_BodyPresenter"
+              Grid.Row="1"
+              Content="{TemplateBinding BodyContent}"
+              ContentTemplate="{TemplateBinding ContentTemplate}" />
+            <StackPanel
+              Grid.Row="2"
+              Orientation="Horizontal">
+              <ContentPresenter
+                Name="PART_FooterPresenter"
+                Content="{TemplateBinding FooterContent}" />
+              <ContentPresenter
+                Name="PART_ConfirmPresenter"
+                Content="{TemplateBinding ConfirmContent}" />
+              <ContentPresenter
+                Name="PART_CancelPresenter"
+                Content="{TemplateBinding CancelContent}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusDialog:not(.fsus-has-title) /template/ ContentPresenter#PART_HeaderPresenter">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog.fsus-has-title /template/ ContentPresenter#PART_HeaderPresenter">
+    <Setter Property="IsVisible" Value="True" />
+    <Setter Property="Margin" Value="0,0,0,16" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog:not(.fsus-has-body-content) /template/ ContentPresenter#PART_BodyPresenter">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog:not(.fsus-has-footer) /template/ ContentPresenter#PART_FooterPresenter">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog.fsus-has-footer /template/ ContentPresenter#PART_FooterPresenter">
+    <Setter Property="IsVisible" Value="True" />
+    <Setter Property="Margin" Value="0,16,0,0" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog:not(.fsus-has-confirm) /template/ ContentPresenter#PART_ConfirmPresenter">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog.fsus-has-confirm /template/ ContentPresenter#PART_ConfirmPresenter">
+    <Setter Property="IsVisible" Value="True" />
+    <Setter Property="Margin" Value="0,16,0,0" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog:not(.fsus-has-cancel) /template/ ContentPresenter#PART_CancelPresenter">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog.fsus-has-cancel /template/ ContentPresenter#PART_CancelPresenter">
+    <Setter Property="IsVisible" Value="True" />
+    <Setter Property="Margin" Value="0,16,0,0" />
+  </Style>
+
   <Style Selector="fsus|FsusDialog.fsus-scrollable-body">
     <Setter Property="Template">
       <ControlTemplate>
