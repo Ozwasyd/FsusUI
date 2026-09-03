@@ -77,6 +77,9 @@ await build({
   base: './',
   logLevel: 'warn',
   plugins: [Vue()],
+  worker: {
+    format: 'es',
+  },
   build: {
     emptyOutDir: true,
     outDir: outputRoot,

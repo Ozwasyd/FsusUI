@@ -5,19 +5,26 @@ import {
   defaultMarkdownEditorLocaleText,
   evaluateMarkdownEditorLocaleMutations,
   filterMarkdownEditorCommands,
+  getMarkdownEditorCommand,
   isMarkdownEditorCommandEnabled,
   isMarkdownEditorCommandVisible,
   resolveMarkdownEditorLocaleText,
   resolveMarkdownEditorOverflowCommands,
   resolveMarkdownEditorPrimaryCommands,
   resolveMarkdownEditorShortcut,
+  resolveMarkdownEditorSyntaxContext,
   resolveMarkdownEditorToolbarLimit,
+  runMarkdownEditorCommand,
   type MarkdownEditorCommand,
   type MarkdownEditorCommandContext,
+  type MarkdownEditorCommandPresentation,
+  type MarkdownEditorMode,
 } from '../src/markdown-editor'
 import {
   createMarkdownEditorCommandSnapshot,
   evaluateMarkdownEditorCommandMutations,
+  selectMarkdownEditorCommandSnapshot,
+  type MarkdownEditorCommandRuntimeState,
 } from '../src/markdown-editor-command-snapshot'
 import {
   abortMarkdownEditorCommandSessions,
@@ -69,6 +76,8 @@ import {
 import {
   composeMarkdownEditorPositionMapInstances,
   createMarkdownEditorPositionMap,
+  normalizeMarkdownEditorSelection,
+  validateMarkdownEditorChanges,
 } from '../src/markdown-editor-transaction'
 import {
   createMarkdownEditorProjection,
@@ -843,5 +852,527 @@ describe('Issue #447: Anchor insert/edit/remove/copy and block move/split/merge 
       'merge-silent-drop',
       'sidecar-state',
     ])
+  })
+})
+
+describe('Issue #432: One migration, one registry, one cross-surface command contract', () => {
+  const modes: readonly MarkdownEditorMode[] = [
+    'source',
+    'live',
+    'split',
+    'preview',
+  ]
+  const presentations: readonly MarkdownEditorCommandPresentation[] = [
+    'toolbar',
+    'selection',
+    'slash',
+    'palette',
+  ]
+
+  /** Generic consumer link command: registry-merged, no FsusUI domain keys. */
+  const consumerLinkCommand: MarkdownEditorCommand = {
+    group: 'insert',
+    key: 'consumer-link',
+    keywords: ['hyperlink'],
+    label: 'Insert reference link',
+    presentation: ['palette', 'toolbar'],
+    shortcut: 'Mod+Shift+L',
+    run: (context) => ({
+      transaction: {
+        changes: [
+          {
+            from: context.selection.start,
+            insert: '[label](https://example.test)',
+            to: context.selection.end,
+          },
+        ],
+        history: 'separate',
+        origin: 'command',
+      },
+    }),
+  }
+
+  /**
+   * Generic consumer attachment command: it owns only the undoable placeholder
+   * transaction. Upload I/O, progress, and lifecycle results stay with the
+   * consumer provider.
+   */
+  const consumerAttachmentCommand: MarkdownEditorCommand = {
+    group: 'insert',
+    key: 'consumer-attachment',
+    label: 'Attach file',
+    presentation: ['palette', 'toolbar'],
+    run: (context) => ({
+      transaction: {
+        changes: [
+          {
+            from: context.selection.start,
+            insert: '![uploading](pending)',
+            to: context.selection.end,
+          },
+        ],
+        history: 'separate',
+        metadata: Object.freeze({ operation: 'asset-placeholder' }),
+        origin: 'command',
+      },
+    }),
+  }
+
+  /** Generic consumer async selector: awaits a provider, honours the signal. */
+  const consumerAsyncSelectorCommand: MarkdownEditorCommand = {
+    group: 'insert',
+    key: 'consumer-async-selector',
+    label: 'Pick from provider',
+    presentation: ['palette', 'selection'],
+    run: async (context) => {
+      const picked = await Promise.resolve('PICKED')
+      if (context.signal.aborted) return {}
+      return {
+        transaction: {
+          changes: [
+            {
+              from: context.selection.start,
+              insert: picked,
+              to: context.selection.end,
+            },
+          ],
+          history: 'separate',
+          origin: 'command',
+        },
+      }
+    },
+  }
+
+  const consumerCommands: readonly MarkdownEditorCommand[] = [
+    consumerLinkCommand,
+    consumerAttachmentCommand,
+    consumerAsyncSelectorCommand,
+  ]
+  const mergedRegistry: readonly MarkdownEditorCommand[] = [
+    ...defaultMarkdownEditorCommands,
+    ...consumerCommands,
+  ]
+
+  const syntaxContextFor = (source: string, caret: number) =>
+    resolveMarkdownEditorSyntaxContext(projectionFor(source), {
+      direction: 'none',
+      end: caret,
+      start: caret,
+    })
+
+  const snapshotFacts = (
+    context: MarkdownEditorCommandContext,
+    runtimeStates?: ReadonlyMap<string, MarkdownEditorCommandRuntimeState>,
+  ) =>
+    createMarkdownEditorCommandSnapshot(
+      defaultMarkdownEditorCommands,
+      context,
+      runtimeStates,
+    ).map((item) => ({
+      disabledReason: item.disabledReason ?? null,
+      enabled: item.enabled,
+      error:
+        item.error instanceof Error ? item.error.message : (item.error ?? null),
+      group: item.group,
+      key: item.key,
+      label: item.label,
+      pending: item.pending,
+      presentation: [...item.presentation],
+      priority: item.priority,
+      shortcut: item.shortcut ?? null,
+      state: item.state,
+      visible: item.visible,
+    }))
+
+  /** Presentation facts must never fork per mode; only `enabled` may. */
+  const presentationFacts = (
+    facts: ReturnType<typeof snapshotFacts>,
+  ) => facts.map(({ enabled: _enabled, ...rest }) => rest)
+
+  it('migrates every default and consumer command onto one registry and one run path', async () => {
+    for (const command of mergedRegistry) {
+      expect(typeof command.run, command.key).toBe('function')
+      expect('apply' in command, command.key).toBe(false)
+    }
+    expect(new Set(mergedRegistry.map((command) => command.key)).size).toBe(
+      mergedRegistry.length,
+    )
+
+    const snapshot = createMarkdownEditorCommandSnapshot(
+      mergedRegistry,
+      makeContext(),
+    )
+    expect(snapshot).toHaveLength(mergedRegistry.length)
+    expect(snapshot.map((item) => item.key)).toEqual(
+      mergedRegistry.map((command) => command.key),
+    )
+
+    const context = makeContext({
+      selection: { direction: 'none', end: 4, start: 4 },
+    })
+    expect(
+      (await runMarkdownEditorCommand(consumerLinkCommand, context))
+        ?.transaction?.changes,
+    ).toEqual([{ from: 4, insert: '[label](https://example.test)', to: 4 }])
+    expect(
+      (await runMarkdownEditorCommand(consumerAttachmentCommand, context))
+        ?.transaction?.metadata,
+    ).toEqual({ operation: 'asset-placeholder' })
+    expect(
+      (await runMarkdownEditorCommand(consumerAsyncSelectorCommand, context))
+        ?.transaction?.changes,
+    ).toEqual([{ from: 4, insert: 'PICKED', to: 4 }])
+
+    // Merging consumer commands keeps one shortcut authority, not a per-surface list.
+    expect(resolveMarkdownEditorShortcut(mergedRegistry, 'mod+shift+l')?.key).toBe(
+      'consumer-link',
+    )
+    expect(
+      filterMarkdownEditorCommands(mergedRegistry, context, 'palette').map(
+        (command) => command.key,
+      ),
+    ).toEqual(
+      createMarkdownEditorCommandSnapshot(mergedRegistry, context)
+        .filter((item) => item.visible && item.presentation.includes('palette'))
+        .map((item) => item.key),
+    )
+  })
+
+  it('keeps key, label, shortcut, when, enabled, pending, error, and result identical across modes and surfaces', async () => {
+    const source = '[Docs](https://safe.test)'
+    const runtimeStates = new Map<string, MarkdownEditorCommandRuntimeState>([
+      ['bold', { state: 'pending' }],
+      [
+        'italic',
+        {
+          disabledReason: 'provider-offline',
+          error: new Error('provider-offline'),
+          state: 'rejected',
+        },
+      ],
+    ])
+    const base = {
+      selection: { direction: 'none' as const, end: 5, start: 1 },
+      syntax: syntaxContextFor(source, 1),
+      value: source,
+    }
+
+    const authority = snapshotFacts(makeContext({ ...base, mode: 'source' }), runtimeStates)
+    const authorityPresentation = presentationFacts(authority)
+    for (const mode of modes.slice(1)) {
+      expect(
+        presentationFacts(
+          snapshotFacts(makeContext({ ...base, mode }), runtimeStates),
+        ),
+        mode,
+      ).toEqual(authorityPresentation)
+    }
+
+    const bold = getMarkdownEditorCommand(defaultMarkdownEditorCommands, 'bold')!
+    const editableModes = modes.filter((mode) => mode !== 'preview')
+    const authorityResult = await runMarkdownEditorCommand(
+      bold,
+      makeContext({ ...base, mode: 'source' }),
+    )
+    expect(authorityResult?.transaction?.changes).toEqual([
+      { from: 1, insert: '**Docs**', to: 5 },
+    ])
+    for (const mode of editableModes.slice(1)) {
+      expect(
+        await runMarkdownEditorCommand(bold, makeContext({ ...base, mode })),
+        mode,
+      ).toEqual(authorityResult)
+      expect(
+        snapshotFacts(makeContext({ ...base, mode }), runtimeStates).map(
+          (item) => item.enabled,
+        ),
+        mode,
+      ).toEqual(authority.map((item) => item.enabled))
+    }
+    // Preview keeps the same commands listed but blocks execution, matching the
+    // attachment, clipboard, code, and language-tool pipelines.
+    expect(
+      await runMarkdownEditorCommand(bold, makeContext({ ...base, mode: 'preview' })),
+    ).toBeUndefined()
+    expect(
+      snapshotFacts(makeContext({ ...base, mode: 'preview' }), runtimeStates).every(
+        (item) => item.enabled === false,
+      ),
+    ).toBe(true)
+    expect(
+      isMarkdownEditorCommandVisible(bold, makeContext({ ...base, mode: 'preview' })),
+    ).toBe(true)
+
+    // Pending/error/reason are shared facts, so every presentation surface reads
+    // the same item rather than tracking its own state.
+    const snapshot = createMarkdownEditorCommandSnapshot(
+      defaultMarkdownEditorCommands,
+      makeContext({ ...base, mode: 'source' }),
+      runtimeStates,
+    )
+    expect(snapshot.find((item) => item.key === 'bold')).toMatchObject({
+      disabledReason: 'pending',
+      enabled: false,
+      pending: true,
+      state: 'pending',
+    })
+    expect(snapshot.find((item) => item.key === 'italic')).toMatchObject({
+      disabledReason: 'provider-offline',
+      enabled: false,
+      pending: false,
+      state: 'rejected',
+    })
+    for (const presentation of presentations) {
+      const selected = selectMarkdownEditorCommandSnapshot(
+        snapshot,
+        presentation,
+      )
+      expect(selected.length, presentation).toBeGreaterThan(0)
+      for (const item of selected) {
+        const shared = snapshot.find((entry) => entry.key === item.key)!
+        expect(
+          {
+            enabled: item.enabled,
+            error: item.error,
+            label: item.label,
+            pending: item.pending,
+            shortcut: item.shortcut,
+            state: item.state,
+          },
+          presentation,
+        ).toEqual({
+          enabled: shared.enabled,
+          error: shared.error,
+          label: shared.label,
+          pending: shared.pending,
+          shortcut: shared.shortcut,
+          state: shared.state,
+        })
+      }
+    }
+  })
+
+  it('produces determined transactions for no-selection, forward, backward, and multiline selections', async () => {
+    const bold = getMarkdownEditorCommand(defaultMarkdownEditorCommands, 'bold')!
+    const heading = getMarkdownEditorCommand(
+      defaultMarkdownEditorCommands,
+      'heading',
+    )!
+    const value = 'hello world'
+    const run = (
+      command: MarkdownEditorCommand,
+      selection: MarkdownEditorCommandContext['selection'],
+      source = value,
+    ) => runMarkdownEditorCommand(command, makeContext({ selection, value: source }))
+
+    expect((await run(bold, { direction: 'none', end: 3, start: 3 }))?.transaction?.changes).toEqual([
+      { from: 3, insert: '**text**', to: 3 },
+    ])
+
+    const forward = await run(bold, { direction: 'forward', end: 5, start: 0 })
+    const backward = await run(bold, { direction: 'backward', end: 5, start: 0 })
+    expect(forward?.transaction?.changes).toEqual([
+      { from: 0, insert: '**hello**', to: 5 },
+    ])
+    expect(backward?.transaction?.changes).toEqual(forward?.transaction?.changes)
+    expect(backward?.transaction?.selection).toEqual({
+      direction: 'backward',
+      end: 7,
+      start: 2,
+    })
+
+    expect(
+      (await run(heading, { direction: 'forward', end: 5, start: 0 }, 'a\nb\nc'))
+        ?.transaction?.changes,
+    ).toEqual([{ from: 0, insert: '## a\n## b\n## c', to: 5 }])
+    // Re-running on already prefixed lines is a no-op change, not doubled markers.
+    expect(
+      (await run(heading, { direction: 'forward', end: 8, start: 0 }, '## a\n## b'))
+        ?.transaction?.changes,
+    ).toEqual([{ from: 0, insert: '## a\n## b', to: 9 }])
+
+    // `start > end` is not a valid editor selection, so the command must fail
+    // closed in the dispatcher instead of writing at a guessed position.
+    const unordered = await run(bold, { direction: 'backward', end: 0, start: 5 })
+    expect(normalizeMarkdownEditorSelection(value, { end: 0, start: 5 })).toBeUndefined()
+    expect(
+      validateMarkdownEditorChanges(value, unordered!.transaction!.changes),
+    ).toBe(false)
+  })
+
+  it('gates contextual commands from projection syntax for every required context', () => {
+    const contextualKeys = [
+      'link-properties',
+      'anchor-properties',
+      'anchor-insert',
+    ]
+    const fixtures: readonly {
+      caret: number
+      source: string
+      status: 'malformed' | 'valid'
+      type: string
+      visible: readonly string[]
+    }[] = [
+      { caret: 4, source: 'plain text here', status: 'valid', type: 'paragraph', visible: ['anchor-insert'] },
+      { caret: 3, source: '# Title', status: 'valid', type: 'heading', visible: ['anchor-insert'] },
+      { caret: 4, source: '- one\n- two', status: 'valid', type: 'list', visible: ['anchor-insert'] },
+      { caret: 4, source: '| a | b |\n| --- | --- |\n| 1 | 2 |', status: 'valid', type: 'table', visible: ['anchor-insert'] },
+      { caret: 6, source: '```\ncode\n```', status: 'valid', type: 'code', visible: ['anchor-insert'] },
+      { caret: 2, source: '[Docs](https://safe.test)', status: 'valid', type: 'link', visible: ['link-properties', 'anchor-insert'] },
+      { caret: 3, source: '![Alt](https://safe.test/i.png)', status: 'valid', type: 'image', visible: ['anchor-insert'] },
+      { caret: 2, source: '[Docs](https://safe.test', status: 'malformed', type: 'malformed', visible: ['anchor-insert'] },
+      { caret: 12, source: 'Paragraph ^intro', status: 'valid', type: 'anchor', visible: ['anchor-properties'] },
+    ]
+
+    for (const fixture of fixtures) {
+      const syntax = syntaxContextFor(fixture.source, fixture.caret)
+      expect(syntax?.type, fixture.type).toBe(fixture.type)
+      expect(syntax?.status, fixture.type).toBe(fixture.status)
+
+      const context = makeContext({
+        selection: { direction: 'none', end: fixture.caret, start: fixture.caret },
+        syntax,
+        value: fixture.source,
+      })
+      const contextual = createMarkdownEditorCommandSnapshot(
+        defaultMarkdownEditorCommands,
+        context,
+      ).filter((item) => contextualKeys.includes(item.key))
+      expect(
+        contextual.filter((item) => item.visible).map((item) => item.key),
+        fixture.type,
+      ).toEqual([...fixture.visible])
+      expect(
+        contextual.every((item) => item.enabled === (fixture.status === 'valid')),
+        fixture.type,
+      ).toBe(true)
+    }
+  })
+
+  it('keeps readonly, disabled, preview, shortcut conflict, document switch, and stale async determined', async () => {
+    const bold = getMarkdownEditorCommand(defaultMarkdownEditorCommands, 'bold')!
+    const disabledCommand: MarkdownEditorCommand = {
+      ...consumerAttachmentCommand,
+      disabledReason: () => 'provider-offline',
+      enabled: () => false,
+      key: 'consumer-attachment-disabled',
+    }
+
+    expect(await runMarkdownEditorCommand(bold, makeContext({ readonly: true }))).toBeUndefined()
+    expect(
+      await runMarkdownEditorCommand(bold, makeContext({ mode: 'preview' })),
+    ).toBeUndefined()
+    expect(
+      await runMarkdownEditorCommand(bold, makeContext({ mode: 'preview', readonly: true })),
+    ).toBeUndefined()
+    expect(await runMarkdownEditorCommand(disabledCommand, makeContext())).toBeUndefined()
+    const blocked = createMarkdownEditorCommandSnapshot(
+      [bold, disabledCommand],
+      makeContext({ mode: 'preview', readonly: true }),
+    )
+    expect(blocked.every((item) => item.enabled === false)).toBe(true)
+    expect(
+      createMarkdownEditorCommandSnapshot(
+        [bold, disabledCommand],
+        makeContext({ mode: 'preview' }),
+      ).every((item) => item.enabled === false),
+    ).toBe(true)
+    expect(
+      blocked.find((item) => item.key === 'consumer-attachment-disabled')
+        ?.disabledReason,
+    ).toBe('provider-offline')
+    expect(isMarkdownEditorCommandVisible(bold, makeContext({ readonly: true }))).toBe(true)
+    expect(isMarkdownEditorCommandEnabled(bold, makeContext({ readonly: true }))).toBe(false)
+
+    // A shortcut conflict fails no matter which command is registered first.
+    const conflicting = [
+      { ...bold, key: 'conflict-a', shortcut: 'Mod+B' },
+      { ...bold, key: 'conflict-b', shortcut: 'mod + b' },
+    ]
+    for (const order of [conflicting, [...conflicting].reverse()]) {
+      expect(() => resolveMarkdownEditorShortcut(order, 'MOD+B')).toThrow(
+        /shortcut conflict/,
+      )
+      expect(() =>
+        createMarkdownEditorCommandSnapshot(order, makeContext()),
+      ).toThrow(/shortcut conflict/)
+    }
+
+    // A document switch aborts pending work even when the source is unchanged.
+    const switched = createMarkdownEditorCommandSession('bold', makeContext(), {
+      anchor: { end: 5, start: 0 },
+    })
+    expect(
+      rebaseMarkdownEditorCommandSession(
+        switched,
+        makeContext({ documentIdentity: { epoch: 1, id: 'doc-2' } }),
+      ),
+    ).toBe('aborted')
+    expect(switched.abort.signal.aborted).toBe(true)
+
+    const sameSourceNewEpoch = createMarkdownEditorCommandSession(
+      'bold',
+      makeContext(),
+      { anchor: { end: 5, start: 0 } },
+    )
+    expect(
+      rebaseMarkdownEditorCommandSession(
+        sameSourceNewEpoch,
+        makeContext({ documentIdentity: { epoch: 2, id: 'doc-1' } }),
+      ),
+    ).toBe('aborted')
+
+    // A late provider result never commits, and a deleted anchor never drifts.
+    const stale = createMarkdownEditorCommandSession('bold', makeContext(), {
+      anchor: { end: 5, start: 0 },
+    })
+    expect(
+      resolveMarkdownEditorCommandSession(
+        stale,
+        makeContext({ revision: 2 }),
+        'resolved-current',
+      ),
+    ).toBe('stale')
+    const deleted = createMarkdownEditorCommandSession('bold', makeContext(), {
+      anchor: { end: 5, start: 0 },
+    })
+    expect(
+      rebaseMarkdownEditorCommandSession(
+        deleted,
+        makeContext({ revision: 2 }),
+        createMarkdownEditorPositionMap([{ from: 0, to: 20, insert: '' }], {
+          source: 'Sample markdown text',
+        }),
+      ),
+    ).toBe('deleted')
+
+    // An aborted async selector result is dropped by the command itself.
+    const abortController = new AbortController()
+    abortController.abort()
+    expect(
+      await runMarkdownEditorCommand(consumerAsyncSelectorCommand, makeContext({ signal: abortController.signal })),
+    ).toBeUndefined()
+  })
+
+  it('kills old apply, local parser, surface list, label dispatch, and private editor access', () => {
+    const report = evaluateMarkdownEditorCommandMutations(
+      mergedRegistry,
+      makeContext(),
+    )
+    expect(report.mutations.map((mutation) => mutation.kind)).toEqual([
+      'local-array',
+      'regex-context',
+      'arbitrary-icon',
+      'duplicate-shortcut',
+      'apply-path',
+      'label-dispatch',
+      'private-editor-access',
+    ])
+    expect(report.mutations.every((mutation) => mutation.accepted === false)).toBe(
+      true,
+    )
+    expect(
+      report.mutations.every((mutation) => mutation.equivalent === false),
+    ).toBe(true)
   })
 })

@@ -275,20 +275,23 @@ describe('HTML and injection boundary surface', () => {
     expect(
       activation.match(/gateway\.commitMarkdownFeatureOutput\(/gu),
     ).toHaveLength(3)
-    for (const renderer of [
+    const gatewayBlocks = activation
+      .split(/(?=const gateway = await loadMarkdownFeatureOutputGateway\(\))/u)
+      .slice(1)
+    expect(gatewayBlocks).toHaveLength(3)
+    for (const [index, renderer] of [
       'renderMermaidFeature',
       'renderLatexFeature',
       'renderCodeHighlightFeature',
-    ]) {
-      expect(activation).toMatch(
-        new RegExp(
-          `Promise\\.all\\(\\[\\s*${renderer}\\([\\s\\S]*?\\),\\s*loadMarkdownFeatureOutputGateway\\(\\),\\s*\\]\\)`,
-          'u',
-        ),
-      )
+    ].entries()) {
+      const block = gatewayBlocks[index] ?? ''
+      const renderAt = block.indexOf(`${renderer}(`)
+      const commitAt = block.indexOf('gateway.commitMarkdownFeatureOutput(')
+      expect(renderAt).toBeGreaterThanOrEqual(0)
+      expect(commitAt).toBeGreaterThan(renderAt)
     }
     expect(activation).toMatch(
-      /const source = code\.textContent \?\? ''\s*if \(!source\) return false\s*try \{[\s\S]*?loadMarkdownFeatureOutputGateway\(\)/u,
+      /const source = code\.textContent \?\? ''\s*if \(!source\) return false[\s\S]*?try \{[\s\S]*?loadMarkdownFeatureOutputGateway\(\)/u,
     )
     expect(runtime).not.toMatch(
       /sanitizeFeatureFragment|createSafeFeatureFragment/,

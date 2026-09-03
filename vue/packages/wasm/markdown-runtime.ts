@@ -29,6 +29,10 @@ import type {
   MarkdownFeatureOutputKind,
 } from './markdown-feature-output-gateway'
 import type {
+  MarkdownHeavyFeatureIsolatedRenderFactory,
+  MarkdownHeavyFeatureIsolatedRenderRequest,
+} from './markdown-heavy-feature-resource'
+import type {
   FsusErrorCode,
   FsusErrorDetail,
   FsusResult,
@@ -608,6 +612,47 @@ export interface MarkdownFeatureActivationResult {
   errors: readonly MarkdownFeatureActivationError[]
 }
 
+type MarkdownHeavyFeatureKind = 'code-highlight' | 'latex' | 'mermaid'
+
+interface MarkdownHeavyFeatureIdentity {
+  readonly config: string
+  readonly documentEpoch: number | string
+  readonly documentKey: string
+  readonly featureKind: MarkdownHeavyFeatureKind
+  readonly gatewayVersion: string
+  readonly locale: string
+  readonly nodeId: string
+  readonly rendererVersion: string
+  readonly revision: number | string
+  readonly sourceIdentity: string
+  readonly theme: string
+}
+
+interface MarkdownHeavyFeatureLifecycle {
+  readonly activate: <T>(input: {
+    readonly commit: (
+      value: T,
+      signal: AbortSignal,
+    ) => HTMLElement | void | Promise<HTMLElement | void>
+    readonly element: HTMLElement
+    readonly estimateBytes: (value: T) => number
+    readonly identity: MarkdownHeavyFeatureIdentity
+    readonly render: (signal: AbortSignal) => Promise<T>
+    readonly resources?: Readonly<{
+      listeners?: number
+      observers?: number
+      runtimes?: number
+      tasks?: number
+    }>
+    readonly signal?: AbortSignal
+    readonly teardown?: () => void
+  }) => Promise<boolean>
+  mountStatic: (input: {
+    readonly element: HTMLElement
+    readonly identity: MarkdownHeavyFeatureIdentity
+  }) => boolean
+}
+
 export type MarkdownFeatureActivationTheme = 'dark' | 'light'
 
 export interface MarkdownFeatureThemeTokens {
@@ -637,6 +682,23 @@ export interface MarkdownFeatureActivationOptions {
   features?: MarkdownFeatureActivationFeatureOptions
   root: ParentNode
   signal?: AbortSignal
+}
+
+interface MarkdownHeavyFeatureActivationOptions extends MarkdownFeatureActivationOptions {
+  readonly heavyLifecycle?: MarkdownHeavyFeatureLifecycle
+  readonly isolatedRenderFactory?: MarkdownHeavyFeatureIsolatedRenderFactory
+  readonly resolveHeavyFeatureIdentity?: (input: {
+    readonly element: HTMLElement
+    readonly kind: MarkdownHeavyFeatureKind
+    readonly source: string
+    readonly theme: MarkdownFeatureActivationTheme
+    readonly tokens: Readonly<MarkdownFeatureThemeTokens>
+  }) => MarkdownHeavyFeatureIdentity | null
+  readonly scheduleHeavyFeatureCommit?: (input: {
+    readonly key: string
+    readonly run: () => HTMLElement | void
+    readonly signal: AbortSignal
+  }) => Promise<HTMLElement | void>
 }
 
 export type { FeatureRenderOutput }
@@ -1424,6 +1486,10 @@ interface MarkdownFeatureActivationContext extends Omit<
     element: HTMLElement,
   ) => Readonly<MarkdownFeatureThemeTokens>
   readonly root: ParentNode
+  readonly heavyLifecycle?: MarkdownHeavyFeatureLifecycle
+  readonly isolatedRenderFactory?: MarkdownHeavyFeatureIsolatedRenderFactory
+  readonly resolveHeavyFeatureIdentity?: MarkdownHeavyFeatureActivationOptions['resolveHeavyFeatureIdentity']
+  readonly scheduleHeavyFeatureCommit?: MarkdownHeavyFeatureActivationOptions['scheduleHeavyFeatureCommit']
 }
 
 const toFeatureRenderContext = (
@@ -1435,6 +1501,102 @@ const toFeatureRenderContext = (
     theme: context.theme,
     tokens: context.resolveTokens(element),
   })
+
+const estimateFeatureOutputBytes = (output: FeatureRenderOutput) =>
+  output.payload.length * 2 +
+  (output.kind === 'mermaid' ? output.rootId.length * 2 : 0)
+
+const activateHeavyFeature = async (input: {
+  readonly commit: (output: FeatureRenderOutput) => HTMLElement | void
+  readonly context: MarkdownFeatureActivationContext
+  readonly element: HTMLElement
+  readonly render: (
+    signal: AbortSignal | undefined,
+  ) => Promise<FeatureRenderOutput>
+  readonly isolatedRequest: MarkdownHeavyFeatureIsolatedRenderRequest
+  readonly source: string
+}) => {
+  const identity = input.context.resolveHeavyFeatureIdentity?.({
+    element: input.element,
+    kind: input.context.kind,
+    source: input.source,
+    theme: input.context.theme,
+    tokens: input.context.resolveTokens(input.element),
+  })
+  if (!input.context.heavyLifecycle) {
+    const output = await input.render(input.context.signal)
+    if (input.context.signal?.aborted) return false
+    input.commit(output)
+    return true
+  }
+  if (!identity) return false
+  const isolatedRequest = Object.freeze({
+    ...input.isolatedRequest,
+    lifecycleKey: [
+      identity.documentKey,
+      identity.documentEpoch,
+      identity.nodeId,
+      identity.featureKind,
+    ].join(':'),
+  })
+  const {
+    assertMarkdownHeavyFeatureAdapterResourceBridge,
+    createMarkdownHeavyFeatureAdapterResourceBridge,
+  } = await import('./markdown-heavy-feature-resource')
+  const resourceBridge = assertMarkdownHeavyFeatureAdapterResourceBridge(
+    createMarkdownHeavyFeatureAdapterResourceBridge(
+      input.context.isolatedRenderFactory,
+    ),
+  )
+  try {
+    return await input.context.heavyLifecycle.activate({
+      commit: (output, signal) =>
+        input.context.scheduleHeavyFeatureCommit
+          ? input.context.scheduleHeavyFeatureCommit({
+              key: [
+                'markdown-heavy-feature',
+                identity.documentKey,
+                identity.documentEpoch,
+                identity.revision,
+                identity.nodeId,
+                identity.featureKind,
+              ].join(':'),
+              run: () => input.commit(output),
+              signal,
+            })
+          : input.commit(output),
+      element: input.element,
+      estimateBytes: estimateFeatureOutputBytes,
+      identity,
+      render: (signal) =>
+        resourceBridge.run(
+          signal,
+          (adapterSignal) => input.render(adapterSignal),
+          isolatedRequest,
+        ),
+      resources: resourceBridge.resources,
+      signal: input.context.signal,
+      teardown: resourceBridge.teardown,
+    })
+  } finally {
+    resourceBridge.teardown()
+  }
+}
+
+const mountPreRenderedHeavyFeature = (
+  element: HTMLElement,
+  context: MarkdownFeatureActivationContext,
+) => {
+  const identity = context.resolveHeavyFeatureIdentity?.({
+    element,
+    kind: context.kind,
+    source: '',
+    theme: context.theme,
+    tokens: context.resolveTokens(element),
+  })
+  if (!context.heavyLifecycle || !identity) return false
+  return context.heavyLifecycle.mountStatic({ element, identity })
+}
 
 const activateBuiltInFeature = async (
   element: HTMLElement,
@@ -1448,6 +1610,7 @@ const activateBuiltInFeature = async (
       !element.querySelector('code')
     ) {
       applyNonceToFeatureStyles(element, context.cspNonce)
+      mountPreRenderedHeavyFeature(element, context)
       return false
     }
     const source = extractFeatureSource(element, [
@@ -1457,18 +1620,37 @@ const activateBuiltInFeature = async (
     ]).trim()
     if (!source) return false
     try {
-      const [output, gateway] = await Promise.all([
-        renderMermaidFeature(source, toFeatureRenderContext(context, element)),
-        loadMarkdownFeatureOutputGateway(),
-      ])
-      if (context.signal?.aborted) return false
-      gateway.commitMarkdownFeatureOutput(element, output, {
-        nonce: context.cspNonce,
+      const gateway = await loadMarkdownFeatureOutputGateway()
+      return await activateHeavyFeature({
+        context,
+        element,
+        source,
+        isolatedRequest: {
+          cspNonce: context.cspNonce,
+          kind: 'mermaid',
+          source,
+          theme: context.theme,
+          tokens: context.resolveTokens(element),
+        },
+        render: (signal) =>
+          renderMermaidFeature(source, {
+            ...toFeatureRenderContext(context, element),
+            signal,
+          }),
+        commit: (output) => {
+          const committed = gateway.commitMarkdownFeatureOutput(
+            element,
+            output,
+            {
+              nonce: context.cspNonce,
+            },
+          )
+          committed.dataset.mermaidRendered = 'true'
+          committed.dataset.markdownFeatureActivated = 'mermaid'
+          committed.removeAttribute('data-mermaid-placeholder')
+          return committed
+        },
       })
-      element.dataset.mermaidRendered = 'true'
-      element.dataset.markdownFeatureActivated = 'mermaid'
-      element.removeAttribute('data-mermaid-placeholder')
-      return true
     } catch (error) {
       renderFeatureError(element, 'mermaid', error, source)
       throw error
@@ -1478,6 +1660,7 @@ const activateBuiltInFeature = async (
   if (kind === 'latex') {
     if (element.dataset.latexRendered && !element.querySelector('code')) {
       applyNonceToFeatureStyles(element, context.cspNonce)
+      mountPreRenderedHeavyFeature(element, context)
       return false
     }
     const source = extractFeatureSource(element, [
@@ -1487,22 +1670,39 @@ const activateBuiltInFeature = async (
     ]).trim()
     if (!source) return false
     try {
-      const [output, gateway] = await Promise.all([
-        renderLatexFeature(
+      const gateway = await loadMarkdownFeatureOutputGateway()
+      return await activateHeavyFeature({
+        context,
+        element,
+        source,
+        isolatedRequest: {
+          cspNonce: context.cspNonce,
+          displayMode: isBlockLatexElement(element),
+          kind: 'latex',
           source,
-          toFeatureRenderContext(context, element),
-          isBlockLatexElement(element),
-        ),
-        loadMarkdownFeatureOutputGateway(),
-      ])
-      if (context.signal?.aborted) return false
-      gateway.commitMarkdownFeatureOutput(element, output, {
-        nonce: context.cspNonce,
+          theme: context.theme,
+          tokens: context.resolveTokens(element),
+        },
+        render: (signal) =>
+          renderLatexFeature(
+            source,
+            { ...toFeatureRenderContext(context, element), signal },
+            isBlockLatexElement(element),
+          ),
+        commit: (output) => {
+          const committed = gateway.commitMarkdownFeatureOutput(
+            element,
+            output,
+            {
+              nonce: context.cspNonce,
+            },
+          )
+          committed.dataset.latexRendered = 'katex'
+          committed.dataset.markdownFeatureActivated = 'latex'
+          committed.removeAttribute('data-latex-placeholder')
+          return committed
+        },
       })
-      element.dataset.latexRendered = 'katex'
-      element.dataset.markdownFeatureActivated = 'latex'
-      element.removeAttribute('data-latex-placeholder')
-      return true
     } catch (error) {
       renderFeatureError(element, 'latex', error, source)
       throw error
@@ -1513,29 +1713,52 @@ const activateBuiltInFeature = async (
     element.tagName === 'CODE' ? element : element.querySelector('code')
   if (!code) return false
   const pre = code.closest('pre') ?? code
-  if (pre instanceof HTMLElement && pre.dataset.codeHighlighted === 'shiki') {
+  if (
+    pre instanceof HTMLElement &&
+    pre.dataset.codeHighlighted === 'shiki' &&
+    pre.dataset.markdownFeatureTheme === context.theme
+  ) {
     applyNonceToFeatureStyles(pre, context.cspNonce)
+    mountPreRenderedHeavyFeature(pre, context)
     return false
   }
   const source = code.textContent ?? ''
   if (!source) return false
+  const language =
+    pre instanceof HTMLElement && pre.dataset.markdownFeatureLanguage
+      ? pre.dataset.markdownFeatureLanguage
+      : extractCodeLanguage(code)
   try {
-    const [output, gateway] = await Promise.all([
-      renderCodeHighlightFeature(
+    const gateway = await loadMarkdownFeatureOutputGateway()
+    return await activateHeavyFeature({
+      context,
+      element: pre,
+      source,
+      isolatedRequest: {
+        cspNonce: context.cspNonce,
+        kind: 'code-highlight',
+        language,
         source,
-        extractCodeLanguage(code),
-        toFeatureRenderContext(context, element),
-      ),
-      loadMarkdownFeatureOutputGateway(),
-    ])
-    if (context.signal?.aborted) return false
-    const committed = gateway.commitMarkdownFeatureOutput(pre, output, {
-      mode: 'replace-element',
-      nonce: context.cspNonce,
+        theme: context.theme,
+        tokens: context.resolveTokens(element),
+      },
+      render: (signal) =>
+        renderCodeHighlightFeature(source, language, {
+          ...toFeatureRenderContext(context, element),
+          signal,
+        }),
+      commit: (output) => {
+        const committed = gateway.commitMarkdownFeatureOutput(pre, output, {
+          mode: 'replace-element',
+          nonce: context.cspNonce,
+        })
+        committed.dataset.codeHighlighted = 'shiki'
+        committed.dataset.markdownFeatureActivated = 'code-highlight'
+        committed.dataset.markdownFeatureLanguage = language
+        committed.dataset.markdownFeatureTheme = context.theme
+        return committed
+      },
     })
-    committed.dataset.codeHighlighted = 'shiki'
-    committed.dataset.markdownFeatureActivated = 'code-highlight'
-    return true
   } catch (error) {
     replaceWithFeatureError(pre, 'code-highlight', error, source)
     throw error
@@ -1557,6 +1780,29 @@ interface MarkdownFeatureActivationBatch {
   readonly errors: MarkdownFeatureActivationError[]
   readonly work: MarkdownFeatureActivationWork[]
 }
+
+const markdownHeavyFeatureActivationRegistry = Object.freeze([
+  Object.freeze({
+    enabled: (features: Required<MarkdownFeatureActivationFeatureOptions>) =>
+      features.mermaid,
+    kind: 'mermaid' as const,
+    selector:
+      '.markdown-renderer__mermaid,[data-mermaid-placeholder],[data-mermaid-rendered]',
+  }),
+  Object.freeze({
+    enabled: (features: Required<MarkdownFeatureActivationFeatureOptions>) =>
+      features.latex,
+    kind: 'latex' as const,
+    selector:
+      '.markdown-renderer__latex,[data-latex-placeholder],[data-latex-rendered]',
+  }),
+  Object.freeze({
+    enabled: (features: Required<MarkdownFeatureActivationFeatureOptions>) =>
+      features.codeHighlight,
+    kind: 'code-highlight' as const,
+    selector: 'pre code[class*="language-"],[data-code-highlighted="shiki"]',
+  }),
+])
 
 const isElementInActivationRoot = (root: ParentNode, element: HTMLElement) => {
   const rootNode = root as Node
@@ -1630,6 +1876,7 @@ const activateMarkdownFeatureWork = async (
 export const activateMarkdownFeatures = async (
   options: MarkdownFeatureActivationOptions,
 ): Promise<MarkdownFeatureActivationResult> => {
+  const heavyOptions = options as MarkdownHeavyFeatureActivationOptions
   const features = toMarkdownFeatureOptions(options.features)
   const activated: MarkdownFeatureActivationItem[] = []
   const errors: MarkdownFeatureActivationError[] = []
@@ -1666,29 +1913,21 @@ export const activateMarkdownFeatures = async (
   const batches: MarkdownFeatureActivationBatch[] = []
   const priorWork: MarkdownFeatureActivationWork[] = []
 
-  for (const [kind, selector] of [
-    [
-      'mermaid',
-      '.markdown-renderer__mermaid,[data-mermaid-placeholder],[data-mermaid-rendered]',
-    ],
-    [
-      'latex',
-      '.markdown-renderer__latex,[data-latex-placeholder],[data-latex-rendered]',
-    ],
-    ['code-highlight', 'pre code[class*="language-"]'],
-  ] as const) {
+  for (const {
+    enabled,
+    kind,
+    selector,
+  } of markdownHeavyFeatureActivationRegistry) {
     if (options.signal?.aborted) break
-    if (
-      (kind === 'mermaid' && !features.mermaid) ||
-      (kind === 'latex' && !features.latex) ||
-      (kind === 'code-highlight' && !features.codeHighlight)
-    ) {
-      continue
-    }
+    if (!enabled(features)) continue
 
     const context: MarkdownFeatureActivationContext = {
       cspNonce: options.cspNonce,
+      heavyLifecycle: heavyOptions.heavyLifecycle,
+      isolatedRenderFactory: heavyOptions.isolatedRenderFactory,
       kind,
+      resolveHeavyFeatureIdentity: heavyOptions.resolveHeavyFeatureIdentity,
+      scheduleHeavyFeatureCommit: heavyOptions.scheduleHeavyFeatureCommit,
       resolveTokens,
       root: options.root,
       signal: options.signal,

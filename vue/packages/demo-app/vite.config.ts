@@ -118,4 +118,7 @@ export default defineConfig({
     port: 4173,
     strictPort: true,
   },
+  worker: {
+    format: 'es',
+  },
 })
