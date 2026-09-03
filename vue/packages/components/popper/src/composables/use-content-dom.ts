@@ -21,6 +21,10 @@ export const usePopperContentDOM = (
 
   const contentAttrs = computed(() => ({
     ...unref(attributes).popper,
+    // FsusBlog #771: this Vue hydration-mismatch suppression marker leaks
+    // into every consumer bundle and violates FsusBlog's public-bootstrap
+    // zero-residue gate; make it opt-in or drop it once popper SSR style
+    // mismatches are proven harmless.
     'data-allow-mismatch': 'style',
   }))
   const contentZIndex = ref<number>(
