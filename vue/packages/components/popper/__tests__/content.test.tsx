@@ -73,7 +73,7 @@ describe('<ElPopperContent />', () => {
       expect(wrapper.html()).toContain(AXIOM)
       expect(popperInjection.popperInstanceRef.value).toBeDefined()
       expect(wrapper.classes()).toEqual(['el-popper', 'is-dark'])
-      expect(wrapper.attributes('data-allow-mismatch')).toBe('style')
+      expect(wrapper.attributes('data-allow-mismatch')).toBeUndefined()
       expect(wrapper.vm.contentStyle).toHaveLength(3)
       expect(wrapper.vm.contentStyle[0]).toHaveProperty('zIndex')
       expect(wrapper.vm.contentStyle[1]).toEqual(
@@ -84,6 +84,15 @@ describe('<ElPopperContent />', () => {
         })
       )
       expect(wrapper.vm.contentStyle[2]).toEqual({})
+    })
+
+    it('emits data-allow-mismatch only when allowMismatch is opt-in', async () => {
+      wrapper = mountContent({
+        allowMismatch: true,
+      }) as unknown as VueWrapper<PopperContentInstance>
+      await nextTick()
+
+      expect(wrapper.attributes('data-allow-mismatch')).toBe('style')
     })
 
     it('should be able to be pure and themed', async () => {

@@ -19,14 +19,18 @@ export const usePopperContentDOM = (
   const { nextZIndex } = useZIndex()
   const ns = useNamespace('popper')
 
-  const contentAttrs = computed(() => ({
-    ...unref(attributes).popper,
-    // FsusBlog #771: this Vue hydration-mismatch suppression marker leaks
-    // into every consumer bundle and violates FsusBlog's public-bootstrap
-    // zero-residue gate; make it opt-in or drop it once popper SSR style
-    // mismatches are proven harmless.
-    'data-allow-mismatch': 'style',
-  }))
+  // FsusBlog #771: the Vue hydration-mismatch suppression marker leaks into
+  // every consumer bundle and violates zero-residue gates that treat it as a
+  // retired suppression token, so it is opt-in via `allowMismatch`.
+  const contentAttrs = computed(() => {
+    const attrs: Record<string, unknown> = {
+      ...unref(attributes).popper,
+    }
+    if (props.allowMismatch) {
+      attrs['data-allow-mismatch'] = 'style'
+    }
+    return attrs
+  })
   const contentZIndex = ref<number>(
     isNumber(props.zIndex) ? props.zIndex : nextZIndex()
   )

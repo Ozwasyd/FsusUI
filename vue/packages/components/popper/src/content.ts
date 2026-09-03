@@ -111,6 +111,7 @@ export const popperContentProps = buildProps({
   },
   virtualTriggering: Boolean,
   zIndex: Number,
+  allowMismatch: Boolean,
 } as const)
 export type PopperContentProps = ExtractPropTypes<typeof popperContentProps>
 
