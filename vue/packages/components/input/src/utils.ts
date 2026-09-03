@@ -28,6 +28,9 @@ const CONTEXT_STYLE = [
   'padding-right',
   'border-width',
   'box-sizing',
+  'word-break',
+  'overflow-wrap',
+  'white-space',
 ]
 
 type NodeStyle = {
