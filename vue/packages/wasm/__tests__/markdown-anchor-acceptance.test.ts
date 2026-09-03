@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import {
+  getMarkdownXssSourceAttackFragment,
+  getMarkdownXssSourceUrl,
+} from '../../../tests/support/markdown-xss-corpus'
+
+import {
   MARKDOWN_ANCHOR_DIAGNOSTIC_CODES,
   MARKDOWN_ANCHOR_ID,
   classifyMarkdownUrl,
@@ -407,10 +412,14 @@ describe('issue #448: anchor security corpus', () => {
       'text ^ab\u200bcd\n',
       'text ^ab\u202ecd\n',
       'text ^ab\u2028cd\n',
-      'text ^a"><img src=x onerror=alert(1)>\n',
-      'text ^<script>alert(1)</script>\n',
+      'text ^a">' +
+        getMarkdownXssSourceAttackFragment('mxss-raw-img-onerror') +
+        '\n',
+      'text ^' +
+        getMarkdownXssSourceAttackFragment('mxss-raw-script-basic') +
+        '\n',
       'text ^a#b?c=1&d=2\n',
-      'text ^javascript:alert(1)\n',
+      'text ^' + getMarkdownXssSourceUrl('mxss-url-javascript-link') + '\n',
       'text ^a%20b\n',
       'text ^../escape\n',
       'text ^a b\n',

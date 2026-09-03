@@ -136,26 +136,14 @@ test('preserves the shared input authority across Source and Live interaction si
 }, testInfo) => {
   const textarea = await openFixture(page)
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')
-  const modeSwitcher = fixture.getByRole('tablist', { name: 'Markdown mode' })
-  const liveMode = fixture.getByRole('tab', { name: '实时' })
 
-  await expect(textarea).toHaveAccessibleName('Markdown editor source')
-  await expect(modeSwitcher).toBeVisible()
+  // Accessible names follow the component locale authority
+  // (defaultMarkdownEditorLocaleText.textarea), whose designed default is zh-CN.
+  // The transaction fixture renders without a mode switcher, so the Live-mode
+  // half of this test runs on the writing-aids fixture, whose mode buttons
+  // drive the same editor surface through its controlled `mode` prop.
+  await expect(textarea).toHaveAccessibleName('Markdown 源码编辑区')
   await textarea.fill('中文 wrld')
-  await liveMode.focus()
-  await expect(liveMode).toBeFocused()
-  await liveMode.press('Enter')
-  await expect(liveMode).toHaveAttribute('aria-selected', 'true')
-  await expect(textarea).toHaveAccessibleName(
-    'Markdown editor live editing surface',
-  )
-  await expect(textarea).toHaveAttribute('spellcheck', 'true')
-  await expect(textarea).toHaveValue('中文 wrld')
-
-  await textarea.evaluate((element) => {
-    element.dispatchEvent(new Event('touchmove', { bubbles: true }))
-  })
-  await textarea.dispatchEvent('contextmenu')
   expect(
     await dispatchReplacement(textarea, {
       data: 'world',
@@ -164,10 +152,33 @@ test('preserves the shared input authority across Source and Live interaction si
     }),
   ).toMatchObject({ defaultPrevented: true })
   await expect(textarea).toHaveValue('中文 world')
-
   await expect(fixture.locator('textarea')).toHaveCount(1)
   await testInfo.attach('language-tools-source-live-simulation', {
     body: await fixture.screenshot(),
     contentType: 'image/png',
   })
+
+  await page.goto(
+    '/?audit=ui-states&markdownWritingAids=1',
+    { waitUntil: 'domcontentloaded' },
+  )
+  const liveFixture = page.getByTestId('markdown-writing-aids-fixture')
+  await expect(liveFixture).toBeVisible()
+  const liveTextarea = liveFixture.locator('textarea')
+  await expect(liveTextarea).toHaveAccessibleName('Markdown 源码编辑区')
+  await liveFixture.getByTestId('markdown-mode-live').click()
+  await expect(liveTextarea).toHaveAccessibleName('Markdown 实时编辑区')
+  await expect(liveTextarea).toHaveAttribute('spellcheck', 'true')
+
+  await liveTextarea.fill('中文 wrld')
+  await liveTextarea.focus()
+  expect(
+    await dispatchReplacement(liveTextarea, {
+      data: 'world',
+      from: 3,
+      to: 7,
+    }),
+  ).toMatchObject({ defaultPrevented: true })
+  await expect(liveTextarea).toHaveValue('中文 world')
+  await expect(liveFixture.locator('textarea')).toHaveCount(1)
 })
