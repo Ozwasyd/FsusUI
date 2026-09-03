@@ -4,7 +4,8 @@ import { dest, parallel, series, src } from 'gulp'
 import gulpSass from 'gulp-sass'
 import dartSass from 'sass'
 import autoprefixer from 'gulp-autoprefixer'
-import cleanCSS from 'gulp-clean-css'
+import { Transform } from 'stream'
+import esbuild from 'esbuild'
 import rename from 'gulp-rename'
 import consola from 'consola'
 import { epOutput } from '@element-plus/build-utils'
@@ -12,6 +13,38 @@ import type { TaskFunction } from 'gulp'
 
 const distFolder = path.resolve(__dirname, 'dist')
 const distBundle = path.resolve(epOutput, 'theme-chalk')
+
+const minifyCSS = (): Transform =>
+  new Transform({
+    objectMode: true,
+    transform(file, _encoding, callback) {
+      if (file.isNull()) {
+        callback(null, file)
+        return
+      }
+      if (file.isBuffer()) {
+        try {
+          const originalSize = file.contents.length
+          const result = esbuild.transformSync(file.contents.toString(), {
+            loader: 'css',
+            minify: true,
+            legalComments: 'none',
+          })
+          file.contents = Buffer.from(result.code)
+          consola.success(
+            `${chalk.cyan(file.relative || file.basename)}: ${chalk.yellow(
+              (originalSize / 1000).toFixed(2),
+            )} KB -> ${chalk.green((file.contents.length / 1000).toFixed(2))} KB`,
+          )
+          callback(null, file)
+        } catch (err) {
+          callback(err instanceof Error ? err : new Error(String(err)))
+        }
+      } else {
+        callback(null, file)
+      }
+    },
+  })
 /* fsus.scss is the complete product entry. fsus-theme.scss remains available
    as a lower-level override bundle, while index.scss remains the Element Plus
    compatibility layer. Keeping all three artifacts makes migration explicit
@@ -47,15 +80,7 @@ const buildThemeChalk: TaskFunction = () => {
       }),
     )
     .pipe(autoprefixer({ cascade: false }))
-    .pipe(
-      cleanCSS({}, (details) => {
-        consola.success(
-          `${chalk.cyan(details.name)}: ${chalk.yellow(
-            details.stats.originalSize / 1000,
-          )} KB -> ${chalk.green(details.stats.minifiedSize / 1000)} KB`,
-        )
-      }),
-    )
+    .pipe(minifyCSS())
     .pipe(
       rename((path) => {
         if (!noElPrefixFile.test(path.basename)) {
