@@ -19,6 +19,7 @@ import {
 } from '../scripts/contract-v2.mjs'
 import { validateVuePublicCoverage } from '../scripts/conformance-v2-vue-public-gate.mjs'
 import { extractStructuredEmitPayloads } from '../scripts/vue-structured-emit-payload.mjs'
+import { extractStructuredExposedSignatures } from '../scripts/vue-structured-exposed-signature.mjs'
 import {
   deprecatedMetadataForNode,
   extractDeprecatedDeclarations,
@@ -728,6 +729,112 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
   assert.match(errors, /duplicates semantic id document/)
 })
 
+test('explicit member dispositions register only exact reviewed Web surfaces', () => {
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+  const markdownEditor = registry.contracts.find(
+    (contract) => contract.component.name === 'ElMarkdownEditor',
+  )
+  const textareaId = markdownEditor.inputs.find(
+    (input) => input.name === 'textareaId',
+  )
+  assert.equal(textareaId.status, 'web-only')
+  assert.equal(textareaId.avalonia, null)
+  assert.equal(textareaId.dispositionBasis, 'explicit-member-disposition')
+  assert.match(textareaId.platformAlternative, /AutomationId/u)
+  assert.ok(
+    markdownEditor.platformDifferences.some(
+      (difference) =>
+        difference.kind === 'input' &&
+        difference.member === 'textareaId' &&
+        difference.status === 'web-only',
+    ),
+  )
+
+  const removed = clone(semanticMemberBindings)
+  removed.dispositions = removed.dispositions.filter(
+    (entry) =>
+      !(
+        entry.component === 'ElMarkdownEditor' &&
+        entry.kind === 'input' &&
+        entry.web === 'textareaId'
+      ),
+  )
+  const regressed = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings: removed,
+    gate,
+  })
+    .contracts.find(
+      (contract) => contract.component.name === 'ElMarkdownEditor',
+    )
+    .inputs.find((input) => input.name === 'textareaId')
+  assert.equal(regressed.status, 'missing')
+})
+
+test('member disposition mutations fail closed', () => {
+  const mutations = [
+    [
+      'unknown member',
+      (registry) => {
+        registry.dispositions[0].web = 'missingWebMember'
+      },
+      /references a missing real Vue member/u,
+    ],
+    [
+      'mapping conflict',
+      (registry) => {
+        registry.dispositions[0] = {
+          ...registry.dispositions[0],
+          kind: registry.mappings[0].kind,
+          web: registry.mappings[0].web,
+        }
+      },
+      /conflicts with an explicit semantic mapping/u,
+    ],
+    [
+      'broad wildcard',
+      (registry) => {
+        registry.dispositions[0].web = '*'
+      },
+      /uses a broad member disposition/u,
+    ],
+    [
+      'missing alternative',
+      (registry) => {
+        registry.dispositions[0].alternative = ''
+      },
+      /missing alternative/u,
+    ],
+    [
+      'invalid status',
+      (registry) => {
+        registry.dispositions[0].status = 'aligned-candidate'
+      },
+      /has invalid status aligned-candidate/u,
+    ],
+  ]
+  for (const [name, mutate, expected] of mutations) {
+    const registry = clone(semanticMemberBindings)
+    mutate(registry)
+    const errors = validateSemanticMemberBindings({
+      registry,
+      vueBaseline,
+      avaloniaBaselines,
+    }).join('\n')
+    assert.match(errors, expected, name)
+  }
+})
+
 test('real mapped inputs use compiler-known metadata and keep unknown values partial', () => {
   const registry = buildRegistry({
     vueBaseline,
@@ -969,20 +1076,90 @@ test('real operation signatures are retained and fail closed when not comparable
     (operation) => operation.semantic === 'search-navigate',
   )
 
+  assert.equal(navigate.web.signature.status, 'callable')
   assert.deepEqual(navigate.web.signature.parameters, [
     {
       name: 'direction',
-      type: "'next' | 'previous'",
+      type: '"next" | "previous"',
       optional: false,
       rest: false,
     },
   ])
+  assert.equal(
+    navigate.web.signature.returnType,
+    '"success" | "deleted" | "stale" | "not-found" | "unsupported"',
+  )
   assert.equal(navigate.avalonia.signature.parameters.length, 1)
   assert.equal(navigate.status, 'partial')
-  assert.match(navigate.drift.operationSignature, /web return type unavailable/)
+  assert.match(navigate.drift.operationSignature, /return type not comparable/)
   assert.match(
     navigate.drift.operationSignature,
     /parameter 1 type not comparable/,
+  )
+})
+
+test('TypeScript checker extracts mapped exposed signatures and source mutations change the contract', () => {
+  const sourceRelativePath =
+    'vue/packages/components/markdown-editor/src/markdown-editor.vue'
+  const source = fs.readFileSync(path.join(root, sourceRelativePath), 'utf8')
+  const { descriptor } = parseSfc(source, { filename: sourceRelativePath })
+  const scriptContent = descriptor.scriptSetup?.content
+  assert.ok(scriptContent)
+
+  const current = extractStructuredExposedSignatures({
+    root,
+    sourceRelativePath,
+    scriptContent,
+    memberNames: ['dispatchTransaction', 'searchNavigate', 'searchUi'],
+  })
+  assert.equal(
+    current.get('dispatchTransaction').returnType,
+    'MarkdownEditorDispatchResult',
+  )
+  assert.equal(
+    current.get('searchNavigate').returnType,
+    '"success" | "deleted" | "stale" | "not-found" | "unsupported"',
+  )
+  assert.deepEqual(current.get('searchUi'), {
+    kind: 'unknown',
+    reason: 'exposed member must have exactly one callable signature',
+    parameters: [],
+    returnType: null,
+  })
+
+  const mutatedScript = scriptContent.replace(
+    "return 'not-found' as const",
+    'return false',
+  )
+  assert.notEqual(mutatedScript, scriptContent)
+  const mutated = extractStructuredExposedSignatures({
+    root,
+    sourceRelativePath,
+    scriptContent: mutatedScript,
+    memberNames: ['searchNavigate'],
+  }).get('searchNavigate')
+  assert.match(mutated.returnType, /false/u)
+
+  const mutatedBaseline = clone(vueBaseline)
+  const exposed = mutatedBaseline.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.exposed.find((member) => member.name === 'searchNavigate')
+  Object.assign(exposed, mutated)
+  const navigate = buildRegistry({
+    vueBaseline: mutatedBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+    .contracts.find(
+      (contract) => contract.component.name === 'ElMarkdownEditor',
+    )
+    .operations.find((operation) => operation.semantic === 'search-navigate')
+  assert.match(
+    navigate.drift.operationSignature,
+    /return type mismatch: web boolean.* vs avalonia FsusMarkdownSearchNavigationResult/u,
   )
 })
 

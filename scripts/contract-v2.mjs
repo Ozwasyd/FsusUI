@@ -785,6 +785,8 @@ const webMethodRef = (member, semantic) => ({
   baseline: VUE_BASELINE_PATH,
   signature: semantic
     ? {
+        status: semantic.signatureStatus ?? 'syntax-only',
+        reason: semantic.signatureReason ?? null,
         returnType: semantic.returnType ?? null,
         parameters: (semantic.parameters ?? []).map((parameter) => ({
           name: parameter.name,
@@ -1110,6 +1112,21 @@ const bindingMetadata = (binding) =>
       }
     : {}
 
+const dispositionMetadata = (disposition) =>
+  disposition
+    ? {
+        dispositionBasis: 'explicit-member-disposition',
+        platformAlternative: disposition.alternative,
+      }
+    : {}
+
+const dispositionGovernance = (disposition) => ({
+  reason: disposition.reason,
+  owner: disposition.owner,
+  testPolicy: disposition.testPolicy,
+  reviewPolicy: disposition.reviewPolicy,
+})
+
 const inputMember = ({
   contractKebab,
   prop,
@@ -1117,7 +1134,21 @@ const inputMember = ({
   typeIndex,
   classification,
   binding,
+  disposition,
 }) => {
+  if (disposition) {
+    return {
+      name: prop.name,
+      kind: 'input',
+      web: webPropRef(prop),
+      avalonia: null,
+      status: 'web-only',
+      drift: emptyDrift(),
+      scenarioIds: [scenarioId(contractKebab, 'input', prop.name)],
+      ...dispositionMetadata(disposition),
+      governance: dispositionGovernance(disposition),
+    }
+  }
   if (!avaloniaType) {
     return {
       name: prop.name,
@@ -1192,8 +1223,22 @@ const outputMember = ({
   typeIndex,
   classification,
   binding,
+  disposition,
 }) => {
   const web = webEventRef(emit, binding ? semantic : null)
+  if (disposition) {
+    return {
+      name: emit,
+      kind: 'output',
+      web,
+      avalonia: null,
+      status: 'web-only',
+      drift: emptyDrift(),
+      scenarioIds: [scenarioId(contractKebab, 'output', emit)],
+      ...dispositionMetadata(disposition),
+      governance: dispositionGovernance(disposition),
+    }
+  }
   if (!avaloniaType) {
     return {
       name: emit,
@@ -1262,7 +1307,21 @@ const operationMember = ({
   avaloniaType,
   classification,
   binding,
+  disposition,
 }) => {
+  if (disposition) {
+    return {
+      name: exposed,
+      kind: 'operation',
+      web: webMethodRef(exposed, semantic),
+      avalonia: null,
+      status: 'web-only',
+      drift: emptyDrift(),
+      scenarioIds: [scenarioId(contractKebab, 'operation', exposed)],
+      ...dispositionMetadata(disposition),
+      governance: dispositionGovernance(disposition),
+    }
+  }
   if (!avaloniaType) {
     return {
       name: exposed,
@@ -1330,8 +1389,23 @@ const contentRegionMember = ({
   avaloniaType,
   classification,
   binding,
+  disposition,
 }) => {
   const web = webContentRegionRef(slot)
+  if (disposition) {
+    return {
+      name: slot.name,
+      kind: 'contentRegion',
+      scoped: Boolean(slot.scoped),
+      web,
+      avalonia: null,
+      status: 'web-only',
+      drift: emptyDrift(),
+      scenarioIds: [scenarioId(contractKebab, 'content-region', slot.name)],
+      ...dispositionMetadata(disposition),
+      governance: dispositionGovernance(disposition),
+    }
+  }
   if (!avaloniaType) {
     return {
       name: slot.name,
@@ -1535,12 +1609,25 @@ const semanticBindingIndex = (registry) =>
     ]),
   )
 
+const semanticDispositionIndex = (registry) =>
+  new Map(
+    (registry?.dispositions ?? []).map((disposition) => [
+      semanticBindingKey(
+        disposition.component,
+        disposition.kind,
+        disposition.web,
+      ),
+      disposition,
+    ]),
+  )
+
 const contractForComponent = ({
   component,
   avaloniaType,
   typeIndex,
   gate,
   semanticBindings,
+  semanticDispositions,
 }) => {
   // Keep the full export name in the stable id so distinct public exports such
   // as ElCollectionSummary and FsusCollectionSummary never collide.
@@ -1548,6 +1635,8 @@ const contractForComponent = ({
   const classification = component.classification ?? 'portable'
   const bindingFor = (kind, web) =>
     semanticBindings.get(semanticBindingKey(component.name, kind, web))
+  const dispositionFor = (kind, web) =>
+    semanticDispositions.get(semanticBindingKey(component.name, kind, web))
   const inputs = (component.semantic?.props ?? []).map((prop) =>
     inputMember({
       contractKebab,
@@ -1556,31 +1645,40 @@ const contractForComponent = ({
       typeIndex,
       classification,
       binding: bindingFor('input', prop.name),
+      disposition: dispositionFor('input', prop.name),
     }),
   )
-  const outputs = (component.emits ?? []).map((emit) =>
+  const semanticEmits = component.semantic?.emits ?? []
+  const outputNames =
+    semanticEmits.length > 0
+      ? semanticEmits.map((emit) => emit.name)
+      : (component.emits ?? [])
+  const outputs = outputNames.map((emit) =>
     outputMember({
       contractKebab,
       emit,
-      semantic: (component.semantic?.emits ?? []).find(
-        (member) => member.name === emit,
-      ),
+      semantic: semanticEmits.find((member) => member.name === emit),
       avaloniaType,
       typeIndex,
       classification,
       binding: bindingFor('output', emit),
+      disposition: dispositionFor('output', emit),
     }),
   )
-  const operations = (component.exposed ?? []).map((exposed) =>
+  const semanticExposed = component.semantic?.exposed ?? []
+  const operationNames =
+    semanticExposed.length > 0
+      ? semanticExposed.map((exposed) => exposed.name)
+      : (component.exposed ?? [])
+  const operations = operationNames.map((exposed) =>
     operationMember({
       contractKebab,
       exposed,
-      semantic: (component.semantic?.exposed ?? []).find(
-        (member) => member.name === exposed,
-      ),
+      semantic: semanticExposed.find((member) => member.name === exposed),
       avaloniaType,
       classification,
       binding: bindingFor('operation', exposed),
+      disposition: dispositionFor('operation', exposed),
     }),
   )
   const contentRegions = (component.slots ?? []).map((slot) =>
@@ -1590,6 +1688,7 @@ const contractForComponent = ({
       avaloniaType,
       classification,
       binding: bindingFor('contentRegion', slot.name),
+      disposition: dispositionFor('contentRegion', slot.name),
     }),
   )
 
@@ -1673,7 +1772,9 @@ const contractForComponent = ({
     platformDifferences: members
       .filter(
         (member) =>
-          member.status !== 'aligned-candidate' && member.status !== 'web-only',
+          member.status !== 'aligned-candidate' &&
+          (member.status !== 'web-only' ||
+            member.dispositionBasis === 'explicit-member-disposition'),
       )
       .map((member) => ({
         member: member.name,
@@ -1874,6 +1975,7 @@ export const buildRegistry = ({
   }
   const typeIndex = avaloniaSemanticIndex(baselines)
   const semanticBindings = semanticBindingIndex(semanticMemberBindings)
+  const semanticDispositions = semanticDispositionIndex(semanticMemberBindings)
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
   const contracts = []
@@ -1886,6 +1988,7 @@ export const buildRegistry = ({
         typeIndex,
         gate,
         semanticBindings,
+        semanticDispositions,
       }),
     )
   }
@@ -1929,7 +2032,7 @@ export const buildRegistry = ({
     owner: CONTRACT_V2_OWNER,
     generatedBy: {
       tool: 'scripts/contract-v2.mjs',
-      toolVersion: '1.2.0',
+      toolVersion: '1.3.0',
     },
     baselines: {
       web: {
@@ -1978,6 +2081,8 @@ export const buildRegistry = ({
       ],
       semanticMemberBindings:
         'explicit platform-neutral semantic ids bind non-equivalent framework member names before normalized candidate matching',
+      semanticMemberDispositions:
+        'exact reviewed Vue members may be registered as web-only with owner, test, review, reason, and native alternative; wildcards and mapping collisions fail validation',
       statusDerivation: {
         alignedCandidate:
           'real member matched with no type/default/required/read-write/nullability/enum/payload drift',
@@ -2015,8 +2120,14 @@ const vueMembersForKind = (component, kind) => {
   if (kind === 'input') {
     return (component.semantic?.props ?? []).map((item) => item.name)
   }
-  if (kind === 'output') return component.emits ?? []
-  if (kind === 'operation') return component.exposed ?? []
+  if (kind === 'output')
+    return (component.semantic?.emits ?? []).length > 0
+      ? component.semantic.emits.map((member) => member.name)
+      : (component.emits ?? [])
+  if (kind === 'operation')
+    return (component.semantic?.exposed ?? []).length > 0
+      ? component.semantic.exposed.map((member) => member.name)
+      : (component.exposed ?? [])
   if (kind === 'contentRegion') {
     return (component.slots ?? []).map((item) => item.name)
   }
@@ -2043,11 +2154,14 @@ export const validateSemanticMemberBindings = ({
   avaloniaBaselines,
 }) => {
   const errors = []
-  if (registry?.schemaVersion !== 1) {
-    errors.push('semantic member bindings schemaVersion must be 1')
+  if (registry?.schemaVersion !== 2) {
+    errors.push('semantic member bindings schemaVersion must be 2')
   }
   if (!Array.isArray(registry?.mappings)) {
     return [...errors, 'semantic member bindings mappings must be an array']
+  }
+  if (!Array.isArray(registry?.dispositions)) {
+    errors.push('semantic member bindings dispositions must be an array')
   }
   const typeIndex = avaloniaSemanticIndex(avaloniaBaselines)
   const components = new Map(
@@ -2107,10 +2221,76 @@ export const validateSemanticMemberBindings = ({
       )
     }
   }
+  const seenDispositions = new Set()
+  for (const disposition of registry.dispositions ?? []) {
+    const context =
+      `member disposition ${disposition?.component ?? '<unknown>'}/` +
+      `${disposition?.kind ?? '<unknown>'}/${disposition?.web ?? '<unknown>'}`
+    for (const field of [
+      'component',
+      'kind',
+      'web',
+      'status',
+      'reason',
+      'owner',
+      'testPolicy',
+      'reviewPolicy',
+      'alternative',
+    ]) {
+      if (
+        typeof disposition?.[field] !== 'string' ||
+        disposition[field].trim() === ''
+      ) {
+        errors.push(`${context} missing ${field}`)
+      }
+    }
+    if (
+      !['input', 'output', 'operation', 'contentRegion'].includes(
+        disposition?.kind,
+      )
+    ) {
+      errors.push(`${context} has invalid kind ${disposition?.kind}`)
+      continue
+    }
+    if (disposition?.status !== 'web-only') {
+      errors.push(`${context} has invalid status ${disposition?.status}`)
+    }
+    if (
+      disposition?.component?.includes('*') ||
+      disposition?.web?.includes('*')
+    ) {
+      errors.push(`${context} uses a broad member disposition`)
+    }
+    const key = semanticBindingKey(
+      disposition.component,
+      disposition.kind,
+      disposition.web,
+    )
+    if (seenDispositions.has(key)) errors.push(`${context} is duplicated`)
+    seenDispositions.add(key)
+    if (seenBindings.has(key)) {
+      errors.push(`${context} conflicts with an explicit semantic mapping`)
+    }
+    const component = components.get(disposition.component)
+    if (!component) {
+      errors.push(`${context} references an unknown Vue component`)
+      continue
+    }
+    if (component.classification === 'web-only') {
+      errors.push(
+        `${context} redundantly classifies a component-level web-only export`,
+      )
+    }
+    if (
+      !vueMembersForKind(component, disposition.kind).includes(disposition.web)
+    ) {
+      errors.push(`${context} references a missing real Vue member`)
+    }
+  }
   return errors
 }
 
-const validateMember = (member, contractId, errors) => {
+const validateMember = (member, contractId, classification, errors) => {
   const context = `${contractId} ${member.kind ?? 'member'} ${member.name ?? '<unknown>'}`
   if (!MEMBER_STATUSES.includes(member.status)) {
     errors.push(`${context} has invalid status ${member.status}`)
@@ -2147,6 +2327,33 @@ const validateMember = (member, contractId, errors) => {
     if (member.avalonia == null) {
       errors.push(
         `${context} explicit semantic binding is missing its Avalonia member`,
+      )
+    }
+  }
+  if (
+    member.status === 'web-only' &&
+    classification !== 'web-only' &&
+    member.dispositionBasis !== 'explicit-member-disposition'
+  ) {
+    errors.push(
+      `${context} web-only status lacks an explicit member disposition`,
+    )
+  }
+  if (member.dispositionBasis === 'explicit-member-disposition') {
+    if (member.status !== 'web-only') {
+      errors.push(`${context} explicit member disposition must be web-only`)
+    }
+    if (member.avalonia != null) {
+      errors.push(
+        `${context} explicit member disposition must not claim an Avalonia member`,
+      )
+    }
+    if (
+      typeof member.platformAlternative !== 'string' ||
+      member.platformAlternative.trim() === ''
+    ) {
+      errors.push(
+        `${context} explicit member disposition missing platform alternative`,
       )
     }
   }
@@ -2229,7 +2436,12 @@ export const validateContract = (contract, gate, errors) => {
     ...(contract.contentRegions ?? []),
   ]
   for (const member of members) {
-    validateMember(member, contract.id, contractErrors)
+    validateMember(
+      member,
+      contract.id,
+      contract.component?.classification,
+      contractErrors,
+    )
   }
   for (const difference of contract.platformDifferences ?? []) {
     validateGovernance(

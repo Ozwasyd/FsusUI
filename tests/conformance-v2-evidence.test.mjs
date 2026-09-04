@@ -75,6 +75,64 @@ test('alignment is derived and readiness excludes partial contracts', () => {
   )
 })
 
+test('alignment preserves unbound web-only exports without creating gaps', () => {
+  const alignment = deriveAlignment({
+    contracts: [
+      {
+        id: 'component-v2.web-only',
+        component: { exportStatus: 'web-only' },
+        bindings: { avalonia: { status: 'unbound' } },
+        coverage: { missing: 0, partial: 0 },
+      },
+    ],
+  })
+  assert.deepEqual(alignment.statuses, [
+    {
+      id: 'component-v2.web-only',
+      status: 'web-only',
+      source: 'derived',
+    },
+  ])
+  assert.deepEqual(alignment.gaps, [])
+  assert.deepEqual(alignment.stable, [])
+})
+
+test('comparison sets align only exact statically complete contracts', () => {
+  const contracts = ['first', 'second', 'no-evidence'].map((name) => ({
+    id: `component-v2.${name}`,
+    component: { exportStatus: 'aligned-candidate' },
+    bindings: { avalonia: { status: 'bound' } },
+    coverage: { missing: 0, partial: 0 },
+  }))
+  const comparison = {
+    schema: 'fsusui.conformance-comparison-set.v2',
+    comparisons: ['first', 'second'].map((name) => ({
+      verdict: 'pass',
+      identity: { contract: `component-v2.${name}` },
+    })),
+  }
+  const alignment = deriveAlignment({ contracts }, comparison)
+  assert.deepEqual(alignment.stable, [
+    'component-v2.first',
+    'component-v2.second',
+  ])
+  assert.equal(
+    alignment.statuses.find((entry) => entry.id === 'component-v2.no-evidence')
+      .status,
+    'blocked',
+  )
+  assert.throws(
+    () =>
+      deriveAlignment(
+        { contracts },
+        {
+          comparisons: [comparison.comparisons[0], comparison.comparisons[0]],
+        },
+      ),
+    /duplicated in comparison set/u,
+  )
+})
+
 test('T762-01 stable readiness rejects missing, stale, and tampered alignment', () => {
   const expected = stableReadinessCurrentIdentity()
   const valid = JSON.parse(

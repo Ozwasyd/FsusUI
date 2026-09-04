@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "ba866da9a56e1a147d06c51076f7e77485c70ab4",
+    "commitSha": "2f7e81ad7605c060d3b7c980478596933b313d1e",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
-    "toolVersion": "avalonia-vue-public-api-baseline@1.3.0+vue-semantic-baseline@1.3.0",
+    "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
     "inputTreeHash": "5b2e329102953647d0703c7c815093f6dcf2dc67bfc7546a0ae529afcebe5199",
-    "compilerOptionsHash": "df8ab8fc92c4ac95499d96bf7c98a51113b92d232707866dd35e1c588d75bb7c",
+    "compilerOptionsHash": "919b1f4f85e411ccb762efdc5a2d646f412fd73928c05ad302bbfdda0ab731e4",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
-    "structuredOutputSelectionHash": "dcb0a0555b218071cd84b8376257f189c11cf19265b3f40e974fa4f36cd99faf",
+    "structuredOutputSelectionHash": "7766081d12b6608e10d05140d5842841ad32fc86691fec8728a43eb16a363e86",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "ef72dc5dd7d2378c7e1f6c5097e7ceaeb1316574c1afef40b419b2f9a38d7d25"
+    "outputHash": "c4ac85d2edc1ea9d45824ab717aa15d9dd52e3dc069be002972b999e1763ac14"
   },
   "summary": {
     "componentModules": 93,
@@ -14590,7 +14590,9 @@
                 "rest": false
               }
             ],
-            "returnType": null
+            "returnType": "MarkdownEditorDispatchResult",
+            "signatureStatus": "callable",
+            "signatureReason": null
           },
           {
             "name": "insertMarkdownAtCursor",
@@ -14630,7 +14632,9 @@
           {
             "name": "redo",
             "parameters": [],
-            "returnType": null
+            "returnType": "MarkdownEditorDispatchResult",
+            "signatureStatus": "callable",
+            "signatureReason": null
           },
           {
             "name": "revealHeading",
@@ -14643,42 +14647,48 @@
               },
               {
                 "name": "options",
-                "type": "Parameters<typeof revealHeadingOutline>[4]",
+                "type": "import(\"./markdown-editor-outline\").MarkdownEditorRevealOptions | undefined",
                 "optional": true,
                 "rest": false
               }
             ],
-            "returnType": null
+            "returnType": "\"success\" | \"deleted\" | \"stale\" | \"not-found\" | \"unsupported\"",
+            "signatureStatus": "callable",
+            "signatureReason": null
           },
           {
             "name": "revealSourceRange",
             "parameters": [
               {
                 "name": "range",
-                "type": "{ start: number; end: number }",
+                "type": "{ start: number; end: number; }",
                 "optional": false,
                 "rest": false
               },
               {
                 "name": "options",
-                "type": "Parameters<typeof revealSourceRangeOutline>[2]",
+                "type": "{ readonly expected?: { readonly documentIdentity: import(\"@element-plus/wasm\").MarkdownDocumentIdentity; readonly revision: number; }; readonly actual?: { readonly documentIdentity: import(\"@element-plus/wasm\").MarkdownDocumentIdentity; readonly revision: number; }; readonly mode?: string; readonly reducedMotion?: boolean; readonly sourceLength?: number; readonly anchorMap?: import(\"@element-plus/wasm\").MarkdownAnchorMap; readonly projection?: MarkdownStableProjection; } | undefined",
                 "optional": true,
                 "rest": false
               }
             ],
-            "returnType": null
+            "returnType": "\"success\" | \"deleted\" | \"stale\" | \"not-found\" | \"unsupported\"",
+            "signatureStatus": "callable",
+            "signatureReason": null
           },
           {
             "name": "searchNavigate",
             "parameters": [
               {
                 "name": "direction",
-                "type": "'next' | 'previous'",
+                "type": "\"next\" | \"previous\"",
                 "optional": false,
                 "rest": false
               }
             ],
-            "returnType": null
+            "returnType": "\"success\" | \"deleted\" | \"stale\" | \"not-found\" | \"unsupported\"",
+            "signatureStatus": "callable",
+            "signatureReason": null
           },
           {
             "name": "searchReplaceAll",
@@ -14698,7 +14708,9 @@
           {
             "name": "undo",
             "parameters": [],
-            "returnType": null
+            "returnType": "MarkdownEditorDispatchResult",
+            "signatureStatus": "callable",
+            "signatureReason": null
           },
           {
             "name": "writingAidsController",
