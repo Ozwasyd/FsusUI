@@ -244,6 +244,9 @@ describe('markdown heavy feature isolated client', () => {
     expect(frame.dataset.fsusMarkdownHeavyPending).toBe('code-highlight')
     expect(frame.dataset.fsusMarkdownHeavyNode).toBe(validRequest.lifecycleKey)
     expect(frame.dataset.fsusMarkdownHeavyWork).toBeUndefined()
+    expect(frame.contentDocument?.doctype?.name).toBe('html')
+    expect(frame.style.display).not.toBe('none')
+    expect(frame.style.pointerEvents).toBe('none')
     const capability =
       frame.contentDocument!.documentElement.dataset
         .fsusMarkdownFrameCapability!

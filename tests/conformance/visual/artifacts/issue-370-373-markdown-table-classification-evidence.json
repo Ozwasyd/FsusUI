@@ -1,0 +1,26 @@
+{
+  "schema": "fsusui-design-conformance.classification-evidence.v1",
+  "issues": [370, 371, 372, 373],
+  "candidateSha": "8e3e392cfd4efeb042071d0eecbe6f2fbff40e6f",
+  "decision": {
+    "uiDecisionClass": "interaction-judgment",
+    "verificationClass": "ux-path",
+    "basis": [
+      "The change extends an existing MarkdownEditor-owned compact table menu and keyboard path without adding a new surface or token.",
+      "Acceptance depends on the complete source-editing interaction path, including focus restoration, IME, undo, wide tables, RTL, zoom, and simulated touch input.",
+      "The production audit fixture exercises the same ElMarkdownEditor implementation shipped by the package."
+    ]
+  },
+  "scope": {
+    "in": [
+      "parser-owned table cell identity and source ranges",
+      "row and column insert, delete, move, alignment, paste, format, navigation, and undo",
+      "compact light, dark, mobile, RTL, zoom, and wide-table presentation"
+    ],
+    "out": [
+      "spreadsheet formulas, merged cells, or a second table model",
+      "consumer application persistence or route composition",
+      "physical touch hardware and external screen-reader sessions"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "editor": {
+    "bottom": 577.515625,
+    "left": 24,
+    "right": 1256,
+    "top": 24
+  },
+  "overlay": {
+    "bottom": 521.125,
+    "left": 42,
+    "right": 462,
+    "top": 234
+  },
+  "tolerancePx": 1,
+  "input": "simulated-touch",
+  "limitation": "Deterministic browser simulation; no physical touch hardware was used.",
+  "name": "rtl-200pct-simulated-touch-containment",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "ElMarkdownEditor structured table input",
+    "ElMarkdownEditor compact table context menu",
+    "ElMarkdownEditor wide table split view"
+  ],
+  "uiDecisionClass": "interaction-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "fsusui-design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "fsusui-design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5"
+    },
+    {
+      "id": "fsusui-design-change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84"
+    },
+    {
+      "id": "fsusui-visual-change-workflow",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+    },
+    {
+      "id": "fsusui-markdown-editor",
+      "path": "docs/components/markdown-editor.md",
+      "digest": "36fd945f1ca17d89d6855b2eb9a1729177407c4cbac388043bb0db430e341771"
+    },
+    {
+      "id": "fsusui-markdown-editor-input",
+      "path": "docs/api/markdown-editor-input.md",
+      "digest": "e7c212578e765a0cb1b263283b49ae8ad044093a448213b822589488f9b4c2b4"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "567cb881c8c7b919af68e255edf8ec53165aa84e",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "fcac3056190da872f8f2c78b07679dbaafdbb98437e8ad4f06ec7dcba8a3d2e9",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "8e3e392cfd4efeb042071d0eecbe6f2fbff40e6f",
+  "candidateDigest": "1e80b1c8694c7dba0d740c095790e819a6ce3e55f59ebc8fc987b3f8944a96a6",
+  "stateEvidenceMatrix": [
+    {
+      "state": "keyboard focus and complete compact table menu",
+      "viewport": "1280x720 local Chromium production fixture",
+      "theme": "light",
+      "evidenceDigest": "f55bc26eb0a8fe1310040f5b42810a4d90a47ea711e84e75d11e631dbd6ee2f3"
+    },
+    {
+      "state": "mobile compact menu and simulated touch targets",
+      "viewport": "390x844 local Chromium production fixture",
+      "theme": "light",
+      "evidenceDigest": "52be420e84621e9959dc04da067f70b9b1128002352a38d29d5fe74f00796ecf"
+    },
+    {
+      "state": "compact table menu in dark theme",
+      "viewport": "1280x720 local Chromium production fixture",
+      "theme": "dark",
+      "evidenceDigest": "05a5f4fd61d615cb826bd85b48b16dd891bf1380596c1133177ebdde912e14d5"
+    },
+    {
+      "state": "RTL compact menu at 200 percent zoom with simulated touch",
+      "viewport": "1280x720 local Chromium production fixture",
+      "theme": "light",
+      "evidenceDigest": "7030a387dbf4b7971567c3152bed24bf4564eebd4e78bef34054fbc207cd1d89"
+    },
+    {
+      "state": "20 by 50 table with editor-owned split-view scrolling",
+      "viewport": "1280x720 local Chromium production fixture",
+      "theme": "light",
+      "evidenceDigest": "0e0b57037dc26144350376a81c9a75c1f17e28c0c399417c912a6b84d365c53e"
+    }
+  ],
+  "inScope": [
+    "#370 parser-owned structural table transactions and stable cell mapping",
+    "#371 shared keyboard, IME, screen-reader, history, and stale-input behavior",
+    "#372 bounded TSV and CSV paste, formatting, cancellation, and undo behavior",
+    "#373 compact table controls, wide-table containment, touch targets, themes, RTL, and zoom"
+  ],
+  "outOfScope": [
+    "spreadsheet formulas, merged cells, or a second table model",
+    "consumer application persistence or route composition",
+    "physical touch hardware and external screen-reader application sessions"
+  ],
+  "classificationEvidenceDigest": "dfbcaa5c67f38d2842dc615c11a8e5c45dbb1c233236d81d4415f836a4518982",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "f7e5c4ab13ec2d1f9793b8e5f20a32cb0bc663466a8f418e660f187f84bbb226"
+}

@@ -464,7 +464,7 @@ const themeIndexSource = read('vue/packages/theme-chalk/src/index.scss')
 const completeThemeSource = read('vue/packages/theme-chalk/src/fsus.scss')
 const completeThemeCss = read('vue/packages/theme-chalk/dist/el-fsus.css')
 const fsusThemeCss = read('vue/packages/theme-chalk/dist/el-fsus-theme.css')
-const normalizedFsusThemeCss = fsusThemeCss.toLowerCase()
+const normalizedFsusThemeCss = fsusThemeCss.toLowerCase().replace(/\s+/gu, '')
 assert(
   !themeIndexSource.includes("@use './fsus-theme.scss'") &&
     !themeIndexSource.includes('@use "./fsus-theme.scss"'),
