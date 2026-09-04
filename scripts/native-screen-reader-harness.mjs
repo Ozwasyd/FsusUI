@@ -330,18 +330,22 @@ const main = async () => {
     const noDocumentLive = !domProbe.live.some(
       (entry) => entry.tag === 'BODY' || entry.tag === 'SECTION',
     )
-    const editableLabel =
-      /markdown editor/i.test(domProbe.textareaLabel || '') ||
-      /markdown editor/i.test(domProbe.regionLabel || '')
+    const editableLabel = Boolean(domProbe.textareaLabel?.trim())
+    const editorRegionLabel = Boolean(domProbe.regionLabel?.trim())
     const atomicActionsExposed =
       domProbe.atomicActions.length === 3 &&
       domProbe.atomicActions.every(
-        (action) => action.role === 'button' && action.tabIndex === -1,
+        (action) =>
+          action.role === 'button' &&
+          action.tabIndex === -1 &&
+          Boolean(action.name?.trim()),
       )
     const orcaPid = orca.pid ?? null
     const verdict =
       textboxHit &&
       noDocumentLive &&
+      editableLabel &&
+      editorRegionLabel &&
       atomicActionsExposed &&
       atspiJson.ok !== false
         ? 'pass'
@@ -454,6 +458,7 @@ const main = async () => {
         textboxExposed: textboxHit,
         documentNotAriaLive: noDocumentLive,
         editableName: editableLabel,
+        editorRegionName: editorRegionLabel,
         atomicActionsExposed,
         decorationsHidden:
           domProbe.decorationsAriaHidden === 'true' ||
