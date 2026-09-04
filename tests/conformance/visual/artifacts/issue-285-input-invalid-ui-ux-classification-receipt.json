@@ -1,0 +1,80 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "Avalonia FsusInput programmatic invalid-state automation"
+  ],
+  "uiDecisionClass": "prescribed",
+  "verificationClass": "ux-local",
+  "requiredAuthorities": [
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84"
+    },
+    {
+      "id": "visual-workflow",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+    },
+    {
+      "id": "avalonia-index",
+      "path": "docs/avalonia/README.md",
+      "digest": "98e43870a8f1068244a2f00ce5de39ca8f39eb534590b9beabb7c7ac4cede0b2"
+    },
+    {
+      "id": "avalonia-input",
+      "path": "docs/avalonia/components/input.md",
+      "digest": "da87fa37aa4575c66ba0305c6e51f4987c1e42381c177c539aa561ce0b778e7f"
+    },
+    {
+      "id": "accessibility",
+      "path": "spec/accessibility/README.md",
+      "digest": "f149631813fbfb060d49412329638555e0f0c371fb441cf89ab46cd64a3e3de6"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "d03a6c12da55669fbfe61e9ba91038bf21c71313",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "0839174ac715f76111132fe95643ae9b6939a7a7e309238af8699b3c37706e3a",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "44ef0511448a1e2c8eec5abaef05154045d95bfb",
+  "candidateDigest": "2511e58fdaef5302f46a611079dee3cec650bad002155e8ff0b36f4b9dd5828a",
+  "stateEvidenceMatrix": [
+    {
+      "state": "invalid-true-and-false-automation-item-status",
+      "viewport": "avalonia-headless-control",
+      "theme": "not-applicable",
+      "evidenceDigest": "846e6221789613027229a3d380807da47391fb5f7a0f672b3ccddc056739ae25"
+    }
+  ],
+  "inScope": [
+    "FsusInput IsInvalid exposure as invalid=true or invalid=false through AutomationProperties.ItemStatus",
+    "headless programmatic automation-state verification"
+  ],
+  "outOfScope": [
+    "visual styling, geometry, token, theme, or motion changes",
+    "browser accessibility behavior",
+    "cross-platform rendered acceptance",
+    "unrelated Avalonia control behavior"
+  ],
+  "classificationEvidenceDigest": "caaa8f08d7f477ae93a70be034687e601de4cac053bba4ba35501592a4036d31",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "59fc097919220b5951ae551e30a2961d34bd42fb3954e52162f022af86f46d1c"
+}
