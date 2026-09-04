@@ -231,8 +231,13 @@ internal static class ImeHarnessRunner
     scenario.EditorTrace = editor.NativeTrace
       .Select(TraceLine)
       .ToList();
+    // XIM may clear preedit before delivering committed text. In that valid
+    // ordering the machine records one ignored composition-end while waiting
+    // for text, followed by the single composition-end commit. Qualify the
+    // semantic commit, not the platform callback count.
     var commitTrace = editor.NativeTrace.Count(entry =>
-      entry.Kind == FsusMarkdownNativeEventKind.CompositionEnd);
+      entry.Kind == FsusMarkdownNativeEventKind.CompositionEnd &&
+      entry.Action == FsusMarkdownNativeAction.Commit);
     scenario.Pass =
       scenario.PhaseDuringComposition == "composing" &&
       composingTrace.Count >= 2 &&
@@ -254,6 +259,10 @@ internal static class ImeHarnessRunner
     if (scenario.Transactions != 1)
     {
       scenario.Reasons.Add($"transactions {scenario.Transactions} != 1 (one commit, one transaction)");
+    }
+    if (commitTrace != 1)
+    {
+      scenario.Reasons.Add($"composition commits {commitTrace} != 1 (native callback ordering must still yield one semantic commit)");
     }
     return scenario;
   }
