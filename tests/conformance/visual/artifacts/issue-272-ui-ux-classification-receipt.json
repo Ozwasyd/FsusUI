@@ -44,13 +44,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "c2ac6caa35cb63ae1e4f85ea46c74ffb45afbcea",
+    "revision": "2c4208f0b22665438007bb72d16be7d153572c05",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "2ce74fc6eac4392b90ffc9f19ac96bdc4eb315bf43ccfcd4e601f92a98e74d28",
-    "dirtyFingerprint": "9c8dff9bf38edbde220e3963d22ab8071f0870a34234a52bc33cb6b78029ac4c"
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "14d448d8ce2f54153edd9aef074d0f5490afe66e",
-  "candidateDigest": "130ed2925c3faadda1864a04f6010b94ab4c430d49a24c7836bf074593c8f655",
+  "candidateSha": "28e30f2107eb7f3deb294dd894c530fc14fdf931",
+  "candidateDigest": "3bb60b6b4cfc9e099029b5280b7d95ff32f30f47d72494d6dfdbed4866a8a480",
   "stateEvidenceMatrix": [
     {
       "state": "eight locales, long copy, RTL, locale-owned search",
@@ -78,5 +78,5 @@
   "classificationEvidenceDigest": "af6e78b10abc58573cd9bb8bbaa4875ed314d50ca24ed7e2c18b9120ca128411",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "7e7299042b4baa120e68931a406bb381f565cab423196ce4a1dfde219e1b105d"
+  "receiptDigest": "dd297fe5ac001d17381c884ac3d75804f4f5be93a601b36be350b87a75f2ad1a"
 }
