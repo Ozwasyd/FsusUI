@@ -191,7 +191,6 @@
 
 .markdown-renderer .markdown-renderer__mermaid[data-mermaid-rendered='true'] {
   inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
-  max-inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
   margin-inline: auto;
 }
 
