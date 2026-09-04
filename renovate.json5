@@ -294,6 +294,7 @@
       matchPackageNames: [
         'actions/cache',
         'actions/checkout',
+        'actions/create-github-app-token',
         'actions/download-artifact',
         'actions/setup-dotnet',
         'actions/setup-node',
