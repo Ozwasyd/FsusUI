@@ -11,7 +11,7 @@ namespace FsusUI.Avalonia.ApiTool;
 
 internal sealed class SourceSemanticEvaluator
 {
-  private const string EvaluatorVersion = "source-semantics-v2";
+  private const string EvaluatorVersion = "source-semantics-v3";
 
   private static readonly CSharpParseOptions ParseOptions =
     new(languageVersion: LanguageVersion.Latest, documentationMode: DocumentationMode.Parse);
@@ -60,7 +60,7 @@ internal sealed class SourceSemanticEvaluator
       CompilationOptions);
 
     var types = new Dictionary<string, MutableSourceTypeSemantics>(StringComparer.Ordinal);
-    IndexRequiredProperties(compilation.Assembly.GlobalNamespace, types);
+    IndexTypeSemantics(compilation.Assembly.GlobalNamespace, types);
     foreach (var tree in syntaxTrees)
     {
       var model = compilation.GetSemanticModel(tree);
@@ -125,6 +125,8 @@ internal sealed class SourceSemanticEvaluator
         {
           Properties = pair.Value.Properties,
           AvaloniaProperties = pair.Value.AvaloniaProperties,
+          GenericParameters = pair.Value.GenericParameters,
+          Commands = pair.Value.Commands,
           ContentProperties = pair.Value.ContentProperties
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToList(),
@@ -260,28 +262,32 @@ internal sealed class SourceSemanticEvaluator
     return type;
   }
 
-  private static void IndexRequiredProperties(
+  private static void IndexTypeSemantics(
     INamespaceSymbol @namespace,
     Dictionary<string, MutableSourceTypeSemantics> types)
   {
     foreach (var childNamespace in @namespace.GetNamespaceMembers())
     {
-      IndexRequiredProperties(childNamespace, types);
+      IndexTypeSemantics(childNamespace, types);
     }
 
     foreach (var type in @namespace.GetTypeMembers())
     {
-      IndexRequiredProperties(type, types);
+      IndexTypeSemantics(type, types);
     }
   }
 
-  private static void IndexRequiredProperties(
+  private static void IndexTypeSemantics(
     INamedTypeSymbol typeSymbol,
     Dictionary<string, MutableSourceTypeSemantics> types)
   {
     if (typeSymbol.Locations.Any(location => location.IsInSource))
     {
       var type = GetOrCreate(types, ReflectionTypeName(typeSymbol));
+      type.GenericParameters.AddRange(
+        typeSymbol.TypeParameters
+          .OrderBy(parameter => parameter.Ordinal)
+          .Select(GenericParameterSemantics));
       foreach (var property in typeSymbol.GetMembers().OfType<IPropertySymbol>())
       {
         if (!property.Locations.Any(location => location.IsInSource))
@@ -298,14 +304,74 @@ internal sealed class SourceSemanticEvaluator
         {
           type.ContentProperties.Add(property.Name);
         }
+        if (property.DeclaredAccessibility == Accessibility.Public &&
+            IsCommandType(property.Type))
+        {
+          type.Commands[property.Name] = new SourceCommandSemantics
+          {
+            Nullable = property.NullableAnnotation switch
+            {
+              NullableAnnotation.Annotated => true,
+              NullableAnnotation.NotAnnotated => false,
+              _ => null,
+            },
+            CanRead = property.GetMethod?.DeclaredAccessibility == Accessibility.Public,
+            CanWrite = property.SetMethod?.DeclaredAccessibility == Accessibility.Public,
+            IsStatic = property.IsStatic,
+          };
+        }
       }
     }
 
     foreach (var nestedType in typeSymbol.GetTypeMembers())
     {
-      IndexRequiredProperties(nestedType, types);
+      IndexTypeSemantics(nestedType, types);
     }
   }
+
+  private static SourceGenericParameterSemantics GenericParameterSemantics(
+    ITypeParameterSymbol parameter) =>
+    new()
+    {
+      Name = parameter.Name,
+      Position = parameter.Ordinal,
+      Variance = parameter.Variance switch
+      {
+        VarianceKind.In => "in",
+        VarianceKind.Out => "out",
+        _ => "none",
+      },
+      ReferenceTypeConstraint = parameter.HasReferenceTypeConstraint,
+      ReferenceTypeConstraintNullable =
+        parameter.HasReferenceTypeConstraint
+          ? parameter.ReferenceTypeConstraintNullableAnnotation ==
+            NullableAnnotation.Annotated
+          : null,
+      ValueTypeConstraint = parameter.HasValueTypeConstraint,
+      UnmanagedTypeConstraint = parameter.HasUnmanagedTypeConstraint,
+      NotNullConstraint = parameter.HasNotNullConstraint,
+      ConstructorConstraint = parameter.HasConstructorConstraint,
+      TypeConstraints = parameter.ConstraintTypes
+        .Select(TypeName)
+        .OrderBy(name => name, StringComparer.Ordinal)
+        .ToList(),
+    };
+
+  private static bool IsCommandType(ITypeSymbol type) =>
+    TypeName(type) == "System.Windows.Input.ICommand" ||
+    type is INamedTypeSymbol named &&
+    named.AllInterfaces.Any(
+      contract => TypeName(contract) == "System.Windows.Input.ICommand");
+
+  private static string TypeName(ITypeSymbol type) =>
+    type
+      .WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+      .ToDisplayString(
+        new SymbolDisplayFormat(
+          globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Omitted,
+          typeQualificationStyle:
+            SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+          genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters));
 
   private static string ReflectionTypeName(INamedTypeSymbol type)
   {
@@ -457,6 +523,11 @@ internal sealed class SourceSemanticEvaluator
     public Dictionary<string, SourceAvaloniaPropertySemantics> AvaloniaProperties { get; } =
       new(StringComparer.Ordinal);
 
+    public List<SourceGenericParameterSemantics> GenericParameters { get; } = [];
+
+    public Dictionary<string, SourceCommandSemantics> Commands { get; } =
+      new(StringComparer.Ordinal);
+
     public HashSet<string> ContentProperties { get; } =
       new(StringComparer.Ordinal);
   }
@@ -482,7 +553,46 @@ internal sealed class SourceTypeSemantics
   public Dictionary<string, SourceAvaloniaPropertySemantics> AvaloniaProperties { get; init; } =
     new(StringComparer.Ordinal);
 
+  public List<SourceGenericParameterSemantics> GenericParameters { get; init; } = [];
+
+  public Dictionary<string, SourceCommandSemantics> Commands { get; init; } =
+    new(StringComparer.Ordinal);
+
   public List<string> ContentProperties { get; init; } = [];
+}
+
+internal sealed class SourceGenericParameterSemantics
+{
+  public string Name { get; init; } = "";
+
+  public int Position { get; init; }
+
+  public string Variance { get; init; } = "";
+
+  public bool ReferenceTypeConstraint { get; init; }
+
+  public bool? ReferenceTypeConstraintNullable { get; init; }
+
+  public bool ValueTypeConstraint { get; init; }
+
+  public bool UnmanagedTypeConstraint { get; init; }
+
+  public bool NotNullConstraint { get; init; }
+
+  public bool ConstructorConstraint { get; init; }
+
+  public List<string> TypeConstraints { get; init; } = [];
+}
+
+internal sealed class SourceCommandSemantics
+{
+  public bool? Nullable { get; init; }
+
+  public bool CanRead { get; init; }
+
+  public bool CanWrite { get; init; }
+
+  public bool IsStatic { get; init; }
 }
 
 internal sealed class SourcePropertySemantics

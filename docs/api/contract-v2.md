@@ -45,6 +45,10 @@ compiler options, dependency versions, Contract V2 schema, and semantic payload.
 Its `outputHash` is computed from the canonical baseline with only
 `source.outputHash` replaced by the empty string; changing a semantic member
 without regenerating the baseline therefore fails before mapping.
+The compiler baseline retains declared generic parameter constraints and public
+`ICommand` properties. Command entries carry their exact nullable/read/write
+surface and merge any CLR, Styled, or Direct property registration metadata;
+unknown invocation parameters or `CanExecute` behavior are not inferred.
 
 The unified `conformance:v2` command reports a stable stage name driven by each
 subprocess exit code. It checks the compiler-derived Web baseline, the
@@ -172,9 +176,14 @@ in `avaloniaOnlyTypes` with governance and scenario coverage. Extra members of
 mapped components are registered per contract in `avaloniaExtras`.
 
 The generator derives a canonical identity from the Roslyn semantic baseline
-for each CLR property (including its Styled/Direct property metadata), event,
-method overload, and enum member. Each extra records its surface kind and hash;
-overloads with the same public name receive distinct scenario IDs. An
+for each CLR property (including its Styled/Direct property metadata), command,
+event, method overload, and enum member. An `ICommand` remains in the baseline
+property inventory, but its Contract V2 public surface is represented once as a
+command with the merged property registration facts. Command operations resolve
+only through an explicit semantic binding; without compiler-proven invocation
+parameters and `CanExecute` behavior they remain `partial`. Each extra records
+its surface kind and hash; overloads with the same public name receive distinct
+scenario IDs. An
 Avalonia-only type records the count and hash of its complete public surface;
 each mapped type records the same hash in `componentMap`.
 The Contract V2 gate recomputes both inventories and fails when a type or member

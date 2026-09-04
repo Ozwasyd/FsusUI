@@ -1,14 +1,14 @@
 {
   "packageId": "FsusUI.Avalonia",
-  "baselineVersion": "2.0.0",
+  "baselineVersion": "2.1.0",
   "source": {
-    "toolVersion": "FsusUI.Avalonia.ApiTool@1.4.0",
+    "toolVersion": "FsusUI.Avalonia.ApiTool@1.5.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "8bc85f2455b32a50fbca5cb8c6208a10b1bc784b6bbbfdc00ced2c4381f126cc",
-    "compilerOptionsHash": "a2e88fe9ebd590171080438846d719d90b904b854e46a43a2c1beae52d55f38b",
+    "inputTreeHash": "add439bc8258d5d93b4066bd68fb2e10af0e238609c87e67505b1777e5f122d9",
+    "compilerOptionsHash": "4cad637d64a53471d9c054a671e7b7a70cbf7b07640e1838952ba18ce227a475",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "2305fbdc9fb4f9c5110b0825f8af4a69435fc83f471da1c72a802dbb308fc923"
+    "outputHash": "529ecdd44f893e4dcfeee74a20cf738dec3fab41ecef8b4191b6eec4ffc32fd7"
   },
   "semanticTypes": [
     {
@@ -4493,6 +4493,63 @@
           "nullable": false,
           "defaultKnown": true,
           "defaultValue": true,
+          "deprecated": false
+        }
+      ],
+      "commands": [
+        {
+          "name": "CopyCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "CutCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "PasteCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "RedoCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "UndoCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
           "deprecated": false
         }
       ],
@@ -11606,6 +11663,19 @@
           "deprecated": false
         }
       ],
+      "commands": [
+        {
+          "name": "BrowseCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "propertyKind": "styled",
+          "defaultKnown": true,
+          "deprecated": false
+        }
+      ],
       "events": [
         {
           "name": "BrowseRequested",
@@ -14530,6 +14600,19 @@
           "type": "System.Object",
           "nullable": true,
           "defaultKnown": true,
+          "deprecated": false
+        }
+      ],
+      "commands": [
+        {
+          "name": "ClearCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
           "deprecated": false
         }
       ],
@@ -26197,6 +26280,19 @@
           "deprecated": false
         }
       ],
+      "commands": [
+        {
+          "name": "ActionCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "propertyKind": "styled",
+          "defaultKnown": true,
+          "deprecated": false
+        }
+      ],
       "events": [
         {
           "name": "ActionActivated",
@@ -26327,6 +26423,19 @@
         }
       ],
       "avaloniaProperties": [],
+      "commands": [
+        {
+          "name": "ActionCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
       "events": [],
       "methods": [
         {
@@ -27927,6 +28036,19 @@
         }
       ],
       "avaloniaProperties": [],
+      "commands": [
+        {
+          "name": "Command",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
       "events": [
         {
           "name": "PropertyChanged",
@@ -30870,6 +30992,21 @@
       "isAbstract": false,
       "isSealed": true,
       "deprecated": false,
+      "genericParameters": [
+        {
+          "name": "TControl",
+          "position": 0,
+          "variance": "none",
+          "referenceTypeConstraint": false,
+          "valueTypeConstraint": false,
+          "unmanagedTypeConstraint": false,
+          "notNullConstraint": false,
+          "constructorConstraint": false,
+          "typeConstraints": [
+            "Avalonia.Controls.Control"
+          ]
+        }
+      ],
       "contentRegions": [],
       "properties": [
         {
@@ -32487,6 +32624,41 @@
           "type": "FsusUI.Avalonia.Controls.FsusShortcutGesture",
           "nullable": true,
           "defaultKnown": true,
+          "deprecated": false
+        }
+      ],
+      "commands": [
+        {
+          "name": "CancelRecordingCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "direct",
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ClearCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "direct",
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "StartRecordingCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "direct",
+          "defaultKnown": false,
           "deprecated": false
         }
       ],
@@ -35395,6 +35567,41 @@
         }
       ],
       "avaloniaProperties": [],
+      "commands": [
+        {
+          "name": "PasteCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "RedoCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "UndoCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "propertyKind": "clr",
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
       "events": [],
       "methods": [
         {

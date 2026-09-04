@@ -87,10 +87,10 @@ internal static class Program
     return new SemanticBaseline
     {
       PackageId = packageId,
-      BaselineVersion = "2.0.0",
+      BaselineVersion = "2.1.0",
       Source = new BaselineSource
       {
-        ToolVersion = "FsusUI.Avalonia.ApiTool@1.4.0",
+        ToolVersion = "FsusUI.Avalonia.ApiTool@1.5.0",
         AssemblyVersion = version,
         InputTreeHash = sourceSemantics.InputTreeHash,
         CompilerOptionsHash = sourceSemantics.CompilerOptionsHash,
@@ -129,6 +129,10 @@ internal static class Program
       .Concat(clrEvents)
       .OrderBy(item => item.Name, StringComparer.Ordinal)
       .ToList();
+    var commands = ExtractCommands(
+      properties,
+      avaloniaProperties,
+      sourceTypeSemantics);
     var obsolete = type.GetCustomAttribute<ObsoleteAttribute>();
 
     return new SemanticType
@@ -140,11 +144,31 @@ internal static class Program
       IsSealed = type.IsSealed,
       Deprecated = obsolete is not null,
       DeprecationMessage = obsolete?.Message,
+      GenericParameters =
+        sourceTypeSemantics?.GenericParameters.Count > 0
+          ? sourceTypeSemantics.GenericParameters
+            .Select(parameter => new SemanticGenericParameter
+            {
+              Name = parameter.Name,
+              Position = parameter.Position,
+              Variance = parameter.Variance,
+              ReferenceTypeConstraint = parameter.ReferenceTypeConstraint,
+              ReferenceTypeConstraintNullable =
+                parameter.ReferenceTypeConstraintNullable,
+              ValueTypeConstraint = parameter.ValueTypeConstraint,
+              UnmanagedTypeConstraint = parameter.UnmanagedTypeConstraint,
+              NotNullConstraint = parameter.NotNullConstraint,
+              ConstructorConstraint = parameter.ConstructorConstraint,
+              TypeConstraints = parameter.TypeConstraints,
+            })
+            .ToList()
+          : null,
       ContentProperty =
         contentRegions.Count == 1 ? contentRegions[0].Name : null,
       ContentRegions = contentRegions,
       Properties = properties,
       AvaloniaProperties = avaloniaProperties,
+      Commands = commands.Count > 0 ? commands : null,
       Events = events,
       Methods = ExtractMethods(type),
       EnumMembers = type.IsEnum ? ExtractEnumMembers(type) : null,
@@ -159,6 +183,56 @@ internal static class Program
     if (type.IsValueType) return "struct";
     if (type.GetMethods(BindingFlags.Public | BindingFlags.Instance).Any(method => method.Name == "<Clone>$")) return "record";
     return "class";
+  }
+
+  private static List<SemanticCommand> ExtractCommands(
+    IReadOnlyList<SemanticProperty> properties,
+    IReadOnlyList<SemanticAvaloniaProperty> avaloniaProperties,
+    SourceTypeSemantics? sourceSemantics)
+  {
+    if (sourceSemantics is null || sourceSemantics.Commands.Count == 0)
+    {
+      return [];
+    }
+
+    var propertiesByName = properties.ToDictionary(
+      property => property.Name,
+      StringComparer.Ordinal);
+    var avaloniaPropertiesByName = avaloniaProperties.ToDictionary(
+      property => property.Name,
+      StringComparer.Ordinal);
+    var commands = new List<SemanticCommand>();
+    foreach (var (name, sourceCommand) in sourceSemantics.Commands)
+    {
+      if (!propertiesByName.TryGetValue(name, out var property))
+      {
+        continue;
+      }
+
+      avaloniaPropertiesByName.TryGetValue(name, out var avaloniaProperty);
+      commands.Add(new SemanticCommand
+      {
+        Name = name,
+        Type = property.Type,
+        Nullable = sourceCommand.Nullable,
+        CanRead = sourceCommand.CanRead,
+        CanWrite = sourceCommand.CanWrite,
+        IsStatic = sourceCommand.IsStatic,
+        PropertyKind = avaloniaProperty?.Kind ?? "clr",
+        DefaultKnown =
+          avaloniaProperty?.DefaultKnown == true || property.DefaultKnown,
+        DefaultValue =
+          avaloniaProperty?.DefaultKnown == true
+            ? avaloniaProperty.DefaultValue
+            : property.DefaultValue,
+        Deprecated = property.Deprecated,
+        DeprecationMessage = property.DeprecationMessage,
+      });
+    }
+
+    return commands
+      .OrderBy(command => command.Name, StringComparer.Ordinal)
+      .ToList();
   }
 
   private static List<SemanticContentRegion> ExtractContentRegions(
@@ -449,6 +523,8 @@ internal sealed class SemanticType
 
   public string? DeprecationMessage { get; init; }
 
+  public List<SemanticGenericParameter>? GenericParameters { get; init; }
+
   public string? ContentProperty { get; init; }
 
   public List<SemanticContentRegion> ContentRegions { get; init; } = [];
@@ -457,11 +533,61 @@ internal sealed class SemanticType
 
   public List<SemanticAvaloniaProperty> AvaloniaProperties { get; init; } = [];
 
+  public List<SemanticCommand>? Commands { get; init; }
+
   public List<SemanticEvent> Events { get; init; } = [];
 
   public List<SemanticMethod> Methods { get; init; } = [];
 
   public List<SemanticEnumMember>? EnumMembers { get; init; }
+}
+
+internal sealed class SemanticGenericParameter
+{
+  public string Name { get; init; } = "";
+
+  public int Position { get; init; }
+
+  public string Variance { get; init; } = "";
+
+  public bool ReferenceTypeConstraint { get; init; }
+
+  public bool? ReferenceTypeConstraintNullable { get; init; }
+
+  public bool ValueTypeConstraint { get; init; }
+
+  public bool UnmanagedTypeConstraint { get; init; }
+
+  public bool NotNullConstraint { get; init; }
+
+  public bool ConstructorConstraint { get; init; }
+
+  public List<string> TypeConstraints { get; init; } = [];
+}
+
+internal sealed class SemanticCommand
+{
+  public string Name { get; init; } = "";
+
+  public string Type { get; init; } = "";
+
+  public bool? Nullable { get; init; }
+
+  public bool CanRead { get; init; }
+
+  public bool CanWrite { get; init; }
+
+  public bool IsStatic { get; init; }
+
+  public string PropertyKind { get; init; } = "";
+
+  public bool DefaultKnown { get; init; }
+
+  public object? DefaultValue { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }
 
 internal sealed class SemanticContentRegion
