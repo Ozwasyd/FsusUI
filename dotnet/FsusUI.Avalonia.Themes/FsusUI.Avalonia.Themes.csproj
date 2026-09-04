@@ -2,6 +2,10 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
     <PackageId>FsusUI.Avalonia.Themes</PackageId>
     <Description>FsusUI Avalonia theme resources generated from shared design tokens.</Description>
   </PropertyGroup>
