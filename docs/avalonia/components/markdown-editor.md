@@ -23,6 +23,69 @@ restore so host-driven scrolling and the internal anchor restore cooperate.
 `ScrollViewportHeight` and `ScrollExtentHeight` expose the underlying metrics
 for hosts that persist per-document scroll state.
 
+## Editor-adjacent contracts
+
+The native editor exposes the four editor-adjacent capability families without
+introducing a second Markdown parser or a second input/scroll owner.
+
+### Search and projection highlight
+
+Call `RequestSearch` with a versioned `FsusMarkdownSearchQuery`. The
+`SearchRequested` event binds the query to the current document identity,
+revision, and raw UTF-16 source. A host bridges that request to the canonical
+Markdown search runtime and returns `FsusMarkdownSearchSnapshot` through
+`CommitSearch`; the control rejects a mismatched identity, revision, query, or
+range. `NavigateSearch` wraps next/previous, selects and reveals the current
+match, and paints current/non-current ranges through the existing projection
+map without changing source, line wrapping, reading order, or scroll-container
+identity. `ClearSearch` removes the query and presentation.
+
+FsusUI deliberately does not add an Avalonia search bar. Product command and
+toolbar composition stays with the host, while the editor owns the public
+query/result/reveal semantics and projection highlight.
+
+### Outline and reveal
+
+`FsusMarkdownOutlineSnapshot` carries canonical-runtime heading items: stable
+node identity, depth, text, source/content ranges, parent identity, and
+diagnostics. `CommitOutline` validates the snapshot against the current
+document and revision without reparsing Markdown. `RevealHeading` and
+`RevealSourceRange` preserve the one native selection/focus owner and scroll
+the mapped source line. They return `Success`, `Stale`, `NotFound`, or
+`Unsupported` instead of guessing from heading text or raw offsets. Source and
+Live are supported; the currently partial Split/Preview surfaces fail closed.
+
+### Canonical HTML export and printing
+
+Set `OutputHost` to an `IFsusMarkdownEditorOutputHost`. `ExportHtmlAsync`
+supplies the current identity, revision, source, and optional committed
+projection to the host's canonical renderer bridge. `PrintAsync` first consumes
+that renderer-owned HTML, then gives it to the host print backend. Capability
+discovery, cancellation, and post-await document/revision checks are explicit;
+unsupported or stale work never reports success. FsusUI does not ship a second
+HTML renderer, WebView, PDF engine, or operating-system print dialog through
+this contract. Tagged PDF and browser-backed outline options remain available
+through the separate [WebView adapter](webview-adapter.md).
+
+### Focus and Typewriter hooks
+
+`FocusWritingAidEnabled` and `TypewriterWritingAidEnabled` are opt-in and
+default to false. `TypewriterAnchor` defaults to `UpperThird`; `Center` requires
+an explicit host choice. `WritingAidsRequested` provides the current canonical
+projection and selection so the host can commit revision-bound active and
+exempt ranges through `CommitWritingAids`. In the `prose` profile, the control
+reduces only non-active text emphasis; committed exempt ranges remain readable
+and the presentation does not change source, selection, history, line wrap, or
+the input owner.
+
+`NotifyWritingAidsInteraction` exposes the native state hooks for input,
+explicit search/outline navigation, user scroll, selection drag, composition,
+and asynchronous layout changes. Manual scroll, drag, and composition suspend
+automatic correction. A later input or explicit navigation restores it;
+selection change/end alone does not steal the viewport. Reduced-motion policy
+is inherited from the native theme, and this contract performs positional
+correction without adding smooth or decorative motion.
+
 ## Per-document undo history
 
 The transaction store archives the undo/redo chain per document identity (up to
@@ -184,3 +247,9 @@ library or an in-process .NET Markdown parser; hosts must provide a canonical
 runtime bridge until the native binding is packaged.
 The Vue-only paste-as-Markdown review flow does not currently map to a native
 Avalonia command.
+FsusUI does not provide search, outline, export, or print chrome on Avalonia;
+hosts compose those commands around the typed control/host contracts. Search,
+outline, and Focus facts must come from the same canonical runtime projection;
+raw-text scanning or a second C# Markdown parser is not a supported producer.
+Split/Preview reveal remains unsupported while those native surfaces are
+partial.
