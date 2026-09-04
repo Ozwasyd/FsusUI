@@ -10,6 +10,7 @@ import {
   buildRegistry,
   compareMembers,
   avaloniaPublicSurfaces,
+  avaloniaAutomationContractFingerprint,
   avaloniaStateContractFingerprint,
   validateAvaloniaSurfaceRegistration,
   validateRegistry,
@@ -146,8 +147,8 @@ test('committed Contract V2 registry passes validation with the committed gate',
 
 test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
   for (const [key, baseline] of Object.entries(avaloniaBaselines)) {
-    assert.equal(baseline.baselineVersion, '2.2.0')
-    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.6.0')
+    assert.equal(baseline.baselineVersion, '2.3.0')
+    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.7.0')
     assert.match(baseline.source.inputTreeHash, sha256Pattern)
     assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
     assert.match(baseline.source.dependencyVersionHash, sha256Pattern)
@@ -373,6 +374,157 @@ test('pseudo-class and class-state mutations invalidate Contract V2 state identi
       avaloniaBaselines,
     }).errors.join('\n'),
     /ElSlider.*has stale state contract fingerprint/,
+  )
+})
+
+test('Avalonia automation baseline separates source observations from declared and runtime contracts', () => {
+  const automationTypes = avaloniaBaselines.avalonia.semanticTypes.filter(
+    (type) => type.automationContract,
+  )
+  const mappings = automationTypes.flatMap(
+    (type) => type.automationContract.mappings,
+  )
+  const semanticCounts = Object.fromEntries(
+    [
+      'role',
+      'name',
+      'value',
+      'state',
+      'help-text',
+      'accessibility-view',
+      'live-setting',
+    ].map((semantic) => [
+      semantic,
+      mappings.filter((mapping) => mapping.semantic === semantic).length,
+    ]),
+  )
+  assert.equal(automationTypes.length, 112)
+  assert.equal(mappings.length, 399)
+  assert.deepEqual(semanticCounts, {
+    role: 106,
+    name: 123,
+    value: 3,
+    state: 109,
+    'help-text': 25,
+    'accessibility-view': 22,
+    'live-setting': 11,
+  })
+  assert.equal(
+    mappings.filter((mapping) => mapping.targetKind === 'public-control-this')
+      .length,
+    321,
+  )
+  assert.equal(
+    mappings.filter((mapping) => mapping.targetKind === 'automation-peer-owner')
+      .length,
+    19,
+  )
+  assert.ok(
+    automationTypes.every(
+      (type) =>
+        type.automationContract.contractDeclared === false &&
+        type.automationContract.runtimeTreeVerified === false &&
+        type.automationContract.mappingComplete === false,
+    ),
+  )
+
+  const slider = automationTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusSlider',
+  )
+  assert.ok(
+    slider.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'role' &&
+        mapping.provider === 'AutomationProperties.SetControlTypeOverride' &&
+        mapping.targetKind === 'public-control-this' &&
+        mapping.valueKnown === true &&
+        mapping.value === 'Slider',
+    ),
+  )
+  assert.ok(
+    slider.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'name' &&
+        mapping.provider === 'AutomationProperties.SetName' &&
+        mapping.valueKnown === false &&
+        mapping.valueExpression.includes('AccessibleName'),
+    ),
+  )
+  assert.ok(
+    slider.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'value' &&
+        mapping.provider ===
+          'Avalonia.Automation.Provider.IRangeValueProvider.Value' &&
+        mapping.targetKind === 'automation-peer-owner' &&
+        mapping.valueKnown === false &&
+        mapping.valueExpression === 'owner.Value',
+    ),
+  )
+  assert.ok(
+    slider.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'state' &&
+        mapping.provider ===
+          'Avalonia.Automation.Provider.IRangeValueProvider.IsReadOnly' &&
+        mapping.valueExpression === '!owner.CanInteract',
+    ),
+  )
+})
+
+test('automation mutations invalidate independent Contract V2 identities without changing derived status', () => {
+  const changedBaselines = clone(avaloniaBaselines)
+  const changedSlider = changedBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusSlider',
+  )
+  const currentFingerprint =
+    avaloniaAutomationContractFingerprint(changedSlider)
+  changedSlider.automationContract.mappings.find(
+    (mapping) => mapping.semantic === 'role',
+  ).value = 'ProgressBar'
+  assert.notEqual(
+    avaloniaAutomationContractFingerprint(changedSlider),
+    currentFingerprint,
+  )
+  const errors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedBaselines,
+  }).errors.join('\n')
+  assert.match(errors, /ElSlider.*has stale automation contract fingerprint/)
+  assert.match(
+    errors,
+    /component-v2\.el-slider has stale Avalonia automation contract binding/,
+  )
+
+  const deletedIdentity = clone(committedRegistry)
+  delete deletedIdentity.componentMap.find(
+    (entry) => entry.vue.name === 'ElSlider',
+  ).avalonia.automationContractFingerprint
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: deletedIdentity,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /ElSlider.*has stale automation contract fingerprint/,
+  )
+
+  const build = (baselines) =>
+    buildRegistry({
+      vueBaseline,
+      avaloniaBaseline: baselines.avalonia,
+      avaloniaThemesBaseline: baselines.avaloniaThemes,
+      avaloniaIconsBaseline: baselines.avaloniaIcons,
+      gate,
+      semanticMemberBindings,
+    })
+  const statuses = (registry) =>
+    registry.contracts.map((contract) => [
+      contract.id,
+      contract.component.exportStatus,
+    ])
+  assert.deepEqual(
+    statuses(build(changedBaselines)),
+    statuses(build(avaloniaBaselines)),
   )
 })
 

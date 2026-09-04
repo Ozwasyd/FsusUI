@@ -57,6 +57,18 @@ declaration authority in the current source, so they are explicitly marked as
 `roslyn-control-instance-operation` implementation observations with
 `classContractDeclared: false`; unresolved expressions remain unresolved and
 cannot promote alignment.
+Automation metadata follows the same evidence boundary. The baseline records
+Roslyn-bound `AutomationProperties` writes under each public control and
+provider properties only when an `OnCreateAutomationPeer` object creation
+proves the peer-to-owner relationship. Each record distinguishes writes to the
+control itself, its peer owner, and owned implementation elements. Compile-time
+constants retain their value; expressions remain explicitly unknown while
+preserving their public FsusUI dependencies. `SetItemStatus` is a status-text
+observation, not proof of a value or complete state provider. The automation
+record therefore declares `contractDeclared: false`,
+`runtimeTreeVerified: false`, and `mappingComplete: false`: it neither replaces
+Phase 4 accessibility execution nor claims that an AutomationPeer tree was
+rendered.
 
 The unified `conformance:v2` command reports a stable stage name driven by each
 subprocess exit code. It checks the compiler-derived Web baseline, the
@@ -197,6 +209,11 @@ each mapped type records the same hash in `componentMap`.
 State metadata has a separate canonical fingerprint in both `componentMap` and
 the bound component contract. This keeps state drift freshness-bound without
 misrepresenting observed internal styling classes as public member surfaces.
+Automation metadata has its own fingerprint and binding reference under the
+same two generated locations. The reference retains its observation-only and
+runtime-unverified flags; changing or deleting a role, name, value, state,
+provider, target, or expression invalidates the registry without changing
+member status.
 The Contract V2 gate recomputes both inventories and fails when a type or member
 is missing, duplicated, stale, or simultaneously mapped and extra. Only public
 symbols enter the member-surface inventory; the separately labelled state
