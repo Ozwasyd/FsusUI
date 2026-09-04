@@ -65,17 +65,20 @@ export const createMarkdownAttachmentJob = (
 
 export const formatMarkdownAttachmentPendingSource = (
   item: MarkdownAttachmentItemIntent,
+  uploading: (name: string) => string = (name) => name,
 ): string => {
+  const label = uploading(item.name)
   if (item.kind === 'image') {
-    return `![Uploading ${item.name}...]()`
+    return `![${label}]()`
   }
-  return `[Uploading ${item.name}...]()`
+  return `[${label}]()`
 }
 
 export const planMarkdownAttachmentInsert = (
   source: string,
   anchor: MarkdownAttachmentAnchor,
   batch: MarkdownAttachmentBatchIntent,
+  uploading: (name: string) => string = (name) => name,
 ): {
   readonly transaction: MarkdownEditorTransaction
   readonly jobs: readonly MarkdownAttachmentJob[]
@@ -86,7 +89,7 @@ export const planMarkdownAttachmentInsert = (
 
   for (let index = 0; index < batch.items.length; index += 1) {
     const item = batch.items[index]!
-    const formatted = formatMarkdownAttachmentPendingSource(item)
+    const formatted = formatMarkdownAttachmentPendingSource(item, uploading)
     const suffix = index < batch.items.length - 1 ? '\n' : ''
     const fullText = formatted + suffix
     const itemRange: MarkdownAttachmentRange = Object.freeze({

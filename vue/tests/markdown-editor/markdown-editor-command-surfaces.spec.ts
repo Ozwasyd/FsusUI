@@ -267,6 +267,16 @@ test('renders locale authority, long copy, RTL, and status density without fallb
       ).toBe('rtl')
     }
     await palette.press('Escape')
+    const textarea = editor.locator('textarea')
+    await textarea.press('Control+f')
+    await expect(editor.getByRole('search')).toHaveAccessibleName(
+      `${prefix} find in document`,
+    )
+    await expect(editor.getByTestId('markdown-search-query')).toHaveAttribute(
+      'placeholder',
+      `${prefix} find`,
+    )
+    await editor.getByTestId('markdown-search-close').click()
   }
 
   await page.setViewportSize({ height: 812, width: 375 })

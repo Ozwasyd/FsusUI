@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "issue": 272,
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "28e30f2107eb7f3deb294dd894c530fc14fdf931",
+  "candidateDigest": "3bb60b6b4cfc9e099029b5280b7d95ff32f30f47d72494d6dfdbed4866a8a480",
+  "classificationReceiptDigest": "dd297fe5ac001d17381c884ac3d75804f4f5be93a601b36be350b87a75f2ad1a",
+  "productionFixture": true,
+  "implementationModifiedPaths": [],
+  "focusedTests": [
+    {
+      "command": "complete MarkdownEditor Vitest directory for #433/#434/#435",
+      "passed": 405,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "focused production Playwright Chromium and Firefox interaction specs",
+      "passed": 46,
+      "failed": 0,
+      "skipped": 2
+    },
+    {
+      "command": "real-component Chromium 100k input, undo, and redo path",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "deterministic incremental parity for 1000 mixed CJK, emoji, combining, CRLF, and RTL edits",
+      "passed": 1000,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "The inspected desktop light render with statusDensity none contains no footer, separator, empty shell, or extra metrics accessibility node.",
+      "The inspected minimal light and 200 percent zoom dark renders retain one restrained status line with exactly two metrics and preserve the editor as the primary surface.",
+      "The inspected 375px long-locale detailed render uses a compact definition list whose full labels wrap without shrinking to 10 or 11px, turning into badges, or reducing the editor body to an unusable area.",
+      "The inspected 375px RTL dark render preserves RTL content and toolbar order while keeping the detailed metrics readable without horizontal overflow.",
+      "The five inspected accessibility trees each expose one editor region and one textbox; detailed metrics occur once as term-definition pairs, minimal metrics occur once as text, and none exposes no metrics representation.",
+      "The 100k no-space CJK update converges locale word and grapheme deltas inside a bounded window; the mixed 1000-edit parity run matched full recomputation with a maximum of 2628 scanned code units."
+    ]
+  },
+  "inspectedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/zh-cn-none-desktop-light.png",
+      "digest": "5688fd631e030345366a2c8c4c625300e298f3b9b04486e82190f1d3d07b6a31"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/en-minimal-desktop-light.png",
+      "digest": "4c68aa90b2970295fff48304890634f4d190d878099c76e37369533353811d69"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/ja-minimal-desktop-dark-zoom-200.png",
+      "digest": "aaccfec50b7bb5cc19cb7eb4007d871d6a997e5833feec82da1bfc7d83383bfe"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/long-detailed-mobile-light.png",
+      "digest": "d9dfdaa83e096730f4af76b1dc34ebf9ee6dab9c3ebf7e95213add8096863325"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/ar-detailed-mobile-dark.png",
+      "digest": "da57d6fe89be962292f2805301f66bd88a3aa862cbf366ec4994bcc0c3117f37"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/zh-cn-none-desktop-light.aria.yml",
+      "digest": "2f63a1b65e42a4abd56e5e8becfe21beab156ff24065a8e2c86af418beb5f010"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/en-minimal-desktop-light.aria.yml",
+      "digest": "fb6d84c1b544d850e87a8052be2b697d66266f254ed95848697dccc2c89d81ba"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/ja-minimal-desktop-dark-zoom-200.aria.yml",
+      "digest": "c85c6f4667818caadaf93440248e19857b9de816005854ccaefd23c0eb1be045"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/long-detailed-mobile-light.aria.yml",
+      "digest": "09bf6cda9b5d0e6075c73eb051c90c45820f178e27238841b18c1b2f5931db23"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/ar-detailed-mobile-dark.aria.yml",
+      "digest": "efd5d49d01b344c15ac67aacb565e79efdd5542fee9f732d04a16d8c6e278e12"
+    }
+  ],
+  "limitations": [
+    "Rendered evidence was inspected from deterministic local production fixtures; no physical assistive-technology session is claimed.",
+    "The two skipped Playwright cases are evidence-gated issue-395 tests outside the #272 dependency chain."
+  ]
+}

@@ -1,0 +1,21 @@
+- region "AR Markdown editor":
+  - button "AR bold"
+  - button "AR italic"
+  - button "AR 6 format tools": AR format tools 6
+  - textbox "AR source editor":
+    - /placeholder: ""
+    - text: 你好 world RTL مرحبا Unicode 👨‍👩‍👧‍👦
+  - term: AR line
+  - definition: "3"
+  - term: AR column
+  - definition: "19"
+  - term: AR lines
+  - definition: "3"
+  - term: AR characters
+  - definition: "28"
+  - term: AR words
+  - definition: "5"
+  - term: AR selected
+  - definition: "0"
+  - term: AR bytes
+  - definition: "61"

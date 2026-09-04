@@ -1,0 +1,11 @@
+- region "ZH-CN Markdown editor":
+  - button "ZH-CN bold"
+  - button "ZH-CN italic"
+  - button "ZH-CN heading"
+  - button "ZH-CN quote"
+  - button "ZH-CN code"
+  - button "ZH-CN link"
+  - button "ZH-CN 2 format tools": ZH-CN format tools 2
+  - textbox "ZH-CN source editor":
+    - /placeholder: ""
+    - text: 你好 world RTL مرحبا Unicode 👨‍👩‍👧‍👦
