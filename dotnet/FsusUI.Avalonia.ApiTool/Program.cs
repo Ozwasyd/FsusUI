@@ -16,7 +16,13 @@ internal static class Program
 
   private static int Main(string[] args)
   {
-    var outputDir = Path.Combine(Directory.GetCurrentDirectory(), "spec/avalonia/semantic");
+    var repoRoot = Directory.GetCurrentDirectory();
+    if (args.Contains("--verify-source-semantics", StringComparer.Ordinal))
+    {
+      SourceSemanticVerifier.Verify(repoRoot);
+    }
+
+    var outputDir = Path.Combine(repoRoot, "spec/avalonia/semantic");
     for (var index = 0; index < args.Length; index += 1)
     {
       if (args[index] == "--output" && index + 1 < args.Length)
@@ -27,16 +33,28 @@ internal static class Program
 
     Directory.CreateDirectory(outputDir);
 
-    var packages = new (string Id, Type Anchor)[]
+    var packages = new (string Id, Type Anchor, string ProjectDirectory)[]
     {
-      ("FsusUI.Avalonia", typeof(FsusUI.Avalonia.Controls.FsusButton)),
-      ("FsusUI.Avalonia.Themes", typeof(FsusUI.Avalonia.Themes.FsusThemeManager)),
-      ("FsusUI.Avalonia.Icons", typeof(FsusUI.Avalonia.Icons.FsusIconKeys)),
+      (
+        "FsusUI.Avalonia",
+        typeof(FsusUI.Avalonia.Controls.FsusButton),
+        "dotnet/FsusUI.Avalonia"),
+      (
+        "FsusUI.Avalonia.Themes",
+        typeof(FsusUI.Avalonia.Themes.FsusThemeManager),
+        "dotnet/FsusUI.Avalonia.Themes"),
+      (
+        "FsusUI.Avalonia.Icons",
+        typeof(FsusUI.Avalonia.Icons.FsusIconKeys),
+        "dotnet/FsusUI.Avalonia.Icons"),
     };
 
-    foreach (var (id, anchor) in packages)
+    foreach (var (id, anchor, projectDirectory) in packages)
     {
-      var baseline = Extract(anchor.Assembly, id);
+      var sourceSemantics = SourceSemanticEvaluator.Extract(
+        repoRoot,
+        Path.Combine(repoRoot, projectDirectory));
+      var baseline = Extract(anchor.Assembly, id, sourceSemantics);
       var json = JsonSerializer.Serialize(baseline, JsonOptions);
       var outputPath = Path.Combine(outputDir, $"{id}.semantic.json");
       File.WriteAllText(outputPath, $"{json}\n");
@@ -46,7 +64,10 @@ internal static class Program
     return 0;
   }
 
-  private static SemanticBaseline Extract(Assembly assembly, string packageId)
+  private static SemanticBaseline Extract(
+    Assembly assembly,
+    string packageId,
+    SourceSemanticIndex sourceSemantics)
   {
     var types = assembly
       .GetExportedTypes()
@@ -55,7 +76,7 @@ internal static class Program
           "FsusUI.Avalonia",
           StringComparison.Ordinal) == true)
       .OrderBy(type => type.FullName, StringComparer.Ordinal)
-      .Select(ExtractType)
+      .Select(type => ExtractType(type, sourceSemantics))
       .ToList();
 
     var version = assembly.GetName().Version?.ToString() ?? "1.0.0";
@@ -66,24 +87,37 @@ internal static class Program
       BaselineVersion = "1.0.0",
       Source = new BaselineSource
       {
-        Tool = "FsusUI.Avalonia.ApiTool@1.0.0",
+        Tool = "FsusUI.Avalonia.ApiTool@1.3.0",
         AssemblyVersion = version,
+        InputTreeHash = sourceSemantics.InputTreeHash,
+        CompilerOptionsHash = sourceSemantics.CompilerOptionsHash,
+        DependencyVersionsHash = sourceSemantics.DependencyVersionsHash,
       },
       SemanticTypes = types,
     };
   }
 
-  private static SemanticType ExtractType(Type type)
+  private static SemanticType ExtractType(
+    Type type,
+    SourceSemanticIndex sourceSemantics)
   {
     var kind = TypeKind(type);
-    var contentProperty = FindContentProperty(type);
-    var avaloniaProperties = ExtractAvaloniaProperties(type);
+    sourceSemantics.Types.TryGetValue(
+      type.FullName ?? type.Name,
+      out var sourceTypeSemantics);
+    var properties = ExtractProperties(type, sourceTypeSemantics);
+    var avaloniaProperties = ExtractAvaloniaProperties(type, sourceTypeSemantics);
+    var contentRegions = ExtractContentRegions(
+      properties,
+      avaloniaProperties,
+      sourceTypeSemantics);
     var routedEvents = ExtractRoutedEvents(type);
     var clrEvents = ExtractClrEvents(type);
     var events = routedEvents
       .Concat(clrEvents)
       .OrderBy(item => item.Name, StringComparer.Ordinal)
       .ToList();
+    var obsolete = type.GetCustomAttribute<ObsoleteAttribute>();
 
     return new SemanticType
     {
@@ -92,8 +126,12 @@ internal static class Program
       BaseType = type.BaseType is null ? null : TypeName(type.BaseType),
       IsAbstract = type.IsAbstract,
       IsSealed = type.IsSealed,
-      ContentProperty = contentProperty,
-      Properties = ExtractProperties(type),
+      Deprecated = obsolete is not null,
+      DeprecationMessage = obsolete?.Message,
+      ContentProperty =
+        contentRegions.Count == 1 ? contentRegions[0].Name : null,
+      ContentRegions = contentRegions,
+      Properties = properties,
       AvaloniaProperties = avaloniaProperties,
       Events = events,
       Methods = ExtractMethods(type),
@@ -111,52 +149,72 @@ internal static class Program
     return "class";
   }
 
-  private static string? FindContentProperty(Type type)
+  private static List<SemanticContentRegion> ExtractContentRegions(
+    IReadOnlyList<SemanticProperty> properties,
+    IReadOnlyList<SemanticAvaloniaProperty> avaloniaProperties,
+    SourceTypeSemantics? sourceSemantics)
   {
-    try
-    {
-      foreach (var attribute in type.GetCustomAttributes(true))
+    var contentProperties = sourceSemantics?.ContentProperties
+      .ToHashSet(StringComparer.Ordinal) ?? [];
+    var avaloniaByName = avaloniaProperties.ToDictionary(
+      property => property.Name,
+      StringComparer.Ordinal);
+    return properties
+      .Where(property => contentProperties.Contains(property.Name))
+      .Select(property =>
       {
-        var attributeType = attribute.GetType();
-        if (attributeType.FullName != "Avalonia.Metadata.ContentAttribute")
+        avaloniaByName.TryGetValue(property.Name, out var avaloniaProperty);
+        return new SemanticContentRegion
         {
-          continue;
-        }
-
-        var nameProperty = attributeType.GetProperty("Name");
-        if (nameProperty is not null)
-        {
-          return nameProperty.GetValue(attribute) as string;
-        }
-      }
-    }
-    catch
-    {
-      // Attribute reflection must never fail baseline extraction.
-    }
-
-    return null;
+          Name = property.Name,
+          Type = property.Type,
+          Nullable = property.Nullable,
+          CanRead = property.CanRead,
+          CanWrite = property.CanWrite,
+          Required = property.Required,
+          PropertyKind = avaloniaProperty?.Kind ?? "clr",
+        };
+      })
+      .OrderBy(region => region.Name, StringComparer.Ordinal)
+      .ToList();
   }
 
-  private static List<SemanticProperty> ExtractProperties(Type type)
+  private static List<SemanticProperty> ExtractProperties(
+    Type type,
+    SourceTypeSemantics? sourceSemantics)
   {
     return type
       .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
       .Where(property => property.GetIndexParameters().Length == 0)
-      .Select(property => new SemanticProperty
+      .Select(property =>
       {
-        Name = property.Name,
-        Type = TypeName(property.PropertyType),
-        Nullable = IsNullable(property.PropertyType),
-        CanRead = property.CanRead,
-        CanWrite = property.CanWrite,
-        IsStatic = property.GetMethod?.IsStatic ?? property.SetMethod?.IsStatic ?? false,
+        SourcePropertySemantics? sourceProperty = null;
+        if (sourceSemantics is not null)
+        {
+          sourceSemantics.Properties.TryGetValue(property.Name, out sourceProperty);
+        }
+        return new SemanticProperty
+        {
+          Name = property.Name,
+          Type = TypeName(property.PropertyType),
+          Nullable = IsNullable(property.PropertyType),
+          CanRead = property.CanRead,
+          CanWrite = property.CanWrite,
+          IsStatic = property.GetMethod?.IsStatic ?? property.SetMethod?.IsStatic ?? false,
+          Required = sourceProperty?.Required,
+          DefaultKnown = sourceProperty?.DefaultKnown ?? false,
+          DefaultValue = sourceProperty?.DefaultValue,
+          Deprecated = property.GetCustomAttribute<ObsoleteAttribute>() is not null,
+          DeprecationMessage = property.GetCustomAttribute<ObsoleteAttribute>()?.Message,
+        };
       })
       .OrderBy(property => property.Name, StringComparer.Ordinal)
       .ToList();
   }
 
-  private static List<SemanticAvaloniaProperty> ExtractAvaloniaProperties(Type type)
+  private static List<SemanticAvaloniaProperty> ExtractAvaloniaProperties(
+    Type type,
+    SourceTypeSemantics? sourceSemantics)
   {
     var result = new List<SemanticAvaloniaProperty>();
     foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly))
@@ -183,22 +241,10 @@ internal static class Program
         ? field.Name[..^"Property".Length]
         : field.Name;
       var valueType = fieldType.GetGenericArguments()[0];
-      object? defaultValue = null;
-      try
+      SourceAvaloniaPropertySemantics? sourceProperty = null;
+      if (sourceSemantics is not null)
       {
-        var fieldValue = field.GetValue(null);
-        if (fieldValue is not null)
-        {
-          var defaultValueProperty = fieldValue.GetType().GetProperty("DefaultValue");
-          if (defaultValueProperty is not null)
-          {
-            defaultValue = EncodeDefault(defaultValueProperty.GetValue(fieldValue));
-          }
-        }
-      }
-      catch
-      {
-        defaultValue = null;
+        sourceSemantics.AvaloniaProperties.TryGetValue(propertyName, out sourceProperty);
       }
 
       result.Add(new SemanticAvaloniaProperty
@@ -207,7 +253,10 @@ internal static class Program
         Kind = kind,
         Type = TypeName(valueType),
         Nullable = IsNullable(valueType),
-        DefaultValue = defaultValue,
+        DefaultKnown = sourceProperty?.DefaultKnown ?? false,
+        DefaultValue = sourceProperty?.DefaultValue,
+        Deprecated = field.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = field.GetCustomAttribute<ObsoleteAttribute>()?.Message,
       });
     }
 
@@ -235,6 +284,8 @@ internal static class Program
         Name = eventName,
         Kind = "routed",
         ArgsType = TypeName(fieldType.GetGenericArguments()[0]),
+        Deprecated = field.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = field.GetCustomAttribute<ObsoleteAttribute>()?.Message,
       });
     }
 
@@ -251,6 +302,8 @@ internal static class Program
         Kind = "clr",
         ArgsType = TypeName(@event.EventHandlerType ?? typeof(EventArgs)),
         IsStatic = @event.AddMethod?.IsStatic ?? false,
+        Deprecated = @event.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = @event.GetCustomAttribute<ObsoleteAttribute>()?.Message,
       })
       .OrderBy(@event => @event.Name, StringComparer.Ordinal)
       .ToList();
@@ -268,6 +321,8 @@ internal static class Program
         Name = method.Name,
         IsStatic = method.IsStatic,
         ReturnType = TypeName(method.ReturnType),
+        Deprecated = method.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = method.GetCustomAttribute<ObsoleteAttribute>()?.Message,
         Parameters = method
           .GetParameters()
           .Select(parameter => new SemanticParameter
@@ -290,30 +345,11 @@ internal static class Program
       {
         Name = name,
         Value = Convert.ToInt64(value),
+        Deprecated = type.GetField(name)?.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = type.GetField(name)?.GetCustomAttribute<ObsoleteAttribute>()?.Message,
       })
       .OrderBy(member => member.Value)
       .ToList();
-  }
-
-  private static object? EncodeDefault(object? value)
-  {
-    if (value is null)
-    {
-      return null;
-    }
-
-    var valueType = value.GetType();
-    if (valueType.IsEnum)
-    {
-      return value.ToString();
-    }
-
-    if (value is string or bool or byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal)
-    {
-      return value;
-    }
-
-    return $"{valueType.FullName}:{value}";
   }
 
   private static bool IsNullable(Type type)
@@ -373,6 +409,12 @@ internal sealed class BaselineSource
   public string Tool { get; init; } = "";
 
   public string AssemblyVersion { get; init; } = "";
+
+  public string InputTreeHash { get; init; } = "";
+
+  public string CompilerOptionsHash { get; init; } = "";
+
+  public string DependencyVersionsHash { get; init; } = "";
 }
 
 internal sealed class SemanticType
@@ -387,7 +429,13 @@ internal sealed class SemanticType
 
   public bool IsSealed { get; init; }
 
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
+
   public string? ContentProperty { get; init; }
+
+  public List<SemanticContentRegion> ContentRegions { get; init; } = [];
 
   public List<SemanticProperty> Properties { get; init; } = [];
 
@@ -398,6 +446,23 @@ internal sealed class SemanticType
   public List<SemanticMethod> Methods { get; init; } = [];
 
   public List<SemanticEnumMember>? EnumMembers { get; init; }
+}
+
+internal sealed class SemanticContentRegion
+{
+  public string Name { get; init; } = "";
+
+  public string Type { get; init; } = "";
+
+  public bool Nullable { get; init; }
+
+  public bool CanRead { get; init; }
+
+  public bool CanWrite { get; init; }
+
+  public bool? Required { get; init; }
+
+  public string PropertyKind { get; init; } = "";
 }
 
 internal sealed class SemanticProperty
@@ -413,6 +478,16 @@ internal sealed class SemanticProperty
   public bool CanWrite { get; init; }
 
   public bool IsStatic { get; init; }
+
+  public bool? Required { get; init; }
+
+  public bool DefaultKnown { get; init; }
+
+  public object? DefaultValue { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }
 
 internal sealed class SemanticAvaloniaProperty
@@ -425,7 +500,13 @@ internal sealed class SemanticAvaloniaProperty
 
   public bool Nullable { get; init; }
 
+  public bool DefaultKnown { get; init; }
+
   public object? DefaultValue { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }
 
 internal sealed class SemanticEvent
@@ -437,6 +518,10 @@ internal sealed class SemanticEvent
   public string ArgsType { get; init; } = "";
 
   public bool IsStatic { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }
 
 internal sealed class SemanticMethod
@@ -446,6 +531,10 @@ internal sealed class SemanticMethod
   public bool IsStatic { get; init; }
 
   public string ReturnType { get; init; } = "";
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 
   public List<SemanticParameter> Parameters { get; init; } = [];
 }
@@ -464,4 +553,8 @@ internal sealed class SemanticEnumMember
   public string Name { get; init; } = "";
 
   public long Value { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }

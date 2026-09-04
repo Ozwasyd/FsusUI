@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "24c5ec4bff6e2af8637670b8ec502470ffe535a1975ac6721beede45a2fa5a53",
+    "hash": "03a9dee6e7f2146646e014818163503ebb15f2dee8d8e042f138f8c1494ea377",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c"
@@ -1767,12 +1767,12 @@
       "contentRegions": [
         {
           "name": "date-cell",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
           "name": "dateCell",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
@@ -4542,8 +4542,8 @@
       ],
       "contentRegions": [
         {
-          "name": "name",
-          "scoped": true,
+          "name": "$dynamic:name",
+          "scoped": false,
           "required": false
         }
       ],
@@ -16299,7 +16299,23 @@
         }
       ],
       "events": [],
-      "contentRegions": [],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "empty",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "prefix",
+          "scoped": false,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -16690,7 +16706,7 @@
       "contentRegions": [
         {
           "name": "default",
-          "scoped": false,
+          "scoped": true,
           "required": false
         },
         {
@@ -20534,7 +20550,18 @@
         }
       ],
       "events": [],
-      "contentRegions": [],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "trigger",
+          "scoped": false,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",

@@ -2,12 +2,28 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
+import ts from 'typescript'
+import { parse as parseSfc } from 'vue/compiler-sfc'
 import { fileURLToPath } from 'node:url'
 import {
+  buildRegistry,
+  compareMembers,
+  validateAvaloniaSurfaceRegistration,
   validateRegistry,
+  validateSemanticMemberBindings,
+  AVALONIA_SEMANTIC_PATHS,
   MARKDOWN_EDITOR_GATE_PATH,
   CONTRACT_V2_REGISTRY_PATH,
+  SEMANTIC_MEMBER_BINDINGS_PATH,
+  VUE_BASELINE_PATH,
 } from '../scripts/contract-v2.mjs'
+import { validateVuePublicCoverage } from '../scripts/conformance-v2-vue-public-gate.mjs'
+import { extractStructuredEmitPayloads } from '../scripts/vue-structured-emit-payload.mjs'
+import {
+  deprecatedMetadataForNode,
+  extractDeprecatedDeclarations,
+  extractTemplateSlots,
+} from '../scripts/vue-semantic-baseline.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const fixtureDirectory = path.join(root, 'tests/fixtures/contract-v2')
@@ -23,8 +39,21 @@ const gate = JSON.parse(
 const committedRegistry = JSON.parse(
   fs.readFileSync(path.join(root, CONTRACT_V2_REGISTRY_PATH), 'utf8'),
 )
+const vueBaseline = JSON.parse(
+  fs.readFileSync(path.join(root, VUE_BASELINE_PATH), 'utf8'),
+)
+const avaloniaBaselines = Object.fromEntries(
+  Object.entries(AVALONIA_SEMANTIC_PATHS).map(([key, relativePath]) => [
+    key,
+    JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8')),
+  ]),
+)
+const semanticMemberBindings = JSON.parse(
+  fs.readFileSync(path.join(root, SEMANTIC_MEMBER_BINDINGS_PATH), 'utf8'),
+)
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
+const sha256Pattern = /^[0-9a-f]{64}$/u
 
 const replaceAtPath = (value, pointer, replacement) => {
   const segments = pointer
@@ -93,8 +122,1097 @@ test('valid Contract V2 fixture registry passes validation', () => {
 })
 
 test('committed Contract V2 registry passes validation with the committed gate', () => {
-  const errors = validateRegistry(committedRegistry, gate)
+  const errors = validateRegistry(committedRegistry, gate, {
+    avaloniaBaselines,
+  })
   assert.deepEqual(errors, [])
+})
+
+test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
+  for (const baseline of Object.values(avaloniaBaselines)) {
+    assert.equal(baseline.source.tool, 'FsusUI.Avalonia.ApiTool@1.3.0')
+    assert.match(baseline.source.inputTreeHash, sha256Pattern)
+    assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
+    assert.match(baseline.source.dependencyVersionsHash, sha256Pattern)
+  }
+  const properties = avaloniaBaselines.avalonia.semanticTypes.flatMap(
+    (type) => type.properties,
+  )
+  const avaloniaProperties = avaloniaBaselines.avalonia.semanticTypes.flatMap(
+    (type) => type.avaloniaProperties,
+  )
+  assert.equal(
+    properties.filter((property) => typeof property.required === 'boolean')
+      .length,
+    2021,
+  )
+  assert.equal(properties.filter((property) => property.required).length, 15)
+  assert.equal(
+    avaloniaProperties.filter((property) => property.defaultKnown).length,
+    294,
+  )
+  const contentRegions = avaloniaBaselines.avalonia.semanticTypes.flatMap(
+    (type) =>
+      (type.contentRegions ?? []).map((region) => ({
+        ownerType: type.name,
+        ...region,
+      })),
+  )
+  assert.deepEqual(
+    contentRegions.map((region) => [
+      region.ownerType,
+      region.name,
+      region.propertyKind,
+    ]),
+    [
+      ['FsusUI.Avalonia.Controls.FsusActivityRailSection', 'Content', 'clr'],
+      [
+        'FsusUI.Avalonia.Controls.FsusActivityRailShell',
+        'MainContent',
+        'styled',
+      ],
+      ['FsusUI.Avalonia.Controls.FsusSettingsCategory', 'Content', 'clr'],
+    ],
+  )
+  for (const region of contentRegions) {
+    assert.equal(region.type, 'System.Object')
+    assert.equal(region.nullable, true)
+    assert.equal(region.canRead, true)
+    assert.equal(region.canWrite, true)
+    assert.equal(region.required, false)
+  }
+  const semanticTypes = Object.values(avaloniaBaselines).flatMap(
+    (baseline) => baseline.semanticTypes,
+  )
+  const enumTypes = semanticTypes.filter((type) => type.kind === 'enum')
+  const enumMembers = enumTypes.flatMap((type) => type.enumMembers)
+  assert.equal(enumTypes.length, 98)
+  assert.equal(enumMembers.length, 430)
+  assert.ok(semanticTypes.every((type) => typeof type.deprecated === 'boolean'))
+  assert.ok(
+    semanticTypes
+      .flatMap((type) => type.properties)
+      .every((property) => typeof property.deprecated === 'boolean'),
+  )
+  assert.ok(
+    enumMembers.every((member) => typeof member.deprecated === 'boolean'),
+  )
+})
+
+test('Vue compiler AST retains dynamic names and scoped slot payload structure', () => {
+  const component = (name) =>
+    vueBaseline.components.find((candidate) => candidate.name === name)
+
+  assert.deepEqual(component('ElCountdown').slots, [
+    {
+      name: '$dynamic:name',
+      nameKnown: false,
+      scoped: false,
+      payload: [],
+      payloadComplete: true,
+      nameExpression: 'name',
+    },
+  ])
+  assert.deepEqual(
+    component('ElSelectV2').slots.map((slot) => [
+      slot.name,
+      slot.scoped,
+      slot.payloadComplete,
+    ]),
+    [
+      ['default', true, false],
+      ['empty', false, true],
+      ['prefix', false, true],
+    ],
+  )
+  assert.equal(
+    component('ElSkeleton').slots.find((slot) => slot.name === 'default')
+      .payloadComplete,
+    false,
+  )
+  assert.deepEqual(
+    component('ElCalendar').slots.find((slot) => slot.name === 'header')
+      .payload,
+    [{ name: 'date', expression: 'i18nDate', type: null }],
+  )
+})
+
+test('Vue compiler AST binds deprecated metadata to the real declaration', () => {
+  const relativePath = 'vue/packages/components/select/src/select.vue'
+  const source = fs.readFileSync(path.join(root, relativePath), 'utf8')
+  const declarations = extractDeprecatedDeclarations({
+    source,
+    filename: relativePath,
+  })
+  assert.deepEqual(declarations, [
+    {
+      kind: 'property',
+      target: 'suffixTransition',
+      message:
+        'will be removed in version 2.4.0, please use override style scheme',
+    },
+  ])
+  const component = vueBaseline.components.find(
+    (candidate) => candidate.name === 'ElSelect',
+  )
+  const suffixTransition = component.semantic.props.find(
+    (prop) => prop.name === 'suffixTransition',
+  )
+  assert.equal(suffixTransition.deprecated, true)
+  assert.match(suffixTransition.deprecationMessage, /override style scheme/)
+  assert.equal(
+    component.semantic.props.find((prop) => prop.name === 'placement')
+      .deprecated,
+    false,
+  )
+  assert.deepEqual(deprecatedMetadataForNode(null), {
+    deprecated: false,
+    deprecationMessage: null,
+  })
+})
+
+test('enum and deprecated comparator mutations fail closed', () => {
+  const web = {
+    categories: ['string'],
+    nullable: false,
+    default: { kind: 'literal', value: 'circle' },
+    required: false,
+    readonly: false,
+    values: ['circle', 'square'],
+    valuesKnown: true,
+    deprecated: false,
+  }
+  const avalonia = {
+    categories: ['string'],
+    nullable: false,
+    defaultKnown: true,
+    defaultValue: 'circle',
+    required: false,
+    canRead: true,
+    canWrite: true,
+    enumMembers: [
+      { name: 'Circle', value: 0 },
+      { name: 'Square', value: 1 },
+    ],
+    enumValuesKnown: true,
+    deprecated: false,
+  }
+  assert.equal(
+    compareMembers({ web, avalonia, kind: 'input' }).compatible,
+    true,
+  )
+
+  const extraEnumValue = compareMembers({
+    web,
+    avalonia: {
+      ...avalonia,
+      enumMembers: [...avalonia.enumMembers, { name: 'Triangle', value: 2 }],
+    },
+    kind: 'input',
+  })
+  assert.match(extraEnumValue.drift.enumValues, /triangle/)
+
+  const singleOverlap = compareMembers({
+    web,
+    avalonia: {
+      ...avalonia,
+      enumMembers: [
+        { name: 'Circle', value: 0 },
+        { name: 'Triangle', value: 1 },
+      ],
+    },
+    kind: 'input',
+  })
+  assert.match(singleOverlap.drift.enumValues, /triangle/)
+
+  const unknownValues = compareMembers({
+    web: { ...web, valuesKnown: false },
+    avalonia,
+    kind: 'input',
+  })
+  assert.equal(
+    unknownValues.drift.enumValues,
+    'web enum/union values unavailable',
+  )
+
+  const deprecatedDrift = compareMembers({
+    web: { ...web, deprecated: true },
+    avalonia,
+    kind: 'input',
+  })
+  assert.equal(
+    deprecatedDrift.drift.deprecated,
+    'web deprecated=true vs avalonia deprecated=false',
+  )
+})
+
+test('real Vue slot source mutation reaches compiler baseline coverage', () => {
+  const relativePath = 'vue/packages/components/select-v2/src/select.vue'
+  const source = fs.readFileSync(path.join(root, relativePath), 'utf8')
+  const mutatedSource = source.replace(
+    '<slot name="empty">',
+    '<slot name="empty-mutated">',
+  )
+  assert.notEqual(mutatedSource, source)
+  const { descriptor, errors } = parseSfc(mutatedSource, {
+    filename: relativePath,
+  })
+  assert.deepEqual(errors, [])
+  const slots = extractTemplateSlots(descriptor.template?.ast)
+  assert.ok(slots.some((slot) => slot.name === 'empty-mutated'))
+  assert.ok(!slots.some((slot) => slot.name === 'empty'))
+
+  const mutatedBaseline = clone(vueBaseline)
+  mutatedBaseline.components.find(
+    (component) => component.name === 'ElSelectV2',
+  ).slots = slots
+  const coverage = validateVuePublicCoverage({
+    baseline: mutatedBaseline,
+    registry: committedRegistry,
+  })
+  assert.match(
+    coverage.errors.join('\n'),
+    /ElSelectV2 contentRegion empty-mutated is missing from Contract V2/,
+  )
+  assert.match(
+    coverage.errors.join('\n'),
+    /ElSelectV2 Contract V2 has extra contentRegion empty/,
+  )
+})
+
+test('content-region comparator fails closed on unknown and drifted structure', () => {
+  const compatibleWeb = {
+    nameKnown: true,
+    scoped: false,
+    payload: [],
+    payloadComplete: true,
+    contentType: 'Object',
+  }
+  const compatibleAvalonia = {
+    content: true,
+    type: 'System.Object',
+    nullable: true,
+    canRead: true,
+    canWrite: true,
+    required: false,
+    propertyKind: 'styled',
+  }
+  assert.equal(
+    compareMembers({
+      web: compatibleWeb,
+      avalonia: compatibleAvalonia,
+      kind: 'contentRegion',
+    }).compatible,
+    true,
+  )
+
+  const mutations = [
+    [
+      { ...compatibleWeb, nameKnown: false },
+      compatibleAvalonia,
+      /name is dynamic or unavailable/,
+    ],
+    [
+      { ...compatibleWeb, payloadComplete: false },
+      compatibleAvalonia,
+      /payload is incomplete or spread-bound/,
+    ],
+    [
+      { ...compatibleWeb, contentType: 'String' },
+      compatibleAvalonia,
+      /content value type mismatch/,
+    ],
+    [
+      compatibleWeb,
+      { ...compatibleAvalonia, nullable: false },
+      /avalonia nullable=false/,
+    ],
+    [
+      compatibleWeb,
+      { ...compatibleAvalonia, canWrite: false },
+      /canWrite=false/,
+    ],
+    [
+      {
+        ...compatibleWeb,
+        scoped: true,
+        payload: [{ name: 'row', type: 'String' }],
+      },
+      compatibleAvalonia,
+      /avalonia scoped content payload shape unavailable/,
+    ],
+  ]
+  for (const [web, avalonia, expected] of mutations) {
+    const comparison = compareMembers({
+      web,
+      avalonia,
+      kind: 'contentRegion',
+    })
+    assert.equal(comparison.compatible, false)
+    assert.match(comparison.drift.contentRegion, expected)
+  }
+})
+
+test('content-region baseline mutation invalidates Avalonia-only surface identity', () => {
+  const changedBaselines = clone(avaloniaBaselines)
+  changedBaselines.avalonia.semanticTypes
+    .find(
+      (type) => type.name === 'FsusUI.Avalonia.Controls.FsusActivityRailShell',
+    )
+    .contentRegions.find((region) => region.name === 'MainContent').nullable =
+    false
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: changedBaselines,
+    }).errors.join('\n'),
+    /FsusActivityRailShell has stale surfaceHash/,
+  )
+})
+
+test('real Avalonia public surfaces have one current mapped or avalonia-extra state', () => {
+  const audit = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines,
+  })
+  assert.deepEqual(audit.errors, [])
+  assert.equal(
+    audit.stats.mappedClaims + audit.stats.avaloniaExtras,
+    audit.stats.mappedSurfaceStates,
+  )
+  assert.equal(
+    audit.stats.mappedTypes + audit.stats.avaloniaOnlyTypes,
+    audit.stats.baselineTypes,
+  )
+  assert.equal(
+    audit.stats.mappedTypeSurfaces + audit.stats.avaloniaOnlySurfaces,
+    audit.stats.baselineSurfaces,
+  )
+  assert.equal(audit.stats.internalSurfaces, 0)
+})
+
+test('real Avalonia surface mutations invalidate current registration', () => {
+  const addedSurfaceBaselines = clone(avaloniaBaselines)
+  addedSurfaceBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusImage')
+    .properties.push({
+      name: 'UnregisteredPublicState',
+      type: 'System.String',
+      nullable: true,
+      canRead: true,
+      canWrite: true,
+      isStatic: false,
+    })
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: addedSurfaceBaselines,
+    }).errors.join('\n'),
+    /UnregisteredPublicState is neither mapped nor registered as avalonia-extra/,
+  )
+
+  const changedOverloadBaselines = clone(avaloniaBaselines)
+  changedOverloadBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusImage')
+    .methods.find(
+      (method) =>
+        method.name === 'OpenPreview' && method.parameters.length === 2,
+    ).parameters[1].type = 'System.String'
+  const changedOverloadErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedOverloadBaselines,
+  }).errors.join('\n')
+  assert.match(
+    changedOverloadErrors,
+    /OpenPreview is neither mapped nor registered as avalonia-extra/,
+  )
+  assert.match(
+    changedOverloadErrors,
+    /OpenPreview does not match an unmatched real public surface/,
+  )
+
+  const changedEventBaselines = clone(avaloniaBaselines)
+  changedEventBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusAlert')
+    .events.find((event) => event.name === 'Dismissed').argsType =
+    'System.EventHandler<System.String>'
+  const changedEventErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedEventBaselines,
+  }).errors.join('\n')
+  assert.match(
+    changedEventErrors,
+    /Dismissed is neither mapped nor registered as avalonia-extra/,
+  )
+  assert.match(
+    changedEventErrors,
+    /Dismissed does not match an unmatched real public surface/,
+  )
+
+  const changedStyledPropertyBaselines = clone(avaloniaBaselines)
+  changedStyledPropertyBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusAlert')
+    .avaloniaProperties.find(
+      (property) => property.name === 'ActionContent',
+    ).kind = 'direct'
+  const changedStyledPropertyErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedStyledPropertyBaselines,
+  }).errors.join('\n')
+  assert.match(
+    changedStyledPropertyErrors,
+    /ActionContent is neither mapped nor registered as avalonia-extra/,
+  )
+  assert.match(
+    changedStyledPropertyErrors,
+    /ActionContent does not match an unmatched real public surface/,
+  )
+
+  const changedOnlyTypeBaselines = clone(avaloniaBaselines)
+  changedOnlyTypeBaselines.avalonia.semanticTypes.find(
+    (type) =>
+      type.name === 'FsusUI.Avalonia.Controls.FsusActiveSourceChangedEventArgs',
+  ).properties[0].type = 'System.Int64'
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: changedOnlyTypeBaselines,
+    }).errors.join('\n'),
+    /FsusActiveSourceChangedEventArgs has stale surfaceHash/,
+  )
+
+  const changedEnumBaselines = clone(avaloniaBaselines)
+  changedEnumBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusAvatarShape')
+    .enumMembers.find((member) => member.name === 'Circle').deprecated = true
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: changedEnumBaselines,
+    }).errors.join('\n'),
+    /FsusAvatarShape has stale surfaceHash/,
+  )
+})
+
+test('Avalonia registration mutations cannot hide missing or duplicate ownership', () => {
+  const missingExtra = clone(committedRegistry)
+  const imageContract = missingExtra.contracts.find(
+    (contract) => contract.component.name === 'ElImage',
+  )
+  imageContract.avaloniaExtras = imageContract.avaloniaExtras.filter(
+    (extra) => extra.member !== 'LoadAsync',
+  )
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: missingExtra,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /LoadAsync is neither mapped nor registered as avalonia-extra/,
+  )
+
+  const duplicateExtra = clone(committedRegistry)
+  const duplicateImageContract = duplicateExtra.contracts.find(
+    (contract) => contract.component.name === 'ElImage',
+  )
+  duplicateImageContract.avaloniaExtras.push(
+    clone(duplicateImageContract.avaloniaExtras[0]),
+  )
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: duplicateExtra,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /duplicates a public surface registration/,
+  )
+
+  const duplicateOverloadScenario = clone(committedRegistry)
+  const openPreviewExtras = duplicateOverloadScenario.contracts
+    .find((contract) => contract.component.name === 'ElImage')
+    .avaloniaExtras.filter((extra) => extra.member === 'OpenPreview')
+  openPreviewExtras[1].scenarioIds = clone(openPreviewExtras[0].scenarioIds)
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: duplicateOverloadScenario,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /stale or non-unique scenario coverage identity/,
+  )
+
+  const missingType = clone(committedRegistry)
+  const removed = missingType.avaloniaOnlyTypes.shift()
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: missingType,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    new RegExp(`${removed.type} has no Vue counterpart`),
+  )
+
+  const duplicateType = clone(committedRegistry)
+  duplicateType.avaloniaOnlyTypes.push(
+    clone(duplicateType.avaloniaOnlyTypes[0]),
+  )
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: duplicateType,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /is registered more than once/,
+  )
+
+  const staleMappedType = clone(committedRegistry)
+  staleMappedType.componentMap.find(
+    (mapping) => mapping.vue.name === 'ElImage',
+  ).avalonia.surfaceHash = '0'.repeat(64)
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: staleMappedType,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /ElImage.*has stale public surface hash/,
+  )
+})
+
+test('explicit semantic member bindings resolve real members from both baselines', () => {
+  assert.deepEqual(
+    validateSemanticMemberBindings({
+      registry: semanticMemberBindings,
+      vueBaseline,
+      avaloniaBaselines,
+    }),
+    [],
+  )
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+  const markdownEditor = registry.contracts.find(
+    (contract) => contract.component.name === 'ElMarkdownEditor',
+  )
+  const document = markdownEditor.inputs.find(
+    (input) => input.semantic === 'document',
+  )
+  assert.equal(document.web.member, 'modelValue')
+  assert.equal(document.avalonia.member, 'Document')
+  assert.equal(document.bindingBasis, 'explicit-semantic')
+  assert.equal(
+    markdownEditor.avaloniaExtras.some((extra) => extra.member === 'Document'),
+    false,
+  )
+})
+
+test('explicit semantic member bindings reject stale and duplicate endpoints', () => {
+  const stale = clone(semanticMemberBindings)
+  stale.mappings[0].avalonia = 'MissingDocument'
+  assert.match(
+    validateSemanticMemberBindings({
+      registry: stale,
+      vueBaseline,
+      avaloniaBaselines,
+    }).join('\n'),
+    /missing real Avalonia member MissingDocument/,
+  )
+
+  const duplicate = clone(semanticMemberBindings)
+  duplicate.mappings.push(clone(duplicate.mappings[0]))
+  const errors = validateSemanticMemberBindings({
+    registry: duplicate,
+    vueBaseline,
+    avaloniaBaselines,
+  }).join('\n')
+  assert.match(errors, /is duplicated/)
+  assert.match(errors, /duplicates semantic id document/)
+})
+
+test('real mapped inputs use compiler-known metadata and keep unknown values partial', () => {
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+  const mappedInputs = registry.contracts.flatMap((contract) =>
+    contract.inputs.filter((input) => input.avalonia != null),
+  )
+  assert.equal(mappedInputs.length, 140)
+  assert.equal(
+    mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
+    13,
+  )
+  assert.equal(
+    mappedInputs.filter((input) => input.status === 'partial').length,
+    126,
+  )
+  const max = registry.contracts
+    .find((contract) => contract.component.name === 'ElBadge')
+    .inputs.find((input) => input.name === 'max')
+  assert.equal(max.avalonia.canRead, true)
+  assert.equal(max.avalonia.canWrite, true)
+  assert.equal(max.drift.nullability, null)
+  assert.equal(max.drift.readWrite, null)
+  assert.equal(max.drift.default, null)
+  assert.equal(max.drift.required, null)
+  assert.equal(max.status, 'aligned-candidate')
+})
+
+test('real mapped input baseline mutations expose default, required, access, and nullability drift', () => {
+  const buildMax = ({
+    mutateWeb = () => {},
+    mutateProperty = () => {},
+    mutateAvaloniaProperty = () => {},
+  } = {}) => {
+    const nextVueBaseline = clone(vueBaseline)
+    const nextAvaloniaBaseline = clone(avaloniaBaselines.avalonia)
+    const webProp = nextVueBaseline.components
+      .find((component) => component.name === 'ElBadge')
+      .semantic.props.find((prop) => prop.name === 'max')
+    const type = nextAvaloniaBaseline.semanticTypes.find(
+      (candidate) => candidate.name === 'FsusUI.Avalonia.Controls.FsusBadge',
+    )
+    const property = type.properties.find(
+      (candidate) => candidate.name === 'Max',
+    )
+    const avaloniaProperty = type.avaloniaProperties.find(
+      (candidate) => candidate.name === 'Max',
+    )
+    mutateWeb(webProp)
+    mutateProperty(property)
+    mutateAvaloniaProperty(avaloniaProperty)
+    return buildRegistry({
+      vueBaseline: nextVueBaseline,
+      avaloniaBaseline: nextAvaloniaBaseline,
+      avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+      avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+      semanticMemberBindings,
+      gate,
+    })
+      .contracts.find((contract) => contract.component.name === 'ElBadge')
+      .inputs.find((input) => input.name === 'max')
+  }
+
+  const matchingKnownMetadata = buildMax({
+    mutateProperty: (property) => {
+      property.required = false
+    },
+    mutateAvaloniaProperty: (property) => {
+      property.defaultValue = 99
+    },
+  })
+  assert.equal(matchingKnownMetadata.drift.default, null)
+  assert.equal(matchingKnownMetadata.drift.required, null)
+  assert.equal(matchingKnownMetadata.drift.readWrite, null)
+  assert.equal(matchingKnownMetadata.drift.nullability, null)
+  assert.equal(matchingKnownMetadata.status, 'aligned-candidate')
+
+  const unknownDefault = buildMax({
+    mutateAvaloniaProperty: (property) => {
+      property.defaultKnown = false
+      delete property.defaultValue
+    },
+  })
+  assert.equal(
+    unknownDefault.drift.default,
+    'avalonia default metadata unavailable',
+  )
+  assert.equal(unknownDefault.status, 'partial')
+
+  const defaultDrift = buildMax({
+    mutateWeb: (property) => {
+      property.default.value = 100
+    },
+    mutateProperty: (property) => {
+      property.required = false
+    },
+    mutateAvaloniaProperty: (property) => {
+      property.defaultValue = 99
+    },
+  })
+  assert.match(
+    defaultDrift.drift.default,
+    /web default=100 vs avalonia default=99/,
+  )
+
+  const requiredDrift = buildMax({
+    mutateWeb: (property) => {
+      property.required = true
+    },
+    mutateProperty: (property) => {
+      property.required = false
+    },
+    mutateAvaloniaProperty: (property) => {
+      property.defaultValue = 99
+    },
+  })
+  assert.match(
+    requiredDrift.drift.required,
+    /web required=true vs avalonia required=false/,
+  )
+
+  const readonlyDrift = buildMax({
+    mutateWeb: (property) => {
+      property.readonly = true
+    },
+  })
+  assert.match(
+    readonlyDrift.drift.readWrite,
+    /web readonly=true vs avalonia canWrite=true/,
+  )
+
+  const unknownReadonly = buildMax({
+    mutateWeb: (property) => {
+      delete property.readonly
+    },
+  })
+  assert.match(
+    unknownReadonly.drift.readWrite,
+    /web readonly metadata unavailable/,
+  )
+
+  const writeDrift = buildMax({
+    mutateProperty: (property) => {
+      property.canWrite = false
+    },
+  })
+  assert.match(
+    writeDrift.drift.readWrite,
+    /web readonly=false vs avalonia canWrite=false/,
+  )
+
+  const readDrift = buildMax({
+    mutateProperty: (property) => {
+      property.canRead = false
+    },
+  })
+  assert.match(readDrift.drift.readWrite, /avalonia canRead=false/)
+
+  const nullabilityDrift = buildMax({
+    mutateWeb: (property) => {
+      property.nullable = true
+    },
+  })
+  assert.match(
+    nullabilityDrift.drift.nullability,
+    /web nullable=true vs avalonia nullable=false/,
+  )
+
+  const unknownNullability = buildMax({
+    mutateProperty: (property) => {
+      delete property.nullable
+    },
+    mutateAvaloniaProperty: (property) => {
+      delete property.nullable
+    },
+  })
+  assert.equal(
+    unknownNullability.drift.nullability,
+    'avalonia nullability metadata unavailable',
+  )
+})
+
+test('mapped input semantic mutations invalidate the committed surface hash', () => {
+  const mutations = [
+    (type) => {
+      type.avaloniaProperties.find(
+        (property) => property.name === 'Max',
+      ).defaultValue = 100
+    },
+    (type) => {
+      type.properties.find((property) => property.name === 'Max').required =
+        true
+    },
+    (type) => {
+      type.properties.find((property) => property.name === 'Max').canWrite =
+        false
+    },
+    (type) => {
+      type.avaloniaProperties.find(
+        (property) => property.name === 'Max',
+      ).nullable = true
+    },
+  ]
+  for (const mutate of mutations) {
+    const nextBaselines = clone(avaloniaBaselines)
+    mutate(
+      nextBaselines.avalonia.semanticTypes.find(
+        (type) => type.name === 'FsusUI.Avalonia.Controls.FsusBadge',
+      ),
+    )
+    assert.match(
+      validateAvaloniaSurfaceRegistration({
+        registry: committedRegistry,
+        avaloniaBaselines: nextBaselines,
+      }).errors.join('\n'),
+      /ElBadge.*has stale public surface hash/,
+    )
+  }
+})
+
+test('real operation signatures are retained and fail closed when not comparable', () => {
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+  const markdownEditor = registry.contracts.find(
+    (contract) => contract.component.name === 'ElMarkdownEditor',
+  )
+  const navigate = markdownEditor.operations.find(
+    (operation) => operation.semantic === 'search-navigate',
+  )
+
+  assert.deepEqual(navigate.web.signature.parameters, [
+    {
+      name: 'direction',
+      type: "'next' | 'previous'",
+      optional: false,
+      rest: false,
+    },
+  ])
+  assert.equal(navigate.avalonia.signature.parameters.length, 1)
+  assert.equal(navigate.status, 'partial')
+  assert.match(navigate.drift.operationSignature, /web return type unavailable/)
+  assert.match(
+    navigate.drift.operationSignature,
+    /parameter 1 type not comparable/,
+  )
+})
+
+test('real baseline mutations expose operation parameter drift', () => {
+  const buildWithMutation = (methodName, mutate) => {
+    const avaloniaBaseline = clone(avaloniaBaselines.avalonia)
+    const markdownEditor = avaloniaBaseline.semanticTypes.find(
+      (type) => type.name === 'FsusUI.Avalonia.Controls.FsusMarkdownEditor',
+    )
+    const method = markdownEditor.methods.find(
+      (candidate) => candidate.name === methodName,
+    )
+    mutate(method)
+    return buildRegistry({
+      vueBaseline,
+      avaloniaBaseline,
+      avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+      avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+      semanticMemberBindings,
+      gate,
+    }).contracts.find(
+      (contract) => contract.component.name === 'ElMarkdownEditor',
+    )
+  }
+
+  const countDrift = buildWithMutation('NavigateSearch', (method) => {
+    method.parameters.push({
+      name: 'wrap',
+      type: 'System.Boolean',
+      optional: true,
+    })
+  }).operations.find((operation) => operation.semantic === 'search-navigate')
+  assert.match(
+    countDrift.drift.operationSignature,
+    /parameter count mismatch: web 1 vs avalonia 2/,
+  )
+
+  const optionalityDrift = buildWithMutation('NavigateSearch', (method) => {
+    method.parameters[0].optional = true
+  }).operations.find((operation) => operation.semantic === 'search-navigate')
+  assert.match(
+    optionalityDrift.drift.operationSignature,
+    /parameter 1 optionality mismatch: web false vs avalonia true/,
+  )
+
+  const orderDrift = buildWithMutation('RevealHeading', (method) => {
+    method.parameters.reverse()
+  }).operations.find((operation) => operation.semantic === 'reveal-heading')
+  assert.match(
+    orderDrift.drift.operationSignature,
+    /parameter 1 type mismatch: web string vs avalonia number/,
+  )
+
+  const typeDrift = buildWithMutation('RevealHeading', (method) => {
+    method.parameters[0].type = 'System.Boolean'
+  }).operations.find((operation) => operation.semantic === 'reveal-heading')
+  assert.match(
+    typeDrift.drift.operationSignature,
+    /parameter 1 type mismatch: web string vs avalonia boolean/,
+  )
+})
+
+test('real mapped event payload shapes fail closed on field drift', () => {
+  const buildWithBaselines = (
+    nextVueBaseline = vueBaseline,
+    nextAvaloniaBaseline = avaloniaBaselines.avalonia,
+  ) =>
+    buildRegistry({
+      vueBaseline: nextVueBaseline,
+      avaloniaBaseline: nextAvaloniaBaseline,
+      avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+      avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+      semanticMemberBindings,
+      gate,
+    }).contracts.find(
+      (contract) => contract.component.name === 'ElMarkdownEditor',
+    )
+  const mappedOutputs = buildWithBaselines().outputs.filter(
+    (output) => output.bindingBasis === 'explicit-semantic',
+  )
+  assert.deepEqual(
+    mappedOutputs.map((output) => [output.semantic, output.status]),
+    [
+      ['history-change', 'partial'],
+      ['selection-change', 'partial'],
+      ['transaction', 'partial'],
+    ],
+  )
+
+  const missingField = clone(vueBaseline)
+  const missingHistoryShape = missingField.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.emits.find((emit) => emit.name === 'history-change')
+    .payload[0].shape
+  missingHistoryShape.fields = missingHistoryShape.fields.filter(
+    (field) => field.name !== 'canRedo',
+  )
+  const missingFieldDrift = buildWithBaselines(missingField).outputs.find(
+    (output) => output.semantic === 'history-change',
+  )
+  assert.match(
+    missingFieldDrift.drift.eventPayload,
+    /extra avalonia field CanRedo/,
+  )
+
+  const nullableField = clone(vueBaseline)
+  nullableField.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.emits.find((emit) => emit.name === 'history-change')
+    .payload[0].shape.fields.find(
+      (field) => field.name === 'redoDepth',
+    ).nullable = true
+  const nullableDrift = buildWithBaselines(nullableField).outputs.find(
+    (output) => output.semantic === 'history-change',
+  )
+  assert.match(
+    nullableDrift.drift.eventPayload,
+    /field redoDepth nullability mismatch: web true vs avalonia false/,
+  )
+
+  const avaloniaTypeDrift = clone(avaloniaBaselines.avalonia)
+  avaloniaTypeDrift.semanticTypes
+    .find(
+      (type) =>
+        type.name === 'FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryState',
+    )
+    .properties.find((property) => property.name === 'RedoDepth').type =
+    'System.String'
+  const typeDrift = buildWithBaselines(
+    vueBaseline,
+    avaloniaTypeDrift,
+  ).outputs.find((output) => output.semantic === 'history-change')
+  assert.match(
+    typeDrift.drift.eventPayload,
+    /field redoDepth type mismatch: web number vs avalonia string/,
+  )
+
+  const unknownShape = clone(vueBaseline)
+  unknownShape.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.emits.find(
+      (emit) => emit.name === 'history-change',
+    ).payload[0].shape = {
+    kind: 'unknown',
+    type: 'RecursivePayload',
+    reason: 'recursive payload type',
+  }
+  const unknownDrift = buildWithBaselines(unknownShape).outputs.find(
+    (output) => output.semantic === 'history-change',
+  )
+  assert.match(
+    unknownDrift.drift.eventPayload,
+    /web payload shape unavailable: recursive payload type/,
+  )
+})
+
+test('real Vue source payload type mutation reaches the comparator', () => {
+  const entryRelativePath =
+    'vue/packages/components/markdown-editor/src/markdown-editor.ts'
+  const transactionRelativePath =
+    'vue/packages/components/markdown-editor/src/markdown-editor-transaction.ts'
+  const entrySource = fs.readFileSync(
+    path.join(root, entryRelativePath),
+    'utf8',
+  )
+  const transactionSource = fs.readFileSync(
+    path.join(root, transactionRelativePath),
+    'utf8',
+  )
+  const sourceFile = ts.createSourceFile(
+    entryRelativePath,
+    entrySource,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  )
+  let emitsObject = null
+  const visit = (node) => {
+    if (
+      ts.isVariableDeclaration(node) &&
+      node.name.getText(sourceFile) === 'markdownEditorEmits' &&
+      ts.isObjectLiteralExpression(node.initializer)
+    ) {
+      emitsObject = node.initializer
+      return
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(sourceFile)
+  assert.ok(emitsObject)
+
+  const mutatedSource = transactionSource.replace(
+    'readonly redoDepth: number',
+    'readonly redoDepth: string',
+  )
+  assert.notEqual(mutatedSource, transactionSource)
+  const extracted = extractStructuredEmitPayloads({
+    root,
+    sourceRelativePath: entryRelativePath,
+    objectStart: emitsObject.getStart(sourceFile),
+    objectEnd: emitsObject.end,
+    eventNames: ['history-change'],
+    sourceOverrides: new Map([[transactionRelativePath, mutatedSource]]),
+  }).get('history-change')
+  const redoDepth = extracted.parameters[0].shape.fields.find(
+    (field) => field.name === 'redoDepth',
+  )
+  assert.equal(redoDepth.type, 'string')
+
+  const mutatedBaseline = clone(vueBaseline)
+  const history = mutatedBaseline.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.emits.find((emit) => emit.name === 'history-change')
+  history.payload = extracted.parameters
+  const output = buildRegistry({
+    vueBaseline: mutatedBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+    .contracts.find(
+      (contract) => contract.component.name === 'ElMarkdownEditor',
+    )
+    .outputs.find((candidate) => candidate.semantic === 'history-change')
+  assert.match(
+    output.drift.eventPayload,
+    /field redoDepth type mismatch: web string vs avalonia number/,
+  )
 })
 
 for (const mutation of mutations) {

@@ -115,6 +115,65 @@ const waitForServer = async (url, timeoutMs) => {
   throw new Error(`preview not ready: ${lastError?.message ?? 'timeout'}`)
 }
 
+export const resolveAtspiBusAddress = (
+  environment = process.env,
+  run = spawnSync,
+) => {
+  if (environment.AT_SPI_BUS_ADDRESS) return environment.AT_SPI_BUS_ADDRESS
+  const result = run(
+    'gdbus',
+    [
+      'call',
+      '--session',
+      '--dest',
+      'org.a11y.Bus',
+      '--object-path',
+      '/org/a11y/bus',
+      '--method',
+      'org.a11y.Bus.GetAddress',
+    ],
+    {
+      encoding: 'utf8',
+      env: environment,
+      timeout: 5_000,
+    },
+  )
+  if (result.status !== 0) return null
+  return result.stdout?.match(/\('([^']+)'/)?.[1] ?? null
+}
+
+export const parseAtspiResult = (result) => {
+  if (result.error || result.status !== 0) {
+    return {
+      ok: false,
+      runnerError: {
+        code: result.error?.code ?? `exit-${result.status ?? 'unknown'}`,
+        message: result.error?.message ?? 'AT-SPI helper exited unsuccessfully',
+      },
+      stderr: result.stderr,
+    }
+  }
+  try {
+    const parsed = JSON.parse(result.stdout || '{}')
+    if (parsed?.ok === true) return parsed
+    return {
+      ...(parsed && typeof parsed === 'object' ? parsed : {}),
+      ok: false,
+      runnerError: {
+        code: 'invalid-result',
+        message: 'AT-SPI helper did not report a successful result',
+      },
+    }
+  } catch {
+    return {
+      ok: false,
+      parseError: true,
+      stdout: result.stdout,
+      stderr: result.stderr,
+    }
+  }
+}
+
 const parseArguments = (argv) => {
   const options = { out: defaultOut, skipBuild: false }
   for (let index = 0; index < argv.length; index += 1) {
@@ -148,6 +207,10 @@ const main = async () => {
   }
   if (!chromePath) throw new Error('no Chromium executable found')
   const options = parseArguments(process.argv.slice(2))
+  const atspiBusAddress = resolveAtspiBusAddress()
+  const nativeEnvironment = atspiBusAddress
+    ? { ...process.env, AT_SPI_BUS_ADDRESS: atspiBusAddress }
+    : process.env
   rmSync(options.out, { force: true, recursive: true })
   mkdirSync(options.out, { recursive: true })
 
@@ -186,7 +249,7 @@ const main = async () => {
   let orca = null
   try {
     orca = spawn('orca', ['--replace', '--no-setup'], {
-      env: process.env,
+      env: nativeEnvironment,
       stdio: ['ignore', 'pipe', 'pipe'],
     })
     await sleep(1500)
@@ -194,7 +257,7 @@ const main = async () => {
     context = await chromium.launchPersistentContext(profileDirectory, {
       headless: false,
       executablePath: chromePath,
-      env: process.env,
+      env: nativeEnvironment,
       locale: 'zh-CN',
       args: [
         '--no-sandbox',
@@ -249,6 +312,7 @@ const main = async () => {
       .locator('[data-markdown-atomic-actions]')
       .first()
       .waitFor({ state: 'attached' })
+    const interactionElapsedMilliseconds = performance.now() - interactionStart
     const cdp = await page.context().newCDPSession(page)
     const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
     const screenshotPath = join(options.out, 'browser.png')
@@ -303,18 +367,18 @@ const main = async () => {
 
     const atspi = spawnSync('python3', [atspiHelper], {
       encoding: 'utf8',
-      env: process.env,
+      env: nativeEnvironment,
+      maxBuffer: 16 * 1024 * 1024,
       timeout: 25_000,
     })
-    let atspiJson = null
-    try {
-      atspiJson = JSON.parse(atspi.stdout || '{}')
-    } catch {
+    let atspiJson = parseAtspiResult(atspi)
+    if (atspiJson == null) {
       atspiJson = {
         ok: false,
-        parseError: true,
-        stdout: atspi.stdout,
-        stderr: atspi.stderr,
+        runnerError: {
+          code: 'missing-result',
+          message: 'AT-SPI helper did not produce a result',
+        },
       }
     }
     writeFileSync(
@@ -372,7 +436,6 @@ const main = async () => {
       motion: 'full',
       runnerHash,
     }
-    const elapsedMilliseconds = performance.now() - interactionStart
     const focusTarget = await page.evaluate(() => {
       const active = document.activeElement
       return active?.tagName === 'BUTTON'
@@ -442,9 +505,9 @@ const main = async () => {
       focusTarget,
       performance: {
         identity,
-        elapsedMilliseconds,
+        elapsedMilliseconds: interactionElapsedMilliseconds,
         budgetMilliseconds: 2000,
-        passed: elapsedMilliseconds < 2000,
+        passed: interactionElapsedMilliseconds < 2000,
       },
       visual: {
         identity,
@@ -500,7 +563,9 @@ const main = async () => {
   }
 }
 
-main().catch((error) => {
-  console.error(`[screen-reader] FAIL ${error.message}`)
-  process.exitCode = 9
-})
+if (resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(`[screen-reader] FAIL ${error.message}`)
+    process.exitCode = 9
+  })
+}

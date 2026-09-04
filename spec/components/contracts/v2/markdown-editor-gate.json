@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "component": "ElMarkdownEditor",
   "blocked": true,
-  "blockedBy": [340, 341, 342, 343],
+  "blockedBy": [342, 343],
   "requiredStatus": "partial",
-  "reason": "FsusMarkdownEditor transaction, native Source/Live projection, selection, history, and position mapping are implemented; Split/Preview, complete native IME acceptance, and AutomationPeer remain partial/blocked."
+  "reason": "FsusMarkdownEditor transaction, native Source/Live projection, selection, history, position mapping, clipboard, and IME composition are implemented; AutomationPeer/virtualization and final packed AOT/native IME/alignment evidence remain partial/blocked."
 }

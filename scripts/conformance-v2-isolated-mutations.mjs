@@ -12,6 +12,7 @@ const out = path.resolve(
   root,
   process.argv[2] ?? '.tmp/conformance-v2/isolated-mutations.json',
 )
+const requestedCaseIds = new Set(process.argv.slice(3))
 const checkout = fs.mkdtempSync(path.join(os.tmpdir(), 'fsusui-v2-mutations-'))
 const sha256 = (value) =>
   crypto.createHash('sha256').update(value).digest('hex')
@@ -60,6 +61,17 @@ const gate = (subcommand, args) => [
   process.execPath,
   ['scripts/conformance-v2-evidence.mjs', subcommand, ...args],
 ]
+const prepareAvaloniaSemanticCheck = () => {
+  const result = run('dotnet', [
+    'restore',
+    'dotnet/FsusUI.Avalonia.ApiTool/FsusUI.Avalonia.ApiTool.csproj',
+    '--force-evaluate',
+  ])
+  if (result.status !== 0)
+    throw new Error(
+      `Avalonia semantic mutation restore failed: ${result.stderr || result.stdout}`,
+    )
+}
 
 const cases = [
   {
@@ -73,6 +85,18 @@ const cases = [
       ),
     command: [process.execPath, ['scripts/conformance-v2-vue-public-gate.mjs']],
     expected: 'Vue public props drift',
+  },
+  {
+    id: 'root-command-vue-baseline-drift',
+    file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+        '  documentIdentity: {\n    type: definePropType<MarkdownEditorDocumentIdentity>(Object),\n    default: undefined,\n  },\n',
+        '',
+      ),
+    command: ['pnpm', ['run', 'conformance:v2']],
+    expected: '[conformance-v2] FAIL baseline:web exit=1',
   },
   {
     id: 'vue-event-modified',
@@ -97,6 +121,18 @@ const cases = [
       ),
     command: [process.execPath, ['scripts/conformance-v2-vue-public-gate.mjs']],
     expected: 'Vue public exposed drift',
+  },
+  {
+    id: 'vue-slot-modified',
+    file: 'vue/packages/components/select-v2/src/select.vue',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/select-v2/src/select.vue',
+        '<slot name="empty">',
+        '<slot name="empty-mutated">',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
   },
   ...[
     ['avalonia-property-removed', 'DocumentIdentityProperty'],
@@ -128,6 +164,7 @@ const cases = [
           : `${locator}Mutation`,
       ),
     command: ['pnpm', ['run', 'avalonia:semantic:check']],
+    prepare: prepareAvaloniaSemanticCheck,
     expected:
       id === 'avalonia-property-removed' ||
       id === 'avalonia-default-nullability-modified'
@@ -138,6 +175,32 @@ const cases = [
             ? 'CS1003'
             : 'baseline',
   })),
+  {
+    id: 'root-command-avalonia-baseline-drift',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusMarkdownEditor.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusMarkdownEditor.cs',
+        'public partial class FsusMarkdownEditor : TemplatedControl\n{',
+        'public partial class FsusMarkdownEditor : TemplatedControl\n{\n  public string RootCommandMutationMember { get; set; } = string.Empty;',
+      ),
+    command: ['pnpm', ['run', 'conformance:v2']],
+    prepare: prepareAvaloniaSemanticCheck,
+    expected: '[conformance-v2] FAIL baseline:avalonia exit=1',
+  },
+  {
+    id: 'avalonia-content-property-removed',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusActivityRailShell.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusActivityRailShell.cs',
+        '  [Content]\n  public object? MainContent',
+        '  public object? MainContent',
+      ),
+    command: ['pnpm', ['run', 'avalonia:semantic:check']],
+    prepare: prepareAvaloniaSemanticCheck,
+    expected: 'content property',
+  },
   ...[
     ['runner-skips-click', 'pointer'],
     ['runner-skips-keyboard', 'keyboard'],
@@ -337,6 +400,15 @@ const cases = [
     expected: 'reviewPolicy',
   },
 ]
+const selectedCases =
+  requestedCaseIds.size === 0
+    ? cases
+    : cases.filter((entry) => requestedCaseIds.has(entry.id))
+for (const requestedCaseId of requestedCaseIds) {
+  if (!selectedCases.some((entry) => entry.id === requestedCaseId)) {
+    throw new Error(`unknown isolated mutation ${requestedCaseId}`)
+  }
+}
 
 try {
   const clone = spawnSync(
@@ -352,9 +424,10 @@ try {
     path.join(checkout, 'node_modules'),
   )
   const results = []
-  for (const entry of cases) {
+  for (const entry of selectedCases) {
     reset()
     entry.inject()
+    entry.prepare?.()
     const diff = run('git', ['diff', '--no-ext-diff', '--', entry.file])
     const [command, args] = entry.command
     const result = run(command, args)

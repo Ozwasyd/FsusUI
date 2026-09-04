@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
     <ProjectReference Include="../FsusUI.Avalonia/FsusUI.Avalonia.csproj" />
     <ProjectReference Include="../FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj" />
     <ProjectReference Include="../FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj" />

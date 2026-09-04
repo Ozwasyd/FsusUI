@@ -14,18 +14,19 @@ explicit or when semantic drift is hidden.
 
 ## Artifacts
 
-| Artifact                | Path                                                            | Role                                                                             |
-| ----------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Registry                | `spec/components/contracts/v2/contract-v2.json`                 | Generated, committed, verified                                                   |
-| Gate                    | `spec/components/contracts/v2/markdown-editor-gate.json`        | MarkdownEditor blocking state                                                    |
-| Runtime projection      | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
-| Runtime projection docs | `docs/api/markdown-runtime-projection.md`                       | Consumer-facing runtime API                                                      |
-| Interaction trace docs  | `docs/api/markdown-interaction-trace.md`                        | Real-browser Web trace schema and Contract V2 binding                            |
-| Editor input            | `spec/components/contracts/v2/markdown-editor-input.json`       | Unique #327–#331 input pipeline and acceptance exports                           |
-| Editor input docs       | `docs/api/markdown-editor-input.md`                             | Consumer-facing input contract                                                   |
-| Generator + comparator  | `scripts/contract-v2.mjs`                                       | `generate` / `--check` / exported validators                                     |
-| Mutation fixtures       | `tests/fixtures/contract-v2/`                                   | Kill-fixtures for every forbidden pattern                                        |
-| Tests                   | `tests/contract-v2.test.mjs`                                    | `node --test` suite                                                              |
+| Artifact                 | Path                                                            | Role                                                                             |
+| ------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Registry                 | `spec/components/contracts/v2/contract-v2.json`                 | Generated, committed, verified                                                   |
+| Gate                     | `spec/components/contracts/v2/markdown-editor-gate.json`        | MarkdownEditor blocking state                                                    |
+| Semantic member bindings | `spec/components/contracts/v2/semantic-member-bindings.json`    | Explicit platform-neutral mappings for framework members whose names differ      |
+| Runtime projection       | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
+| Runtime projection docs  | `docs/api/markdown-runtime-projection.md`                       | Consumer-facing runtime API                                                      |
+| Interaction trace docs   | `docs/api/markdown-interaction-trace.md`                        | Real-browser Web trace schema and Contract V2 binding                            |
+| Editor input             | `spec/components/contracts/v2/markdown-editor-input.json`       | Unique #327–#331 input pipeline and acceptance exports                           |
+| Editor input docs        | `docs/api/markdown-editor-input.md`                             | Consumer-facing input contract                                                   |
+| Generator + comparator   | `scripts/contract-v2.mjs`                                       | `generate` / `--check` / exported validators                                     |
+| Mutation fixtures        | `tests/fixtures/contract-v2/`                                   | Kill-fixtures for every forbidden pattern                                        |
+| Tests                    | `tests/contract-v2.test.mjs`                                    | `node --test` suite                                                              |
 
 ## Generation
 
@@ -33,25 +34,39 @@ explicit or when semantic drift is hidden.
 pnpm run contract-v2:generate   # rebuild spec/components/contracts/v2/contract-v2.json
 pnpm run contract-v2:check      # fail on drift from the committed registry
 pnpm run test:contract-v2       # mutation fixture suite
+pnpm run conformance:v2         # baseline through real execution and readiness
 pnpm run conformance:contracts  # v1 + v2 + mutation tests + doc gates
 ```
 
 The registry records SHA-256 hashes of every baseline it consumes, so any
 baseline change without regeneration fails `contract-v2:check`.
 
+The unified `conformance:v2` command reports a stable stage name driven by each
+subprocess exit code. It checks the compiler-derived Web baseline, the
+Roslyn-derived Avalonia semantic baseline, Contract V2 mapping and coverage
+before building or launching either runtime. It then executes the real Web and
+Avalonia scenarios and runs differential comparison, alignment derivation,
+stable readiness, and negative mutations. A public API mutation therefore
+stops at `baseline:web` or `baseline:avalonia` instead of reaching runtime with
+stale evidence.
+
 ## Member mapping
 
-Every Vue public export receives exactly one contract. For each real member the
-generator either finds a real Avalonia member (name-equality after the narrow
-`Is/Can/Has` + `Changed` + kebab normalization) or explicitly records a gap.
+Every Vue public export receives exactly one contract. Explicit platform-neutral
+semantic bindings are resolved first; for example, `document` binds Web
+`modelValue` to Avalonia `Document`. The generator validates both endpoints
+against their independent baselines and rejects stale or duplicate mappings.
+Members without an explicit mapping remain candidate-matched by name equality
+after the narrow `Is/Can/Has` + `Changed` + kebab normalization, or are recorded
+as gaps.
 Each member carries exactly one status:
 
-| Status              | Meaning                                                                                       |
-| ------------------- | --------------------------------------------------------------------------------------------- |
-| `aligned-candidate` | Real member exists on both sides with no detected type/default/nullability/enum/payload drift |
-| `partial`           | Real member exists on both sides but semantic drift or non-comparable typing was detected     |
-| `missing`           | No real counterpart member exists on the other platform                                       |
-| `web-only`          | Explicit web-only registration with governance                                                |
+| Status              | Meaning                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `aligned-candidate` | Real member exists on both sides with no detected type/default/required/access/nullability/enum/payload drift |
+| `partial`           | Real member exists on both sides but semantic drift or non-comparable typing was detected                     |
+| `missing`           | No real counterpart member exists on the other platform                                                       |
+| `web-only`          | Explicit web-only registration with governance                                                                |
 
 A member with a status other than `aligned-candidate` must carry governance
 (`reason`, `owner`, `testPolicy`, `reviewPolicy`). Every required member must
@@ -61,14 +76,45 @@ carry at least one scenario coverage id.
 
 - **Type drift**: CLR categories (string/boolean/number/array/function/object/date)
   are compared against Vue runtime/semantic categories; definite mismatch fails.
-- **Default drift**: literal defaults are compared across platforms; mismatch fails.
-- **Nullability drift**: declared nullability must agree when both sides are known.
-- **Event payload drift**: payload types are compared when both sides expose them.
-- **Operation signature drift**: return categories are compared when both sides
-  expose signatures.
+- **Default drift**: literal defaults are compared only when compiled metadata
+  makes both values known. Missing Avalonia metadata and non-literal Vue
+  defaults remain `partial`.
+- **Required drift**: Vue required metadata is compared only with an explicit
+  compiled Avalonia required marker; absence on either side remains `partial`.
+- **Read/write drift**: Vue readonly metadata is compared with the real CLR
+  `CanRead`/`CanWrite` surface. Unknown access, an unreadable property, or a
+  readonly/write mismatch remains `partial`.
+- **Nullability drift**: declared nullability must agree. Missing metadata on
+  either side remains `partial`.
+- **Event payload drift**: explicitly bound Vue outputs use the TypeScript
+  checker to retain their shallow source-interface fields (bounded to 64),
+  optionality, and nullability. The comparator checks those fields against
+  Roslyn EventArgs properties. A single EventArgs property is unwrapped only
+  when its name matches the single Vue payload parameter and both shapes are
+  available. Recursive, framework, unresolved, multi-parameter, and rest
+  payloads remain `partial`; wrapper type names are never guessed equivalent.
+- **Operation signature drift**: compiler/Roslyn return and ordered parameter
+  signatures are compared by the existing primitive/array categories, parameter
+  count, optionality, and rest semantics. Framework or domain wrapper types are
+  not guessed equivalent; an unavailable or non-comparable type keeps the member
+  `partial`.
+- **Content-region drift**: Vue slot outlets come from the Vue SFC compiler AST,
+  including static versus dynamic names, scoped payload field names, and whether
+  a spread/dynamic binding makes the payload incomplete. Avalonia content
+  regions come from Roslyn-confirmed property-level `ContentAttribute` metadata
+  with their CLR/Styled kind, type, nullability, and read/write surface. Only an
+  explicit member-scoped semantic binding may pair the two. Dynamic names,
+  unknown content types, incomplete payloads, or scoped payloads without a
+  compiler-proven Avalonia shape remain `partial`; a `ContentProperty` is never
+  broadly applied to every Vue slot.
 - **Enum value drift**: Vue `values` sets must intersect the Avalonia enum member
   names when both are known.
 - **Scenario coverage**: a required semantic without a scenario coverage id fails.
+- **Vue public coverage**: every compiler-baseline component and every semantic
+  input, output, operation, and content region must appear exactly once in the
+  corresponding Contract V2 section with its baseline binding and an explicit
+  status. Extra, missing, duplicate, cross-kind, or misclassified web-only
+  entries fail the gate.
 - **Governance**: an override/omission missing any governance field fails.
 
 ## Fixed rules enforced by the validator
@@ -102,3 +148,14 @@ clear the MarkdownEditor gate.
 Every Avalonia public type that has no Vue counterpart is explicitly registered
 in `avaloniaOnlyTypes` with governance and scenario coverage. Extra members of
 mapped components are registered per contract in `avaloniaExtras`.
+
+The generator derives a canonical identity from the Roslyn semantic baseline
+for each CLR property (including its Styled/Direct property metadata), event,
+method overload, and enum member. Each extra records its surface kind and hash;
+overloads with the same public name receive distinct scenario IDs. An
+Avalonia-only type records the count and hash of its complete public surface;
+each mapped type records the same hash in `componentMap`.
+The Contract V2 gate recomputes both inventories and fails when a type or member
+is missing, duplicated, stale, or simultaneously mapped and extra. The semantic
+baselines contain public symbols only, so internal implementation details do
+not enter this registry.
