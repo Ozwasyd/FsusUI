@@ -203,21 +203,24 @@ const enumMemberNames = (enumMembers) => [
   ),
 ]
 
-const literalDefaultValue = (webDefault) =>
-  webDefault?.kind === 'literal' ? webDefault.value : undefined
+const knownBoolean = (value) => (typeof value === 'boolean' ? value : null)
 
 const normalizeDefault = (value) => {
+  if (value === null) return 'null'
+  if (value === undefined) return undefined
   if (typeof value === 'string') return value.toLowerCase()
   if (typeof value === 'number') return String(value)
   if (typeof value === 'boolean') return String(value)
   if (typeof value === 'object' && value !== null)
     return String(value.value ?? value)
-  return value == null ? undefined : String(value)
+  return String(value)
 }
 
 const COMPARISON_KEY = [
   'type',
   'default',
+  'required',
+  'readWrite',
   'nullability',
   'eventPayload',
   'operationSignature',
@@ -230,6 +233,27 @@ const emptyDrift = () =>
 const setDrift = (drift, key, detail) => {
   drift[key] = detail
   return drift
+}
+
+const compareInputDefaults = (web, avalonia) => {
+  const webDefault = web.default
+  if (typeof webDefault !== 'object' || webDefault == null) {
+    return 'web default metadata unavailable'
+  }
+  if (avalonia?.defaultKnown !== true) {
+    return 'avalonia default metadata unavailable'
+  }
+  if (!['literal', 'null'].includes(webDefault.kind)) {
+    return `web default kind ${webDefault.kind ?? 'unknown'} is not comparable`
+  }
+  const webValue = webDefault.kind === 'null' ? null : webDefault.value
+  if (normalizeDefault(webValue) !== normalizeDefault(avalonia.defaultValue)) {
+    return (
+      `web default=${JSON.stringify(webValue)} vs ` +
+      `avalonia default=${JSON.stringify(avalonia.defaultValue)}`
+    )
+  }
+  return null
 }
 
 const compareOperationSignatures = (web, avalonia) => {
@@ -405,26 +429,62 @@ export const compareMembers = ({ web, avalonia, kind }) => {
   }
 
   if (kind === 'input') {
-    const webNullable = Boolean(web.nullable)
+    const webNullable = web.nullable
     const avaloniaNullable = avalonia?.nullable
-    if (avaloniaNullable != null && webNullable !== Boolean(avaloniaNullable)) {
+    if (typeof webNullable !== 'boolean') {
+      setDrift(drift, 'nullability', 'web nullability metadata unavailable')
+    } else if (typeof avaloniaNullable !== 'boolean') {
       setDrift(
         drift,
         'nullability',
-        `web nullable=${webNullable} vs avalonia nullable=${Boolean(avaloniaNullable)}`,
+        'avalonia nullability metadata unavailable',
+      )
+    } else if (webNullable !== avaloniaNullable) {
+      setDrift(
+        drift,
+        'nullability',
+        `web nullable=${webNullable} vs avalonia nullable=${avaloniaNullable}`,
       )
     }
 
-    const webLiteral = literalDefaultValue(web.default)
-    const avaloniaDefault = avalonia?.defaultValue
-    if (webLiteral !== undefined && avaloniaDefault !== undefined) {
-      if (normalizeDefault(webLiteral) !== normalizeDefault(avaloniaDefault)) {
-        setDrift(
-          drift,
-          'default',
-          `web default=${JSON.stringify(webLiteral)} vs avalonia default=${JSON.stringify(avaloniaDefault)}`,
-        )
-      }
+    const defaultDifference = compareInputDefaults(web, avalonia)
+    if (defaultDifference) {
+      setDrift(drift, 'default', defaultDifference)
+    }
+
+    if (typeof web.required !== 'boolean') {
+      setDrift(drift, 'required', 'web required metadata unavailable')
+    } else if (typeof avalonia?.required !== 'boolean') {
+      setDrift(drift, 'required', 'avalonia required metadata unavailable')
+    } else if (web.required !== avalonia.required) {
+      setDrift(
+        drift,
+        'required',
+        `web required=${web.required} vs avalonia required=${avalonia.required}`,
+      )
+    }
+
+    const readWriteDifferences = []
+    if (typeof web.readonly !== 'boolean') {
+      readWriteDifferences.push('web readonly metadata unavailable')
+    }
+    if (typeof avalonia?.canRead !== 'boolean') {
+      readWriteDifferences.push('avalonia canRead metadata unavailable')
+    } else if (avalonia.canRead !== true) {
+      readWriteDifferences.push('avalonia canRead=false')
+    }
+    if (typeof avalonia?.canWrite !== 'boolean') {
+      readWriteDifferences.push('avalonia canWrite metadata unavailable')
+    } else if (
+      typeof web.readonly === 'boolean' &&
+      web.readonly === avalonia.canWrite
+    ) {
+      readWriteDifferences.push(
+        `web readonly=${web.readonly} vs avalonia canWrite=${avalonia.canWrite}`,
+      )
+    }
+    if (readWriteDifferences.length > 0) {
+      setDrift(drift, 'readWrite', readWriteDifferences.join('; '))
     }
 
     const webValues = comparableValues(web.values)
@@ -484,19 +544,25 @@ const webPropRef = (prop) => ({
   categories: categoriesFromVueProp(prop),
   runtimeType: prop.runtimeType ?? null,
   semanticType: prop.semanticType ?? null,
-  nullable: Boolean(prop.nullable),
-  default: prop.default ?? { kind: 'missing' },
+  nullable: knownBoolean(prop.nullable),
+  default: prop.default ?? null,
   values: prop.values ?? null,
-  required: Boolean(prop.required),
-  readonly: Boolean(prop.readonly),
+  required: knownBoolean(prop.required),
+  readonly: knownBoolean(prop.readonly),
 })
 
 const avaloniaPropRef = (property) => ({
   member: property.name,
   categories: categoriesFromClrType(property.type),
   type: property.type,
-  nullable: Boolean(property.nullable),
-  defaultValue: property.defaultValue ?? undefined,
+  nullable: knownBoolean(property.nullable),
+  propertyKind: property.propertyKind,
+  defaultKnown: property.defaultKnown,
+  defaultValue: property.defaultKnown ? property.defaultValue : null,
+  required: knownBoolean(property.required),
+  canRead: knownBoolean(property.canRead),
+  canWrite: knownBoolean(property.canWrite),
+  isStatic: knownBoolean(property.isStatic),
   enumMembers: property.enumMembers ?? undefined,
 })
 
@@ -628,16 +694,21 @@ const canonicalAvaloniaPropertySurface = (
   kind: 'property',
   member: property.name,
   type: property.type,
-  nullable: Boolean(property.nullable),
-  canRead: Boolean(property.canRead),
-  canWrite: Boolean(property.canWrite),
-  isStatic: Boolean(property.isStatic),
+  nullable: knownBoolean(property.nullable),
+  canRead: knownBoolean(property.canRead),
+  canWrite: knownBoolean(property.canWrite),
+  isStatic: knownBoolean(property.isStatic),
+  required: knownBoolean(property.required),
   isContentProperty: contentProperty === property.name,
   avaloniaProperty: avaloniaProperty
     ? {
         kind: avaloniaProperty.kind,
         type: avaloniaProperty.type,
-        nullable: Boolean(avaloniaProperty.nullable),
+        nullable: knownBoolean(avaloniaProperty.nullable),
+        defaultKnown: Object.hasOwn(avaloniaProperty, 'defaultValue'),
+        defaultValue: Object.hasOwn(avaloniaProperty, 'defaultValue')
+          ? avaloniaProperty.defaultValue
+          : null,
       }
     : null,
 })
@@ -647,7 +718,11 @@ const canonicalAvaloniaPropertyOnlySurface = (property, contentProperty) => ({
   member: property.name,
   propertyKind: property.kind,
   type: property.type,
-  nullable: Boolean(property.nullable),
+  nullable: knownBoolean(property.nullable),
+  defaultKnown: Object.hasOwn(property, 'defaultValue'),
+  defaultValue: Object.hasOwn(property, 'defaultValue')
+    ? property.defaultValue
+    : null,
   isContentProperty: contentProperty === property.name,
 })
 
@@ -656,18 +731,18 @@ const canonicalAvaloniaEventSurface = (event) => ({
   member: event.name,
   eventKind: event.kind,
   argsType: event.argsType,
-  isStatic: Boolean(event.isStatic),
+  isStatic: knownBoolean(event.isStatic),
 })
 
 const canonicalAvaloniaMethodSurface = (method) => ({
   kind: 'method',
   member: method.name,
-  isStatic: Boolean(method.isStatic),
+  isStatic: knownBoolean(method.isStatic),
   returnType: method.returnType,
   parameters: (method.parameters ?? []).map((parameter) => ({
     name: parameter.name,
     type: parameter.type,
-    optional: Boolean(parameter.optional),
+    optional: knownBoolean(parameter.optional),
   })),
 })
 
@@ -721,8 +796,8 @@ const avaloniaTypeSurfaceHash = (type) =>
       type: type.name,
       kind: type.kind,
       baseType: type.baseType ?? null,
-      isAbstract: Boolean(type.isAbstract),
-      isSealed: Boolean(type.isSealed),
+      isAbstract: knownBoolean(type.isAbstract),
+      isSealed: knownBoolean(type.isSealed),
       surfaces: avaloniaPublicSurfaces(type),
     }),
   )
@@ -738,14 +813,43 @@ const findAvaloniaType = (componentName, typeIndex) => {
   return null
 }
 
+const combinedAvaloniaProperty = (name, avaloniaType) => {
+  const property =
+    (avaloniaType.properties ?? []).find(
+      (candidate) => candidate.name === name,
+    ) ?? null
+  const avaloniaProperty =
+    (avaloniaType.avaloniaProperties ?? []).find(
+      (candidate) => candidate.name === name,
+    ) ?? null
+  if (!property && !avaloniaProperty) return null
+  return {
+    name,
+    type: avaloniaProperty?.type ?? property?.type ?? null,
+    nullable:
+      typeof avaloniaProperty?.nullable === 'boolean'
+        ? avaloniaProperty.nullable
+        : typeof property?.nullable === 'boolean'
+          ? property.nullable
+          : null,
+    propertyKind: avaloniaProperty?.kind ?? 'clr',
+    defaultKnown:
+      avaloniaProperty != null &&
+      Object.hasOwn(avaloniaProperty, 'defaultValue'),
+    defaultValue: avaloniaProperty?.defaultValue,
+    required:
+      typeof property?.required === 'boolean' ? property.required : null,
+    canRead: typeof property?.canRead === 'boolean' ? property.canRead : null,
+    canWrite:
+      typeof property?.canWrite === 'boolean' ? property.canWrite : null,
+    isStatic:
+      typeof property?.isStatic === 'boolean' ? property.isStatic : null,
+  }
+}
+
 const matchAvaloniaProperty = (webName, avaloniaType, binding) => {
   if (binding) {
-    return (
-      [
-        ...(avaloniaType.avaloniaProperties ?? []),
-        ...(avaloniaType.properties ?? []),
-      ].find((property) => property.name === binding.avalonia) ?? null
-    )
+    return combinedAvaloniaProperty(binding.avalonia, avaloniaType)
   }
   const normalized = normalizeMemberName(webName)
   const properties = [
@@ -756,7 +860,9 @@ const matchAvaloniaProperty = (webName, avaloniaType, binding) => {
   for (const property of properties) {
     if (seen.has(property.name)) continue
     seen.add(property.name)
-    if (normalizeMemberName(property.name) === normalized) return property
+    if (normalizeMemberName(property.name) === normalized) {
+      return combinedAvaloniaProperty(property.name, avaloniaType)
+    }
   }
   return null
 }
@@ -1588,7 +1694,7 @@ export const buildRegistry = ({
     owner: CONTRACT_V2_OWNER,
     generatedBy: {
       tool: 'scripts/contract-v2.mjs',
-      toolVersion: '1.1.0',
+      toolVersion: '1.2.0',
     },
     baselines: {
       web: {
@@ -1639,7 +1745,7 @@ export const buildRegistry = ({
         'explicit platform-neutral semantic ids bind non-equivalent framework member names before normalized candidate matching',
       statusDerivation: {
         alignedCandidate:
-          'real member matched with no type/default/nullability/enum/payload drift',
+          'real member matched with no type/default/required/read-write/nullability/enum/payload drift',
         partial:
           'real member matched but semantic drift or non-comparable typing',
         missing: 'no real counterpart member on the other platform',

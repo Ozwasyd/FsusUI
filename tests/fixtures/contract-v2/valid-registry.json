@@ -55,6 +55,8 @@
           "drift": {
             "type": null,
             "default": null,
+            "required": null,
+            "readWrite": null,
             "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
@@ -87,6 +89,8 @@
           "drift": {
             "type": null,
             "default": null,
+            "required": null,
+            "readWrite": null,
             "nullability": "web nullable=false vs avalonia nullable=true",
             "eventPayload": null,
             "operationSignature": null,
@@ -227,6 +231,8 @@
           "drift": {
             "type": null,
             "default": null,
+            "required": null,
+            "readWrite": null,
             "nullability": null,
             "eventPayload": null,
             "operationSignature": null,

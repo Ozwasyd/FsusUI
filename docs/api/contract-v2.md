@@ -61,12 +61,12 @@ after the narrow `Is/Can/Has` + `Changed` + kebab normalization, or are recorded
 as gaps.
 Each member carries exactly one status:
 
-| Status              | Meaning                                                                                       |
-| ------------------- | --------------------------------------------------------------------------------------------- |
-| `aligned-candidate` | Real member exists on both sides with no detected type/default/nullability/enum/payload drift |
-| `partial`           | Real member exists on both sides but semantic drift or non-comparable typing was detected     |
-| `missing`           | No real counterpart member exists on the other platform                                       |
-| `web-only`          | Explicit web-only registration with governance                                                |
+| Status              | Meaning                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `aligned-candidate` | Real member exists on both sides with no detected type/default/required/access/nullability/enum/payload drift |
+| `partial`           | Real member exists on both sides but semantic drift or non-comparable typing was detected                     |
+| `missing`           | No real counterpart member exists on the other platform                                                       |
+| `web-only`          | Explicit web-only registration with governance                                                                |
 
 A member with a status other than `aligned-candidate` must carry governance
 (`reason`, `owner`, `testPolicy`, `reviewPolicy`). Every required member must
@@ -76,8 +76,16 @@ carry at least one scenario coverage id.
 
 - **Type drift**: CLR categories (string/boolean/number/array/function/object/date)
   are compared against Vue runtime/semantic categories; definite mismatch fails.
-- **Default drift**: literal defaults are compared across platforms; mismatch fails.
-- **Nullability drift**: declared nullability must agree when both sides are known.
+- **Default drift**: literal defaults are compared only when compiled metadata
+  makes both values known. Missing Avalonia metadata and non-literal Vue
+  defaults remain `partial`.
+- **Required drift**: Vue required metadata is compared only with an explicit
+  compiled Avalonia required marker; absence on either side remains `partial`.
+- **Read/write drift**: Vue readonly metadata is compared with the real CLR
+  `CanRead`/`CanWrite` surface. Unknown access, an unreadable property, or a
+  readonly/write mismatch remains `partial`.
+- **Nullability drift**: declared nullability must agree. Missing metadata on
+  either side remains `partial`.
 - **Event payload drift**: explicitly bound Vue outputs use the TypeScript
   checker to retain their shallow source-interface fields (bounded to 64),
   optionality, and nullability. The comparator checks those fields against

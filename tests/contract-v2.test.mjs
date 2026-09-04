@@ -365,6 +365,218 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
   assert.match(errors, /duplicates semantic id document/)
 })
 
+test('real mapped input semantics fail closed when Avalonia metadata is unavailable', () => {
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+  const mappedInputs = registry.contracts.flatMap((contract) =>
+    contract.inputs.filter((input) => input.avalonia != null),
+  )
+  assert.equal(mappedInputs.length, 140)
+  assert.equal(
+    mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
+    0,
+  )
+  assert.equal(
+    mappedInputs.filter((input) => input.status === 'partial').length,
+    139,
+  )
+  const max = registry.contracts
+    .find((contract) => contract.component.name === 'ElBadge')
+    .inputs.find((input) => input.name === 'max')
+  assert.equal(max.avalonia.canRead, true)
+  assert.equal(max.avalonia.canWrite, true)
+  assert.equal(max.drift.nullability, null)
+  assert.equal(max.drift.readWrite, null)
+  assert.equal(max.drift.default, 'avalonia default metadata unavailable')
+  assert.equal(max.drift.required, 'avalonia required metadata unavailable')
+})
+
+test('real mapped input baseline mutations expose default, required, access, and nullability drift', () => {
+  const buildMax = ({
+    mutateWeb = () => {},
+    mutateProperty = () => {},
+    mutateAvaloniaProperty = () => {},
+  } = {}) => {
+    const nextVueBaseline = clone(vueBaseline)
+    const nextAvaloniaBaseline = clone(avaloniaBaselines.avalonia)
+    const webProp = nextVueBaseline.components
+      .find((component) => component.name === 'ElBadge')
+      .semantic.props.find((prop) => prop.name === 'max')
+    const type = nextAvaloniaBaseline.semanticTypes.find(
+      (candidate) => candidate.name === 'FsusUI.Avalonia.Controls.FsusBadge',
+    )
+    const property = type.properties.find(
+      (candidate) => candidate.name === 'Max',
+    )
+    const avaloniaProperty = type.avaloniaProperties.find(
+      (candidate) => candidate.name === 'Max',
+    )
+    mutateWeb(webProp)
+    mutateProperty(property)
+    mutateAvaloniaProperty(avaloniaProperty)
+    return buildRegistry({
+      vueBaseline: nextVueBaseline,
+      avaloniaBaseline: nextAvaloniaBaseline,
+      avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+      avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+      semanticMemberBindings,
+      gate,
+    })
+      .contracts.find((contract) => contract.component.name === 'ElBadge')
+      .inputs.find((input) => input.name === 'max')
+  }
+
+  const matchingKnownMetadata = buildMax({
+    mutateProperty: (property) => {
+      property.required = false
+    },
+    mutateAvaloniaProperty: (property) => {
+      property.defaultValue = 99
+    },
+  })
+  assert.equal(matchingKnownMetadata.drift.default, null)
+  assert.equal(matchingKnownMetadata.drift.required, null)
+  assert.equal(matchingKnownMetadata.drift.readWrite, null)
+  assert.equal(matchingKnownMetadata.drift.nullability, null)
+  assert.equal(matchingKnownMetadata.status, 'aligned-candidate')
+
+  const defaultDrift = buildMax({
+    mutateWeb: (property) => {
+      property.default.value = 100
+    },
+    mutateProperty: (property) => {
+      property.required = false
+    },
+    mutateAvaloniaProperty: (property) => {
+      property.defaultValue = 99
+    },
+  })
+  assert.match(
+    defaultDrift.drift.default,
+    /web default=100 vs avalonia default=99/,
+  )
+
+  const requiredDrift = buildMax({
+    mutateWeb: (property) => {
+      property.required = true
+    },
+    mutateProperty: (property) => {
+      property.required = false
+    },
+    mutateAvaloniaProperty: (property) => {
+      property.defaultValue = 99
+    },
+  })
+  assert.match(
+    requiredDrift.drift.required,
+    /web required=true vs avalonia required=false/,
+  )
+
+  const readonlyDrift = buildMax({
+    mutateWeb: (property) => {
+      property.readonly = true
+    },
+  })
+  assert.match(
+    readonlyDrift.drift.readWrite,
+    /web readonly=true vs avalonia canWrite=true/,
+  )
+
+  const unknownReadonly = buildMax({
+    mutateWeb: (property) => {
+      delete property.readonly
+    },
+  })
+  assert.match(
+    unknownReadonly.drift.readWrite,
+    /web readonly metadata unavailable/,
+  )
+
+  const writeDrift = buildMax({
+    mutateProperty: (property) => {
+      property.canWrite = false
+    },
+  })
+  assert.match(
+    writeDrift.drift.readWrite,
+    /web readonly=false vs avalonia canWrite=false/,
+  )
+
+  const readDrift = buildMax({
+    mutateProperty: (property) => {
+      property.canRead = false
+    },
+  })
+  assert.match(readDrift.drift.readWrite, /avalonia canRead=false/)
+
+  const nullabilityDrift = buildMax({
+    mutateWeb: (property) => {
+      property.nullable = true
+    },
+  })
+  assert.match(
+    nullabilityDrift.drift.nullability,
+    /web nullable=true vs avalonia nullable=false/,
+  )
+
+  const unknownNullability = buildMax({
+    mutateProperty: (property) => {
+      delete property.nullable
+    },
+    mutateAvaloniaProperty: (property) => {
+      delete property.nullable
+    },
+  })
+  assert.equal(
+    unknownNullability.drift.nullability,
+    'avalonia nullability metadata unavailable',
+  )
+})
+
+test('mapped input semantic mutations invalidate the committed surface hash', () => {
+  const mutations = [
+    (type) => {
+      type.avaloniaProperties.find(
+        (property) => property.name === 'Max',
+      ).defaultValue = 99
+    },
+    (type) => {
+      type.properties.find((property) => property.name === 'Max').required =
+        false
+    },
+    (type) => {
+      type.properties.find((property) => property.name === 'Max').canWrite =
+        false
+    },
+    (type) => {
+      type.avaloniaProperties.find(
+        (property) => property.name === 'Max',
+      ).nullable = true
+    },
+  ]
+  for (const mutate of mutations) {
+    const nextBaselines = clone(avaloniaBaselines)
+    mutate(
+      nextBaselines.avalonia.semanticTypes.find(
+        (type) => type.name === 'FsusUI.Avalonia.Controls.FsusBadge',
+      ),
+    )
+    assert.match(
+      validateAvaloniaSurfaceRegistration({
+        registry: committedRegistry,
+        avaloniaBaselines: nextBaselines,
+      }).errors.join('\n'),
+      /ElBadge.*has stale public surface hash/,
+    )
+  }
+})
+
 test('real operation signatures are retained and fail closed when not comparable', () => {
   const registry = buildRegistry({
     vueBaseline,
