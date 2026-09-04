@@ -114,3 +114,4 @@ assert.ok(!recovery.includes('npm publish'))
 console.log('npm release workflow lock and recovery policy passed.')
 
 await import('./test-fsusui-release-dispatch.mjs')
+await import('./test-cross-repo-app-verifier.mjs')

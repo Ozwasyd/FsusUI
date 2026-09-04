@@ -255,6 +255,17 @@ These tests are implementation evidence only. They do not claim a real npm
 publication, GitHub App installation, repository dispatch, or downstream
 migration.
 
+The separate #318 pre-publish App uses
+`FSUS_CROSS_REPO_APP_ID` / `FSUS_CROSS_REPO_APP_PRIVATE_KEY` and is restricted
+to metadata and contents read for exactly FsusUI and FsusBlog. Its verifier
+produces only the non-sensitive installation identifiers and permission/check
+summary defined by
+[`spec/releases/fsus-cross-repo-app-evidence.schema.json`](../../spec/releases/fsus-cross-repo-app-evidence.schema.json).
+It exits before reading credentials in an untrusted context. The checked-in
+simulator proves the fail-closed contract; the real installation and its
+administrator-owned evidence remain external and must not be inferred from a
+local pass.
+
 发布后至少检查：
 
 - GitHub Actions run 成功
