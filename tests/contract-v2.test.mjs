@@ -733,6 +733,44 @@ test('explicit semantic member bindings resolve real members from both baselines
   )
 })
 
+test('inactive MarkdownEditor issue gate preserves evidence-derived partial status', () => {
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+  const markdownEditor = registry.contracts.find(
+    (contract) => contract.component.name === 'ElMarkdownEditor',
+  )
+  assert.deepEqual(markdownEditor.markdownEditorGate, {
+    blocked: false,
+    blockedBy: [],
+  })
+  assert.equal(markdownEditor.coverage.missing, 41)
+  assert.equal(markdownEditor.coverage.partial, 17)
+  assert.equal(markdownEditor.component.exportStatus, 'partial')
+
+  const forgedAligned = clone(registry)
+  forgedAligned.contracts.find(
+    (contract) => contract.component.name === 'ElMarkdownEditor',
+  ).component.exportStatus = 'aligned-candidate'
+  assert.match(
+    validateRegistry(forgedAligned, gate, { avaloniaBaselines }).join('\n'),
+    /component-v2\.el-markdown-editor exportStatus aligned-candidate disagrees with derived status partial/u,
+  )
+
+  const staleInactiveGate = { ...gate, blockedBy: [343] }
+  assert.match(
+    validateRegistry(registry, staleInactiveGate, {
+      avaloniaBaselines,
+    }).join('\n'),
+    /blocked=false cannot retain stale blockedBy entries/u,
+  )
+})
+
 test('explicit semantic member bindings reject stale and duplicate endpoints', () => {
   const stale = clone(semanticMemberBindings)
   stale.mappings[0].avalonia = 'MissingDocument'

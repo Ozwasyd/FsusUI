@@ -17,7 +17,7 @@ explicit or when semantic drift is hidden.
 | Artifact                 | Path                                                            | Role                                                                             |
 | ------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Registry                 | `spec/components/contracts/v2/contract-v2.json`                 | Generated, committed, verified                                                   |
-| Gate                     | `spec/components/contracts/v2/markdown-editor-gate.json`        | MarkdownEditor blocking state                                                    |
+| Gate                     | `spec/components/contracts/v2/markdown-editor-gate.json`        | Audited MarkdownEditor issue-blocking state                                      |
 | Semantic member bindings | `spec/components/contracts/v2/semantic-member-bindings.json`    | Exact platform-neutral mappings and reviewed member-level Web-only dispositions  |
 | Runtime projection       | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
 | Runtime projection docs  | `docs/api/markdown-runtime-projection.md`                       | Consumer-facing runtime API                                                      |
@@ -151,15 +151,19 @@ evidence that the scenario ran.
    (`supported`, `unsupported-platform`, `runtime-unavailable`,
    `projection-failed`, `feature-degraded`, `fatal`) and carries no `write`
    alias. `readonly`/`disabled` are editor props, not capability tokens.
-   While `#338`–`#343` are open the gate keeps the export status at
-   `partial` automatically.
+   The completed `#338`–`#343` and `#288` dependency chain leaves the issue
+   gate inactive with an empty `blockedBy` list. An inactive gate cannot force
+   an export status: MarkdownEditor remains `partial` while its real static
+   member mapping or execution evidence is incomplete. The validator rejects
+   stale blocker numbers on an inactive gate and any generated status that
+   disagrees with this automatic derivation.
 
 The editor projection kernel is not a Vue/Avalonia component member map. It is
 the unique runtime authority on
 `@ozwasyd/element-plus/markdown-runtime`. Contract V2 records that authority in
 `markdown-runtime-projection.json` so outline, table, search, technical, and
 property consumers stay bound to the same `syn:` identities. That file does not
-clear the MarkdownEditor gate.
+determine the MarkdownEditor alignment status.
 
 ## Avalonia-only surface
 
