@@ -208,7 +208,11 @@ test('fails closed, mounts an exact virtual target, and preserves keyboard and S
     'user-scroll-suspended',
   )
   await fixture.getByTestId('markdown-reveal-virtual').click()
-  await textarea.dispatchEvent('touchmove')
+  await textarea.evaluate((element) => {
+    element.dispatchEvent(
+      new Event('touchmove', { bubbles: true, cancelable: true }),
+    )
+  })
   await expect(editor).toHaveAttribute(
     'data-markdown-writing-aids-state',
     'user-scroll-suspended',
