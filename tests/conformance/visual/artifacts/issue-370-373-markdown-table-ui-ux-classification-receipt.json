@@ -50,8 +50,8 @@
     "authorityDigest": "fcac3056190da872f8f2c78b07679dbaafdbb98437e8ad4f06ec7dcba8a3d2e9",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "7770f3e61566c2548e74dad8826ba94e84df3ff1",
-  "candidateDigest": "1c14c8ae2ef0578461b33a836882624550b72e563f1749ed52ca107158505642",
+  "candidateSha": "3b9e52b5f10884f7a732361ea1650e28780de172",
+  "candidateDigest": "d32fa48df7967e4bd1cf6b6315d8dacd1bc352cfbed596d09e5f5aaf8bf9c17f",
   "stateEvidenceMatrix": [
     {
       "state": "keyboard focus and complete compact table menu",
@@ -95,8 +95,8 @@
     "consumer application persistence or route composition",
     "physical touch hardware and external screen-reader application sessions"
   ],
-  "classificationEvidenceDigest": "b273c76f77d8d5a9b5ed80e5b35036f71ab3f2ec6a143a1f464233b7cb3d5979",
+  "classificationEvidenceDigest": "5a95a79a617ffa2d416ec9839c2b5f9f7ae5398600330303da60f70e82fb4d5b",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "dfba8a8bffe56480f6eaad55729094a55e9a2712e47944040fa6a04e76f92da8"
+  "receiptDigest": "b20487598517fd4ec55248d918896edac453cf85708c8d17767e766a36d6f665"
 }
