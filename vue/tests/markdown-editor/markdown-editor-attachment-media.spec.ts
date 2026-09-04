@@ -136,7 +136,12 @@ test('renders and operates the attachment lifecycle with local pointer, touch, a
     listLabel: 'Attachments',
     reducedMotion: true,
   })
-  expect(accessibilitySnapshot.liveRegions).toHaveLength(2)
+  expect(accessibilitySnapshot.liveRegions).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ text: expect.stringContaining('upload complete') }),
+      expect.objectContaining({ text: expect.stringContaining('upload cancelled') }),
+    ]),
+  )
   await testInfo.attach('attachment-accessibility-simulation.json', {
     body: Buffer.from(JSON.stringify(accessibilitySnapshot, null, 2)),
     contentType: 'application/json',
