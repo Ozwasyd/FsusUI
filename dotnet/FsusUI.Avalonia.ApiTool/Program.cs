@@ -87,10 +87,10 @@ internal static class Program
     return new SemanticBaseline
     {
       PackageId = packageId,
-      BaselineVersion = "2.3.0",
+      BaselineVersion = "2.4.0",
       Source = new BaselineSource
       {
-        ToolVersion = "FsusUI.Avalonia.ApiTool@1.7.0",
+        ToolVersion = "FsusUI.Avalonia.ApiTool@1.8.0",
         AssemblyVersion = version,
         InputTreeHash = sourceSemantics.InputTreeHash,
         CompilerOptionsHash = sourceSemantics.CompilerOptionsHash,
@@ -98,6 +98,8 @@ internal static class Program
         ContractSchemaVersion = "2.0.0",
       },
       SemanticTypes = types,
+      TokenThemeContract = ExtractTokenThemeContract(
+        sourceSemantics.TokenThemeContract),
     };
   }
 
@@ -107,6 +109,47 @@ internal static class Program
     var payload = $"{JsonSerializer.Serialize(baseline, JsonOptions)}\n";
     return Convert.ToHexString(
       SHA256.HashData(Encoding.UTF8.GetBytes(payload))).ToLowerInvariant();
+  }
+
+  private static SemanticTokenThemeContract? ExtractTokenThemeContract(
+    SourceTokenThemeContract? source)
+  {
+    if (source is null) return null;
+    return new SemanticTokenThemeContract
+    {
+      CanonicalAuthority = source.CanonicalAuthority,
+      GeneratedMetadataAuthority = source.GeneratedMetadataAuthority,
+      GeneratedXamlAuthority = source.GeneratedXamlAuthority,
+      GeneratedCsharpAuthority = source.GeneratedCsharpAuthority,
+      ContractDeclared = source.ContractDeclared,
+      RenderedEvidenceVerified = source.RenderedEvidenceVerified,
+      Definitions = source.Definitions
+        .Select(definition => new SemanticTokenDefinition
+        {
+          CanonicalName = definition.CanonicalName,
+          Owner = definition.Owner,
+          GeneratedOutputs = definition.GeneratedOutputs,
+          ResourceKeys = definition.ResourceKeys,
+          CsharpMembers = definition.CsharpMembers,
+          DeclarationAuthority = definition.DeclarationAuthority,
+        })
+        .ToList(),
+      Dependencies = source.Dependencies
+        .Select(dependency => new SemanticTokenDependency
+        {
+          Kind = dependency.Kind,
+          Authority = dependency.Authority,
+          SourceFile = dependency.SourceFile,
+          SourceMember = dependency.SourceMember,
+          Dependency = dependency.Dependency,
+          CanonicalName = dependency.CanonicalName,
+          Resolved = dependency.Resolved,
+          OwnerType = dependency.OwnerType,
+          Ownership = dependency.Ownership,
+          OwnerExpression = dependency.OwnerExpression,
+        })
+        .ToList(),
+    };
   }
 
   private static SemanticType ExtractType(
@@ -595,6 +638,44 @@ internal sealed class SemanticBaseline
   public BaselineSource Source { get; init; } = new();
 
   public List<SemanticType> SemanticTypes { get; init; } = [];
+
+  public SemanticTokenThemeContract? TokenThemeContract { get; init; }
+}
+
+internal sealed class SemanticTokenThemeContract
+{
+  public string CanonicalAuthority { get; init; } = "";
+  public string GeneratedMetadataAuthority { get; init; } = "";
+  public string GeneratedXamlAuthority { get; init; } = "";
+  public string GeneratedCsharpAuthority { get; init; } = "";
+  public bool ContractDeclared { get; init; }
+  public bool RenderedEvidenceVerified { get; init; }
+  public List<SemanticTokenDefinition> Definitions { get; init; } = [];
+  public List<SemanticTokenDependency> Dependencies { get; init; } = [];
+}
+
+internal sealed class SemanticTokenDefinition
+{
+  public string CanonicalName { get; init; } = "";
+  public string Owner { get; init; } = "";
+  public List<string> GeneratedOutputs { get; init; } = [];
+  public List<string> ResourceKeys { get; init; } = [];
+  public List<string> CsharpMembers { get; init; } = [];
+  public string DeclarationAuthority { get; init; } = "";
+}
+
+internal sealed class SemanticTokenDependency
+{
+  public string Kind { get; init; } = "";
+  public string Authority { get; init; } = "";
+  public string SourceFile { get; init; } = "";
+  public string SourceMember { get; init; } = "";
+  public string Dependency { get; init; } = "";
+  public string? CanonicalName { get; init; }
+  public bool Resolved { get; init; }
+  public string? OwnerType { get; init; }
+  public string Ownership { get; init; } = "";
+  public string? OwnerExpression { get; init; }
 }
 
 internal sealed class BaselineSource

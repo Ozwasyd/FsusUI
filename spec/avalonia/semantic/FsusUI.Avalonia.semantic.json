@@ -1,14 +1,14 @@
 {
   "packageId": "FsusUI.Avalonia",
-  "baselineVersion": "2.3.0",
+  "baselineVersion": "2.4.0",
   "source": {
-    "toolVersion": "FsusUI.Avalonia.ApiTool@1.7.0",
+    "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "da45aad404587079f3b93d48bd726fadd39f985d35da4200a763c70d85918b3e",
-    "compilerOptionsHash": "e354646dae1a711a933b0acd5350e730ad2c3d450fa0719cffa9902173cad7f9",
+    "inputTreeHash": "9e9ffcb64a451ad2b2d8d4ae280a6f5b8d97fac860f2da004271648d52f99727",
+    "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "58ce0820f33edb927eec0f24e78fd4946e01768ceaa44be0cfce169635da76d3"
+    "outputHash": "11721c549b98770c97f1828e0941ff3f3a927ead11004aa530ab52b3db290d06"
   },
   "semanticTypes": [
     {
@@ -62005,5 +62005,2649 @@
         }
       ]
     }
-  ]
+  ],
+  "tokenThemeContract": {
+    "canonicalAuthority": "spec/tokens/tokens.json",
+    "generatedMetadataAuthority": "vue/packages/theme-chalk/src/generated/tokens.json",
+    "generatedXamlAuthority": "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+    "generatedCsharpAuthority": "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs",
+    "contractDeclared": false,
+    "renderedEvidenceVerified": false,
+    "definitions": [
+      {
+        "canonicalName": "border.control.width",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusBorderControlWidth"
+        ],
+        "csharpMembers": [
+          "BorderControlWidthName",
+          "BorderControlWidthResourceKey",
+          "BorderControlWidthThickness",
+          "BorderControlWidthValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "brush.surface.base",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusBrushSurfaceBase"
+        ],
+        "csharpMembers": [
+          "BrushSurfaceBaseBrush",
+          "BrushSurfaceBaseName",
+          "BrushSurfaceBaseResourceKey",
+          "BrushSurfaceBaseValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "brush.surface.raised",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusBrushSurfaceRaised"
+        ],
+        "csharpMembers": [
+          "BrushSurfaceRaisedBrush",
+          "BrushSurfaceRaisedName",
+          "BrushSurfaceRaisedResourceKey",
+          "BrushSurfaceRaisedValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.action.primary",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorActionPrimary",
+          "FsusColorActionPrimaryBrush",
+          "FsusColorActionPrimaryDark",
+          "FsusColorActionPrimaryDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorActionPrimaryBrush",
+          "ColorActionPrimaryBrushResourceKey",
+          "ColorActionPrimaryColor",
+          "ColorActionPrimaryDarkResourceKey",
+          "ColorActionPrimaryDarkValue",
+          "ColorActionPrimaryName",
+          "ColorActionPrimaryResourceKey",
+          "ColorActionPrimaryValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.action.primary.hover",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorActionPrimaryHover",
+          "FsusColorActionPrimaryHoverBrush",
+          "FsusColorActionPrimaryHoverDark",
+          "FsusColorActionPrimaryHoverDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorActionPrimaryHoverBrush",
+          "ColorActionPrimaryHoverBrushResourceKey",
+          "ColorActionPrimaryHoverColor",
+          "ColorActionPrimaryHoverDarkResourceKey",
+          "ColorActionPrimaryHoverDarkValue",
+          "ColorActionPrimaryHoverName",
+          "ColorActionPrimaryHoverResourceKey",
+          "ColorActionPrimaryHoverValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.border.extra.light",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorBorderExtraLight",
+          "FsusColorBorderExtraLightBrush",
+          "FsusColorBorderExtraLightDark",
+          "FsusColorBorderExtraLightDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorBorderExtraLightBrush",
+          "ColorBorderExtraLightBrushResourceKey",
+          "ColorBorderExtraLightColor",
+          "ColorBorderExtraLightDarkResourceKey",
+          "ColorBorderExtraLightDarkValue",
+          "ColorBorderExtraLightName",
+          "ColorBorderExtraLightResourceKey",
+          "ColorBorderExtraLightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.border.light",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorBorderLight",
+          "FsusColorBorderLightBrush",
+          "FsusColorBorderLightDark",
+          "FsusColorBorderLightDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorBorderLightBrush",
+          "ColorBorderLightBrushResourceKey",
+          "ColorBorderLightColor",
+          "ColorBorderLightDarkResourceKey",
+          "ColorBorderLightDarkValue",
+          "ColorBorderLightName",
+          "ColorBorderLightResourceKey",
+          "ColorBorderLightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.border.lighter",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorBorderLighter",
+          "FsusColorBorderLighterBrush",
+          "FsusColorBorderLighterDark",
+          "FsusColorBorderLighterDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorBorderLighterBrush",
+          "ColorBorderLighterBrushResourceKey",
+          "ColorBorderLighterColor",
+          "ColorBorderLighterDarkResourceKey",
+          "ColorBorderLighterDarkValue",
+          "ColorBorderLighterName",
+          "ColorBorderLighterResourceKey",
+          "ColorBorderLighterValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.border.subtle",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorBorderSubtle",
+          "FsusColorBorderSubtleBrush",
+          "FsusColorBorderSubtleDark",
+          "FsusColorBorderSubtleDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorBorderSubtleBrush",
+          "ColorBorderSubtleBrushResourceKey",
+          "ColorBorderSubtleColor",
+          "ColorBorderSubtleDarkResourceKey",
+          "ColorBorderSubtleDarkValue",
+          "ColorBorderSubtleName",
+          "ColorBorderSubtleResourceKey",
+          "ColorBorderSubtleValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.fill.base",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorFillBase",
+          "FsusColorFillBaseBrush",
+          "FsusColorFillBaseDark",
+          "FsusColorFillBaseDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorFillBaseBrush",
+          "ColorFillBaseBrushResourceKey",
+          "ColorFillBaseColor",
+          "ColorFillBaseDarkResourceKey",
+          "ColorFillBaseDarkValue",
+          "ColorFillBaseName",
+          "ColorFillBaseResourceKey",
+          "ColorFillBaseValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.fill.dark",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorFillDark",
+          "FsusColorFillDarkBrush",
+          "FsusColorFillDarkDark",
+          "FsusColorFillDarkDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorFillDarkBrush",
+          "ColorFillDarkBrushResourceKey",
+          "ColorFillDarkColor",
+          "ColorFillDarkDarkResourceKey",
+          "ColorFillDarkDarkValue",
+          "ColorFillDarkName",
+          "ColorFillDarkResourceKey",
+          "ColorFillDarkValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.fill.darker",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorFillDarker",
+          "FsusColorFillDarkerBrush",
+          "FsusColorFillDarkerDark",
+          "FsusColorFillDarkerDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorFillDarkerBrush",
+          "ColorFillDarkerBrushResourceKey",
+          "ColorFillDarkerColor",
+          "ColorFillDarkerDarkResourceKey",
+          "ColorFillDarkerDarkValue",
+          "ColorFillDarkerName",
+          "ColorFillDarkerResourceKey",
+          "ColorFillDarkerValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.fill.extra.light",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorFillExtraLight",
+          "FsusColorFillExtraLightBrush",
+          "FsusColorFillExtraLightDark",
+          "FsusColorFillExtraLightDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorFillExtraLightBrush",
+          "ColorFillExtraLightBrushResourceKey",
+          "ColorFillExtraLightColor",
+          "ColorFillExtraLightDarkResourceKey",
+          "ColorFillExtraLightDarkValue",
+          "ColorFillExtraLightName",
+          "ColorFillExtraLightResourceKey",
+          "ColorFillExtraLightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.fill.light",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorFillLight",
+          "FsusColorFillLightBrush",
+          "FsusColorFillLightDark",
+          "FsusColorFillLightDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorFillLightBrush",
+          "ColorFillLightBrushResourceKey",
+          "ColorFillLightColor",
+          "ColorFillLightDarkResourceKey",
+          "ColorFillLightDarkValue",
+          "ColorFillLightName",
+          "ColorFillLightResourceKey",
+          "ColorFillLightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.fill.lighter",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorFillLighter",
+          "FsusColorFillLighterBrush",
+          "FsusColorFillLighterDark",
+          "FsusColorFillLighterDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorFillLighterBrush",
+          "ColorFillLighterBrushResourceKey",
+          "ColorFillLighterColor",
+          "ColorFillLighterDarkResourceKey",
+          "ColorFillLighterDarkValue",
+          "ColorFillLighterName",
+          "ColorFillLighterResourceKey",
+          "ColorFillLighterValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.focus.ring",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorFocusRing",
+          "FsusColorFocusRingBrush",
+          "FsusColorFocusRingDark",
+          "FsusColorFocusRingDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorFocusRingBrush",
+          "ColorFocusRingBrushResourceKey",
+          "ColorFocusRingColor",
+          "ColorFocusRingDarkResourceKey",
+          "ColorFocusRingDarkValue",
+          "ColorFocusRingName",
+          "ColorFocusRingResourceKey",
+          "ColorFocusRingValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.status.danger",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorStatusDanger",
+          "FsusColorStatusDangerBrush"
+        ],
+        "csharpMembers": [
+          "ColorStatusDangerBrush",
+          "ColorStatusDangerBrushResourceKey",
+          "ColorStatusDangerColor",
+          "ColorStatusDangerName",
+          "ColorStatusDangerResourceKey",
+          "ColorStatusDangerValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.surface.base",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorSurfaceBase",
+          "FsusColorSurfaceBaseBrush",
+          "FsusColorSurfaceBaseDark",
+          "FsusColorSurfaceBaseDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorSurfaceBaseBrush",
+          "ColorSurfaceBaseBrushResourceKey",
+          "ColorSurfaceBaseColor",
+          "ColorSurfaceBaseDarkResourceKey",
+          "ColorSurfaceBaseDarkValue",
+          "ColorSurfaceBaseName",
+          "ColorSurfaceBaseResourceKey",
+          "ColorSurfaceBaseValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.surface.overlay",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorSurfaceOverlay",
+          "FsusColorSurfaceOverlayBrush",
+          "FsusColorSurfaceOverlayDark",
+          "FsusColorSurfaceOverlayDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorSurfaceOverlayBrush",
+          "ColorSurfaceOverlayBrushResourceKey",
+          "ColorSurfaceOverlayColor",
+          "ColorSurfaceOverlayDarkResourceKey",
+          "ColorSurfaceOverlayDarkValue",
+          "ColorSurfaceOverlayName",
+          "ColorSurfaceOverlayResourceKey",
+          "ColorSurfaceOverlayValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.surface.page",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorSurfacePage",
+          "FsusColorSurfacePageBrush",
+          "FsusColorSurfacePageDark",
+          "FsusColorSurfacePageDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorSurfacePageBrush",
+          "ColorSurfacePageBrushResourceKey",
+          "ColorSurfacePageColor",
+          "ColorSurfacePageDarkResourceKey",
+          "ColorSurfacePageDarkValue",
+          "ColorSurfacePageName",
+          "ColorSurfacePageResourceKey",
+          "ColorSurfacePageValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.surface.raised",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorSurfaceRaised",
+          "FsusColorSurfaceRaisedBrush",
+          "FsusColorSurfaceRaisedDark",
+          "FsusColorSurfaceRaisedDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorSurfaceRaisedBrush",
+          "ColorSurfaceRaisedBrushResourceKey",
+          "ColorSurfaceRaisedColor",
+          "ColorSurfaceRaisedDarkResourceKey",
+          "ColorSurfaceRaisedDarkValue",
+          "ColorSurfaceRaisedName",
+          "ColorSurfaceRaisedResourceKey",
+          "ColorSurfaceRaisedValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.text.decorative",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorTextDecorative",
+          "FsusColorTextDecorativeBrush",
+          "FsusColorTextDecorativeDark",
+          "FsusColorTextDecorativeDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorTextDecorativeBrush",
+          "ColorTextDecorativeBrushResourceKey",
+          "ColorTextDecorativeColor",
+          "ColorTextDecorativeDarkResourceKey",
+          "ColorTextDecorativeDarkValue",
+          "ColorTextDecorativeName",
+          "ColorTextDecorativeResourceKey",
+          "ColorTextDecorativeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.text.muted",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorTextMuted",
+          "FsusColorTextMutedBrush"
+        ],
+        "csharpMembers": [
+          "ColorTextMutedBrush",
+          "ColorTextMutedBrushResourceKey",
+          "ColorTextMutedColor",
+          "ColorTextMutedName",
+          "ColorTextMutedResourceKey",
+          "ColorTextMutedValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.text.primary",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorTextPrimary",
+          "FsusColorTextPrimaryBrush",
+          "FsusColorTextPrimaryDark",
+          "FsusColorTextPrimaryDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorTextPrimaryBrush",
+          "ColorTextPrimaryBrushResourceKey",
+          "ColorTextPrimaryColor",
+          "ColorTextPrimaryDarkResourceKey",
+          "ColorTextPrimaryDarkValue",
+          "ColorTextPrimaryName",
+          "ColorTextPrimaryResourceKey",
+          "ColorTextPrimaryValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "color.text.quiet",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusColorTextQuiet",
+          "FsusColorTextQuietBrush",
+          "FsusColorTextQuietDark",
+          "FsusColorTextQuietDarkBrush"
+        ],
+        "csharpMembers": [
+          "ColorTextQuietBrush",
+          "ColorTextQuietBrushResourceKey",
+          "ColorTextQuietColor",
+          "ColorTextQuietDarkResourceKey",
+          "ColorTextQuietDarkValue",
+          "ColorTextQuietName",
+          "ColorTextQuietResourceKey",
+          "ColorTextQuietValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component-state.button.primary.background.default",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentStateButtonPrimaryBackgroundDefault",
+          "FsusComponentStateButtonPrimaryBackgroundDefaultDark"
+        ],
+        "csharpMembers": [
+          "ComponentStateButtonPrimaryBackgroundDefaultBrush",
+          "ComponentStateButtonPrimaryBackgroundDefaultDarkResourceKey",
+          "ComponentStateButtonPrimaryBackgroundDefaultDarkValue",
+          "ComponentStateButtonPrimaryBackgroundDefaultName",
+          "ComponentStateButtonPrimaryBackgroundDefaultResourceKey",
+          "ComponentStateButtonPrimaryBackgroundDefaultValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component-state.button.primary.background.hover",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentStateButtonPrimaryBackgroundHover",
+          "FsusComponentStateButtonPrimaryBackgroundHoverDark"
+        ],
+        "csharpMembers": [
+          "ComponentStateButtonPrimaryBackgroundHoverBrush",
+          "ComponentStateButtonPrimaryBackgroundHoverDarkResourceKey",
+          "ComponentStateButtonPrimaryBackgroundHoverDarkValue",
+          "ComponentStateButtonPrimaryBackgroundHoverName",
+          "ComponentStateButtonPrimaryBackgroundHoverResourceKey",
+          "ComponentStateButtonPrimaryBackgroundHoverValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component-state.surface.emphasis.background",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentStateSurfaceEmphasisBackground",
+          "FsusComponentStateSurfaceEmphasisBackgroundBrush",
+          "FsusComponentStateSurfaceEmphasisBackgroundDark",
+          "FsusComponentStateSurfaceEmphasisBackgroundDarkBrush"
+        ],
+        "csharpMembers": [
+          "ComponentStateSurfaceEmphasisBackgroundBrush",
+          "ComponentStateSurfaceEmphasisBackgroundBrushResourceKey",
+          "ComponentStateSurfaceEmphasisBackgroundColor",
+          "ComponentStateSurfaceEmphasisBackgroundDarkResourceKey",
+          "ComponentStateSurfaceEmphasisBackgroundDarkValue",
+          "ComponentStateSurfaceEmphasisBackgroundName",
+          "ComponentStateSurfaceEmphasisBackgroundResourceKey",
+          "ComponentStateSurfaceEmphasisBackgroundValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component-state.surface.focus.border",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentStateSurfaceFocusBorder",
+          "FsusComponentStateSurfaceFocusBorderBrush",
+          "FsusComponentStateSurfaceFocusBorderDark",
+          "FsusComponentStateSurfaceFocusBorderDarkBrush"
+        ],
+        "csharpMembers": [
+          "ComponentStateSurfaceFocusBorderBrush",
+          "ComponentStateSurfaceFocusBorderBrushResourceKey",
+          "ComponentStateSurfaceFocusBorderColor",
+          "ComponentStateSurfaceFocusBorderDarkResourceKey",
+          "ComponentStateSurfaceFocusBorderDarkValue",
+          "ComponentStateSurfaceFocusBorderName",
+          "ComponentStateSurfaceFocusBorderResourceKey",
+          "ComponentStateSurfaceFocusBorderValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component-state.surface.hover.background",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentStateSurfaceHoverBackground",
+          "FsusComponentStateSurfaceHoverBackgroundBrush",
+          "FsusComponentStateSurfaceHoverBackgroundDark",
+          "FsusComponentStateSurfaceHoverBackgroundDarkBrush"
+        ],
+        "csharpMembers": [
+          "ComponentStateSurfaceHoverBackgroundBrush",
+          "ComponentStateSurfaceHoverBackgroundBrushResourceKey",
+          "ComponentStateSurfaceHoverBackgroundColor",
+          "ComponentStateSurfaceHoverBackgroundDarkResourceKey",
+          "ComponentStateSurfaceHoverBackgroundDarkValue",
+          "ComponentStateSurfaceHoverBackgroundName",
+          "ComponentStateSurfaceHoverBackgroundResourceKey",
+          "ComponentStateSurfaceHoverBackgroundValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component-state.surface.invalid.border",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentStateSurfaceInvalidBorder",
+          "FsusComponentStateSurfaceInvalidBorderBrush"
+        ],
+        "csharpMembers": [
+          "ComponentStateSurfaceInvalidBorderBrush",
+          "ComponentStateSurfaceInvalidBorderBrushResourceKey",
+          "ComponentStateSurfaceInvalidBorderColor",
+          "ComponentStateSurfaceInvalidBorderName",
+          "ComponentStateSurfaceInvalidBorderResourceKey",
+          "ComponentStateSurfaceInvalidBorderValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component-state.surface.selected.background",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentStateSurfaceSelectedBackground",
+          "FsusComponentStateSurfaceSelectedBackgroundBrush",
+          "FsusComponentStateSurfaceSelectedBackgroundDark",
+          "FsusComponentStateSurfaceSelectedBackgroundDarkBrush"
+        ],
+        "csharpMembers": [
+          "ComponentStateSurfaceSelectedBackgroundBrush",
+          "ComponentStateSurfaceSelectedBackgroundBrushResourceKey",
+          "ComponentStateSurfaceSelectedBackgroundColor",
+          "ComponentStateSurfaceSelectedBackgroundDarkResourceKey",
+          "ComponentStateSurfaceSelectedBackgroundDarkValue",
+          "ComponentStateSurfaceSelectedBackgroundName",
+          "ComponentStateSurfaceSelectedBackgroundResourceKey",
+          "ComponentStateSurfaceSelectedBackgroundValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.button.padding.x",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentButtonPaddingX"
+        ],
+        "csharpMembers": [
+          "ComponentButtonPaddingXName",
+          "ComponentButtonPaddingXResourceKey",
+          "ComponentButtonPaddingXThickness",
+          "ComponentButtonPaddingXValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.button.radius",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentButtonRadius"
+        ],
+        "csharpMembers": [
+          "ComponentButtonRadiusCornerRadius",
+          "ComponentButtonRadiusName",
+          "ComponentButtonRadiusResourceKey",
+          "ComponentButtonRadiusValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.cascader.suggestion.max-height",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentCascaderSuggestionMaxHeight"
+        ],
+        "csharpMembers": [
+          "ComponentCascaderSuggestionMaxHeightDouble",
+          "ComponentCascaderSuggestionMaxHeightName",
+          "ComponentCascaderSuggestionMaxHeightResourceKey",
+          "ComponentCascaderSuggestionMaxHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.dialog.min-height",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentDialogMinHeight"
+        ],
+        "csharpMembers": [
+          "ComponentDialogMinHeightDouble",
+          "ComponentDialogMinHeightName",
+          "ComponentDialogMinHeightResourceKey",
+          "ComponentDialogMinHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.dialog.min-width",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentDialogMinWidth"
+        ],
+        "csharpMembers": [
+          "ComponentDialogMinWidthDouble",
+          "ComponentDialogMinWidthName",
+          "ComponentDialogMinWidthResourceKey",
+          "ComponentDialogMinWidthValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.dialog.padding",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentDialogPadding"
+        ],
+        "csharpMembers": [
+          "ComponentDialogPaddingName",
+          "ComponentDialogPaddingResourceKey",
+          "ComponentDialogPaddingThickness",
+          "ComponentDialogPaddingValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.link.danger.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentLinkDangerColor",
+          "FsusComponentLinkDangerColorBrush",
+          "FsusComponentLinkDangerColorDark",
+          "FsusComponentLinkDangerColorDarkBrush"
+        ],
+        "csharpMembers": [
+          "ComponentLinkDangerColorBrush",
+          "ComponentLinkDangerColorBrushResourceKey",
+          "ComponentLinkDangerColorColor",
+          "ComponentLinkDangerColorDarkResourceKey",
+          "ComponentLinkDangerColorDarkValue",
+          "ComponentLinkDangerColorName",
+          "ComponentLinkDangerColorResourceKey",
+          "ComponentLinkDangerColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.link.info.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentLinkInfoColor",
+          "FsusComponentLinkInfoColorBrush",
+          "FsusComponentLinkInfoColorDark",
+          "FsusComponentLinkInfoColorDarkBrush"
+        ],
+        "csharpMembers": [
+          "ComponentLinkInfoColorBrush",
+          "ComponentLinkInfoColorBrushResourceKey",
+          "ComponentLinkInfoColorColor",
+          "ComponentLinkInfoColorDarkResourceKey",
+          "ComponentLinkInfoColorDarkValue",
+          "ComponentLinkInfoColorName",
+          "ComponentLinkInfoColorResourceKey",
+          "ComponentLinkInfoColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.link.success.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentLinkSuccessColor",
+          "FsusComponentLinkSuccessColorBrush",
+          "FsusComponentLinkSuccessColorDark",
+          "FsusComponentLinkSuccessColorDarkBrush"
+        ],
+        "csharpMembers": [
+          "ComponentLinkSuccessColorBrush",
+          "ComponentLinkSuccessColorBrushResourceKey",
+          "ComponentLinkSuccessColorColor",
+          "ComponentLinkSuccessColorDarkResourceKey",
+          "ComponentLinkSuccessColorDarkValue",
+          "ComponentLinkSuccessColorName",
+          "ComponentLinkSuccessColorResourceKey",
+          "ComponentLinkSuccessColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.link.warning.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentLinkWarningColor",
+          "FsusComponentLinkWarningColorBrush",
+          "FsusComponentLinkWarningColorDark",
+          "FsusComponentLinkWarningColorDarkBrush"
+        ],
+        "csharpMembers": [
+          "ComponentLinkWarningColorBrush",
+          "ComponentLinkWarningColorBrushResourceKey",
+          "ComponentLinkWarningColorColor",
+          "ComponentLinkWarningColorDarkResourceKey",
+          "ComponentLinkWarningColorDarkValue",
+          "ComponentLinkWarningColorName",
+          "ComponentLinkWarningColorResourceKey",
+          "ComponentLinkWarningColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.material.overlay.blur",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentMaterialOverlayBlur"
+        ],
+        "csharpMembers": [
+          "ComponentMaterialOverlayBlurDouble",
+          "ComponentMaterialOverlayBlurName",
+          "ComponentMaterialOverlayBlurResourceKey",
+          "ComponentMaterialOverlayBlurValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.material.paper.blur",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentMaterialPaperBlur"
+        ],
+        "csharpMembers": [
+          "ComponentMaterialPaperBlurDouble",
+          "ComponentMaterialPaperBlurName",
+          "ComponentMaterialPaperBlurResourceKey",
+          "ComponentMaterialPaperBlurValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.material.paper.blur.soft",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentMaterialPaperBlurSoft"
+        ],
+        "csharpMembers": [
+          "ComponentMaterialPaperBlurSoftDouble",
+          "ComponentMaterialPaperBlurSoftName",
+          "ComponentMaterialPaperBlurSoftResourceKey",
+          "ComponentMaterialPaperBlurSoftValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.material.paper.saturate",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentMaterialPaperSaturate"
+        ],
+        "csharpMembers": [
+          "ComponentMaterialPaperSaturateName",
+          "ComponentMaterialPaperSaturateResourceKey",
+          "ComponentMaterialPaperSaturateValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.overlay.scrim",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentOverlayScrim",
+          "FsusComponentOverlayScrimBrush"
+        ],
+        "csharpMembers": [
+          "ComponentOverlayScrimBrush",
+          "ComponentOverlayScrimBrushResourceKey",
+          "ComponentOverlayScrimColor",
+          "ComponentOverlayScrimName",
+          "ComponentOverlayScrimResourceKey",
+          "ComponentOverlayScrimValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.tag.height.default",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentTagHeightDefault"
+        ],
+        "csharpMembers": [
+          "ComponentTagHeightDefaultDouble",
+          "ComponentTagHeightDefaultName",
+          "ComponentTagHeightDefaultResourceKey",
+          "ComponentTagHeightDefaultValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.tag.height.large",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentTagHeightLarge"
+        ],
+        "csharpMembers": [
+          "ComponentTagHeightLargeDouble",
+          "ComponentTagHeightLargeName",
+          "ComponentTagHeightLargeResourceKey",
+          "ComponentTagHeightLargeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.tag.height.small",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentTagHeightSmall"
+        ],
+        "csharpMembers": [
+          "ComponentTagHeightSmallDouble",
+          "ComponentTagHeightSmallName",
+          "ComponentTagHeightSmallResourceKey",
+          "ComponentTagHeightSmallValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.control.action.y",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensityControlActionY"
+        ],
+        "csharpMembers": [
+          "DensityControlActionYDouble",
+          "DensityControlActionYName",
+          "DensityControlActionYResourceKey",
+          "DensityControlActionYValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.control.compact.y",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensityControlCompactY"
+        ],
+        "csharpMembers": [
+          "DensityControlCompactYDouble",
+          "DensityControlCompactYName",
+          "DensityControlCompactYResourceKey",
+          "DensityControlCompactYValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.control.default.y",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensityControlDefaultY",
+          "FsusDensityControlDefaultYDensityCompact",
+          "FsusDensityControlDefaultYDensitySpacious"
+        ],
+        "csharpMembers": [
+          "DensityControlDefaultYDensityCompactResourceKey",
+          "DensityControlDefaultYDensityCompactValue",
+          "DensityControlDefaultYDensitySpaciousResourceKey",
+          "DensityControlDefaultYDensitySpaciousValue",
+          "DensityControlDefaultYDouble",
+          "DensityControlDefaultYName",
+          "DensityControlDefaultYResourceKey",
+          "DensityControlDefaultYValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.control.spacious.y",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensityControlSpaciousY"
+        ],
+        "csharpMembers": [
+          "DensityControlSpaciousYDouble",
+          "DensityControlSpaciousYName",
+          "DensityControlSpaciousYResourceKey",
+          "DensityControlSpaciousYValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.icon.target",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensityIconTarget"
+        ],
+        "csharpMembers": [
+          "DensityIconTargetDouble",
+          "DensityIconTargetName",
+          "DensityIconTargetResourceKey",
+          "DensityIconTargetValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.icon.target.small",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensityIconTargetSmall"
+        ],
+        "csharpMembers": [
+          "DensityIconTargetSmallDouble",
+          "DensityIconTargetSmallName",
+          "DensityIconTargetSmallResourceKey",
+          "DensityIconTargetSmallValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.menu.horizontal.y",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensityMenuHorizontalY"
+        ],
+        "csharpMembers": [
+          "DensityMenuHorizontalYDouble",
+          "DensityMenuHorizontalYName",
+          "DensityMenuHorizontalYResourceKey",
+          "DensityMenuHorizontalYValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.menu.item.y",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensityMenuItemY"
+        ],
+        "csharpMembers": [
+          "DensityMenuItemYDouble",
+          "DensityMenuItemYName",
+          "DensityMenuItemYResourceKey",
+          "DensityMenuItemYValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "density.select.option.y",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusDensitySelectOptionY"
+        ],
+        "csharpMembers": [
+          "DensitySelectOptionYDouble",
+          "DensitySelectOptionYName",
+          "DensitySelectOptionYResourceKey",
+          "DensitySelectOptionYValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "icon.fill.default",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusIconFillDefault"
+        ],
+        "csharpMembers": [
+          "IconFillDefaultName",
+          "IconFillDefaultResourceKey",
+          "IconFillDefaultValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "icon.size.md",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusIconSizeMd"
+        ],
+        "csharpMembers": [
+          "IconSizeMdDouble",
+          "IconSizeMdName",
+          "IconSizeMdResourceKey",
+          "IconSizeMdValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "icon.stroke.md",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusIconStrokeMd"
+        ],
+        "csharpMembers": [
+          "IconStrokeMdDouble",
+          "IconStrokeMdName",
+          "IconStrokeMdResourceKey",
+          "IconStrokeMdValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.distance.large",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionDistanceLarge"
+        ],
+        "csharpMembers": [
+          "MotionDistanceLargeDouble",
+          "MotionDistanceLargeName",
+          "MotionDistanceLargeResourceKey",
+          "MotionDistanceLargeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.distance.medium",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionDistanceMedium"
+        ],
+        "csharpMembers": [
+          "MotionDistanceMediumDouble",
+          "MotionDistanceMediumName",
+          "MotionDistanceMediumResourceKey",
+          "MotionDistanceMediumValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.distance.small",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionDistanceSmall"
+        ],
+        "csharpMembers": [
+          "MotionDistanceSmallDouble",
+          "MotionDistanceSmallName",
+          "MotionDistanceSmallResourceKey",
+          "MotionDistanceSmallValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.duration.control",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionDurationControl",
+          "FsusMotionDurationControlMotionDisabled",
+          "FsusMotionDurationControlMotionReduced"
+        ],
+        "csharpMembers": [
+          "MotionDurationControlMotionDisabledResourceKey",
+          "MotionDurationControlMotionDisabledValue",
+          "MotionDurationControlMotionReducedResourceKey",
+          "MotionDurationControlMotionReducedValue",
+          "MotionDurationControlName",
+          "MotionDurationControlResourceKey",
+          "MotionDurationControlTimeSpan",
+          "MotionDurationControlValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.duration.control.fast",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionDurationControlFast",
+          "FsusMotionDurationControlFastMotionDisabled",
+          "FsusMotionDurationControlFastMotionReduced"
+        ],
+        "csharpMembers": [
+          "MotionDurationControlFastMotionDisabledResourceKey",
+          "MotionDurationControlFastMotionDisabledValue",
+          "MotionDurationControlFastMotionReducedResourceKey",
+          "MotionDurationControlFastMotionReducedValue",
+          "MotionDurationControlFastName",
+          "MotionDurationControlFastResourceKey",
+          "MotionDurationControlFastTimeSpan",
+          "MotionDurationControlFastValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.duration.overlay",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionDurationOverlay",
+          "FsusMotionDurationOverlayMotionDisabled",
+          "FsusMotionDurationOverlayMotionReduced"
+        ],
+        "csharpMembers": [
+          "MotionDurationOverlayMotionDisabledResourceKey",
+          "MotionDurationOverlayMotionDisabledValue",
+          "MotionDurationOverlayMotionReducedResourceKey",
+          "MotionDurationOverlayMotionReducedValue",
+          "MotionDurationOverlayName",
+          "MotionDurationOverlayResourceKey",
+          "MotionDurationOverlayTimeSpan",
+          "MotionDurationOverlayValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.duration.panel",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionDurationPanel",
+          "FsusMotionDurationPanelMotionDisabled",
+          "FsusMotionDurationPanelMotionReduced"
+        ],
+        "csharpMembers": [
+          "MotionDurationPanelMotionDisabledResourceKey",
+          "MotionDurationPanelMotionDisabledValue",
+          "MotionDurationPanelMotionReducedResourceKey",
+          "MotionDurationPanelMotionReducedValue",
+          "MotionDurationPanelName",
+          "MotionDurationPanelResourceKey",
+          "MotionDurationPanelTimeSpan",
+          "MotionDurationPanelValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.easing.emphasized",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionEasingEmphasized"
+        ],
+        "csharpMembers": [
+          "MotionEasingEmphasizedEasing",
+          "MotionEasingEmphasizedName",
+          "MotionEasingEmphasizedResourceKey",
+          "MotionEasingEmphasizedValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.easing.standard",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionEasingStandard"
+        ],
+        "csharpMembers": [
+          "MotionEasingStandardEasing",
+          "MotionEasingStandardName",
+          "MotionEasingStandardResourceKey",
+          "MotionEasingStandardValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.intensity.standard",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionIntensityStandard"
+        ],
+        "csharpMembers": [
+          "MotionIntensityStandardDouble",
+          "MotionIntensityStandardName",
+          "MotionIntensityStandardResourceKey",
+          "MotionIntensityStandardValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.intensity.subtle",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionIntensitySubtle"
+        ],
+        "csharpMembers": [
+          "MotionIntensitySubtleDouble",
+          "MotionIntensitySubtleName",
+          "MotionIntensitySubtleResourceKey",
+          "MotionIntensitySubtleValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "motion.stagger.default",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusMotionStaggerDefault"
+        ],
+        "csharpMembers": [
+          "MotionStaggerDefaultName",
+          "MotionStaggerDefaultResourceKey",
+          "MotionStaggerDefaultTimeSpan",
+          "MotionStaggerDefaultValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "opacity.disabled.content",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusOpacityDisabledContent"
+        ],
+        "csharpMembers": [
+          "OpacityDisabledContentDouble",
+          "OpacityDisabledContentName",
+          "OpacityDisabledContentResourceKey",
+          "OpacityDisabledContentValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "primitive.color.blue.600",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusPrimitiveColorBlue600",
+          "FsusPrimitiveColorBlue600Brush"
+        ],
+        "csharpMembers": [
+          "PrimitiveColorBlue600Brush",
+          "PrimitiveColorBlue600BrushResourceKey",
+          "PrimitiveColorBlue600Color",
+          "PrimitiveColorBlue600Name",
+          "PrimitiveColorBlue600ResourceKey",
+          "PrimitiveColorBlue600Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "primitive.color.blue.700",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusPrimitiveColorBlue700",
+          "FsusPrimitiveColorBlue700Brush"
+        ],
+        "csharpMembers": [
+          "PrimitiveColorBlue700Brush",
+          "PrimitiveColorBlue700BrushResourceKey",
+          "PrimitiveColorBlue700Color",
+          "PrimitiveColorBlue700Name",
+          "PrimitiveColorBlue700ResourceKey",
+          "PrimitiveColorBlue700Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "primitive.color.gray.400",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusPrimitiveColorGray400",
+          "FsusPrimitiveColorGray400Brush"
+        ],
+        "csharpMembers": [
+          "PrimitiveColorGray400Brush",
+          "PrimitiveColorGray400BrushResourceKey",
+          "PrimitiveColorGray400Color",
+          "PrimitiveColorGray400Name",
+          "PrimitiveColorGray400ResourceKey",
+          "PrimitiveColorGray400Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "primitive.color.gray.500",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusPrimitiveColorGray500",
+          "FsusPrimitiveColorGray500Brush"
+        ],
+        "csharpMembers": [
+          "PrimitiveColorGray500Brush",
+          "PrimitiveColorGray500BrushResourceKey",
+          "PrimitiveColorGray500Color",
+          "PrimitiveColorGray500Name",
+          "PrimitiveColorGray500ResourceKey",
+          "PrimitiveColorGray500Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "primitive.color.gray.950",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusPrimitiveColorGray950",
+          "FsusPrimitiveColorGray950Brush"
+        ],
+        "csharpMembers": [
+          "PrimitiveColorGray950Brush",
+          "PrimitiveColorGray950BrushResourceKey",
+          "PrimitiveColorGray950Color",
+          "PrimitiveColorGray950Name",
+          "PrimitiveColorGray950ResourceKey",
+          "PrimitiveColorGray950Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "primitive.color.white",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusPrimitiveColorWhite",
+          "FsusPrimitiveColorWhiteBrush"
+        ],
+        "csharpMembers": [
+          "PrimitiveColorWhiteBrush",
+          "PrimitiveColorWhiteBrushResourceKey",
+          "PrimitiveColorWhiteColor",
+          "PrimitiveColorWhiteName",
+          "PrimitiveColorWhiteResourceKey",
+          "PrimitiveColorWhiteValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "radius.control.md",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusRadiusControlMd"
+        ],
+        "csharpMembers": [
+          "RadiusControlMdCornerRadius",
+          "RadiusControlMdName",
+          "RadiusControlMdResourceKey",
+          "RadiusControlMdValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "radius.control.sm",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusRadiusControlSm"
+        ],
+        "csharpMembers": [
+          "RadiusControlSmCornerRadius",
+          "RadiusControlSmName",
+          "RadiusControlSmResourceKey",
+          "RadiusControlSmValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "radius.pill",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusRadiusPill"
+        ],
+        "csharpMembers": [
+          "RadiusPillCornerRadius",
+          "RadiusPillName",
+          "RadiusPillResourceKey",
+          "RadiusPillValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "radius.surface.lg",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusRadiusSurfaceLg"
+        ],
+        "csharpMembers": [
+          "RadiusSurfaceLgCornerRadius",
+          "RadiusSurfaceLgName",
+          "RadiusSurfaceLgResourceKey",
+          "RadiusSurfaceLgValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "radius.surface.md",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusRadiusSurfaceMd"
+        ],
+        "csharpMembers": [
+          "RadiusSurfaceMdCornerRadius",
+          "RadiusSurfaceMdName",
+          "RadiusSurfaceMdResourceKey",
+          "RadiusSurfaceMdValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "radius.surface.sm",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusRadiusSurfaceSm"
+        ],
+        "csharpMembers": [
+          "RadiusSurfaceSmCornerRadius",
+          "RadiusSurfaceSmName",
+          "RadiusSurfaceSmResourceKey",
+          "RadiusSurfaceSmValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "shadow.floating",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusShadowFloating",
+          "FsusShadowFloatingDark"
+        ],
+        "csharpMembers": [
+          "ShadowFloatingBoxShadows",
+          "ShadowFloatingDarkResourceKey",
+          "ShadowFloatingDarkValue",
+          "ShadowFloatingName",
+          "ShadowFloatingResourceKey",
+          "ShadowFloatingValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "shadow.overlay.md",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusShadowOverlayMd"
+        ],
+        "csharpMembers": [
+          "ShadowOverlayMdBoxShadows",
+          "ShadowOverlayMdName",
+          "ShadowOverlayMdResourceKey",
+          "ShadowOverlayMdValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "shadow.panel.dark",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusShadowPanelDark",
+          "FsusShadowPanelDarkDark"
+        ],
+        "csharpMembers": [
+          "ShadowPanelDarkBoxShadows",
+          "ShadowPanelDarkDarkResourceKey",
+          "ShadowPanelDarkDarkValue",
+          "ShadowPanelDarkName",
+          "ShadowPanelDarkResourceKey",
+          "ShadowPanelDarkValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "shadow.panel.light",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusShadowPanelLight",
+          "FsusShadowPanelLightDark"
+        ],
+        "csharpMembers": [
+          "ShadowPanelLightBoxShadows",
+          "ShadowPanelLightDarkResourceKey",
+          "ShadowPanelLightDarkValue",
+          "ShadowPanelLightName",
+          "ShadowPanelLightResourceKey",
+          "ShadowPanelLightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "shadow.panel.lighter",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusShadowPanelLighter",
+          "FsusShadowPanelLighterDark"
+        ],
+        "csharpMembers": [
+          "ShadowPanelLighterBoxShadows",
+          "ShadowPanelLighterDarkResourceKey",
+          "ShadowPanelLighterDarkValue",
+          "ShadowPanelLighterName",
+          "ShadowPanelLighterResourceKey",
+          "ShadowPanelLighterValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "space.1",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusSpace1"
+        ],
+        "csharpMembers": [
+          "Space1Name",
+          "Space1ResourceKey",
+          "Space1Thickness",
+          "Space1Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "space.2",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusSpace2"
+        ],
+        "csharpMembers": [
+          "Space2Name",
+          "Space2ResourceKey",
+          "Space2Thickness",
+          "Space2Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "space.3",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusSpace3"
+        ],
+        "csharpMembers": [
+          "Space3Name",
+          "Space3ResourceKey",
+          "Space3Thickness",
+          "Space3Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "space.4",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusSpace4"
+        ],
+        "csharpMembers": [
+          "Space4Name",
+          "Space4ResourceKey",
+          "Space4Thickness",
+          "Space4Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "space.5",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusSpace5"
+        ],
+        "csharpMembers": [
+          "Space5Name",
+          "Space5ResourceKey",
+          "Space5Thickness",
+          "Space5Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "space.6",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusSpace6"
+        ],
+        "csharpMembers": [
+          "Space6Name",
+          "Space6ResourceKey",
+          "Space6Thickness",
+          "Space6Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "space.8",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusSpace8"
+        ],
+        "csharpMembers": [
+          "Space8Name",
+          "Space8ResourceKey",
+          "Space8Thickness",
+          "Space8Value"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "thickness.border.default",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusThicknessBorderDefault"
+        ],
+        "csharpMembers": [
+          "ThicknessBorderDefaultName",
+          "ThicknessBorderDefaultResourceKey",
+          "ThicknessBorderDefaultThickness",
+          "ThicknessBorderDefaultValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "thickness.focus.md",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusThicknessFocusMd"
+        ],
+        "csharpMembers": [
+          "ThicknessFocusMdName",
+          "ThicknessFocusMdResourceKey",
+          "ThicknessFocusMdThickness",
+          "ThicknessFocusMdValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.body.lg.size",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyBodyLgSize"
+        ],
+        "csharpMembers": [
+          "TypographyBodyLgSizeDouble",
+          "TypographyBodyLgSizeName",
+          "TypographyBodyLgSizeResourceKey",
+          "TypographyBodyLgSizeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.body.md.line-height",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyBodyMdLineHeight"
+        ],
+        "csharpMembers": [
+          "TypographyBodyMdLineHeightDouble",
+          "TypographyBodyMdLineHeightName",
+          "TypographyBodyMdLineHeightResourceKey",
+          "TypographyBodyMdLineHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.body.md.size",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyBodyMdSize"
+        ],
+        "csharpMembers": [
+          "TypographyBodyMdSizeDouble",
+          "TypographyBodyMdSizeName",
+          "TypographyBodyMdSizeResourceKey",
+          "TypographyBodyMdSizeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.body.md.weight",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyBodyMdWeight"
+        ],
+        "csharpMembers": [
+          "TypographyBodyMdWeightFontWeight",
+          "TypographyBodyMdWeightName",
+          "TypographyBodyMdWeightResourceKey",
+          "TypographyBodyMdWeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.caption.md.size",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyCaptionMdSize"
+        ],
+        "csharpMembers": [
+          "TypographyCaptionMdSizeDouble",
+          "TypographyCaptionMdSizeName",
+          "TypographyCaptionMdSizeResourceKey",
+          "TypographyCaptionMdSizeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.caption.sm.size",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyCaptionSmSize"
+        ],
+        "csharpMembers": [
+          "TypographyCaptionSmSizeDouble",
+          "TypographyCaptionSmSizeName",
+          "TypographyCaptionSmSizeResourceKey",
+          "TypographyCaptionSmSizeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.family.body",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyFamilyBody"
+        ],
+        "csharpMembers": [
+          "TypographyFamilyBodyFontFamily",
+          "TypographyFamilyBodyName",
+          "TypographyFamilyBodyResourceKey",
+          "TypographyFamilyBodyValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.family.monospace",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyFamilyMonospace"
+        ],
+        "csharpMembers": [
+          "TypographyFamilyMonospaceFontFamily",
+          "TypographyFamilyMonospaceName",
+          "TypographyFamilyMonospaceResourceKey",
+          "TypographyFamilyMonospaceValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.heading.lg.line-height",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyHeadingLgLineHeight"
+        ],
+        "csharpMembers": [
+          "TypographyHeadingLgLineHeightDouble",
+          "TypographyHeadingLgLineHeightName",
+          "TypographyHeadingLgLineHeightResourceKey",
+          "TypographyHeadingLgLineHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.heading.lg.size",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyHeadingLgSize"
+        ],
+        "csharpMembers": [
+          "TypographyHeadingLgSizeDouble",
+          "TypographyHeadingLgSizeName",
+          "TypographyHeadingLgSizeResourceKey",
+          "TypographyHeadingLgSizeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.heading.md.size",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyHeadingMdSize"
+        ],
+        "csharpMembers": [
+          "TypographyHeadingMdSizeDouble",
+          "TypographyHeadingMdSizeName",
+          "TypographyHeadingMdSizeResourceKey",
+          "TypographyHeadingMdSizeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.heading.sm.size",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyHeadingSmSize"
+        ],
+        "csharpMembers": [
+          "TypographyHeadingSmSizeDouble",
+          "TypographyHeadingSmSizeName",
+          "TypographyHeadingSmSizeResourceKey",
+          "TypographyHeadingSmSizeValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.weight.bold",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyWeightBold"
+        ],
+        "csharpMembers": [
+          "TypographyWeightBoldFontWeight",
+          "TypographyWeightBoldName",
+          "TypographyWeightBoldResourceKey",
+          "TypographyWeightBoldValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "typography.weight.medium",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusTypographyWeightMedium"
+        ],
+        "csharpMembers": [
+          "TypographyWeightMediumFontWeight",
+          "TypographyWeightMediumName",
+          "TypographyWeightMediumResourceKey",
+          "TypographyWeightMediumValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "z.overlay.dialog",
+        "owner": "FsusUI design system",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusZOverlayDialog"
+        ],
+        "csharpMembers": [
+          "ZOverlayDialogInt32",
+          "ZOverlayDialogName",
+          "ZOverlayDialogResourceKey",
+          "ZOverlayDialogValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      }
+    ],
+    "dependencies": [
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildResultRow",
+        "dependency": "Space1Thickness",
+        "canonicalName": "space.1",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCommandPalette",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusCommandPalette"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildResultRow",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCommandPalette",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusCommandPalette"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildVisualTree",
+        "dependency": "DensityMenuItemYDouble",
+        "canonicalName": "density.menu.item.y",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCommandPalette",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusCommandPalette"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildVisualTree",
+        "dependency": "DensityMenuItemYDouble",
+        "canonicalName": "density.menu.item.y",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCommandPalette",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusCommandPalette"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildVisualTree",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCommandPalette",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusCommandPalette"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildVisualTree",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCommandPalette",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusCommandPalette"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.Open",
+        "dependency": "DensityMenuItemYDouble",
+        "canonicalName": "density.menu.item.y",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCommandPalette",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusCommandPalette"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusLayoutControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusLayoutMetrics.ResolveGap",
+        "dependency": "Space1Thickness",
+        "canonicalName": "space.1",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusLayoutMetrics"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusLayoutControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusLayoutMetrics.ResolveGap",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusLayoutMetrics"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusLayoutControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusLayoutMetrics.ResolveGap",
+        "dependency": "Space3Thickness",
+        "canonicalName": "space.3",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusLayoutMetrics"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusLayoutControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusLayoutMetrics.ResolveGap",
+        "dependency": "Space4Thickness",
+        "canonicalName": "space.4",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusLayoutMetrics"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusLayoutControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusScrollbar.KeyboardScrollStepProperty",
+        "dependency": "DensityControlCompactYDouble",
+        "canonicalName": "density.control.compact.y",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusScrollbar",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusScrollbar"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusLayoutControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusScrollbar.PointerScrollStepProperty",
+        "dependency": "Space4Thickness",
+        "canonicalName": "space.4",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusScrollbar",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusScrollbar"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildInlineEditContent",
+        "dependency": "Space1Thickness",
+        "canonicalName": "space.1",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow",
+        "dependency": "DensityControlDefaultYDouble",
+        "canonicalName": "density.control.default.y",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow",
+        "dependency": "Space5Thickness",
+        "canonicalName": "space.5",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.HandleRowPointerPressed",
+        "dependency": "Space6Thickness",
+        "canonicalName": "space.6",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
+        "dependency": "DensityControlDefaultYDouble",
+        "canonicalName": "density.control.default.y",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
+        "dependency": "DensityControlDefaultYResourceKey",
+        "canonicalName": "density.control.default.y",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
+        "dependency": "Space5Thickness",
+        "canonicalName": "space.5",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Overlay/FsusOverlayHost.cs",
+        "sourceMember": "FsusUI.Avalonia.Overlay.FsusOverlayHost.\u003CBaseZIndex\u003Ek__BackingField",
+        "dependency": "ZOverlayDialogInt32",
+        "canonicalName": "z.overlay.dialog",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Overlay.FsusOverlayHost"
+      }
+    ]
+  }
 }

@@ -1,3 +1,7 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Xml.Linq;
+
 namespace FsusUI.Avalonia.ApiTool;
 
 internal static class SourceSemanticVerifier
@@ -14,6 +18,15 @@ internal static class SourceSemanticVerifier
     "dotnet/FsusUI.Avalonia/Controls/FsusServiceHelperControls.cs";
   private const string ThemeSource =
     "dotnet/FsusUI.Avalonia.Themes/FsusThemeManager.cs";
+  private const string TreeSource =
+    "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs";
+  private const string MarkdownThemeSource =
+    "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/MarkdownEditor.axaml";
+  private const string CanonicalTokensSource = "spec/tokens/tokens.json";
+  private const string GeneratedTokensXaml =
+    "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml";
+  private const string GeneratedTokensCsharp =
+    "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs";
 
   public static void Verify(string repoRoot)
   {
@@ -99,6 +112,22 @@ internal static class SourceSemanticVerifier
       valueKnown: false,
       expectedValue: null,
       expectedExpression: "!owner.CanInteract");
+    AssertTokenDependency(
+      current,
+      TreeSource,
+      "Space2Thickness",
+      "space.2",
+      "FsusUI.Avalonia.Controls.FsusTree",
+      resolved: true,
+      ownership: "resolved");
+    AssertTokenDependency(
+      current,
+      TreeSource,
+      "DensityControlDefaultYResourceKey",
+      "density.control.default.y",
+      "FsusUI.Avalonia.Controls.FsusTree",
+      resolved: true,
+      ownership: "resolved");
 
     var sliderSource = File.ReadAllText(Path.Combine(repoRoot, SliderSource));
     var changedLiteral = WithOverride(
@@ -337,6 +366,22 @@ internal static class SourceSemanticVerifier
       "command source mutation must change inputTreeHash");
 
     var currentThemes = Extract(repoRoot, ThemesProject);
+    AssertTokenDependency(
+      currentThemes,
+      MarkdownThemeSource,
+      "FsusSpace2",
+      "space.2",
+      "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
+      resolved: true,
+      ownership: "resolved");
+    AssertTokenDependency(
+      currentThemes,
+      MarkdownThemeSource,
+      "FsusThemeTextBrush",
+      canonicalName: null,
+      ownerType: "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
+      resolved: false,
+      ownership: "resolved");
     AssertClrDefault(
       currentThemes,
       "FsusUI.Avalonia.Themes.FsusTypographyOptions",
@@ -374,8 +419,93 @@ internal static class SourceSemanticVerifier
       known: false,
       expected: null);
 
+    var treeSource = File.ReadAllText(Path.Combine(repoRoot, TreeSource));
+    var changedCsharpTokenDependency = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      TreeSource,
+      ReplaceFirst(
+        treeSource,
+        "FsusTokens.Space2Thickness",
+        "FsusTokens.Space3Thickness"));
+    AssertTokenDependency(
+      changedCsharpTokenDependency,
+      TreeSource,
+      "Space3Thickness",
+      "space.3",
+      "FsusUI.Avalonia.Controls.FsusTree",
+      resolved: true,
+      ownership: "resolved");
+    Assert(
+      changedCsharpTokenDependency.InputTreeHash != current.InputTreeHash,
+      "C# token dependency mutation must change inputTreeHash");
+
+    var markdownTheme = File.ReadAllText(
+      Path.Combine(repoRoot, MarkdownThemeSource));
+    var changedXamlTokenDependency = WithOverride(
+      repoRoot,
+      ThemesProject,
+      MarkdownThemeSource,
+      ReplaceFirst(
+        markdownTheme,
+        "{DynamicResource FsusSpace2}",
+        "{DynamicResource FsusSpace3}"));
+    AssertTokenDependency(
+      changedXamlTokenDependency,
+      MarkdownThemeSource,
+      "FsusSpace3",
+      "space.3",
+      "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
+      resolved: true,
+      ownership: "resolved");
+    Assert(
+      changedXamlTokenDependency.InputTreeHash != currentThemes.InputTreeHash,
+      "XAML token dependency mutation must change inputTreeHash");
+
+    var canonicalTokens = JsonNode.Parse(
+      File.ReadAllText(Path.Combine(repoRoot, CanonicalTokensSource)))!;
+    canonicalTokens["tokens"]!.AsArray().RemoveAt(0);
+    AssertExtractionFails(
+      () => WithOverride(
+        repoRoot,
+        ThemesProject,
+        CanonicalTokensSource,
+        canonicalTokens.ToJsonString(new JsonSerializerOptions
+        {
+          WriteIndented = true,
+        })),
+      "canonical tokens and generated token metadata drifted");
+
+    var generatedXaml = XDocument.Parse(
+      File.ReadAllText(Path.Combine(repoRoot, GeneratedTokensXaml)));
+    XNamespace xamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml";
+    generatedXaml.Descendants()
+      .Single(element =>
+        element.Attribute(xamlNamespace + "Key")?.Value == "FsusSpace2")
+      .Remove();
+    AssertExtractionFails(
+      () => WithOverride(
+        repoRoot,
+        ThemesProject,
+        GeneratedTokensXaml,
+        generatedXaml.ToString()),
+      "generated XAML is missing primary resource key FsusSpace2");
+
+    var generatedCsharp = File.ReadAllText(
+      Path.Combine(repoRoot, GeneratedTokensCsharp));
+    AssertExtractionFails(
+      () => WithOverride(
+        repoRoot,
+        AvaloniaProject,
+        GeneratedTokensCsharp,
+        ReplaceFirst(
+          generatedCsharp,
+          "public const string Space2ResourceKey = \"FsusSpace2\";",
+          "public const string Space2ResourceKey = \"FsusSpace2Drift\";")),
+      "generated XAML is missing primary resource key FsusSpace2Drift for space.2");
+
     Console.WriteLine(
-      "source-semantics verification passed: current literal/default/required/content/generic/command/state/automation metadata and 15 real-source mutations");
+      "source-semantics verification passed: current literal/default/required/content/generic/command/state/automation/token-theme metadata and 20 real-source mutations");
   }
 
   private static SourceSemanticIndex Extract(string repoRoot, string project) =>
@@ -536,6 +666,41 @@ internal static class SourceSemanticVerifier
         candidate.Semantic == semantic &&
         candidate.Provider == provider),
       $"{typeName}.{semantic} automation mapping must be absent");
+
+  private static void AssertTokenDependency(
+    SourceSemanticIndex index,
+    string sourceFile,
+    string dependency,
+    string? canonicalName,
+    string? ownerType,
+    bool resolved,
+    string ownership)
+  {
+    var contract = index.TokenThemeContract ??
+      throw new InvalidOperationException("missing token/theme contract");
+    var item = contract.Dependencies.First(candidate =>
+      candidate.SourceFile == sourceFile &&
+      candidate.Dependency == dependency &&
+      candidate.OwnerType == ownerType);
+    Assert(item.CanonicalName == canonicalName, $"{dependency} canonical token");
+    Assert(item.Resolved == resolved, $"{dependency} resolved");
+    Assert(item.Ownership == ownership, $"{dependency} ownership");
+  }
+
+  private static void AssertExtractionFails(Action action, string expected)
+  {
+    try
+    {
+      action();
+    }
+    catch (InvalidOperationException error)
+      when (error.Message.Contains(expected, StringComparison.Ordinal))
+    {
+      return;
+    }
+    throw new InvalidOperationException(
+      $"token/theme mutation did not fail with {expected}");
+  }
 
   private static SourceTypeSemantics Type(SourceSemanticIndex index, string typeName)
   {

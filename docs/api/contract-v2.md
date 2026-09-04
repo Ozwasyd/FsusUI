@@ -69,6 +69,20 @@ record therefore declares `contractDeclared: false`,
 `runtimeTreeVerified: false`, and `mappingComplete: false`: it neither replaces
 Phase 4 accessibility execution nor claims that an AutomationPeer tree was
 rendered.
+Token/theme dependency metadata is package-level and follows the canonical
+authority in [`spec/tokens/tokens.json`](../../spec/tokens/tokens.json). The
+extractor relates each generated C# `*Name` constant to its sibling resource
+keys through Roslyn symbols, then checks those keys against the generated
+Avalonia resource dictionary with an XML parser. Control-theme dependencies
+come from parsed XAML resource references and C# dependencies from Roslyn
+symbol references. A dependency is attached to a public control only when its
+selector/target or containing symbol resolves uniquely; every ambiguous,
+framework-owned, unknown, or non-canonical reference remains an explicit
+unbound or unresolved observation. Package and per-control token/theme
+fingerprints are freshness-bound, but declare neither a public token contract
+nor rendered visual evidence and cannot change alignment status. Generated
+token values and resources remain outputs of the token pipeline and are not
+edited by Contract V2.
 
 The unified `conformance:v2` command reports a stable stage name driven by each
 subprocess exit code. It checks the compiler-derived Web baseline, the
@@ -214,6 +228,12 @@ same two generated locations. The reference retains its observation-only and
 runtime-unverified flags; changing or deleting a role, name, value, state,
 provider, target, or expression invalidates the registry without changing
 member status.
+Token/theme metadata likewise has independent package fingerprints plus
+per-type references for uniquely owned dependencies. Canonical/generated
+deletion or drift and changes to parsed XAML/C# consumers invalidate these
+identities. Unresolved resource aliases and unbound selector observations stay
+in the package fingerprint instead of being discarded or promoted to a
+component contract.
 The Contract V2 gate recomputes both inventories and fails when a type or member
 is missing, duplicated, stale, or simultaneously mapped and extra. Only public
 symbols enter the member-surface inventory; the separately labelled state
