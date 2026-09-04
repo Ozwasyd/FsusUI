@@ -1,0 +1,22 @@
+{
+  "editor": {
+    "bottom": 443.1875,
+    "left": 24,
+    "right": 366,
+    "top": 24
+  },
+  "overlay": {
+    "bottom": 415,
+    "left": 147,
+    "right": 357,
+    "top": 141
+  },
+  "tolerancePx": 1,
+  "input": "simulated-touch",
+  "limitation": "Deterministic browser simulation; no physical touch hardware was used.",
+  "name": "mobile-touch-target-containment",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  }
+}
