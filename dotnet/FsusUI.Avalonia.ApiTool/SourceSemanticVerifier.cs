@@ -10,6 +10,8 @@ internal static class SourceSemanticVerifier
     "dotnet/FsusUI.Avalonia/Controls/FsusActivityRailShell.cs";
   private const string MarkdownEventSource =
     "dotnet/FsusUI.Avalonia/Controls/FsusMarkdownNativeEventMachine.cs";
+  private const string ServiceHelperSource =
+    "dotnet/FsusUI.Avalonia/Controls/FsusServiceHelperControls.cs";
   private const string ThemeSource =
     "dotnet/FsusUI.Avalonia.Themes/FsusThemeManager.cs";
 
@@ -38,6 +40,17 @@ internal static class SourceSemanticVerifier
       "FsusUI.Avalonia.Controls.FsusActivityRailShell",
       "MainContent",
       expected: true);
+    AssertGenericConstraint(
+      current,
+      "FsusUI.Avalonia.Controls.FsusServiceHandle`1",
+      "TControl",
+      "Avalonia.Controls.Control");
+    AssertCommand(
+      current,
+      "FsusUI.Avalonia.Controls.FsusNotificationOptions",
+      "ActionCommand",
+      nullable: true,
+      canWrite: true);
 
     var sliderSource = File.ReadAllText(Path.Combine(repoRoot, SliderSource));
     var changedLiteral = WithOverride(
@@ -106,6 +119,43 @@ internal static class SourceSemanticVerifier
       "Kind",
       expected: false);
 
+    var serviceHelperSource = File.ReadAllText(
+      Path.Combine(repoRoot, ServiceHelperSource));
+    var changedGenericConstraint = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      ServiceHelperSource,
+      ReplaceFirst(
+        serviceHelperSource,
+        "where TControl : Control",
+        "where TControl : ContentControl"));
+    AssertGenericConstraint(
+      changedGenericConstraint,
+      "FsusUI.Avalonia.Controls.FsusServiceHandle`1",
+      "TControl",
+      "Avalonia.Controls.ContentControl");
+    Assert(
+      changedGenericConstraint.InputTreeHash != current.InputTreeHash,
+      "generic constraint source mutation must change inputTreeHash");
+
+    var changedCommandNullability = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      ServiceHelperSource,
+      ReplaceFirst(
+        serviceHelperSource,
+        "public ICommand? ActionCommand { get; init; }",
+        "public ICommand ActionCommand { get; init; }"));
+    AssertCommand(
+      changedCommandNullability,
+      "FsusUI.Avalonia.Controls.FsusNotificationOptions",
+      "ActionCommand",
+      nullable: false,
+      canWrite: true);
+    Assert(
+      changedCommandNullability.InputTreeHash != current.InputTreeHash,
+      "command source mutation must change inputTreeHash");
+
     var currentThemes = Extract(repoRoot, ThemesProject);
     AssertClrDefault(
       currentThemes,
@@ -145,7 +195,7 @@ internal static class SourceSemanticVerifier
       expected: null);
 
     Console.WriteLine(
-      "source-semantics verification passed: current literal/default/required/content metadata and 6 real-source mutations");
+      "source-semantics verification passed: current literal/default/required/content/generic/command metadata and 8 real-source mutations");
   }
 
   private static SourceSemanticIndex Extract(string repoRoot, string project) =>
@@ -207,6 +257,35 @@ internal static class SourceSemanticVerifier
         propertyName,
         StringComparer.Ordinal) == expected,
       $"{typeName}.{propertyName} content property");
+
+  private static void AssertGenericConstraint(
+    SourceSemanticIndex index,
+    string typeName,
+    string parameterName,
+    string expectedConstraint)
+  {
+    var parameter = Type(index, typeName).GenericParameters.Single(
+      candidate => candidate.Name == parameterName);
+    Assert(
+      parameter.TypeConstraints.SequenceEqual(
+        [expectedConstraint],
+        StringComparer.Ordinal),
+      $"{typeName}.{parameterName} generic constraint");
+  }
+
+  private static void AssertCommand(
+    SourceSemanticIndex index,
+    string typeName,
+    string commandName,
+    bool nullable,
+    bool canWrite)
+  {
+    var command = Type(index, typeName).Commands[commandName];
+    Assert(command.Nullable == nullable, $"{typeName}.{commandName} nullable");
+    Assert(command.CanRead, $"{typeName}.{commandName} canRead");
+    Assert(command.CanWrite == canWrite, $"{typeName}.{commandName} canWrite");
+    Assert(!command.IsStatic, $"{typeName}.{commandName} isStatic");
+  }
 
   private static SourceTypeSemantics Type(SourceSemanticIndex index, string typeName)
   {

@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url'
 import {
   buildRegistry,
   compareMembers,
+  avaloniaPublicSurfaces,
   validateAvaloniaSurfaceRegistration,
   validateRegistry,
   validateSemanticMemberBindings,
@@ -144,8 +145,8 @@ test('committed Contract V2 registry passes validation with the committed gate',
 
 test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
   for (const [key, baseline] of Object.entries(avaloniaBaselines)) {
-    assert.equal(baseline.baselineVersion, '2.0.0')
-    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.4.0')
+    assert.equal(baseline.baselineVersion, '2.1.0')
+    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.5.0')
     assert.match(baseline.source.inputTreeHash, sha256Pattern)
     assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
     assert.match(baseline.source.dependencyVersionHash, sha256Pattern)
@@ -225,6 +226,147 @@ test('Avalonia semantic output hash rejects payload drift', () => {
   const currentHash = avaloniaBaselines.avalonia.source.outputHash
   const mutation = source.replace('"deprecated": false', '"deprecated": true')
   assert.notEqual(avaloniaOutputHash(mutation), currentHash)
+})
+
+test('Avalonia semantic baseline retains real generic constraints and command surfaces', () => {
+  const genericType = avaloniaBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusServiceHandle`1',
+  )
+  assert.deepEqual(genericType.genericParameters, [
+    {
+      name: 'TControl',
+      position: 0,
+      variance: 'none',
+      referenceTypeConstraint: false,
+      valueTypeConstraint: false,
+      unmanagedTypeConstraint: false,
+      notNullConstraint: false,
+      constructorConstraint: false,
+      typeConstraints: ['Avalonia.Controls.Control'],
+    },
+  ])
+
+  const commands = avaloniaBaselines.avalonia.semanticTypes.flatMap((type) =>
+    (type.commands ?? []).map((command) => ({
+      ownerType: type.name,
+      ...command,
+    })),
+  )
+  assert.equal(commands.length, 16)
+  assert.equal(commands.filter((command) => command.nullable).length, 4)
+  assert.deepEqual(
+    commands
+      .filter((command) => command.propertyKind !== 'clr')
+      .map((command) => [
+        command.ownerType,
+        command.name,
+        command.propertyKind,
+      ]),
+    [
+      ['FsusUI.Avalonia.Controls.FsusDropZone', 'BrowseCommand', 'styled'],
+      ['FsusUI.Avalonia.Controls.FsusNotification', 'ActionCommand', 'styled'],
+      [
+        'FsusUI.Avalonia.Controls.FsusShortcutRecorder',
+        'CancelRecordingCommand',
+        'direct',
+      ],
+      [
+        'FsusUI.Avalonia.Controls.FsusShortcutRecorder',
+        'ClearCommand',
+        'direct',
+      ],
+      [
+        'FsusUI.Avalonia.Controls.FsusShortcutRecorder',
+        'StartRecordingCommand',
+        'direct',
+      ],
+    ],
+  )
+
+  const notification = avaloniaBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusNotification',
+  )
+  const actionSurfaces = avaloniaPublicSurfaces(notification).filter(
+    (surface) => surface.member === 'ActionCommand',
+  )
+  assert.equal(actionSurfaces.length, 1)
+  assert.equal(actionSurfaces[0].kind, 'command')
+  assert.equal(actionSurfaces[0].propertyKind, 'styled')
+
+  const recorder = avaloniaBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusShortcutRecorder',
+  )
+  const clearSurfaces = avaloniaPublicSurfaces(recorder).filter(
+    (surface) => surface.member === 'ClearCommand',
+  )
+  assert.equal(clearSurfaces.length, 1)
+  assert.equal(clearSurfaces[0].kind, 'command')
+  assert.equal(clearSurfaces[0].propertyKind, 'direct')
+})
+
+test('generic-constraint and command-nullability mutations invalidate Contract V2 identities', () => {
+  const changedConstraintBaselines = clone(avaloniaBaselines)
+  changedConstraintBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusServiceHandle`1',
+  ).genericParameters[0].typeConstraints[0] = 'Avalonia.Controls.ContentControl'
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: changedConstraintBaselines,
+    }).errors.join('\n'),
+    /FsusServiceHandle`1 has stale surfaceHash/,
+  )
+
+  const changedCommandBaselines = clone(avaloniaBaselines)
+  changedCommandBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusInput')
+    .commands.find((command) => command.name === 'ClearCommand').nullable = true
+  const changedCommandErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedCommandBaselines,
+  }).errors.join('\n')
+  assert.match(changedCommandErrors, /ElInput.*has stale public surface hash/)
+  assert.match(
+    changedCommandErrors,
+    /ClearCommand is neither mapped nor registered as avalonia-extra/,
+  )
+})
+
+test('explicit command operation bindings remain partial without invocation semantics', () => {
+  const bindings = clone(semanticMemberBindings)
+  bindings.mappings.push({
+    component: 'ElInput',
+    semantic: 'clear-command',
+    kind: 'operation',
+    web: 'clear',
+    avalonia: 'ClearCommand',
+  })
+  assert.deepEqual(
+    validateSemanticMemberBindings({
+      registry: bindings,
+      vueBaseline,
+      avaloniaBaselines,
+    }),
+    [],
+  )
+
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings: bindings,
+    gate,
+  })
+  const clear = registry.contracts
+    .find((contract) => contract.component.name === 'ElInput')
+    .operations.find((operation) => operation.name === 'clear')
+  assert.equal(clear.bindingBasis, 'explicit-semantic')
+  assert.equal(clear.avalonia.member, 'ClearCommand')
+  assert.equal(clear.avalonia.operationKind, 'command')
+  assert.equal(clear.avalonia.signature, null)
+  assert.equal(clear.status, 'partial')
+  assert.match(clear.drift.operationSignature, /avalonia signature unavailable/)
 })
 
 test('Vue compiler AST retains dynamic names and scoped slot payload structure', () => {

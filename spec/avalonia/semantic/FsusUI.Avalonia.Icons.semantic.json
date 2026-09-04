@@ -1,14 +1,14 @@
 {
   "packageId": "FsusUI.Avalonia.Icons",
-  "baselineVersion": "2.0.0",
+  "baselineVersion": "2.1.0",
   "source": {
-    "toolVersion": "FsusUI.Avalonia.ApiTool@1.4.0",
+    "toolVersion": "FsusUI.Avalonia.ApiTool@1.5.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "f185565af033c45ff19bf5d9a6895adae799ba84974700705bcff1710d39cae6",
-    "compilerOptionsHash": "a2e88fe9ebd590171080438846d719d90b904b854e46a43a2c1beae52d55f38b",
+    "inputTreeHash": "dbb4cbe0c9b419ac5c713f53434045af824513633024177d2252e164849f6b89",
+    "compilerOptionsHash": "4cad637d64a53471d9c054a671e7b7a70cbf7b07640e1838952ba18ce227a475",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "e1af22dffe7618fdc660bc9959f013b250ee38ba789f144fb37028dcbdbe8b5f"
+    "outputHash": "40d25090a8bbe5a8f3888177a23952dfe9e7017a6d5ad1b84435ea7ef32a9124"
   },
   "semanticTypes": [
     {

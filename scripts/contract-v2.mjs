@@ -780,6 +780,30 @@ const avaloniaMethodRef = (method) => ({
   },
 })
 
+const avaloniaCommandRef = (command) => ({
+  member: command.name,
+  operationKind: 'command',
+  signature: null,
+  command: {
+    type: command.type,
+    nullable: knownBoolean(command.nullable),
+    canRead: knownBoolean(command.canRead),
+    canWrite: knownBoolean(command.canWrite),
+    isStatic: knownBoolean(command.isStatic),
+    propertyKind: command.propertyKind,
+    defaultKnown: command.defaultKnown === true,
+    defaultValue:
+      command.defaultKnown === true ? (command.defaultValue ?? null) : null,
+    deprecated: knownBoolean(command.deprecated),
+    deprecationMessage: command.deprecationMessage ?? null,
+  },
+})
+
+const avaloniaOperationRef = (operation) =>
+  operation.kind === 'command'
+    ? avaloniaCommandRef(operation.value)
+    : avaloniaMethodRef(operation.value)
+
 const webMethodRef = (member, semantic) => ({
   member,
   baseline: VUE_BASELINE_PATH,
@@ -912,6 +936,22 @@ const canonicalAvaloniaMethodSurface = (method) => ({
   })),
 })
 
+const canonicalAvaloniaCommandSurface = (command) => ({
+  kind: 'command',
+  member: command.name,
+  type: command.type,
+  nullable: knownBoolean(command.nullable),
+  canRead: knownBoolean(command.canRead),
+  canWrite: knownBoolean(command.canWrite),
+  isStatic: knownBoolean(command.isStatic),
+  propertyKind: command.propertyKind,
+  defaultKnown: command.defaultKnown === true,
+  defaultValue:
+    command.defaultKnown === true ? (command.defaultValue ?? null) : null,
+  deprecated: knownBoolean(command.deprecated),
+  deprecationMessage: command.deprecationMessage ?? null,
+})
+
 const canonicalAvaloniaEnumMemberSurface = (member) => ({
   kind: 'enum-member',
   member: member.name,
@@ -921,6 +961,9 @@ const canonicalAvaloniaEnumMemberSurface = (member) => ({
 })
 
 export const avaloniaPublicSurfaces = (type) => {
+  const commands = new Map(
+    (type.commands ?? []).map((command) => [command.name, command]),
+  )
   const avaloniaProperties = new Map(
     (type.avaloniaProperties ?? []).map((property) => [
       property.name,
@@ -943,13 +986,16 @@ export const avaloniaPublicSurfaces = (type) => {
   if (contentRegions.size === 0 && type.contentProperty) {
     contentRegions.set(type.contentProperty, null)
   }
-  const surfaces = (type.properties ?? []).map((property) =>
-    canonicalAvaloniaPropertySurface(
-      property,
-      avaloniaProperties.get(property.name),
-      contentRegions,
-    ),
-  )
+  const surfaces = (type.properties ?? []).map((property) => {
+    const command = commands.get(property.name)
+    return command
+      ? canonicalAvaloniaCommandSurface(command)
+      : canonicalAvaloniaPropertySurface(
+          property,
+          avaloniaProperties.get(property.name),
+          contentRegions,
+        )
+  })
   const clrPropertyNames = new Set(
     (type.properties ?? []).map((property) => property.name),
   )
@@ -984,6 +1030,30 @@ const avaloniaTypeSurfaceHash = (type) =>
       isSealed: knownBoolean(type.isSealed),
       deprecated: knownBoolean(type.deprecated),
       deprecationMessage: type.deprecationMessage ?? null,
+      ...(Array.isArray(type.genericParameters)
+        ? {
+            genericParameters: type.genericParameters.map((parameter) => ({
+              name: parameter.name,
+              position: parameter.position,
+              variance: parameter.variance,
+              referenceTypeConstraint: knownBoolean(
+                parameter.referenceTypeConstraint,
+              ),
+              referenceTypeConstraintNullable: knownBoolean(
+                parameter.referenceTypeConstraintNullable,
+              ),
+              valueTypeConstraint: knownBoolean(parameter.valueTypeConstraint),
+              unmanagedTypeConstraint: knownBoolean(
+                parameter.unmanagedTypeConstraint,
+              ),
+              notNullConstraint: knownBoolean(parameter.notNullConstraint),
+              constructorConstraint: knownBoolean(
+                parameter.constructorConstraint,
+              ),
+              typeConstraints: parameter.typeConstraints ?? null,
+            })),
+          }
+        : {}),
       surfaces: avaloniaPublicSurfaces(type),
     }),
   )
@@ -1089,17 +1159,22 @@ const matchAvaloniaEvent = (webName, avaloniaType, binding) => {
   return null
 }
 
-const matchAvaloniaMethod = (webName, avaloniaType, binding) => {
+const matchAvaloniaOperation = (webName, avaloniaType, binding) => {
   if (binding) {
-    return (
-      (avaloniaType.methods ?? []).find(
-        (method) => method.name === binding.avalonia,
-      ) ?? null
+    const method = (avaloniaType.methods ?? []).find(
+      (candidate) => candidate.name === binding.avalonia,
     )
+    if (method) return { kind: 'method', value: method }
+    const command = (avaloniaType.commands ?? []).find(
+      (candidate) => candidate.name === binding.avalonia,
+    )
+    return command ? { kind: 'command', value: command } : null
   }
   const normalized = normalizeMemberName(webName)
   for (const method of avaloniaType.methods ?? []) {
-    if (normalizeMemberName(method.name) === normalized) return method
+    if (normalizeMemberName(method.name) === normalized) {
+      return { kind: 'method', value: method }
+    }
   }
   return null
 }
@@ -1342,7 +1417,7 @@ const operationMember = ({
             ),
     }
   }
-  const avalonia = matchAvaloniaMethod(exposed, avaloniaType, binding)
+  const avalonia = matchAvaloniaOperation(exposed, avaloniaType, binding)
   let status
   let governance = null
   let drift = emptyDrift()
@@ -1359,7 +1434,7 @@ const operationMember = ({
   } else {
     const comparison = compareMembers({
       web: webMethodRef(exposed, semantic),
-      avalonia: avaloniaMethodRef(avalonia),
+      avalonia: avaloniaOperationRef(avalonia),
       kind: 'operation',
     })
     drift = comparison.drift
@@ -1374,7 +1449,7 @@ const operationMember = ({
     name: exposed,
     kind: 'operation',
     web: webMethodRef(exposed, semantic),
-    avalonia: avalonia ? avaloniaMethodRef(avalonia) : null,
+    avalonia: avalonia ? avaloniaOperationRef(avalonia) : null,
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'operation', exposed)],
@@ -1799,11 +1874,32 @@ const contractForComponent = ({
   return contract
 }
 
-const methodSignatureMatchesSurface = (signature, surface) =>
-  surface.kind === 'method' &&
-  signature?.returnType === surface.returnType &&
-  JSON.stringify(signature?.parameters ?? []) ===
-    JSON.stringify(surface.parameters)
+const operationMatchesSurface = (operation, surface) => {
+  if (operation.operationKind === 'command') {
+    if (surface.kind !== 'command') return false
+    return (
+      JSON.stringify(operation.command) ===
+      JSON.stringify({
+        type: surface.type,
+        nullable: surface.nullable,
+        canRead: surface.canRead,
+        canWrite: surface.canWrite,
+        isStatic: surface.isStatic,
+        propertyKind: surface.propertyKind,
+        defaultKnown: surface.defaultKnown,
+        defaultValue: surface.defaultValue,
+        deprecated: surface.deprecated,
+        deprecationMessage: surface.deprecationMessage,
+      })
+    )
+  }
+  return (
+    surface.kind === 'method' &&
+    operation.signature?.returnType === surface.returnType &&
+    JSON.stringify(operation.signature?.parameters ?? []) ===
+      JSON.stringify(surface.parameters)
+  )
+}
 
 const resolveAvaloniaSurfaceClaims = ({
   contract,
@@ -1815,7 +1911,7 @@ const resolveAvaloniaSurfaceClaims = ({
   const sections = [
     ['inputs', new Set(['property', 'avalonia-property'])],
     ['outputs', new Set(['event'])],
-    ['operations', new Set(['method'])],
+    ['operations', new Set(['method', 'command'])],
     ['contentRegions', new Set(['property', 'avalonia-property'])],
   ]
   for (const [section, surfaceKinds] of sections) {
@@ -1828,7 +1924,7 @@ const resolveAvaloniaSurfaceClaims = ({
       )
       if (section === 'operations') {
         candidates = candidates.filter((surface) =>
-          methodSignatureMatchesSurface(member.avalonia.signature, surface),
+          operationMatchesSurface(member.avalonia, surface),
         )
       } else if (section === 'contentRegions') {
         candidates = candidates.filter(
@@ -2130,7 +2226,11 @@ const avaloniaMembersForKind = (type, kind) => {
     )
   }
   if (kind === 'output') return (type.events ?? []).map((item) => item.name)
-  if (kind === 'operation') return (type.methods ?? []).map((item) => item.name)
+  if (kind === 'operation') {
+    return [...(type.methods ?? []), ...(type.commands ?? [])].map(
+      (item) => item.name,
+    )
+  }
   if (kind === 'contentRegion') {
     return (type.contentRegions ?? []).map((item) => item.name)
   }

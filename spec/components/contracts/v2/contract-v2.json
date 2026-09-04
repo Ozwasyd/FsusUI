@@ -15,17 +15,17 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "dc76ac289317b4a0c9d1b06e9aabe3329346237c273ed365d5f5a04e0da2ca13",
+      "hash": "79b93fba0385202678332db8849126a40898142dc7b74a9bc7aa841191c3e49d",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "fc60b95f6c38e4ffb770b6d60cabda5d035bd82ef198fc1fb2dfe5e63055d254",
+      "hash": "1de0a58af8ca8a240069e3088e5f828a9573ed82eb19a4fb9d84e1f8659f8656",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json",
-      "hash": "98e2b94761d7b28d8591473a147d54a2d1702a7939bd9627526d01660207a150",
+      "hash": "41db6f63ad7e21d291f71bcde997e104a038393904f939a849bfb0d448f5b384",
       "packageId": "FsusUI.Avalonia.Icons"
     },
     "markdownEditorGate": {
@@ -737,7 +737,7 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusInput",
         "packageId": "avalonia",
-        "surfaceHash": "734e26a92724aec7e2d26218a3d22bc7f414368fd007ef850cd35e188a88eca5"
+        "surfaceHash": "51e8a7520654cb8a33c0cdb75f6a5421520c26499d36d4956c4e22b11288f470"
       },
       "basis": "name-equality"
     },
@@ -929,7 +929,7 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusNotification",
         "packageId": "avalonia",
-        "surfaceHash": "03b1ee779e65e82d47bb1b15b73f4ed61c55d80f459bd1e9d9dbf015a15410fb"
+        "surfaceHash": "0bce9790aa35dd36448a83097468c81df7b10d07beb29ee5a4c0e4a99ec179a8"
       },
       "basis": "name-equality"
     },
@@ -52585,8 +52585,8 @@
         {
           "member": "ClearCommand",
           "kind": "avalonia-extra",
-          "surfaceKind": "property",
-          "surfaceHash": "838cc67e7b61dd3d7bfde4594e5ea75d4e5d15404839c001ac558317ed7700fc",
+          "surfaceKind": "command",
+          "surfaceHash": "1020ee42f9398e9b2ba2a6a82076c839de9e376fc7a58ee10056f032d35d3b8b",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
@@ -70105,8 +70105,8 @@
         {
           "member": "ActionCommand",
           "kind": "avalonia-extra",
-          "surfaceKind": "property",
-          "surfaceHash": "eef94bb2ade904710e7af273ffee944e1d995df964d376b7754efa649cce8b1c",
+          "surfaceKind": "command",
+          "surfaceHash": "b45221a23df3ab0c92f777e998d8d41c63b51905e1df401111544daa2fd1445d",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
@@ -165056,7 +165056,7 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 56,
-      "surfaceHash": "efb319cceba1f1c295f0629a8e8525105aa068fd6731276e0fa6f390032d5415",
+      "surfaceHash": "20c20aec9e99d86f83568165c65f55ed1c431c90a6a6df793ff885a4e7fbe509",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-code-editor"
       ],
@@ -166059,7 +166059,7 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 29,
-      "surfaceHash": "e207200d475371d41da8cfcf78d7498f24155fdc0599dec35755b20fdd5ce8ef",
+      "surfaceHash": "c7bfb3490b2b9c835789fc4ff058680ff62432de1f52b5da5478cc43ef3c1705",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-drop-zone"
       ],
@@ -168439,7 +168439,7 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 10,
-      "surfaceHash": "76050da95d26bf88e8e974606dfa79a589823d9a0b6f51e9a66c6df2d0e935af",
+      "surfaceHash": "b444ad8f72daa9a2aa4d5206466c78189fd4a3e762286cb85055523c46b84d62",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-notification-options"
       ],
@@ -168677,7 +168677,7 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 24,
-      "surfaceHash": "d902bbfdf0051cd59b4683aa8d2c5c8a6c81b5a411662b1fa8318fe7592d0c85",
+      "surfaceHash": "1e1ef0e6714e28dffaae504746d3684cdd049270a5c1057513971918989f5a0d",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-platform-command"
       ],
@@ -168949,7 +168949,7 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 5,
-      "surfaceHash": "bd0433fbea7d185df78b1a7d7dda52c3c449aded217c1c00715cd075c53971c5",
+      "surfaceHash": "e95b1504f508edeb46f8fd8f42b9ad3ca518e69a632c1086afbb2ffe6cb089a5",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-service-handle-1"
       ],
@@ -169204,7 +169204,7 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 25,
-      "surfaceHash": "79db98799799ec28bda14de97b8d39fc5f9cf96eb97593fae2979fb694695e1e",
+      "surfaceHash": "fd6889e708dbd01047ea8d34bfb7c45d5516602a1fae767f52c440062b21b9bc",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-shortcut-recorder"
       ],
@@ -169493,7 +169493,7 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 36,
-      "surfaceHash": "53c48137c5fae2936d562749114747347e64ffea50bb7760e4fa6270642a21a5",
+      "surfaceHash": "f4872c72589e65f95adb2235fbb6040ade7d11302eb22a64546f3ac3a342af49",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-text-editor"
       ],
