@@ -112,7 +112,7 @@ describe('markdown input acceptance', () => {
     expect(store.value).toBe('ab中')
   })
 
-  it('kills consumer keydown, DOM mutation, HTML paste, pair drift, double insert, and full normalize', () => {
+  it('kills input, rich-paste, platform-pair, stale-commit, synthetic-only IME, and normalization mutations', () => {
     const report = evaluateMarkdownInputAcceptanceMutations()
     const byKind = Object.fromEntries(
       report.mutations.map((mutation) => [mutation.kind, mutation]),
@@ -122,6 +122,8 @@ describe('markdown input acceptance', () => {
     expect(byKind['html-paste']?.accepted).toBe(false)
     expect(byKind['pair-drift']?.accepted).toBe(false)
     expect(byKind['double-insert']?.accepted).toBe(false)
+    expect(byKind['stale-commit']?.accepted).toBe(false)
+    expect(byKind['synthetic-only-ime']?.accepted).toBe(false)
     expect(byKind['full-normalize']?.accepted).toBe(false)
   })
 

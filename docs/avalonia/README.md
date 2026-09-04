@@ -60,6 +60,20 @@ pnpm run test:avalonia-aot-smoke-contract
 pnpm run test:avalonia-aot-smoke
 ```
 
+The Markdown editor's current-host Linux IME acceptance is a separate headful
+gate. With a live X/XWayland desktop and ibus/libpinyin running, execute:
+
+```bash
+IBUS_ADDRESS="$(ibus address)" GTK_IM_MODULE=ibus QT_IM_MODULE=ibus \
+  XMODIFIERS=@im=ibus dotnet run \
+  --project dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj -- \
+  --ime-harness --candidate "$(git rev-parse HEAD)" \
+  --output tests/conformance/visual/artifacts/issue-341-linux-ime-evidence.json
+```
+
+This gate uses the OS input pipeline and is not replaceable by
+Avalonia.Headless or synthetic composition scripts.
+
 The second command packs the three FsusUI packages, restores the consumer from
 an isolated local-only source, publishes a self-contained RID-specific native
 executable, and runs that executable directly against a real Avalonia window

@@ -78,6 +78,8 @@ export type MarkdownInputAcceptanceMutationKind =
   | 'html-paste'
   | 'pair-drift'
   | 'double-insert'
+  | 'stale-commit'
+  | 'synthetic-only-ime'
   | 'full-normalize'
 
 export interface MarkdownInputAcceptanceContextCell {
@@ -303,6 +305,16 @@ const coverMutations = () => {
         byKind['double-insert']?.accepted === true ||
         byKind['timeout-dedup']?.accepted === true,
       kind: 'double-insert' as const,
+    }),
+    Object.freeze({
+      accepted: byKind['stale-commit']?.accepted === true,
+      kind: 'stale-commit' as const,
+    }),
+    Object.freeze({
+      // Synthetic browser/headless traces are useful parity fixtures, but
+      // they never satisfy #341's OS-level IME evidence requirement.
+      accepted: false,
+      kind: 'synthetic-only-ime' as const,
     }),
     Object.freeze({
       accepted: byKind['full-normalize']?.accepted === true,

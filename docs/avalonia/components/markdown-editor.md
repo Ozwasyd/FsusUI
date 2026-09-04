@@ -7,7 +7,7 @@ Component ID: `markdown-editor`
 Use `FsusMarkdownEditor` for the public native Source and Live surface.
 Document, identity, mode, chrome, locale, status density, transaction commands,
 and canonical projection commits share one native input and selection owner.
-Split/Preview, complete platform IME acceptance, and atomic-node automation
+Split/Preview, off-host platform IME coverage, and atomic-node automation
 actions remain partial. The editor itself exposes native Edit/Value automation
 semantics; its value is writable only while the control is enabled and not
 read-only, and the whole document is not a live region.
@@ -116,6 +116,21 @@ only text input, selection, composition, and undo-command owner. Source and Live
 present through the same native Avalonia `TextLayout` viewport; Source uses an
 identity source map, while Live uses the canonical projection map. Live
 decorations never become document authority.
+
+That same owner is the only Avalonia IME, key, and clipboard path. The native
+client decorator forwards Avalonia's preedit rendering and candidate-caret
+geometry while the shared event machine freezes smart pairs, block transforms,
+and unsafe selection restoration until composition commits or cancels. A
+commit is one separate-history source transaction; a late commit after an
+identity, epoch, revision, or selection change is rejected. Normal paste
+priority is file attachment intent, Markdown source, plain text, then safe
+HTML-to-text fallback; active HTML and data URLs never become editor source.
+
+The Linux `--ime-harness` route is headful and requires a live X display with
+ibus/libpinyin and libXtst. It rejects synthetic-only qualification by first
+composing through a stock Avalonia `TextBox`, then drives the production editor
+through OS key events and records structured commit, cancel, undo, stale,
+clipboard, Unicode, high-DPI, and scrolled candidate-caret evidence.
 
 The canonical Markdown runtime supplies a parser-neutral
 `FsusMarkdownProjectionSnapshot` through `CommitProjection`. Each snapshot is
@@ -237,8 +252,8 @@ editor.Mode = FsusMarkdownEditorMode.Live;
 
 ## Known Limitations
 
-Split/Preview presentation, complete syntax-specific input behavior, real
-native IME matrix acceptance, atomic-node AutomationPeer actions, and final AOT
+Split/Preview presentation, off-host native IME matrix coverage, atomic-node
+AutomationPeer actions, and final AOT
 acceptance remain partial. When no current canonical snapshot exists, Live
 mode intentionally presents localized/current raw source fallback and reports
 `source-fallback`.
