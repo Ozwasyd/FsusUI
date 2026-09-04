@@ -81,22 +81,22 @@ test('keeps search identity, ranges, geometry, and focus stable across all four 
   await expect(query).toBeFocused()
   await query.fill('alpha')
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    '1 of 3',
+    '1 / 3',
   )
   await query.fill('does-not-exist')
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    'No matches',
+    '无匹配项',
   )
   await query.fill('😀')
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    '1 of 1',
+    '1 / 1',
   )
   await query.fill('alpha|café')
-  await fixture.getByRole('button', { name: 'Use Regular Expression' }).click()
+  await fixture.getByRole('button', { name: '使用正则表达式' }).click()
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    '1 of 4',
+    '1 / 4',
   )
-  await fixture.getByRole('button', { name: 'Use Regular Expression' }).click()
+  await fixture.getByRole('button', { name: '使用正则表达式' }).click()
   await query.fill('alpha')
 
   const rootAfter = await root.boundingBox()
@@ -114,7 +114,7 @@ test('keeps search identity, ranges, geometry, and focus stable across all four 
       mode,
     )
     await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-      '1 of 3',
+      '1 / 3',
     )
     expect(await root.getAttribute('data-markdown-instance')).toBe(
       instanceBefore,
@@ -140,11 +140,11 @@ test('keeps search identity, ranges, geometry, and focus stable across all four 
 
   await fixture.getByTestId('markdown-search-next').click()
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    '2 of 3',
+    '2 / 3',
   )
   await fixture.getByTestId('markdown-search-prev').click()
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    '1 of 3',
+    '1 / 3',
   )
 
   if (testInfo.project.name === 'chromium') {
@@ -205,7 +205,7 @@ test('find/replace is one transaction and refreshes stale ranges without stealin
   await fixture.getByTestId('markdown-search-query').fill('alpha')
   await fixture.getByTestId('markdown-search-replace-all').click()
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    'No matches',
+    '无匹配项',
   )
   expect(await sourceValue(fixture)).not.toContain('alpha')
   await expect(
@@ -239,7 +239,7 @@ test('bounds 100k source and 10000 matches while keeping rendering and rapid-que
       return performance.now() - started
     })
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    '1 of 10000',
+    '1 / 10000',
   )
   expect(elapsed).toBeLessThan(1_000)
   expect(
@@ -250,7 +250,7 @@ test('bounds 100k source and 10000 matches while keeping rendering and rapid-que
   await query.fill('界')
   await query.fill('hit')
   await expect(fixture.getByTestId('markdown-search-count')).toHaveText(
-    '1 of 10000',
+    '1 / 10000',
   )
   await expect(
     page.getByTestId('markdown-search-embed-open-find'),
@@ -298,24 +298,24 @@ test('renders controlled embed states through the consumer-owned provider', asyn
     'Resolved excerpt with <strong>literal provider markup</strong>',
   )
   await expect(embeds.filter({ hasText: 'missing-doc' })).toContainText(
-    'missing',
+    '内容缺失',
   )
   for (const [target, status] of [
-    ['forbidden-doc', 'forbidden'],
-    ['cycle-doc', 'cycle'],
-    ['depth-doc', 'depth-exceeded'],
-    ['mismatch-doc', 'mode-mismatch'],
+    ['forbidden-doc', '无权访问'],
+    ['cycle-doc', '检测到循环引用'],
+    ['depth-doc', '超出嵌套深度'],
+    ['mismatch-doc', '模式不匹配'],
   ] as const) {
     const failedEmbed = embeds.filter({ hasText: target })
     await expect(failedEmbed).toContainText(status)
     await expect(
-      failedEmbed.getByRole('button', { name: 'Retry' }),
+      failedEmbed.getByRole('button', { name: '重试' }),
     ).toBeVisible()
   }
   await expect(embeds.filter({ hasText: 'pending-doc' })).toContainText(
-    'pending',
+    '加载中',
   )
-  await expect(embeds.filter({ hasText: 'stale-doc' })).toContainText('stale')
+  await expect(embeds.filter({ hasText: 'stale-doc' })).toContainText('内容已过期')
   expect(await root.textContent()).not.toContain(
     'This stale payload must not render.',
   )
@@ -323,7 +323,7 @@ test('renders controlled embed states through the consumer-owned provider', asyn
   expect(await sourceValue(fixture)).toBe(sourceBefore)
 
   const safeEmbed = embeds.filter({ hasText: 'Safe consumer document' })
-  await safeEmbed.getByRole('button', { name: 'Copy' }).click()
+  await safeEmbed.getByRole('button', { name: '复制' }).click()
   expect(
     await page.evaluate(
       () =>
@@ -332,7 +332,7 @@ test('renders controlled embed states through the consumer-owned provider', asyn
     ),
   ).toBe('::embed[target="safe-doc" mode="article"]')
 
-  await safeEmbed.getByRole('button', { name: 'Open Source' }).click()
+  await safeEmbed.getByRole('button', { name: '打开来源' }).click()
   await expect(fixture.getByTestId('markdown-search-embed-open')).toHaveText(
     'safe-doc:article',
   )
@@ -342,9 +342,9 @@ test('renders controlled embed states through the consumer-owned provider', asyn
   )
   await fixture.getByTestId('markdown-search-embed-resolve-failure').click()
   const missingEmbed = embeds.filter({ hasText: 'missing-doc' })
-  await missingEmbed.getByRole('button', { name: 'Retry' }).click()
+  await missingEmbed.getByRole('button', { name: '重试' }).click()
   await expect(embeds.filter({ hasText: 'Recovered heading' })).toContainText(
-    'resolved',
+    '已加载',
   )
   await expect(fixture.getByTestId('markdown-search-embed-retry')).toHaveText(
     'missing-doc:heading',
@@ -386,7 +386,7 @@ test('preserves atomic source selection, deletion, undo, and focus ownership', a
   const embeds = root.locator('.el-markdown-embed')
   await expect(embeds).toHaveCount(8)
   const currentSafeEmbed = embeds.filter({ hasText: 'Safe consumer document' })
-  await currentSafeEmbed.getByRole('button', { name: 'Source Reveal' }).click()
+  await currentSafeEmbed.getByRole('button', { name: '显示源码' }).click()
   await expect(textarea).toBeVisible()
   await expect(textarea).toBeFocused()
   const revealedSelection = await textarea.evaluate((element) => {
@@ -402,7 +402,7 @@ test('preserves atomic source selection, deletion, undo, and focus ownership', a
   await expect(embeds).toHaveCount(8)
   await embeds
     .filter({ hasText: 'Safe consumer document' })
-    .getByRole('button', { name: 'Delete' })
+    .getByRole('button', { name: '删除' })
     .click()
   expect(await sourceValue(fixture)).not.toContain('target="safe-doc"')
   await expect(
@@ -560,9 +560,9 @@ test('simulates touch, screen-reader, soft-keyboard, reduced-motion, and 200% zo
       ?.textContent?.trim(),
   }))
   expect(searchSemantics).toEqual({
-    label: 'Find in document',
-    queryLabel: 'Find in document',
-    status: '1 of 3',
+    label: '在文档中查找',
+    queryLabel: '在文档中查找',
+    status: '1 / 3',
   })
 
   if (testInfo.project.name === 'chromium') {
@@ -592,9 +592,9 @@ test('simulates touch, screen-reader, soft-keyboard, reduced-motion, and 200% zo
     embedRegions.every(
       (region) =>
         region.role === 'region' &&
-        region.label?.startsWith('Embed ') &&
+        region.label?.startsWith('嵌入内容 ') &&
         region.tabIndex === null &&
-        region.actions.includes('Open Source'),
+        region.actions.includes('打开来源'),
     ),
   ).toBe(true)
   const semantics = {
