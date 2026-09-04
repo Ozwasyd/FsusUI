@@ -1,4 +1,8 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
+using Avalonia.Markup.Xaml;
+using Avalonia.Themes.Fluent;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Icons;
 using FsusUI.Avalonia.Themes;
@@ -15,6 +19,10 @@ public static class PackedConsumerSmoke
 {
   public static bool Run()
   {
+    AppBuilder.Configure<PackedConsumerApplication>()
+      .UseHeadless(new AvaloniaHeadlessPlatformOptions())
+      .SetupWithoutStarting();
+    Application.Current!.Styles.Add(new FluentTheme());
     var button = new FsusButton
     {
       Content = "Open report",
@@ -24,6 +32,19 @@ public static class PackedConsumerSmoke
     var input = new FsusInput { AccessibleName = "Report name", Text = "Stable" };
     var icon = new FsusIcon { IconKey = FsusIconKeys.Settings, IsDecorative = true };
     var theme = FsusThemeOptions.Default with { Density = FsusDensity.Compact };
+    var resources = new[]
+    {
+      new Uri("avares://FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml"),
+      new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
+      new Uri("avares://FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml"),
+    };
+    foreach (var resource in resources)
+    {
+      if (AvaloniaXamlLoader.Load(resource) is null)
+      {
+        throw new InvalidOperationException($"Packed Avalonia resource is missing: {resource}");
+      }
+    }
 
     var panel = new StackPanel();
     panel.Children.Add(button);
@@ -36,4 +57,8 @@ public static class PackedConsumerSmoke
       icon.IconKey == FsusIconKeys.Settings &&
       theme.Density == FsusDensity.Compact;
   }
+}
+
+public sealed class PackedConsumerApplication : Application
+{
 }
