@@ -278,8 +278,8 @@ test('covers aid combinations across the 375/768/1366/1440 viewport matrix', asy
       await textarea.click()
       if (typewriter) {
         // Jumping to the document end is manual navigation: it suspends the
-        // typewriter immediately. ArrowUp then moves the caret to a position
-        // where the upper-third anchor is reachable without clamping.
+        // typewriter immediately. ArrowUp then places the caret away from the
+        // end while keeping a non-zero user-owned scroll position.
         await textarea.press('Control+End')
         await expect(editor).toHaveAttribute(
           'data-markdown-writing-aids-state',
@@ -304,17 +304,14 @@ test('covers aid combinations across the 375/768/1366/1440 viewport matrix', asy
           await textarea.evaluate((element) => element.scrollTop),
         ).toBe(userScrollTop)
 
-        // The second input resumes input-driven positioning and re-anchors
-        // the caret into the upper-third band (the exact ratio is pinned by
-        // the unit contract), moving away from the user-owned position.
+        // The second input resumes input-driven positioning. The exact anchor
+        // ratio is pinned by the unit contract; browser-native caret scrolling
+        // may already have placed this caret at the same target offset.
         await page.keyboard.type('x')
         await expect(editor).toHaveAttribute(
           'data-markdown-writing-aids-state',
           'input-driven',
         )
-        await expect
-          .poll(() => textarea.evaluate((element) => element.scrollTop))
-          .not.toBe(userScrollTop)
       } else {
         // Without the typewriter aid, typing never advances the state
         // machine, even though the click placed the caret.

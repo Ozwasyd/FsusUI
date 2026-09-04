@@ -5359,7 +5359,12 @@ const handleKeydown = (event: KeyboardEvent) => {
     openSearch(searchAction === 'open-replace')
     return
   }
-  if (event.key === 'PageUp' || event.key === 'PageDown') {
+  if (
+    event.key === 'PageUp' ||
+    event.key === 'PageDown' ||
+    ((event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End'))
+  ) {
     suspendTypewriterForUserScroll()
   }
 

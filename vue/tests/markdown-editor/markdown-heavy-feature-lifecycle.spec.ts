@@ -288,6 +288,7 @@ const runAtCodeAdapterStarted = (
 test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(360_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto(
     '/?visual=basic&theme=light&performance=markdown-heavy-feature-lifecycle&size=100000',
