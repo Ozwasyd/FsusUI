@@ -190,14 +190,14 @@
 }
 
 .markdown-renderer .markdown-renderer__mermaid[data-mermaid-rendered='true'] {
-  inline-size: fit-content;
+  inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
   max-inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
   margin-inline: auto;
 }
 
 .markdown-renderer .markdown-renderer__mermaid > svg {
   display: block;
-  inline-size: auto;
+  inline-size: 100%;
   max-inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
   block-size: auto;
   max-block-size: min(60vh, var(--fsus-markdown-diagram-max-height, 28rem));
