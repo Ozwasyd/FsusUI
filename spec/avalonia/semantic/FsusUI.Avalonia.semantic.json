@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "9e9ffcb64a451ad2b2d8d4ae280a6f5b8d97fac860f2da004271648d52f99727",
+    "inputTreeHash": "855a74e099ef2becc8a76078a96ac597a8490ddbe638b588388c4e5745eb87f3",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "11721c549b98770c97f1828e0941ff3f3a927ead11004aa530ab52b3db290d06"
+    "outputHash": "4835f336a53474e61892d4d07c7a3e3ecd7aba764f6e4eef1c5ac0afd9532526"
   },
   "semanticTypes": [
     {
@@ -21790,7 +21790,8 @@
         "observedSemantics": [
           "accessibility-view",
           "name",
-          "role"
+          "role",
+          "state"
         ],
         "mappings": [
           {
@@ -21837,6 +21838,19 @@
             "valueKnown": true,
             "value": "Edit",
             "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusInput.SyncAutomation"
+          },
+          {
+            "semantic": "state",
+            "provider": "AutomationProperties.SetItemStatus",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "public-control-this",
+            "targetExpression": "this",
+            "valueKnown": false,
+            "valueExpression": "$\u0022invalid={IsInvalid.ToString(CultureInfo.InvariantCulture).ToLowerInvariant()}\u0022",
+            "publicDependencies": [
+              "FsusUI.Avalonia.Controls.FsusInput.IsInvalid"
+            ],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusInput.SyncAutomation"
           }
         ]

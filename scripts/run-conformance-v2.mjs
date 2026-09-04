@@ -28,6 +28,7 @@ run('mapping:negative-tests', 'pnpm', ['run', 'test:contract-v2'])
 run('coverage:vue-public', 'pnpm', ['run', 'conformance:v2:vue-public'])
 run('execution:web-build', 'pnpm', ['run', 'build:demo'])
 run('execution:avalonia', 'pnpm', ['run', 'conformance:v2:avalonia'])
+run('execution:avalonia-accessibility', 'pnpm', ['run', 'a11y:runtime'])
 run('execution:web-accessibility', process.execPath, [
   'scripts/native-screen-reader-harness.mjs',
   '--skip-build',

@@ -7,6 +7,7 @@ using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
@@ -18,6 +19,7 @@ namespace FsusUI.Avalonia.HeadlessTests.Generated;
 
 public sealed record AccessibilityRuntimeGap(
   string Field,
+  string ObservedJson,
   string Reason,
   string Owner,
   string TestPolicy,
@@ -25,16 +27,19 @@ public sealed record AccessibilityRuntimeGap(
 
 public sealed record AccessibilityRuntimeScenario(
   string Id,
-  string ContractId,
-  string ScenarioId,
+  string? ContractId,
+  string? ContractScenarioId,
   string Checkpoint,
   string SnapshotId,
   string Factory,
+  string BindingDisposition,
   string Role,
   string AccessibleName,
   string? Value,
   bool? Disabled,
+  bool? Selected,
   bool? Checked,
+  bool? Expanded,
   bool? Invalid,
   int TabOrder,
   IReadOnlyList<AccessibilityRuntimeGap> ImplementationGaps);
@@ -57,6 +62,8 @@ internal static class AccessibilityRuntimeEvidence
     "dotnet/FsusUI.Avalonia.HeadlessTests/Generated/AccessibilityConformanceTests.cs";
   private const string RuntimeHelperPath =
     "dotnet/FsusUI.Avalonia.HeadlessTests/AccessibilityRuntimeEvidence.cs";
+  private const string RootConformanceRunnerPath =
+    "scripts/run-conformance-v2.mjs";
 
   private static readonly JsonSerializerOptions JsonOptions = new()
   {
@@ -80,23 +87,27 @@ internal static class AccessibilityRuntimeEvidence
       GeneratorPath,
       GeneratedTestPath,
       RuntimeHelperPath,
-      RuntimeScenariosPath);
+      RuntimeScenariosPath,
+      RootConformanceRunnerPath);
     var scenarioSetHash = FileHash(repositoryRoot, RuntimeScenariosPath);
     var sourceTreeHash = Git(repositoryRoot, "rev-parse", "HEAD^{tree}");
     var workspaceClean = string.IsNullOrWhiteSpace(
       Git(repositoryRoot, "status", "--porcelain", "--untracked-files=all"));
+    var assertionErrors = new List<string>();
     var captured = scenarios.Select(scenario => CaptureScenario(
-      scenario,
-      candidate,
-      contractHash,
-      webBaselineHash,
-      avaloniaBaselineHash,
-      accessibilityContractHash,
-      declaredSnapshotHash,
-      runnerHash,
-      scenarioSetHash,
-      sourceTreeHash,
-      workspaceClean)).ToArray();
+        scenario,
+        candidate,
+        contractHash,
+        webBaselineHash,
+        avaloniaBaselineHash,
+        accessibilityContractHash,
+        declaredSnapshotHash,
+        runnerHash,
+        scenarioSetHash,
+        sourceTreeHash,
+        workspaceClean,
+        assertionErrors))
+      .ToArray();
     var output = Environment.GetEnvironmentVariable("FSUS_A11Y_RUNTIME_OUTPUT");
     var outputPath = Path.GetFullPath(
       output ?? Path.Combine(
@@ -129,6 +140,12 @@ internal static class AccessibilityRuntimeEvidence
       $"{JsonSerializer.Serialize(evidenceSet, JsonOptions)}\n");
     Console.WriteLine(
       $"[accessibility-runtime] wrote {outputPath} scenarios={captured.Length}");
+    if (assertionErrors.Count > 0)
+    {
+      throw new InvalidOperationException(
+        "Accessibility runtime assertions failed:\n- " +
+        string.Join("\n- ", assertionErrors));
+    }
   }
 
   private static object CaptureScenario(
@@ -142,7 +159,8 @@ internal static class AccessibilityRuntimeEvidence
     string runnerHash,
     string runtimeScenarioSetHash,
     string sourceTreeHash,
-    bool workspaceClean)
+    bool workspaceClean,
+    List<string> assertionErrors)
   {
     var control = CreateControl(scenario);
     var window = new Window
@@ -190,7 +208,14 @@ internal static class AccessibilityRuntimeEvidence
         null,
         scenario.TabOrder,
         nodes);
-      AssertScenarioEvidence(scenario, nodes);
+      try
+      {
+        AssertScenarioEvidence(scenario, nodes);
+      }
+      catch (InvalidOperationException error)
+      {
+        assertionErrors.Add(error.Message);
+      }
       var executionId =
         $"accessibility-v2-{candidate[..Math.Min(candidate.Length, 12)]}-{scenario.Id}";
       var locale = string.IsNullOrWhiteSpace(CultureInfo.CurrentCulture.Name)
@@ -207,7 +232,8 @@ internal static class AccessibilityRuntimeEvidence
         accessibilityContractHash,
         declaredSnapshotHash,
         runtimeScenarioSetHash,
-        scenario = scenario.ScenarioId,
+        runtimeScenario = scenario.Id,
+        contractScenario = scenario.ContractScenarioId,
         contract = scenario.ContractId,
         documentId = scenario.SnapshotId,
         documentEpoch = 1,
@@ -249,6 +275,7 @@ internal static class AccessibilityRuntimeEvidence
         {
           scenario.SnapshotId,
           scenario.Factory,
+          scenario.BindingDisposition,
         },
         source = new
         {
@@ -272,33 +299,76 @@ internal static class AccessibilityRuntimeEvidence
   {
     Control control = scenario.Factory switch
     {
-      "button" => new FsusButton
-      {
-        AccessibleName = scenario.AccessibleName,
-        Content = "Runtime accessibility action",
-      },
-      "input" => new FsusInput
-      {
-        AccessibleName = scenario.AccessibleName,
-        IsInvalid = scenario.Invalid == true,
-        Text = scenario.Value,
-      },
-      "checkbox" => new FsusCheckbox
-      {
-        AccessibleName = scenario.AccessibleName,
-        Content = scenario.AccessibleName,
-        IsChecked = scenario.Checked,
-      },
-      "switch" => new FsusSwitch
-      {
-        AccessibleName = scenario.AccessibleName,
-        Content = scenario.AccessibleName,
-        IsChecked = scenario.Checked,
-      },
-      "markdown-editor-atomic" => CreateMarkdownEditor(scenario),
+      nameof(FsusAlert) => new FsusAlert(),
+      nameof(FsusButton) => new FsusButton(),
+      nameof(FsusCheckbox) => new FsusCheckbox(),
+      nameof(FsusDataTable) => new FsusDataTable(),
+      nameof(FsusDialog) => new FsusDialog(),
+      nameof(FsusDrawer) => new FsusDrawer(),
+      nameof(FsusDropdown) => new FsusDropdown(),
+      nameof(FsusForm) => new FsusForm(),
+      nameof(FsusIconButton) => new FsusIconButton(),
+      nameof(FsusImageViewer) => new FsusImageViewer(),
+      nameof(FsusInboxLayout) => new FsusInboxLayout(),
+      nameof(FsusInput) => new FsusInput(),
+      nameof(FsusInputNumber) => new FsusInputNumber(),
+      nameof(FsusLink) => new FsusLink(),
+      nameof(FsusMarkdownEditor) => CreateMarkdownEditor(scenario),
+      nameof(FsusMenu) => new FsusMenu(),
+      nameof(FsusMessageBox) => new FsusMessageBox(),
+      nameof(FsusMetricList) => new FsusMetricList(),
+      nameof(FsusPerceptionChallenge) => new FsusPerceptionChallenge(),
+      nameof(FsusPerceptionCharacterChallenge) =>
+        new FsusPerceptionCharacterChallenge(),
+      nameof(FsusPopconfirm) => new FsusPopconfirm(),
+      nameof(FsusPopover) => new FsusPopover(),
+      nameof(FsusPublicShell) => new FsusPublicShell(),
+      nameof(FsusRadio) => new FsusRadio(),
+      nameof(FsusResponsiveCollection) => new FsusResponsiveCollection(),
+      nameof(FsusSettingsSection) => new FsusSettingsSection(),
+      nameof(FsusSiteHeader) => new FsusSiteHeader(),
+      nameof(FsusSwitch) => new FsusSwitch(),
+      nameof(FsusTableV2) => new FsusTableV2(),
+      nameof(FsusTabs) => new FsusTabs(),
+      nameof(FsusTextEditor) => new FsusTextEditor(),
+      nameof(FsusTextarea) => new FsusTextarea(),
+      nameof(FsusTextViewer) => new FsusTextViewer(),
+      nameof(FsusThemeModeToggle) => new FsusThemeModeToggle(),
+      nameof(FsusTooltip) => new FsusTooltip(),
+      nameof(FsusTree) => new FsusTree(),
+      nameof(FsusTreeTable) => new FsusTreeTable(),
+      nameof(FsusVirtualList) => new FsusVirtualList(),
       _ => throw new InvalidOperationException(
         $"Unknown accessibility runtime factory {scenario.Factory}."),
     };
+    AutomationProperties.SetName(control, scenario.AccessibleName);
+    if (control is ContentControl contentControl && contentControl.Content is null)
+    {
+      contentControl.Content = scenario.AccessibleName;
+    }
+    if (control is FsusInput input)
+    {
+      input.Text = scenario.Value;
+      input.IsInvalid = scenario.Invalid == true;
+    }
+    if (
+      control is FsusInputNumber inputNumber &&
+      decimal.TryParse(
+        scenario.Value,
+        NumberStyles.Float,
+        CultureInfo.InvariantCulture,
+        out var numberValue))
+    {
+      inputNumber.Value = numberValue;
+    }
+    if (control is ToggleButton toggle)
+    {
+      toggle.IsChecked = scenario.Checked;
+    }
+    if (control is FsusAlert alert)
+    {
+      alert.Content = scenario.Value ?? scenario.AccessibleName;
+    }
     control.IsEnabled = scenario.Disabled != true;
     control.TabIndex = scenario.TabOrder;
     return control;
@@ -392,7 +462,14 @@ internal static class AccessibilityRuntimeEvidence
     var root = nodes.FirstOrDefault(node => node.Id == "root")
       ?? throw new InvalidOperationException(
         $"{scenario.Id} root AutomationPeer node is missing.");
-    var unavailableFields = new HashSet<string>(StringComparer.Ordinal);
+    var problems = new Dictionary<string, string>(StringComparer.Ordinal);
+    void Compare<T>(string field, T expected, T actual)
+    {
+      if (!EqualityComparer<T>.Default.Equals(expected, actual))
+      {
+        problems[field] = JsonSerializer.Serialize(actual);
+      }
+    }
     var expectedRole = scenario.Role switch
     {
       "text-input" => "edit",
@@ -400,51 +477,79 @@ internal static class AccessibilityRuntimeEvidence
       "radio" => "radiobutton",
       _ => scenario.Role,
     };
-    RequireEqual(scenario, "role", expectedRole, root.Role);
-    RequireEqual(scenario, "name", scenario.AccessibleName, root.Name);
+    Compare("role", expectedRole, root.Role);
+    Compare("name", scenario.AccessibleName, root.Name);
     if (scenario.Value is not null)
     {
-      RequireEqual(scenario, "value", scenario.Value, root.Value);
+      Compare("value", scenario.Value, root.Value);
     }
     if (scenario.Disabled is not null)
     {
-      RequireEqual(
-        scenario,
-        "states.disabled",
-        scenario.Disabled.Value,
-        root.States.Disabled);
+      Compare("states.disabled", scenario.Disabled.Value, root.States.Disabled);
+    }
+    if (scenario.Selected is not null)
+    {
+      Compare("states.selected", scenario.Selected.Value, root.States.Selected);
     }
     if (scenario.Checked is not null)
     {
-      RequireEqual(
-        scenario,
+      Compare(
         "states.checkedState",
         scenario.Checked.Value ? "on" : "off",
         root.States.CheckedState);
     }
+    if (scenario.Expanded is not null)
+    {
+      Compare("states.expanded", scenario.Expanded.Value, root.States.Expanded);
+    }
     if (scenario.Invalid is not null)
     {
-      if (root.States.Invalid is null)
+      Compare("states.invalid", scenario.Invalid.Value, root.States.Invalid);
+    }
+    Compare("focus.tabOrder", (int?)scenario.TabOrder, root.Focus.TabOrder);
+    if (scenario.Factory == nameof(FsusMarkdownEditor))
+    {
+      if (root.Selection is null)
       {
-        unavailableFields.Add("states.invalid");
+        problems["selection"] = "null";
       }
-      else
+      if (root.Caret is null)
       {
-        RequireEqual(
-          scenario,
-          "states.invalid",
-          scenario.Invalid.Value,
-          root.States.Invalid.Value);
+        problems["caret"] = "null";
+      }
+      if (root.Children.Count == 0)
+      {
+        problems["tree.children"] = "[]";
+      }
+      var descendantRoles = nodes.Skip(1).Select(node => node.Role).ToArray();
+      if (
+        !descendantRoles.Contains("group", StringComparer.Ordinal) ||
+        !descendantRoles.Contains("button", StringComparer.Ordinal))
+      {
+        problems["tree.roles"] = JsonSerializer.Serialize(descendantRoles);
       }
     }
-    var declaredGapFields = scenario.ImplementationGaps
-      .Select(gap => gap.Field)
-      .ToHashSet(StringComparer.Ordinal);
-    if (!unavailableFields.SetEquals(declaredGapFields))
+    var declaredGaps = scenario.ImplementationGaps.ToDictionary(
+      gap => gap.Field,
+      StringComparer.Ordinal);
+    var problemFields = problems.Keys.ToHashSet(StringComparer.Ordinal);
+    if (!problemFields.SetEquals(declaredGaps.Keys))
     {
       throw new InvalidOperationException(
-        $"{scenario.Id} unavailable fields [{string.Join(", ", unavailableFields.Order())}] " +
-        $"do not match declared implementation gaps [{string.Join(", ", declaredGapFields.Order())}].");
+        $"{scenario.Id} problem fields [{string.Join(", ", problemFields.Order())}] " +
+        $"do not match declared implementation gaps [{string.Join(", ", declaredGaps.Keys.Order())}].");
+    }
+    foreach (var (field, observedJson) in problems)
+    {
+      if (!string.Equals(
+        observedJson,
+        declaredGaps[field].ObservedJson,
+        StringComparison.Ordinal))
+      {
+        throw new InvalidOperationException(
+          $"{scenario.Id} implementation gap {field} expected observed=" +
+          $"{declaredGaps[field].ObservedJson} actual={observedJson}.");
+      }
     }
     var nodeById = nodes.ToDictionary(node => node.Id);
     foreach (var node in nodes)
@@ -462,23 +567,6 @@ internal static class AccessibilityRuntimeEvidence
           node.Id,
           child.LogicalParent);
       }
-    }
-    if (scenario.Factory != "markdown-editor-atomic")
-    {
-      return;
-    }
-    if (root.Selection is null || root.Caret is null)
-    {
-      throw new InvalidOperationException(
-        $"{scenario.Id} MarkdownEditor selection/caret is unavailable.");
-    }
-    if (
-      root.Children.Count == 0 ||
-      !nodes.Skip(1).Any(node => node.Role == "group") ||
-      !nodes.Skip(1).Any(node => node.Role == "button"))
-    {
-      throw new InvalidOperationException(
-        $"{scenario.Id} MarkdownEditor atomic peer tree is incomplete.");
     }
   }
 

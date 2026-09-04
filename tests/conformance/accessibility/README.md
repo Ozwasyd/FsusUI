@@ -24,11 +24,21 @@ explicit `null` and make the scenario partial. This headless evidence is not an
 OS screen-reader run and is never sufficient to promote cross-platform
 alignment.
 
-An unavailable required field must be declared as a narrowly scoped
-`implementationGaps` entry with a reason, owner, test policy, and review date.
+All 41 declared Avalonia snapshots are runtime inputs. The runner uses an
+explicit production-control factory for every row and rejects an omitted,
+duplicate, unknown, or unconstructed row. Thirty-three rows also bind an exact
+Contract V2 accessibility scenario. The remaining eight still produce real
+peer-tree evidence but carry a governed, freshness-checked unbound disposition
+and contribute no Contract V2 scenario coverage. `pnpm run conformance:v2`
+executes this lane as `execution:avalonia-accessibility`; deleting or
+duplicating that root stage fails the static accessibility gate.
+
+An unavailable or mismatched required field must be declared by exact snapshot,
+field, and observed value, with a reason, owner, test policy, and review date.
 The runtime verifier requires exact set equality: an undeclared missing field
-and a stale declaration both fail. These entries document implementation gaps;
-they are not platform overrides or allow-failures.
+or mismatch, observed-value drift, and a stale declaration all fail. These
+entries document implementation gaps; they are not platform overrides or
+allow-failures.
 
 `pnpm run conformance:a11y` composes both checks. Stable controls cannot pass
 with visual evidence or declaration-only snapshots alone.
