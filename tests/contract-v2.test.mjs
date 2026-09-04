@@ -1110,7 +1110,12 @@ test('TypeScript checker extracts mapped exposed signatures and source mutations
     root,
     sourceRelativePath,
     scriptContent,
-    memberNames: ['dispatchTransaction', 'searchNavigate', 'searchUi'],
+    memberNames: [
+      'dispatchTransaction',
+      'revealSourceRange',
+      'searchNavigate',
+      'searchUi',
+    ],
   })
   assert.equal(
     current.get('dispatchTransaction').returnType,
@@ -1119,6 +1124,10 @@ test('TypeScript checker extracts mapped exposed signatures and source mutations
   assert.equal(
     current.get('searchNavigate').returnType,
     '"success" | "deleted" | "stale" | "not-found" | "unsupported"',
+  )
+  assert.doesNotMatch(
+    current.get('revealSourceRange').parameters[1].type,
+    /import\(/u,
   )
   assert.deepEqual(current.get('searchUi'), {
     kind: 'unknown',

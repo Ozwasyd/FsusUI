@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "48a56445f6569b73fe1cc368fcc06795449bfd6a8bc62b135f77bd0ffbdbabed",
+      "hash": "3a7e0a317e402225970b123f48d887b2056266b832454e3493b89726b14ec014",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -60440,7 +60440,7 @@
                 },
                 {
                   "name": "options",
-                  "type": "import(\"./markdown-editor-outline\").MarkdownEditorRevealOptions | undefined",
+                  "type": "MarkdownEditorRevealOptions | undefined",
                   "optional": true,
                   "rest": false
                 }
@@ -60514,7 +60514,7 @@
                 },
                 {
                   "name": "options",
-                  "type": "{ readonly expected?: { readonly documentIdentity: import(\"@element-plus/wasm\").MarkdownDocumentIdentity; readonly revision: number; }; readonly actual?: { readonly documentIdentity: import(\"@element-plus/wasm\").MarkdownDocumentIdentity; readonly revision: number; }; readonly mode?: string; readonly reducedMotion?: boolean; readonly sourceLength?: number; readonly anchorMap?: import(\"@element-plus/wasm\").MarkdownAnchorMap; readonly projection?: MarkdownStableProjection; } | undefined",
+                  "type": "{ readonly expected?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number; }; readonly actual?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number; }; readonly mode?: string; readonly reducedMotion?: boolean; readonly sourceLength?: number; readonly anchorMap?: MarkdownAnchorMap; readonly projection?: MarkdownStableProjection; } | undefined",
                   "optional": true,
                   "rest": false
                 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "2f7e81ad7605c060d3b7c980478596933b313d1e",
+    "commitSha": "0fb4348ff674653f20fee11091e7692a77efd218",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
@@ -12,7 +12,7 @@
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "7766081d12b6608e10d05140d5842841ad32fc86691fec8728a43eb16a363e86",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "c4ac85d2edc1ea9d45824ab717aa15d9dd52e3dc069be002972b999e1763ac14"
+    "outputHash": "561090fc404a52c19f4cfdae9f7e244a13fb8369d87bcfaca5ed55474a98e53f"
   },
   "summary": {
     "componentModules": 93,
@@ -14647,7 +14647,7 @@
               },
               {
                 "name": "options",
-                "type": "import(\"./markdown-editor-outline\").MarkdownEditorRevealOptions | undefined",
+                "type": "MarkdownEditorRevealOptions | undefined",
                 "optional": true,
                 "rest": false
               }
@@ -14667,7 +14667,7 @@
               },
               {
                 "name": "options",
-                "type": "{ readonly expected?: { readonly documentIdentity: import(\"@element-plus/wasm\").MarkdownDocumentIdentity; readonly revision: number; }; readonly actual?: { readonly documentIdentity: import(\"@element-plus/wasm\").MarkdownDocumentIdentity; readonly revision: number; }; readonly mode?: string; readonly reducedMotion?: boolean; readonly sourceLength?: number; readonly anchorMap?: import(\"@element-plus/wasm\").MarkdownAnchorMap; readonly projection?: MarkdownStableProjection; } | undefined",
+                "type": "{ readonly expected?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number; }; readonly actual?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number; }; readonly mode?: string; readonly reducedMotion?: boolean; readonly sourceLength?: number; readonly anchorMap?: MarkdownAnchorMap; readonly projection?: MarkdownStableProjection; } | undefined",
                 "optional": true,
                 "rest": false
               }

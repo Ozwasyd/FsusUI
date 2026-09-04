@@ -9,6 +9,10 @@ const hasTypeFlag = (type, flag) =>
 const unknownType = (type) =>
   hasTypeFlag(type, ts.TypeFlags.Any) || hasTypeFlag(type, ts.TypeFlags.Unknown)
 
+const typeFormatFlags =
+  ts.TypeFormatFlags.NoTruncation |
+  ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope
+
 const propertyName = (property, sourceFile) => {
   const name = property.name
   if (ts.isIdentifier(name) || ts.isStringLiteralLike(name)) return name.text
@@ -169,11 +173,7 @@ export const extractStructuredExposedSignatures = ({
         name: parameter.name,
         type: unknownType(parameterType)
           ? null
-          : checker.typeToString(
-              parameterType,
-              location,
-              ts.TypeFormatFlags.NoTruncation,
-            ),
+          : checker.typeToString(parameterType, location, typeFormatFlags),
         optional:
           (parameter.flags & ts.SymbolFlags.Optional) !== 0 ||
           Boolean(declaration?.questionToken) ||
@@ -198,11 +198,7 @@ export const extractStructuredExposedSignatures = ({
       kind: 'callable',
       reason: null,
       parameters,
-      returnType: checker.typeToString(
-        returnType,
-        value,
-        ts.TypeFormatFlags.NoTruncation,
-      ),
+      returnType: checker.typeToString(returnType, value, typeFormatFlags),
     })
   }
   return result
