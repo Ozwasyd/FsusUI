@@ -11,7 +11,7 @@ namespace FsusUI.Avalonia.ApiTool;
 
 internal sealed class SourceSemanticEvaluator
 {
-  private const string EvaluatorVersion = "source-semantics-v5";
+  private const string EvaluatorVersion = "source-semantics-v6";
 
   private static readonly CSharpParseOptions ParseOptions =
     new(languageVersion: LanguageVersion.Latest, documentationMode: DocumentationMode.Parse);
@@ -139,6 +139,7 @@ internal sealed class SourceSemanticEvaluator
 
     var inputFiles = sourceFiles
       .Concat(RequiredInputFiles())
+      .Concat(TokenThemeSemanticEvaluator.InputFiles(repoRoot, projectDirectory))
       .Distinct(StringComparer.Ordinal)
       .OrderBy(file => NormalizePath(Path.GetRelativePath(repoRoot, file)), StringComparer.Ordinal)
       .ToList();
@@ -169,6 +170,12 @@ internal sealed class SourceSemanticEvaluator
             .ToList(),
         },
         StringComparer.Ordinal),
+      TokenThemeContract = TokenThemeSemanticEvaluator.Extract(
+        repoRoot,
+        projectDirectory,
+        compilation,
+        syntaxTrees,
+        sourceOverrides),
       InputTreeHash = HashFiles(inputFiles),
       CompilerOptionsHash = HashText(
         string.Join(
@@ -1180,6 +1187,8 @@ internal sealed class SourceSemanticIndex
 {
   public Dictionary<string, SourceTypeSemantics> Types { get; init; } =
     new(StringComparer.Ordinal);
+
+  public SourceTokenThemeContract? TokenThemeContract { get; init; }
 
   public string InputTreeHash { get; init; } = "";
 

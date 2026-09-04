@@ -12,6 +12,7 @@ import {
   avaloniaPublicSurfaces,
   avaloniaAutomationContractFingerprint,
   avaloniaStateContractFingerprint,
+  avaloniaTokenThemeContractFingerprint,
   validateAvaloniaSurfaceRegistration,
   validateRegistry,
   validateSemanticMemberBindings,
@@ -147,8 +148,8 @@ test('committed Contract V2 registry passes validation with the committed gate',
 
 test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
   for (const [key, baseline] of Object.entries(avaloniaBaselines)) {
-    assert.equal(baseline.baselineVersion, '2.3.0')
-    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.7.0')
+    assert.equal(baseline.baselineVersion, '2.4.0')
+    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.8.0')
     assert.match(baseline.source.inputTreeHash, sha256Pattern)
     assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
     assert.match(baseline.source.dependencyVersionHash, sha256Pattern)
@@ -506,6 +507,123 @@ test('automation mutations invalidate independent Contract V2 identities without
       avaloniaBaselines,
     }).errors.join('\n'),
     /ElSlider.*has stale automation contract fingerprint/,
+  )
+
+  const build = (baselines) =>
+    buildRegistry({
+      vueBaseline,
+      avaloniaBaseline: baselines.avalonia,
+      avaloniaThemesBaseline: baselines.avaloniaThemes,
+      avaloniaIconsBaseline: baselines.avaloniaIcons,
+      gate,
+      semanticMemberBindings,
+    })
+  const statuses = (registry) =>
+    registry.contracts.map((contract) => [
+      contract.id,
+      contract.component.exportStatus,
+    ])
+  assert.deepEqual(
+    statuses(build(changedBaselines)),
+    statuses(build(avaloniaBaselines)),
+  )
+})
+
+test('Avalonia token/theme baseline retains generated authorities and honest dependency ownership', () => {
+  const avalonia = avaloniaBaselines.avalonia.tokenThemeContract
+  const themes = avaloniaBaselines.avaloniaThemes.tokenThemeContract
+  assert.equal(avalonia.definitions.length, 116)
+  assert.equal(themes.definitions.length, 116)
+  assert.equal(avalonia.dependencies.length, 23)
+  assert.equal(themes.dependencies.length, 990)
+  assert.equal(
+    avalonia.dependencies.filter((dependency) => dependency.resolved).length,
+    23,
+  )
+  assert.equal(
+    themes.dependencies.filter((dependency) => dependency.resolved).length,
+    491,
+  )
+  assert.equal(
+    themes.dependencies.filter(
+      (dependency) => dependency.ownership === 'resolved',
+    ).length,
+    607,
+  )
+  assert.ok(
+    [avalonia, themes].every(
+      (contract) =>
+        contract.contractDeclared === false &&
+        contract.renderedEvidenceVerified === false,
+    ),
+  )
+  assert.ok(
+    avalonia.dependencies.some(
+      (dependency) =>
+        dependency.dependency === 'DensityControlDefaultYResourceKey' &&
+        dependency.canonicalName === 'density.control.default.y' &&
+        dependency.resolved === true &&
+        dependency.ownerType === 'FsusUI.Avalonia.Controls.FsusTree',
+    ),
+  )
+  assert.ok(
+    themes.dependencies.some(
+      (dependency) =>
+        dependency.sourceFile.endsWith('Controls/MarkdownEditor.axaml') &&
+        dependency.dependency === 'FsusSpace2' &&
+        dependency.canonicalName === 'space.2' &&
+        dependency.ownerType ===
+          'FsusUI.Avalonia.Controls.FsusMarkdownEditor' &&
+        dependency.ownership === 'resolved',
+    ),
+  )
+  assert.ok(
+    themes.dependencies.some(
+      (dependency) =>
+        dependency.dependency === 'FsusThemeTextBrush' &&
+        dependency.resolved === false,
+    ),
+  )
+})
+
+test('token/theme dependency drift invalidates package and type Contract V2 identities without changing status', () => {
+  const changedBaselines = clone(avaloniaBaselines)
+  const dependency =
+    changedBaselines.avaloniaThemes.tokenThemeContract.dependencies.find(
+      (candidate) =>
+        candidate.sourceFile.endsWith('Controls/MarkdownEditor.axaml') &&
+        candidate.dependency === 'FsusSpace2' &&
+        candidate.ownerType === 'FsusUI.Avalonia.Controls.FsusMarkdownEditor',
+    )
+  dependency.canonicalName = 'space.3'
+  assert.notEqual(
+    avaloniaTokenThemeContractFingerprint(
+      changedBaselines.avaloniaThemes.tokenThemeContract,
+    ),
+    committedRegistry.tokenThemeBaselines.avaloniaThemes.fingerprint,
+  )
+  const errors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedBaselines,
+  }).errors.join('\n')
+  assert.match(errors, /token\/theme baseline avaloniaThemes is stale/)
+  assert.match(
+    errors,
+    /ElMarkdownEditor.*stale token\/theme contract fingerprint/,
+  )
+  assert.match(
+    errors,
+    /component-v2\.el-markdown-editor has stale Avalonia token\/theme contract binding/,
+  )
+
+  const deletedIdentity = clone(committedRegistry)
+  delete deletedIdentity.tokenThemeBaselines.avaloniaThemes
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: deletedIdentity,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /token\/theme baseline avaloniaThemes is stale/,
   )
 
   const build = (baselines) =>

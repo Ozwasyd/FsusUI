@@ -858,6 +858,15 @@ const avaloniaSemanticIndex = (baselines) => {
       index.set(type.name, { ...type, packageId })
     }
   }
+  for (const [packageId] of Object.entries(AVALONIA_SEMANTIC_PATHS)) {
+    for (const dependency of baselines[packageId]?.tokenThemeContract
+      ?.dependencies ?? []) {
+      const owner = index.get(dependency.ownerType)
+      if (!owner) continue
+      owner.tokenThemeDependencies ??= []
+      owner.tokenThemeDependencies.push({ ...dependency, packageId })
+    }
+  }
   return index
 }
 
@@ -1169,6 +1178,96 @@ const avaloniaAutomationContractRef = (type) => {
     mappingComplete: knownBoolean(type.automationContract.mappingComplete),
     observedSemantics: [
       ...(type.automationContract.observedSemantics ?? []),
+    ].sort(),
+  }
+}
+
+const canonicalTokenDefinition = (definition) => ({
+  canonicalName: definition.canonicalName ?? null,
+  owner: definition.owner ?? null,
+  generatedOutputs: [...(definition.generatedOutputs ?? [])].sort(),
+  resourceKeys: [...(definition.resourceKeys ?? [])].sort(),
+  csharpMembers: [...(definition.csharpMembers ?? [])].sort(),
+  declarationAuthority: definition.declarationAuthority ?? null,
+})
+
+const canonicalTokenDependency = (dependency) => ({
+  kind: dependency.kind ?? null,
+  authority: dependency.authority ?? null,
+  sourceFile: dependency.sourceFile ?? null,
+  sourceMember: dependency.sourceMember ?? null,
+  dependency: dependency.dependency ?? null,
+  canonicalName: dependency.canonicalName ?? null,
+  resolved: knownBoolean(dependency.resolved),
+  ownerType: dependency.ownerType ?? null,
+  ownership: dependency.ownership ?? null,
+  ownerExpression: dependency.ownerExpression ?? null,
+  ...(dependency.packageId ? { packageId: dependency.packageId } : {}),
+})
+
+export const canonicalAvaloniaTokenThemeContract = (contract) => {
+  if (!contract) return null
+  return {
+    canonicalAuthority: contract.canonicalAuthority ?? null,
+    generatedMetadataAuthority: contract.generatedMetadataAuthority ?? null,
+    generatedXamlAuthority: contract.generatedXamlAuthority ?? null,
+    generatedCsharpAuthority: contract.generatedCsharpAuthority ?? null,
+    contractDeclared: knownBoolean(contract.contractDeclared),
+    renderedEvidenceVerified: knownBoolean(contract.renderedEvidenceVerified),
+    definitions: (contract.definitions ?? [])
+      .map(canonicalTokenDefinition)
+      .sort((first, second) =>
+        JSON.stringify(first).localeCompare(JSON.stringify(second)),
+      ),
+    dependencies: (contract.dependencies ?? [])
+      .map(canonicalTokenDependency)
+      .sort((first, second) =>
+        JSON.stringify(first).localeCompare(JSON.stringify(second)),
+      ),
+  }
+}
+
+export const avaloniaTokenThemeContractFingerprint = (contract) => {
+  const canonical = canonicalAvaloniaTokenThemeContract(contract)
+  return canonical ? sha256(JSON.stringify(canonical)) : null
+}
+
+const canonicalAvaloniaTypeTokenThemeContract = (type) => {
+  const dependencies = (type?.tokenThemeDependencies ?? [])
+    .map(canonicalTokenDependency)
+    .sort((first, second) =>
+      JSON.stringify(first).localeCompare(JSON.stringify(second)),
+    )
+  if (dependencies.length === 0) return null
+  return {
+    contractDeclared: false,
+    renderedEvidenceVerified: false,
+    dependencies,
+  }
+}
+
+export const avaloniaTypeTokenThemeContractFingerprint = (type) => {
+  const canonical = canonicalAvaloniaTypeTokenThemeContract(type)
+  return canonical ? sha256(JSON.stringify(canonical)) : null
+}
+
+const avaloniaTypeTokenThemeContractRef = (type) => {
+  const canonical = canonicalAvaloniaTypeTokenThemeContract(type)
+  if (!canonical) return null
+  return {
+    fingerprint: sha256(JSON.stringify(canonical)),
+    dependencyCount: canonical.dependencies.length,
+    resolvedCount: canonical.dependencies.filter(
+      (dependency) => dependency.resolved,
+    ).length,
+    contractDeclared: false,
+    renderedEvidenceVerified: false,
+    baselines: [
+      ...new Set(
+        canonical.dependencies.map(
+          (dependency) => AVALONIA_SEMANTIC_PATHS[dependency.packageId],
+        ),
+      ),
     ].sort(),
   }
 }
@@ -1920,6 +2019,9 @@ const contractForComponent = ({
   const automationContract = avaloniaType
     ? avaloniaAutomationContractRef(avaloniaType)
     : null
+  const tokenThemeContract = avaloniaType
+    ? avaloniaTypeTokenThemeContractRef(avaloniaType)
+    : null
 
   const contract = {
     id: `component-v2.${contractKebab}`,
@@ -1945,6 +2047,7 @@ const contractForComponent = ({
             type: avaloniaType.name,
             ...(stateContract ? { stateContract } : {}),
             ...(automationContract ? { automationContract } : {}),
+            ...(tokenThemeContract ? { tokenThemeContract } : {}),
           }
         : { status: 'unbound', package: null, type: null },
     },
@@ -2137,6 +2240,8 @@ const avaloniaOnlyType = ({ type, packageId }) => {
   const stateContractFingerprint = avaloniaStateContractFingerprint(type)
   const automationContractFingerprint =
     avaloniaAutomationContractFingerprint(type)
+  const tokenThemeContractFingerprint =
+    avaloniaTypeTokenThemeContractFingerprint(type)
   return {
     type: type.name,
     kind: type.kind,
@@ -2146,6 +2251,7 @@ const avaloniaOnlyType = ({ type, packageId }) => {
     surfaceHash: avaloniaTypeSurfaceHash(type),
     ...(stateContractFingerprint ? { stateContractFingerprint } : {}),
     ...(automationContractFingerprint ? { automationContractFingerprint } : {}),
+    ...(tokenThemeContractFingerprint ? { tokenThemeContractFingerprint } : {}),
     scenarioIds: [
       `scenario.v2.avalonia-only.${toKebab(type.name.split('.').pop() ?? type.name)}`,
     ],
@@ -2164,6 +2270,8 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
       avaloniaStateContractFingerprint(avaloniaType)
     const automationContractFingerprint =
       avaloniaAutomationContractFingerprint(avaloniaType)
+    const tokenThemeContractFingerprint =
+      avaloniaTypeTokenThemeContractFingerprint(avaloniaType)
     map.push({
       vue: { name: component.name, module: component.module },
       avalonia: {
@@ -2173,6 +2281,9 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
         ...(stateContractFingerprint ? { stateContractFingerprint } : {}),
         ...(automationContractFingerprint
           ? { automationContractFingerprint }
+          : {}),
+        ...(tokenThemeContractFingerprint
+          ? { tokenThemeContractFingerprint }
           : {}),
       },
       basis: 'name-equality',
@@ -2248,6 +2359,31 @@ export const buildRegistry = ({
             1000,
         ) / 10
 
+  const tokenThemeBaselines = Object.fromEntries(
+    Object.entries(baselines)
+      .filter(([, baseline]) => baseline?.tokenThemeContract)
+      .map(([packageId, baseline]) => {
+        const contract = baseline.tokenThemeContract
+        return [
+          packageId,
+          {
+            baseline: AVALONIA_SEMANTIC_PATHS[packageId],
+            fingerprint: avaloniaTokenThemeContractFingerprint(contract),
+            definitionCount: contract.definitions?.length ?? 0,
+            dependencyCount: contract.dependencies?.length ?? 0,
+            resolvedCount: (contract.dependencies ?? []).filter(
+              (dependency) => dependency.resolved === true,
+            ).length,
+            ownerBoundCount: (contract.dependencies ?? []).filter(
+              (dependency) => dependency.ownership === 'resolved',
+            ).length,
+            contractDeclared: false,
+            renderedEvidenceVerified: false,
+          },
+        ]
+      }),
+  )
+
   return {
     schemaVersion: CONTRACT_V2_SCHEMA_VERSION,
     registryVersion: CONTRACT_V2_REGISTRY_VERSION,
@@ -2255,7 +2391,7 @@ export const buildRegistry = ({
     owner: CONTRACT_V2_OWNER,
     generatedBy: {
       tool: 'scripts/contract-v2.mjs',
-      toolVersion: '1.5.0',
+      toolVersion: '1.6.0',
     },
     baselines: {
       web: {
@@ -2320,6 +2456,7 @@ export const buildRegistry = ({
     componentMap,
     contracts,
     avaloniaOnlyTypes,
+    tokenThemeBaselines,
     coverage,
   }
 }
@@ -2781,14 +2918,45 @@ export const validateAvaloniaSurfaceRegistration = ({
   avaloniaBaselines,
 }) => {
   const errors = []
-  const types = new Map()
+  const seenTypes = new Set()
   for (const [packageId] of Object.entries(AVALONIA_SEMANTIC_PATHS)) {
     for (const type of avaloniaBaselines[packageId]?.semanticTypes ?? []) {
-      if (types.has(type.name)) {
+      if (seenTypes.has(type.name)) {
         errors.push(`duplicate Avalonia baseline type ${type.name}`)
         continue
       }
-      types.set(type.name, { ...type, packageId })
+      seenTypes.add(type.name)
+    }
+  }
+  const types = avaloniaSemanticIndex(avaloniaBaselines)
+
+  for (const [packageId] of Object.entries(AVALONIA_SEMANTIC_PATHS)) {
+    const baselineContract = avaloniaBaselines[packageId]?.tokenThemeContract
+    const actual = registry.tokenThemeBaselines?.[packageId] ?? null
+    if (!baselineContract) {
+      if (actual) {
+        errors.push(
+          `token/theme baseline ${packageId} exists without baseline metadata`,
+        )
+      }
+      continue
+    }
+    const expected = {
+      baseline: AVALONIA_SEMANTIC_PATHS[packageId],
+      fingerprint: avaloniaTokenThemeContractFingerprint(baselineContract),
+      definitionCount: baselineContract.definitions?.length ?? 0,
+      dependencyCount: baselineContract.dependencies?.length ?? 0,
+      resolvedCount: (baselineContract.dependencies ?? []).filter(
+        (dependency) => dependency.resolved === true,
+      ).length,
+      ownerBoundCount: (baselineContract.dependencies ?? []).filter(
+        (dependency) => dependency.ownership === 'resolved',
+      ).length,
+      contractDeclared: false,
+      renderedEvidenceVerified: false,
+    }
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+      errors.push(`token/theme baseline ${packageId} is stale`)
     }
   }
 
@@ -2843,6 +3011,12 @@ export const validateAvaloniaSurfaceRegistration = ({
     ) {
       errors.push(`${context} has stale automation contract fingerprint`)
     }
+    if (
+      (mapping.avalonia?.tokenThemeContractFingerprint ?? null) !==
+      avaloniaTypeTokenThemeContractFingerprint(type)
+    ) {
+      errors.push(`${context} has stale token/theme contract fingerprint`)
+    }
     const contract = contracts.get(componentName)
     if (!contract) {
       errors.push(`${context} has no component contract`)
@@ -2861,6 +3035,15 @@ export const validateAvaloniaSurfaceRegistration = ({
     ) {
       errors.push(
         `${contract.id} has stale Avalonia automation contract binding`,
+      )
+    }
+    if (
+      JSON.stringify(
+        contract.bindings?.avalonia?.tokenThemeContract ?? null,
+      ) !== JSON.stringify(avaloniaTypeTokenThemeContractRef(type))
+    ) {
+      errors.push(
+        `${contract.id} has stale Avalonia token/theme contract binding`,
       )
     }
 
@@ -2972,6 +3155,7 @@ export const validateAvaloniaSurfaceRegistration = ({
       'surfaceHash',
       'stateContractFingerprint',
       'automationContractFingerprint',
+      'tokenThemeContractFingerprint',
     ]) {
       if ((entry[field] ?? null) !== (expected[field] ?? null)) {
         errors.push(`${context} has stale ${field}`)

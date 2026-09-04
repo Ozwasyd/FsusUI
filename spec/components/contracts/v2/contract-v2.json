@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "generatedBy": {
     "tool": "scripts/contract-v2.mjs",
-    "toolVersion": "1.5.0"
+    "toolVersion": "1.6.0"
   },
   "baselines": {
     "web": {
@@ -15,17 +15,17 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "0b0aa391167ab7fb7bb23ddbce5f9d0d94f1514c6ec4ccfce056b4ed2dcce5c7",
+      "hash": "b780b605ba9faa5209ea425e69f3b7c4fc59c1de9e1a224a8fce2be94f3e02ad",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "11f1453dbb78f90df7a6a0c135196569733b0e2a82efe964a6d3665dc55bc3ef",
+      "hash": "7612822a1f097ae24d449917b612ae188bc7ba2e99cf1e5c5aaaae2fe229c8a1",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json",
-      "hash": "fe8278e65cc4c89d6ee1b40b49ec72215691aefb0709f9237d5f2035152aab04",
+      "hash": "db18d502851d49a3fa46414ad7815d09b8f276c581d3df39bf6cffaee0a16aa4",
       "packageId": "FsusUI.Avalonia.Icons"
     },
     "markdownEditorGate": {
@@ -67,7 +67,8 @@
         "packageId": "avalonia",
         "surfaceHash": "7dfa92bf7d597f78f42248a2e2bf86ce9687ec6e4194d67a5cad6b4dbcf5a85e",
         "stateContractFingerprint": "085bef7074a17465ded55d076641fccb4b7f86ddd464e2a1d0769a24d954a10b",
-        "automationContractFingerprint": "70b325f3e74dcba2d4d514da0c68c1f8adc593c6e0ec2cb978c996b96c17fb70"
+        "automationContractFingerprint": "70b325f3e74dcba2d4d514da0c68c1f8adc593c6e0ec2cb978c996b96c17fb70",
+        "tokenThemeContractFingerprint": "cfa149737ddd11759d36abc67a691a022599c0aa1cd496c43d89570dc92eacce"
       },
       "basis": "name-equality"
     },
@@ -81,7 +82,8 @@
         "packageId": "avalonia",
         "surfaceHash": "e9459552d6e45b95e5ff476258f79619c80e94acd15cf71dd3c2d4141d22b308",
         "stateContractFingerprint": "2977d52d82193fb9b411bc6ab726fd48fdad55dfa91e1f9375d470df955b4f91",
-        "automationContractFingerprint": "1a598d0d9ec60971881a5beeebfa432bc11a2d3ad775d898f0f2b3c8a7eaad21"
+        "automationContractFingerprint": "1a598d0d9ec60971881a5beeebfa432bc11a2d3ad775d898f0f2b3c8a7eaad21",
+        "tokenThemeContractFingerprint": "6f56198700e67baa3bb7c69776ad30b7f0b1328d968b997019358002f1848551"
       },
       "basis": "name-equality"
     },
@@ -93,7 +95,8 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAside",
         "packageId": "avalonia",
-        "surfaceHash": "14ec68e3eae0062fd0787d0681a9f1376ebd41b6d03179961113c84ce1dba41f"
+        "surfaceHash": "14ec68e3eae0062fd0787d0681a9f1376ebd41b6d03179961113c84ce1dba41f",
+        "tokenThemeContractFingerprint": "2eb842af12e56efcca4fd05ce6c8d0da2a864d99aea6d2d750631d3a16cd1e6c"
       },
       "basis": "name-equality"
     },
@@ -106,7 +109,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusAutocomplete",
         "packageId": "avalonia",
         "surfaceHash": "ba06d9463ce548e2b218fc176eb6a409f7cd01eab2c72d0a0b3bf75f0d08c65c",
-        "automationContractFingerprint": "726becb2055280ea638564cd825db90f9406d6274699f8bb63fbbb669fd6bc42"
+        "automationContractFingerprint": "726becb2055280ea638564cd825db90f9406d6274699f8bb63fbbb669fd6bc42",
+        "tokenThemeContractFingerprint": "58dd6f7a2c0d91ff498ea84d3768413af52cc1709a768a1982d645558dd4c4ee"
       },
       "basis": "name-equality"
     },
@@ -134,7 +138,8 @@
         "packageId": "avalonia",
         "surfaceHash": "77a1d124b381f27e633542b049df7850581d95ae96ad53719483735b889f7fc9",
         "stateContractFingerprint": "e2317b3fc91101e3283b0c6b9e065f714e4f4ef82037d4d59618d012063a0baa",
-        "automationContractFingerprint": "f5a6c43090be0947bb7a8557ff8ced01f437d0116a1d57b2d63f9a87f02cb305"
+        "automationContractFingerprint": "f5a6c43090be0947bb7a8557ff8ced01f437d0116a1d57b2d63f9a87f02cb305",
+        "tokenThemeContractFingerprint": "175d004d74261a9ed9559c605ea6b5ad1c35a0dd868919e5bdf3645570fdc756"
       },
       "basis": "name-equality"
     },
@@ -148,7 +153,8 @@
         "packageId": "avalonia",
         "surfaceHash": "03f97a224532d801941221d402c8974860f31e0f44c56e4a5015dc909986b400",
         "stateContractFingerprint": "25643d06283b58430787b6e1f348061b279feca7b82c7ecfcfd77ab42a470f09",
-        "automationContractFingerprint": "1cb444fe447a017c88e5203114836c52143cf18f782853d5d0c06dbed6bdfc3a"
+        "automationContractFingerprint": "1cb444fe447a017c88e5203114836c52143cf18f782853d5d0c06dbed6bdfc3a",
+        "tokenThemeContractFingerprint": "1e55d3d5b59f5e7af4b99941def269e5db53beaf8f350a70b9fabbad895e6bd5"
       },
       "basis": "name-equality"
     },
@@ -176,7 +182,8 @@
         "packageId": "avalonia",
         "surfaceHash": "5dcd038fde51d0d4b12c706eb66fe54739ca195c016277494db6c718f1abd2e4",
         "stateContractFingerprint": "9086858b792e3c38009ec27dba6f8a0dd436c6f45cba6769d656149bd156b08d",
-        "automationContractFingerprint": "a1fd0fafd56595778df2fbe58fda44384585345da715f1a4a310f6ccc0efa181"
+        "automationContractFingerprint": "a1fd0fafd56595778df2fbe58fda44384585345da715f1a4a310f6ccc0efa181",
+        "tokenThemeContractFingerprint": "5dca1d313d267f7d48da58b3a2ff18296186f026e103a2049ad3938791e0e380"
       },
       "basis": "name-equality"
     },
@@ -190,7 +197,8 @@
         "packageId": "avalonia",
         "surfaceHash": "03372211e3e94d8d05bb78945140ed6e3820e1f9a6fccfc6d295a0430e58897f",
         "stateContractFingerprint": "26a8036ed524b43106a0141606e5fd2829b61654f8f3188f10dfc2771e2a1031",
-        "automationContractFingerprint": "6bf36d2781ff7c4ebeadbe6508a5ab4b4377ce38765326daea873498a398018e"
+        "automationContractFingerprint": "6bf36d2781ff7c4ebeadbe6508a5ab4b4377ce38765326daea873498a398018e",
+        "tokenThemeContractFingerprint": "de9b64af7338dbceb7cbd6e57a2674c5c33309fe074c8149ae306f2beefd9920"
       },
       "basis": "name-equality"
     },
@@ -204,7 +212,8 @@
         "packageId": "avalonia",
         "surfaceHash": "af2272bd9bfe543086933d0b66bc908c90952f3a3da07d28a29ea59301266867",
         "stateContractFingerprint": "77e1275c614f9288a304c16ddba1f579df81bbad6267377dc19fad903d865d84",
-        "automationContractFingerprint": "50c6b7f9928d84552557bac6503ebb230c4b4de6f45c409e156ba7f4cbd33073"
+        "automationContractFingerprint": "50c6b7f9928d84552557bac6503ebb230c4b4de6f45c409e156ba7f4cbd33073",
+        "tokenThemeContractFingerprint": "2e4d4d83bc88007ccc3ab6d934759fb4cf3ab203eb8a3afc7bb032c8926b3d84"
       },
       "basis": "name-equality"
     },
@@ -217,7 +226,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusButtonGroup",
         "packageId": "avalonia",
         "surfaceHash": "8a045bba8753f7172f19e6903aa2e589a00d792219e3dd01e41d0612b1172af9",
-        "stateContractFingerprint": "b78d5994a4cc169c7eab30c6cf87ba9efff3c44ab8da3dab904e830936ed902f"
+        "stateContractFingerprint": "b78d5994a4cc169c7eab30c6cf87ba9efff3c44ab8da3dab904e830936ed902f",
+        "tokenThemeContractFingerprint": "1f603eb27e4ce12a6241395e966bb526468d9dcdec256713eb176dcc31774b36"
       },
       "basis": "name-equality"
     },
@@ -231,7 +241,8 @@
         "packageId": "avalonia",
         "surfaceHash": "cc63fb994e90c01209dc07f5d5fddb4c323fada8b733b6f54543b3a46005dd49",
         "stateContractFingerprint": "628ad0369f568f3c89fd91806da8ffb445b6a8d56fa13adb8cb82fd4163b61f8",
-        "automationContractFingerprint": "5e60f3fc5d41e0cc608c781820fb73b379671587cbe1174dd919ffff548842fa"
+        "automationContractFingerprint": "5e60f3fc5d41e0cc608c781820fb73b379671587cbe1174dd919ffff548842fa",
+        "tokenThemeContractFingerprint": "17cc6e6aa6e23168ec148ddf46c2a6643ac90d2c3bfc1edbdfcad895e7a59606"
       },
       "basis": "name-equality"
     },
@@ -245,7 +256,8 @@
         "packageId": "avalonia",
         "surfaceHash": "d69b7e41d500b891c37fa799e25be5da82a6d903515e7d94df76c79168c75503",
         "stateContractFingerprint": "630e5d6e4abc718db7f3e47a68919029eb8fb9fa298f81bd13dfee622f4076e0",
-        "automationContractFingerprint": "1d945739611c951c68f9b66ba77ecce30cc9ed18542fd7c71b37abf6d5444ddc"
+        "automationContractFingerprint": "1d945739611c951c68f9b66ba77ecce30cc9ed18542fd7c71b37abf6d5444ddc",
+        "tokenThemeContractFingerprint": "9331c01aeac7363f0e79e86a1b87680db9520a375f72e393835149bb9d9eb2e8"
       },
       "basis": "name-equality"
     },
@@ -273,7 +285,8 @@
         "packageId": "avalonia",
         "surfaceHash": "60843b495c8609b88c7da8f800669b0d2626a2ff3c15bbf304024ed3b1d86784",
         "stateContractFingerprint": "30feb94e2123197bf2db67588b1e5b89d77b1c047a72ad227966db0e42ab72a4",
-        "automationContractFingerprint": "4d3eba75325d1645058946c5ac42af8261fb6e00875893feb5c12fc2e86f2402"
+        "automationContractFingerprint": "4d3eba75325d1645058946c5ac42af8261fb6e00875893feb5c12fc2e86f2402",
+        "tokenThemeContractFingerprint": "100fabe8e611a659dc40a176bb42a2771fb043769fa20b68112a881efad19b78"
       },
       "basis": "name-equality"
     },
@@ -301,7 +314,8 @@
         "packageId": "avalonia",
         "surfaceHash": "bae68f4783fa95f41f395fe795f7d8d29f06e1cc025ee90760e3722b8b8db9e4",
         "stateContractFingerprint": "746c496bcc82d141be87721f42904882047d7567bfd5755c49d68d029c6fcbea",
-        "automationContractFingerprint": "3e0d9f51bc8bd3c34a2e282df2f86d198cc6502f040d267d545ea05b69569a32"
+        "automationContractFingerprint": "3e0d9f51bc8bd3c34a2e282df2f86d198cc6502f040d267d545ea05b69569a32",
+        "tokenThemeContractFingerprint": "e7373478575bcea355d0dd566184f39c69869ae30d52a244d7f433429eb3c5d4"
       },
       "basis": "name-equality"
     },
@@ -315,7 +329,8 @@
         "packageId": "avalonia",
         "surfaceHash": "bc3f5f06b05aacad614e272f167ee3af2a7ce601947e3a7b73bbbd3e2b61dd4a",
         "stateContractFingerprint": "3538c4710b2e49f0b3bc7cf3de974464ef30eecdaddc767136fb973b5da595fe",
-        "automationContractFingerprint": "82dbf6eeba570a6f706c2b76811271bcee4473786f93b668709d317ba4712a48"
+        "automationContractFingerprint": "82dbf6eeba570a6f706c2b76811271bcee4473786f93b668709d317ba4712a48",
+        "tokenThemeContractFingerprint": "0ed907b7e7e7b07176f3346f4f2fad3c8b4115b3a6139d6a17bc5ad4338a5d03"
       },
       "basis": "name-equality"
     },
@@ -329,7 +344,8 @@
         "packageId": "avalonia",
         "surfaceHash": "72136b055bf9b05a655369137f53888034b0b23f4f8699fa7353cfb5f994b3a4",
         "stateContractFingerprint": "a02b209325aea53a2ff0872a311bd9b3b052b9b139e172f85ce3c1d5eac343dc",
-        "automationContractFingerprint": "58ec7e024222fd5d1f5e442dd59b1d512a77c0973ad4f487f47ddde0591cb9b1"
+        "automationContractFingerprint": "58ec7e024222fd5d1f5e442dd59b1d512a77c0973ad4f487f47ddde0591cb9b1",
+        "tokenThemeContractFingerprint": "06e4d3b73f78861f664ceb35317f3d39477cb59378d5e8daab3ed1f3359c1a9e"
       },
       "basis": "name-equality"
     },
@@ -356,7 +372,8 @@
         "packageId": "avalonia",
         "surfaceHash": "81d2a02709e351eb6ae79d6edfddec27902f066ccb9e843712c84fbe88f2f59c",
         "stateContractFingerprint": "f05951e0b489f0987343a8ab780771210df9cf8bdce6dfe8ed1c5b31efb3878d",
-        "automationContractFingerprint": "c3ac3ea0f1a6f5e0530a603466c9efc996456348fdc8d838b2c3a92b366e770f"
+        "automationContractFingerprint": "c3ac3ea0f1a6f5e0530a603466c9efc996456348fdc8d838b2c3a92b366e770f",
+        "tokenThemeContractFingerprint": "a8cb421c6f342ff346424335de347004eb4284278d4df6623d701034697e3f2e"
       },
       "basis": "name-equality"
     },
@@ -369,7 +386,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusCol",
         "packageId": "avalonia",
         "surfaceHash": "fe36e544494d8e80640f18595533c85f7a246dfc276fab74260dbcb02fcad529",
-        "stateContractFingerprint": "8787cd23b6cd98a5e4e429dd61ffdaf703537b4eeaf4a1a700113c540e49995a"
+        "stateContractFingerprint": "8787cd23b6cd98a5e4e429dd61ffdaf703537b4eeaf4a1a700113c540e49995a",
+        "tokenThemeContractFingerprint": "4a72523430afaf324e559c57b5888016fc11b67da0fcd0995b9d1596081bc95a"
       },
       "basis": "name-equality"
     },
@@ -382,7 +400,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusCollapse",
         "packageId": "avalonia",
         "surfaceHash": "a6791b58360033d9a18147483ec03728d191f6e4a9b0522add1e29b578221dba",
-        "stateContractFingerprint": "48cd6b6faaad35d51b5c2dde6424824f3cf6d728ee33e7bdadacc7c5474aeeef"
+        "stateContractFingerprint": "48cd6b6faaad35d51b5c2dde6424824f3cf6d728ee33e7bdadacc7c5474aeeef",
+        "tokenThemeContractFingerprint": "a22f75ffacdc4896f48799270a11e8d0fe7901310a31bbed9c085bf8d18d68a8"
       },
       "basis": "name-equality"
     },
@@ -396,7 +415,8 @@
         "packageId": "avalonia",
         "surfaceHash": "0545ad52e25a85f27dcf5474a36619ff02644620f2b7d14f838005ec3e93e177",
         "stateContractFingerprint": "51b73237fea3c2119c7f648d19ee8ce934a72a41821dde85c0d8b954c52bccdc",
-        "automationContractFingerprint": "e64b2d7f8c08046edb8c0dd52708f7816cb01c3e95470ca35521c1671a766f79"
+        "automationContractFingerprint": "e64b2d7f8c08046edb8c0dd52708f7816cb01c3e95470ca35521c1671a766f79",
+        "tokenThemeContractFingerprint": "981c3db64bd4ae560c9f97cd4ace7fa0c7005f1087008d2e54e4589307f4e606"
       },
       "basis": "name-equality"
     },
@@ -410,7 +430,8 @@
         "packageId": "avalonia",
         "surfaceHash": "b200a9a0b732d866b538363fdd4ed81edaee3eefa46b334a5be14b0e9cc8dcb5",
         "stateContractFingerprint": "b9000a67c91da75623ea48f2666e9ea782525b848d10efb314d1bcff0a6b0666",
-        "automationContractFingerprint": "3d2fcbb2c25a5e3e04d90cc00195721a64e3b6887ac42d5b727a032eeaf15045"
+        "automationContractFingerprint": "3d2fcbb2c25a5e3e04d90cc00195721a64e3b6887ac42d5b727a032eeaf15045",
+        "tokenThemeContractFingerprint": "74819fc5c8d8810b21c7087813c05a01cbcf93fd0beaae92eb17fe76d31ad1f0"
       },
       "basis": "name-equality"
     },
@@ -424,7 +445,8 @@
         "packageId": "avalonia",
         "surfaceHash": "86df9db727c8daa64df43bbcdcb1073bc690daf5be6dbb38099980af1b269841",
         "stateContractFingerprint": "a49f7f4ff6f0f06328f3cfdb6a1c775dd8d28157f553baf582af5392bb52d168",
-        "automationContractFingerprint": "e190ccb5dbd75d3650fa0ab82b675024f0552b57177fe956185b7b317dd69270"
+        "automationContractFingerprint": "e190ccb5dbd75d3650fa0ab82b675024f0552b57177fe956185b7b317dd69270",
+        "tokenThemeContractFingerprint": "6d4b0bbe4722ff84f74830503ae947b5ebd7aee468df0af12b8b4fdffa4ed1d6"
       },
       "basis": "name-equality"
     },
@@ -461,7 +483,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusCopyableDetail",
         "packageId": "avalonia",
         "surfaceHash": "c729a77787f3168d7e72636c7789ee3b01a4a4035a70674242b2ef1f1956b02f",
-        "stateContractFingerprint": "1e3b9e22898cd220fcad367fca086305c3e357a890fca721bb63b94e39f68d3f"
+        "stateContractFingerprint": "1e3b9e22898cd220fcad367fca086305c3e357a890fca721bb63b94e39f68d3f",
+        "tokenThemeContractFingerprint": "9c1306d9b211f46834837b3256aea4381276fcd741c6a3af23c971f824567a64"
       },
       "basis": "name-equality"
     },
@@ -475,7 +498,8 @@
         "packageId": "avalonia",
         "surfaceHash": "686b426ef0487bc8cd170ad9e93e5a0ead88214190b7e61f8d6a593cf20a892a",
         "stateContractFingerprint": "76f34b3a32feab54907daaa60b4c515123420e2f2da7cdb28ce7e948dc87ff71",
-        "automationContractFingerprint": "7d104a03ec38c3f92022720c6a0dbf7deca7e8398f73b8027149c3fb6e6c5088"
+        "automationContractFingerprint": "7d104a03ec38c3f92022720c6a0dbf7deca7e8398f73b8027149c3fb6e6c5088",
+        "tokenThemeContractFingerprint": "844cf8abdca26a3d4c9e11361811665cf593e472a0252958b5e0dbd3d1fe9269"
       },
       "basis": "name-equality"
     },
@@ -515,7 +539,8 @@
         "packageId": "avalonia",
         "surfaceHash": "ecf376a4d2036676bf703db0e008d31cbad1d54bef546b286b9a1b58711a1d2b",
         "stateContractFingerprint": "582442e4afb438d4421254e81ada0f1de2cb8ece8f1befb7bb4ff7f79b3db36d",
-        "automationContractFingerprint": "e0ca2816b068a0fe6df55ad01455fbc5b30e0228120f10522f55fd88df2cb7bc"
+        "automationContractFingerprint": "e0ca2816b068a0fe6df55ad01455fbc5b30e0228120f10522f55fd88df2cb7bc",
+        "tokenThemeContractFingerprint": "d94e298092739f8d877c882a9b3736f1739aa2f5f0eab40d7b2d31b696c3d735"
       },
       "basis": "name-equality"
     },
@@ -566,7 +591,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusDialog",
         "packageId": "avalonia",
         "surfaceHash": "0f560549a90fc93784aabf913966f4aa81459e7df90bdd14e89b31232c2a0b80",
-        "stateContractFingerprint": "4f8822b6171ce59ab2155af051a9c730106daec9d67a528901d4a47f413ce28a"
+        "stateContractFingerprint": "4f8822b6171ce59ab2155af051a9c730106daec9d67a528901d4a47f413ce28a",
+        "tokenThemeContractFingerprint": "bf8c305e9a938927038d1309c52e709a14965e2ab7c3f98e915dfde275a3da98"
       },
       "basis": "name-equality"
     },
@@ -592,7 +618,8 @@
         "packageId": "avalonia",
         "surfaceHash": "d2a984933a863a2cdf46d19cf9a8b47f37bced114155eab416a994e7f024c43f",
         "stateContractFingerprint": "f6176263bbf54e6b26f70e9b96f0296daebf711719e70522a5fb32fdd79177c9",
-        "automationContractFingerprint": "55a56eded8d86b13750c44ce49122658c31dfe2da591a1513943cd2412ccff92"
+        "automationContractFingerprint": "55a56eded8d86b13750c44ce49122658c31dfe2da591a1513943cd2412ccff92",
+        "tokenThemeContractFingerprint": "650fb90812564f488a6337bafb73e4a76e727b44b3cae0040c22d8377d605d89"
       },
       "basis": "name-equality"
     },
@@ -606,7 +633,8 @@
         "packageId": "avalonia",
         "surfaceHash": "d07d9f5e0a9ee5f91ef66a986669e5a84bbcba013a74d1736e281efbe3153425",
         "stateContractFingerprint": "33c1adf97df6e834bb01275b83b3af9a99da5f1e8a56ba18faf5c50ce830ae47",
-        "automationContractFingerprint": "d19ec68edbb2b9fd6f269e973eae740fb615bd8fa92eda4372c86b55127b8f76"
+        "automationContractFingerprint": "d19ec68edbb2b9fd6f269e973eae740fb615bd8fa92eda4372c86b55127b8f76",
+        "tokenThemeContractFingerprint": "2dff890c9a0c25f3abfdcb721f6ab959c9be07543a26188488df13f38d9b4836"
       },
       "basis": "name-equality"
     },
@@ -633,7 +661,8 @@
         "packageId": "avalonia",
         "surfaceHash": "dc26282ec5f60b9bc30478cc5eb66ec6523b7c59b8d9a88ce3c835a20f9ac9fd",
         "stateContractFingerprint": "453dd7e6e49d0b96d93e800877d882245b55ac74302962053989608db0e53642",
-        "automationContractFingerprint": "7dd2089d1f2f2def4d64d753ce885aa43791b756422476c2687cb2973cb09d9e"
+        "automationContractFingerprint": "7dd2089d1f2f2def4d64d753ce885aa43791b756422476c2687cb2973cb09d9e",
+        "tokenThemeContractFingerprint": "93c597c57833cf1d6900a0bd46c15ac67e703ca5ce36e046d8dfa4a2f3d59970"
       },
       "basis": "name-equality"
     },
@@ -647,7 +676,8 @@
         "packageId": "avalonia",
         "surfaceHash": "30b47aaddf266df56a229c04099d10999b1474bc2c2bceb08fcb1d92c389e5c8",
         "stateContractFingerprint": "2f45563983b19efbb94c1d4440faee68490d8b513383d2a91e8a5902fff81ade",
-        "automationContractFingerprint": "427061ec5baf76f8b8556a160ddc0af6bb2125770a04cd5b989ee16e795a0da6"
+        "automationContractFingerprint": "427061ec5baf76f8b8556a160ddc0af6bb2125770a04cd5b989ee16e795a0da6",
+        "tokenThemeContractFingerprint": "2b1777a7e55486965753462c6d29139d16d8baafe422ef6d826b93b69add2152"
       },
       "basis": "name-equality"
     },
@@ -661,7 +691,8 @@
         "packageId": "avalonia",
         "surfaceHash": "0b2772bfda504e624236ace97977679dbb6fcecdad7be5a6dec376cbd2cbd515",
         "stateContractFingerprint": "3c938a8355861ef0c1a1d91c2d7ceccec7392b54ecd7daf7b73adc76fc318326",
-        "automationContractFingerprint": "031747e2a93365a9d8da3b3171e42e9786107b5aded1cf436a23ff14a4ed36cc"
+        "automationContractFingerprint": "031747e2a93365a9d8da3b3171e42e9786107b5aded1cf436a23ff14a4ed36cc",
+        "tokenThemeContractFingerprint": "c15035454ca7ccafc60b4de826c9f108b94b2a3e4d5687747f193e2d7f3be4d7"
       },
       "basis": "name-equality"
     },
@@ -686,7 +717,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusForm",
         "packageId": "avalonia",
         "surfaceHash": "39ac902930f9592636d743b418e0e925c75de7f408a9acb970efac0a1178b5fa",
-        "stateContractFingerprint": "3ed1eabc184252dfbbc388ffc2db268e9ba85b942cf3dbd09222433f6cafa254"
+        "stateContractFingerprint": "3ed1eabc184252dfbbc388ffc2db268e9ba85b942cf3dbd09222433f6cafa254",
+        "tokenThemeContractFingerprint": "0996c7160315bd5c9ad3f47bd81eb575e28871cf21c407d613344bff5717c0ba"
       },
       "basis": "name-equality"
     },
@@ -700,7 +732,8 @@
         "packageId": "avalonia",
         "surfaceHash": "890e547c055cd6ce93eeb3a02e794a1e54307069b00d113d91760557bd020d11",
         "stateContractFingerprint": "c189531648405489c9474cfbe09ba608aad685c283c3366c7e7bd017e1644f1f",
-        "automationContractFingerprint": "29eb81b5abc9e62cb8fd7e21e49fda176770ae63e6f7f4966d30bd358428ddba"
+        "automationContractFingerprint": "29eb81b5abc9e62cb8fd7e21e49fda176770ae63e6f7f4966d30bd358428ddba",
+        "tokenThemeContractFingerprint": "caef97f8302e11510b1cc48cdcebcf334a9ab541bf4bddf31846e2940df1a23f"
       },
       "basis": "name-equality"
     },
@@ -726,7 +759,8 @@
         "packageId": "avalonia",
         "surfaceHash": "de320df79a562d74c52fdb5838093d063e99b22046b457f5c37e1e3e24468b9a",
         "stateContractFingerprint": "244ce94d10c1f0cbe4ce0b415662a47d8cae8be97021b1a098f3f59a93d968f3",
-        "automationContractFingerprint": "fd86e90c43c709540d0cc13dc5901f80fd824a3ab105f1f7f172c7f7a5c42ea8"
+        "automationContractFingerprint": "fd86e90c43c709540d0cc13dc5901f80fd824a3ab105f1f7f172c7f7a5c42ea8",
+        "tokenThemeContractFingerprint": "fc95e45c8c9f5f72f08a4ca98d8c87d098e8dec388145f402b965b6c0bfcbed1"
       },
       "basis": "name-equality"
     },
@@ -754,7 +788,8 @@
         "packageId": "avalonia",
         "surfaceHash": "8d783c8635c757634e7eac8d4e0025080d89428a175bdf09316160e03728219f",
         "stateContractFingerprint": "e70699162a18713c9e537db683e570a0da45e25e448a7c590b82fb0e7f13671f",
-        "automationContractFingerprint": "670afac10b4e3cd01efd245d1e98357f64b3ab88ebe17a1d487ecc4755146a38"
+        "automationContractFingerprint": "670afac10b4e3cd01efd245d1e98357f64b3ab88ebe17a1d487ecc4755146a38",
+        "tokenThemeContractFingerprint": "e9f8561e40fb987151ea04a2ebc885b8a556c741d0066d1766b5c0e41ad4a0d2"
       },
       "basis": "name-equality"
     },
@@ -816,7 +851,8 @@
         "packageId": "avalonia",
         "surfaceHash": "51e8a7520654cb8a33c0cdb75f6a5421520c26499d36d4956c4e22b11288f470",
         "stateContractFingerprint": "46245c035fd88c91cb49570337df9755e3b5d0f7b9ebd75c6d8b99969b0e4cfc",
-        "automationContractFingerprint": "d07f28c2134ad8fc7febdcf8c2566eb70ebbad6817289e3158e534c615904c01"
+        "automationContractFingerprint": "d07f28c2134ad8fc7febdcf8c2566eb70ebbad6817289e3158e534c615904c01",
+        "tokenThemeContractFingerprint": "1340cacccb21d5e31a6ae7fd7ecc247fd58b7671e91cc3ecbe2c2a10d7775436"
       },
       "basis": "name-equality"
     },
@@ -868,7 +904,8 @@
         "packageId": "avalonia",
         "surfaceHash": "5d943ec76529748997689611d2311b5ce3c285179f1c2b0558ae95618317c082",
         "stateContractFingerprint": "a41880b857ec0f8ebd2f069ec9bde3a19ac0c337eb39bf8a0e67b479f5353afb",
-        "automationContractFingerprint": "2ba9af934d8472a8f7d0fc96af6c4319b64e69eaf4f570e8895bc3065b4b0570"
+        "automationContractFingerprint": "2ba9af934d8472a8f7d0fc96af6c4319b64e69eaf4f570e8895bc3065b4b0570",
+        "tokenThemeContractFingerprint": "7a65965f41c7a9b041f9cb637c25a1e48cf0084e9ba83b07052159950ffdcb4a"
       },
       "basis": "name-equality"
     },
@@ -919,7 +956,8 @@
         "packageId": "avalonia",
         "surfaceHash": "21ad80a24ee58bdeae6d361defb8e558c2ec5021d76caee35807a8db5f5755b8",
         "stateContractFingerprint": "669bc930d78af118219e7fc7b037d1fa4303e5b756e115c98917a1996b2270c5",
-        "automationContractFingerprint": "d0a3fb96216236ac575eef08cecc7c8493ae2092de69415f80b0447715d3ea2c"
+        "automationContractFingerprint": "d0a3fb96216236ac575eef08cecc7c8493ae2092de69415f80b0447715d3ea2c",
+        "tokenThemeContractFingerprint": "2acf30d7d26219b6b4471ffdaf67a039c9d11b167b9f8548737c2ea54beb9700"
       },
       "basis": "name-equality"
     },
@@ -970,7 +1008,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusMessageBox",
         "packageId": "avalonia",
         "surfaceHash": "9135824ec32beddaa6307f7869233e9200b509f7f9d1f46ac40a591cdbc760ea",
-        "stateContractFingerprint": "ed940aa148bfa2f22e2c0e3b580f5451868c15c384c605594e99a46d9d21831a"
+        "stateContractFingerprint": "ed940aa148bfa2f22e2c0e3b580f5451868c15c384c605594e99a46d9d21831a",
+        "tokenThemeContractFingerprint": "98387b3a03c538aea7023297b550a39bb134fb11b177fcbd6b134e5c7d061707"
       },
       "basis": "name-equality"
     },
@@ -1021,7 +1060,8 @@
         "packageId": "avalonia",
         "surfaceHash": "0bce9790aa35dd36448a83097468c81df7b10d07beb29ee5a4c0e4a99ec179a8",
         "stateContractFingerprint": "b531fc5c55fcef30aab58681477bb7c26aa5272d8e3b044dfb72c2ac1c673702",
-        "automationContractFingerprint": "270e15e9e50be980f0d609aecd554f0f432fb3cd83e1388744c48f44e474261a"
+        "automationContractFingerprint": "270e15e9e50be980f0d609aecd554f0f432fb3cd83e1388744c48f44e474261a",
+        "tokenThemeContractFingerprint": "ef1748e32727f091d2d53fa27f46fecab1d845e5476fed56cab6e7dd9abbb9b4"
       },
       "basis": "name-equality"
     },
@@ -1035,7 +1075,8 @@
         "packageId": "avalonia",
         "surfaceHash": "7e9f3c9813b0440ea323383dba53226f9b1084e606d2275c7b6effb6d3af2f26",
         "stateContractFingerprint": "cec809653f00290df7d172041ee293c9e1fc8022cc1151d3a5f5368d142bd428",
-        "automationContractFingerprint": "0ac26977c3ef2e3bb617d3e1e3c6c9fe17a9613f951a87ed95efc1edc99e44f1"
+        "automationContractFingerprint": "0ac26977c3ef2e3bb617d3e1e3c6c9fe17a9613f951a87ed95efc1edc99e44f1",
+        "tokenThemeContractFingerprint": "77c90f13d314778f636ff50fdc00b91182a6c900e363ca9384ddffa875d7ec6e"
       },
       "basis": "name-equality"
     },
@@ -1049,7 +1090,8 @@
         "packageId": "avalonia",
         "surfaceHash": "af24ed434ab847c27fcb8749a79cc8dbd629bc01cffa478be55af278a0f54056",
         "stateContractFingerprint": "cf7eac7c740b3d998233ae7143d233400e9efbd80aff3a7ca799e1ebb6d25597",
-        "automationContractFingerprint": "e38736f8e10fe5d46e15a9b2a9c1939cdb54fc4dae23ec21275be262ab83bdbb"
+        "automationContractFingerprint": "e38736f8e10fe5d46e15a9b2a9c1939cdb54fc4dae23ec21275be262ab83bdbb",
+        "tokenThemeContractFingerprint": "58118c40eec8c88f569e7b5c2f1013e4f58d6134c7345c63389597c16a806a03"
       },
       "basis": "name-equality"
     },
@@ -1063,7 +1105,8 @@
         "packageId": "avalonia",
         "surfaceHash": "2b7f849c0cdabf6a00ef97d4007cf9a7ba049abb48bc22ccb0a14acb546d7c2c",
         "stateContractFingerprint": "d27ff177c8c9bac0b47d091eaa56c13e10bb66aa4d81b7e8c93bdf4ff95488ae",
-        "automationContractFingerprint": "4a6abca37712c179bbf86fa710ae9b1c2f77741875d7eefafe7e3d3bcb152847"
+        "automationContractFingerprint": "4a6abca37712c179bbf86fa710ae9b1c2f77741875d7eefafe7e3d3bcb152847",
+        "tokenThemeContractFingerprint": "33f963a5446cfe10fc7774d7b29b3b6df95ad63c0de866dae60a69fac5c74d8a"
       },
       "basis": "name-equality"
     },
@@ -1077,7 +1120,8 @@
         "packageId": "avalonia",
         "surfaceHash": "77d494341f70f0eea073d94498906714883cd2819cae2306d62756434bd9363a",
         "stateContractFingerprint": "9da1ad8858d2c3c96c2bcf2c5b2bc633b8b2049a76273e823f6d1b2ffd8a9af5",
-        "automationContractFingerprint": "48cc50302413e41143c62b263aa3b6c19b067946a4a9bfb7985c45d027344493"
+        "automationContractFingerprint": "48cc50302413e41143c62b263aa3b6c19b067946a4a9bfb7985c45d027344493",
+        "tokenThemeContractFingerprint": "da4744522e5b291d7590f3b90f3fb6884a988aa2dde2be85a57d88095be7ce54"
       },
       "basis": "name-equality"
     },
@@ -1105,7 +1149,8 @@
         "packageId": "avalonia",
         "surfaceHash": "d33497b63f1120241fc893cb6f602e292ab143b7d3cc05199d51006a1b5496f3",
         "stateContractFingerprint": "b7f11fe504cae3a3b4428c864b940d8ad31f729dc3b65b2b5e1eb57acb86b18f",
-        "automationContractFingerprint": "cb552269cd0756e39fa6e48294d7877357d2a3e1b807cae01164c2b0c4e187ff"
+        "automationContractFingerprint": "cb552269cd0756e39fa6e48294d7877357d2a3e1b807cae01164c2b0c4e187ff",
+        "tokenThemeContractFingerprint": "77427ff31fbfd990e2c9d11d0aa0537c50b03a19f2c72d01d7a8130e85aa4236"
       },
       "basis": "name-equality"
     },
@@ -1119,7 +1164,8 @@
         "packageId": "avalonia",
         "surfaceHash": "5a2e0948e6682f5672913a95502536e889bbf9274c639632d29130705deeda50",
         "stateContractFingerprint": "b598449779400fa3f2d2ab45d7e4f7407ab5655e907e3a715557286d818b3753",
-        "automationContractFingerprint": "72634dd815f9694882bc433383d23adc5337e4bef2e81ad0fd980f3e20f7d90e"
+        "automationContractFingerprint": "72634dd815f9694882bc433383d23adc5337e4bef2e81ad0fd980f3e20f7d90e",
+        "tokenThemeContractFingerprint": "e97d61d4f96d4ea995f068a782c378c6f166dd81c85d9233b66b62a6360119d3"
       },
       "basis": "name-equality"
     },
@@ -1132,7 +1178,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
         "packageId": "avalonia",
         "surfaceHash": "5e9bcad8efa89b96a32ee5c1f77f74164113e2c9baaa8198de7e50c0de859a56",
-        "stateContractFingerprint": "93b1741a75043de0870a3f91e8b8436d779eb92a38fcb70224e2a6028a38cb9c"
+        "stateContractFingerprint": "93b1741a75043de0870a3f91e8b8436d779eb92a38fcb70224e2a6028a38cb9c",
+        "tokenThemeContractFingerprint": "a3de8b53fab5ac63cec899324adc9f15b4d487f963175f5dc27133da363e535b"
       },
       "basis": "name-equality"
     },
@@ -1159,7 +1206,8 @@
         "packageId": "avalonia",
         "surfaceHash": "663e511c11f038fba23c5236cd545373751d8a10ce64323358d5f5ab4f7fd6b5",
         "stateContractFingerprint": "4cdac7abda60f48a8ad4626622fd0e179b50aec783ee62a9607fd79c0cdf1384",
-        "automationContractFingerprint": "3f136f7a7cdd25f9285f1cf91cdf38a657ef5caaae2de776b6158e85950556d3"
+        "automationContractFingerprint": "3f136f7a7cdd25f9285f1cf91cdf38a657ef5caaae2de776b6158e85950556d3",
+        "tokenThemeContractFingerprint": "ed4b4aabc9398b6c2f1ca033e6bb40c0424ea69377a1a5ee0a848327caa8156b"
       },
       "basis": "name-equality"
     },
@@ -1173,7 +1221,8 @@
         "packageId": "avalonia",
         "surfaceHash": "6a1609836064648bfaca9d1948005101f8719b7df81c338fda1189a2416bee08",
         "stateContractFingerprint": "1b2385fd9ad536b5cb471a0e60574109aaaadcf3445e445261438ec58976006d",
-        "automationContractFingerprint": "1f1d7d6ce447906f52424133623436568ec1ed71b5a398ca730bc376ebcb2a38"
+        "automationContractFingerprint": "1f1d7d6ce447906f52424133623436568ec1ed71b5a398ca730bc376ebcb2a38",
+        "tokenThemeContractFingerprint": "df7b994cbf80380a29dacac9a2fbe56f69adc88e1dd8263181dcf57e92526d28"
       },
       "basis": "name-equality"
     },
@@ -1214,7 +1263,8 @@
         "packageId": "avalonia",
         "surfaceHash": "133359edc4820e1578c8a4df4cb7a9aebd416ae79d2c0dc4d4de2cadf3604991",
         "stateContractFingerprint": "d2f9b2d2215f8188e387d551c01917dc8809bdd82115d78f1b372792af0346ad",
-        "automationContractFingerprint": "a2c84f38c9ee2db3490c4d9a86772b910b0843ab379ee039fbfba509512689e7"
+        "automationContractFingerprint": "a2c84f38c9ee2db3490c4d9a86772b910b0843ab379ee039fbfba509512689e7",
+        "tokenThemeContractFingerprint": "fabebb0ca39b5ac8d787458831f2551692fbd2f4734356a8be1f177fd0ad0d09"
       },
       "basis": "name-equality"
     },
@@ -1240,7 +1290,8 @@
         "packageId": "avalonia",
         "surfaceHash": "5ac09411e637c22462552d433027b9b512395f11abf7d31bff71d2cfb7e71080",
         "stateContractFingerprint": "a82409dd9d82bbbbbda8f9ce05cd7e8ba9087f14c7cabf6c8e3e0f39addc7f7b",
-        "automationContractFingerprint": "8bf333c7970b590d5e0cf35bbaea24ef095bfee12d82d29b1f075cbb272cc17a"
+        "automationContractFingerprint": "8bf333c7970b590d5e0cf35bbaea24ef095bfee12d82d29b1f075cbb272cc17a",
+        "tokenThemeContractFingerprint": "15c9fd7ef64514d4890b1bc61862446927cf24fc4b10195880df29cded8020da"
       },
       "basis": "name-equality"
     },
@@ -1254,7 +1305,8 @@
         "packageId": "avalonia",
         "surfaceHash": "771c8b8d70501485c65de26568927e29aaa4c183ed64a49996681943b894ddd6",
         "stateContractFingerprint": "484be62edbf351f8669f20f29245665669c12eecc4cb532331e8ed2347acfb23",
-        "automationContractFingerprint": "eb38caabcf0ca4cf1028d08bbcbfd44f9c7f489baadced20456455e780e9f9d5"
+        "automationContractFingerprint": "eb38caabcf0ca4cf1028d08bbcbfd44f9c7f489baadced20456455e780e9f9d5",
+        "tokenThemeContractFingerprint": "b66bdd7af8f87aa6996d46e85b661d001d4bed48e6d5a34f9ee4ba9e8b645868"
       },
       "basis": "name-equality"
     },
@@ -1293,7 +1345,8 @@
         "packageId": "avalonia",
         "surfaceHash": "defc50287f8a42eedca46e3fb4b13403f97d31d9db4229a64927f4e93f9c3669",
         "stateContractFingerprint": "18a9c2aebd00539adf74a9a8697d5899f94c396c9cfb2ad631e093d3277d4699",
-        "automationContractFingerprint": "b261a369f7a0107809f3db8e0e26ef029d356c3875bffbf0d977a1481f96b002"
+        "automationContractFingerprint": "b261a369f7a0107809f3db8e0e26ef029d356c3875bffbf0d977a1481f96b002",
+        "tokenThemeContractFingerprint": "52a93f6e5374eb59e60d6a801b272ebdee7ef1f6beb1dd1d5dac340a926fd14f"
       },
       "basis": "name-equality"
     },
@@ -1307,7 +1360,8 @@
         "packageId": "avalonia",
         "surfaceHash": "818f337ae36f84e1198ac079d0410c9c6dc9774517788556fa90e04273cba59e",
         "stateContractFingerprint": "1084bc604737448dcef269845dc97a2446ddb60fa584e53346ea6e9d943d69e9",
-        "automationContractFingerprint": "bdf685b2acebe467595c1df05a4dcd5360a0dc0adff289fb18f29257678e0164"
+        "automationContractFingerprint": "bdf685b2acebe467595c1df05a4dcd5360a0dc0adff289fb18f29257678e0164",
+        "tokenThemeContractFingerprint": "3090a66bf51e1d68b641b0ba7e8f29bc2045091d8ae696f0427183619835bd9e"
       },
       "basis": "name-equality"
     },
@@ -1345,7 +1399,8 @@
         "packageId": "avalonia",
         "surfaceHash": "e67fbb667bc1fa86e1be9cf1134a55605d46fbb902cddd9db85563b1f6e44a2d",
         "stateContractFingerprint": "5db731b86b16937e6ecaed1fe757482bc85d84e97aaed3571c0fd11dcede3209",
-        "automationContractFingerprint": "5b9df32ec5c0a771a665b8d63d0dfcebda8a18452f5854af48e66a40a4535594"
+        "automationContractFingerprint": "5b9df32ec5c0a771a665b8d63d0dfcebda8a18452f5854af48e66a40a4535594",
+        "tokenThemeContractFingerprint": "155c3313632e97d82f6e6a0c83da89af159e5dd91aeeced454a53e065d424840"
       },
       "basis": "name-equality"
     },
@@ -1359,7 +1414,8 @@
         "packageId": "avalonia",
         "surfaceHash": "52424d12efd7449a947e895a1d7355dd6969c9f96e86334fc825abaa15215572",
         "stateContractFingerprint": "815fba48385c049605d33d665010ccaf304cb3791276fc99ee9a9f8709f8ce03",
-        "automationContractFingerprint": "149bac7b90d1c1fa1e8f16730aa06b99a17ccc8d5cd8cd4083fe5c2669c2f02d"
+        "automationContractFingerprint": "149bac7b90d1c1fa1e8f16730aa06b99a17ccc8d5cd8cd4083fe5c2669c2f02d",
+        "tokenThemeContractFingerprint": "d34ca9953050357b64c10ed1c9b721161f00acea5fd89c798bb77f90d4f03d42"
       },
       "basis": "name-equality"
     },
@@ -1373,7 +1429,8 @@
         "packageId": "avalonia",
         "surfaceHash": "ac7c16a973bd17f74a73a8675c2a38aa660e63e5083edc03a82bb24c7ca7c773",
         "stateContractFingerprint": "d980ca2fb06e1326788f8705b5b1c61edef8e1fe93fdc288b6ff70dc21412307",
-        "automationContractFingerprint": "f5b499c8a48cab521fe7b800ba4f3a075b0998b2739a751b459ab3d0c1127440"
+        "automationContractFingerprint": "f5b499c8a48cab521fe7b800ba4f3a075b0998b2739a751b459ab3d0c1127440",
+        "tokenThemeContractFingerprint": "326f9aae16609d5f215f8385cc556e20acf27a769eae5849f0bea0d32222e99e"
       },
       "basis": "name-equality"
     },
@@ -1426,7 +1483,8 @@
         "packageId": "avalonia",
         "surfaceHash": "d7771fdbe3aae337c418fbe7c3272f2f12163c7d49d4d9ff5c0d6b4947e32c85",
         "stateContractFingerprint": "3c71026fdd8fc381fe44f90699227a150a9cfc361adfebb69db1d9c908c063b1",
-        "automationContractFingerprint": "24cfcfa39824a28d469941ce4e6ab5a1bd8cfa25255ef7dbf91d916c63fa7222"
+        "automationContractFingerprint": "24cfcfa39824a28d469941ce4e6ab5a1bd8cfa25255ef7dbf91d916c63fa7222",
+        "tokenThemeContractFingerprint": "330f76e5dd50200475ae1b60390794404231aaca10dbccbd12e7937f2aea2068"
       },
       "basis": "name-equality"
     },
@@ -1440,7 +1498,8 @@
         "packageId": "avalonia",
         "surfaceHash": "81b2e5d86932d4d3ee38e019183c6e529798e4d42a8c7c117cdf73efe9f6ebca",
         "stateContractFingerprint": "60ee3c1276686238df88f70d73541bae29688faf7dbb79fd0eb2eb19255dbb7b",
-        "automationContractFingerprint": "2c00a3a86f13ec9033e32ed619b6d0c4526a5b5561fcaef0bc9fc719a2eeb506"
+        "automationContractFingerprint": "2c00a3a86f13ec9033e32ed619b6d0c4526a5b5561fcaef0bc9fc719a2eeb506",
+        "tokenThemeContractFingerprint": "3daa85bd30c31b2747a0ad9002426f668ccf9f67b8f7e6aa405b094286be9070"
       },
       "basis": "name-equality"
     },
@@ -1468,7 +1527,8 @@
         "packageId": "avalonia",
         "surfaceHash": "b5a1cf8e7f59765a3f2abe8195fb0165d9ca5c9dd46fb569441f412f94b50c53",
         "stateContractFingerprint": "5ed8c87301b90feba412aace626efdd1eaa56a9b5632836aaeb6737f98bad96b",
-        "automationContractFingerprint": "8bf91612e5d4ee4bde13602fc8632cf2fab69b4367a5943bc9c1abc99c3cc87c"
+        "automationContractFingerprint": "8bf91612e5d4ee4bde13602fc8632cf2fab69b4367a5943bc9c1abc99c3cc87c",
+        "tokenThemeContractFingerprint": "34e976a03cfe49c7d70e8e32863d8a51352cf0fa78853c07902cb55adb9a97ba"
       },
       "basis": "name-equality"
     },
@@ -1524,7 +1584,8 @@
         "packageId": "avalonia",
         "surfaceHash": "2a2cb13ac02bde3f5a76d45c7ad56b1e27662e9268545f1b25ec325cecaa6200",
         "stateContractFingerprint": "72390356297a43f7998323e34b5b688cc2426da412f4ac279e4c2d46bd65a082",
-        "automationContractFingerprint": "5698237479a8fdb9059113e691f0634accdaa1093b5290d263080d1df6e35653"
+        "automationContractFingerprint": "5698237479a8fdb9059113e691f0634accdaa1093b5290d263080d1df6e35653",
+        "tokenThemeContractFingerprint": "4ef6690cf7a35ffee605b3667d4dbb6e82202e52ed63ed9176bcba4045236118"
       },
       "basis": "name-equality"
     },
@@ -1552,7 +1613,8 @@
         "packageId": "avalonia",
         "surfaceHash": "4eac12a6c0b4f1c150d85107cd7723b0b0f0e472b2c3896468a338b179761456",
         "stateContractFingerprint": "5581ae45739eaa285c4ef69a3fbddc7237a4010cc2753ca9cc72ae9418397c43",
-        "automationContractFingerprint": "63ea1e1b750ca6d283c33434950b4496312a1bc360caf571dacbf874d40febc4"
+        "automationContractFingerprint": "63ea1e1b750ca6d283c33434950b4496312a1bc360caf571dacbf874d40febc4",
+        "tokenThemeContractFingerprint": "fcc9db7b6e4221f956f0086f1cafd82ed6d7bd78bf7175e2cb386fa62e46ec6e"
       },
       "basis": "name-equality"
     },
@@ -1579,7 +1641,8 @@
         "packageId": "avaloniaThemes",
         "surfaceHash": "3f7a949875df166d961e28cb901c30b8e23311fda2afc0e1bfb9fcffcf572ad5",
         "stateContractFingerprint": "563716adcbe7f23c46205467b99f3b3a9c78590b7bd1dd19b29dbffdbe028221",
-        "automationContractFingerprint": "c3e91d35d772103d32f9d00b2e198236d0c9acedbc9cf755e5beb8aebfdf7536"
+        "automationContractFingerprint": "c3e91d35d772103d32f9d00b2e198236d0c9acedbc9cf755e5beb8aebfdf7536",
+        "tokenThemeContractFingerprint": "d34ef1d73a467aea362e0c44cdd45bdaafd4c66c98d02c8b17ed21c8230276fd"
       },
       "basis": "name-equality"
     },
@@ -1605,7 +1668,8 @@
         "packageId": "avalonia",
         "surfaceHash": "7e7cfb3c4d3baf8d333e45809313bb7ae082ccd3e6cfc959d6116f14b418f1f9",
         "stateContractFingerprint": "21ddc28a0f1712383ffac2f435a8946b8c1c871a9e49e9e881d086db1b63cab5",
-        "automationContractFingerprint": "e27b5588cf9e58a2410b7d2c82a3939aaf72c6080837846afaf23109acee41b5"
+        "automationContractFingerprint": "e27b5588cf9e58a2410b7d2c82a3939aaf72c6080837846afaf23109acee41b5",
+        "tokenThemeContractFingerprint": "4c82d337e2cd127bf96781656961700fb42fde4de78f6ea3830ec4375d749a2a"
       },
       "basis": "name-equality"
     },
@@ -1619,7 +1683,8 @@
         "packageId": "avalonia",
         "surfaceHash": "5231e77df0b69fdd13505cf93c3ae03a704b5315febd762d82747a388fbc36bf",
         "stateContractFingerprint": "ee63f1f27fa67b726470dd9329960d083dced81956428601a47098498d2b10f1",
-        "automationContractFingerprint": "8d3879d9dca408c584e165548a0055ac2bd77be225a3b78f38d3442d36a544cc"
+        "automationContractFingerprint": "8d3879d9dca408c584e165548a0055ac2bd77be225a3b78f38d3442d36a544cc",
+        "tokenThemeContractFingerprint": "d5bde887cf7cae1e9f8d2a52016f3607aff70f71c5ac16c565bde9086ceda980"
       },
       "basis": "name-equality"
     },
@@ -1660,7 +1725,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusTooltip",
         "packageId": "avalonia",
         "surfaceHash": "61d9beb0ebdb5a85e3148185e09f5d666aac39993ae84827732432bbe51f62d9",
-        "automationContractFingerprint": "52727f834f0f4636f832530155561aeedd04227ed15701b45a83bc095b8b1646"
+        "automationContractFingerprint": "52727f834f0f4636f832530155561aeedd04227ed15701b45a83bc095b8b1646",
+        "tokenThemeContractFingerprint": "bf29cc8480ff8d240df0358f8fd07d60c444309f5ea27eae3c6800aa6ccd1577"
       },
       "basis": "name-equality"
     },
@@ -1674,7 +1740,8 @@
         "packageId": "avalonia",
         "surfaceHash": "da8af42f15721b271d22f57153d519ee53b7e5021fd76fdf51f3368ceb44935e",
         "stateContractFingerprint": "f741fbaaf002af7727b7597fdfbafe1f352e91f4c8167853816274ed65dea566",
-        "automationContractFingerprint": "b9bdbfa075053b724587fa9b28edcddb7e5440b4b2c6c6f0e721d56e45e7b7f1"
+        "automationContractFingerprint": "b9bdbfa075053b724587fa9b28edcddb7e5440b4b2c6c6f0e721d56e45e7b7f1",
+        "tokenThemeContractFingerprint": "9df0c85c27b9eae2a07271de8dbdc76d4ffa028f9694db539abc0e1508f04ec5"
       },
       "basis": "name-equality"
     },
@@ -1688,7 +1755,8 @@
         "packageId": "avalonia",
         "surfaceHash": "4fd0d2981a800eb53861136623ffeb3f77cfbca9d70a4f1093b9274109f90ec0",
         "stateContractFingerprint": "baed4b385e29c1bcac6834ab2a083e13a90b853d03bac0277c7f8d7f6e8954b1",
-        "automationContractFingerprint": "2f0df748f8a8b9cf787765d7008e9b163d02c80189cfb3d3393da6c1300e5552"
+        "automationContractFingerprint": "2f0df748f8a8b9cf787765d7008e9b163d02c80189cfb3d3393da6c1300e5552",
+        "tokenThemeContractFingerprint": "160e8183549b0ff72670693772df00b885df9c7824e569b5be1a1e92dd407b4c"
       },
       "basis": "name-equality"
     },
@@ -1702,7 +1770,8 @@
         "packageId": "avalonia",
         "surfaceHash": "cd1d70ab8ab3765fdc04945d958b8deaa5eb8edb4951e84736c1267f890250f2",
         "stateContractFingerprint": "c311ff2e0d07d73865a07315a55fa4d59803ee1b3996bb3fca8c72ae64361742",
-        "automationContractFingerprint": "941ea52ccf31e0222224c6300a2593e89ea8806631e3c9db6781255b7b0cd81c"
+        "automationContractFingerprint": "941ea52ccf31e0222224c6300a2593e89ea8806631e3c9db6781255b7b0cd81c",
+        "tokenThemeContractFingerprint": "86369091e001e9b1e1ac699b626c9ab579e7ad135d31820699b97dd4a3f5111b"
       },
       "basis": "name-equality"
     },
@@ -1741,7 +1810,8 @@
         "packageId": "avalonia",
         "surfaceHash": "2e658a192f3b0cf8bd6624d325c4e70ba8024dde48cc3763f43724e4366c13b7",
         "stateContractFingerprint": "47ec2817a2467b462823ca654bde4a4c84ec26510ae97959de9b21b0e0eb6635",
-        "automationContractFingerprint": "20470f7e4ec2b2d9e77fd9d5b9f536ca697916856648ec4111c1dbfd5dcf0d62"
+        "automationContractFingerprint": "20470f7e4ec2b2d9e77fd9d5b9f536ca697916856648ec4111c1dbfd5dcf0d62",
+        "tokenThemeContractFingerprint": "f4d2bf9c8ac0c6070a5be2fa0a83b8d9c6b3bdce65d9e33d7766e1e5564e3eb9"
       },
       "basis": "name-equality"
     },
@@ -1792,7 +1862,8 @@
         "type": "FsusUI.Avalonia.Controls.FsusCopyableDetail",
         "packageId": "avalonia",
         "surfaceHash": "c729a77787f3168d7e72636c7789ee3b01a4a4035a70674242b2ef1f1956b02f",
-        "stateContractFingerprint": "1e3b9e22898cd220fcad367fca086305c3e357a890fca721bb63b94e39f68d3f"
+        "stateContractFingerprint": "1e3b9e22898cd220fcad367fca086305c3e357a890fca721bb63b94e39f68d3f",
+        "tokenThemeContractFingerprint": "9c1306d9b211f46834837b3256aea4381276fcd741c6a3af23c971f824567a64"
       },
       "basis": "name-equality"
     },
@@ -1978,7 +2049,8 @@
         "packageId": "avalonia",
         "surfaceHash": "d33497b63f1120241fc893cb6f602e292ab143b7d3cc05199d51006a1b5496f3",
         "stateContractFingerprint": "b7f11fe504cae3a3b4428c864b940d8ad31f729dc3b65b2b5e1eb57acb86b18f",
-        "automationContractFingerprint": "cb552269cd0756e39fa6e48294d7877357d2a3e1b807cae01164c2b0c4e187ff"
+        "automationContractFingerprint": "cb552269cd0756e39fa6e48294d7877357d2a3e1b807cae01164c2b0c4e187ff",
+        "tokenThemeContractFingerprint": "77427ff31fbfd990e2c9d11d0aa0537c50b03a19f2c72d01d7a8130e85aa4236"
       },
       "basis": "name-equality"
     },
@@ -1992,7 +2064,8 @@
         "packageId": "avalonia",
         "surfaceHash": "5a2e0948e6682f5672913a95502536e889bbf9274c639632d29130705deeda50",
         "stateContractFingerprint": "b598449779400fa3f2d2ab45d7e4f7407ab5655e907e3a715557286d818b3753",
-        "automationContractFingerprint": "72634dd815f9694882bc433383d23adc5337e4bef2e81ad0fd980f3e20f7d90e"
+        "automationContractFingerprint": "72634dd815f9694882bc433383d23adc5337e4bef2e81ad0fd980f3e20f7d90e",
+        "tokenThemeContractFingerprint": "e97d61d4f96d4ea995f068a782c378c6f166dd81c85d9233b66b62a6360119d3"
       },
       "basis": "name-equality"
     },
@@ -5110,6 +5183,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "cfa149737ddd11759d36abc67a691a022599c0aa1cd496c43d89570dc92eacce",
+            "dependencyCount": 6,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -5704,6 +5787,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "6f56198700e67baa3bb7c69776ad30b7f0b1328d968b997019358002f1848551",
+            "dependencyCount": 5,
+            "resolvedCount": 5,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -6489,7 +6582,17 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusAside"
+          "type": "FsusUI.Avalonia.Controls.FsusAside",
+          "tokenThemeContract": {
+            "fingerprint": "2eb842af12e56efcca4fd05ce6c8d0da2a864d99aea6d2d750631d3a16cd1e6c",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
+          }
         }
       },
       "inputs": [
@@ -6827,6 +6930,16 @@
             "mappingComplete": false,
             "observedSemantics": [
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "58dd6f7a2c0d91ff498ea84d3768413af52cc1709a768a1982d645558dd4c4ee",
+            "dependencyCount": 4,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -9361,6 +9474,16 @@
               "name",
               "role"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "175d004d74261a9ed9559c605ea6b5ad1c35a0dd868919e5bdf3645570fdc756",
+            "dependencyCount": 5,
+            "resolvedCount": 4,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -10052,6 +10175,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "1e55d3d5b59f5e7af4b99941def269e5db53beaf8f350a70b9fabbad895e6bd5",
+            "dependencyCount": 4,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -10884,6 +11017,16 @@
               "name",
               "role"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "5dca1d313d267f7d48da58b3a2ff18296186f026e103a2049ad3938791e0e380",
+            "dependencyCount": 4,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -11270,6 +11413,16 @@
               "name",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "de9b64af7338dbceb7cbd6e57a2674c5c33309fe074c8149ae306f2beefd9920",
+            "dependencyCount": 5,
+            "resolvedCount": 2,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -11639,6 +11792,16 @@
             "mappingComplete": false,
             "observedSemantics": [
               "name"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "2e4d4d83bc88007ccc3ab6d934759fb4cf3ab203eb8a3afc7bb032c8926b3d84",
+            "dependencyCount": 2,
+            "resolvedCount": 2,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -13581,6 +13744,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "1f603eb27e4ce12a6241395e966bb526468d9dcdec256713eb176dcc31774b36",
+            "dependencyCount": 1,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -13775,6 +13948,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "17cc6e6aa6e23168ec148ddf46c2a6643ac90d2c3bfc1edbdfcad895e7a59606",
+            "dependencyCount": 9,
+            "resolvedCount": 5,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -14695,6 +14878,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "9331c01aeac7363f0e79e86a1b87680db9520a375f72e393835149bb9d9eb2e8",
+            "dependencyCount": 17,
+            "resolvedCount": 11,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -16478,6 +16671,16 @@
             "observedSemantics": [
               "name",
               "role"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "100fabe8e611a659dc40a176bb42a2771fb043769fa20b68112a881efad19b78",
+            "dependencyCount": 4,
+            "resolvedCount": 4,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -18686,6 +18889,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "e7373478575bcea355d0dd566184f39c69869ae30d52a244d7f433429eb3c5d4",
+            "dependencyCount": 7,
+            "resolvedCount": 4,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -19178,6 +19391,16 @@
               "help-text",
               "name"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "a8cb421c6f342ff346424335de347004eb4284278d4df6623d701034697e3f2e",
+            "dependencyCount": 7,
+            "resolvedCount": 6,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -19502,6 +19725,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "0ed907b7e7e7b07176f3346f4f2fad3c8b4115b3a6139d6a17bc5ad4338a5d03",
+            "dependencyCount": 2,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -20702,6 +20935,16 @@
             "observedSemantics": [
               "help-text",
               "name"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "06e4d3b73f78861f664ceb35317f3d39477cb59378d5e8daab3ed1f3359c1a9e",
+            "dependencyCount": 13,
+            "resolvedCount": 7,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -22774,6 +23017,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "4a72523430afaf324e559c57b5888016fc11b67da0fcd0995b9d1596081bc95a",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -23609,6 +23862,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "a22f75ffacdc4896f48799270a11e8d0fe7901310a31bbed9c085bf8d18d68a8",
+            "dependencyCount": 3,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -24119,6 +24382,16 @@
             "observedSemantics": [
               "help-text",
               "name"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "981c3db64bd4ae560c9f97cd4ace7fa0c7005f1087008d2e54e4589307f4e606",
+            "dependencyCount": 8,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -25899,6 +26172,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "74819fc5c8d8810b21c7087813c05a01cbcf93fd0beaae92eb17fe76d31ad1f0",
+            "dependencyCount": 2,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -27422,6 +27705,16 @@
             "mappingComplete": false,
             "observedSemantics": [
               "role"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "6d4b0bbe4722ff84f74830503ae947b5ebd7aee468df0af12b8b4fdffa4ed1d6",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -29022,6 +29315,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "9c1306d9b211f46834837b3256aea4381276fcd741c6a3af23c971f824567a64",
+            "dependencyCount": 5,
+            "resolvedCount": 2,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -29880,6 +30183,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "844cf8abdca26a3d4c9e11361811665cf593e472a0252958b5e0dbd3d1fe9269",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -32904,6 +33217,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "d94e298092739f8d877c882a9b3736f1739aa2f5f0eab40d7b2d31b696c3d735",
+            "dependencyCount": 1,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -35976,6 +36299,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "bf8c305e9a938927038d1309c52e709a14965e2ab7c3f98e915dfde275a3da98",
+            "dependencyCount": 7,
+            "resolvedCount": 5,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -38569,6 +38902,16 @@
               "name",
               "role"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "650fb90812564f488a6337bafb73e4a76e727b44b3cae0040c22d8377d605d89",
+            "dependencyCount": 2,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -38916,6 +39259,16 @@
             "mappingComplete": false,
             "observedSemantics": [
               "role"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "2dff890c9a0c25f3abfdcb721f6ab959c9be07543a26188488df13f38d9b4836",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -39627,6 +39980,16 @@
               "name",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "93c597c57833cf1d6900a0bd46c15ac67e703ca5ce36e046d8dfa4a2f3d59970",
+            "dependencyCount": 6,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -39964,6 +40327,16 @@
             "observedSemantics": [
               "role"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "2b1777a7e55486965753462c6d29139d16d8baafe422ef6d826b93b69add2152",
+            "dependencyCount": 5,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -40204,6 +40577,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "c15035454ca7ccafc60b4de826c9f108b94b2a3e4d5687747f193e2d7f3be4d7",
+            "dependencyCount": 6,
+            "resolvedCount": 5,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -42493,6 +42876,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "0996c7160315bd5c9ad3f47bd81eb575e28871cf21c407d613344bff5717c0ba",
+            "dependencyCount": 1,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -44005,6 +44398,16 @@
               "help-text",
               "name",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "caef97f8302e11510b1cc48cdcebcf334a9ab541bf4bddf31846e2940df1a23f",
+            "dependencyCount": 11,
+            "resolvedCount": 5,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -46400,6 +46803,16 @@
               "accessibility-view",
               "name"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "fc95e45c8c9f5f72f08a4ca98d8c87d098e8dec388145f402b965b6c0bfcbed1",
+            "dependencyCount": 6,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -48447,6 +48860,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "e9f8561e40fb987151ea04a2ebc885b8a556c741d0066d1766b5c0e41ad4a0d2",
+            "dependencyCount": 1,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -50687,6 +51110,16 @@
               "accessibility-view",
               "name",
               "role"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "1340cacccb21d5e31a6ae7fd7ecc247fd58b7671e91cc3ecbe2c2a10d7775436",
+            "dependencyCount": 1,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -56266,6 +56699,16 @@
               "name",
               "role"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "7a65965f41c7a9b041f9cb637c25a1e48cf0084e9ba83b07052159950ffdcb4a",
+            "dependencyCount": 15,
+            "resolvedCount": 12,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -57951,6 +58394,16 @@
               "role",
               "state",
               "value"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "2acf30d7d26219b6b4471ffdaf67a039c9d11b167b9f8548737c2ea54beb9700",
+            "dependencyCount": 6,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -66404,6 +66857,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "98387b3a03c538aea7023297b550a39bb134fb11b177fcbd6b134e5c7d061707",
+            "dependencyCount": 2,
+            "resolvedCount": 2,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -70025,6 +70488,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "ef1748e32727f091d2d53fa27f46fecab1d845e5476fed56cab6e7dd9abbb9b4",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -71367,6 +71840,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "77c90f13d314778f636ff50fdc00b91182a6c900e363ca9384ddffa875d7ec6e",
+            "dependencyCount": 8,
+            "resolvedCount": 4,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -71832,6 +72315,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "58118c40eec8c88f569e7b5c2f1013e4f58d6134c7345c63389597c16a806a03",
+            "dependencyCount": 3,
+            "resolvedCount": 2,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -72290,6 +72783,16 @@
             "observedSemantics": [
               "name",
               "role"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "33f963a5446cfe10fc7774d7b29b3b6df95ad63c0de866dae60a69fac5c74d8a",
+            "dependencyCount": 9,
+            "resolvedCount": 6,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -73027,6 +73530,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "da4744522e5b291d7590f3b90f3fb6884a988aa2dde2be85a57d88095be7ce54",
+            "dependencyCount": 2,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -73743,6 +74256,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "77427ff31fbfd990e2c9d11d0aa0537c50b03a19f2c72d01d7a8130e85aa4236",
+            "dependencyCount": 3,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -76427,6 +76950,16 @@
               "name",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "e97d61d4f96d4ea995f068a782c378c6f166dd81c85d9233b66b62a6360119d3",
+            "dependencyCount": 2,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -78505,6 +79038,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "a3de8b53fab5ac63cec899324adc9f15b4d487f963175f5dc27133da363e535b",
+            "dependencyCount": 1,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -83941,6 +84484,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "ed4b4aabc9398b6c2f1ca033e6bb40c0424ea69377a1a5ee0a848327caa8156b",
+            "dependencyCount": 14,
+            "resolvedCount": 10,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -84991,6 +85544,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "df7b994cbf80380a29dacac9a2fbe56f69adc88e1dd8263181dcf57e92526d28",
+            "dependencyCount": 6,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -89421,6 +89984,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "fabebb0ca39b5ac8d787458831f2551692fbd2f4734356a8be1f177fd0ad0d09",
+            "dependencyCount": 2,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -92437,6 +93010,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "15c9fd7ef64514d4890b1bc61862446927cf24fc4b10195880df29cded8020da",
+            "dependencyCount": 4,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -93346,6 +93929,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "b66bdd7af8f87aa6996d46e85b661d001d4bed48e6d5a34f9ee4ba9e8b645868",
+            "dependencyCount": 8,
+            "resolvedCount": 6,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -94711,6 +95304,17 @@
             "observedSemantics": [
               "name",
               "role"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "52a93f6e5374eb59e60d6a801b272ebdee7ef1f6beb1dd1d5dac340a926fd14f",
+            "dependencyCount": 11,
+            "resolvedCount": 6,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
+              "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json"
             ]
           }
         }
@@ -98025,6 +98629,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "3090a66bf51e1d68b641b0ba7e8f29bc2045091d8ae696f0427183619835bd9e",
+            "dependencyCount": 4,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -102834,6 +103448,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "155c3313632e97d82f6e6a0c83da89af159e5dd91aeeced454a53e065d424840",
+            "dependencyCount": 7,
+            "resolvedCount": 2,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -104072,6 +104696,16 @@
             "observedSemantics": [
               "accessibility-view"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "d34ca9953050357b64c10ed1c9b721161f00acea5fd89c798bb77f90d4f03d42",
+            "dependencyCount": 9,
+            "resolvedCount": 5,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -104830,6 +105464,16 @@
               "role",
               "state",
               "value"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "326f9aae16609d5f215f8385cc556e20acf27a769eae5849f0bea0d32222e99e",
+            "dependencyCount": 25,
+            "resolvedCount": 9,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -109015,6 +109659,16 @@
               "name",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "330f76e5dd50200475ae1b60390794404231aaca10dbccbd12e7937f2aea2068",
+            "dependencyCount": 9,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -109723,6 +110377,16 @@
             "mappingComplete": false,
             "observedSemantics": [
               "role"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "3daa85bd30c31b2747a0ad9002426f668ccf9f67b8f7e6aa405b094286be9070",
+            "dependencyCount": 4,
+            "resolvedCount": 3,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -110519,6 +111183,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "34e976a03cfe49c7d70e8e32863d8a51352cf0fa78853c07902cb55adb9a97ba",
+            "dependencyCount": 4,
+            "resolvedCount": 4,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -114995,6 +115669,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "4ef6690cf7a35ffee605b3667d4dbb6e82202e52ed63ed9176bcba4045236118",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -116670,6 +117354,16 @@
               "accessibility-view",
               "name"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "fcc9db7b6e4221f956f0086f1cafd82ed6d7bd78bf7175e2cb386fa62e46ec6e",
+            "dependencyCount": 9,
+            "resolvedCount": 7,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -117632,6 +118326,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "d34ef1d73a467aea362e0c44cdd45bdaafd4c66c98d02c8b17ed21c8230276fd",
+            "dependencyCount": 8,
+            "resolvedCount": 4,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -123960,6 +124664,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "4c82d337e2cd127bf96781656961700fb42fde4de78f6ea3830ec4375d749a2a",
+            "dependencyCount": 1,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -124738,6 +125452,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "d5bde887cf7cae1e9f8d2a52016f3607aff70f71c5ac16c565bde9086ceda980",
+            "dependencyCount": 2,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -125443,6 +126167,16 @@
             "mappingComplete": false,
             "observedSemantics": [
               "role"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "bf29cc8480ff8d240df0358f8fd07d60c444309f5ea27eae3c6800aa6ccd1577",
+            "dependencyCount": 2,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -126535,6 +127269,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "9df0c85c27b9eae2a07271de8dbdc76d4ffa028f9694db539abc0e1508f04ec5",
+            "dependencyCount": 2,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -128334,6 +129078,17 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "160e8183549b0ff72670693772df00b885df9c7824e569b5be1a1e92dd407b4c",
+            "dependencyCount": 11,
+            "resolvedCount": 9,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
+              "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json"
             ]
           }
         }
@@ -131249,6 +132004,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "86369091e001e9b1e1ac699b626c9ab579e7ad135d31820699b97dd4a3f5111b",
+            "dependencyCount": 1,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -133291,6 +134056,16 @@
               "name",
               "role",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "f4d2bf9c8ac0c6070a5be2fa0a83b8d9c6b3bdce65d9e33d7766e1e5564e3eb9",
+            "dependencyCount": 4,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -138181,6 +138956,16 @@
             "pseudoClassContractComplete": false,
             "classContractDeclared": false,
             "classNamesResolved": true
+          },
+          "tokenThemeContract": {
+            "fingerprint": "9c1306d9b211f46834837b3256aea4381276fcd741c6a3af23c971f824567a64",
+            "dependencyCount": 5,
+            "resolvedCount": 2,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -150463,6 +151248,16 @@
               "role",
               "state"
             ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "77427ff31fbfd990e2c9d11d0aa0537c50b03a19f2c72d01d7a8130e85aa4236",
+            "dependencyCount": 3,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+            ]
           }
         }
       },
@@ -153145,6 +153940,16 @@
               "live-setting",
               "name",
               "state"
+            ]
+          },
+          "tokenThemeContract": {
+            "fingerprint": "e97d61d4f96d4ea995f068a782c378c6f166dd81c85d9233b66b62a6360119d3",
+            "dependencyCount": 2,
+            "resolvedCount": 0,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
             ]
           }
         }
@@ -166807,6 +167612,7 @@
       "surfaceHash": "735f8d8e826ea13ace0efa58eefeebb5937e50506d18fa71b6296a9a3d4babe5",
       "stateContractFingerprint": "c63f9aef3889f513a1b233af0e7bdfe6588e234dab1db571bbae4661ccabf932",
       "automationContractFingerprint": "fdac4e8ab76688436e71d82590996e80cba2673c6db5693a2b6ef0b62232227b",
+      "tokenThemeContractFingerprint": "411976a04fff4ae1b5040d9843f9242a0c46935bd0a8101efa16164760c04610",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-activity-rail-section"
       ],
@@ -166826,6 +167632,7 @@
       "surfaceHash": "c242deca33362bb8e9869bd7696286d71c3c3406d1ff1a77b06ab174775e761c",
       "stateContractFingerprint": "ce7a953c9efb1ad5ee4ba0cb1593504800e1b87d9b61365fd041cc9e4fbcb523",
       "automationContractFingerprint": "46167459db8a7536c5de508a20db208593abce04ccb1ab835db9f4e8f255348e",
+      "tokenThemeContractFingerprint": "73c388286e704ff0cc99b7a3a074e412c374182fe51e11b2ba340970e98a0d03",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-activity-rail-shell"
       ],
@@ -167102,6 +167909,7 @@
       "surfaceHash": "20c20aec9e99d86f83568165c65f55ed1c431c90a6a6df793ff885a4e7fbe509",
       "stateContractFingerprint": "bcb44facd4bff9615b366cfbdbd0d9cbca596aafeaef3f558a22096a37a39f63",
       "automationContractFingerprint": "d8266bd21af7f21c399c607b188dfb15476f5850609d4078314150e275778fe5",
+      "tokenThemeContractFingerprint": "cd64e99f329b01c9742194ea98e968327224ce3313ef601a0b3c720a9b956223",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-code-editor"
       ],
@@ -167291,6 +168099,7 @@
       "surfaceHash": "272d798a82c27c8ce2b376a9638967afdff6875227db78ec4af671e73a97ee5a",
       "stateContractFingerprint": "b015156f8ccd1a9448c2816ef174464dfbe25d33a5d9f2ede4036469b5305cba",
       "automationContractFingerprint": "169e775f50465aa91b699e0d28f4da0128bed6885b664380629162050c2f2b5c",
+      "tokenThemeContractFingerprint": "707d9105104b38d178bad19be3f9f835a1517dcc60f9d04a58b4f3ff0702d864",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-command-palette"
       ],
@@ -167480,6 +168289,7 @@
       "surfaceHash": "07a1e3379f973f2429b84f5d84f7d68ccca058882a8003e9bf8b8cfbdb5b1b6d",
       "stateContractFingerprint": "e40d5db70bfa52501bc7fcdbdf9fb1fe7252ecb2c3f0b6712dd59ba9aada273b",
       "automationContractFingerprint": "d3804eeecf8410440444a9ed720cbabb9fad490a0396852ff8dd3bd3725c9f48",
+      "tokenThemeContractFingerprint": "9665efc58d5f1df15373d29f8cddf025a091401a20844b6ea9443e4431b58bcb",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-context-menu"
       ],
@@ -167517,6 +168327,7 @@
       "surfaceHash": "d401fa54d2dfe7f23320f34b2386148e9fa08eb3d625387998986811f00028c3",
       "stateContractFingerprint": "859e8bc521953e8a0bb497496b4deba9e9ac6d2211bf5ccb5f16054bb89a00bb",
       "automationContractFingerprint": "9c3d7b7fb48e211108dddf887fc85569eafced06db8b9dda4c058db4b0e82738",
+      "tokenThemeContractFingerprint": "8496374bdad7f3e519fe79f951afeae829606f984cd2f0b97ded94cf6aa7b8ee",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-context-menu-item"
       ],
@@ -167569,6 +168380,7 @@
       "memberCount": 0,
       "surfaceHash": "578aa07cbc5828038632d60e9e326befc6fb2d6672b54f068d9ea1c9c2d0b9a7",
       "automationContractFingerprint": "e10ee41a3abe846295790a9e036c8ef4b1bb8e8865793e5870986c9c683c7869",
+      "tokenThemeContractFingerprint": "478d34896431b164a0a9841bd11ccffefbf8fc29289eb3d35a6ec031d3fa9715",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-context-menu-separator"
       ],
@@ -167655,6 +168467,7 @@
       "memberCount": 39,
       "surfaceHash": "671f47b17458d4ef6397839689ab9059cda31bfc27c8a172de165b0dbefdac9f",
       "stateContractFingerprint": "566370f7907bd81926831bc1b5a288e4d31484973f698dc5f3d9dc2cc81c13e7",
+      "tokenThemeContractFingerprint": "7f925a84a552691b01b27fdf0e640d1beb6b7ff62f970659730d4562de47319a",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-data-table"
       ],
@@ -167980,6 +168793,7 @@
       "surfaceHash": "28100943761015067f7e16a38605f08e86f1638f2a6db228a032c64d83508202",
       "stateContractFingerprint": "947d2e59381cc10f1ff82aca275c61acc839314e1764d3d987dceb5b0c60c624",
       "automationContractFingerprint": "643fb1a778ef7d07ff309efd8c50df526792a3cd0a5f43b76a672f1d49404f39",
+      "tokenThemeContractFingerprint": "f074d04113c5bc587d29af459c03f66f8fbba65aa545f39d220d25af50f8a93d",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-document-tab"
       ],
@@ -168084,6 +168898,7 @@
       "surfaceHash": "ac17225ecba7277354dc57883b6a7a82f4899545b54816b47d2d822ae0711d3a",
       "stateContractFingerprint": "fc113fc6afc0ceb6b4bcf66f33a06da1392b00fd83103e747729b9f48a193970",
       "automationContractFingerprint": "0a03cd68a4738f81154a0d04d94012247a6720c33efa555a9720cb538d723bd5",
+      "tokenThemeContractFingerprint": "07d622c0b5eaff7ad36f08dbd16263a69eadbff66ee84fe528bd26c27a20702b",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-document-tabs"
       ],
@@ -168120,6 +168935,7 @@
       "surfaceHash": "c7bfb3490b2b9c835789fc4ff058680ff62432de1f52b5da5478cc43ef3c1705",
       "stateContractFingerprint": "754f1e5dc661cc3c352f056cdac37fa9d32926002a22e8e53f01da6b704fc522",
       "automationContractFingerprint": "c4b283c1496fa8baffb87506d2a1a46d696d45c8f2912b2ee0aa9f418473707d",
+      "tokenThemeContractFingerprint": "8a7c69e650d52723f4489400c22b6214dccba464f0f3028dd36611ed35714f0e",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-drop-zone"
       ],
@@ -168360,6 +169176,7 @@
       "surfaceHash": "fe7f1748fb5358316de95bdda580851b675d3cfd2a18827ff7ad31f80ac815c1",
       "stateContractFingerprint": "a8609b5b36baaa2a78d70ffaf4a6612c59a96a9e06b2b0d6ea912368d9df10ec",
       "automationContractFingerprint": "4860a8ca2457a79981fe018bfbdf88df4f9e45adaf25f5f2a54c487b0a4aa748",
+      "tokenThemeContractFingerprint": "af202c536cdddf7a6cb3a85308f0a03081ea6a83a0b6eececa2d57e154ef048b",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-icon-button"
       ],
@@ -168600,6 +169417,7 @@
       "surfaceHash": "576dce85222455c33bf6f0089f18b96044c2b3f69dd122b35dd91d848503bc08",
       "stateContractFingerprint": "1b13ef36128b7d08ba94ca5c346518594e9c8ea3c7324585165a7b6c1eb36463",
       "automationContractFingerprint": "2dd929c87417ee3a1b0392d376eb9fff836e3f2bc8e67709f619ae4e10dd6060",
+      "tokenThemeContractFingerprint": "3decfba641de2ed1b510e126859087e57956e52ebb0a7323554b4a431be9ba59",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-loading-indicator"
       ],
@@ -168636,6 +169454,7 @@
       "surfaceHash": "8683346181572de77bf76445b312817b3074440f9d2187e1cbf3abfd3e89b28b",
       "stateContractFingerprint": "2034698e7174c3f85b05d9a1a1a0f2fcad31a1df74cd16ee18b3a3e2c77df77b",
       "automationContractFingerprint": "110999f434957fe325fe69d855cccf2160a45a12856532f97477cac6f3c7f89c",
+      "tokenThemeContractFingerprint": "0718ef11708aba09f12c94dd358d5633c73f3fcc82f4a1613819ad58f2b76920",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-loading-overlay"
       ],
@@ -170429,6 +171248,7 @@
       "surfaceHash": "710ae835a11699daa0379f45c76f52af723c07bfad975c70d1f2dcbdd2009598",
       "stateContractFingerprint": "8a6a1f62407e0a963ef6bba1035faca4bf3c27dd29f586c00be2f7cb357740b7",
       "automationContractFingerprint": "f4d0287f9cd04de7d25179f1f969e0897bfee6b0b04208499ab7565c97a71e3e",
+      "tokenThemeContractFingerprint": "cb1e66875803c9f1a80e0daa0a0e0c81358b56a84ec2426d7e93c57ce1a6ede2",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-native-title-bar"
       ],
@@ -171081,6 +171901,7 @@
       "surfaceHash": "6d4458cd3ac51b22e660f0594fbac1bbc5a007783f8cc1f615583f64b0bfe6d4",
       "stateContractFingerprint": "b1f9f55308d04676c779df17b92a0f14e69f7d863f851fe4b7df3188c98c94ee",
       "automationContractFingerprint": "1f0868ba53f5b6c99cf1f7a5bf484d949663a0a9170412ad55dc9599c1405934",
+      "tokenThemeContractFingerprint": "cde3ffd5dc24203ed2d37c26b22f0f6e33ee9a59c8c871accd46ddd37421d972",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-settings-category"
       ],
@@ -171237,6 +172058,7 @@
       "surfaceHash": "e17464841c8fb932b183b397218948a70f725ff09533f38d29c20d18f4f5fac5",
       "stateContractFingerprint": "4dec7a0df6d609d944b7c10d4e232798e49980b432c9da4b01290f31ca57f1cf",
       "automationContractFingerprint": "f482fd1ef38665e544e511f95b1862c1975584853d865554aa4949b245cc0bea",
+      "tokenThemeContractFingerprint": "48a4783471c0343e8389e6087b0a8e6b138a703450a5754be31afbbed4eb831d",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-settings-shell"
       ],
@@ -171290,6 +172112,7 @@
       "surfaceHash": "fd6889e708dbd01047ea8d34bfb7c45d5516602a1fae767f52c440062b21b9bc",
       "stateContractFingerprint": "2b38e6cc8b2c3cf8d9f17ff1eac5383412604a1a5d79e336bbd958ebcc980c02",
       "automationContractFingerprint": "db2c9e526d6aade4c5487725b7d56a0ca1eb4b27bb71e1884d00236f294e1b29",
+      "tokenThemeContractFingerprint": "54ccb89c3d729c67759b84083276857570864460922625555b204e840639d517",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-shortcut-recorder"
       ],
@@ -171584,6 +172407,7 @@
       "surfaceHash": "f4872c72589e65f95adb2235fbb6040ade7d11302eb22a64546f3ac3a342af49",
       "stateContractFingerprint": "ecae2d5a9cf49fc24c62d6f3919ff3545f218019937e5f509a0cc5b6f4ec9a60",
       "automationContractFingerprint": "b11d916e223fcb09f61c81d62813f5e11d55b3b844e5d3d4d83f582e3cf90441",
+      "tokenThemeContractFingerprint": "bcea10a15be489509c162521e87da50953a703bab95e21c9bb343ee15c923d5b",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-text-editor"
       ],
@@ -171671,6 +172495,7 @@
       "surfaceHash": "e90151549a83a00b7347f17cc13222cb387ed71abc0c3525b35030da30348871",
       "stateContractFingerprint": "2d6b6656a952782cd3706475643ba5e5c69ad05bb9f7add980f6ea51814a7fa4",
       "automationContractFingerprint": "57cb5f518ab7fdc845f6462ecbe33e34124f8f4e6da1beb7e60f577918d88ab5",
+      "tokenThemeContractFingerprint": "c588204b81e884e912304858b7b2d2d36849956f11b59de7c8ad91efb59d15d2",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-text-viewer"
       ],
@@ -172338,6 +173163,7 @@
       "surfaceHash": "5b45a65f98f837be4c29b1b5b44d8c9fa08cf29af33251344710644ba7f0a739",
       "stateContractFingerprint": "c712b9724b813bd1341da885106c44a4d55a6b01e283c4465c848ea5e7926eb6",
       "automationContractFingerprint": "d248e8a56d13e41bf3d90982e1b7369146c7a273a641a70a041db30c62c49461",
+      "tokenThemeContractFingerprint": "5c4de5427bb10a2332b41a5d63f638053c51f8234422e911500dda0aac9dc760",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-virtual-list"
       ],
@@ -172408,6 +173234,7 @@
       "surfaceHash": "9a5fb46fd4e034220f593da9ee145aa07555b0b9c6fbdfb28089f41511c0c276",
       "stateContractFingerprint": "2cbea22648ef2517f9267d2a41948f8c75e251903a129c68031864d44c0cf916",
       "automationContractFingerprint": "890923430b4708f36021abd2a4d7715f18da9f8c4bcc87f44047a9bb9d6e4741",
+      "tokenThemeContractFingerprint": "30091ff2395c6e34285d87a257616241a82e849d91181323a76da462817659bd",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-virtual-list-item-container"
       ],
@@ -173107,6 +173934,7 @@
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 15,
       "surfaceHash": "c600eed16e1d4c6702cecd5acd81affaec46f7c9f051a1bdab215da3c68e35d2",
+      "tokenThemeContractFingerprint": "850d697df289a034b601f81e42c7f4442e965ccdee7e1bc7e9e26082423e8291",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-overlay-host"
       ],
@@ -173311,6 +174139,7 @@
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
       "memberCount": 7,
       "surfaceHash": "e1b13aed4ed9d717487debaf191146da8d0976c0c4865cb64cfb7827bcc69a6a",
+      "tokenThemeContractFingerprint": "18a1c80a5b9de3f0f4064e679e4e19dd03553741ff7f280835e877c6f6a6e0e1",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-motion-service"
       ],
@@ -173379,6 +174208,7 @@
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
       "memberCount": 3,
       "surfaceHash": "fa3b56d8f9d19a4ee9f3f1536eb62d08e6c684a579cde3d2f05ac0889134d65b",
+      "tokenThemeContractFingerprint": "39bc44f6ee6563b85d8c05aa96138e7da7570022c98e9eb740c4f54cacf4b674",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-theme-manager"
       ],
@@ -173430,6 +174260,7 @@
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
       "memberCount": 0,
       "surfaceHash": "fe734ea1d9db7171c47410877b0b1770ec0fc1e74a1b438afe58e6f2550017c3",
+      "tokenThemeContractFingerprint": "e48410cd13956caef0f3bdc1293d00a5a61e0e857822785a18de9f56205c38bc",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-theme-resource-keys"
       ],
@@ -173475,6 +174306,28 @@
       }
     }
   ],
+  "tokenThemeBaselines": {
+    "avalonia": {
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "fingerprint": "658bec26f8802b1ea714486d09bfe71c0a72f80ca6184f01da66ab2249076b5f",
+      "definitionCount": 116,
+      "dependencyCount": 23,
+      "resolvedCount": 23,
+      "ownerBoundCount": 19,
+      "contractDeclared": false,
+      "renderedEvidenceVerified": false
+    },
+    "avaloniaThemes": {
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
+      "fingerprint": "c2a85654993463c8874c15a89652cd9adb8d5aaf84a5d7f547f1c0ae15b5b021",
+      "definitionCount": 116,
+      "dependencyCount": 990,
+      "resolvedCount": 491,
+      "ownerBoundCount": 607,
+      "contractDeclared": false,
+      "renderedEvidenceVerified": false
+    }
+  },
   "coverage": {
     "aligned-candidate": 13,
     "partial": 139,
