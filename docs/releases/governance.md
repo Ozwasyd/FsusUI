@@ -224,6 +224,83 @@ workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前�
 
 ## 5. 发布后核验
 
+For a stable `latest` release, `publish-npm.yml` performs the automated
+post-publish verification before the manual checks below. It consumes the
+successful `fsusblog-consumer-gate` artifact produced by the #318 gate and
+binds its digest to the immutable candidate and manifest before `npm publish`.
+After an actual publish (never an idempotent skip), it polls the canonical npm
+registry, downloads the registry-provided tarball, verifies SHA-512 integrity,
+candidate SHA-256, package name/version, and the `latest` dist-tag, then sends
+the strict `fsusui-npm-published-v1` event. Preview, next, and other prerelease
+channels never enter this path.
+
+The payload contract is
+[`spec/releases/fsusui-npm-published-v1.schema.json`](../../spec/releases/fsusui-npm-published-v1.schema.json).
+The sanitized artifact contract is
+[`spec/releases/fsusui-release-dispatch-receipt.schema.json`](../../spec/releases/fsusui-release-dispatch-receipt.schema.json).
+The sender uses only `FSUS_RELEASE_TRAIN_APP_ID` and
+`FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY`: it mints a metadata-only token scoped to
+FsusUI and a separate FsusBlog-only token with metadata read, contents write,
+and pull requests write. Missing, insufficient, or additional token permissions
+fail before dispatch. PATs and the workflow `GITHUB_TOKEN` are not cross-repo
+dispatch credentials.
+
+The local deterministic registry/App/dispatch matrix is:
+
+```bash
+pnpm check:npm-release-workflow
+```
+
+These tests are implementation evidence only. They do not claim a real npm
+publication, GitHub App installation, repository dispatch, or downstream
+migration.
+
+The separate #318 pre-publish App uses
+`FSUS_CROSS_REPO_APP_ID` / `FSUS_CROSS_REPO_APP_PRIVATE_KEY` and is restricted
+to metadata and contents read for exactly FsusUI and FsusBlog. Its verifier
+produces only the non-sensitive installation identifiers and permission/check
+summary defined by
+[`spec/releases/fsus-cross-repo-app-evidence.schema.json`](../../spec/releases/fsus-cross-repo-app-evidence.schema.json).
+It exits before reading credentials in an untrusted context. The checked-in
+simulator proves the fail-closed contract; the real installation and its
+administrator-owned evidence remain external and must not be inferred from a
+local pass.
+
+Release quality invokes the reusable
+`.github/workflows/_fsusblog-consumer-gate.yml` only from a trusted release-tag
+context. The workflow resolves the current FsusBlog default branch through the
+API exactly once, freezes its full 40-character head SHA, checks out that SHA
+with credentials disabled after checkout, and runs the formal
+`verify:fsusui-candidate` entry against an absolute path to the downloaded local
+tarball. It records exact Node/npm/Vue/Vite/TypeScript/vue-tsc versions and
+requires a clean, unchanged FsusBlog checkout both before and after the command.
+The formal entry must write its exact five-gate status and duration evidence to
+the path supplied in `FSUSBLOG_FSUSUI_CANDIDATE_EVIDENCE`; a missing, malformed,
+candidate-mismatched, failed, or skipped gate record fails closed.
+It never resolves the candidate from a registry and never changes FsusBlog.
+Before checkout and again after FsusBlog consumption, the gate recomputes the
+tarball SHA-256 and requires exact agreement among the workflow input, release
+quality output, adjacent candidate manifest, matrix summary, and all three
+profile receipts. The two canonical binding records must be byte-identical.
+Mutation, replacement, repack, missing profile, receipt tamper, source-SHA
+drift, or registry substitution fails the job; there is no previous-candidate
+fallback.
+
+The reusable gate emits `fsusblog-consumer-gate.receipt.json` and its SHA-256
+sidecar under the closed schema
+[`spec/releases/fsusblog-consumer-gate-receipt.schema.json`](../../spec/releases/fsusblog-consumer-gate-receipt.schema.json).
+Success binds the pinned FsusBlog SHA, exact toolchain, all five #1921 sub-gates,
+clean-tree pre/post state, candidate pre/post SHA-256, UTC interval, and workflow
+run identity. A failed or skipped command, dirty tree, candidate mutation, or
+identity mismatch produces only sanitized failure diagnostics and can never be
+consumed as success.
+`publish-npm.yml` invokes this gate after release quality and makes both
+preflight and publish explicitly depend on its successful job/output. Before
+the channel lock it revalidates the receipt digest, candidate/manifest identity,
+source commit, and release tag. No failed, skipped, missing, stale, or tampered
+receipt can reach `npm publish`; the established monotonicity, provenance, and
+immutable-candidate checks remain mandatory.
+
 发布后至少检查：
 
 - GitHub Actions run 成功

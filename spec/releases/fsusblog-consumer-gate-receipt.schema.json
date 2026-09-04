@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ozwasyd/FsusUI/spec/releases/fsusblog-consumer-gate-receipt.schema.json",
+  "title": "FsusBlog immutable candidate consumer gate receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "status",
+    "fsusui",
+    "candidate",
+    "fsusblog",
+    "toolchain",
+    "gates",
+    "workingTree",
+    "startedAt",
+    "completedAt",
+    "workflow",
+    "diagnostics"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "status": { "enum": ["success", "failed"] },
+    "fsusui": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "sourceCommit", "releaseTag"],
+      "properties": {
+        "repository": { "const": "Ozwasyd/FsusUI" },
+        "sourceCommit": { "$ref": "#/$defs/fullSha" },
+        "releaseTag": {
+          "type": "string",
+          "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package",
+        "version",
+        "sha256",
+        "manifestSha256",
+        "bindingSha256"
+      ],
+      "properties": {
+        "package": { "const": "@ozwasyd/element-plus" },
+        "version": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "manifestSha256": { "$ref": "#/$defs/sha256" },
+        "bindingSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "fsusblog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "defaultBranch", "commitSha"],
+      "properties": {
+        "repository": { "const": "Ozwasyd/FsusBlog" },
+        "defaultBranch": { "type": "string", "minLength": 1 },
+        "commitSha": { "$ref": "#/$defs/fullSha" }
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node", "npm", "vue", "vite", "typescript", "vueTsc"],
+      "properties": {
+        "node": { "type": "string", "minLength": 1 },
+        "npm": { "type": "string", "minLength": 1 },
+        "vue": { "type": "string", "minLength": 1 },
+        "vite": { "type": "string", "minLength": 1 },
+        "typescript": { "type": "string", "minLength": 1 },
+        "vueTsc": { "type": "string", "minLength": 1 }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status", "durationMs"],
+        "properties": {
+          "name": {
+            "enum": [
+              "published-package-typecheck",
+              "fsusui-export-boundary",
+              "frontend-production-build",
+              "worker-wasm-package-path",
+              "single-vue-runtime"
+            ]
+          },
+          "status": { "enum": ["success", "failed", "skipped"] },
+          "durationMs": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "workingTree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["before", "after"],
+      "properties": {
+        "before": { "enum": ["clean", "dirty"] },
+        "after": { "enum": ["clean", "dirty"] }
+      }
+    },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "completedAt": { "type": "string", "format": "date-time" },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runId", "runUrl"],
+      "properties": {
+        "runId": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+        "runUrl": { "type": "string", "format": "uri" }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "fullSha": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+  }
+}

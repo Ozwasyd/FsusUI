@@ -1584,6 +1584,9 @@ describe('Fsus theme visual baseline', () => {
       'animation: none;',
     ])
     expect(markdownCss).not.toContain('markdown-renderer-spin')
+    expect(markdownCss).not.toMatch(
+      /\.markdown-renderer__virtual-unit\s*\{[^}]*contain:\s*layout/u
+    )
   })
 
   test('keeps inline action buttons from wrapping into neighboring content', () => {

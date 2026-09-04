@@ -14,12 +14,28 @@ import { existsSync, readFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { writeFreshnessReport } from './deps-freshness-report.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
 const SURFACE_REL = 'config/dependencies/update-surface.json'
 const EXCEPTIONS_REL = 'config/dependencies/exceptions.json'
+const REQUIRED_CHECKS_REL = 'config/dependencies/required-checks.json'
+const outputIndex = process.argv.indexOf('--output')
+const outputPath = outputIndex < 0 ? null : process.argv[outputIndex + 1]
+const operationalErrors = []
+
+if (outputIndex >= 0 && !outputPath) {
+  console.error('[deps:freshness] --output requires a path')
+  process.exit(2)
+}
+
+function operationalError(source, identity) {
+  const message = `${source} lookup failed for ${identity}`
+  operationalErrors.push({ source, identity, message })
+  return null
+}
 
 function readJson(relPath) {
   const fullPath = path.resolve(repoRoot, relPath)
@@ -31,30 +47,73 @@ function npmLatest(name) {
   try {
     const r = execSync(`npm view "${name}" version 2>/dev/null`, { encoding: 'utf-8', timeout: 10_000 }).trim()
     return r || null
-  } catch { return null }
+  } catch {
+    return operationalError('npm-registry', name)
+  }
 }
 
 function ghReleaseLatest(repo) {
   try {
     const r = execSync(`gh release view --repo "${repo}" --json tagName --jq '.tagName' 2>/dev/null`, { encoding: 'utf-8', timeout: 15_000 }).trim()
     return r?.replace(/^v/, '') || null
-  } catch { return null }
+  } catch {
+    return operationalError('github-api', repo)
+  }
 }
 
-function findRenovatePR(depId) {
+function normalizeCheck(check) {
+  return {
+    name: check.name ?? check.context ?? '',
+    conclusion: String(
+      check.conclusion ?? check.state ?? check.status ?? 'missing',
+    ).toLowerCase(),
+    createdAt: check.createdAt ?? null,
+    startedAt: check.startedAt ?? null,
+    completedAt: check.completedAt ?? null,
+  }
+}
+
+function findRenovatePRs(depId) {
   try {
-    const r = execSync(`gh pr list --state open --search "${depId} in:title" --json title,headRefName,number --limit 5 2>/dev/null`, { encoding: 'utf-8', timeout: 15_000 }).trim()
-    if (!r || r === '[]') return null
+    const r = execSync(
+      `gh pr list --state open --search "${depId} in:title" --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 5 2>/dev/null`,
+      { encoding: 'utf-8', timeout: 15_000 },
+    ).trim()
+    if (!r || r === '[]') return []
     const prs = JSON.parse(r)
-    return prs.find(p => p.headRefName?.includes('renovate')) || prs[0] || null
-  } catch { return null }
+    const selected =
+      prs.find((pullRequest) =>
+        pullRequest.headRefName?.includes('renovate'),
+      ) ?? prs[0]
+    return [
+      selected,
+      ...prs.filter((pullRequest) => pullRequest !== selected),
+    ].map((pullRequest) => ({
+      number: pullRequest.number,
+      title: pullRequest.title,
+      url: pullRequest.url,
+      headRefName: pullRequest.headRefName,
+      state: 'OPEN',
+      createdAt: pullRequest.createdAt,
+      superseding: /(?:supersedes|replaces)\s+#\d+/iu.test(
+        pullRequest.body ?? '',
+      ),
+      labels: (pullRequest.labels ?? []).map((label) => label.name),
+      checks: (pullRequest.statusCheckRollup ?? []).map(normalizeCheck),
+    }))
+  } catch {
+    operationalError('github-api', `pull requests for ${depId}`)
+    return []
+  }
 }
 
 function curlJson(url) {
   try {
     const r = execSync(`curl -sSL "${url}" 2>/dev/null`, { encoding: 'utf-8', timeout: 10_000 }).trim()
     return r ? JSON.parse(r) : null
-  } catch { return null }
+  } catch {
+    return operationalError('upstream-registry', url)
+  }
 }
 
 // ===== Version resolvers per datasource =====
@@ -152,9 +211,13 @@ const surface = readJson(SURFACE_REL)
 if (!surface) { console.error('[deps:freshness] missing update-surface.json'); process.exit(1) }
 
 const exceptions = readJson(EXCEPTIONS_REL)
+const requiredChecks =
+  readJson(REQUIRED_CHECKS_REL)?.branchProtection?.requiredChecks
 const now = new Date()
 const activeExceptions = new Map()
+const exceptionHistory = new Map()
 for (const exc of (exceptions?.exceptions || [])) {
+  exceptionHistory.set(exc.dependencyId, exc)
   if (new Date(exc.expiresAt) > now) activeExceptions.set(exc.dependencyId, exc)
 }
 
@@ -164,10 +227,13 @@ let failures = 0
 for (const entry of (surface.surfaces || [])) {
   const current = resolveCurrent(entry)
   const latest = resolveLatest(entry)
-  if (!current && !latest) continue
-
   let state = 'skipped'
   let detail = ''
+  let pullRequests = []
+  const recordedException = exceptionHistory.get(entry.id)
+  let exception = recordedException
+    ? { owner: recordedException.owner, expiresAt: recordedException.expiresAt }
+    : null
 
   if (!latest || !current) {
     state = 'skipped'
@@ -176,7 +242,8 @@ for (const entry of (surface.surfaces || [])) {
     state = 'current'
     detail = current
   } else {
-    const pr = findRenovatePR(entry.id)
+    pullRequests = findRenovatePRs(entry.id)
+    const pr = pullRequests[0]
     if (pr) {
       state = 'latest-target-pr'
       detail = `PR #${pr.number}: ${pr.title}`
@@ -185,6 +252,10 @@ for (const entry of (surface.surfaces || [])) {
       if (exc) {
         state = 'exception'
         detail = `expires ${exc.expiresAt}: ${exc.reason}`
+        exception = {
+          owner: exc.owner,
+          expiresAt: exc.expiresAt,
+        }
       } else {
         state = 'stale'
         detail = `current=${current} latest=${latest}`
@@ -193,7 +264,18 @@ for (const entry of (surface.surfaces || [])) {
     }
   }
 
-  results.push({ id: entry.id, state, detail })
+  results.push({
+    dependencyId: entry.id,
+    datasource: entry.datasource,
+    packageName: entry.packageName,
+    currentVersion: current,
+    targetVersion: latest,
+    state,
+    detail,
+    pullRequests,
+    exception,
+    blockerReasons: state === 'stale' ? ['stale'] : [],
+  })
   console.log(`[deps:freshness] ${state.padEnd(16)} ${entry.id}: ${detail}`)
 }
 
@@ -201,6 +283,12 @@ for (const entry of (surface.surfaces || [])) {
 for (const exc of (exceptions?.exceptions || [])) {
   if (new Date(exc.expiresAt) <= now) {
     console.error(`[deps:freshness] FAIL expired-exception ${exc.dependencyId}`)
+    const result = results.find(
+      (entry) => entry.dependencyId === exc.dependencyId,
+    )
+    if (result && !result.blockerReasons.includes('expired-exception')) {
+      result.blockerReasons.push('expired-exception')
+    }
     failures += 1
   }
 }
@@ -215,7 +303,20 @@ const summary = {
 }
 console.log(`\n[deps:freshness] summary ${JSON.stringify(summary)}`)
 
-if (failures > 0) {
+const report = {
+  schemaVersion: 1,
+  generatedAt: now.toISOString(),
+  requiredChecks: requiredChecks ?? [],
+  results,
+  errors: operationalErrors,
+  summary,
+}
+if (outputPath) {
+  writeFreshnessReport(outputPath, report, repoRoot)
+  console.log(`[deps:freshness] structured result ${outputPath}`)
+}
+
+if (failures > 0 || operationalErrors.length > 0) {
   console.error(`[deps:freshness] FAILED stale=${failures}`)
   process.exit(1)
 }

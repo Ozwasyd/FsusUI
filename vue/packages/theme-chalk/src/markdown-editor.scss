@@ -181,6 +181,7 @@
   @include e((command, command-more)) {
     min-inline-size: 2rem;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   @media (max-width: 767px) {
