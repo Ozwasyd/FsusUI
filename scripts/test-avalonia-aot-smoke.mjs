@@ -85,7 +85,23 @@ const execute = (command, arguments_, options = {}) => {
     encoding: 'utf8',
     env: options.env ?? process.env,
     timeout: options.timeout ?? 600_000,
+    killSignal: 'SIGKILL',
   })
+  assert.equal(
+    result.error,
+    undefined,
+    `${options.label ?? command} did not terminate cleanly: ${result.error?.message}`,
+  )
+  assert.equal(
+    result.signal,
+    null,
+    `${options.label ?? command} was terminated by ${result.signal}`,
+  )
+  assert.notEqual(
+    result.status,
+    null,
+    `${options.label ?? command} did not return an exit status`,
+  )
   if (options.expectFailure) {
     assert.notEqual(
       result.status,
@@ -418,14 +434,11 @@ const display = inheritedDisplayReady
   : `:${100 + (process.pid % 500)}`
 const xvfb = inheritedDisplayReady
   ? null
-  : spawn('/usr/bin/Xvfb', [
-      display,
-      '-screen',
-      '0',
-      '1024x768x24',
-      '-nolisten',
-      'tcp',
-    ])
+  : spawn(
+      '/usr/bin/Xvfb',
+      [display, '-screen', '0', '1024x768x24', '-nolisten', 'tcp'],
+      { stdio: 'ignore' },
+    )
 const wait = (milliseconds) =>
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds)
 let ready = inheritedDisplayReady
@@ -503,6 +516,46 @@ for (const directory of [
   mkdirSync(directory, { recursive: true, mode: 0o700 })
 }
 
+const negativeControlTimeout = 60_000
+const delay = (milliseconds) =>
+  new Promise((resolve) => setTimeout(resolve, milliseconds))
+const stopSpawnedChild = async (child, label) => {
+  if (!child || child.exitCode !== null || child.signalCode !== null) return
+  child.kill('SIGTERM')
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    await delay(50)
+    if (child.exitCode !== null || child.signalCode !== null) return
+  }
+  child.kill('SIGKILL')
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    await delay(50)
+    if (child.exitCode !== null || child.signalCode !== null) return
+  }
+  throw new Error(`${label} did not terminate after SIGKILL`)
+}
+const stopProcessId = async (pid, label) => {
+  const signal = (value) => {
+    try {
+      process.kill(pid, value)
+      return true
+    } catch (error) {
+      if (error?.code === 'ESRCH') return false
+      throw error
+    }
+  }
+  if (!signal('SIGTERM')) return
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    await delay(50)
+    if (!signal(0)) return
+  }
+  if (!signal('SIGKILL')) return
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    await delay(50)
+    if (!signal(0)) return
+  }
+  throw new Error(`${label} did not terminate after SIGKILL`)
+}
+
 try {
   const positive = execute(nativeBinary, smokeArguments(reportPath), {
     cwd: temporaryRoot,
@@ -562,6 +615,7 @@ try {
       env: runtimeFreeEnvironment,
       expectFailure: true,
       label: 'missing packaged resource',
+      timeout: negativeControlTimeout,
     },
   )
   assert.match(resourceFailure.stderr, /resource failure|DefinitelyMissing/iu)
@@ -574,6 +628,7 @@ try {
       env: { ...runtimeFreeEnvironment, DISPLAY: '' },
       expectFailure: true,
       label: 'missing Avalonia platform loader',
+      timeout: negativeControlTimeout,
     },
   )
   assert.match(loaderFailure.stderr, /loader failure|display|x11/iu)
@@ -589,6 +644,7 @@ try {
       env: runtimeFreeEnvironment,
       expectFailure: true,
       label: 'ignored binding log',
+      timeout: negativeControlTimeout,
     },
   )
   const ignoredLogReport = JSON.parse(
@@ -622,7 +678,11 @@ try {
       '--no-cache',
       '--force',
     ],
-    { expectFailure: true, label: 'missing local FsusUI package' },
+    {
+      expectFailure: true,
+      label: 'missing local FsusUI package',
+      timeout: negativeControlTimeout,
+    },
   )
   assert.match(
     packageFailure.stdout + packageFailure.stderr,
@@ -685,13 +745,17 @@ try {
   )
   if (positive.stdout) process.stdout.write(positive.stdout)
 } finally {
-  xvfb?.kill('SIGTERM')
   try {
-    process.kill(sessionBusPid, 'SIGTERM')
-  } catch {}
-  if (!keepTemporaryRoot) {
-    rmSync(temporaryRoot, { recursive: true, force: true })
-  } else {
-    console.log(`kept=${temporaryRoot}`)
+    await stopSpawnedChild(xvfb, 'Xvfb')
+  } finally {
+    try {
+      await stopProcessId(sessionBusPid, 'isolated desktop session bus')
+    } finally {
+      if (!keepTemporaryRoot) {
+        rmSync(temporaryRoot, { recursive: true, force: true })
+      } else {
+        console.log(`kept=${temporaryRoot}`)
+      }
+    }
   }
 }
