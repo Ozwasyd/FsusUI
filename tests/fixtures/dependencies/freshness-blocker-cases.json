@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "positive": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-08-30T06:00:00.000Z",
+    "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+    "results": [
+      {
+        "dependencyId": "z-package",
+        "datasource": "npm",
+        "packageName": "z-package",
+        "currentVersion": "1.0.0",
+        "targetVersion": "2.0.0",
+        "state": "stale",
+        "pullRequests": [],
+        "exception": null
+      },
+      {
+        "dependencyId": "a-package",
+        "datasource": "nuget",
+        "packageName": "A.Package",
+        "currentVersion": "1.0.0",
+        "targetVersion": "2.0.0",
+        "state": "stale",
+        "pullRequests": [
+          {
+            "number": 42,
+            "url": "https://example.invalid/pull/42",
+            "state": "OPEN",
+            "createdAt": "2026-08-28T00:00:00Z",
+            "superseding": true,
+            "labels": [],
+            "checks": [
+              {
+                "name": "pr-fast",
+                "conclusion": "success",
+                "completedAt": "2026-08-29T00:00:00Z"
+              },
+              {
+                "name": "pr-real-render-performance",
+                "conclusion": "success",
+                "completedAt": "2026-08-29T00:00:00Z"
+              }
+            ]
+          }
+        ],
+        "exception": {
+          "owner": "@release-owner",
+          "expiresAt": "2026-09-01T00:00:00Z"
+        }
+      }
+    ],
+    "errors": []
+  },
+  "negative": [
+    {
+      "name": "github-api-error",
+      "expected": "operational errors",
+      "report": {
+        "schemaVersion": 1,
+        "generatedAt": "2026-08-30T00:00:00.000Z",
+        "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+        "results": [],
+        "errors": [
+          {
+            "source": "github-api",
+            "message": "github-api unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "name": "registry-error",
+      "expected": "operational errors",
+      "report": {
+        "schemaVersion": 1,
+        "generatedAt": "2026-08-30T00:00:00.000Z",
+        "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+        "results": [],
+        "errors": [
+          {
+            "source": "npm-registry",
+            "message": "npm-registry unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "name": "incomplete-registry-result",
+      "expected": "no complete registry freshness result",
+      "report": {
+        "schemaVersion": 1,
+        "generatedAt": "2026-08-30T00:00:00.000Z",
+        "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+        "results": [
+          {
+            "dependencyId": "npm-a",
+            "datasource": "npm",
+            "packageName": "npm-a",
+            "currentVersion": null,
+            "targetVersion": null,
+            "state": "skipped",
+            "pullRequests": [],
+            "exception": null
+          }
+        ],
+        "errors": []
+      }
+    }
+  ]
+}
