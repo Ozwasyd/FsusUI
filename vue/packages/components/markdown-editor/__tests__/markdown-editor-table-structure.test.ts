@@ -75,6 +75,17 @@ describe('markdown table structural transactions', () => {
     })
   })
 
+  it('returns no table cell for a large pipe-free document', () => {
+    const source = Array.from(
+      { length: 300 },
+      (_, index) => `## Section ${index}\n\nParagraph ${index} with 中文 content.\n`,
+    ).join('\n')
+
+    expect(
+      resolveMarkdownTableCellAtOffset(source, document, source.length),
+    ).toBeNull()
+  })
+
   it('dispatches one undoable target-table change with an explicit mapped selection', () => {
     const source =
       'before  \n\n| h1 | h2 |\n| --- | ---: |\n| a\\|b | `[x](u) | code` |\n\nafter  \n'

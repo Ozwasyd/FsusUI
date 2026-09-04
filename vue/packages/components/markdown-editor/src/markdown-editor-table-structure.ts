@@ -146,6 +146,10 @@ export const resolveMarkdownTableCellAtOffset = (
   documentIdentity: MarkdownDocumentIdentity,
   offset: number,
 ): MarkdownTableCellIdentity | null => {
+  // Every supported table spelling contains a pipe in its parser-owned
+  // separator row. Avoid rebuilding the full Markdown projection for the
+  // overwhelmingly common non-table caret/key path.
+  if (!source.includes('|')) return null
   const table = createTableAuthorities(source, documentIdentity).find(
     (node) => offset > node.rawRange.start && offset < node.rawRange.end,
   )
