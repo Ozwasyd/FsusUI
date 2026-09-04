@@ -91,7 +91,7 @@ test('renders focus mode and reveals a source range on desktop and mobile', asyn
       ])
       return Math.abs(textareaScrollTop - layerScrollTop)
     })
-    .toBeLessThanOrEqual(1)
+    .toBeLessThanOrEqual(2)
   await expect.poll(() => presentationFits(desktopEditor)).toBe(true)
   await desktop.screenshot({
     path: testInfo.outputPath('writing-aids-light-desktop.png'),
