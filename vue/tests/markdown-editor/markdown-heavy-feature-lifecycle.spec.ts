@@ -976,7 +976,7 @@ test('preserves heavy atomic source entry, Escape, and focus return in the real 
         ),
       )
       .toBe(true)
-    await atomicActions.nth(2).click({ force: true })
+    await atomicActions.nth(2).evaluate((action) => action.click())
     await expect(body).toHaveAttribute(
       'data-markdown-atomic-kind',
       section.kind,

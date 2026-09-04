@@ -113,6 +113,8 @@ const baseline =
     encoding: 'utf8',
   }).trim()
 const candidate = process.env.FSUS_INTERACTION_CANDIDATE ?? currentRevision
+const moveToLineEndShortcut =
+  process.platform === 'darwin' ? 'Meta+ArrowRight' : 'End'
 
 const browserIdentityFor = (
   browser: Browser,
@@ -508,18 +510,22 @@ test('traces MarkdownEditor input, paste, drop, exposed methods, and public stat
       ),
       action: 'keyboard',
       target: 'ElMarkdownEditor.source',
-      expected: { key: 'End', selectionAtEnd: true },
-      perform: () => textarea.press('End'),
-      actual: async () =>
-        textarea.evaluate((element) => {
+      expected: { key: moveToLineEndShortcut, selectionAtEnd: true },
+      perform: () => textarea.press(moveToLineEndShortcut),
+      actual: async () => ({
+        key: moveToLineEndShortcut,
+        ...(await textarea.evaluate((element) => {
           const target = element as HTMLTextAreaElement
           return {
-            key: 'End',
+            selectionEnd: target.selectionEnd,
+            selectionStart: target.selectionStart,
             selectionAtEnd:
               target.selectionStart === target.value.length &&
               target.selectionEnd === target.value.length,
+            valueLength: target.value.length,
           }
-        }),
+        })),
+      }),
       matches: (actual) =>
         (actual as { selectionAtEnd: boolean }).selectionAtEnd,
     })
