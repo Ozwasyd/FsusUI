@@ -114,7 +114,7 @@ const cases = [
     ],
     [
       'avalonia-unmapped-public-member',
-      'public class FsusMarkdownEditor : TemplatedControl\n{',
+      'public partial class FsusMarkdownEditor : TemplatedControl\n{',
     ],
   ].map(([id, locator]) => ({
     id,

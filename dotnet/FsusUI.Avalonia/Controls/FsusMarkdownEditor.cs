@@ -36,7 +36,7 @@ public enum FsusMarkdownEditorStatusDensity
 
 public sealed record FsusMarkdownDocumentIdentity(string Id, int Epoch);
 
-public class FsusMarkdownEditor : TemplatedControl
+public partial class FsusMarkdownEditor : TemplatedControl
 {
   public static readonly StyledProperty<string> DocumentProperty =
     AvaloniaProperty.Register<FsusMarkdownEditor, string>(nameof(Document), string.Empty);
@@ -155,6 +155,7 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       lastProjectionRequestKey = null;
       UpdateNativeSurface();
+      RequestWritingAidsSnapshot();
     }
     return result;
   }
@@ -237,6 +238,7 @@ public class FsusMarkdownEditor : TemplatedControl
       sourceProjectionMap = new(Document, []);
       projection.Reset();
       lastProjectionRequestKey = null;
+      ResetAdjacentState(preserveSearchQuery: false);
       UpdateNativeSurface();
     }
     else if (change.Property == DocumentProperty && !synchronizingDocument && store.Value != Document)
@@ -254,17 +256,27 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       store.BreakMergeGroup();
       UpdateNativeSurface();
+      RequestWritingAidsSnapshot();
     }
     else if (change.Property == ProjectionFeatureRevisionProperty)
     {
       projection.Reset();
       lastProjectionRequestKey = null;
+      writingAidsSnapshot = null;
       UpdateNativeSurface();
     }
     else if (change.Property == ScrollContentFloorProperty)
     {
       lastAppliedContentFloor = double.NaN;
       UpdateScrollContentFloor();
+    }
+    else if (change.Property == FocusWritingAidEnabledProperty ||
+      change.Property == TypewriterWritingAidEnabledProperty ||
+      change.Property == TypewriterAnchorProperty ||
+      change.Property == ProfileProperty)
+    {
+      UpdateAdjacentPresentation();
+      RequestWritingAidsSnapshot();
     }
     else if (change.Property == IsReadOnlyProperty ||
       change.Property == ForegroundProperty ||
@@ -369,6 +381,7 @@ public class FsusMarkdownEditor : TemplatedControl
       {
         projection.Advance(previousValue, result.Value, result.Revision, result.PositionMap);
       }
+      RefreshAdjacentStateAfterTransaction();
     }
     if (result.Accepted && result.Value != Document)
     {
@@ -444,6 +457,7 @@ public class FsusMarkdownEditor : TemplatedControl
     inputOwner.PointerPressed += OnInputPointerPressed;
     inputOwner.PointerMoved += OnInputPointerMoved;
     inputOwner.PointerReleased += OnInputPointerReleased;
+    inputOwner.PointerWheelChanged += OnInputPointerWheelChanged;
 
     nativeSurface = new Grid();
     nativeSurface.Children.Add(inputOwner);
@@ -540,6 +554,7 @@ public class FsusMarkdownEditor : TemplatedControl
       presentationMap,
       store.Selection,
       live ? projection.Snapshot?.Spans : null);
+    UpdateAdjacentPresentation();
     RestoreViewportSourceAnchor(sourceAnchor, preservedHorizontalOffset);
   }
 
@@ -698,6 +713,7 @@ public class FsusMarkdownEditor : TemplatedControl
       Selection: selection,
       DocumentIdentity: store.Identity);
     _ = Execute(transaction, () => store.Dispatch(transaction));
+    NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.Input);
   }
 
   private void OnInputSelectionChanged(object? sender, RoutedEventArgs args)
@@ -714,6 +730,7 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       SelectionChange?.Invoke(this, new(store.Revision, store.Selection));
       UpdateProjectionSelection();
+      RequestWritingAidsSnapshot();
     }
   }
 
@@ -737,6 +754,7 @@ public class FsusMarkdownEditor : TemplatedControl
 
   private void OnInputPointerPressed(object? sender, PointerPressedEventArgs args)
   {
+    NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.SelectionDragStart);
     if (Mode != FsusMarkdownEditorMode.Live ||
       projectionView is null ||
       inputOwner is null)
@@ -775,9 +793,16 @@ public class FsusMarkdownEditor : TemplatedControl
       livePointerAnchor = null;
       args.Pointer.Capture(null);
       args.Handled = true;
+      NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.SelectionDragEnd);
       return;
     }
     OnInputSelectionChanged(sender, args);
+    NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.SelectionDragEnd);
+  }
+
+  private void OnInputPointerWheelChanged(object? sender, PointerWheelEventArgs args)
+  {
+    NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.UserScroll);
   }
 
   private void SetNativeSelection(FsusMarkdownEditorSelection selection)
@@ -800,6 +825,7 @@ public class FsusMarkdownEditor : TemplatedControl
     if (store.SetSelection(selection) && store.Selection != previous)
     {
       SelectionChange?.Invoke(this, new(store.Revision, store.Selection));
+      RequestWritingAidsSnapshot();
     }
     UpdateProjectionSelection();
   }
@@ -820,6 +846,7 @@ public class FsusMarkdownEditor : TemplatedControl
         : sourceProjectionMap,
       store.Selection,
       live ? projection.Snapshot?.Spans : null);
+    UpdateAdjacentPresentation();
   }
 
   private FsusMarkdownEditorTransaction OperationTransaction(string operation) =>

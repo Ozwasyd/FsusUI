@@ -22,6 +22,13 @@ const forbiddenProjectProperties = [
   /<TrimmerRootAssembly(?:\s|>)/i,
   /<WarningsAsErrors>\s*false\s*<\/WarningsAsErrors>/i,
 ]
+const requiredProjectProperties = [
+  'IsAotCompatible',
+  'IsTrimmable',
+  'EnableTrimAnalyzer',
+  'EnableSingleFileAnalyzer',
+  'EnableAotAnalyzer',
+]
 
 async function source(path) {
   return readFile(resolve(root, path), 'utf8')
@@ -30,8 +37,10 @@ async function source(path) {
 const failures = []
 for (const project of publicPackages) {
   const text = await source(project)
-  if (!/<IsAotCompatible>\s*true\s*<\/IsAotCompatible>/i.test(text)) {
-    failures.push(`${project} must declare IsAotCompatible=true`)
+  for (const property of requiredProjectProperties) {
+    if (!new RegExp(`<${property}>\\s*true\\s*</${property}>`, 'i').test(text)) {
+      failures.push(`${project} must declare ${property}=true`)
+    }
   }
   for (const pattern of forbiddenProjectProperties) {
     if (pattern.test(text)) {
