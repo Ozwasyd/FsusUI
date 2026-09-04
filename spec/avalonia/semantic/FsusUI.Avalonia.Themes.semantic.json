@@ -2,9 +2,9 @@
   "packageId": "FsusUI.Avalonia.Themes",
   "baselineVersion": "1.0.0",
   "source": {
-    "tool": "FsusUI.Avalonia.ApiTool@1.2.0",
+    "tool": "FsusUI.Avalonia.ApiTool@1.3.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "bca717129b2d246177fa6ff7e3d56da1cc2deb0dd384c53957b58d41e40677c2",
+    "inputTreeHash": "2632dd8f4a0fea4aed92422acc92f6d5bbf7914fa9dfcae077eef58440a7bcd5",
     "compilerOptionsHash": "a2e88fe9ebd590171080438846d719d90b904b854e46a43a2c1beae52d55f38b",
     "dependencyVersionsHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e"
   },
@@ -15,6 +15,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -23,15 +24,18 @@
       "enumMembers": [
         {
           "name": "Light",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "Dark",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         },
         {
           "name": "System",
-          "value": 2
+          "value": 2,
+          "deprecated": false
         }
       ]
     },
@@ -41,6 +45,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -51,7 +56,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -64,6 +70,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -74,7 +81,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Compact",
@@ -84,7 +92,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "CurrentMode",
@@ -94,7 +103,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Labels",
@@ -104,7 +114,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "ThemeManager",
@@ -114,7 +125,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Variant",
@@ -125,7 +137,8 @@
           "isStatic": false,
           "required": false,
           "defaultKnown": true,
-          "defaultValue": "Segmented"
+          "defaultValue": "Segmented",
+          "deprecated": false
         },
         {
           "name": "Visibility",
@@ -136,7 +149,8 @@
           "isStatic": false,
           "required": false,
           "defaultKnown": true,
-          "defaultValue": "Always"
+          "defaultValue": "Always",
+          "deprecated": false
         },
         {
           "name": "VisibleLabels",
@@ -146,7 +160,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -155,7 +170,8 @@
           "name": "ModeChanged",
           "kind": "clr",
           "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusThemeModeChangedEventArgs\u003E",
-          "isStatic": false
+          "isStatic": false,
+          "deprecated": false
         }
       ],
       "methods": [
@@ -163,6 +179,7 @@
           "name": "SetMode",
           "isStatic": false,
           "returnType": "System.Void",
+          "deprecated": false,
           "parameters": [
             {
               "name": "mode",
@@ -179,6 +196,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -189,7 +207,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "DarkShort",
@@ -199,7 +218,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Light",
@@ -209,7 +229,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "LightShort",
@@ -219,7 +240,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "System",
@@ -229,7 +251,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "SystemShort",
@@ -239,7 +262,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -249,6 +273,7 @@
           "name": "\u003CClone\u003E$",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Controls.FsusThemeModeToggleLabels",
+          "deprecated": false,
           "parameters": []
         }
       ]
@@ -259,6 +284,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -267,11 +293,13 @@
       "enumMembers": [
         {
           "name": "Segmented",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "MenuButton",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         }
       ]
     },
@@ -281,6 +309,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -289,15 +318,18 @@
       "enumMembers": [
         {
           "name": "Always",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "Desktop",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         },
         {
           "name": "Mobile",
-          "value": 2
+          "value": 2,
+          "deprecated": false
         }
       ]
     },
@@ -307,6 +339,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -315,15 +348,18 @@
       "enumMembers": [
         {
           "name": "Compact",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "Default",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         },
         {
           "name": "Spacious",
-          "value": 2
+          "value": 2,
+          "deprecated": false
         }
       ]
     },
@@ -333,6 +369,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -341,19 +378,23 @@
       "enumMembers": [
         {
           "name": "System",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "Enabled",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         },
         {
           "name": "Reduced",
-          "value": 2
+          "value": 2,
+          "deprecated": false
         },
         {
           "name": "Disabled",
-          "value": 3
+          "value": 3,
+          "deprecated": false
         }
       ]
     },
@@ -363,6 +404,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -373,7 +415,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "CurrentMode",
@@ -383,7 +426,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "PreviousEffectiveMode",
@@ -393,7 +437,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "PreviousMode",
@@ -403,7 +448,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -416,6 +462,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -424,11 +471,13 @@
       "enumMembers": [
         {
           "name": "Enter",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "Leave",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         }
       ]
     },
@@ -438,6 +487,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -448,7 +498,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Duration",
@@ -458,7 +509,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "DurationToken",
@@ -468,7 +520,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Easing",
@@ -478,7 +531,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "EasingToken",
@@ -488,7 +542,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "EffectiveMode",
@@ -498,7 +553,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "From",
@@ -508,7 +564,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "IsAnimated",
@@ -518,7 +575,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Phase",
@@ -528,7 +586,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "PreservesFocus",
@@ -538,7 +597,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Preset",
@@ -548,7 +608,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "TerminalState",
@@ -558,7 +619,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "To",
@@ -568,7 +630,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -578,12 +641,14 @@
           "name": "\u003CClone\u003E$",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusMotionPlan",
+          "deprecated": false,
           "parameters": []
         },
         {
           "name": "Deconstruct",
           "isStatic": false,
           "returnType": "System.Void",
+          "deprecated": false,
           "parameters": [
             {
               "name": "Preset",
@@ -660,6 +725,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -668,23 +734,28 @@
       "enumMembers": [
         {
           "name": "ControlFeedback",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "PanelEnter",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         },
         {
           "name": "OverlayTransition",
-          "value": 2
+          "value": 2,
+          "deprecated": false
         },
         {
           "name": "ListItemAppearance",
-          "value": 3
+          "value": 3,
+          "deprecated": false
         },
         {
           "name": "ActionRowSafe",
-          "value": 4
+          "value": 4,
+          "deprecated": false
         }
       ]
     },
@@ -694,6 +765,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -704,7 +776,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Phase",
@@ -715,7 +788,8 @@
           "isStatic": false,
           "required": false,
           "defaultKnown": true,
-          "defaultValue": "Enter"
+          "defaultValue": "Enter",
+          "deprecated": false
         },
         {
           "name": "Preset",
@@ -725,7 +799,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -735,12 +810,14 @@
           "name": "\u003CClone\u003E$",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusMotionRequest",
+          "deprecated": false,
           "parameters": []
         },
         {
           "name": "Deconstruct",
           "isStatic": false,
           "returnType": "System.Void",
+          "deprecated": false,
           "parameters": [
             {
               "name": "Preset",
@@ -757,6 +834,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -767,7 +845,8 @@
           "canWrite": false,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "RequestedMode",
@@ -777,7 +856,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "SystemPrefersReducedMotion",
@@ -787,7 +867,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -796,7 +877,8 @@
           "name": "MotionModeChanged",
           "kind": "clr",
           "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Themes.FsusMotionModeChangedEventArgs\u003E",
-          "isStatic": false
+          "isStatic": false,
+          "deprecated": false
         }
       ],
       "methods": [
@@ -804,6 +886,7 @@
           "name": "Resolve",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusMotionPlan",
+          "deprecated": false,
           "parameters": [
             {
               "name": "preset",
@@ -816,6 +899,7 @@
           "name": "Resolve",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusMotionPlan",
+          "deprecated": false,
           "parameters": [
             {
               "name": "request",
@@ -828,6 +912,7 @@
           "name": "SetMode",
           "isStatic": false,
           "returnType": "System.Void",
+          "deprecated": false,
           "parameters": [
             {
               "name": "mode",
@@ -849,6 +934,7 @@
       "baseType": "System.ValueType",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -859,7 +945,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Terminal",
@@ -869,7 +956,8 @@
           "canWrite": false,
           "isStatic": true,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "X",
@@ -879,7 +967,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Y",
@@ -889,7 +978,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -899,6 +989,7 @@
           "name": "Deconstruct",
           "isStatic": false,
           "returnType": "System.Void",
+          "deprecated": false,
           "parameters": [
             {
               "name": "X",
@@ -921,6 +1012,7 @@
           "name": "TranslateY",
           "isStatic": true,
           "returnType": "FsusUI.Avalonia.Themes.FsusMotionTransform",
+          "deprecated": false,
           "parameters": [
             {
               "name": "value",
@@ -937,6 +1029,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -947,7 +1040,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Terminal",
@@ -957,7 +1051,8 @@
           "canWrite": false,
           "isStatic": true,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Transform",
@@ -967,7 +1062,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -977,12 +1073,14 @@
           "name": "\u003CClone\u003E$",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
+          "deprecated": false,
           "parameters": []
         },
         {
           "name": "Deconstruct",
           "isStatic": false,
           "returnType": "System.Void",
+          "deprecated": false,
           "parameters": [
             {
               "name": "Opacity",
@@ -1004,6 +1102,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -1012,15 +1111,18 @@
       "enumMembers": [
         {
           "name": "Enabled",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "Reduced",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         },
         {
           "name": "Disabled",
-          "value": 2
+          "value": 2,
+          "deprecated": false
         }
       ]
     },
@@ -1030,6 +1132,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -1040,7 +1143,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -1050,6 +1154,7 @@
           "name": "Apply",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "deprecated": false,
           "parameters": [
             {
               "name": "application",
@@ -1067,6 +1172,7 @@
           "name": "Apply",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "deprecated": false,
           "parameters": [
             {
               "name": "resources",
@@ -1088,6 +1194,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -1098,7 +1205,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Default",
@@ -1108,7 +1216,8 @@
           "canWrite": false,
           "isStatic": true,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Density",
@@ -1119,7 +1228,8 @@
           "isStatic": false,
           "required": false,
           "defaultKnown": true,
-          "defaultValue": "Default"
+          "defaultValue": "Default",
+          "deprecated": false
         },
         {
           "name": "FollowSystemTheme",
@@ -1129,7 +1239,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "HighContrast",
@@ -1139,7 +1250,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "MotionMode",
@@ -1150,7 +1262,8 @@
           "isStatic": false,
           "required": false,
           "defaultKnown": true,
-          "defaultValue": "System"
+          "defaultValue": "System",
+          "deprecated": false
         },
         {
           "name": "Palette",
@@ -1160,7 +1273,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Typography",
@@ -1170,7 +1284,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Variant",
@@ -1181,7 +1296,8 @@
           "isStatic": false,
           "required": false,
           "defaultKnown": true,
-          "defaultValue": "Light"
+          "defaultValue": "Light",
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -1191,6 +1307,7 @@
           "name": "\u003CClone\u003E$",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "deprecated": false,
           "parameters": []
         }
       ]
@@ -1201,6 +1318,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -1211,7 +1329,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Border",
@@ -1221,7 +1340,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Icon",
@@ -1231,7 +1351,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "MutedText",
@@ -1241,7 +1362,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Surface",
@@ -1251,7 +1373,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "SurfaceRaised",
@@ -1261,7 +1384,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Text",
@@ -1271,7 +1395,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -1281,6 +1406,7 @@
           "name": "\u003CClone\u003E$",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusThemePaletteOptions",
+          "deprecated": false,
           "parameters": []
         }
       ]
@@ -1291,6 +1417,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -1303,6 +1430,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
@@ -1311,11 +1439,13 @@
       "enumMembers": [
         {
           "name": "Light",
-          "value": 0
+          "value": 0,
+          "deprecated": false
         },
         {
           "name": "Dark",
-          "value": 1
+          "value": 1,
+          "deprecated": false
         }
       ]
     },
@@ -1325,6 +1455,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "deprecated": false,
       "contentRegions": [],
       "properties": [
         {
@@ -1335,7 +1466,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "ApplicationMonospaceFontFamilies",
@@ -1345,7 +1477,8 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "Default",
@@ -1355,7 +1488,8 @@
           "canWrite": false,
           "isStatic": true,
           "required": false,
-          "defaultKnown": false
+          "defaultKnown": false,
+          "deprecated": false
         },
         {
           "name": "UseSystemFallback",
@@ -1366,7 +1500,8 @@
           "isStatic": false,
           "required": false,
           "defaultKnown": true,
-          "defaultValue": true
+          "defaultValue": true,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
@@ -1376,6 +1511,7 @@
           "name": "\u003CClone\u003E$",
           "isStatic": false,
           "returnType": "FsusUI.Avalonia.Themes.FsusTypographyOptions",
+          "deprecated": false,
           "parameters": []
         }
       ]

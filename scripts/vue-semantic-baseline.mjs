@@ -45,6 +45,143 @@ const walkNodes = (node, visit) => {
 const sha256 = (value) =>
   crypto.createHash('sha256').update(value).digest('hex')
 
+const normalizeJsDocLine = (line) =>
+  line
+    .trim()
+    .replace(/^\*+\s?/u, '')
+    .trim()
+
+export const deprecatedMetadataForNode = (node) => {
+  const comment = [...(node?.leadingComments ?? [])]
+    .reverse()
+    .find((candidate) => /@deprecated\b/u.test(candidate.value))
+  if (!comment) return { deprecated: false, deprecationMessage: null }
+
+  const lines = comment.value.split(/\r?\n/u).map(normalizeJsDocLine)
+  const marker = lines.findIndex((line) => /^@deprecated\b/u.test(line))
+  const message = [
+    lines[marker]?.replace(/^@deprecated\b\s*/u, '') ?? '',
+    ...lines.slice(marker + 1).filter((line) => !line.startsWith('@')),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
+  return {
+    deprecated: true,
+    deprecationMessage: message || null,
+  }
+}
+
+const declarationNames = (node) => {
+  if (!node) return []
+  if (node.type === 'ExportNamedDeclaration')
+    return declarationNames(node.declaration)
+  if (node.type === 'VariableDeclaration') {
+    return (node.declarations ?? [])
+      .map((declaration) =>
+        declaration.id?.type === 'Identifier' ? declaration.id.name : null,
+      )
+      .filter(Boolean)
+  }
+  if (
+    node.type === 'TSTypeAliasDeclaration' ||
+    node.type === 'TSInterfaceDeclaration' ||
+    node.type === 'ClassDeclaration' ||
+    node.type === 'FunctionDeclaration'
+  ) {
+    return node.id?.name ? [node.id.name] : []
+  }
+  if (
+    node.type === 'ObjectProperty' ||
+    node.type === 'ObjectMethod' ||
+    node.type === 'TSPropertySignature' ||
+    node.type === 'TSMethodSignature'
+  ) {
+    if (node.key?.type === 'Identifier') return [node.key.name]
+    if (node.key?.type === 'StringLiteral') return [node.key.value]
+  }
+  if (
+    node.type === 'StringLiteral' ||
+    node.type === 'NumericLiteral' ||
+    node.type === 'BooleanLiteral'
+  ) {
+    return [String(node.value)]
+  }
+  return []
+}
+
+const declarationKind = (node) => {
+  const target =
+    node?.type === 'ExportNamedDeclaration' ? node.declaration : node
+  if (target?.type === 'ObjectProperty' || target?.type === 'ObjectMethod')
+    return 'property'
+  if (
+    target?.type === 'StringLiteral' ||
+    target?.type === 'NumericLiteral' ||
+    target?.type === 'BooleanLiteral'
+  )
+    return 'literal-value'
+  if (node?.type === 'ExportNamedDeclaration') return 'export'
+  return 'declaration'
+}
+
+export const extractDeprecatedDeclarations = ({ source, filename }) => {
+  const scriptSources = []
+  if (filename.endsWith('.vue')) {
+    const { descriptor } = parseSfc(source, { filename })
+    if (descriptor.script?.content)
+      scriptSources.push(descriptor.script.content)
+    if (descriptor.scriptSetup?.content)
+      scriptSources.push(descriptor.scriptSetup.content)
+  } else {
+    scriptSources.push(source)
+  }
+
+  const declarations = []
+  for (const scriptSource of scriptSources) {
+    let parsed
+    try {
+      parsed = babelParse(scriptSource, {
+        sourceType: 'module',
+        plugins: [
+          'typescript',
+          'jsx',
+          'decorators-legacy',
+          'importAttributes',
+          'topLevelAwait',
+        ],
+        errorRecovery: true,
+        allowReturnOutsideFunction: true,
+      })
+    } catch {
+      continue
+    }
+    walkNodes(parsed.program.body, (node) => {
+      const metadata = deprecatedMetadataForNode(node)
+      if (!metadata.deprecated) return
+      for (const target of declarationNames(node)) {
+        declarations.push({
+          kind: declarationKind(node),
+          target,
+          message: metadata.deprecationMessage,
+        })
+      }
+    })
+  }
+  const unique = new Map()
+  for (const declaration of declarations) {
+    unique.set(
+      `${declaration.kind}\u0000${declaration.target}\u0000${declaration.message ?? ''}`,
+      declaration,
+    )
+  }
+  return [...unique.values()].sort(
+    (first, second) =>
+      first.target.localeCompare(second.target) ||
+      first.kind.localeCompare(second.kind),
+  )
+}
+
 const staticStringExpression = (expression) => {
   if (expression?.type !== 4) return null
   const value = expression.content.trim()
@@ -572,29 +709,76 @@ const literalToJson = (node, source) => {
   }
 }
 
-const arrayLiteralValues = (node, source) => {
+const literalTypeValues = (node) => {
+  if (!node) return { values: null, valuesKnown: false }
+  if (
+    node.type === 'TSParenthesizedType' ||
+    node.type === 'TSOptionalType' ||
+    node.type === 'TSRestType'
+  ) {
+    return literalTypeValues(node.typeAnnotation)
+  }
+  if (node.type === 'TSTypeReference' && node.typeParameters?.params?.length) {
+    const name =
+      node.typeName?.type === 'Identifier' ? node.typeName.name : null
+    if (name === 'PropType' || name === 'Readonly') {
+      return literalTypeValues(node.typeParameters.params[0])
+    }
+  }
+  if (node.type === 'TSLiteralType') {
+    if (node.literal?.type === 'StringLiteral')
+      return { values: [node.literal.value], valuesKnown: true }
+    if (node.literal?.type === 'NumericLiteral')
+      return { values: [node.literal.value], valuesKnown: true }
+    if (node.literal?.type === 'BooleanLiteral')
+      return { values: [node.literal.value], valuesKnown: true }
+    return { values: null, valuesKnown: false }
+  }
+  if (
+    node.type === 'TSNullKeyword' ||
+    node.type === 'TSUndefinedKeyword' ||
+    node.type === 'TSVoidKeyword'
+  ) {
+    return { values: [], valuesKnown: true }
+  }
+  if (node.type !== 'TSUnionType') return { values: null, valuesKnown: false }
+
+  const values = []
+  for (const member of node.types ?? []) {
+    const extracted = literalTypeValues(member)
+    if (!extracted.valuesKnown) return { values: null, valuesKnown: false }
+    values.push(...extracted.values)
+  }
+  return { values: [...new Set(values)], valuesKnown: true }
+}
+
+const arrayLiteralValues = (node) => {
   if (!node) return null
   if (node.type === 'ArrayExpression') {
     const values = []
+    let valuesKnown = true
     for (const element of node.elements || []) {
       if (!element) continue
       if (element.type === 'StringLiteral') values.push(element.value)
       else if (element.type === 'NumericLiteral') values.push(element.value)
       else if (element.type === 'BooleanLiteral') values.push(element.value)
       else if (element.type === 'NullLiteral') values.push(null)
-      else
-        values.push(
-          `<expr:${sha256(source.slice(element.start, element.end)).slice(0, 12)}>`,
-        )
+      else valuesKnown = false
     }
-    return values
+    return { values, valuesKnown }
   }
   return null
 }
 
 const extractTypeExpression = (typeNode, source) => {
   if (!typeNode)
-    return { runtimeType: null, semanticType: null, nullable: false }
+    return {
+      runtimeType: null,
+      semanticType: null,
+      nullable: false,
+      values: null,
+      valuesKnown: false,
+    }
   if (typeNode.type === 'Identifier') {
     return {
       runtimeType: RUNTIME_TYPE_NAMES.has(typeNode.name) ? typeNode.name : null,
@@ -602,15 +786,20 @@ const extractTypeExpression = (typeNode, source) => {
         ? null
         : typeNode.name,
       nullable: false,
+      values: null,
+      valuesKnown: false,
     }
   }
   if (typeNode.type === 'TSAsExpression') {
     const inner = extractTypeExpression(typeNode.expression, source)
     const semantic = typeText(typeNode.typeAnnotation, source)
+    const literalValues = literalTypeValues(typeNode.typeAnnotation)
     return {
       runtimeType: inner.runtimeType || null,
       semanticType: semantic,
       nullable: /\bnull\b|\bundefined\b/u.test(semantic || ''),
+      values: literalValues.valuesKnown ? literalValues.values : inner.values,
+      valuesKnown: literalValues.valuesKnown || inner.valuesKnown,
     }
   }
   if (typeNode.type === 'TSTypeAssertion') {
@@ -633,9 +822,16 @@ const extractTypeExpression = (typeNode, source) => {
         runtimeType,
         semanticType: semantic,
         nullable: /\bnull\b|\bundefined\b/u.test(semantic || ''),
+        ...literalTypeValues(typeParam),
       }
     }
-    return { runtimeType: null, semanticType: null, nullable: false }
+    return {
+      runtimeType: null,
+      semanticType: null,
+      nullable: false,
+      values: null,
+      valuesKnown: false,
+    }
   }
   if (typeNode.type === 'ArrayExpression') {
     const names = (typeNode.elements || []).map((el) =>
@@ -645,6 +841,8 @@ const extractTypeExpression = (typeNode, source) => {
       runtimeType: 'Array',
       semanticType: names.filter(Boolean).join(' | '),
       nullable: false,
+      values: null,
+      valuesKnown: false,
     }
   }
   if (
@@ -657,9 +855,16 @@ const extractTypeExpression = (typeNode, source) => {
       runtimeType: null,
       semanticType: semantic,
       nullable: /\bnull\b|\bundefined\b/u.test(semantic || ''),
+      ...literalTypeValues(typeNode),
     }
   }
-  return { runtimeType: null, semanticType: null, nullable: false }
+  return {
+    runtimeType: null,
+    semanticType: null,
+    nullable: false,
+    values: null,
+    valuesKnown: false,
+  }
 }
 
 class PropDescriptorParser {
@@ -689,7 +894,7 @@ class PropDescriptorParser {
         continue
       const name = this.propertyName(property)
       if (!name) continue
-      const descriptor = this.parsePropValue(property.value, name)
+      const descriptor = this.parsePropValue(property.value, name, property)
       if (descriptor) result.push(descriptor)
     }
     return result
@@ -701,8 +906,9 @@ class PropDescriptorParser {
     return null
   }
 
-  parsePropValue(valueNode, name) {
+  parsePropValue(valueNode, name, declarationNode = null) {
     if (!valueNode) return null
+    const deprecated = deprecatedMetadataForNode(declarationNode)
     valueNode = unwrapExpression(valueNode)
     if (valueNode.type === 'Identifier') {
       if (RUNTIME_TYPE_NAMES.has(valueNode.name)) {
@@ -712,9 +918,11 @@ class PropDescriptorParser {
           semanticType: null,
           nullable: false,
           values: null,
+          valuesKnown: false,
           default: { kind: 'missing' },
           required: false,
           readonly: false,
+          ...deprecated,
         }
       }
       const resolved = this.resolver.resolveIdentifier(
@@ -728,26 +936,33 @@ class PropDescriptorParser {
           semanticType: valueNode.name,
           nullable: false,
           values: null,
+          valuesKnown: false,
           default: { kind: 'missing' },
           required: false,
           readonly: false,
+          ...deprecated,
         }
       }
       const sub = this.parseFromNode(resolved.node, name, resolved.relPath)
-      if (sub) return sub
+      if (sub) return { ...sub, ...deprecated }
       return {
         name,
         runtimeType: null,
         semanticType: valueNode.name,
         nullable: false,
         values: null,
+        valuesKnown: false,
         default: { kind: 'missing' },
         required: false,
         readonly: false,
+        ...deprecated,
       }
     }
     if (valueNode.type === 'ObjectExpression') {
-      return this.parseDescriptorObject(valueNode, name)
+      return {
+        ...this.parseDescriptorObject(valueNode, name),
+        ...deprecated,
+      }
     }
     if (
       valueNode.type === 'CallExpression' &&
@@ -756,7 +971,10 @@ class PropDescriptorParser {
     ) {
       const arg = unwrapExpression(valueNode.arguments?.[0])
       if (arg?.type === 'ObjectExpression')
-        return this.parseDescriptorObject(arg, name)
+        return {
+          ...this.parseDescriptorObject(arg, name),
+          ...deprecated,
+        }
     }
     const typeInfo = extractTypeExpression(valueNode, this.source)
     return {
@@ -764,10 +982,12 @@ class PropDescriptorParser {
       runtimeType: typeInfo.runtimeType,
       semanticType: typeInfo.semanticType,
       nullable: typeInfo.nullable,
-      values: null,
+      values: typeInfo.values,
+      valuesKnown: typeInfo.valuesKnown,
       default: { kind: 'missing' },
       required: false,
       readonly: false,
+      ...deprecated,
     }
   }
 
@@ -813,10 +1033,13 @@ class PropDescriptorParser {
         runtimeType: typeInfo.runtimeType,
         semanticType: typeInfo.semanticType,
         nullable: typeInfo.nullable,
-        values: null,
+        values: typeInfo.values,
+        valuesKnown: typeInfo.valuesKnown,
         default: { kind: 'missing' },
         required: false,
         readonly: false,
+        deprecated: false,
+        deprecationMessage: null,
       }
     }
     return null
@@ -827,6 +1050,7 @@ class PropDescriptorParser {
     let semanticType = null
     let nullable = false
     let values = null
+    let valuesKnown = false
     let defaultValue = { kind: 'missing' }
     let required = false
     let readonly = false
@@ -843,6 +1067,7 @@ class PropDescriptorParser {
             semanticType = merged.semanticType
             nullable = merged.nullable
             values = merged.values
+            valuesKnown = merged.valuesKnown
             defaultValue = merged.default
             required = merged.required
             readonly = merged.readonly
@@ -857,20 +1082,24 @@ class PropDescriptorParser {
         runtimeType = info.runtimeType
         semanticType = info.semanticType
         nullable = info.nullable
+        if (info.valuesKnown) {
+          values = info.values
+          valuesKnown = true
+        }
       } else if (key === 'values') {
-        if (property.value.type === 'ArrayExpression')
-          values = arrayLiteralValues(property.value, this.source)
-        else if (property.value.type === 'Identifier') {
+        let extracted = null
+        if (property.value.type === 'ArrayExpression') {
+          extracted = arrayLiteralValues(property.value)
+        } else if (property.value.type === 'Identifier') {
           const resolved = this.resolver.resolveIdentifier(
             property.value.name,
             this.fromRelPath,
           )
           if (resolved?.node?.type === 'ArrayExpression')
-            values = arrayLiteralValues(
-              resolved.node,
-              this.resolver.readSource(resolved.relPath) || this.source,
-            )
+            extracted = arrayLiteralValues(resolved.node)
         }
+        values = extracted?.values ?? null
+        valuesKnown = extracted?.valuesKnown ?? false
       } else if (key === 'default') {
         defaultValue = literalToJson(property.value, this.source)
       } else if (key === 'required') {
@@ -892,9 +1121,12 @@ class PropDescriptorParser {
       semanticType,
       nullable,
       values,
+      valuesKnown,
       default: defaultValue,
       required,
       readonly,
+      deprecated: false,
+      deprecationMessage: null,
     }
   }
 }

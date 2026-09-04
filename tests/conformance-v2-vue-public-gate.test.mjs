@@ -127,6 +127,34 @@ test('content-region compiler metadata drift fails Vue public coverage', () => {
   )
 })
 
+test('enum values and deprecated compiler metadata drift fail Vue public coverage', () => {
+  const enumValuesDrift = clone(baseline)
+  enumValuesDrift.components
+    .find((component) => component.name === 'ElAvatar')
+    .semantic.props.find((prop) => prop.name === 'shape')
+    .values.push('triangle')
+  assert.match(
+    errorsFor({ mutatedBaseline: enumValuesDrift }),
+    /ElAvatar input shape stale compiler values/,
+  )
+
+  const deprecatedDrift = clone(baseline)
+  const suffixTransition = deprecatedDrift.components
+    .find((component) => component.name === 'ElSelect')
+    .semantic.props.find((prop) => prop.name === 'suffixTransition')
+  suffixTransition.deprecated = false
+  suffixTransition.deprecationMessage = null
+  const deprecatedErrors = errorsFor({ mutatedBaseline: deprecatedDrift })
+  assert.match(
+    deprecatedErrors,
+    /ElSelect input suffixTransition stale compiler deprecated/,
+  )
+  assert.match(
+    deprecatedErrors,
+    /ElSelect input suffixTransition stale compiler deprecationMessage/,
+  )
+})
+
 test('a real registry cross-kind duplicate fails Vue public coverage', () => {
   const duplicateAcrossKind = clone(registry)
   const button = duplicateAcrossKind.contracts.find(

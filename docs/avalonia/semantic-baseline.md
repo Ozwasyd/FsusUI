@@ -14,6 +14,12 @@ defaults only when a CLR initializer or Avalonia
 constant. Complex or unresolved expressions remain explicitly unknown; the
 extractor does not execute field initializers or source code.
 
+Reflection also records exact enum member names/numeric values and
+`ObsoleteAttribute` state/message for public types and members. Contract V2
+compares a property whose compiled type is an enum only with a compiler-known
+Vue literal-value set. The normalized sets must be equal; an unresolved union,
+expression-backed value, or missing enum type remains `partial`.
+
 Each baseline also records hashes for its input tree, compiler options, and
 dependency assembly identities. The freshness check regenerates the baseline
 and runs real-source mutations for literal defaults, CLR initializers, required

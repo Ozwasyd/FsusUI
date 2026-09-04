@@ -226,6 +226,7 @@ const COMPARISON_KEY = [
   'operationSignature',
   'contentRegion',
   'enumValues',
+  'deprecated',
 ]
 
 const emptyDrift = () =>
@@ -574,17 +575,36 @@ export const compareMembers = ({ web, avalonia, kind }) => {
       setDrift(drift, 'readWrite', readWriteDifferences.join('; '))
     }
 
-    const webValues = comparableValues(web.values)
-    const avaloniaValues = enumMemberNames(avalonia?.enumMembers)
-    if (webValues.length > 0 && avaloniaValues.length > 0) {
-      const overlap = webValues.some((value) => avaloniaValues.includes(value))
-      if (!overlap) {
-        setDrift(
-          drift,
-          'enumValues',
-          `web values [${webValues.join(', ')}] vs avalonia enum [${avaloniaValues.join(', ')}]`,
-        )
+    const webValuesKnown = web.valuesKnown === true
+    const avaloniaValuesKnown = avalonia?.enumValuesKnown === true
+    if (webValuesKnown || avaloniaValuesKnown) {
+      if (!webValuesKnown) {
+        setDrift(drift, 'enumValues', 'web enum/union values unavailable')
+      } else if (!avaloniaValuesKnown) {
+        setDrift(drift, 'enumValues', 'avalonia enum values unavailable')
+      } else {
+        const webValues = comparableValues(web.values).sort()
+        const avaloniaValues = enumMemberNames(avalonia.enumMembers).sort()
+        if (JSON.stringify(webValues) !== JSON.stringify(avaloniaValues)) {
+          setDrift(
+            drift,
+            'enumValues',
+            `web values [${webValues.join(', ')}] vs avalonia enum [${avaloniaValues.join(', ')}]`,
+          )
+        }
       }
+    }
+
+    if (typeof web.deprecated !== 'boolean') {
+      setDrift(drift, 'deprecated', 'web deprecated metadata unavailable')
+    } else if (typeof avalonia?.deprecated !== 'boolean') {
+      setDrift(drift, 'deprecated', 'avalonia deprecated metadata unavailable')
+    } else if (web.deprecated !== avalonia.deprecated) {
+      setDrift(
+        drift,
+        'deprecated',
+        `web deprecated=${web.deprecated} vs avalonia deprecated=${avalonia.deprecated}`,
+      )
     }
   }
 
@@ -641,8 +661,11 @@ const webPropRef = (prop) => ({
   nullable: knownBoolean(prop.nullable),
   default: prop.default ?? null,
   values: prop.values ?? null,
+  valuesKnown: knownBoolean(prop.valuesKnown),
   required: knownBoolean(prop.required),
   readonly: knownBoolean(prop.readonly),
+  deprecated: knownBoolean(prop.deprecated),
+  deprecationMessage: prop.deprecationMessage ?? null,
 })
 
 const avaloniaPropRef = (property) => ({
@@ -658,6 +681,9 @@ const avaloniaPropRef = (property) => ({
   canWrite: knownBoolean(property.canWrite),
   isStatic: knownBoolean(property.isStatic),
   enumMembers: property.enumMembers ?? undefined,
+  enumValuesKnown: knownBoolean(property.enumValuesKnown),
+  deprecated: knownBoolean(property.deprecated),
+  deprecationMessage: property.deprecationMessage ?? null,
 })
 
 const webEventRef = (member, semantic) => ({
@@ -825,6 +851,8 @@ const canonicalAvaloniaPropertySurface = (
   defaultKnown: property.defaultKnown === true,
   defaultValue:
     property.defaultKnown === true ? (property.defaultValue ?? null) : null,
+  deprecated: knownBoolean(property.deprecated),
+  deprecationMessage: property.deprecationMessage ?? null,
   isContentProperty: contentRegions.has(property.name),
   contentRegion: contentRegions.get(property.name) ?? null,
   avaloniaProperty: avaloniaProperty
@@ -837,6 +865,8 @@ const canonicalAvaloniaPropertySurface = (
           avaloniaProperty.defaultKnown === true
             ? (avaloniaProperty.defaultValue ?? null)
             : null,
+        deprecated: knownBoolean(avaloniaProperty.deprecated),
+        deprecationMessage: avaloniaProperty.deprecationMessage ?? null,
       }
     : null,
 })
@@ -850,6 +880,8 @@ const canonicalAvaloniaPropertyOnlySurface = (property, contentRegions) => ({
   defaultKnown: property.defaultKnown === true,
   defaultValue:
     property.defaultKnown === true ? (property.defaultValue ?? null) : null,
+  deprecated: knownBoolean(property.deprecated),
+  deprecationMessage: property.deprecationMessage ?? null,
   isContentProperty: contentRegions.has(property.name),
   contentRegion: contentRegions.get(property.name) ?? null,
 })
@@ -860,6 +892,8 @@ const canonicalAvaloniaEventSurface = (event) => ({
   eventKind: event.kind,
   argsType: event.argsType,
   isStatic: knownBoolean(event.isStatic),
+  deprecated: knownBoolean(event.deprecated),
+  deprecationMessage: event.deprecationMessage ?? null,
 })
 
 const canonicalAvaloniaMethodSurface = (method) => ({
@@ -867,6 +901,8 @@ const canonicalAvaloniaMethodSurface = (method) => ({
   member: method.name,
   isStatic: knownBoolean(method.isStatic),
   returnType: method.returnType,
+  deprecated: knownBoolean(method.deprecated),
+  deprecationMessage: method.deprecationMessage ?? null,
   parameters: (method.parameters ?? []).map((parameter) => ({
     name: parameter.name,
     type: parameter.type,
@@ -878,6 +914,8 @@ const canonicalAvaloniaEnumMemberSurface = (member) => ({
   kind: 'enum-member',
   member: member.name,
   value: member.value,
+  deprecated: knownBoolean(member.deprecated),
+  deprecationMessage: member.deprecationMessage ?? null,
 })
 
 export const avaloniaPublicSurfaces = (type) => {
@@ -942,6 +980,8 @@ const avaloniaTypeSurfaceHash = (type) =>
       baseType: type.baseType ?? null,
       isAbstract: knownBoolean(type.isAbstract),
       isSealed: knownBoolean(type.isSealed),
+      deprecated: knownBoolean(type.deprecated),
+      deprecationMessage: type.deprecationMessage ?? null,
       surfaces: avaloniaPublicSurfaces(type),
     }),
   )
@@ -957,7 +997,7 @@ const findAvaloniaType = (componentName, typeIndex) => {
   return null
 }
 
-const combinedAvaloniaProperty = (name, avaloniaType) => {
+const combinedAvaloniaProperty = (name, avaloniaType, typeIndex) => {
   const property =
     (avaloniaType.properties ?? []).find(
       (candidate) => candidate.name === name,
@@ -967,9 +1007,12 @@ const combinedAvaloniaProperty = (name, avaloniaType) => {
       (candidate) => candidate.name === name,
     ) ?? null
   if (!property && !avaloniaProperty) return null
+  const propertyType = avaloniaProperty?.type ?? property?.type ?? null
+  const enumType = typeIndex.get((propertyType ?? '').replace(/\?$/u, ''))
+  const deprecatedMembers = [property, avaloniaProperty].filter(Boolean)
   return {
     name,
-    type: avaloniaProperty?.type ?? property?.type ?? null,
+    type: propertyType,
     nullable:
       typeof avaloniaProperty?.nullable === 'boolean'
         ? avaloniaProperty.nullable
@@ -996,12 +1039,22 @@ const combinedAvaloniaProperty = (name, avaloniaType) => {
       typeof property?.canWrite === 'boolean' ? property.canWrite : null,
     isStatic:
       typeof property?.isStatic === 'boolean' ? property.isStatic : null,
+    enumMembers: enumType?.kind === 'enum' ? enumType.enumMembers : undefined,
+    enumValuesKnown: enumType?.kind === 'enum',
+    deprecated: deprecatedMembers.every(
+      (member) => typeof member.deprecated === 'boolean',
+    )
+      ? deprecatedMembers.some((member) => member.deprecated)
+      : null,
+    deprecationMessage:
+      deprecatedMembers.find((member) => member.deprecationMessage)
+        ?.deprecationMessage ?? null,
   }
 }
 
-const matchAvaloniaProperty = (webName, avaloniaType, binding) => {
+const matchAvaloniaProperty = (webName, avaloniaType, typeIndex, binding) => {
   if (binding) {
-    return combinedAvaloniaProperty(binding.avalonia, avaloniaType)
+    return combinedAvaloniaProperty(binding.avalonia, avaloniaType, typeIndex)
   }
   const normalized = normalizeMemberName(webName)
   const properties = [
@@ -1013,7 +1066,7 @@ const matchAvaloniaProperty = (webName, avaloniaType, binding) => {
     if (seen.has(property.name)) continue
     seen.add(property.name)
     if (normalizeMemberName(property.name) === normalized) {
-      return combinedAvaloniaProperty(property.name, avaloniaType)
+      return combinedAvaloniaProperty(property.name, avaloniaType, typeIndex)
     }
   }
   return null
@@ -1061,6 +1114,7 @@ const inputMember = ({
   contractKebab,
   prop,
   avaloniaType,
+  typeIndex,
   classification,
   binding,
 }) => {
@@ -1084,7 +1138,12 @@ const inputMember = ({
             ),
     }
   }
-  const avalonia = matchAvaloniaProperty(prop.name, avaloniaType, binding)
+  const avalonia = matchAvaloniaProperty(
+    prop.name,
+    avaloniaType,
+    typeIndex,
+    binding,
+  )
   let status
   let governance = null
   let drift = emptyDrift()
@@ -1494,6 +1553,7 @@ const contractForComponent = ({
       contractKebab,
       prop,
       avaloniaType,
+      typeIndex,
       classification,
       binding: bindingFor('input', prop.name),
     }),

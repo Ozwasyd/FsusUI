@@ -87,7 +87,7 @@ internal static class Program
       BaselineVersion = "1.0.0",
       Source = new BaselineSource
       {
-        Tool = "FsusUI.Avalonia.ApiTool@1.2.0",
+        Tool = "FsusUI.Avalonia.ApiTool@1.3.0",
         AssemblyVersion = version,
         InputTreeHash = sourceSemantics.InputTreeHash,
         CompilerOptionsHash = sourceSemantics.CompilerOptionsHash,
@@ -117,6 +117,7 @@ internal static class Program
       .Concat(clrEvents)
       .OrderBy(item => item.Name, StringComparer.Ordinal)
       .ToList();
+    var obsolete = type.GetCustomAttribute<ObsoleteAttribute>();
 
     return new SemanticType
     {
@@ -125,6 +126,8 @@ internal static class Program
       BaseType = type.BaseType is null ? null : TypeName(type.BaseType),
       IsAbstract = type.IsAbstract,
       IsSealed = type.IsSealed,
+      Deprecated = obsolete is not null,
+      DeprecationMessage = obsolete?.Message,
       ContentProperty =
         contentRegions.Count == 1 ? contentRegions[0].Name : null,
       ContentRegions = contentRegions,
@@ -201,6 +204,8 @@ internal static class Program
           Required = sourceProperty?.Required,
           DefaultKnown = sourceProperty?.DefaultKnown ?? false,
           DefaultValue = sourceProperty?.DefaultValue,
+          Deprecated = property.GetCustomAttribute<ObsoleteAttribute>() is not null,
+          DeprecationMessage = property.GetCustomAttribute<ObsoleteAttribute>()?.Message,
         };
       })
       .OrderBy(property => property.Name, StringComparer.Ordinal)
@@ -250,6 +255,8 @@ internal static class Program
         Nullable = IsNullable(valueType),
         DefaultKnown = sourceProperty?.DefaultKnown ?? false,
         DefaultValue = sourceProperty?.DefaultValue,
+        Deprecated = field.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = field.GetCustomAttribute<ObsoleteAttribute>()?.Message,
       });
     }
 
@@ -277,6 +284,8 @@ internal static class Program
         Name = eventName,
         Kind = "routed",
         ArgsType = TypeName(fieldType.GetGenericArguments()[0]),
+        Deprecated = field.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = field.GetCustomAttribute<ObsoleteAttribute>()?.Message,
       });
     }
 
@@ -293,6 +302,8 @@ internal static class Program
         Kind = "clr",
         ArgsType = TypeName(@event.EventHandlerType ?? typeof(EventArgs)),
         IsStatic = @event.AddMethod?.IsStatic ?? false,
+        Deprecated = @event.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = @event.GetCustomAttribute<ObsoleteAttribute>()?.Message,
       })
       .OrderBy(@event => @event.Name, StringComparer.Ordinal)
       .ToList();
@@ -310,6 +321,8 @@ internal static class Program
         Name = method.Name,
         IsStatic = method.IsStatic,
         ReturnType = TypeName(method.ReturnType),
+        Deprecated = method.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = method.GetCustomAttribute<ObsoleteAttribute>()?.Message,
         Parameters = method
           .GetParameters()
           .Select(parameter => new SemanticParameter
@@ -332,6 +345,8 @@ internal static class Program
       {
         Name = name,
         Value = Convert.ToInt64(value),
+        Deprecated = type.GetField(name)?.GetCustomAttribute<ObsoleteAttribute>() is not null,
+        DeprecationMessage = type.GetField(name)?.GetCustomAttribute<ObsoleteAttribute>()?.Message,
       })
       .OrderBy(member => member.Value)
       .ToList();
@@ -414,6 +429,10 @@ internal sealed class SemanticType
 
   public bool IsSealed { get; init; }
 
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
+
   public string? ContentProperty { get; init; }
 
   public List<SemanticContentRegion> ContentRegions { get; init; } = [];
@@ -465,6 +484,10 @@ internal sealed class SemanticProperty
   public bool DefaultKnown { get; init; }
 
   public object? DefaultValue { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }
 
 internal sealed class SemanticAvaloniaProperty
@@ -480,6 +503,10 @@ internal sealed class SemanticAvaloniaProperty
   public bool DefaultKnown { get; init; }
 
   public object? DefaultValue { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }
 
 internal sealed class SemanticEvent
@@ -491,6 +518,10 @@ internal sealed class SemanticEvent
   public string ArgsType { get; init; } = "";
 
   public bool IsStatic { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }
 
 internal sealed class SemanticMethod
@@ -500,6 +531,10 @@ internal sealed class SemanticMethod
   public bool IsStatic { get; init; }
 
   public string ReturnType { get; init; } = "";
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 
   public List<SemanticParameter> Parameters { get; init; } = [];
 }
@@ -518,4 +553,8 @@ internal sealed class SemanticEnumMember
   public string Name { get; init; } = "";
 
   public long Value { get; init; }
+
+  public bool Deprecated { get; init; }
+
+  public string? DeprecationMessage { get; init; }
 }

@@ -5,6 +5,7 @@ import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
+  extractDeprecatedDeclarations,
   extractComponentSemantics,
   sourceForComponent as compilerSourceForComponent,
 } from './vue-semantic-baseline.mjs'
@@ -300,20 +301,13 @@ const parseDeprecatedApis = (root) => {
   for (const file of files) {
     const content = read(file)
     if (!content.includes('@deprecated')) continue
-    const lines = content.split('\n')
-    for (let index = 0; index < lines.length; index += 1) {
-      if (!lines[index].includes('@deprecated')) continue
-      let target = ''
-      for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
-        const line = lines[cursor].trim()
-        if (!line || line.startsWith('*') || line.startsWith('*/')) continue
-        target = line.replace(/,$/, '')
-        break
-      }
+    for (const declaration of extractDeprecatedDeclarations({
+      source: content,
+      filename: file,
+    })) {
       deprecated.push({
         file: toPosix(path.relative(root, file)),
-        marker: lines[index].trim().replace(/^\*\s?/, ''),
-        target,
+        ...declaration,
       })
     }
   }
@@ -758,7 +752,7 @@ export const buildArtifacts = (root, options = {}) => {
     ).length
   }
 
-  const semanticVersion = '1.2.0'
+  const semanticVersion = '1.3.0'
   const compilerOptionsHash = sha256(
     stableJson({
       parser: ['@babel/parser'],

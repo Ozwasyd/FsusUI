@@ -134,6 +134,35 @@ export const validateVuePublicCoverage = ({ baseline, registry }) => {
         if (member.web?.baseline !== VUE_BASELINE_PATH) {
           errors.push(`${context} is not bound to the Vue compiler baseline`)
         }
+        if (section.kind === 'input') {
+          const prop = (component.semantic?.props ?? []).find(
+            (candidate) => candidate.name === member.name,
+          )
+          for (const [field, expected, actual] of [
+            ['values', prop?.values ?? null, member.web?.values ?? null],
+            [
+              'valuesKnown',
+              typeof prop?.valuesKnown === 'boolean' ? prop.valuesKnown : null,
+              member.web?.valuesKnown ?? null,
+            ],
+            [
+              'deprecated',
+              typeof prop?.deprecated === 'boolean' ? prop.deprecated : null,
+              member.web?.deprecated ?? null,
+            ],
+            [
+              'deprecationMessage',
+              prop?.deprecationMessage ?? null,
+              member.web?.deprecationMessage ?? null,
+            ],
+          ]) {
+            if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+              errors.push(
+                `${context} stale compiler ${field}: baseline ${JSON.stringify(expected)} vs Contract V2 ${JSON.stringify(actual)}`,
+              )
+            }
+          }
+        }
         if (section.kind === 'contentRegion') {
           const slot = (component.slots ?? []).find(
             (candidate) => candidate.name === member.name,

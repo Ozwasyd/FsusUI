@@ -19,7 +19,11 @@ import {
 } from '../scripts/contract-v2.mjs'
 import { validateVuePublicCoverage } from '../scripts/conformance-v2-vue-public-gate.mjs'
 import { extractStructuredEmitPayloads } from '../scripts/vue-structured-emit-payload.mjs'
-import { extractTemplateSlots } from '../scripts/vue-semantic-baseline.mjs'
+import {
+  deprecatedMetadataForNode,
+  extractDeprecatedDeclarations,
+  extractTemplateSlots,
+} from '../scripts/vue-semantic-baseline.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const fixtureDirectory = path.join(root, 'tests/fixtures/contract-v2')
@@ -126,7 +130,7 @@ test('committed Contract V2 registry passes validation with the committed gate',
 
 test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
   for (const baseline of Object.values(avaloniaBaselines)) {
-    assert.equal(baseline.source.tool, 'FsusUI.Avalonia.ApiTool@1.2.0')
+    assert.equal(baseline.source.tool, 'FsusUI.Avalonia.ApiTool@1.3.0')
     assert.match(baseline.source.inputTreeHash, sha256Pattern)
     assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
     assert.match(baseline.source.dependencyVersionsHash, sha256Pattern)
@@ -177,6 +181,22 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
     assert.equal(region.canWrite, true)
     assert.equal(region.required, false)
   }
+  const semanticTypes = Object.values(avaloniaBaselines).flatMap(
+    (baseline) => baseline.semanticTypes,
+  )
+  const enumTypes = semanticTypes.filter((type) => type.kind === 'enum')
+  const enumMembers = enumTypes.flatMap((type) => type.enumMembers)
+  assert.equal(enumTypes.length, 98)
+  assert.equal(enumMembers.length, 430)
+  assert.ok(semanticTypes.every((type) => typeof type.deprecated === 'boolean'))
+  assert.ok(
+    semanticTypes
+      .flatMap((type) => type.properties)
+      .every((property) => typeof property.deprecated === 'boolean'),
+  )
+  assert.ok(
+    enumMembers.every((member) => typeof member.deprecated === 'boolean'),
+  )
 })
 
 test('Vue compiler AST retains dynamic names and scoped slot payload structure', () => {
@@ -214,6 +234,115 @@ test('Vue compiler AST retains dynamic names and scoped slot payload structure',
     component('ElCalendar').slots.find((slot) => slot.name === 'header')
       .payload,
     [{ name: 'date', expression: 'i18nDate', type: null }],
+  )
+})
+
+test('Vue compiler AST binds deprecated metadata to the real declaration', () => {
+  const relativePath = 'vue/packages/components/select/src/select.vue'
+  const source = fs.readFileSync(path.join(root, relativePath), 'utf8')
+  const declarations = extractDeprecatedDeclarations({
+    source,
+    filename: relativePath,
+  })
+  assert.deepEqual(declarations, [
+    {
+      kind: 'property',
+      target: 'suffixTransition',
+      message:
+        'will be removed in version 2.4.0, please use override style scheme',
+    },
+  ])
+  const component = vueBaseline.components.find(
+    (candidate) => candidate.name === 'ElSelect',
+  )
+  const suffixTransition = component.semantic.props.find(
+    (prop) => prop.name === 'suffixTransition',
+  )
+  assert.equal(suffixTransition.deprecated, true)
+  assert.match(suffixTransition.deprecationMessage, /override style scheme/)
+  assert.equal(
+    component.semantic.props.find((prop) => prop.name === 'placement')
+      .deprecated,
+    false,
+  )
+  assert.deepEqual(deprecatedMetadataForNode(null), {
+    deprecated: false,
+    deprecationMessage: null,
+  })
+})
+
+test('enum and deprecated comparator mutations fail closed', () => {
+  const web = {
+    categories: ['string'],
+    nullable: false,
+    default: { kind: 'literal', value: 'circle' },
+    required: false,
+    readonly: false,
+    values: ['circle', 'square'],
+    valuesKnown: true,
+    deprecated: false,
+  }
+  const avalonia = {
+    categories: ['string'],
+    nullable: false,
+    defaultKnown: true,
+    defaultValue: 'circle',
+    required: false,
+    canRead: true,
+    canWrite: true,
+    enumMembers: [
+      { name: 'Circle', value: 0 },
+      { name: 'Square', value: 1 },
+    ],
+    enumValuesKnown: true,
+    deprecated: false,
+  }
+  assert.equal(
+    compareMembers({ web, avalonia, kind: 'input' }).compatible,
+    true,
+  )
+
+  const extraEnumValue = compareMembers({
+    web,
+    avalonia: {
+      ...avalonia,
+      enumMembers: [...avalonia.enumMembers, { name: 'Triangle', value: 2 }],
+    },
+    kind: 'input',
+  })
+  assert.match(extraEnumValue.drift.enumValues, /triangle/)
+
+  const singleOverlap = compareMembers({
+    web,
+    avalonia: {
+      ...avalonia,
+      enumMembers: [
+        { name: 'Circle', value: 0 },
+        { name: 'Triangle', value: 1 },
+      ],
+    },
+    kind: 'input',
+  })
+  assert.match(singleOverlap.drift.enumValues, /triangle/)
+
+  const unknownValues = compareMembers({
+    web: { ...web, valuesKnown: false },
+    avalonia,
+    kind: 'input',
+  })
+  assert.equal(
+    unknownValues.drift.enumValues,
+    'web enum/union values unavailable',
+  )
+
+  const deprecatedDrift = compareMembers({
+    web: { ...web, deprecated: true },
+    avalonia,
+    kind: 'input',
+  })
+  assert.equal(
+    deprecatedDrift.drift.deprecated,
+    'web deprecated=true vs avalonia deprecated=false',
   )
 })
 
@@ -450,6 +579,18 @@ test('real Avalonia surface mutations invalidate current registration', () => {
       avaloniaBaselines: changedOnlyTypeBaselines,
     }).errors.join('\n'),
     /FsusActiveSourceChangedEventArgs has stale surfaceHash/,
+  )
+
+  const changedEnumBaselines = clone(avaloniaBaselines)
+  changedEnumBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusAvatarShape')
+    .enumMembers.find((member) => member.name === 'Circle').deprecated = true
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: changedEnumBaselines,
+    }).errors.join('\n'),
+    /FsusAvatarShape has stale surfaceHash/,
   )
 })
 
