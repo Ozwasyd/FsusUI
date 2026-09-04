@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "issue": 341,
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+  "candidateDigest": "ce4b073e47878c49bbcaba4270be707788fa625ca9fbfc43b476111b2cb14adc",
+  "classificationReceiptDigest": "a025b0aaa888044f70c82a039eeeb813f0ac804dba1429106fffd2c24ffe0c00",
+  "productionFixture": true,
+  "implementationModifiedPaths": [],
+  "focusedTests": [
+    {
+      "command": "pnpm exec vitest run --config vue/vitest.config.ts vue/packages/components/markdown-editor/__tests__/markdown-editor-input-vectors.test.ts vue/packages/components/markdown-editor/__tests__/markdown-editor-input-acceptance.test.ts",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "dotnet test dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj --filter FullyQualifiedName~FsusMarkdownEditorClipboardVectorTests|FullyQualifiedName~FsusMarkdownEditorPairInputVectorTests|FullyQualifiedName~FsusMarkdownNativeEventVectorTests|FullyQualifiedName~FsusMarkdownEditorBlockInputVectorTests --nologo",
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --filter FullyQualifiedName~FsusMarkdownEditorNativeInputHeadlessTests --nologo",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "IBUS_ADDRESS=$(ibus address) GTK_IM_MODULE=ibus QT_IM_MODULE=ibus XMODIFIERS=@im=ibus dotnet run --project dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj -- --ime-harness --candidate 810fe29ed7eb82ff2f700ac700c16c7243d17403 --output tests/conformance/visual/artifacts/issue-341-linux-ime-evidence.json",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "FSUS_CONFORMANCE_V2_AVALONIA_OUTPUT=tests/conformance/visual/artifacts/issue-341-rendered/avalonia.json pnpm run conformance:v2:avalonia",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "The inspected 960x720 real-top-level light render retains the existing hierarchy, restrained editor surface, visible keyboard focus, and unchanged content priority after the Markdown transaction and undo path.",
+      "The inspected 680x360 light and dark production renders retain the same single input/scroll owner, source projection geometry, wrapping, focus affordance, and current-range emphasis without added decoration or layout drift.",
+      "The live Linux XWayland/ibus/libpinyin receipt proves a stock Avalonia TextBox platform probe, XTest-injected OS keys, one-transaction CJK commit, zero-transaction cancellation, one-step undo, stale-document rejection, rich/plain clipboard safety, exact BOM/CRLF/CJK/emoji/combining/RTL preservation, and a valid candidate caret at 2x scaling with a 1498-DIP scroll offset."
+    ]
+  },
+  "inspectedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-341-rendered/avalonia.png",
+      "digest": "0a3354587d410610f0a0232195817753af1d624e8c6de5c99ce397f40e693ad6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-341-rendered/issue-717-markdown-editor-adjacent/markdown-editor-adjacent-light.png",
+      "digest": "6742bc25315464c88c08449c6883e5f4ec3372a90fdceb040a8f363751114ca5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-341-rendered/issue-717-markdown-editor-adjacent/markdown-editor-adjacent-dark.png",
+      "digest": "306eb8989cb18ac6ceb0f57a74d50d587ec3687521e077d2f13b6771ecfc56bc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-341-linux-ime-evidence.json",
+      "digest": "c510e8b28069c130cedb0a08bf260728e46d7e6e0e65629e78724789ea96cca6"
+    }
+  ],
+  "limitations": [
+    "The required native IME host is the current Linux XWayland/ibus/libpinyin cell; no Windows or macOS native IME result is claimed.",
+    "Light and dark presentation coverage comes from the deterministic production headless Skia fixture, while the physical OS-level IME run uses the light real-top-level surface."
+  ]
+}

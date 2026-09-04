@@ -70,8 +70,8 @@
     "authorityDigest": "f7264a63413804e31062e550a7b4d8c5cd17d9bed12df75684c3918843b91bed",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "c96032967013a5c17b1238067db5fbf64927656d",
-  "candidateDigest": "c70f6149c0fd59bfeb08faa3d387a0a4f791a6f48758b6ce7dc5a44ac9e6baf4",
+  "candidateSha": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+  "candidateDigest": "ce4b073e47878c49bbcaba4270be707788fa625ca9fbfc43b476111b2cb14adc",
   "stateEvidenceMatrix": [
     {
       "state": "baseline Source and Live Markdown editor presentation",
@@ -109,5 +109,5 @@
   "classificationEvidenceDigest": "7eda65dec5263f01c7934f6de615230bc8bdadd14de1c8299f4bc69c42ef2ac6",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "6d2261f6729046cbe443cc33bdea4c162c668563d7b1a786f000660fa156ea10"
+  "receiptDigest": "a025b0aaa888044f70c82a039eeeb813f0ac804dba1429106fffd2c24ffe0c00"
 }
