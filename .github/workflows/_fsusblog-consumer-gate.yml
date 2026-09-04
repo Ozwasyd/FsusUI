@@ -15,6 +15,14 @@ on:
         description: Expected SHA-256 from the release-quality build-package job.
         required: true
         type: string
+      quality-candidate-digest:
+        description: Candidate SHA-256 exported by the release-quality job.
+        required: true
+        type: string
+      matrix-artifact-name:
+        description: Three-profile consumer matrix artifact from release quality.
+        required: true
+        type: string
       target-repository:
         description: Repository containing the formal FsusUI candidate consumer entry.
         default: Ozwasyd/FsusBlog
@@ -30,6 +38,9 @@ on:
       fsusblog-commit-sha:
         description: Full immutable FsusBlog commit used for every consumer step.
         value: ${{ jobs.consumer.outputs.commit-sha }}
+      candidate-binding-sha256:
+        description: Digest of the same-candidate cross-repository binding.
+        value: ${{ jobs.consumer.outputs.candidate-binding-sha256 }}
 
 permissions:
   contents: read
@@ -42,6 +53,7 @@ jobs:
     outputs:
       default-branch: ${{ steps.resolve.outputs.default_branch }}
       commit-sha: ${{ steps.resolve.outputs.commit_sha }}
+      candidate-binding-sha256: ${{ steps.binding-before.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,7 +70,11 @@ jobs:
           test "$GITHUB_EVENT_NAME" = "push"
           case "$GITHUB_REF" in refs/tags/v*) ;; *) exit 1 ;; esac
           test '${{ inputs.target-repository }}' = 'Ozwasyd/FsusBlog'
+          test '${{ inputs.candidate-artifact-name }}' = 'fsusui-npm-candidate'
+          test '${{ inputs.candidate-manifest-name }}' = 'fsusui-npm-candidate.manifest.json'
+          test '${{ inputs.matrix-artifact-name }}' = 'consumer-matrix-release'
           printf '%s' '${{ inputs.candidate-digest }}' | grep -Eq '^[a-f0-9]{64}$'
+          printf '%s' '${{ inputs.quality-candidate-digest }}' | grep -Eq '^[a-f0-9]{64}$'
       - name: Verify read-only App installation contract
         working-directory: fsusui
         env:
@@ -93,12 +109,34 @@ jobs:
         with:
           name: ${{ inputs.candidate-artifact-name }}
           path: candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.matrix-artifact-name }}
+          path: consumer-matrix
       - name: Require the declared immutable candidate files
         env:
           CANDIDATE_MANIFEST_NAME: ${{ inputs.candidate-manifest-name }}
         run: |
           test -f candidate/fsusui-npm-candidate.tgz
           test -f "candidate/$CANDIDATE_MANIFEST_NAME"
+          test -f consumer-matrix/receipts/matrix-summary.json
+      - name: Install FsusUI verification dependencies
+        working-directory: fsusui
+        run: pnpm install --frozen-lockfile
+      - name: Bind candidate, manifest, quality output, and consumer matrix
+        id: binding-before
+        run: |
+          digest="$(node fsusui/scripts/cross-repo-candidate-binding.mjs \
+            --repo-root fsusui \
+            --candidate candidate/fsusui-npm-candidate.tgz \
+            --candidate-manifest candidate/fsusui-npm-candidate.manifest.json \
+            --matrix-directory consumer-matrix/receipts \
+            --candidate-digest '${{ inputs.candidate-digest }}' \
+            --quality-candidate-digest '${{ inputs.quality-candidate-digest }}' \
+            --source-commit "$GITHUB_SHA" \
+            --release-tag "$GITHUB_REF_NAME" \
+            --output candidate-binding-before.json)"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
       - name: Checkout the frozen FsusBlog commit
         uses: actions/checkout@v4
         with:
@@ -138,6 +176,21 @@ jobs:
           test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
           git diff --exit-code
           test -z "$(git status --porcelain)"
+      - name: Reverify immutable candidate after FsusBlog consumption
+        if: always()
+        run: |
+          digest="$(node fsusui/scripts/cross-repo-candidate-binding.mjs \
+            --repo-root fsusui \
+            --candidate candidate/fsusui-npm-candidate.tgz \
+            --candidate-manifest candidate/fsusui-npm-candidate.manifest.json \
+            --matrix-directory consumer-matrix/receipts \
+            --candidate-digest '${{ inputs.candidate-digest }}' \
+            --quality-candidate-digest '${{ inputs.quality-candidate-digest }}' \
+            --source-commit "$GITHUB_SHA" \
+            --release-tag "$GITHUB_REF_NAME" \
+            --output candidate-binding-after.json)"
+          test "$digest" = '${{ steps.binding-before.outputs.digest }}'
+          cmp candidate-binding-before.json candidate-binding-after.json
       - name: Upload sanitized App evidence
         uses: actions/upload-artifact@v4
         with:
