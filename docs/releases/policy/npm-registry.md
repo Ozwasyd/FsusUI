@@ -105,6 +105,16 @@ pnpm test:release-channel
 pnpm check:npm-release-workflow
 ```
 
+Stable `latest` publication has an additional fail-closed sender stage. Before
+publish it requires the successful #318 FsusBlog consumer-gate receipt to bind
+the same candidate tarball and manifest. Only after `npm publish` actually
+returns successfully does it poll `https://registry.npmjs.org/`, download the
+registry-provided tarball, and verify integrity, SHA-256 identity, package
+name/version, and the `latest` dist-tag. It then sends the strict
+`fsusui-npm-published-v1` repository dispatch with the dedicated release-train
+GitHub App. An already-published monotonicity skip, any prerelease channel, or
+any verification/App permission failure sends no event.
+
 An intentional dist-tag move uses only `recover-npm-dist-tag.yml`. It requires a
 target version, the expected current value, and an auditable reason, runs in the
 protected `npm-recovery` environment, and takes the same package/channel lock.

@@ -21,6 +21,16 @@ Local workspace consumers can reference the three projects directly:
 `FsusThemeManager`. `FsusUI.Avalonia.Icons` contains generated icon resources
 and `FsusIconKeys`.
 
+## Trimming and AOT Library Boundary
+
+The three packages above declare an AOT-compatible library contract and run
+trimming, single-file, and AOT analyzers. They do not set `PublishAot` or claim
+that a final RID-specific Native AOT application has been validated. AXAML,
+theme, token, and icon resources use the same package paths shown below for
+trimmed and non-trimmed consumers. Application-owned reflection, runtime type
+or assembly loading, runtime code generation, and third-party plugins remain
+outside this library support statement and require consumer verification.
+
 ## Application Setup
 
 Import the theme and icon resources from the app:
