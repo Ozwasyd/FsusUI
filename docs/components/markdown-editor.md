@@ -274,6 +274,33 @@ sanitization remain owned by
 [Markdown editor input](../api/markdown-editor-input.md) and the existing HTML
 import boundary.
 
+## Markdown table editing
+
+Table editing remains source-authoritative. The active cell is resolved from the
+stable table projection plus an exact source-range anchor; row and column numbers
+are remapped coordinates, not the cell identity on their own. Structural commands
+therefore act on the cell containing the current editor selection and reject a
+missing, malformed, deleted, or stale anchor.
+
+While a source, live, or split editing surface owns focus, Tab and Shift+Tab move
+between cells, Tab from the final cell appends one row, Escape exits the table, and
+boundary arrow/Enter actions use the same transaction dispatcher. The contextual
+table trigger opens one scrollable menu for row, column, alignment, and formatting
+actions; it does not keep a multi-button toolbar visible. Arrow Up/Down and Home/End
+move within the menu, Escape restores the trigger, and Tab follows normal focus
+order instead of trapping focus. A context-menu request inside a cell opens the same
+action authority rather than a second command implementation.
+
+Pasting `text/tab-separated-values` or `text/csv` inside a table creates one
+separate-history table transaction. It respects the document identity and revision,
+keeps quoted CSV line breaks as `<br>`, applies row/column/cell budgets, and falls
+back to ordinary clipboard handling when the payload is not table data. Preview
+tables keep their width inside the editor-owned horizontal scroll container; the
+consumer must not patch private table selectors. Explicit format preserves the
+document newline style and cell text, pads each column to at least three source
+characters, and writes separators as `---`, `:---`, `---:`, or `:---:` for
+unaligned, left, right, or centered columns.
+
 When the shared projection identifies the current selection as an image, the
 editor exposes one compact property surface for alternative text, destination,
 title, and the adjacent `::caption[...]` text. Apply, source reveal, safe open,

@@ -13,12 +13,7 @@ namespace {
 
 constexpr std::string_view kCodeClass = "shiki";
 
-enum class table_alignment {
-  none,
-  left,
-  center,
-  right
-};
+using table_alignment = syntax_table_alignment;
 
 struct footnote_def {
   std::string label;
@@ -1032,36 +1027,121 @@ std::string_view strip_blockquote_prefix(std::string_view line) {
   return trim_left(trimmed.substr(index));
 }
 
-std::vector<std::string> split_table_cells(std::string_view row) {
-  std::vector<std::string> cells;
-  std::string cell;
-  const std::size_t begin = row.starts_with('|') ? 1 : 0;
-  const std::size_t end = row.size() > begin && row.back() == '|' ? row.size() - 1 : row.size();
+struct table_cell_source_range final {
+  std::size_t start{0};
+  std::size_t end{0};
+};
 
+std::vector<table_cell_source_range> table_cell_source_ranges(
+  std::string_view row,
+  std::vector<std::size_t>* delimiters = nullptr
+) {
+  std::vector<table_cell_source_range> ranges;
+  const std::size_t begin = row.starts_with('|') ? 1 : 0;
+  std::size_t cell_start = begin;
   bool escaped = false;
-  for (std::size_t index = begin; index < end; ++index) {
+  std::size_t backtick_run = 0;
+  bool trailing_delimiter = false;
+
+  const auto append_range = [&](std::size_t start, std::size_t end) {
+    while (start < end && is_space(row[start])) {
+      ++start;
+    }
+    while (end > start && is_space(row[end - 1])) {
+      --end;
+    }
+    ranges.push_back({start, end});
+  };
+
+  for (std::size_t index = begin; index < row.size(); ++index) {
     const char ch = row[index];
     if (escaped) {
-      cell.push_back(ch);
       escaped = false;
+      trailing_delimiter = false;
       continue;
     }
-
     if (ch == '\\') {
       escaped = true;
+      trailing_delimiter = false;
       continue;
     }
-
-    if (ch == '|') {
-      cells.emplace_back(trim(cell));
-      cell.clear();
+    if (ch == '`') {
+      std::size_t run = 1;
+      while (index + run < row.size() && row[index + run] == '`') {
+        ++run;
+      }
+      if (backtick_run == 0) {
+        bool has_closing_run = false;
+        for (std::size_t search = index + run; search < row.size();) {
+          if (row[search] != '`') {
+            ++search;
+            continue;
+          }
+          std::size_t closing_run = 1;
+          while (
+            search + closing_run < row.size() &&
+            row[search + closing_run] == '`'
+          ) {
+            ++closing_run;
+          }
+          if (closing_run == run) {
+            has_closing_run = true;
+            break;
+          }
+          search += closing_run;
+        }
+        if (has_closing_run) {
+          backtick_run = run;
+        }
+      } else if (backtick_run == run) {
+        backtick_run = 0;
+      }
+      index += run - 1;
+      trailing_delimiter = false;
       continue;
     }
-
-    cell.push_back(ch);
+    if (ch == '|' && backtick_run == 0) {
+      if (delimiters != nullptr) {
+        delimiters->push_back(index);
+      }
+      append_range(cell_start, index);
+      cell_start = index + 1;
+      trailing_delimiter = cell_start == row.size();
+      continue;
+    }
+    trailing_delimiter = false;
   }
 
-  cells.emplace_back(trim(cell));
+  if (!trailing_delimiter) {
+    append_range(cell_start, row.size());
+  }
+  return ranges;
+}
+
+std::vector<std::string> split_table_cells(std::string_view row) {
+  std::vector<std::string> cells;
+  for (const auto& range : table_cell_source_ranges(row)) {
+    std::string cell;
+    const std::string_view source = row.substr(
+      range.start,
+      range.end - range.start
+    );
+    bool escaped = false;
+    for (const char ch : source) {
+      if (escaped) {
+        cell.push_back(ch);
+        escaped = false;
+      } else if (ch == '\\') {
+        escaped = true;
+      } else {
+        cell.push_back(ch);
+      }
+    }
+    if (escaped) {
+      cell.push_back('\\');
+    }
+    cells.emplace_back(std::move(cell));
+  }
   return cells;
 }
 
@@ -1940,30 +2020,41 @@ void decorate_table_syntax(std::string_view source, syntax_node& node) {
       node.end_offset
     );
     const std::string_view line = source.substr(line_start, line_end - line_start);
+    const std::size_t row_index = node.table_row_ranges.size();
+    node.table_row_ranges.push_back({line_start, line_end});
+    std::vector<std::size_t> delimiters;
+    const auto cell_ranges = table_cell_source_ranges(line, &delimiters);
+    std::vector<syntax_range> absolute_cell_ranges;
+    absolute_cell_ranges.reserve(cell_ranges.size());
+    for (const auto& range : cell_ranges) {
+      absolute_cell_ranges.push_back({
+        line_start + range.start,
+        line_start + range.end,
+      });
+    }
+    node.table_cell_ranges.push_back(std::move(absolute_cell_ranges));
+
     std::vector<table_alignment> alignments;
     if (parse_table_separator_row(line, alignments)) {
+      node.table_separator_row = row_index;
+      node.table_alignments = alignments;
       const std::string_view trimmed = trim(line);
       const std::size_t offset = line.find(trimmed);
       append_syntax_range(node.marker_ranges, line_start + offset, line_start + offset + trimmed.size());
     } else {
-      std::size_t cell_start = 0;
-      for (std::size_t index = 0; index <= line.size(); ++index) {
-        if (index < line.size() && line[index] != '|') {
-          continue;
-        }
-        std::size_t content_start = cell_start;
-        std::size_t content_end = index;
-        while (content_start < content_end && is_space(line[content_start])) {
-          ++content_start;
-        }
-        while (content_end > content_start && is_space(line[content_end - 1])) {
-          --content_end;
-        }
-        append_syntax_range(node.content_ranges, line_start + content_start, line_start + content_end);
-        if (index < line.size()) {
-          append_syntax_range(node.marker_ranges, line_start + index, line_start + index + 1);
-        }
-        cell_start = index + 1;
+      for (const auto& range : cell_ranges) {
+        append_syntax_range(
+          node.content_ranges,
+          line_start + range.start,
+          line_start + range.end
+        );
+      }
+      for (const std::size_t delimiter : delimiters) {
+        append_syntax_range(
+          node.marker_ranges,
+          line_start + delimiter,
+          line_start + delimiter + 1
+        );
       }
     }
     if (newline == std::string_view::npos || newline >= node.end_offset) {

@@ -80,9 +80,10 @@ test('renders and dismisses command surfaces without a stale slash commit', asyn
   const palette = page.locator('.el-markdown-editor__palette-dialog')
   await expect(palette).toBeVisible()
   await expect(palette).toHaveAccessibleName('命令面板')
-  await palette.locator('input').fill('bold')
+  const paletteInput = palette.locator('input')
+  await paletteInput.fill('bold')
   await expect(palette.getByRole('option')).toHaveCount(1)
-  await palette.press('Escape')
+  await paletteInput.press('Escape')
   await expect(palette).toBeHidden()
   await expect(textarea).toBeFocused()
 

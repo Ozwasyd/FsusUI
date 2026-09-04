@@ -192,8 +192,19 @@ export const createMarkdownEditorPositionMap = (
     (maximum, change) => Math.max(maximum, change.from, change.to),
     0,
   )
+  // Without a real source the anchor map still needs a length that covers the
+  // pre-change document implied by the changes and every post-change anchor,
+  // mirroring the synthetic fallback in rebaseMarkdownAttachmentJob.
+  const syntheticLength = [...changes]
+    .sort((left, right) => left.from - right.from || left.to - right.to)
+    .reduce(
+      (length, change) =>
+        Math.max(change.to + 1, length + change.insert.length) -
+        (change.to - change.from),
+      Math.max(maximumOffset + 1, 1),
+    )
   const originalSource =
-    options.source ?? '\u0000'.repeat(Math.max(maximumOffset, 1))
+    options.source ?? '\u0000'.repeat(Math.max(syntheticLength, maximumOffset + 1, 1))
   const identity = options.documentIdentity ?? {
     id: 'markdown-position-map',
     epoch: 0,

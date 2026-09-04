@@ -36,7 +36,10 @@ const markdownFeatureTrustedTypesPolicies = new WeakMap<
   MarkdownFeatureTrustedTypesPolicy
 >()
 
-const toMarkdownFeatureParsingHtml = (document: Document, payload: string) => {
+export const toMarkdownFeatureParsingHtml = (
+  document: Document,
+  payload: string,
+) => {
   const ownerWindow =
     document.defaultView as MarkdownFeatureTrustedTypesWindow | null
   const trustedTypes = ownerWindow?.trustedTypes

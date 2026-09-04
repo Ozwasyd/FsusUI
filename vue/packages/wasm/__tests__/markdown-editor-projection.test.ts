@@ -70,6 +70,46 @@ describe('markdown editor projection contract', () => {
     expect(raw.slice(table.rawRange.start, table.rawRange.end)).toContain('| h |')
   })
 
+  it('projects exact table rows, cells, separator, and alignments from the C++ parse pass', () => {
+    const raw = [
+      '| h1 | h2 | h3 |',
+      '| :--- | :---: | ---: |',
+      '| a\\|b | [x](u) | `c | d` |',
+      '| left || right |',
+      '| unmatched `tick | delimiter | still |',
+      '',
+    ].join('\n')
+    const table = createMarkdownEditorProjection(raw).nodes.find(
+      (node) => node.kind === 'table',
+    )
+
+    expect(table?.table).toBeDefined()
+    expect(table!.table!.separatorRow).toBe(1)
+    expect(table!.table!.alignments).toEqual(['left', 'center', 'right'])
+    expect(
+      table!.table!.rows.map((row) =>
+        row.rawCellRanges.map((range) => raw.slice(range.start, range.end)),
+      ),
+    ).toEqual([
+      ['h1', 'h2', 'h3'],
+      [':---', ':---:', '---:'],
+      ['a\\|b', '[x](u)', '`c | d`'],
+      ['left', '', 'right'],
+      ['unmatched `tick', 'delimiter', 'still'],
+    ])
+    expect(
+      table!.table!.rows.map((row) =>
+        raw.slice(row.rawRange.start, row.rawRange.end),
+      ),
+    ).toEqual([
+      '| h1 | h2 | h3 |',
+      '| :--- | :---: | ---: |',
+      '| a\\|b | [x](u) | `c | d` |',
+      '| left || right |',
+      '| unmatched `tick | delimiter | still |',
+    ])
+  })
+
   it('maps mermaid/latex blocks through the #321 coordinate map', () => {
     const raw = '\uFEFF```mermaid\r\nflowchart LR\r\n```\n\n$$\na^2\n$$'
     const projection = createMarkdownEditorProjection(raw)
