@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ozwasyd/FsusUI/spec/releases/fsus-cross-repo-app-evidence.schema.json",
+  "title": "Sanitized FsusUI/FsusBlog read-only GitHub App evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "appId",
+    "permissions",
+    "repositories",
+    "checks",
+    "status"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "appId": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata", "contents"],
+      "properties": {
+        "metadata": { "const": "read" },
+        "contents": { "const": "read" }
+      }
+    },
+    "repositories": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["repository", "installationId", "selection"],
+        "properties": {
+          "repository": {
+            "enum": ["Ozwasyd/FsusUI", "Ozwasyd/FsusBlog"]
+          },
+          "installationId": { "type": "integer", "minimum": 1 },
+          "selection": { "const": "selected" }
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadataRead", "contentsRead", "writeCapability"],
+      "properties": {
+        "metadataRead": { "const": "success" },
+        "contentsRead": { "const": "success" },
+        "writeCapability": { "const": "absent" }
+      }
+    },
+    "status": { "const": "success" }
+  }
+}
