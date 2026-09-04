@@ -45,6 +45,7 @@ const semanticMemberBindings = JSON.parse(
 )
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
+const sha256Pattern = /^[0-9a-f]{64}$/u
 
 const replaceAtPath = (value, pointer, replacement) => {
   const segments = pointer
@@ -117,6 +118,31 @@ test('committed Contract V2 registry passes validation with the committed gate',
     avaloniaBaselines,
   })
   assert.deepEqual(errors, [])
+})
+
+test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
+  for (const baseline of Object.values(avaloniaBaselines)) {
+    assert.equal(baseline.source.tool, 'FsusUI.Avalonia.ApiTool@1.1.0')
+    assert.match(baseline.source.inputTreeHash, sha256Pattern)
+    assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
+    assert.match(baseline.source.dependencyVersionsHash, sha256Pattern)
+  }
+  const properties = avaloniaBaselines.avalonia.semanticTypes.flatMap(
+    (type) => type.properties,
+  )
+  const avaloniaProperties = avaloniaBaselines.avalonia.semanticTypes.flatMap(
+    (type) => type.avaloniaProperties,
+  )
+  assert.equal(
+    properties.filter((property) => typeof property.required === 'boolean')
+      .length,
+    2021,
+  )
+  assert.equal(properties.filter((property) => property.required).length, 15)
+  assert.equal(
+    avaloniaProperties.filter((property) => property.defaultKnown).length,
+    294,
+  )
 })
 
 test('real Avalonia public surfaces have one current mapped or avalonia-extra state', () => {
@@ -365,7 +391,7 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
   assert.match(errors, /duplicates semantic id document/)
 })
 
-test('real mapped input semantics fail closed when Avalonia metadata is unavailable', () => {
+test('real mapped inputs use compiler-known metadata and keep unknown values partial', () => {
   const registry = buildRegistry({
     vueBaseline,
     avaloniaBaseline: avaloniaBaselines.avalonia,
@@ -380,11 +406,11 @@ test('real mapped input semantics fail closed when Avalonia metadata is unavaila
   assert.equal(mappedInputs.length, 140)
   assert.equal(
     mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
-    0,
+    13,
   )
   assert.equal(
     mappedInputs.filter((input) => input.status === 'partial').length,
-    139,
+    126,
   )
   const max = registry.contracts
     .find((contract) => contract.component.name === 'ElBadge')
@@ -393,8 +419,9 @@ test('real mapped input semantics fail closed when Avalonia metadata is unavaila
   assert.equal(max.avalonia.canWrite, true)
   assert.equal(max.drift.nullability, null)
   assert.equal(max.drift.readWrite, null)
-  assert.equal(max.drift.default, 'avalonia default metadata unavailable')
-  assert.equal(max.drift.required, 'avalonia required metadata unavailable')
+  assert.equal(max.drift.default, null)
+  assert.equal(max.drift.required, null)
+  assert.equal(max.status, 'aligned-candidate')
 })
 
 test('real mapped input baseline mutations expose default, required, access, and nullability drift', () => {
@@ -445,6 +472,18 @@ test('real mapped input baseline mutations expose default, required, access, and
   assert.equal(matchingKnownMetadata.drift.readWrite, null)
   assert.equal(matchingKnownMetadata.drift.nullability, null)
   assert.equal(matchingKnownMetadata.status, 'aligned-candidate')
+
+  const unknownDefault = buildMax({
+    mutateAvaloniaProperty: (property) => {
+      property.defaultKnown = false
+      delete property.defaultValue
+    },
+  })
+  assert.equal(
+    unknownDefault.drift.default,
+    'avalonia default metadata unavailable',
+  )
+  assert.equal(unknownDefault.status, 'partial')
 
   const defaultDrift = buildMax({
     mutateWeb: (property) => {
@@ -544,11 +583,11 @@ test('mapped input semantic mutations invalidate the committed surface hash', ()
     (type) => {
       type.avaloniaProperties.find(
         (property) => property.name === 'Max',
-      ).defaultValue = 99
+      ).defaultValue = 100
     },
     (type) => {
       type.properties.find((property) => property.name === 'Max').required =
-        false
+        true
     },
     (type) => {
       type.properties.find((property) => property.name === 'Max').canWrite =

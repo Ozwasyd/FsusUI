@@ -2,8 +2,11 @@
   "packageId": "FsusUI.Avalonia.Icons",
   "baselineVersion": "1.0.0",
   "source": {
-    "tool": "FsusUI.Avalonia.ApiTool@1.0.0",
-    "assemblyVersion": "0.0.0.0"
+    "tool": "FsusUI.Avalonia.ApiTool@1.1.0",
+    "assemblyVersion": "0.0.0.0",
+    "inputTreeHash": "14e134f2e5c4641fbd131e80f4b4ff8217444a3e713863f398b7d02b94ad86bd",
+    "compilerOptionsHash": "ecffd3b7b5f35d1069422f1c890f32f99495e519da68b530f910d121bf7085a1",
+    "dependencyVersionsHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e"
   },
   "semanticTypes": [
     {

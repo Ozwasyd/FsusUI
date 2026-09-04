@@ -699,16 +699,20 @@ const canonicalAvaloniaPropertySurface = (
   canWrite: knownBoolean(property.canWrite),
   isStatic: knownBoolean(property.isStatic),
   required: knownBoolean(property.required),
+  defaultKnown: property.defaultKnown === true,
+  defaultValue:
+    property.defaultKnown === true ? (property.defaultValue ?? null) : null,
   isContentProperty: contentProperty === property.name,
   avaloniaProperty: avaloniaProperty
     ? {
         kind: avaloniaProperty.kind,
         type: avaloniaProperty.type,
         nullable: knownBoolean(avaloniaProperty.nullable),
-        defaultKnown: Object.hasOwn(avaloniaProperty, 'defaultValue'),
-        defaultValue: Object.hasOwn(avaloniaProperty, 'defaultValue')
-          ? avaloniaProperty.defaultValue
-          : null,
+        defaultKnown: avaloniaProperty.defaultKnown === true,
+        defaultValue:
+          avaloniaProperty.defaultKnown === true
+            ? (avaloniaProperty.defaultValue ?? null)
+            : null,
       }
     : null,
 })
@@ -719,10 +723,9 @@ const canonicalAvaloniaPropertyOnlySurface = (property, contentProperty) => ({
   propertyKind: property.kind,
   type: property.type,
   nullable: knownBoolean(property.nullable),
-  defaultKnown: Object.hasOwn(property, 'defaultValue'),
-  defaultValue: Object.hasOwn(property, 'defaultValue')
-    ? property.defaultValue
-    : null,
+  defaultKnown: property.defaultKnown === true,
+  defaultValue:
+    property.defaultKnown === true ? (property.defaultValue ?? null) : null,
   isContentProperty: contentProperty === property.name,
 })
 
@@ -834,9 +837,17 @@ const combinedAvaloniaProperty = (name, avaloniaType) => {
           : null,
     propertyKind: avaloniaProperty?.kind ?? 'clr',
     defaultKnown:
-      avaloniaProperty != null &&
-      Object.hasOwn(avaloniaProperty, 'defaultValue'),
-    defaultValue: avaloniaProperty?.defaultValue,
+      avaloniaProperty != null
+        ? avaloniaProperty.defaultKnown === true
+        : property?.defaultKnown === true,
+    defaultValue:
+      avaloniaProperty != null
+        ? avaloniaProperty.defaultKnown === true
+          ? (avaloniaProperty.defaultValue ?? null)
+          : undefined
+        : property?.defaultKnown === true
+          ? (property.defaultValue ?? null)
+          : undefined,
     required:
       typeof property?.required === 'boolean' ? property.required : null,
     canRead: typeof property?.canRead === 'boolean' ? property.canRead : null,

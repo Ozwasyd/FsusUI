@@ -40,6 +40,7 @@ try {
       '--project',
       project,
       '--',
+      '--verify-source-semantics',
       '--output',
       tmpDir,
     ],
