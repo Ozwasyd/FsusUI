@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "ownerIssue": 358,
+  "boundaries": [
+    {
+      "package": "FsusUI.Avalonia",
+      "member": "FsusSelect.ResolveMemberPath",
+      "path": "dotnet/FsusUI.Avalonia/Controls/FsusPickerControls.cs",
+      "annotation": "UnconditionalSuppressMessage",
+      "code": "IL2075",
+      "docs": "docs/avalonia/components/picker.md",
+      "test": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusSelectHeadlessTests.cs"
+    },
+    {
+      "package": "FsusUI.Avalonia",
+      "member": "FsusMacOSNativeMenuRuntime.ResolveServicesMenuProperty",
+      "path": "dotnet/FsusUI.Avalonia/Controls/FsusMacOSNativeMenuAdapter.cs",
+      "annotation": "DynamicDependency",
+      "code": "Avalonia.Native.MacOSNativeMenuCommands.PublicFields",
+      "docs": "docs/avalonia/components/navigation.md",
+      "test": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuMacOSAdapterTests.cs"
+    },
+    {
+      "package": "FsusUI.Avalonia",
+      "member": "FsusMarkdownEditorShellContract.Capture",
+      "path": "dotnet/FsusUI.Avalonia/Controls/FsusMarkdownEditorProjectionSurface.cs",
+      "annotation": "GetMethod",
+      "code": "GetMethod(FsusMarkdownEditorProjectionState.Advance)",
+      "docs": "docs/avalonia/components/markdown-editor.md",
+      "test": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorShellTests.cs"
+    }
+  ]
+}
