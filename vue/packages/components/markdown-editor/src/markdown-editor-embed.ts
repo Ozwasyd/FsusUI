@@ -9,9 +9,7 @@ import {
   type MarkdownEmbedMode,
   type MarkdownEmbedValidNode,
 } from '../../../wasm/markdown-runtime'
-import type {
-  MarkdownEmbedResult,
-} from '../../../wasm/markdown-embed-provider'
+import type { MarkdownEmbedResult } from '../../../wasm/markdown-embed-provider'
 import {
   presentMarkdownEmbed,
   sanitizeEmbedExcerpt,
@@ -64,6 +62,7 @@ export interface MarkdownEmbedPresentationPlan {
   readonly target: string
   readonly mode: MarkdownEmbedMode
   readonly status: MarkdownEmbedPresentationStatus
+  readonly statusText: string
   readonly title: string
   readonly excerpt?: string
   readonly visible: boolean
@@ -164,6 +163,11 @@ export const runMarkdownEmbedRemove = (
 export const planMarkdownEmbedPresentation = (
   node: MarkdownEmbedValidNode,
   result?: MarkdownEmbedResult | null,
+  copy?: Readonly<{
+    modes: Readonly<Record<MarkdownEmbedMode, string>>
+    name: (target: string, mode: string) => string
+    statuses: Readonly<Record<MarkdownEmbedPresentationStatus, string>>
+  }>,
 ): MarkdownEmbedPresentationPlan => {
   const status: MarkdownEmbedPresentationStatus =
     (result?.status as MarkdownEmbedPresentationStatus) ?? 'pending'
@@ -174,11 +178,20 @@ export const planMarkdownEmbedPresentation = (
   const title = result?.title ?? node.target
   const excerpt = sanitizeEmbedExcerpt(result?.excerpt)
   const sourceDirective = formatMarkdownEmbedDirective(node.target, node.mode)
+  const modeText = copy?.modes[node.mode] ?? node.mode
+  const statusText = copy?.statuses[status] ?? status
 
   const allowedActions: MarkdownEmbedActionKind[] = isResolved
     ? ['source-reveal', 'open-source', 'copy', 'select-node', 'delete']
     : isFailure
-      ? ['source-reveal', 'retry', 'open-source', 'copy', 'select-node', 'delete']
+      ? [
+          'source-reveal',
+          'retry',
+          'open-source',
+          'copy',
+          'select-node',
+          'delete',
+        ]
       : ['source-reveal', 'open-source', 'copy', 'select-node', 'delete']
 
   return Object.freeze({
@@ -186,6 +199,7 @@ export const planMarkdownEmbedPresentation = (
     target: node.target,
     mode: node.mode,
     status,
+    statusText,
     title,
     excerpt: excerpt.length > 0 ? excerpt : undefined,
     visible: isResolved || isPending || isFailure,
@@ -194,8 +208,8 @@ export const planMarkdownEmbedPresentation = (
     allowedActions: Object.freeze(allowedActions),
     accessibility: Object.freeze({
       role: 'region' as const,
-      name: `Embed ${node.target} (${node.mode})`,
-      status,
+      name: copy?.name(node.target, modeText) ?? `${node.target} (${modeText})`,
+      status: statusText,
       tabStop: false as const,
     }),
     sourceDirective,

@@ -712,23 +712,23 @@ export const createMarkdownAttachmentAtomicPresentation = (input: {
   readonly kind?: MarkdownAttachmentItemKind
   readonly status: MarkdownAttachmentProviderStatus
   readonly progress: number
+  readonly copy?: Readonly<{
+    actions: Readonly<Record<'cancel' | 'remove' | 'retry', string>>
+    status: (name: string, status: string, percent: number) => string
+  }>
 }): MarkdownAttachmentAtomicPresentation => {
   const percent = Math.min(100, Math.max(0, Math.round(input.progress)))
+  const displayedPercent = Math.round(percent / 25) * 25
   const progressAriaText =
-    input.status === 'resolved'
-      ? `${input.name} upload complete`
-      : input.status === 'rejected'
-        ? `${input.name} upload failed`
-        : input.status === 'cancelled'
-          ? `${input.name} upload cancelled`
-          : `${input.name}: ${Math.round(percent / 25) * 25}% uploaded`
+    input.copy?.status(input.name, input.status, displayedPercent) ??
+    `${input.name}:${input.status}:${displayedPercent}`
 
   const actions: MarkdownAttachmentAtomicAction[] = []
   if (input.status === 'pending' || input.status === 'progress') {
     actions.push(
       Object.freeze({
         key: 'cancel' as const,
-        label: 'Cancel',
+        label: input.copy?.actions.cancel ?? 'cancel',
         minTouchTargetPx: 44,
         disabled: false,
       }),
@@ -738,7 +738,7 @@ export const createMarkdownAttachmentAtomicPresentation = (input: {
     actions.push(
       Object.freeze({
         key: 'retry' as const,
-        label: 'Retry',
+        label: input.copy?.actions.retry ?? 'retry',
         minTouchTargetPx: 44,
         disabled: false,
       }),
@@ -746,7 +746,7 @@ export const createMarkdownAttachmentAtomicPresentation = (input: {
     actions.push(
       Object.freeze({
         key: 'remove' as const,
-        label: 'Remove',
+        label: input.copy?.actions.remove ?? 'remove',
         minTouchTargetPx: 44,
         disabled: false,
       }),
@@ -915,7 +915,7 @@ export const evaluateMarkdownAttachmentAcceptance =
     const accessibility = Object.freeze({
       screenReaderNonFlooding:
         accessibilitySample.statusAriaLive === 'polite' &&
-        accessibilitySample.progressAriaText.endsWith('50% uploaded'),
+        accessibilitySample.progressAriaText.endsWith(':progress:50'),
       touchTargetMeetsBudget: accessibilitySample.actions.every(
         (action) => action.minTouchTargetPx >= 44,
       ),

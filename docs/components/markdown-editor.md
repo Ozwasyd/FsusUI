@@ -227,8 +227,11 @@ capability 的 `aria-live` announcement；该 announcement 通过
 `localeText.capabilityAnnouncement` 本地化。
 
 `localeText` 是 editor-owned 可见文案的唯一 override authority，包括 modes、
-内置 commands、command group、actions、palette、selection/slash/contextual surface、textarea 名称、
-capability/result 状态与 status 指标标签。Extension command 的 `label`、
+内置 commands、command group、actions、palette、search/replace、attachment、
+image property、embed、atomic action、selection/slash/contextual surface、textarea 名称、
+capability/result 状态与 status 指标标签。Provider 只回传 stable status/reason
+code，editor 在显示与 ARIA boundary 通过 `localeText` 解析，不依赖 error message
+string matching。Extension command 的 `label`、
 `title`、`description` 仍由 extension 自己提供；自定义 group key 应通过
 `localeText.commandGroups` 提供可见名称。`statusDensity="minimal"` 只显示
 字符与词数；`detailed` 使用 definition list 显示行/列、行数、字符、词、选区与

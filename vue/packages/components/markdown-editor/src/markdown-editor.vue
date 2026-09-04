@@ -37,7 +37,7 @@
           v-model="searchQuery"
           type="text"
           :class="ns.e('search-input')"
-          placeholder="Find"
+          :placeholder="localeText.search.find"
           :aria-label="searchUiState.aria.queryAriaLabel"
           data-testid="markdown-search-query"
           @input="handleSearchQueryInput"
@@ -53,27 +53,36 @@
         </span>
         <button
           type="button"
-          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'plain-case')]"
-          aria-label="Match Case"
-          title="Match Case"
+          :class="[
+            ns.e('search-toggle'),
+            ns.is('active', searchMode === 'plain-case'),
+          ]"
+          :aria-label="localeText.search.matchCase"
+          :title="localeText.search.matchCase"
           @click="toggleSearchMode('plain-case')"
         >
           Aa
         </button>
         <button
           type="button"
-          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'whole-word')]"
-          aria-label="Match Whole Word"
-          title="Match Whole Word"
+          :class="[
+            ns.e('search-toggle'),
+            ns.is('active', searchMode === 'whole-word'),
+          ]"
+          :aria-label="localeText.search.wholeWord"
+          :title="localeText.search.wholeWord"
           @click="toggleSearchMode('whole-word')"
         >
           &#92;b
         </button>
         <button
           type="button"
-          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'regex')]"
-          aria-label="Use Regular Expression"
-          title="Use Regular Expression"
+          :class="[
+            ns.e('search-toggle'),
+            ns.is('active', searchMode === 'regex'),
+          ]"
+          :aria-label="localeText.search.useRegex"
+          :title="localeText.search.useRegex"
           @click="toggleSearchMode('regex')"
         >
           .*
@@ -82,8 +91,8 @@
           type="button"
           :class="ns.e('search-nav')"
           :disabled="!searchMatches.length"
-          aria-label="Previous match"
-          title="Previous match"
+          :aria-label="localeText.search.previousMatch"
+          :title="localeText.search.previousMatch"
           data-testid="markdown-search-prev"
           @click="searchNavigate('previous')"
         >
@@ -93,8 +102,8 @@
           type="button"
           :class="ns.e('search-nav')"
           :disabled="!searchMatches.length"
-          aria-label="Next match"
-          title="Next match"
+          :aria-label="localeText.search.nextMatch"
+          :title="localeText.search.nextMatch"
           data-testid="markdown-search-next"
           @click="searchNavigate('next')"
         >
@@ -102,9 +111,12 @@
         </button>
         <button
           type="button"
-          :class="[ns.e('search-toggle'), ns.is('active', searchUiState.replaceOpen)]"
-          aria-label="Toggle Replace"
-          title="Toggle Replace"
+          :class="[
+            ns.e('search-toggle'),
+            ns.is('active', searchUiState.replaceOpen),
+          ]"
+          :aria-label="localeText.search.toggleReplace"
+          :title="localeText.search.toggleReplace"
           @click="toggleSearchReplace"
         >
           ⇄
@@ -112,8 +124,8 @@
         <button
           type="button"
           :class="ns.e('search-close')"
-          aria-label="Close search"
-          title="Close search"
+          :aria-label="localeText.search.close"
+          :title="localeText.search.close"
           data-testid="markdown-search-close"
           @click="closeSearch"
         >
@@ -126,7 +138,7 @@
           v-model="searchReplaceText"
           type="text"
           :class="ns.e('search-input')"
-          placeholder="Replace"
+          :placeholder="localeText.search.replace"
           :aria-label="searchUiState.aria.replaceAriaLabel"
           data-testid="markdown-search-replace"
           @keydown="handleSearchReplaceKeydown"
@@ -138,7 +150,7 @@
           data-testid="markdown-search-replace-current"
           @click="searchReplaceCurrent"
         >
-          Replace
+          {{ localeText.search.replace }}
         </button>
         <button
           type="button"
@@ -147,7 +159,7 @@
           data-testid="markdown-search-replace-all"
           @click="searchReplaceAll"
         >
-          Replace All
+          {{ localeText.search.replaceAll }}
         </button>
       </div>
     </div>
@@ -360,7 +372,7 @@
       <ul
         v-if="attachmentPresentations.length"
         :class="ns.e('attachments')"
-        aria-label="Attachments"
+        :aria-label="localeText.attachments.region"
       >
         <li
           v-for="attachment in attachmentPresentations"
@@ -391,15 +403,15 @@
       <form
         v-if="activeImage"
         :class="ns.e('media-properties')"
-        aria-label="Image properties"
+        :aria-label="localeText.imageProperties.region"
         @submit.prevent="applyImageProperties"
       >
         <label>
-          <span>Alternative text</span>
+          <span>{{ localeText.imageProperties.alt }}</span>
           <input v-model="imageAltDraft" :disabled="editingBlocked" />
         </label>
         <label>
-          <span>Destination</span>
+          <span>{{ localeText.imageProperties.destination }}</span>
           <input
             v-model="imageDestinationDraft"
             :aria-invalid="imagePropertyError ? 'true' : undefined"
@@ -407,48 +419,50 @@
           />
         </label>
         <label>
-          <span>Title</span>
+          <span>{{ localeText.imageProperties.title }}</span>
           <input v-model="imageTitleDraft" :disabled="editingBlocked" />
         </label>
         <label>
-          <span>Caption</span>
+          <span>{{ localeText.imageProperties.caption }}</span>
           <input v-model="imageCaptionDraft" :disabled="editingBlocked" />
         </label>
         <p v-if="imagePropertyError" role="alert">
           {{ imagePropertyError }}
         </p>
         <div :class="ns.e('media-actions')">
-          <button type="submit" :disabled="editingBlocked">Apply</button>
+          <button type="submit" :disabled="editingBlocked">
+            {{ localeText.imageProperties.apply }}
+          </button>
           <button
             type="button"
             :disabled="editingBlocked"
             @click="revealActiveImageSource"
           >
-            Source
+            {{ localeText.imageProperties.source }}
           </button>
           <button
             type="button"
             :disabled="!activeImageOpenAllowed"
             @click="openActiveImage"
           >
-            Open
+            {{ localeText.imageProperties.open }}
           </button>
           <button type="button" @click="copyActiveFigure('exact')">
-            Copy source
+            {{ localeText.imageProperties.copySource }}
           </button>
           <button
             v-if="activeImage.figure"
             type="button"
             @click="copyActiveFigure('visible')"
           >
-            Copy visible
+            {{ localeText.imageProperties.copyVisible }}
           </button>
           <button
             type="button"
             :disabled="editingBlocked"
             @click="openActiveImageReplacement"
           >
-            Replace
+            {{ localeText.imageProperties.replace }}
           </button>
           <button
             v-if="activeImage.figure"
@@ -456,14 +470,14 @@
             :disabled="editingBlocked"
             @click="removeActiveCaption"
           >
-            Remove caption
+            {{ localeText.imageProperties.removeCaption }}
           </button>
           <button
             type="button"
             :disabled="editingBlocked"
             @click="removeActiveImage"
           >
-            Remove image
+            {{ localeText.imageProperties.removeImage }}
           </button>
         </div>
       </form>
@@ -485,7 +499,7 @@
       <div
         v-if="currentMode === 'live' && embedPresentationSegments.length"
         :class="ns.e('live-embeds')"
-        aria-label="Embedded content"
+        :aria-label="localeText.embeds.region"
         role="region"
       >
         <section
@@ -500,10 +514,10 @@
               segment.plan.title
             }}</span>
             <span class="el-markdown-embed__mode-tag">{{
-              segment.plan.mode
+              localeText.embeds.modes[segment.plan.mode]
             }}</span>
             <span class="el-markdown-embed__status" role="status">{{
-              segment.plan.status
+              segment.plan.statusText
             }}</span>
           </header>
           <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
@@ -562,9 +576,15 @@
             role="region"
           >
             <header class="el-markdown-embed__header">
-              <span class="el-markdown-embed__target">{{ segment.plan.title }}</span>
-              <span class="el-markdown-embed__mode-tag">{{ segment.plan.mode }}</span>
-              <span class="el-markdown-embed__status" role="status">{{ segment.plan.status }}</span>
+              <span class="el-markdown-embed__target">{{
+                segment.plan.title
+              }}</span>
+              <span class="el-markdown-embed__mode-tag">{{
+                localeText.embeds.modes[segment.plan.mode]
+              }}</span>
+              <span class="el-markdown-embed__status" role="status">{{
+                segment.plan.statusText
+              }}</span>
             </header>
             <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
               {{ segment.plan.excerpt }}
@@ -585,43 +605,45 @@
       </div>
 
       <template v-if="atomicActionNodes.length">
-      <div
-        v-for="atomicNode in atomicActionNodes"
-        :key="atomicNode.id"
-        :class="ns.e('visually-hidden')"
-        role="group"
-        :aria-label="`${atomicNode.kind} atomic Markdown actions`"
-        v-bind="{ 'data-markdown-atomic-actions': '' }"
-      >
-        <button
-          type="button"
-          tabindex="-1"
-          :aria-label="`${atomicNode.kind} enter before`"
-          @click="invokeAtomicNodeAction(atomicNode.id, 'caret-before')"
+        <div
+          v-for="atomicNode in atomicActionNodes"
+          :key="atomicNode.id"
+          :class="ns.e('visually-hidden')"
+          role="group"
+          :aria-label="localeText.atomic.actionsRegion(atomicNode.kind)"
+          v-bind="{ 'data-markdown-atomic-actions': '' }"
         >
-          Enter before
-        </button>
-        <button
-          type="button"
-          tabindex="-1"
-          :aria-label="`${atomicNode.kind} enter after`"
-          @click="invokeAtomicNodeAction(atomicNode.id, 'caret-after')"
-        >
-          Enter after
-        </button>
-        <button
-          type="button"
-          tabindex="-1"
-          :aria-label="`${atomicNode.kind} edit source`"
-          @click="invokeAtomicNodeAction(atomicNode.id, 'enter-source')"
-        >
-          Edit source
-        </button>
-      </div>
+          <button
+            type="button"
+            tabindex="-1"
+            :aria-label="localeText.atomic.enterBefore(atomicNode.kind)"
+            @click="invokeAtomicNodeAction(atomicNode.id, 'caret-before')"
+          >
+            {{ localeText.atomic.enterBefore(atomicNode.kind) }}
+          </button>
+          <button
+            type="button"
+            tabindex="-1"
+            :aria-label="localeText.atomic.enterAfter(atomicNode.kind)"
+            @click="invokeAtomicNodeAction(atomicNode.id, 'caret-after')"
+          >
+            {{ localeText.atomic.enterAfter(atomicNode.kind) }}
+          </button>
+          <button
+            type="button"
+            tabindex="-1"
+            :aria-label="localeText.atomic.editSource(atomicNode.kind)"
+            @click="invokeAtomicNodeAction(atomicNode.id, 'enter-source')"
+          >
+            {{ localeText.atomic.editSource(atomicNode.kind) }}
+          </button>
+        </div>
       </template>
 
       <el-markdown-renderer
-        v-else-if="liveSurface.rendererVisible && embedRenderSegments.length <= 1"
+        v-else-if="
+          liveSurface.rendererVisible && embedRenderSegments.length <= 1
+        "
         ref="previewRendererRef"
         :class="ns.e('preview')"
         :base-url="previewBaseUrl"
@@ -1519,10 +1541,11 @@ const attachmentPresentations = computed(() =>
       const item = attachmentItems.get(job.itemId ?? job.id)
       return createMarkdownAttachmentAtomicPresentation({
         itemId: job.itemId ?? job.id,
-        name: item?.name ?? 'Attachment',
+        name: item?.name ?? localeText.value.attachments.unnamed,
         kind: item?.kind,
         status: job.phase === 'idle' ? 'pending' : job.phase,
         progress: job.progress,
+        copy: localeText.value.attachments,
       })
     }),
 )
@@ -2416,6 +2439,7 @@ const captureAttachmentFiles = (
     transactionStore.value,
     captured.batch.anchor,
     captured.batch,
+    localeText.value.attachments.uploading,
   )
   const dispatched = dispatchTransaction(planned.transaction)
   if (!dispatched.accepted) return captured
@@ -4523,35 +4547,43 @@ const refreshEmbedPresentations = () => {
   for (const node of embedNodes.value) void resolveEmbedNode(node, generation)
 }
 
-const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(() => {
-  const segments: MarkdownEmbedRenderSegment[] = []
-  let offset = 0
-  for (const node of embedNodes.value) {
+const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(
+  () => {
+    const segments: MarkdownEmbedRenderSegment[] = []
+    let offset = 0
+    for (const node of embedNodes.value) {
+      segments.push({
+        content: editorValue.value.slice(offset, node.ranges.full.start),
+        key: `markdown:${offset}`,
+        kind: 'markdown',
+      })
+      const result = embedResults.value.get(embedNodeId(node))
+      segments.push({
+        key: embedNodeId(node),
+        kind: 'embed',
+        node,
+        plan: planMarkdownEmbedPresentation(
+          node,
+          result,
+          localeText.value.embeds,
+        ),
+        result,
+      })
+      offset = node.ranges.full.end
+    }
+    if (!segments.length) {
+      return [
+        { content: editorValue.value, key: 'markdown:all', kind: 'markdown' },
+      ]
+    }
     segments.push({
-      content: editorValue.value.slice(offset, node.ranges.full.start),
+      content: editorValue.value.slice(offset),
       key: `markdown:${offset}`,
       kind: 'markdown',
     })
-    const result = embedResults.value.get(embedNodeId(node))
-    segments.push({
-      key: embedNodeId(node),
-      kind: 'embed',
-      node,
-      plan: planMarkdownEmbedPresentation(node, result),
-      result,
-    })
-    offset = node.ranges.full.end
-  }
-  if (!segments.length) {
-    return [{ content: editorValue.value, key: 'markdown:all', kind: 'markdown' }]
-  }
-  segments.push({
-    content: editorValue.value.slice(offset),
-    key: `markdown:${offset}`,
-    kind: 'markdown',
-  })
-  return Object.freeze(segments)
-})
+    return Object.freeze(segments)
+  },
+)
 const embedPresentationSegments = computed(() =>
   embedRenderSegments.value.filter(
     (
@@ -4564,10 +4596,7 @@ const embedPresentationSegments = computed(() =>
 )
 
 const embedActionLabel = (action: MarkdownEmbedActionKind) =>
-  action
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
+  localeText.value.embeds.actions[action]
 
 const markdownCommandContext = () => ({
   dispatch: { dispatch: dispatchTransaction },
@@ -4627,6 +4656,7 @@ const updateSearchState = () => {
       mode: searchMode.value,
       replaceOpen: searchUiState.value.replaceOpen,
       replaceText: searchReplaceText.value,
+      copy: localeText.value.search,
     },
   )
 }
@@ -4663,6 +4693,7 @@ const openSearch = (replace = false) => {
       mode: searchMode.value,
       replaceOpen: replace,
       replaceText: searchReplaceText.value,
+      copy: localeText.value.search,
     },
   )
   if (searchQuery.value) {
@@ -4687,6 +4718,7 @@ const closeSearch = () => {
       mode: searchMode.value,
       replaceOpen: false,
       replaceText: searchReplaceText.value,
+      copy: localeText.value.search,
     },
   )
   if (currentMode.value === 'preview') {
@@ -4711,6 +4743,7 @@ const toggleSearchReplace = () => {
       mode: searchMode.value,
       replaceOpen: !searchUiState.value.replaceOpen,
       replaceText: searchReplaceText.value,
+      copy: localeText.value.search,
     },
   )
 }
@@ -5133,7 +5166,10 @@ const applyImageProperties = () => {
     },
   )
   if (!destinationValidation.open.allowed) {
-    imagePropertyError.value = `Destination rejected: ${destinationValidation.state}`
+    imagePropertyError.value =
+      localeText.value.imageProperties.destinationRejected(
+        destinationValidation.state,
+      )
     return
   }
 
@@ -5194,7 +5230,9 @@ const applyImageProperties = () => {
   })
   imagePropertyError.value = result.accepted
     ? ''
-    : `Image properties rejected: ${result.reason ?? 'invalid-change'}`
+    : localeText.value.imageProperties.updateRejected(
+        result.reason ?? 'invalid-change',
+      )
 }
 
 const revealActiveImageSource = () => {
