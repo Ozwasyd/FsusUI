@@ -423,6 +423,7 @@ const readEditorBox = (page) =>
     if (!textarea) return null
     const rectangle = textarea.getBoundingClientRect()
     return {
+      devicePixelRatio: window.devicePixelRatio,
       innerWidth: window.innerWidth,
       innerHeight: window.innerHeight,
       rect: {
@@ -440,6 +441,7 @@ const computeTarget = (box, windowGeometry) => {
   }
   const point = computeX11Target({
     windowGeometry,
+    devicePixelRatio: box.devicePixelRatio,
     innerWidth: box.innerWidth,
     innerHeight: box.innerHeight,
     rect: box.rect,
@@ -933,10 +935,27 @@ const main = async () => {
           'trace listener could not attach to editor textarea',
         )
       }
+      await page.evaluate(() => {
+        window.__fsusNativeImePointerDown = null
+        document.addEventListener(
+          'pointerdown',
+          (event) => {
+            window.__fsusNativeImePointerDown = {
+              clientX: event.clientX,
+              clientY: event.clientY,
+              target: event.target?.tagName ?? null,
+            }
+          },
+          { capture: true, once: true },
+        )
+      })
+      await page.evaluate((selector) => {
+        document.querySelector(selector)?.blur()
+      }, editorSelector)
       const beforeDocumentId = before.documentId
 
       const x11Pid = evidence.window?.pid ?? browserPid.pid
-      const x11Result = runPythonX11(
+      const x11ClickResult = runPythonX11(
         [
           '--expect-class',
           boundWindowClass || expectedWindowClass,
@@ -948,15 +967,49 @@ const main = async () => {
           String(target.y),
           '--activate',
           '--click',
+        ],
+        display,
+      )
+      if (x11ClickResult.window.id !== evidence.window.id) {
+        fail(
+          'window-pid-mismatch',
+          `window identity changed: ${evidence.window.id} -> ${x11ClickResult.window.id}`,
+        )
+      }
+      try {
+        await page.waitForFunction(
+          (selector) => document.activeElement === document.querySelector(selector),
+          editorSelector,
+          { timeout: 5000 },
+        )
+      } catch {
+        const pointerDown = await page.evaluate(
+          () => window.__fsusNativeImePointerDown,
+        )
+        fail(
+          'input-not-delivered',
+          `native pointer click did not focus the editor at (${target.x}, ${target.y}); pointer=${JSON.stringify(x11ClickResult.pointer)} dom=${JSON.stringify(pointerDown)} box=${JSON.stringify(editorBox)}`,
+        )
+      }
+      // Let the platform input method attach to the freshly focused native
+      // window before XTEST sends the first real key. This is deliberately a
+      // separate OS-input step; Playwright is only observing focus here.
+      await sleep(300)
+      const x11KeyResult = runPythonX11(
+        [
+          '--expect-class',
+          boundWindowClass || expectedWindowClass,
+          '--expect-pid',
+          String(x11Pid),
           '--keys',
           ...scenario.keys,
         ],
         display,
       )
-      if (x11Result.window.id !== evidence.window.id) {
+      if (x11KeyResult.window.id !== evidence.window.id) {
         fail(
           'window-pid-mismatch',
-          `window identity changed: ${evidence.window.id} -> ${x11Result.window.id}`,
+          `window identity changed: ${evidence.window.id} -> ${x11KeyResult.window.id}`,
         )
       }
 

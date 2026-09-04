@@ -886,6 +886,10 @@ describe('MarkdownEditor', () => {
       )
       await nextTick()
       expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+      expect(element.value).toBe(composed)
+
+      await wrapper.setProps({ placeholder: 'Composition remains native' })
+      expect(element.value).toBe(composed)
 
       element.dispatchEvent(
         new CompositionEvent('compositionend', {
