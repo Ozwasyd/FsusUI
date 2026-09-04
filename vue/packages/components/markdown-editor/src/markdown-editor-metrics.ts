@@ -95,7 +95,7 @@ const lineColumnAt = (starts: readonly number[], offset: number) => {
 
 const whitespaceCount = (value: string) => value.match(/\s/gu)?.length ?? 0
 
-const SEGMENT_CONTEXT_CODE_UNITS = 64
+const SEGMENT_CONTEXT_CODE_UNITS = [64, 128, 256, 512, 1_024, 2_048, 4_096] as const
 
 const isHighSurrogate = (value: string | undefined) =>
   value !== undefined && /[\uD800-\uDBFF]/u.test(value)
@@ -107,9 +107,10 @@ const segmentWindow = (
   source: string,
   from: number,
   to: number,
+  contextCodeUnits: number,
 ) => {
-  const lowerBound = Math.max(0, from - SEGMENT_CONTEXT_CODE_UNITS)
-  const upperBound = Math.min(source.length, to + SEGMENT_CONTEXT_CODE_UNITS)
+  const lowerBound = Math.max(0, from - contextCodeUnits)
+  const upperBound = Math.min(source.length, to + contextCodeUnits)
   let start = from
   while (start > lowerBound && !/\s/u.test(source[start - 1]!)) start -= 1
   while (start > lowerBound && /\s/u.test(source[start - 1]!)) start -= 1
@@ -123,6 +124,59 @@ const segmentWindow = (
     end += 1
   }
   return { start, end }
+}
+
+const boundedSegmentDelta = (
+  source: string,
+  next: string,
+  change: MarkdownEditorMetricsChange,
+  locale: string | undefined,
+  mode: 'intl' | 'fallback',
+) => {
+  const codeUnitDelta = change.insert.length - (change.to - change.from)
+  let previous:
+    | { readonly graphemeCount: number; readonly wordCount: number }
+    | undefined
+  let matchingExpansions = 0
+  let scannedCodeUnits = 0
+
+  for (const contextCodeUnits of SEGMENT_CONTEXT_CODE_UNITS) {
+    const oldWindow = segmentWindow(
+      source,
+      change.from,
+      change.to,
+      contextCodeUnits,
+    )
+    const newWindow = {
+      start: oldWindow.start,
+      end: oldWindow.end + codeUnitDelta,
+    }
+    const removed = source.slice(oldWindow.start, oldWindow.end)
+    const inserted = next.slice(newWindow.start, newWindow.end)
+    scannedCodeUnits += removed.length + inserted.length
+    const current = {
+      graphemeCount:
+        graphemeParts(inserted, locale, mode).length -
+        graphemeParts(removed, locale, mode).length,
+      wordCount:
+        wordParts(inserted, locale, mode).length -
+        wordParts(removed, locale, mode).length,
+    }
+    const matchesPrevious =
+      previous &&
+      previous.graphemeCount === current.graphemeCount &&
+      previous.wordCount === current.wordCount
+    matchingExpansions = matchesPrevious ? matchingExpansions + 1 : 0
+    previous = current
+    if (matchingExpansions >= 2) {
+      return { ...current, scannedCodeUnits }
+    }
+  }
+
+  return {
+    ...(previous ?? { graphemeCount: 0, wordCount: 0 }),
+    scannedCodeUnits,
+  }
 }
 
 const isUsableIncrementalChange = (
@@ -318,25 +372,21 @@ export const createMarkdownEditorMetricsSession = (
       return metrics
     }
     const mode = segmenterMode(merged)
-    const oldWindow = segmentWindow(source, change.from, change.to)
+    const segmentDelta = boundedSegmentDelta(
+      source,
+      next,
+      change,
+      merged.locale,
+      mode,
+    )
     const delta = change.insert.length - (change.to - change.from)
-    const newWindow = {
-      start: oldWindow.start,
-      end: oldWindow.end + delta,
-    }
-    const removed = source.slice(oldWindow.start, oldWindow.end)
-    const inserted = next.slice(newWindow.start, newWindow.end)
     const graphemeCount = Math.max(
       0,
-      metrics.graphemeCount -
-        graphemeParts(removed, merged.locale, mode).length +
-        graphemeParts(inserted, merged.locale, mode).length,
+      metrics.graphemeCount + segmentDelta.graphemeCount,
     )
     const wordCount = Math.max(
       0,
-        metrics.wordCount -
-        wordParts(removed, merged.locale, mode).length +
-        wordParts(inserted, merged.locale, mode).length,
+      metrics.wordCount + segmentDelta.wordCount,
     )
     const removedChange = source.slice(change.from, change.to)
     const byteWindowStart = Math.max(0, change.from - 1)
@@ -363,8 +413,7 @@ export const createMarkdownEditorMetricsSession = (
       graphemeCount,
       wordCount,
       scannedCodeUnits:
-        removed.length +
-        inserted.length +
+        segmentDelta.scannedCodeUnits +
         oldByteWindow.length +
         newByteWindow.length +
         lineUpdate.scannedCodeUnits,

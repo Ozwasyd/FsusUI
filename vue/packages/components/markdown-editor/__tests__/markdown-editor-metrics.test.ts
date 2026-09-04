@@ -77,7 +77,51 @@ describe('markdown editor locale-aware source metrics', () => {
     })
     const full = calculateMarkdownEditorMetrics(next, { locale: 'zh-CN' })
 
-    expect(incremental.scannedCodeUnits).toBeLessThan(1_024)
+    expect(incremental.scannedCodeUnits).toBeLessThan(4_096)
+    expect({ ...incremental, scannedCodeUnits: 0 }).toEqual({
+      ...full,
+      scannedCodeUnits: 0,
+    })
+  })
+
+  it('expands bounded context until locale word segmentation converges', () => {
+    let seed = 0x272434
+    const random = () => {
+      seed = (seed * 1_664_525 + 1_013_904_223) >>> 0
+      return seed / 0x1_0000_0000
+    }
+    const inserts = [
+      '你',
+      '好',
+      '😀',
+      '👨‍👩‍👧‍👦',
+      'e\u0301',
+      '\r\n',
+      ' ',
+      'مرحبا',
+      '',
+      'ไทย',
+    ]
+    let source = `${'你'.repeat(100_000)}\r\nمرحبا 😀 e\u0301`
+    let target = { from: 0, insert: '', to: 0 }
+    for (let index = 0; index <= 879; index += 1) {
+      const from = Math.floor(random() * (source.length + 1))
+      const to =
+        from +
+        Math.min(source.length - from, Math.floor(random() * 4))
+      const insert = inserts[Math.floor(random() * inserts.length)]!
+      random()
+      target = { from, insert, to }
+      if (index === 879) break
+      source = `${source.slice(0, from)}${insert}${source.slice(to)}`
+    }
+    const session = createMarkdownEditorMetricsSession({ locale: 'zh-CN' })
+    session.calculate(source)
+    const next = `${source.slice(0, target.from)}${target.insert}${source.slice(target.to)}`
+    const incremental = session.calculate(next, { change: target })
+    const full = calculateMarkdownEditorMetrics(next, { locale: 'zh-CN' })
+
+    expect(incremental.scannedCodeUnits).toBeLessThan(4_096)
     expect({ ...incremental, scannedCodeUnits: 0 }).toEqual({
       ...full,
       scannedCodeUnits: 0,
