@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 
 const root = process.env.FSUSUI_AOT_REMEDIATION_ROOT
   ? resolve(process.env.FSUSUI_AOT_REMEDIATION_ROOT)
@@ -184,7 +184,11 @@ const walk = (directory) => {
     else if (entry.name.endsWith('.cs')) sourceFiles.push(file)
   }
 }
-walk('dotnet/FsusUI.Avalonia')
+for (const packageDirectory of packages.map(({ project }) =>
+  dirname(project),
+)) {
+  walk(packageDirectory)
+}
 for (const file of sourceFiles) {
   const source = await read(file)
   for (const annotation of [
