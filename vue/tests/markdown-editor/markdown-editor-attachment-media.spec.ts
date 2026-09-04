@@ -3,7 +3,7 @@ import type { Locator, Page } from '@playwright/test'
 
 const openFixture = async (
   page: Page,
-  options: { interactionProfile?: 'keyboard' } = {},
+  options: { interactionProfile?: 'keyboard'; modeMatrix?: boolean } = {},
 ) => {
   const parameters = new URLSearchParams({
     audit: 'ui-states',
@@ -14,6 +14,9 @@ const openFixture = async (
       'markdownEditorInteractionProfile',
       options.interactionProfile,
     )
+  }
+  if (options.modeMatrix) {
+    parameters.set('markdownEditorModeMatrix', '1')
   }
   await page.goto(`/?${parameters.toString()}`, {
     waitUntil: 'domcontentloaded',
@@ -231,7 +234,10 @@ test('applies image property and caption figure commands through the production 
       'All four modes use the public keyboard interaction profile; touch/coarse-pointer behavior is covered separately.',
   })
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  const fixture = await openFixture(page, { interactionProfile: 'keyboard' })
+  const fixture = await openFixture(page, {
+    interactionProfile: 'keyboard',
+    modeMatrix: true,
+  })
   const editor = fixture.locator('.el-markdown-editor')
   const textarea = editor.locator('textarea')
 
