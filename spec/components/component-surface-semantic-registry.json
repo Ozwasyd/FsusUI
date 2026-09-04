@@ -166,7 +166,7 @@
       "path": "vue/packages/theme-chalk/src/common/transition.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "c6659ec0606eb443746a801b68cbab10b8fa7ca92edf6c9934dd86cd0f11eb24"
+      "digest": "a5a640588fca159c8141d9185f8b71a4eeff438fe5a92e2af646e2b864d1a2d7"
     },
     "implementation-21": {
       "path": "vue/packages/theme-chalk/src/public-shell.scss",
