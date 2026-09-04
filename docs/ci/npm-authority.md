@@ -140,6 +140,27 @@ Renovate PR. Repository owners must compare the live default-branch protection
 payload with the checked-in authority before treating hosted automerge as
 accepted evidence.
 
+## Freshness blocker lifecycle (#411 / #412)
+
+`pnpm deps:freshness -- --output <path>` writes the single structured result
+consumed by `.github/workflows/dependency-freshness.yml`. The workflow runs at
+six-hour intervals and by manual dispatch, serializes runs, and maintains the
+fixed `Dependency freshness blockers` issue plus the `dependency-blocked` label
+for upgrade PRs whose required checks have failed for more than 24 hours.
+Operational lookup errors, incomplete registry results, permission failures,
+and older result watermarks stop reconciliation before an issue can be closed.
+The lifecycle does not close or replace dependency PRs, select lower versions,
+create exceptions, change required checks, or enable automerge.
+
+The deterministic local lifecycle simulation is:
+
+```bash
+node scripts/test-dependency-freshness-blocker.mjs
+```
+
+It is not evidence that a scheduled GitHub Actions run or live API mutation has
+completed successfully.
+
 ## What #405 / #406 / #408 cover
 
 - **#405:** authority schema, inventory, migration baseline digests.
