@@ -308,6 +308,10 @@ const reorderUploadFiles = () => {
   display: none;
 }
 
+:deep(.ssr-motion-fixture__legacy-consumers .el-upload--picture-card) {
+  display: none;
+}
+
 .ssr-motion-fixture__flip-anchor {
   position: fixed;
   top: 0;

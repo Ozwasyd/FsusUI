@@ -501,6 +501,8 @@ test('records real legacy consumer state machines in all explicit modes', async 
     body: traceEvidence,
     contentType: 'application/json',
   })
+  await page.getByTestId('loading-toggle').click()
+  await expect(page.locator('.el-loading-mask')).toHaveCount(0)
   const terminalRender = await page.screenshot({ fullPage: true })
   await retainEvidence('legacy-motion-terminal-render.png', terminalRender)
   await testInfo.attach('legacy-motion-terminal-render.png', {
