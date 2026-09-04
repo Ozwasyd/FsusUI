@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "2a7fd39fd9569afef581e9cf9285c0e8c7a8968c",
+    "commitSha": "68e35225685932e14442e03d3232e9b8c0471bff",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "4d70c19c6cc9b54a467da8cc01d19a80f4a621ee18c812148621e5c129d4da1f",
+    "inputTreeHash": "5b2e329102953647d0703c7c815093f6dcf2dc67bfc7546a0ae529afcebe5199",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "7948576c9d18504421248c413f8a0312d2bf5d49102a2381071302ddeaf7e861"
+    "outputHash": "31baa9cb4a0a30a75811de22d833bd5f22d89df5d8683000ed4e2e123b39f488"
   },
   "summary": {
     "componentModules": 93,
