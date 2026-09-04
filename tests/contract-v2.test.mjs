@@ -6,6 +6,7 @@ import ts from 'typescript'
 import { fileURLToPath } from 'node:url'
 import {
   buildRegistry,
+  validateAvaloniaSurfaceRegistration,
   validateRegistry,
   validateSemanticMemberBindings,
   AVALONIA_SEMANTIC_PATHS,
@@ -112,8 +113,201 @@ test('valid Contract V2 fixture registry passes validation', () => {
 })
 
 test('committed Contract V2 registry passes validation with the committed gate', () => {
-  const errors = validateRegistry(committedRegistry, gate)
+  const errors = validateRegistry(committedRegistry, gate, {
+    avaloniaBaselines,
+  })
   assert.deepEqual(errors, [])
+})
+
+test('real Avalonia public surfaces have one current mapped or avalonia-extra state', () => {
+  const audit = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines,
+  })
+  assert.deepEqual(audit.errors, [])
+  assert.equal(
+    audit.stats.mappedClaims + audit.stats.avaloniaExtras,
+    audit.stats.mappedSurfaceStates,
+  )
+  assert.equal(
+    audit.stats.mappedTypes + audit.stats.avaloniaOnlyTypes,
+    audit.stats.baselineTypes,
+  )
+  assert.equal(
+    audit.stats.mappedTypeSurfaces + audit.stats.avaloniaOnlySurfaces,
+    audit.stats.baselineSurfaces,
+  )
+  assert.equal(audit.stats.internalSurfaces, 0)
+})
+
+test('real Avalonia surface mutations invalidate current registration', () => {
+  const addedSurfaceBaselines = clone(avaloniaBaselines)
+  addedSurfaceBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusImage')
+    .properties.push({
+      name: 'UnregisteredPublicState',
+      type: 'System.String',
+      nullable: true,
+      canRead: true,
+      canWrite: true,
+      isStatic: false,
+    })
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: addedSurfaceBaselines,
+    }).errors.join('\n'),
+    /UnregisteredPublicState is neither mapped nor registered as avalonia-extra/,
+  )
+
+  const changedOverloadBaselines = clone(avaloniaBaselines)
+  changedOverloadBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusImage')
+    .methods.find(
+      (method) =>
+        method.name === 'OpenPreview' && method.parameters.length === 2,
+    ).parameters[1].type = 'System.String'
+  const changedOverloadErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedOverloadBaselines,
+  }).errors.join('\n')
+  assert.match(
+    changedOverloadErrors,
+    /OpenPreview is neither mapped nor registered as avalonia-extra/,
+  )
+  assert.match(
+    changedOverloadErrors,
+    /OpenPreview does not match an unmatched real public surface/,
+  )
+
+  const changedEventBaselines = clone(avaloniaBaselines)
+  changedEventBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusAlert')
+    .events.find((event) => event.name === 'Dismissed').argsType =
+    'System.EventHandler<System.String>'
+  const changedEventErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedEventBaselines,
+  }).errors.join('\n')
+  assert.match(
+    changedEventErrors,
+    /Dismissed is neither mapped nor registered as avalonia-extra/,
+  )
+  assert.match(
+    changedEventErrors,
+    /Dismissed does not match an unmatched real public surface/,
+  )
+
+  const changedStyledPropertyBaselines = clone(avaloniaBaselines)
+  changedStyledPropertyBaselines.avalonia.semanticTypes
+    .find((type) => type.name === 'FsusUI.Avalonia.Controls.FsusAlert')
+    .avaloniaProperties.find(
+      (property) => property.name === 'ActionContent',
+    ).kind = 'direct'
+  const changedStyledPropertyErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedStyledPropertyBaselines,
+  }).errors.join('\n')
+  assert.match(
+    changedStyledPropertyErrors,
+    /ActionContent is neither mapped nor registered as avalonia-extra/,
+  )
+  assert.match(
+    changedStyledPropertyErrors,
+    /ActionContent does not match an unmatched real public surface/,
+  )
+
+  const changedOnlyTypeBaselines = clone(avaloniaBaselines)
+  changedOnlyTypeBaselines.avalonia.semanticTypes.find(
+    (type) =>
+      type.name === 'FsusUI.Avalonia.Controls.FsusActiveSourceChangedEventArgs',
+  ).properties[0].type = 'System.Int64'
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: changedOnlyTypeBaselines,
+    }).errors.join('\n'),
+    /FsusActiveSourceChangedEventArgs has stale surfaceHash/,
+  )
+})
+
+test('Avalonia registration mutations cannot hide missing or duplicate ownership', () => {
+  const missingExtra = clone(committedRegistry)
+  const imageContract = missingExtra.contracts.find(
+    (contract) => contract.component.name === 'ElImage',
+  )
+  imageContract.avaloniaExtras = imageContract.avaloniaExtras.filter(
+    (extra) => extra.member !== 'LoadAsync',
+  )
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: missingExtra,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /LoadAsync is neither mapped nor registered as avalonia-extra/,
+  )
+
+  const duplicateExtra = clone(committedRegistry)
+  const duplicateImageContract = duplicateExtra.contracts.find(
+    (contract) => contract.component.name === 'ElImage',
+  )
+  duplicateImageContract.avaloniaExtras.push(
+    clone(duplicateImageContract.avaloniaExtras[0]),
+  )
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: duplicateExtra,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /duplicates a public surface registration/,
+  )
+
+  const duplicateOverloadScenario = clone(committedRegistry)
+  const openPreviewExtras = duplicateOverloadScenario.contracts
+    .find((contract) => contract.component.name === 'ElImage')
+    .avaloniaExtras.filter((extra) => extra.member === 'OpenPreview')
+  openPreviewExtras[1].scenarioIds = clone(openPreviewExtras[0].scenarioIds)
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: duplicateOverloadScenario,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /stale or non-unique scenario coverage identity/,
+  )
+
+  const missingType = clone(committedRegistry)
+  const removed = missingType.avaloniaOnlyTypes.shift()
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: missingType,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    new RegExp(`${removed.type} has no Vue counterpart`),
+  )
+
+  const duplicateType = clone(committedRegistry)
+  duplicateType.avaloniaOnlyTypes.push(
+    clone(duplicateType.avaloniaOnlyTypes[0]),
+  )
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: duplicateType,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /is registered more than once/,
+  )
+
+  const staleMappedType = clone(committedRegistry)
+  staleMappedType.componentMap.find(
+    (mapping) => mapping.vue.name === 'ElImage',
+  ).avalonia.surfaceHash = '0'.repeat(64)
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: staleMappedType,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /ElImage.*has stale public surface hash/,
+  )
 })
 
 test('explicit semantic member bindings resolve real members from both baselines', () => {

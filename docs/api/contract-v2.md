@@ -131,3 +131,14 @@ clear the MarkdownEditor gate.
 Every Avalonia public type that has no Vue counterpart is explicitly registered
 in `avaloniaOnlyTypes` with governance and scenario coverage. Extra members of
 mapped components are registered per contract in `avaloniaExtras`.
+
+The generator derives a canonical identity from the Roslyn semantic baseline
+for each CLR property (including its Styled/Direct property metadata), event,
+method overload, and enum member. Each extra records its surface kind and hash;
+overloads with the same public name receive distinct scenario IDs. An
+Avalonia-only type records the count and hash of its complete public surface;
+each mapped type records the same hash in `componentMap`.
+The Contract V2 gate recomputes both inventories and fails when a type or member
+is missing, duplicated, stale, or simultaneously mapped and extra. The semantic
+baselines contain public symbols only, so internal implementation details do
+not enter this registry.

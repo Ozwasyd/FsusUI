@@ -149,13 +149,17 @@
         {
           "member": "AccessibleName",
           "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           },
-          "scenarioIds": ["scenario.v2.el-fixture.avalonia-extra.accessible-name"]
+          "scenarioIds": [
+            "scenario.v2.el-fixture.avalonia-extra.accessible-name"
+          ]
         }
       ],
       "scenarioIds": [
@@ -281,7 +285,14 @@
       "avaloniaExtras": [],
       "markdownEditor": {
         "modes": ["source", "live", "split", "preview"],
-        "capabilities": ["supported", "unsupported-platform", "runtime-unavailable", "projection-failed", "feature-degraded", "fatal"],
+        "capabilities": [
+          "supported",
+          "unsupported-platform",
+          "runtime-unavailable",
+          "projection-failed",
+          "feature-degraded",
+          "fatal"
+        ],
         "writeAlias": false,
         "canonical": true
       },
@@ -329,7 +340,9 @@
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
       "memberCount": 30,
-      "scenarioIds": ["scenario.v2.avalonia-only.fsus-anchored-overlay-surface"],
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-anchored-overlay-surface"
+      ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
         "owner": "FsusUI Core",

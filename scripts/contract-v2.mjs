@@ -620,6 +620,113 @@ const avaloniaSemanticIndex = (baselines) => {
   return index
 }
 
+const canonicalAvaloniaPropertySurface = (
+  property,
+  avaloniaProperty,
+  contentProperty,
+) => ({
+  kind: 'property',
+  member: property.name,
+  type: property.type,
+  nullable: Boolean(property.nullable),
+  canRead: Boolean(property.canRead),
+  canWrite: Boolean(property.canWrite),
+  isStatic: Boolean(property.isStatic),
+  isContentProperty: contentProperty === property.name,
+  avaloniaProperty: avaloniaProperty
+    ? {
+        kind: avaloniaProperty.kind,
+        type: avaloniaProperty.type,
+        nullable: Boolean(avaloniaProperty.nullable),
+      }
+    : null,
+})
+
+const canonicalAvaloniaPropertyOnlySurface = (property, contentProperty) => ({
+  kind: 'avalonia-property',
+  member: property.name,
+  propertyKind: property.kind,
+  type: property.type,
+  nullable: Boolean(property.nullable),
+  isContentProperty: contentProperty === property.name,
+})
+
+const canonicalAvaloniaEventSurface = (event) => ({
+  kind: 'event',
+  member: event.name,
+  eventKind: event.kind,
+  argsType: event.argsType,
+  isStatic: Boolean(event.isStatic),
+})
+
+const canonicalAvaloniaMethodSurface = (method) => ({
+  kind: 'method',
+  member: method.name,
+  isStatic: Boolean(method.isStatic),
+  returnType: method.returnType,
+  parameters: (method.parameters ?? []).map((parameter) => ({
+    name: parameter.name,
+    type: parameter.type,
+    optional: Boolean(parameter.optional),
+  })),
+})
+
+const canonicalAvaloniaEnumMemberSurface = (member) => ({
+  kind: 'enum-member',
+  member: member.name,
+  value: member.value,
+})
+
+export const avaloniaPublicSurfaces = (type) => {
+  const avaloniaProperties = new Map(
+    (type.avaloniaProperties ?? []).map((property) => [
+      property.name,
+      property,
+    ]),
+  )
+  const surfaces = (type.properties ?? []).map((property) =>
+    canonicalAvaloniaPropertySurface(
+      property,
+      avaloniaProperties.get(property.name),
+      type.contentProperty,
+    ),
+  )
+  const clrPropertyNames = new Set(
+    (type.properties ?? []).map((property) => property.name),
+  )
+  for (const property of type.avaloniaProperties ?? []) {
+    if (clrPropertyNames.has(property.name)) continue
+    surfaces.push(
+      canonicalAvaloniaPropertyOnlySurface(property, type.contentProperty),
+    )
+  }
+  surfaces.push(
+    ...(type.events ?? []).map(canonicalAvaloniaEventSurface),
+    ...(type.methods ?? []).map(canonicalAvaloniaMethodSurface),
+    ...(type.enumMembers ?? []).map(canonicalAvaloniaEnumMemberSurface),
+  )
+  return surfaces.sort(
+    (first, second) =>
+      first.member.localeCompare(second.member) ||
+      first.kind.localeCompare(second.kind) ||
+      JSON.stringify(first).localeCompare(JSON.stringify(second)),
+  )
+}
+
+const avaloniaSurfaceFingerprint = (surface) => sha256(JSON.stringify(surface))
+
+const avaloniaTypeSurfaceHash = (type) =>
+  sha256(
+    JSON.stringify({
+      type: type.name,
+      kind: type.kind,
+      baseType: type.baseType ?? null,
+      isAbstract: Boolean(type.isAbstract),
+      isSealed: Boolean(type.isSealed),
+      surfaces: avaloniaPublicSurfaces(type),
+    }),
+  )
+
 const findAvaloniaType = (componentName, typeIndex) => {
   const kebab = kebabName(componentName)
   for (const [fullName, type] of typeIndex) {
@@ -1265,6 +1372,79 @@ const contractForComponent = ({
   return contract
 }
 
+const methodSignatureMatchesSurface = (signature, surface) =>
+  surface.kind === 'method' &&
+  signature?.returnType === surface.returnType &&
+  JSON.stringify(signature?.parameters ?? []) ===
+    JSON.stringify(surface.parameters)
+
+const resolveAvaloniaSurfaceClaims = ({
+  contract,
+  avaloniaType,
+  errors = [],
+}) => {
+  const surfaces = avaloniaPublicSurfaces(avaloniaType)
+  const claims = new Set()
+  const sections = [
+    ['inputs', new Set(['property', 'avalonia-property'])],
+    ['outputs', new Set(['event'])],
+    ['operations', new Set(['method'])],
+    ['contentRegions', new Set(['property', 'avalonia-property'])],
+  ]
+  for (const [section, surfaceKinds] of sections) {
+    for (const member of contract[section] ?? []) {
+      if (!member.avalonia?.member) continue
+      let candidates = surfaces.filter(
+        (surface) =>
+          surfaceKinds.has(surface.kind) &&
+          surface.member === member.avalonia.member,
+      )
+      if (section === 'operations') {
+        candidates = candidates.filter((surface) =>
+          methodSignatureMatchesSurface(member.avalonia.signature, surface),
+        )
+      }
+      const context =
+        `${contract.id} ${member.kind} ${member.name} Avalonia ` +
+        `${member.avalonia.member}`
+      if (candidates.length !== 1) {
+        errors.push(
+          `${context} resolves to ${candidates.length} real public surfaces`,
+        )
+        continue
+      }
+      const fingerprint = avaloniaSurfaceFingerprint(candidates[0])
+      if (claims.has(fingerprint)) {
+        errors.push(
+          `${context} duplicates an already registered public surface`,
+        )
+      }
+      claims.add(fingerprint)
+    }
+  }
+  return claims
+}
+
+const avaloniaExtraForSurface = (
+  contractKebab,
+  surface,
+  disambiguateMember,
+) => ({
+  member: surface.member,
+  kind: 'avalonia-extra',
+  surfaceKind: surface.kind,
+  surfaceHash: avaloniaSurfaceFingerprint(surface),
+  governance: defaultGovernance(
+    'Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.',
+  ),
+  scenarioIds: [
+    `scenario.v2.${contractKebab}.avalonia-extra.${toKebab(surface.member)}` +
+      (disambiguateMember
+        ? `.${toKebab(surface.kind)}.${avaloniaSurfaceFingerprint(surface).slice(0, 12)}`
+        : ''),
+  ],
+})
+
 const extractAvaloniaExtras = ({
   contractKebab,
   avaloniaType,
@@ -1273,33 +1453,33 @@ const extractAvaloniaExtras = ({
   operations,
   contentRegions,
 }) => {
-  const matchedAvaloniaNames = new Set([
-    ...inputs.map((input) => input.avalonia?.member).filter(Boolean),
-    ...outputs.map((output) => output.avalonia?.member).filter(Boolean),
-    ...operations
-      .map((operation) => operation.avalonia?.member)
-      .filter(Boolean),
-    ...contentRegions.map((region) => region.avalonia?.member).filter(Boolean),
-  ])
-  const extras = []
-  const addExtra = (member) => {
-    if (matchedAvaloniaNames.has(member.name)) return
-    extras.push({
-      member: member.name,
-      kind: 'avalonia-extra',
-      governance: defaultGovernance(
-        'Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.',
-      ),
-      scenarioIds: [
-        `scenario.v2.${contractKebab}.avalonia-extra.${toKebab(member.name)}`,
-      ],
-    })
+  const contract = {
+    id: `component-v2.${contractKebab}`,
+    inputs,
+    outputs,
+    operations,
+    contentRegions,
   }
-  for (const property of avaloniaType.properties ?? []) addExtra(property)
-  for (const event of avaloniaType.events ?? []) addExtra(event)
-  for (const method of avaloniaType.methods ?? []) addExtra(method)
-  return extras.sort((first, second) =>
-    first.member.localeCompare(second.member),
+  const matchedSurfaces = resolveAvaloniaSurfaceClaims({
+    contract,
+    avaloniaType,
+  })
+  const unmatched = avaloniaPublicSurfaces(avaloniaType).filter(
+    (surface) => !matchedSurfaces.has(avaloniaSurfaceFingerprint(surface)),
+  )
+  const memberCounts = new Map()
+  for (const surface of unmatched) {
+    memberCounts.set(
+      surface.member,
+      (memberCounts.get(surface.member) ?? 0) + 1,
+    )
+  }
+  return unmatched.map((surface) =>
+    avaloniaExtraForSurface(
+      contractKebab,
+      surface,
+      memberCounts.get(surface.member) > 1,
+    ),
   )
 }
 
@@ -1308,12 +1488,8 @@ const avaloniaOnlyType = ({ type, packageId }) => ({
   kind: type.kind,
   packageId,
   baseline: AVALONIA_SEMANTIC_PATHS[packageId],
-  memberCount:
-    (type.properties?.length ?? 0) +
-    (type.avaloniaProperties?.length ?? 0) +
-    (type.events?.length ?? 0) +
-    (type.methods?.length ?? 0) +
-    (type.enumMembers?.length ?? 0),
+  memberCount: avaloniaPublicSurfaces(type).length,
+  surfaceHash: avaloniaTypeSurfaceHash(type),
   scenarioIds: [
     `scenario.v2.avalonia-only.${toKebab(type.name.split('.').pop() ?? type.name)}`,
   ],
@@ -1329,7 +1505,11 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
     if (!avaloniaType) continue
     map.push({
       vue: { name: component.name, module: component.module },
-      avalonia: { type: avaloniaType.name, packageId: avaloniaType.packageId },
+      avalonia: {
+        type: avaloniaType.name,
+        packageId: avaloniaType.packageId,
+        surfaceHash: avaloniaTypeSurfaceHash(avaloniaType),
+      },
       basis: 'name-equality',
     })
   }
@@ -1408,7 +1588,7 @@ export const buildRegistry = ({
     owner: CONTRACT_V2_OWNER,
     generatedBy: {
       tool: 'scripts/contract-v2.mjs',
-      toolVersion: '1.0.0',
+      toolVersion: '1.1.0',
     },
     baselines: {
       web: {
@@ -1733,6 +1913,14 @@ export const validateContract = (contract, gate, errors) => {
         `${contract.id} avalonia extra ${extra.member ?? '<unknown>'} missing scenario coverage id`,
       )
     }
+    if (
+      typeof extra.surfaceKind !== 'string' ||
+      !/^[a-f0-9]{64}$/.test(extra.surfaceHash ?? '')
+    ) {
+      contractErrors.push(
+        `${contract.id} avalonia extra ${extra.member ?? '<unknown>'} missing canonical public surface identity`,
+      )
+    }
   }
   if (contract.scenarioIds.length === 0) {
     contractErrors.push(`${contract.id} missing required scenario ids`)
@@ -1746,7 +1934,219 @@ export const validateContract = (contract, gate, errors) => {
   return contractErrors
 }
 
-export const validateRegistry = (registry, gate) => {
+export const validateAvaloniaSurfaceRegistration = ({
+  registry,
+  avaloniaBaselines,
+}) => {
+  const errors = []
+  const types = new Map()
+  for (const [packageId] of Object.entries(AVALONIA_SEMANTIC_PATHS)) {
+    for (const type of avaloniaBaselines[packageId]?.semanticTypes ?? []) {
+      if (types.has(type.name)) {
+        errors.push(`duplicate Avalonia baseline type ${type.name}`)
+        continue
+      }
+      types.set(type.name, { ...type, packageId })
+    }
+  }
+
+  const contracts = new Map()
+  for (const contract of registry.contracts ?? []) {
+    const componentName = contract.component?.name
+    if (!componentName) continue
+    if (contracts.has(componentName)) {
+      errors.push(`duplicate contract component ${componentName}`)
+      continue
+    }
+    contracts.set(componentName, contract)
+  }
+
+  const mappedTypes = new Set()
+  const mappedComponents = new Set()
+  let mappedSurfaceStates = 0
+  let mappedClaims = 0
+  let avaloniaExtras = 0
+  for (const mapping of registry.componentMap ?? []) {
+    const componentName = mapping.vue?.name
+    const typeName = mapping.avalonia?.type
+    const context =
+      `componentMap ${componentName ?? '<unknown>'} -> ` +
+      `${typeName ?? '<unknown>'}`
+    if (mappedComponents.has(componentName)) {
+      errors.push(`${context} duplicates a Vue component mapping`)
+      continue
+    }
+    mappedComponents.add(componentName)
+    const type = types.get(typeName)
+    if (!type) {
+      errors.push(`${context} references a missing Avalonia baseline type`)
+      continue
+    }
+    mappedTypes.add(typeName)
+    if (mapping.avalonia?.packageId !== type.packageId) {
+      errors.push(`${context} has stale package ownership`)
+    }
+    if (mapping.avalonia?.surfaceHash !== avaloniaTypeSurfaceHash(type)) {
+      errors.push(`${context} has stale public surface hash`)
+    }
+    const contract = contracts.get(componentName)
+    if (!contract) {
+      errors.push(`${context} has no component contract`)
+      continue
+    }
+
+    const surfaces = avaloniaPublicSurfaces(type)
+    const claims = resolveAvaloniaSurfaceClaims({
+      contract,
+      avaloniaType: type,
+      errors,
+    })
+    mappedSurfaceStates += surfaces.length
+    mappedClaims += claims.size
+
+    const unmatchedSurfaces = surfaces.filter(
+      (surface) => !claims.has(avaloniaSurfaceFingerprint(surface)),
+    )
+    const unmatchedMemberCounts = new Map()
+    for (const surface of unmatchedSurfaces) {
+      unmatchedMemberCounts.set(
+        surface.member,
+        (unmatchedMemberCounts.get(surface.member) ?? 0) + 1,
+      )
+    }
+    const expectedExtras = new Map(
+      unmatchedSurfaces.map((surface) => [
+        avaloniaSurfaceFingerprint(surface),
+        surface,
+      ]),
+    )
+    const actualExtras = new Map()
+    for (const extra of contract.avaloniaExtras ?? []) {
+      avaloniaExtras += 1
+      const extraContext = `${contract.id} avalonia extra ${extra.member ?? '<unknown>'}`
+      if (extra.kind !== 'avalonia-extra') {
+        errors.push(`${extraContext} has invalid status ${extra.kind}`)
+      }
+      if (
+        typeof extra.surfaceKind !== 'string' ||
+        typeof extra.surfaceHash !== 'string'
+      ) {
+        errors.push(`${extraContext} has no canonical public surface identity`)
+        continue
+      }
+      const fingerprint = extra.surfaceHash
+      if (actualExtras.has(fingerprint)) {
+        errors.push(`${extraContext} duplicates a public surface registration`)
+      }
+      actualExtras.set(fingerprint, extra)
+      const expectedSurface = expectedExtras.get(fingerprint)
+      if (!expectedSurface) {
+        errors.push(
+          `${extraContext} does not match an unmatched real public surface`,
+        )
+      } else if (
+        extra.member !== expectedSurface.member ||
+        extra.surfaceKind !== expectedSurface.kind
+      ) {
+        errors.push(
+          `${extraContext} member or kind disagrees with its real public surface`,
+        )
+      } else {
+        const expectedEntry = avaloniaExtraForSurface(
+          toKebab(componentName),
+          expectedSurface,
+          unmatchedMemberCounts.get(expectedSurface.member) > 1,
+        )
+        if (
+          JSON.stringify(extra.scenarioIds) !==
+          JSON.stringify(expectedEntry.scenarioIds)
+        ) {
+          errors.push(
+            `${extraContext} has stale or non-unique scenario coverage identity`,
+          )
+        }
+      }
+    }
+    for (const [fingerprint, surface] of expectedExtras) {
+      if (actualExtras.has(fingerprint)) continue
+      errors.push(
+        `${contract.id} real Avalonia ${surface.kind} ${surface.member} is neither mapped nor registered as avalonia-extra`,
+      )
+    }
+  }
+
+  const onlyTypes = new Map()
+  for (const entry of registry.avaloniaOnlyTypes ?? []) {
+    const context = `avalonia-only type ${entry.type ?? '<unknown>'}`
+    if (onlyTypes.has(entry.type)) {
+      errors.push(`${context} is registered more than once`)
+      continue
+    }
+    onlyTypes.set(entry.type, entry)
+    const type = types.get(entry.type)
+    if (!type) {
+      errors.push(`${context} does not exist in the Avalonia baselines`)
+      continue
+    }
+    if (mappedTypes.has(entry.type)) {
+      errors.push(`${context} is also registered as a Vue counterpart`)
+    }
+    const expected = avaloniaOnlyType({
+      type,
+      packageId: type.packageId,
+    })
+    for (const field of [
+      'kind',
+      'packageId',
+      'baseline',
+      'memberCount',
+      'surfaceHash',
+    ]) {
+      if (entry[field] !== expected[field]) {
+        errors.push(`${context} has stale ${field}`)
+      }
+    }
+  }
+
+  let avaloniaOnlySurfaces = 0
+  let mappedTypeSurfaces = 0
+  for (const type of types.values()) {
+    const surfaceCount = avaloniaPublicSurfaces(type).length
+    if (mappedTypes.has(type.name)) {
+      mappedTypeSurfaces += surfaceCount
+      continue
+    }
+    avaloniaOnlySurfaces += surfaceCount
+    if (!onlyTypes.has(type.name)) {
+      errors.push(
+        `real Avalonia type ${type.name} has no Vue counterpart and is not registered as avalonia-extra`,
+      )
+    }
+  }
+
+  return {
+    errors,
+    stats: {
+      baselineTypes: types.size,
+      mappedTypes: mappedTypes.size,
+      mappedContracts: mappedComponents.size,
+      avaloniaOnlyTypes: types.size - mappedTypes.size,
+      avaloniaOnlySurfaces,
+      mappedTypeSurfaces,
+      baselineSurfaces: mappedTypeSurfaces + avaloniaOnlySurfaces,
+      mappedSurfaceStates,
+      mappedClaims,
+      avaloniaExtras,
+      internalSurfaces: 0,
+    },
+  }
+}
+
+export const validateRegistry = (
+  registry,
+  gate,
+  { avaloniaBaselines = null } = {},
+) => {
   const errors = []
   if (registry.schemaVersion !== CONTRACT_V2_SCHEMA_VERSION) {
     errors.push('registry schemaVersion must be 2')
@@ -1785,6 +2185,14 @@ export const validateRegistry = (registry, gate) => {
         `componentMap ${entry.vue?.name ?? '<unknown>'} must use name-equality basis`,
       )
     }
+  }
+  if (avaloniaBaselines) {
+    errors.push(
+      ...validateAvaloniaSurfaceRegistration({
+        registry,
+        avaloniaBaselines,
+      }).errors,
+    )
   }
   return errors
 }
@@ -1839,7 +2247,11 @@ const main = () => {
     gate,
     semanticMemberBindings,
   })
-  const errors = validateRegistry(registry, gate)
+  const surfaceAudit = validateAvaloniaSurfaceRegistration({
+    registry,
+    avaloniaBaselines,
+  })
+  const errors = validateRegistry(registry, gate, { avaloniaBaselines })
   if (errors.length > 0) {
     console.error('contract-v2 validation failed:')
     for (const error of errors) console.error(`- ${error}`)
@@ -1864,14 +2276,20 @@ const main = () => {
       return
     }
     console.log(
-      `contract-v2:check passed (${registry.contracts.length} contracts, ${registry.coverage.total} members)`,
+      `contract-v2:check passed (${registry.contracts.length} contracts, ${registry.coverage.total} members; ` +
+        `${surfaceAudit.stats.baselineTypes} Avalonia types/${surfaceAudit.stats.baselineSurfaces} public surfaces, ` +
+        `${surfaceAudit.stats.mappedSurfaceStates} mapped-contract surface states, ` +
+        `${surfaceAudit.stats.avaloniaOnlyTypes} avalonia-only types)`,
     )
     return
   }
 
   write(registryPath, output)
   console.log(
-    `contract-v2:generate wrote ${CONTRACT_V2_REGISTRY_PATH} (${registry.contracts.length} contracts, ${registry.coverage.total} members)`,
+    `contract-v2:generate wrote ${CONTRACT_V2_REGISTRY_PATH} (${registry.contracts.length} contracts, ${registry.coverage.total} members; ` +
+      `${surfaceAudit.stats.baselineTypes} Avalonia types/${surfaceAudit.stats.baselineSurfaces} public surfaces, ` +
+      `${surfaceAudit.stats.mappedSurfaceStates} mapped-contract surface states, ` +
+      `${surfaceAudit.stats.avaloniaOnlyTypes} avalonia-only types)`,
   )
 }
 
