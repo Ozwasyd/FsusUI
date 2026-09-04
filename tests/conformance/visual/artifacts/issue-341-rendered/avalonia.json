@@ -1,0 +1,641 @@
+{
+  "schema": "fsusui.conformance-evidence.v2",
+  "kind": "interaction-trace",
+  "platform": "avalonia",
+  "runtime": {
+    "framework": "Avalonia",
+    "realTopLevel": true,
+    "headless": false,
+    "mock": false,
+    "windowTitle": "FsusUI Contract V2 real-window runner"
+  },
+  "identity": {
+    "executionId": "conformance-v2-097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+    "checkpoint": "markdown-after-undo",
+    "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+    "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+    "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+    "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+    "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+    "contract": "component-v2.el-markdown-editor",
+    "documentId": "markdown-editor-interaction-trace",
+    "documentEpoch": 348,
+    "sourceRevision": 2,
+    "theme": "light",
+    "density": "default",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motion": "full",
+    "runnerHash": "6d5fd8e77482de2aaec83905cf16c1f4b743c56e1af1d9d0d9933b8d354b026b"
+  },
+  "environment": {
+    "os": "Unix 7.0.0.30",
+    "architecture": "X64",
+    "framework": "10.0.10"
+  },
+  "steps": [
+    {
+      "index": 0,
+      "action": "render",
+      "target": "Window",
+      "focusTarget": null,
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "isVisible": true,
+          "width": 960,
+          "height": 720
+        },
+        "passed": true
+      }
+    },
+    {
+      "index": 1,
+      "action": "pointer",
+      "target": "FsusButton",
+      "focusTarget": null,
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "eventCount": 2
+        },
+        "passed": true
+      }
+    },
+    {
+      "index": 2,
+      "action": "focus-input",
+      "target": "FsusInput",
+      "focusTarget": null,
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "focused": true,
+          "isFocused": true,
+          "text": "after"
+        },
+        "passed": true
+      }
+    },
+    {
+      "index": 3,
+      "action": "ime-simulation",
+      "target": "FsusInput",
+      "focusTarget": null,
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "value": "after\u4E2D",
+          "simulation": true,
+          "physicalIme": false,
+          "boundary": "linux-avalonia-text-input"
+        },
+        "passed": true
+      }
+    },
+    {
+      "index": 4,
+      "action": "keyboard",
+      "target": "FsusButton",
+      "focusTarget": null,
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "isFocused": true,
+          "eventCount": 1
+        },
+        "passed": true
+      }
+    },
+    {
+      "index": 5,
+      "action": "operation",
+      "target": "FsusMarkdownEditor.DispatchTransaction",
+      "focusTarget": "FsusMarkdownEditor",
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "accepted": true,
+          "value": "Trace start exposed",
+          "beforeRevision": 0,
+          "revision": 1,
+          "documentIdentity": {
+            "id": "markdown-editor-interaction-trace",
+            "epoch": 348
+          },
+          "selection": {
+            "start": 19,
+            "end": 19,
+            "direction": "none"
+          },
+          "history": {
+            "canUndo": true,
+            "canRedo": false,
+            "undoDepth": 1,
+            "redoDepth": 0,
+            "retainedUnits": 8
+          },
+          "positionMap": {},
+          "reason": null,
+          "canUndo": true,
+          "canRedo": false
+        },
+        "passed": true
+      }
+    },
+    {
+      "index": 6,
+      "action": "keyboard",
+      "target": "FsusMarkdownEditor.Undo",
+      "focusTarget": "FsusMarkdownEditor",
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "accepted": true,
+          "value": "Trace start",
+          "beforeRevision": 1,
+          "revision": 2,
+          "documentIdentity": {
+            "id": "markdown-editor-interaction-trace",
+            "epoch": 348
+          },
+          "selection": {
+            "start": 11,
+            "end": 11,
+            "direction": "none"
+          },
+          "history": {
+            "canUndo": false,
+            "canRedo": true,
+            "undoDepth": 0,
+            "redoDepth": 1,
+            "retainedUnits": 8
+          },
+          "positionMap": {},
+          "reason": null,
+          "canUndo": false,
+          "canRedo": true
+        },
+        "passed": true
+      }
+    },
+    {
+      "index": 7,
+      "action": "operation",
+      "target": "FsusMarkdownEditor.CommitProjection",
+      "focusTarget": null,
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "accepted": true,
+          "revision": 2,
+          "retainedNodeIds": [],
+          "rebuiltNodeIds": [
+            "trace-atomic"
+          ],
+          "removedNodeIds": [],
+          "reason": null
+        },
+        "passed": true
+      }
+    },
+    {
+      "index": 8,
+      "action": "open-close",
+      "target": "Window",
+      "focusTarget": null,
+      "binding": {
+        "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+        "contract": "component-v2.el-markdown-editor",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+        "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+        "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+        "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+        "os": "Unix 7.0.0.30",
+        "avalonia": "10.0.10"
+      },
+      "observation": {
+        "actual": {
+          "childOpened": true,
+          "childClosed": true
+        },
+        "passed": true
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "button.pointer-pressed"
+    },
+    {
+      "name": "button.pointer-pressed"
+    },
+    {
+      "name": "input.value-changed",
+      "payload": {
+        "oldValue": "before",
+        "newValue": "afterbefore"
+      }
+    },
+    {
+      "name": "input.value-changed",
+      "payload": {
+        "oldValue": "afterbefore",
+        "newValue": "after"
+      }
+    },
+    {
+      "name": "input.value-changed",
+      "payload": {
+        "oldValue": "after",
+        "newValue": "after\u4E2D"
+      }
+    },
+    {
+      "name": "input.value-changed",
+      "payload": {
+        "oldValue": "after\u4E2D",
+        "newValue": "after"
+      }
+    },
+    {
+      "name": "button.activated"
+    },
+    {
+      "name": "markdown.transaction",
+      "payload": {
+        "accepted": true,
+        "revision": 1,
+        "origin": "programmatic"
+      }
+    },
+    {
+      "name": "markdown.selection-change",
+      "payload": {
+        "revision": 1,
+        "selection": {
+          "start": 19,
+          "end": 19,
+          "direction": "none"
+        }
+      }
+    },
+    {
+      "name": "markdown.history-change",
+      "payload": {
+        "canUndo": true,
+        "canRedo": false,
+        "undoDepth": 1,
+        "redoDepth": 0,
+        "retainedUnits": 8
+      }
+    },
+    {
+      "name": "markdown.transaction",
+      "payload": {
+        "accepted": true,
+        "revision": 2,
+        "origin": "command"
+      }
+    },
+    {
+      "name": "markdown.selection-change",
+      "payload": {
+        "revision": 2,
+        "selection": {
+          "start": 11,
+          "end": 11,
+          "direction": "none"
+        }
+      }
+    },
+    {
+      "name": "markdown.history-change",
+      "payload": {
+        "canUndo": false,
+        "canRedo": true,
+        "undoDepth": 0,
+        "redoDepth": 1,
+        "retainedUnits": 8
+      }
+    }
+  ],
+  "state": {
+    "value": "Trace start",
+    "revision": 2,
+    "selection": {
+      "start": 11,
+      "end": 11,
+      "direction": "none"
+    },
+    "history": {
+      "canUndo": false,
+      "canRedo": true,
+      "undoDepth": 0,
+      "redoDepth": 1,
+      "retainedUnits": 8
+    },
+    "capability": "supported",
+    "rawCapability": "aligned",
+    "focus": "TextBox"
+  },
+  "accessibility": {
+    "source": "real-avalonia-automation-peer",
+    "sameExecution": true,
+    "nodes": [
+      {
+        "control": "FsusButton",
+        "role": "button",
+        "name": "Run conformance action",
+        "description": "",
+        "value": null,
+        "selection": null,
+        "states": {
+          "disabled": false,
+          "readOnly": false,
+          "invalid": false,
+          "selected": false,
+          "expanded": false,
+          "checkedState": null
+        },
+        "liveRegion": "off",
+        "logicalParent": "StackPanel",
+        "children": [
+          ""
+        ],
+        "focus": {
+          "keyboardFocusable": true,
+          "focused": false,
+          "tabOrder": 1
+        }
+      },
+      {
+        "control": "FsusInput",
+        "role": "edit",
+        "name": "Conformance input",
+        "description": "",
+        "value": "after",
+        "selection": null,
+        "states": {
+          "disabled": false,
+          "readOnly": false,
+          "invalid": false,
+          "selected": false,
+          "expanded": false,
+          "checkedState": null
+        },
+        "liveRegion": "off",
+        "logicalParent": "StackPanel",
+        "children": [],
+        "focus": {
+          "keyboardFocusable": true,
+          "focused": false,
+          "tabOrder": 2
+        }
+      },
+      {
+        "control": "FsusMarkdownEditor",
+        "role": "edit",
+        "name": "Markdown editor",
+        "description": "",
+        "value": "Trace start",
+        "selection": {
+          "start": 11,
+          "end": 11,
+          "direction": "none"
+        },
+        "states": {
+          "disabled": false,
+          "readOnly": false,
+          "invalid": false,
+          "selected": false,
+          "expanded": false,
+          "checkedState": null
+        },
+        "liveRegion": "off",
+        "logicalParent": "StackPanel",
+        "children": [
+          "code enter-before",
+          "code enter-after",
+          "code edit-source"
+        ],
+        "focus": {
+          "keyboardFocusable": true,
+          "focused": false,
+          "tabOrder": 3
+        }
+      },
+      {
+        "control": "FsusMarkdownAtomicAction",
+        "role": "button",
+        "name": "code enter-before",
+        "description": "Trace start",
+        "value": "Trace start",
+        "selection": null,
+        "states": {
+          "disabled": false,
+          "readOnly": true,
+          "invalid": false,
+          "selected": false,
+          "expanded": false,
+          "checkedState": null
+        },
+        "liveRegion": "off",
+        "logicalParent": "FsusMarkdownEditor",
+        "children": [],
+        "focus": {
+          "keyboardFocusable": false,
+          "focused": false,
+          "tabOrder": -1
+        },
+        "action": {
+          "invokable": true,
+          "sourceEntry": false
+        }
+      },
+      {
+        "control": "FsusMarkdownAtomicAction",
+        "role": "button",
+        "name": "code enter-after",
+        "description": "Trace start",
+        "value": "Trace start",
+        "selection": null,
+        "states": {
+          "disabled": false,
+          "readOnly": true,
+          "invalid": false,
+          "selected": false,
+          "expanded": false,
+          "checkedState": null
+        },
+        "liveRegion": "off",
+        "logicalParent": "FsusMarkdownEditor",
+        "children": [],
+        "focus": {
+          "keyboardFocusable": false,
+          "focused": false,
+          "tabOrder": -2
+        },
+        "action": {
+          "invokable": true,
+          "sourceEntry": false
+        }
+      },
+      {
+        "control": "FsusMarkdownAtomicAction",
+        "role": "button",
+        "name": "code edit-source",
+        "description": "Trace start",
+        "value": "Trace start",
+        "selection": null,
+        "states": {
+          "disabled": false,
+          "readOnly": true,
+          "invalid": false,
+          "selected": false,
+          "expanded": false,
+          "checkedState": null
+        },
+        "liveRegion": "off",
+        "logicalParent": "FsusMarkdownEditor",
+        "children": [],
+        "focus": {
+          "keyboardFocusable": false,
+          "focused": false,
+          "tabOrder": -3
+        },
+        "action": {
+          "invokable": true,
+          "sourceEntry": true
+        }
+      }
+    ],
+    "markdown": {
+      "editableMultiline": true,
+      "wholeDocumentLiveRegion": false,
+      "decorationDuplicate": false,
+      "paragraphTabStops": 0,
+      "atomicActionCount": 3
+    }
+  },
+  "performance": {
+    "identity": {
+      "executionId": "conformance-v2-097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+      "checkpoint": "markdown-after-undo",
+      "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+      "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+      "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+      "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+      "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+      "contract": "component-v2.el-markdown-editor",
+      "documentId": "markdown-editor-interaction-trace",
+      "documentEpoch": 348,
+      "sourceRevision": 2,
+      "theme": "light",
+      "density": "default",
+      "locale": "zh-CN",
+      "direction": "ltr",
+      "motion": "full",
+      "runnerHash": "6d5fd8e77482de2aaec83905cf16c1f4b743c56e1af1d9d0d9933b8d354b026b"
+    },
+    "elapsedMilliseconds": 47.7816,
+    "budgetMilliseconds": 2000,
+    "passed": true
+  },
+  "visual": {
+    "identity": {
+      "executionId": "conformance-v2-097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+      "checkpoint": "markdown-after-undo",
+      "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+      "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
+      "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
+      "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
+      "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+      "contract": "component-v2.el-markdown-editor",
+      "documentId": "markdown-editor-interaction-trace",
+      "documentEpoch": 348,
+      "sourceRevision": 2,
+      "theme": "light",
+      "density": "default",
+      "locale": "zh-CN",
+      "direction": "ltr",
+      "motion": "full",
+      "runnerHash": "6d5fd8e77482de2aaec83905cf16c1f4b743c56e1af1d9d0d9933b8d354b026b"
+    },
+    "artifact": "avalonia.png",
+    "sha256": "0a3354587d410610f0a0232195817753af1d624e8c6de5c99ce397f40e693ad6",
+    "renderedTopLevel": true
+  }
+}
