@@ -118,6 +118,11 @@ export function validateCrossGateReceipt(receipt) {
     )
       throw new Error(`#318 receipt gate ${name} is invalid.`)
   }
+  if (
+    new Set(receipt.gates.map((gate) => gate.name)).size !==
+    REQUIRED_GATES.length
+  )
+    throw new Error('#318 receipt gate coverage contains duplicates.')
   exact(receipt.workingTree, ['before', 'after'], 'Working tree')
   if (
     !ISO.test(receipt.startedAt) ||
@@ -167,16 +172,12 @@ export function createCrossGateReceipt({
     runRecord.candidateSha256Before ===
       bindingRecord.binding.candidate.sha256 &&
     runRecord.candidateSha256After === bindingRecord.binding.candidate.sha256
-  const gates = REQUIRED_GATES.map((name) => ({
-    name,
-    status:
-      runRecord.commandStatus === 'success'
-        ? 'success'
-        : runRecord.commandStatus === 'failed'
-          ? 'failed'
-          : 'skipped',
-    durationMs: runRecord.durationMs,
-  }))
+  const gates = REQUIRED_GATES.map((name) => {
+    const gate = runRecord.gates?.find((entry) => entry.name === name)
+    return gate
+      ? { name, status: gate.status, durationMs: gate.durationMs }
+      : { name, status: 'skipped', durationMs: 0 }
+  })
   const diagnostics = []
   if (!sameCandidate) diagnostics.push('candidate-mutated')
   if (runRecord.commitSha !== fsusblog.commitSha)
@@ -185,6 +186,14 @@ export function createCrossGateReceipt({
   if (runRecord.workingTreeAfter !== 'clean') diagnostics.push('dirty-after')
   if (runRecord.commandStatus !== 'success')
     diagnostics.push('consumer-command-failed')
+  if (runRecord.evidenceStatus === 'missing')
+    diagnostics.push('consumer-evidence-missing')
+  if (runRecord.evidenceStatus === 'invalid')
+    diagnostics.push('consumer-evidence-invalid')
+  if (gates.some((gate) => gate.status === 'failed'))
+    diagnostics.push('consumer-gate-failed')
+  if (gates.some((gate) => gate.status === 'skipped'))
+    diagnostics.push('consumer-gate-skipped')
   const receipt = {
     schemaVersion: 1,
     status: diagnostics.length === 0 ? 'success' : 'failed',

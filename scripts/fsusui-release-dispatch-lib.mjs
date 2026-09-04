@@ -23,6 +23,13 @@ const HEX_64 = /^[a-f0-9]{64}$/u
 const STABLE_VERSION = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/u
 const SHA512_INTEGRITY = /^sha512-([A-Za-z0-9+/]+={0,2})$/u
 const RUN_ID = /^[1-9]\d*$/u
+const CROSS_GATE_NAMES = [
+  'published-package-typecheck',
+  'fsusui-export-boundary',
+  'frontend-production-build',
+  'worker-wasm-package-path',
+  'single-vue-runtime',
+]
 
 const PAYLOAD_KEYS = [
   'schemaVersion',
@@ -205,6 +212,54 @@ const assertCrossGateReceipt = ({
   sourceCommit,
   releaseTag,
 }) => {
+  assertExactKeys(
+    receipt,
+    [
+      'schemaVersion',
+      'status',
+      'fsusui',
+      'candidate',
+      'fsusblog',
+      'toolchain',
+      'gates',
+      'workingTree',
+      'startedAt',
+      'completedAt',
+      'workflow',
+      'diagnostics',
+    ],
+    '#318 receipt',
+  )
+  assertExactKeys(
+    receipt.fsusui,
+    ['repository', 'sourceCommit', 'releaseTag'],
+    '#318 receipt FsusUI identity',
+  )
+  assertExactKeys(
+    receipt.candidate,
+    ['package', 'version', 'sha256', 'manifestSha256', 'bindingSha256'],
+    '#318 receipt candidate identity',
+  )
+  assertExactKeys(
+    receipt.fsusblog,
+    ['repository', 'defaultBranch', 'commitSha'],
+    '#318 receipt FsusBlog identity',
+  )
+  assertExactKeys(
+    receipt.toolchain,
+    ['node', 'npm', 'vue', 'vite', 'typescript', 'vueTsc'],
+    '#318 receipt toolchain',
+  )
+  assertExactKeys(
+    receipt.workingTree,
+    ['before', 'after'],
+    '#318 receipt working tree',
+  )
+  assertExactKeys(
+    receipt.workflow,
+    ['runId', 'runUrl'],
+    '#318 receipt workflow',
+  )
   if (
     receipt.schemaVersion !== 1 ||
     receipt.status !== 'success' ||
@@ -215,8 +270,35 @@ const assertCrossGateReceipt = ({
     receipt.candidate?.version !== releaseTag.slice(1) ||
     receipt.candidate?.sha256 !== candidateSha256 ||
     receipt.candidate?.manifestSha256 !== candidateManifestSha256 ||
+    !HEX_64.test(receipt.candidate?.bindingSha256 ?? '') ||
     receipt.fsusblog?.repository !== TARGET_REPOSITORY ||
-    !HEX_40.test(receipt.fsusblog?.commitSha ?? '')
+    typeof receipt.fsusblog?.defaultBranch !== 'string' ||
+    receipt.fsusblog.defaultBranch.length === 0 ||
+    !HEX_40.test(receipt.fsusblog?.commitSha ?? '') ||
+    Object.values(receipt.toolchain).some(
+      (value) => typeof value !== 'string' || value.length === 0,
+    ) ||
+    receipt.workingTree.before !== 'clean' ||
+    receipt.workingTree.after !== 'clean' ||
+    !Array.isArray(receipt.gates) ||
+    receipt.gates.length !== CROSS_GATE_NAMES.length ||
+    CROSS_GATE_NAMES.some((name) => {
+      const gates = receipt.gates.filter((gate) => gate?.name === name)
+      return (
+        gates.length !== 1 ||
+        Object.keys(gates[0]).length !== 3 ||
+        gates[0].status !== 'success' ||
+        !Number.isInteger(gates[0].durationMs) ||
+        gates[0].durationMs < 0
+      )
+    }) ||
+    !Array.isArray(receipt.diagnostics) ||
+    receipt.diagnostics.length !== 0 ||
+    typeof receipt.startedAt !== 'string' ||
+    typeof receipt.completedAt !== 'string' ||
+    receipt.completedAt < receipt.startedAt ||
+    !RUN_ID.test(receipt.workflow.runId ?? '') ||
+    !/^https:\/\//u.test(receipt.workflow.runUrl ?? '')
   ) {
     throw new Error(
       '#318 receipt is not successful or is not bound to this candidate.',

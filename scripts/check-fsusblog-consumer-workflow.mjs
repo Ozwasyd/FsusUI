@@ -5,6 +5,7 @@ const workflow = readFileSync(
   '.github/workflows/_fsusblog-consumer-gate.yml',
   'utf8',
 )
+const runner = readFileSync('scripts/fsusblog-consumer-runner.mjs', 'utf8')
 
 const validate = (source) => {
   for (const fragment of [
@@ -69,6 +70,10 @@ const validate = (source) => {
 }
 
 validate(workflow)
+assert.ok(
+  runner.includes('FSUSBLOG_FSUSUI_CANDIDATE_EVIDENCE'),
+  'FsusBlog runner must request exact per-gate producer evidence',
+)
 
 for (const [name, mutation, expected] of [
   [

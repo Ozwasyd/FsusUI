@@ -274,6 +274,9 @@ with credentials disabled after checkout, and runs the formal
 `verify:fsusui-candidate` entry against an absolute path to the downloaded local
 tarball. It records exact Node/npm/Vue/Vite/TypeScript/vue-tsc versions and
 requires a clean, unchanged FsusBlog checkout both before and after the command.
+The formal entry must write its exact five-gate status and duration evidence to
+the path supplied in `FSUSBLOG_FSUSUI_CANDIDATE_EVIDENCE`; a missing, malformed,
+candidate-mismatched, failed, or skipped gate record fails closed.
 It never resolves the candidate from a registry and never changes FsusBlog.
 Before checkout and again after FsusBlog consumption, the gate recomputes the
 tarball SHA-256 and requires exact agreement among the workflow input, release

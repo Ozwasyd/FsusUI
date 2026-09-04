@@ -105,6 +105,7 @@ const createFixture = () => {
         version: VERSION,
         sha256: candidateSha256,
         manifestSha256: candidateManifestSha256,
+        bindingSha256: 'd'.repeat(64),
       },
       fsusblog: {
         repository: 'Ozwasyd/FsusBlog',
@@ -120,11 +121,33 @@ const createFixture = () => {
         vueTsc: '3.0.5',
       },
       gates: [
-        { name: 'verify:fsusui-candidate', status: 'success', durationMs: 1 },
+        {
+          name: 'published-package-typecheck',
+          status: 'success',
+          durationMs: 1,
+        },
+        {
+          name: 'fsusui-export-boundary',
+          status: 'success',
+          durationMs: 1,
+        },
+        {
+          name: 'frontend-production-build',
+          status: 'success',
+          durationMs: 1,
+        },
+        {
+          name: 'worker-wasm-package-path',
+          status: 'success',
+          durationMs: 1,
+        },
+        { name: 'single-vue-runtime', status: 'success', durationMs: 1 },
       ],
+      workingTree: { before: 'clean', after: 'clean' },
       startedAt: '2026-09-03T00:00:00Z',
       completedAt: '2026-09-03T00:00:01Z',
       workflow: { runId: '318001', runUrl: 'https://example.test/runs/318001' },
+      diagnostics: [],
     }),
   )
   return {
@@ -441,6 +464,26 @@ test('#318 receipt missing or digest/candidate mismatch fails closed', () => {
         ),
       }),
     /not bound to this candidate/u,
+  )
+  const unknown = createFixture()
+  const unknownReceipt = JSON.parse(
+    readFileSync(unknown.crossGateReceiptPath, 'utf8'),
+  )
+  unknownReceipt.untrusted = true
+  writeFileSync(unknown.crossGateReceiptPath, canonicalJson(unknownReceipt))
+  assert.throws(
+    () =>
+      verifyLocalBindings({
+        candidatePath: unknown.candidatePath,
+        candidateManifestPath: unknown.candidateManifestPath,
+        crossGateReceiptPath: unknown.crossGateReceiptPath,
+        expectedCrossGateReceiptSha256: sha256(
+          readFileSync(unknown.crossGateReceiptPath),
+        ),
+        sourceCommit: SOURCE_COMMIT,
+        releaseTag: `v${VERSION}`,
+      }),
+    /missing or unknown fields/u,
   )
 })
 

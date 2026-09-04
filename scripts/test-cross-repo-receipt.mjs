@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
+import { mkdtempSync, writeFileSync } from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 import { test } from 'node:test'
 import {
   createCrossGateReceipt,
@@ -7,6 +10,10 @@ import {
   validateCrossGateReceipt,
 } from './cross-repo-receipt.mjs'
 import { canonicalJson } from './fsusui-release-dispatch-lib.mjs'
+import {
+  readProducerEvidence,
+  validateProducerEvidence,
+} from './fsusblog-consumer-runner.mjs'
 import { verifyReceiptBinding } from './verify-cross-repo-receipt.mjs'
 
 const digest = 'a'.repeat(64)
@@ -32,6 +39,12 @@ const runRecord = {
   workingTreeBefore: 'clean',
   workingTreeAfter: 'clean',
   commandStatus: 'success',
+  evidenceStatus: 'valid',
+  gates: REQUIRED_GATES.map((name, index) => ({
+    name,
+    status: 'success',
+    durationMs: index + 1,
+  })),
   durationMs: 42,
   startedAt: '2026-09-03T00:00:00.000Z',
   completedAt: '2026-09-03T00:00:01.000Z',
@@ -59,6 +72,48 @@ const inputs = (overrides = {}) => ({
   ...overrides,
 })
 
+const producerEvidence = (overrides = {}) => ({
+  schemaVersion: 1,
+  candidateSha256: digest,
+  gates: runRecord.gates,
+  ...overrides,
+})
+
+test('producer evidence requires every exact #1921 sub-gate', () => {
+  assert.equal(
+    validateProducerEvidence(producerEvidence(), digest).gates.length,
+    REQUIRED_GATES.length,
+  )
+  assert.throws(
+    () =>
+      validateProducerEvidence(
+        producerEvidence({ gates: runRecord.gates.slice(1) }),
+        digest,
+      ),
+    /coverage/u,
+  )
+  assert.throws(
+    () =>
+      validateProducerEvidence(
+        producerEvidence({ candidateSha256: 'f'.repeat(64) }),
+        digest,
+      ),
+    /candidate identity/u,
+  )
+})
+
+test('missing or malformed producer evidence becomes skipped fail-closed gates', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'fsusblog-evidence-'))
+  const missing = readProducerEvidence(path.join(root, 'missing.json'), digest)
+  assert.equal(missing.evidenceStatus, 'missing')
+  assert.ok(missing.gates.every((gate) => gate.status === 'skipped'))
+  const malformedPath = path.join(root, 'malformed.json')
+  writeFileSync(malformedPath, '{')
+  const malformed = readProducerEvidence(malformedPath, digest)
+  assert.equal(malformed.evidenceStatus, 'invalid')
+  assert.ok(malformed.gates.every((gate) => gate.status === 'skipped'))
+})
+
 test('success receipt binds every required gate and stable digest', () => {
   const first = createCrossGateReceipt(inputs())
   const second = createCrossGateReceipt(inputs())
@@ -73,7 +128,13 @@ test('success receipt binds every required gate and stable digest', () => {
 test('candidate mutation, skipped command, and dirty tree produce failed receipts', () => {
   for (const changed of [
     { candidateSha256After: 'f'.repeat(64) },
-    { commandStatus: 'skipped' },
+    {
+      commandStatus: 'failed',
+      gates: runRecord.gates.map((gate, index) =>
+        index === 2 ? { ...gate, status: 'skipped' } : gate,
+      ),
+    },
+    { commandStatus: 'failed', evidenceStatus: 'missing', gates: [] },
     { workingTreeBefore: 'dirty' },
     { workingTreeAfter: 'dirty' },
   ]) {
@@ -100,7 +161,15 @@ test('receipt tamper, non-full SHA, and missing field fail validation', () => {
 
 test('failure diagnostics remain sanitized codes', () => {
   const result = createCrossGateReceipt(
-    inputs({ runRecord: { ...runRecord, commandStatus: 'failed' } }),
+    inputs({
+      runRecord: {
+        ...runRecord,
+        commandStatus: 'failed',
+        gates: runRecord.gates.map((gate, index) =>
+          index === 0 ? { ...gate, status: 'failed' } : gate,
+        ),
+      },
+    }),
   )
   assert.equal(result.receipt.status, 'failed')
   assert.doesNotMatch(
