@@ -82,18 +82,83 @@ const lineStartsInRaw = (raw: string) => {
 }
 
 const lineColumnAt = (starts: readonly number[], offset: number) => {
-  let line = 1
-  let start = 0
-  for (let index = 1; index < starts.length; index += 1) {
-    const nextStart = starts[index]!
-    if (nextStart <= offset) {
-      line = index + 1
-      start = nextStart
+  let low = 0
+  let high = starts.length
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2)
+    if (starts[middle]! <= offset) low = middle + 1
+    else high = middle
+  }
+  const index = Math.max(0, low - 1)
+  return { line: index + 1, column: offset - starts[index]! }
+}
+
+const whitespaceCount = (value: string) => value.match(/\s/gu)?.length ?? 0
+
+const segmentWindow = (
+  source: string,
+  from: number,
+  to: number,
+) => {
+  let start = from
+  while (start > 0 && !/\s/u.test(source[start - 1]!)) start -= 1
+  while (start > 0 && /\s/u.test(source[start - 1]!)) start -= 1
+  let end = to
+  while (end < source.length && !/\s/u.test(source[end]!)) end += 1
+  while (end < source.length && /\s/u.test(source[end]!)) end += 1
+  return { start, end }
+}
+
+const newlineEndsInRaw = (raw: string, base: number, source: string) => {
+  const starts: number[] = []
+  for (let index = 0; index < raw.length; index += 1) {
+    if (raw[index] === '\n') {
+      starts.push(base + index + 1)
       continue
     }
-    break
+    if (raw[index] === '\r') {
+      if (
+        index + 1 === raw.length &&
+        source[base + index + 1] === '\n'
+      ) continue
+      const next = raw[index + 1] === '\n' ? index + 2 : index + 1
+      starts.push(base + next)
+      if (raw[index + 1] === '\n') index += 1
+    }
   }
-  return { line, column: offset - start }
+  return starts
+}
+
+const updateLineStarts = (
+  previous: readonly number[],
+  oldSource: string,
+  nextSource: string,
+  change: MarkdownEditorMetricsChange,
+) => {
+  const delta = change.insert.length - (change.to - change.from)
+  const scanStart = Math.max(0, change.from - 1)
+  const oldScanEnd = Math.min(oldSource.length, change.to + 2)
+  const newScanEnd = Math.max(
+    scanStart,
+    Math.min(nextSource.length, oldScanEnd + delta),
+  )
+  const starts = [
+    ...previous.filter((start) => start <= scanStart),
+    ...newlineEndsInRaw(
+      nextSource.slice(scanStart, newScanEnd),
+      scanStart,
+      nextSource,
+    ),
+    ...previous
+      .filter((start) => start > oldScanEnd)
+      .map((start) => start + delta),
+  ]
+  return {
+    starts: starts.filter(
+      (start, index) => index === 0 || start !== starts[index - 1],
+    ),
+    scannedCodeUnits: newScanEnd - scanStart,
+  }
 }
 
 const segmenterMode = (options: MarkdownEditorMetricsOptions): 'intl' | 'fallback' => {
@@ -110,6 +175,8 @@ const finish = (
     readonly wordCount: number
     readonly scannedCodeUnits: number
     readonly lineStarts: readonly number[]
+    readonly whitespaceCount: number
+    readonly byteCount?: number
   },
 ): MarkdownEditorMetrics => {
   const mode = segmenterMode(options)
@@ -124,7 +191,7 @@ const finish = (
         Math.max(options.selection.start, options.selection.end),
       )
     : ''
-  const spaceless = source.length > 0 && !/\s/u.test(source)
+  const spaceless = source.length > 0 && counts.whitespaceCount === 0
   const tokenCount =
     spaceless && counts.wordCount <= 1 && counts.graphemeCount > 1
       ? counts.graphemeCount
@@ -141,7 +208,9 @@ const finish = (
     graphemeSelectionLength: selected ? graphemeParts(selected, options.locale, mode).length : 0,
     segmenter: mode,
     scannedCodeUnits: counts.scannedCodeUnits,
-    ...(options.includeBytes ? { byteCount: new TextEncoder().encode(source).length } : {}),
+    ...(options.includeBytes
+      ? { byteCount: counts.byteCount ?? new TextEncoder().encode(source).length }
+      : {}),
   })
 }
 
@@ -157,6 +226,7 @@ export const calculateMarkdownEditorMetrics = (
     wordCount: wordParts(source, options.locale, mode).length,
     scannedCodeUnits: source.length,
     lineStarts: lineStartsInRaw(source),
+    whitespaceCount: whitespaceCount(source),
   })
 }
 
@@ -166,6 +236,9 @@ export const createMarkdownEditorMetricsSession = (
   let source = ''
   let metrics = calculateMarkdownEditorMetrics('', initial)
   let lineStarts = lineStartsInRaw('')
+  let cachedByteCount = 0
+  let cachedWhitespaceCount = 0
+  let configuration = `${segmenterMode(initial)}:${initial.locale ?? ''}`
 
   const calculate = (
     next: string,
@@ -176,36 +249,86 @@ export const createMarkdownEditorMetricsSession = (
   ) => {
     const merged = { ...initial, ...options }
     const change = options.change
-    if (!change || source.length === 0 || next !== `${source.slice(0, change.from)}${change.insert}${source.slice(change.to)}`) {
+    const nextConfiguration = `${segmenterMode(merged)}:${merged.locale ?? ''}`
+    if (
+      !change ||
+      source.length === 0 ||
+      nextConfiguration !== configuration ||
+      next !== `${source.slice(0, change.from)}${change.insert}${source.slice(change.to)}`
+    ) {
       source = next
       lineStarts = lineStartsInRaw(next)
       metrics = calculateMarkdownEditorMetrics(next, merged)
+      cachedByteCount = new TextEncoder().encode(next).length
+      cachedWhitespaceCount = whitespaceCount(next)
+      configuration = nextConfiguration
+      return metrics
+    }
+    if (next === source) {
+      metrics = finish(next, merged, {
+        graphemeCount: metrics.graphemeCount,
+        wordCount: metrics.wordCount,
+        scannedCodeUnits: 0,
+        lineStarts,
+        whitespaceCount: cachedWhitespaceCount,
+        byteCount: cachedByteCount,
+      })
       return metrics
     }
     const mode = segmenterMode(merged)
-    const removed = source.slice(change.from, change.to)
-    const windowStart = Math.max(0, change.from - 8)
-    const windowEnd = Math.min(next.length, change.from + change.insert.length + 8)
-    const scanned = next.slice(windowStart, windowEnd)
+    const oldWindow = segmentWindow(source, change.from, change.to)
+    const delta = change.insert.length - (change.to - change.from)
+    const newWindow = {
+      start: oldWindow.start,
+      end: oldWindow.end + delta,
+    }
+    const removed = source.slice(oldWindow.start, oldWindow.end)
+    const inserted = next.slice(newWindow.start, newWindow.end)
     const graphemeCount = Math.max(
       0,
       metrics.graphemeCount -
         graphemeParts(removed, merged.locale, mode).length +
-        graphemeParts(change.insert, merged.locale, mode).length,
+        graphemeParts(inserted, merged.locale, mode).length,
     )
     const wordCount = Math.max(
       0,
-      metrics.wordCount -
+        metrics.wordCount -
         wordParts(removed, merged.locale, mode).length +
-        wordParts(change.insert, merged.locale, mode).length,
+        wordParts(inserted, merged.locale, mode).length,
     )
+    const removedChange = source.slice(change.from, change.to)
+    const byteWindowStart = Math.max(0, change.from - 1)
+    const oldByteWindowEnd = Math.min(source.length, change.to + 1)
+    const newByteWindowEnd = oldByteWindowEnd + delta
+    const oldByteWindow = source.slice(byteWindowStart, oldByteWindowEnd)
+    const newByteWindow = next.slice(byteWindowStart, newByteWindowEnd)
+    cachedByteCount = Math.max(
+      0,
+      cachedByteCount -
+        new TextEncoder().encode(oldByteWindow).length +
+        new TextEncoder().encode(newByteWindow).length,
+    )
+    cachedWhitespaceCount = Math.max(
+      0,
+      cachedWhitespaceCount -
+        whitespaceCount(removedChange) +
+        whitespaceCount(change.insert),
+    )
+    const lineUpdate = updateLineStarts(lineStarts, source, next, change)
+    lineStarts = lineUpdate.starts
     source = next
-    lineStarts = lineStartsInRaw(next)
     metrics = finish(next, merged, {
       graphemeCount,
       wordCount,
-      scannedCodeUnits: scanned.length,
+      scannedCodeUnits:
+        removed.length +
+        inserted.length +
+        oldByteWindow.length +
+        newByteWindow.length +
+        lineUpdate.scannedCodeUnits,
       lineStarts,
+      whitespaceCount: cachedWhitespaceCount,
+      byteCount: cachedByteCount,
     })
     return metrics
   }

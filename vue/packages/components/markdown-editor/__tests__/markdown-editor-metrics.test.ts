@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
 
 import { createMarkdownSourceCoordinateMap } from '../../../wasm/markdown-runtime'
 import {
@@ -62,8 +63,57 @@ describe('markdown editor locale-aware source metrics', () => {
       change: { from: large.length, to: large.length, insert: '!' },
       selection: { start: next.length, end: next.length },
     })
-    expect(incremental.scannedCodeUnits).toBeLessThan(next.length)
+    expect(incremental.scannedCodeUnits).toBeLessThan(64)
     expect(incremental.codeUnitLength).toBe(next.length)
+  })
+
+  it('matches a full calculation across word, Unicode, newline, byte, and selection boundaries', () => {
+    const options = { includeBytes: true, locale: 'en' }
+    const session = createMarkdownEditorMetricsSession(options)
+    let source = 'alpha beta\r\nemoji 👨‍👩‍👧‍👦\nlast'
+    session.calculate(source, options)
+    const changes = [
+      { from: 5, to: 6, insert: '' },
+      { from: 5, to: 5, insert: ' ' },
+      { from: 10, to: 12, insert: '\n' },
+      { from: 0, to: 0, insert: '😀 ' },
+    ]
+    for (const change of changes) {
+      const next = `${source.slice(0, change.from)}${change.insert}${source.slice(change.to)}`
+      const selection = {
+        start: Math.min(2, next.length),
+        end: next.length,
+        direction: 'backward' as const,
+      }
+      const incremental = session.calculate(next, { ...options, change, selection })
+      const full = calculateMarkdownEditorMetrics(next, { ...options, selection })
+      expect({ ...incremental, scannedCodeUnits: 0 }).toEqual({
+        ...full,
+        scannedCodeUnits: 0,
+      })
+      source = next
+    }
+
+    const unchanged = session.calculate(source, {
+      ...options,
+      change: { from: 0, to: 0, insert: '' },
+      selection: { start: 0, end: 0 },
+    })
+    expect(unchanged.scannedCodeUnits).toBe(0)
+    expect(unchanged.caretLine).toBe(1)
+  })
+
+  it('keeps the incremental branch free of a whole-source line rescan', () => {
+    const implementation = readFileSync(
+      'vue/packages/components/markdown-editor/src/markdown-editor-metrics.ts',
+      'utf8',
+    )
+    const incrementalBranch = implementation.slice(
+      implementation.indexOf('if (next === source)'),
+      implementation.indexOf('return metrics\n  }', implementation.indexOf('if (next === source)')),
+    )
+    expect(incrementalBranch).not.toContain('lineStartsInRaw(next)')
+    expect(incrementalBranch).toContain('updateLineStarts')
   })
 
   it('kills whitespace-only words, normalized offsets, code-unit characters, and full rescan', () => {

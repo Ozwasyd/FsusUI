@@ -235,7 +235,9 @@ string matching。Extension command 的 `label`、
 `title`、`description` 仍由 extension 自己提供；自定义 group key 应通过
 `localeText.commandGroups` 提供可见名称。`statusDensity="minimal"` 只显示
 字符与词数；`detailed` 使用 definition list 显示行/列、行数、字符、词、选区与
-可选字节数；普通输入不会把这些指标逐键写入 `aria-live`。
+可选字节数；指标 session 仅重新分段变更边界并增量更新 raw
+line starts 与 UTF-8 byte count，选区状态变更不会重扫文档。普通输入不会把
+这些指标逐键写入 `aria-live`。
 
 ## Paste as Markdown
 

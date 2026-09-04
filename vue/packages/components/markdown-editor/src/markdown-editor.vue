@@ -1092,6 +1092,7 @@ import {
   markdownEditorEmits,
   markdownEditorProps,
   createMarkdownEditorMetricsSession,
+  type MarkdownEditorMetricsChange,
   resolveMarkdownEditorCommandCopy,
   resolveMarkdownEditorLocaleText,
   resolveMarkdownEditorOverflowCommands,
@@ -2222,6 +2223,8 @@ const restoreTextareaSelection = async (
   })
 }
 
+let pendingMetricsChange: MarkdownEditorMetricsChange | undefined
+
 const dispatchEditorOperation = (
   operation: EditorOperation,
 ): MarkdownEditorDispatchResult => {
@@ -2264,6 +2267,14 @@ const dispatchEditorOperation = (
       : operation.kind === 'undo'
         ? transactionStore.undo()
         : transactionStore.redo()
+
+  if (result.accepted && result.value !== previousValue) {
+    pendingMetricsChange =
+      operation.kind === 'transaction' &&
+      operation.transaction.changes.length === 1
+        ? operation.transaction.changes[0]
+        : deriveMarkdownEditorChange(previousValue, result.value)
+  }
 
   if (result.accepted && result.value !== previousValue) {
     const change = deriveMarkdownEditorChange(previousValue, result.value)
@@ -2606,11 +2617,14 @@ watch(
     () => props.statusDensity,
   ],
   ([value, selection, options, density]) => {
-    const change = deriveMarkdownEditorChange(metricsSource, value) ?? {
-      from: 0,
-      insert: '',
-      to: 0,
-    }
+    const change =
+      pendingMetricsChange ??
+      deriveMarkdownEditorChange(metricsSource, value) ?? {
+        from: 0,
+        insert: '',
+        to: 0,
+      }
+    pendingMetricsChange = undefined
     metricsSource = value
     editorMetrics.value = metricsSession.calculate(value, {
       ...options,
