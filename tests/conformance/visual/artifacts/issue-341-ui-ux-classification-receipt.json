@@ -37,22 +37,22 @@
     {
       "id": "avalonia-index",
       "path": "docs/avalonia/README.md",
-      "digest": "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506"
+      "digest": "4993c8a075f89b5e2f9abf172469887a9135994fe222a18a1449deedb41e3a23"
     },
     {
       "id": "avalonia-markdown-editor",
       "path": "docs/avalonia/components/markdown-editor.md",
-      "digest": "f1cbea9be45f2439dfe7578f176ec3845c6d491294c7cd7a2e6d3665a818fe7c"
+      "digest": "fc4ba16f5a9c9dfd8b8868e1a2d1ece65a8e8f4fcc082f04a452ebde05d9c696"
     },
     {
       "id": "avalonia-platform-differences",
       "path": "docs/avalonia/platform-differences.md",
-      "digest": "735e34e305b5bb6ae473bb8e6d33bb7eb615d111c25e710361d2fc463230a227"
+      "digest": "dd8692775e7e02c3a25d40dc8e3c837e6c970563792ceff8e344869d2aec63e5"
     },
     {
       "id": "markdown-editor-input",
       "path": "docs/api/markdown-editor-input.md",
-      "digest": "e877dee20be5dfd2aa1c1da8127f432488c6ad0812dfe555173d1ff7eb6ce1e2"
+      "digest": "0771a78abca0759ad79105cb2bbd13aba31cedbdf027ac706652137282f6741b"
     },
     {
       "id": "markdown-input-spec",
@@ -65,31 +65,31 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "c96032967013a5c17b1238067db5fbf64927656d",
+    "revision": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "f7264a63413804e31062e550a7b4d8c5cd17d9bed12df75684c3918843b91bed",
+    "authorityDigest": "69d88216e6eb4039c0e06565228ffa6063cfebc294fe5168aa62281e4e292c90",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
-  "candidateDigest": "ce4b073e47878c49bbcaba4270be707788fa625ca9fbfc43b476111b2cb14adc",
+  "candidateSha": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+  "candidateDigest": "12db41a2fdb3b283d1e373bc3e4b9197e4efd09f84be385652d5c09fb238304e",
   "stateEvidenceMatrix": [
     {
       "state": "baseline Source and Live Markdown editor presentation",
       "viewport": "desktop 820x186",
       "theme": "light",
-      "evidenceDigest": "adfc327c2b87cc42ec81c4a83fa97b3bada16269f891c2c376e39dd068cf465e"
+      "evidenceDigest": "0a3354587d410610f0a0232195817753af1d624e8c6de5c99ce397f40e693ad6"
     },
     {
       "state": "native composition commit cancel undo and candidate caret positioning",
       "viewport": "Linux desktop native window",
       "theme": "both",
-      "evidenceDigest": "fd0b314bdf48fb3143a151dedd65f21fc7551abdaab57d37dddcc99effd4583e"
+      "evidenceDigest": "62ee5266d1d4c36cf68e9b70e1de1e2757d849b60d4617cb8dad8891ea17e99e"
     },
     {
       "state": "block pair clipboard and stale-result transaction parity",
       "viewport": "Web and Avalonia runtime paths",
       "theme": "not-applicable",
-      "evidenceDigest": "e9ee569cef65f935b42a315bf4904b01cce1826eaf0a3c2eae94ecf9dacc410c"
+      "evidenceDigest": "f4626bc48cc7a1810a5ed1f2cfcf9cf15e9018ba75cb23f2c11a380f4870bb89"
     }
   ],
   "inScope": [
@@ -106,8 +106,8 @@
     "new design tokens visual redesign or consumer workflow",
     "table editing behavior owned by issues 370 through 373 and pull request 660"
   ],
-  "classificationEvidenceDigest": "7eda65dec5263f01c7934f6de615230bc8bdadd14de1c8299f4bc69c42ef2ac6",
+  "classificationEvidenceDigest": "cad6eb722650801e30136c645d1fb7e413dd9da85e1176265898b5adb4be473f",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "a025b0aaa888044f70c82a039eeeb813f0ac804dba1429106fffd2c24ffe0c00"
+  "receiptDigest": "69a5e972cb0ff2188316850a785948baae25b6543f1a4435d4b28b892c6d5b26"
 }

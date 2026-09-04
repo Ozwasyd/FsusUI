@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "issue": 341,
   "evidenceClass": "independent-rendered-evidence-review",
-  "candidateSha": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
-  "candidateDigest": "ce4b073e47878c49bbcaba4270be707788fa625ca9fbfc43b476111b2cb14adc",
-  "classificationReceiptDigest": "a025b0aaa888044f70c82a039eeeb813f0ac804dba1429106fffd2c24ffe0c00",
+  "candidateSha": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+  "candidateDigest": "12db41a2fdb3b283d1e373bc3e4b9197e4efd09f84be385652d5c09fb238304e",
+  "classificationReceiptDigest": "69a5e972cb0ff2188316850a785948baae25b6543f1a4435d4b28b892c6d5b26",
   "productionFixture": true,
   "implementationModifiedPaths": [],
   "focusedTests": [
@@ -22,12 +22,12 @@
     },
     {
       "command": "dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --filter FullyQualifiedName~FsusMarkdownEditorNativeInputHeadlessTests --nologo",
-      "passed": 12,
+      "passed": 15,
       "failed": 0,
       "skipped": 0
     },
     {
-      "command": "IBUS_ADDRESS=$(ibus address) GTK_IM_MODULE=ibus QT_IM_MODULE=ibus XMODIFIERS=@im=ibus dotnet run --project dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj -- --ime-harness --candidate 810fe29ed7eb82ff2f700ac700c16c7243d17403 --output tests/conformance/visual/artifacts/issue-341-linux-ime-evidence.json",
+      "command": "IBUS_ADDRESS=$(ibus address) GTK_IM_MODULE=ibus QT_IM_MODULE=ibus XMODIFIERS=@im=ibus dotnet run --project dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj -- --ime-harness --candidate 097554db2d39ebd74d92f2fe89eb444a27f8de4a --output tests/conformance/visual/artifacts/issue-341-linux-ime-evidence.json",
       "passed": 8,
       "failed": 0,
       "skipped": 0
@@ -45,6 +45,7 @@
     "observations": [
       "The inspected 960x720 real-top-level light render retains the existing hierarchy, restrained editor surface, visible keyboard focus, and unchanged content priority after the Markdown transaction and undo path.",
       "The inspected 680x360 light and dark production renders retain the same single input/scroll owner, source projection geometry, wrapping, focus affordance, and current-range emphasis without added decoration or layout drift.",
+      "The delayed headless clipboard regressions prove that same-source document identity changes, revision changes, and selection changes after the native clipboard read begins all reject without a paste transaction or new-document mutation.",
       "The live Linux XWayland/ibus/libpinyin receipt proves a stock Avalonia TextBox platform probe, XTest-injected OS keys, one-transaction CJK commit, zero-transaction cancellation, one-step undo, stale-document rejection, rich/plain clipboard safety, exact BOM/CRLF/CJK/emoji/combining/RTL preservation, and a valid candidate caret at 2x scaling with a 1498-DIP scroll offset."
     ]
   },
@@ -63,7 +64,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-341-linux-ime-evidence.json",
-      "digest": "c510e8b28069c130cedb0a08bf260728e46d7e6e0e65629e78724789ea96cca6"
+      "digest": "62ee5266d1d4c36cf68e9b70e1de1e2757d849b60d4617cb8dad8891ea17e99e"
     }
   ],
   "limitations": [

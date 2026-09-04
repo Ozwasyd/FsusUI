@@ -10,9 +10,9 @@
     "windowTitle": "FsusUI Contract V2 real-window runner"
   },
   "identity": {
-    "executionId": "conformance-v2-810fe29ed7eb82ff2f700ac700c16c7243d17403",
+    "executionId": "conformance-v2-097554db2d39ebd74d92f2fe89eb444a27f8de4a",
     "checkpoint": "markdown-after-undo",
-    "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+    "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
     "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
     "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
     "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -26,7 +26,7 @@
     "locale": "zh-CN",
     "direction": "ltr",
     "motion": "full",
-    "runnerHash": "6ae0069a753c36056729aebaddc62acc907c30b058c53131d54d978d2f4337f8"
+    "runnerHash": "6d5fd8e77482de2aaec83905cf16c1f4b743c56e1af1d9d0d9933b8d354b026b"
   },
   "environment": {
     "os": "Unix 7.0.0.30",
@@ -42,7 +42,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -66,7 +66,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -88,7 +88,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -112,7 +112,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -137,7 +137,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -160,7 +160,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -205,7 +205,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -250,7 +250,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -279,7 +279,7 @@
       "binding": {
         "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
         "contract": "component-v2.el-markdown-editor",
-        "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+        "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
         "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
         "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
         "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -592,9 +592,9 @@
   },
   "performance": {
     "identity": {
-      "executionId": "conformance-v2-810fe29ed7eb82ff2f700ac700c16c7243d17403",
+      "executionId": "conformance-v2-097554db2d39ebd74d92f2fe89eb444a27f8de4a",
       "checkpoint": "markdown-after-undo",
-      "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+      "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
       "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
       "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
       "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -608,17 +608,17 @@
       "locale": "zh-CN",
       "direction": "ltr",
       "motion": "full",
-      "runnerHash": "6ae0069a753c36056729aebaddc62acc907c30b058c53131d54d978d2f4337f8"
+      "runnerHash": "6d5fd8e77482de2aaec83905cf16c1f4b743c56e1af1d9d0d9933b8d354b026b"
     },
-    "elapsedMilliseconds": 70.7896,
+    "elapsedMilliseconds": 47.7816,
     "budgetMilliseconds": 2000,
     "passed": true
   },
   "visual": {
     "identity": {
-      "executionId": "conformance-v2-810fe29ed7eb82ff2f700ac700c16c7243d17403",
+      "executionId": "conformance-v2-097554db2d39ebd74d92f2fe89eb444a27f8de4a",
       "checkpoint": "markdown-after-undo",
-      "candidate": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+      "candidate": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
       "contractHash": "742fc630b924edf43513a35859a5c87c87e0cde7299d64f85b4dc1b7b7a13cb2",
       "webBaselineHash": "290399177bfc4cb50f6eff1e4a079c169eb7b40cc42ab2ba1a53faf501899388",
       "avaloniaBaselineHash": "3441b153531a4034b6eb53634e86cc645bf02309c0f5bb9c8d40252f2c18920d",
@@ -632,7 +632,7 @@
       "locale": "zh-CN",
       "direction": "ltr",
       "motion": "full",
-      "runnerHash": "6ae0069a753c36056729aebaddc62acc907c30b058c53131d54d978d2f4337f8"
+      "runnerHash": "6d5fd8e77482de2aaec83905cf16c1f4b743c56e1af1d9d0d9933b8d354b026b"
     },
     "artifact": "avalonia.png",
     "sha256": "0a3354587d410610f0a0232195817753af1d624e8c6de5c99ce397f40e693ad6",

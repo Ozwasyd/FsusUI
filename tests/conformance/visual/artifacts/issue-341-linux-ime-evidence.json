@@ -10,7 +10,7 @@
     "sessionType": "wayland",
     "xModifiers": "@im=ibus",
     "hostOs": "Unix 7.0.0.30",
-    "candidateSha": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
+    "candidateSha": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
     "editorProvenance": "linux-x11-ibus:libpinyin",
     "platformProbeText": "\u4F60\u597D",
     "rawKeyEvents": [

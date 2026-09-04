@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "a025b0aaa888044f70c82a039eeeb813f0ac804dba1429106fffd2c24ffe0c00",
-  "candidateSha": "810fe29ed7eb82ff2f700ac700c16c7243d17403",
-  "candidateDigest": "ce4b073e47878c49bbcaba4270be707788fa625ca9fbfc43b476111b2cb14adc",
+  "classificationReceiptDigest": "69a5e972cb0ff2188316850a785948baae25b6543f1a4435d4b28b892c6d5b26",
+  "candidateSha": "097554db2d39ebd74d92f2fe89eb444a27f8de4a",
+  "candidateDigest": "12db41a2fdb3b283d1e373bc3e4b9197e4efd09f84be385652d5c09fb238304e",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,15 +13,15 @@
     "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
     "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
     "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
-    "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506",
-    "f1cbea9be45f2439dfe7578f176ec3845c6d491294c7cd7a2e6d3665a818fe7c",
-    "735e34e305b5bb6ae473bb8e6d33bb7eb615d111c25e710361d2fc463230a227",
-    "e877dee20be5dfd2aa1c1da8127f432488c6ad0812dfe555173d1ff7eb6ce1e2",
+    "4993c8a075f89b5e2f9abf172469887a9135994fe222a18a1449deedb41e3a23",
+    "fc4ba16f5a9c9dfd8b8868e1a2d1ece65a8e8f4fcc082f04a452ebde05d9c696",
+    "dd8692775e7e02c3a25d40dc8e3c837e6c970563792ceff8e344869d2aec63e5",
+    "0771a78abca0759ad79105cb2bbd13aba31cedbdf027ac706652137282f6741b",
     "1dc525d0cfefcd47530730b826a7f590565fde6cc349c3798ebe3812d89a1359"
   ],
-  "activeBaselineIdentityDigest": "993e02246ae968cf22f04511e682d9c57b2c73cf5e1b958c0aa58ad6361b5909",
+  "activeBaselineIdentityDigest": "cdd83f679a6ca2106cd1f7772a209c1ec85ef417a741fd8d0fe385b3a1259023",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "2d1a6210eec68aea8c5aabbed974843e76c1399e15ad423dfbdeaa334cc49c94",
+  "independenceEvidenceDigest": "3b75bf8e895dcadba2055670d8997c08a89c0700b2fa70cf1c1aae0d70e8328a",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -51,7 +51,7 @@
       "state": "real ibus composition commit cancel undo stale reject clipboard Unicode and candidate caret",
       "theme": "light",
       "inputModes": ["keyboard"],
-      "evidenceDigest": "c510e8b28069c130cedb0a08bf260728e46d7e6e0e65629e78724789ea96cca6"
+      "evidenceDigest": "62ee5266d1d4c36cf68e9b70e1de1e2757d849b60d4617cb8dad8891ea17e99e"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -83,12 +83,12 @@
       "id": "linux-native-ime-trace",
       "kind": "trace",
       "path": "tests/conformance/visual/artifacts/issue-341-linux-ime-evidence.json",
-      "digest": "c510e8b28069c130cedb0a08bf260728e46d7e6e0e65629e78724789ea96cca6",
+      "digest": "62ee5266d1d4c36cf68e9b70e1de1e2757d849b60d4617cb8dad8891ea17e99e",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "9821bf5dbdc5ce6490876bd59f9d2121fb8de35fcf1222842fbde37e3d2ca2b8"
+  "receiptDigest": "7122122ea9a8610d644f0f73ad4b85d281f8a08d8edc3e037f807e73b8ee74fd"
 }
