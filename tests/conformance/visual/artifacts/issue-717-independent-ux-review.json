@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "issue": 717,
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "4a8a5bff891bb551a2e486cb46581588a3039b43",
+  "candidateDigest": "63cde66dc9d2b18cd119ed225a32ed07936c625dd4483b97726da134a47175c6",
+  "classificationReceiptDigest": "0202414022ddb21f29b9b281638d7601c4fbdbb2756d96d0566af19d41ffbf72",
+  "productionFixture": true,
+  "implementationModifiedPaths": [],
+  "focusedTests": [
+    {
+      "command": "dotnet test dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj --no-restore --filter FullyQualifiedName~FsusMarkdownEditorAdjacentTests",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT=tests/conformance/visual/artifacts/issue-717 dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --filter FullyQualifiedName~FsusMarkdownEditorAdjacentHeadlessTests|FullyQualifiedName~MarkdownEditorGallery",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "The inspected light and dark 680x360 production renders retain the existing editor hierarchy and show a restrained current search match over the canonical Live projection while non-active prose is reduced to the Web-contract 0.72 opacity.",
+      "The production headless fixture verifies the same TextBox and PART_Scroll instances before and after the adjacent states, with unchanged input bounds and scroll extent.",
+      "Search navigation selects and reveals through the existing UTF-16 projection map; outline snapshots, canonical HTML export, host print, and writing-aid suspension are covered by revision and identity rejection tests without a second parser, renderer, input owner, or scroll owner."
+    ]
+  },
+  "inspectedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-717/issue-717-markdown-editor-adjacent/markdown-editor-adjacent-light.png",
+      "digest": "6742bc25315464c88c08449c6883e5f4ec3372a90fdceb040a8f363751114ca5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-717/issue-717-markdown-editor-adjacent/markdown-editor-adjacent-dark.png",
+      "digest": "306eb8989cb18ac6ceb0f57a74d50d587ec3687521e077d2f13b6771ecfc56bc"
+    }
+  ],
+  "limitations": [
+    "Deterministic local Avalonia headless Skia rendering; no physical display or native assistive-technology session is claimed.",
+    "The typed print boundary is verified with a host test double because FsusUI intentionally does not own an operating-system print dialog or print engine."
+  ]
+}
