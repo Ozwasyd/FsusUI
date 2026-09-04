@@ -10,6 +10,7 @@ using Avalonia.Input.TextInput;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -39,6 +40,8 @@ public sealed record FsusMarkdownDocumentIdentity(string Id, int Epoch);
 
 public partial class FsusMarkdownEditor : TemplatedControl
 {
+  private const int AutomationAtomicNodeBudget = 64;
+
   public static readonly StyledProperty<string> DocumentProperty =
     AvaloniaProperty.Register<FsusMarkdownEditor, string>(nameof(Document), string.Empty);
 
@@ -130,6 +133,8 @@ public partial class FsusMarkdownEditor : TemplatedControl
     AutomationProperties.SetAccessibilityView(this, AccessibilityView.Control);
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Edit);
     AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Off);
+    AutomationProperties.SetName(this, "Markdown editor");
+    SyncAutomationState();
   }
 
   protected override AutomationPeer OnCreateAutomationPeer() =>
@@ -166,6 +171,7 @@ public partial class FsusMarkdownEditor : TemplatedControl
       lastProjectionRequestKey = null;
       UpdateNativeSurface();
       RequestWritingAidsSnapshot();
+      InvalidateAutomationChildren();
     }
     return result;
   }
@@ -235,6 +241,23 @@ public partial class FsusMarkdownEditor : TemplatedControl
     BuildNativeSurface();
     UpdateScrollContentFloor();
     UpdateNativeSurface();
+    SyncAutomationState();
+  }
+
+  protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToVisualTree(e);
+    if (contentPresenter is not null && nativeSurface is null)
+    {
+      BuildNativeSurface();
+      UpdateNativeSurface();
+    }
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    ReleaseNativeSurface();
+    base.OnDetachedFromVisualTree(e);
   }
 
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -289,6 +312,7 @@ public partial class FsusMarkdownEditor : TemplatedControl
       RequestWritingAidsSnapshot();
     }
     else if (change.Property == IsReadOnlyProperty ||
+      change.Property == IsEnabledProperty ||
       change.Property == ForegroundProperty ||
       change.Property == FontFamilyProperty ||
       change.Property == FontSizeProperty ||
@@ -298,6 +322,7 @@ public partial class FsusMarkdownEditor : TemplatedControl
     {
       UpdateNativeSurface();
     }
+    SyncAutomationState();
   }
 
   private void EnsureStore()
@@ -428,6 +453,8 @@ public partial class FsusMarkdownEditor : TemplatedControl
     if (result.Accepted)
     {
       UpdateNativeSurface();
+      SyncAutomationState();
+      InvalidateAutomationChildren();
     }
     return result;
   }
@@ -503,6 +530,81 @@ public partial class FsusMarkdownEditor : TemplatedControl
       nativeSurface.Children,
       projection);
     contentPresenter.Content = nativeSurface;
+    UpdateInputOwnerViewport();
+  }
+
+  private void UpdateInputOwnerViewport()
+  {
+    if (inputOwner is null || projectionView is null)
+    {
+      return;
+    }
+    var diagnostics = projectionView.ViewportDiagnostics;
+    if (!diagnostics.IsVirtualized)
+    {
+      inputOwner.Height = double.NaN;
+      return;
+    }
+    var viewport = scrollViewer?.Viewport.Height ?? Bounds.Height;
+    inputOwner.Height = Math.Max(FontSize * 1.5, viewport);
+    inputOwner.VerticalAlignment =
+      global::Avalonia.Layout.VerticalAlignment.Top;
+  }
+
+  private void ReleaseNativeSurface()
+  {
+    if (scrollViewer is not null)
+    {
+      scrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
+    }
+    if (inputOwner is not null)
+    {
+      inputOwner.TextChanged -= OnInputTextChanged;
+      inputOwner.KeyDown -= OnInputKeyDown;
+      inputOwner.KeyUp -= OnInputSelectionChanged;
+      inputOwner.PointerPressed -= OnInputPointerPressed;
+      inputOwner.PointerMoved -= OnInputPointerMoved;
+      inputOwner.PointerReleased -= OnInputPointerReleased;
+      inputOwner.PointerWheelChanged -= OnInputPointerWheelChanged;
+    }
+    projectionView?.ReleaseRetainedState();
+    if (contentPresenter is not null &&
+      ReferenceEquals(contentPresenter.Content, nativeSurface))
+    {
+      contentPresenter.Content = null;
+    }
+    inputOwner = null;
+    projectionView = null;
+    nativeSurface = null;
+  }
+
+  private void SyncAutomationState()
+  {
+    var selection = store.Selection;
+    var state = string.Join(
+      "; ",
+      $"mode={Mode.ToString().ToLowerInvariant()}",
+      $"capability={CapabilityState}",
+      $"selection={selection.Start}:{selection.End}",
+      $"caret={selection.End}",
+      IsReadOnly ? "readonly=true" : "readonly=false",
+      IsEnabled ? "disabled=false" : "disabled=true",
+      DataValidationErrors.GetHasErrors(this) ? "invalid=true" : "invalid=false",
+      "multiline=true");
+    AutomationProperties.SetItemStatus(this, state);
+    AutomationProperties.SetHelpText(
+      this,
+      IsReadOnly
+        ? "Read-only multi-line Markdown text."
+        : "Editable multi-line Markdown text.");
+  }
+
+  private void InvalidateAutomationChildren()
+  {
+    if (ControlAutomationPeer.FromElement(this) is MarkdownEditorAutomationPeer peer)
+    {
+      peer.RefreshChildren();
+    }
   }
 
   private void UpdateNativeSurface()
@@ -595,13 +697,23 @@ public partial class FsusMarkdownEditor : TemplatedControl
       presentationMap,
       store.Selection,
       live ? projection.Snapshot?.Spans : null);
+    projectionView.UpdateViewport(
+      scrollViewer?.Offset.Y ?? 0,
+      scrollViewer?.Viewport.Height ?? Bounds.Height);
+    UpdateInputOwnerViewport();
     UpdateAdjacentPresentation();
     RestoreViewportSourceAnchor(sourceAnchor, preservedHorizontalOffset);
+    SyncAutomationState();
   }
 
   private void OnScrollLayoutUpdated(object? sender, EventArgs args)
   {
     UpdateScrollContentFloor();
+    projectionView?.UpdateViewport(
+      scrollViewer?.Offset.Y ?? 0,
+      scrollViewer?.Viewport.Height ?? Bounds.Height);
+    UpdateInputOwnerViewport();
+    InvalidateAutomationChildren();
   }
 
   private void UpdateScrollContentFloor()
@@ -804,6 +916,8 @@ public partial class FsusMarkdownEditor : TemplatedControl
       SelectionChange?.Invoke(this, new(store.Revision, store.Selection));
       UpdateProjectionSelection();
       RequestWritingAidsSnapshot();
+      SyncAutomationState();
+      InvalidateAutomationChildren();
     }
   }
 
@@ -1473,9 +1587,11 @@ public partial class FsusMarkdownEditor : TemplatedControl
   {
     private FsusMarkdownEditor Editor => (FsusMarkdownEditor)Owner;
 
-    public bool IsReadOnly => Editor.IsReadOnly;
+    public bool IsReadOnly => Editor.IsReadOnly || !Editor.IsEnabled;
 
     public string Value => Editor.Document;
+
+    public void RefreshChildren() => InvalidateChildren();
 
     public void SetValue(string? value)
     {
@@ -1496,65 +1612,144 @@ public partial class FsusMarkdownEditor : TemplatedControl
         return null;
       }
 
-      var peers = new List<AutomationPeer>(atomicSpans.Length * 3);
-      foreach (var span in atomicSpans)
+      if (Editor.projectionView is { } view &&
+        view.ViewportDiagnostics.IsVirtualized)
       {
-        peers.Add(AtomicActionPeer(span, "enter-before", span.SourceRange.Start));
-        peers.Add(AtomicActionPeer(span, "enter-after", span.SourceRange.End));
-        peers.Add(AtomicActionPeer(span, "edit-source", span.SourceRange.Start));
+        var visible = view.VisibleSourceRange;
+        atomicSpans = atomicSpans
+          .Where(span =>
+            span.SourceRange.End >= visible.Start &&
+            span.SourceRange.Start <= visible.End)
+          .ToArray();
       }
-      return peers;
+      return atomicSpans
+        .Take(AutomationAtomicNodeBudget)
+        .Select(span => (AutomationPeer)new AtomicNodeAutomationPeer(
+          new AtomicNodeControl(Editor, span)))
+        .ToArray();
+    }
+  }
+
+  private sealed class AtomicNodeControl(
+    FsusMarkdownEditor owner,
+    FsusMarkdownProjectionSpan span) : Control
+  {
+    public FsusMarkdownEditor Editor { get; } = owner;
+
+    public FsusMarkdownProjectionSpan Span { get; } = span;
+
+    public void MoveTo(int sourceOffset, bool sourceMode)
+    {
+      var previous = Editor.store.Selection;
+      var next = new FsusMarkdownEditorSelection(sourceOffset, sourceOffset);
+      if (Editor.store.SetSelection(next) && Editor.store.Selection != previous)
+      {
+        Editor.SelectionChange?.Invoke(Editor, new(Editor.store.Revision, Editor.store.Selection));
+        Editor.UpdateProjectionSelection();
+      }
+      if (sourceMode)
+      {
+        Editor.Mode = FsusMarkdownEditorMode.Source;
+      }
+      _ = Editor.Focus();
+      Editor.SyncAutomationState();
     }
 
-    private AutomationPeer AtomicActionPeer(
-      FsusMarkdownProjectionSpan span,
-      string action,
-      int sourceOffset)
+    public void SelectSource()
     {
-      var control = new AtomicActionControl(Editor, sourceOffset)
+      var previous = Editor.store.Selection;
+      var next = new FsusMarkdownEditorSelection(
+        Span.SourceRange.Start,
+        Span.SourceRange.End);
+      if (Editor.store.SetSelection(next) && Editor.store.Selection != previous)
+      {
+        Editor.SelectionChange?.Invoke(Editor, new(Editor.store.Revision, Editor.store.Selection));
+        Editor.UpdateProjectionSelection();
+      }
+      _ = Editor.Focus();
+      Editor.SyncAutomationState();
+    }
+
+    public void Delete()
+    {
+      if (Editor.IsReadOnly || !Editor.IsEnabled)
+      {
+        return;
+      }
+      _ = Editor.DispatchTransaction(new FsusMarkdownEditorTransaction(
+        [new FsusMarkdownEditorChange(
+          Span.SourceRange.Start,
+          Span.SourceRange.End,
+          string.Empty)],
+        Selection: new FsusMarkdownEditorSelection(
+          Span.SourceRange.Start,
+          Span.SourceRange.Start),
+        Origin: "command",
+        DocumentIdentity: Editor.store.Identity));
+      _ = Editor.Focus();
+    }
+  }
+
+  private sealed class AtomicNodeAutomationPeer
+    : ControlAutomationPeer, IValueProvider
+  {
+    public AtomicNodeAutomationPeer(AtomicNodeControl owner) : base(owner)
+    {
+      AutomationProperties.SetAccessibilityView(owner, AccessibilityView.Content);
+      AutomationProperties.SetControlTypeOverride(owner, AutomationControlType.Group);
+      AutomationProperties.SetName(
+        owner,
+        owner.Span.SemanticKind ?? "Markdown atomic node");
+      AutomationProperties.SetHelpText(owner, owner.Span.DisplayText);
+      AutomationProperties.SetItemStatus(
+        owner,
+        $"atomic; source={owner.Span.SourceRange.Start}:{owner.Span.SourceRange.End}");
+      owner.Focusable = false;
+      owner.IsHitTestVisible = false;
+    }
+
+    private AtomicNodeControl Node => (AtomicNodeControl)Owner;
+
+    public bool IsReadOnly => true;
+
+    public string Value => Node.Span.DisplayText;
+
+    public void SetValue(string? value) =>
+      throw new InvalidOperationException("Atomic Markdown nodes are read-only.");
+
+    protected override IReadOnlyList<AutomationPeer> GetChildrenCore() =>
+    [
+      Action("enter-before", () => Node.MoveTo(Node.Span.SourceRange.Start, false)),
+      Action("enter-after", () => Node.MoveTo(Node.Span.SourceRange.End, false)),
+      Action("edit-source", () => Node.MoveTo(Node.Span.SourceRange.Start, true)),
+      Action("select-source", Node.SelectSource),
+      Action("delete", Node.Delete),
+    ];
+
+    private AutomationPeer Action(string action, Action invoke)
+    {
+      var control = new AtomicActionControl(invoke)
       {
         Focusable = false,
         IsHitTestVisible = false,
       };
       AutomationProperties.SetAccessibilityView(control, AccessibilityView.Control);
       AutomationProperties.SetControlTypeOverride(control, AutomationControlType.Button);
-      AutomationProperties.SetName(
-        control,
-        $"{span.SemanticKind ?? "atomic"} {action}");
-      AutomationProperties.SetHelpText(control, span.DisplayText);
+      AutomationProperties.SetName(control, action);
+      AutomationProperties.SetHelpText(control, Node.Span.DisplayText);
       AutomationProperties.SetItemStatus(control, action);
-      return new AtomicActionAutomationPeer(control, span.DisplayText);
+      return new AtomicActionAutomationPeer(control);
     }
   }
 
-  private sealed class AtomicActionControl(
-    FsusMarkdownEditor editor,
-    int sourceOffset) : Control
+  private sealed class AtomicActionControl(Action invoke) : Control
   {
-    public void Invoke()
-    {
-      var previous = editor.store.Selection;
-      var next = new FsusMarkdownEditorSelection(sourceOffset, sourceOffset);
-      if (editor.store.SetSelection(next) && editor.store.Selection != previous)
-      {
-        editor.SelectionChange?.Invoke(editor, new(editor.store.Revision, editor.store.Selection));
-        editor.UpdateProjectionSelection();
-      }
-      _ = editor.Focus();
-    }
+    public void Invoke() => invoke();
   }
 
   private sealed class AtomicActionAutomationPeer(
-    AtomicActionControl owner,
-    string value) : ControlAutomationPeer(owner), IInvokeProvider, IValueProvider
+    AtomicActionControl owner) : ControlAutomationPeer(owner), IInvokeProvider
   {
-    public bool IsReadOnly => true;
-
-    public string Value => value;
-
     public void Invoke() => owner.Invoke();
-
-    public void SetValue(string? value) =>
-      throw new InvalidOperationException("Atomic Markdown actions are read-only.");
   }
 }

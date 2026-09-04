@@ -1,15 +1,20 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Security.Cryptography;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Logging;
 using Avalonia.Media;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Icons;
 using FsusUI.Avalonia.Localization;
@@ -133,9 +138,10 @@ internal static class Program
         1);
       var markdownEditor = new FsusMarkdownEditor
       {
-        Document = "# AOT",
+        Document = "# AOT\n\n[widget]",
         DocumentIdentity = projectionIdentity,
         Mode = FsusMarkdownEditorMode.Live,
+        Height = 140,
       };
       var projectionRequest = new FsusMarkdownProjectionRequestedEventArgs(
         projectionIdentity,
@@ -174,6 +180,19 @@ internal static class Program
         DocumentTitle = "Native AOT shell",
         Status = "Ready",
       };
+      var largeMarkdownSource = string.Join(
+        "\n",
+        Enumerable.Range(0, 10_000).Select(index =>
+          index % 10 == 0
+            ? $"# Heading {index:D5} {new string('界', 180)}"
+            : $"# Heading {index:D5} content"));
+      var largeMarkdownEditor = new FsusMarkdownEditor
+      {
+        Document = largeMarkdownSource,
+        DocumentIdentity = new FsusMarkdownDocumentIdentity("native-aot-large", 1),
+        Mode = FsusMarkdownEditorMode.Source,
+        Height = 180,
+      };
       var panel = new StackPanel();
       var scenarios = CreateStableScenarios(
         button,
@@ -189,6 +208,8 @@ internal static class Program
       panel.Children.Add(titleBar);
       panel.Children.Add(activityShell);
       panel.Children.Add(codeEditor);
+      panel.Children.Add(markdownEditor);
+      panel.Children.Add(largeMarkdownEditor);
 
       var window = new Window
       {
@@ -204,6 +225,8 @@ internal static class Program
           {
             try
             {
+              var markdownProbeStarted = Stopwatch.GetTimestamp();
+              var markdownMemoryBefore = GC.GetTotalMemory(false);
               report.TopLevelCreated = window is TopLevel;
               report.DispatcherReached = Dispatcher.UIThread.CheckAccess();
               report.PlatformHandleCreated = window.TryGetPlatformHandle() is not null;
@@ -251,6 +274,42 @@ internal static class Program
               report.MarkdownProjectionProducerReady =
                 projectionCommit.Accepted &&
                 markdownEditor.CapabilityState == "aligned";
+              var markdownPeer =
+                ControlAutomationPeer.CreatePeerForElement(markdownEditor);
+              var markdownAtomicNodes = markdownPeer.GetChildren() ?? [];
+              var markdownAtomicNode = markdownAtomicNodes.SingleOrDefault();
+              report.MarkdownAutomationNodeCount = markdownAtomicNodes.Count;
+              report.MarkdownAutomationReady =
+                markdownPeer.GetAutomationControlType() == AutomationControlType.Edit &&
+                markdownPeer.GetProvider<IValueProvider>()?.Value == markdownEditor.Document &&
+                markdownPeer.GetItemStatus().Contains("multiline=true", StringComparison.Ordinal) &&
+                markdownAtomicNode is not null &&
+                markdownAtomicNode.GetAutomationControlType() == AutomationControlType.Group &&
+                markdownAtomicNode.GetProvider<IValueProvider>()?.Value == "Widget" &&
+                markdownAtomicNode.GetChildren()?.Count == 5 &&
+                markdownAtomicNode.GetChildren()!.All(action =>
+                  action.GetProvider<IInvokeProvider>() is not null &&
+                  !action.IsKeyboardFocusable());
+              var largeVisuals = largeMarkdownEditor.GetVisualDescendants().ToArray();
+              var largeInput = largeVisuals.OfType<TextBox>().SingleOrDefault();
+              var largeScroll = largeVisuals.OfType<ScrollViewer>()
+                .SingleOrDefault(candidate => candidate.Name == "PART_Scroll");
+              report.MarkdownDocumentCharacters = largeMarkdownSource.Length;
+              report.MarkdownBlockCount = 10_000;
+              report.MarkdownHeadingCount = 10_000;
+              report.MarkdownVisualCount = largeVisuals.Length;
+              report.MarkdownVirtualizationReady =
+                largeMarkdownSource.Length >= 100_000 &&
+                largeVisuals.Length < 64 &&
+                largeInput is not null &&
+                largeInput.Bounds.Height <= largeMarkdownEditor.Height &&
+                largeScroll is not null &&
+                largeScroll.Extent.Height > largeMarkdownEditor.Height;
+              report.MarkdownLayoutMilliseconds =
+                Stopwatch.GetElapsedTime(markdownProbeStarted).TotalMilliseconds;
+              report.MarkdownManagedBytesDelta =
+                Math.Max(0, GC.GetTotalMemory(false) - markdownMemoryBefore);
+              report.RenderScaling = window.RenderScaling;
               report.WebViewAdapterReady = webViewAdapterReady;
               report.ActivitySectionCount = activityShell.Sections.Count;
               report.DocumentCount = documents.Documents.Count;
@@ -267,6 +326,8 @@ internal static class Program
                 report.DocumentCount == 1 &&
                 report.CodeEditorReady &&
                 report.MarkdownProjectionProducerReady &&
+                report.MarkdownAutomationReady &&
+                report.MarkdownVirtualizationReady &&
                 report.WebViewAdapterReady
                   ? 0
                   : 1;
@@ -674,6 +735,28 @@ internal static class Program
 
 internal sealed class SmokeApplication : Application
 {
+  public override void Initialize()
+  {
+    base.Initialize();
+    new FsusThemeManager().Apply(Resources, new()
+    {
+      Variant = FsusThemeVariant.Light,
+      MotionMode = FsusMotionMode.Reduced,
+    });
+    Resources.MergedDictionaries.Add(
+      new ResourceInclude(new Uri("avares://FsusUI.Avalonia.Themes"))
+      {
+        Source = new Uri(
+          "avares://FsusUI.Avalonia.Themes/Themes/FsusLight.axaml"),
+      });
+    Styles.Add(
+      new StyleInclude(new Uri("avares://FsusUI.Avalonia.Themes"))
+      {
+        Source = new Uri(
+          "avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
+      });
+  }
+
   public override void OnFrameworkInitializationCompleted()
   {
     if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -766,6 +849,12 @@ internal sealed class AotProjectionProducer(
             FsusMarkdownProjectionSpanKind.Text,
             "AOT",
             "heading"),
+          new(
+            "widget",
+            new(7, 15),
+            FsusMarkdownProjectionSpanKind.Atomic,
+            "Widget",
+            "embedded-widget"),
         ],
         request.FeatureRevision),
       []));
@@ -917,6 +1006,16 @@ internal sealed record SmokeReport
   public int CommandPaletteTreeCount { get; set; }
   public bool CodeEditorReady { get; set; }
   public bool MarkdownProjectionProducerReady { get; set; }
+  public bool MarkdownAutomationReady { get; set; }
+  public bool MarkdownVirtualizationReady { get; set; }
+  public int MarkdownDocumentCharacters { get; set; }
+  public int MarkdownBlockCount { get; set; }
+  public int MarkdownHeadingCount { get; set; }
+  public int MarkdownAutomationNodeCount { get; set; }
+  public int MarkdownVisualCount { get; set; }
+  public double MarkdownLayoutMilliseconds { get; set; }
+  public long MarkdownManagedBytesDelta { get; set; }
+  public double RenderScaling { get; set; }
   public bool WebViewAdapterReady { get; set; }
   public int ActivitySectionCount { get; set; }
   public int DocumentCount { get; set; }
