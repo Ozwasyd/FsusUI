@@ -1,0 +1,83 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "0d598ee311c5a6e836d2b3f3321d20fc044fad26ee60b8129577561ab8500aeb",
+  "candidateSha": "8127f8cd8408714a94f29eff3d31ee4e86792fc5",
+  "candidateDigest": "e389918d3fbf88bc9cab50574e792df3463e1ceb4ade92fe72db0d8c6c19598a",
+  "verificationClass": "ux-system",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "a4a29ee47820b7e13f9ddbce653703c3afba9b30cdc0fec02b498d633184ae14",
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
+    "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
+    "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
+    "06f5d43729158b6375038364f8a8bf6b6c4951bd3dddb7689e6edd5cede4b54a",
+    "f7705d710ea07a94439c8e6aa4424c5cf24c843e832de3a61348635c3743ea1a"
+  ],
+  "activeBaselineIdentityDigest": "cc3f00e65e7ae94573d6c21163eb0d7e0dc5c806a5582430c95f27ac61fd98a3",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "dde181173830db24e43363d6949b08b4f7f05eaa656abfe91faa679f2cc979b9",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "Chromium 1280x1100",
+      "state": "enabled rapid nested interrupt reverse reorder placement-flip focus and DOM cleanup",
+      "theme": "light",
+      "inputModes": ["pointer", "keyboard"],
+      "evidenceDigest": "6f4d6584f4bb96987abfc67fe9827b3aa3ceea70ebd08e8c37501bfdca73df5f"
+    },
+    {
+      "viewport": "Chromium 1280x1100",
+      "state": "reduced rapid nested interrupt reverse reorder placement-flip focus and DOM cleanup",
+      "theme": "light",
+      "inputModes": ["pointer", "keyboard", "reduced-motion"],
+      "evidenceDigest": "6f4d6584f4bb96987abfc67fe9827b3aa3ceea70ebd08e8c37501bfdca73df5f"
+    },
+    {
+      "viewport": "Chromium 1280x1100",
+      "state": "disabled rapid nested interrupt reverse reorder placement-flip focus and DOM cleanup",
+      "theme": "light",
+      "inputModes": ["pointer", "keyboard", "reduced-motion"],
+      "evidenceDigest": "6f4d6584f4bb96987abfc67fe9827b3aa3ceea70ebd08e8c37501bfdca73df5f"
+    },
+    {
+      "viewport": "Chromium 1280x1100",
+      "state": "timer-based 60Hz and 120Hz cadence sampling under four-times CPU throttle",
+      "theme": "light",
+      "inputModes": ["pointer"],
+      "evidenceDigest": "bafcea98d603a54f4090c3e11a7ba2863246b777e7ad7b94b84b3026e436b496"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "legacy-motion-runtime-trace",
+      "kind": "trace",
+      "path": "tests/conformance/visual/artifacts/issue-472/legacy-motion-runtime-trace.json",
+      "digest": "6f4d6584f4bb96987abfc67fe9827b3aa3ceea70ebd08e8c37501bfdca73df5f",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "legacy-motion-terminal-render",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-472/legacy-motion-terminal-render.png",
+      "digest": "a5446c2868c4cbda5b7fc420ca39b0b6513b24b23e692573660caef3677f53a5",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "local-motion-cadence-simulation",
+      "kind": "trace",
+      "path": "tests/conformance/visual/artifacts/issue-472/local-motion-cadence-simulation.json",
+      "digest": "bafcea98d603a54f4090c3e11a7ba2863246b777e7ad7b94b84b3026e436b496",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "6376b90979fb7d96aac8f9b1fbc17c993d5ccce41fd8e3601c539e6d7b5528ea"
+}
