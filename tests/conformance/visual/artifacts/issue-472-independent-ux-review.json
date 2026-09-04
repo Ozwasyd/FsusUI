@@ -4,15 +4,15 @@
   "parentIssue": 308,
   "childIssues": [469, 470, 471, 472],
   "evidenceClass": "independent-rendered-evidence-review",
-  "candidateSha": "8127f8cd8408714a94f29eff3d31ee4e86792fc5",
-  "candidateDigest": "e389918d3fbf88bc9cab50574e792df3463e1ceb4ade92fe72db0d8c6c19598a",
-  "classificationReceiptDigest": "0d598ee311c5a6e836d2b3f3321d20fc044fad26ee60b8129577561ab8500aeb",
+  "candidateSha": "81240e107ced87d0d5a2896f8d738483325be139",
+  "candidateDigest": "d2c8a4dc311602d048f8d67e4ad38e6ccda25e8d7aab38554994b799e41b9390",
+  "classificationReceiptDigest": "ffa9e977af673daca84fc4b19c21c37debe0183cda02e5c7762d566273c4922d",
   "productionFixture": true,
   "implementationModifiedPaths": [],
   "exactHead": {
-    "base": "0006645861aa88dac35dae67efe7cf581a4bba27",
+    "base": "c2ac6caa35cb63ae1e4f85ea46c74ffb45afbcea",
     "requiredBaseAncestor": "918aa27c",
-    "candidate": "8127f8cd8408714a94f29eff3d31ee4e86792fc5"
+    "candidate": "81240e107ced87d0d5a2896f8d738483325be139"
   },
   "focusedTests": [
     {
@@ -50,21 +50,21 @@
     {
       "mode": "enabled",
       "traceEntries": 277,
-      "activePhaseEntries": 169,
+      "activePhaseEntries": 165,
       "maxDurationMs": 300,
       "maxDelayMs": 0
     },
     {
       "mode": "reduced",
-      "traceEntries": 282,
-      "activePhaseEntries": 165,
+      "traceEntries": 279,
+      "activePhaseEntries": 157,
       "maxDurationMs": 1,
       "maxDelayMs": 0
     },
     {
       "mode": "disabled",
       "traceEntries": 282,
-      "activePhaseEntries": 165,
+      "activePhaseEntries": 164,
       "maxDurationMs": 1,
       "maxDelayMs": 0
     }
@@ -83,7 +83,7 @@
   "inspectedArtifacts": [
     {
       "path": "tests/conformance/visual/artifacts/issue-472/legacy-motion-runtime-trace.json",
-      "digest": "6f4d6584f4bb96987abfc67fe9827b3aa3ceea70ebd08e8c37501bfdca73df5f"
+      "digest": "12354faaa0cef2e1563e125dad0132e3a186073419d271e948a4644f9eb2a5c0"
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-472/legacy-motion-terminal-render.png",
@@ -91,7 +91,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-472/local-motion-cadence-simulation.json",
-      "digest": "bafcea98d603a54f4090c3e11a7ba2863246b777e7ad7b94b84b3026e436b496"
+      "digest": "dffb4da7e383dc1dc08b6daad1df6c2b393748f0ce2c8b251dbefe42cc1c34cc"
     }
   ],
   "limitations": [
