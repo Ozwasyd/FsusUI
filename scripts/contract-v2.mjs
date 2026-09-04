@@ -18,7 +18,12 @@ export const MEMBER_STATUSES = [
   'missing',
   'web-only',
 ]
-export const GOVERNANCE_FIELDS = ['reason', 'owner', 'testPolicy', 'reviewPolicy']
+export const GOVERNANCE_FIELDS = [
+  'reason',
+  'owner',
+  'testPolicy',
+  'reviewPolicy',
+]
 export const MARKDOWN_EDITOR_MODES = ['source', 'live', 'split', 'preview']
 export const MARKDOWN_EDITOR_CAPABILITIES = [
   'supported',
@@ -37,6 +42,8 @@ export const AVALONIA_SEMANTIC_PATHS = {
 }
 export const MARKDOWN_EDITOR_GATE_PATH =
   'spec/components/contracts/v2/markdown-editor-gate.json'
+export const SEMANTIC_MEMBER_BINDINGS_PATH =
+  'spec/components/contracts/v2/semantic-member-bindings.json'
 export const CONTRACT_V2_REGISTRY_PATH =
   'spec/components/contracts/v2/contract-v2.json'
 
@@ -69,7 +76,10 @@ export const kebabName = (value) =>
 // narrow (single member), documented, and never hides a member gap: every
 // member that does not resolve to a real counterpart is explicitly registered.
 export const normalizeMemberName = (value) => {
-  let normalized = value.replace(/^Is(?=[A-Z])/, '').replace(/^Can(?=[A-Z])/, '').replace(/^Has(?=[A-Z])/, '')
+  let normalized = value
+    .replace(/^Is(?=[A-Z])/, '')
+    .replace(/^Can(?=[A-Z])/, '')
+    .replace(/^Has(?=[A-Z])/, '')
   normalized = normalized.replace(/Changed$/, '')
   return toKebab(normalized)
 }
@@ -106,7 +116,11 @@ export const categoriesFromClrType = (type) => {
   ) {
     return ['array']
   }
-  if (base === 'System.Action' || base === 'System.Func' || base === 'System.EventHandler') {
+  if (
+    base === 'System.Action' ||
+    base === 'System.Func' ||
+    base === 'System.EventHandler'
+  ) {
     return ['function']
   }
   return [base.split('.').pop() || 'unknown']
@@ -145,10 +159,17 @@ export const categoriesFromVueProp = (prop) => {
       .map((part) => {
         const normalized = normalizeVueSemanticType(part)
         if (normalized === 'string') return 'string'
-        if (normalized === 'boolean' || normalized === 'true' || normalized === 'false') return 'boolean'
+        if (
+          normalized === 'boolean' ||
+          normalized === 'true' ||
+          normalized === 'false'
+        )
+          return 'boolean'
         if (normalized === 'number') return 'number'
-        if (normalized.endsWith('[]') || normalized.startsWith('SingleOrRange')) return 'array'
-        if (normalized.includes('Component') || normalized.includes('VNode')) return 'component'
+        if (normalized.endsWith('[]') || normalized.startsWith('SingleOrRange'))
+          return 'array'
+        if (normalized.includes('Component') || normalized.includes('VNode'))
+          return 'component'
         return 'unknown'
       })
   }
@@ -156,17 +177,29 @@ export const categoriesFromVueProp = (prop) => {
 }
 
 const categoriesOverlap = (first, second) => {
-  const a = first.includes('unknown') ? first.filter((x) => x !== 'unknown') : first
-  const b = second.includes('unknown') ? second.filter((x) => x !== 'unknown') : second
+  const a = first.includes('unknown')
+    ? first.filter((x) => x !== 'unknown')
+    : first
+  const b = second.includes('unknown')
+    ? second.filter((x) => x !== 'unknown')
+    : second
   if (a.length === 0 || b.length === 0) return null // not comparable
   return a.some((value) => b.includes(value))
 }
 
-const comparableValues = (values) =>
-  [...new Set((values ?? []).filter((value) => value != null).map((value) => String(value).toLowerCase()))]
+const comparableValues = (values) => [
+  ...new Set(
+    (values ?? [])
+      .filter((value) => value != null)
+      .map((value) => String(value).toLowerCase()),
+  ),
+]
 
-const enumMemberNames = (enumMembers) =>
-  [...new Set((enumMembers ?? []).map((member) => String(member.name).toLowerCase()))]
+const enumMemberNames = (enumMembers) => [
+  ...new Set(
+    (enumMembers ?? []).map((member) => String(member.name).toLowerCase()),
+  ),
+]
 
 const literalDefaultValue = (webDefault) =>
   webDefault?.kind === 'literal' ? webDefault.value : undefined
@@ -175,7 +208,8 @@ const normalizeDefault = (value) => {
   if (typeof value === 'string') return value.toLowerCase()
   if (typeof value === 'number') return String(value)
   if (typeof value === 'boolean') return String(value)
-  if (typeof value === 'object' && value !== null) return String(value.value ?? value)
+  if (typeof value === 'object' && value !== null)
+    return String(value.value ?? value)
   return value == null ? undefined : String(value)
 }
 
@@ -275,7 +309,10 @@ export const compareMembers = ({ web, avalonia, kind }) => {
     if (webSignature && avaloniaSignature) {
       const signatureCompatible = categoriesOverlap(
         categoriesFromClrType(avaloniaSignature.returnType),
-        categoriesFromVueProp({ runtimeType: webSignature.returnType, semanticType: webSignature.returnType }),
+        categoriesFromVueProp({
+          runtimeType: webSignature.returnType,
+          semanticType: webSignature.returnType,
+        }),
       )
       if (signatureCompatible === false) {
         setDrift(
@@ -367,7 +404,15 @@ const findAvaloniaType = (componentName, typeIndex) => {
   return null
 }
 
-const matchAvaloniaProperty = (webName, avaloniaType) => {
+const matchAvaloniaProperty = (webName, avaloniaType, binding) => {
+  if (binding) {
+    return (
+      [
+        ...(avaloniaType.avaloniaProperties ?? []),
+        ...(avaloniaType.properties ?? []),
+      ].find((property) => property.name === binding.avalonia) ?? null
+    )
+  }
   const normalized = normalizeMemberName(webName)
   const properties = [
     ...(avaloniaType.avaloniaProperties ?? []),
@@ -382,7 +427,14 @@ const matchAvaloniaProperty = (webName, avaloniaType) => {
   return null
 }
 
-const matchAvaloniaEvent = (webName, avaloniaType) => {
+const matchAvaloniaEvent = (webName, avaloniaType, binding) => {
+  if (binding) {
+    return (
+      (avaloniaType.events ?? []).find(
+        (event) => event.name === binding.avalonia,
+      ) ?? null
+    )
+  }
   const normalized = normalizeMemberName(webName)
   for (const event of avaloniaType.events ?? []) {
     if (normalizeMemberName(event.name) === normalized) return event
@@ -390,7 +442,14 @@ const matchAvaloniaEvent = (webName, avaloniaType) => {
   return null
 }
 
-const matchAvaloniaMethod = (webName, avaloniaType) => {
+const matchAvaloniaMethod = (webName, avaloniaType, binding) => {
+  if (binding) {
+    return (
+      (avaloniaType.methods ?? []).find(
+        (method) => method.name === binding.avalonia,
+      ) ?? null
+    )
+  }
   const normalized = normalizeMemberName(webName)
   for (const method of avaloniaType.methods ?? []) {
     if (normalizeMemberName(method.name) === normalized) return method
@@ -398,7 +457,21 @@ const matchAvaloniaMethod = (webName, avaloniaType) => {
   return null
 }
 
-const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
+const bindingMetadata = (binding) =>
+  binding
+    ? {
+        semantic: binding.semantic,
+        bindingBasis: 'explicit-semantic',
+      }
+    : {}
+
+const inputMember = ({
+  contractKebab,
+  prop,
+  avaloniaType,
+  classification,
+  binding,
+}) => {
   if (!avaloniaType) {
     return {
       name: prop.name,
@@ -408,6 +481,7 @@ const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
       scenarioIds: [scenarioId(contractKebab, 'input', prop.name)],
+      ...bindingMetadata(binding),
       governance:
         classification === 'web-only'
           ? defaultGovernance(
@@ -418,7 +492,7 @@ const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
             ),
     }
   }
-  const avalonia = matchAvaloniaProperty(prop.name, avaloniaType)
+  const avalonia = matchAvaloniaProperty(prop.name, avaloniaType, binding)
   let status
   let governance = null
   let drift = emptyDrift()
@@ -454,11 +528,18 @@ const inputMember = ({ contractKebab, prop, avaloniaType, classification }) => {
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'input', prop.name)],
+    ...bindingMetadata(binding),
     governance,
   }
 }
 
-const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => {
+const outputMember = ({
+  contractKebab,
+  emit,
+  avaloniaType,
+  classification,
+  binding,
+}) => {
   if (!avaloniaType) {
     return {
       name: emit,
@@ -468,6 +549,7 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
       scenarioIds: [scenarioId(contractKebab, 'output', emit)],
+      ...bindingMetadata(binding),
       governance:
         classification === 'web-only'
           ? defaultGovernance(
@@ -478,7 +560,7 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
             ),
     }
   }
-  const avalonia = matchAvaloniaEvent(emit, avaloniaType)
+  const avalonia = matchAvaloniaEvent(emit, avaloniaType, binding)
   let status
   let governance = null
   let drift = emptyDrift()
@@ -514,11 +596,18 @@ const outputMember = ({ contractKebab, emit, avaloniaType, classification }) => 
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'output', emit)],
+    ...bindingMetadata(binding),
     governance,
   }
 }
 
-const operationMember = ({ contractKebab, exposed, avaloniaType, classification }) => {
+const operationMember = ({
+  contractKebab,
+  exposed,
+  avaloniaType,
+  classification,
+  binding,
+}) => {
   if (!avaloniaType) {
     return {
       name: exposed,
@@ -528,6 +617,7 @@ const operationMember = ({ contractKebab, exposed, avaloniaType, classification 
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
       scenarioIds: [scenarioId(contractKebab, 'operation', exposed)],
+      ...bindingMetadata(binding),
       governance:
         classification === 'web-only'
           ? defaultGovernance(
@@ -538,7 +628,7 @@ const operationMember = ({ contractKebab, exposed, avaloniaType, classification 
             ),
     }
   }
-  const avalonia = matchAvaloniaMethod(exposed, avaloniaType)
+  const avalonia = matchAvaloniaMethod(exposed, avaloniaType, binding)
   let status
   let governance = null
   let drift = emptyDrift()
@@ -574,17 +664,27 @@ const operationMember = ({ contractKebab, exposed, avaloniaType, classification 
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'operation', exposed)],
+    ...bindingMetadata(binding),
     governance,
   }
 }
 
-const contentRegionMember = ({ contractKebab, slot, avaloniaType, classification }) => {
+const contentRegionMember = ({
+  contractKebab,
+  slot,
+  avaloniaType,
+  classification,
+}) => {
   if (!avaloniaType) {
     return {
       name: slot.name,
       kind: 'contentRegion',
       scoped: Boolean(slot.scoped),
-      web: { member: slot.name, scoped: Boolean(slot.scoped), baseline: VUE_BASELINE_PATH },
+      web: {
+        member: slot.name,
+        scoped: Boolean(slot.scoped),
+        baseline: VUE_BASELINE_PATH,
+      },
       avalonia: null,
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
@@ -621,7 +721,11 @@ const contentRegionMember = ({ contractKebab, slot, avaloniaType, classification
     name: slot.name,
     kind: 'contentRegion',
     scoped: Boolean(slot.scoped),
-    web: { member: slot.name, scoped: Boolean(slot.scoped), baseline: VUE_BASELINE_PATH },
+    web: {
+      member: slot.name,
+      scoped: Boolean(slot.scoped),
+      baseline: VUE_BASELINE_PATH,
+    },
     avalonia,
     status,
     drift: emptyDrift(),
@@ -634,9 +738,12 @@ const deriveStates = ({ component, inputs, outputs }) => {
   const inputNames = new Set(inputs.map((input) => input.name))
   const outputNames = new Set(outputs.map((output) => output.name))
   const states = [{ name: 'default', kind: 'initial' }]
-  if (inputNames.has('disabled')) states.push({ name: 'disabled', kind: 'derived' })
-  if (inputNames.has('loading')) states.push({ name: 'loading', kind: 'derived' })
-  if (inputNames.has('readonly')) states.push({ name: 'readonly', kind: 'derived' })
+  if (inputNames.has('disabled'))
+    states.push({ name: 'disabled', kind: 'derived' })
+  if (inputNames.has('loading'))
+    states.push({ name: 'loading', kind: 'derived' })
+  if (inputNames.has('readonly'))
+    states.push({ name: 'readonly', kind: 'derived' })
   if (outputNames.has('open') || outputNames.has('visible')) {
     states.push({ name: 'open', kind: 'derived' })
     states.push({ name: 'closed', kind: 'derived' })
@@ -676,7 +783,12 @@ const deriveStates = ({ component, inputs, outputs }) => {
   return { machine: `fsus-${kebabName(component.name)}`, states, transitions }
 }
 
-const deriveRequirements = ({ inputs, outputs, operations, contentRegions }) => {
+const deriveRequirements = ({
+  inputs,
+  outputs,
+  operations,
+  contentRegions,
+}) => {
   const inputNames = new Set(inputs.map((input) => input.name))
   const hasInteractiveSurface =
     outputs.length > 0 || inputNames.has('disabled') || operations.length > 0
@@ -685,25 +797,35 @@ const deriveRequirements = ({ inputs, outputs, operations, contentRegions }) => 
   ]
   const pointer = []
   if (outputs.length > 0) {
-    pointer.push('Pointer/tap activation must raise the corresponding public output.')
+    pointer.push(
+      'Pointer/tap activation must raise the corresponding public output.',
+    )
   }
   if (inputNames.has('disabled')) {
     pointer.push('Disabled surfaces must not respond to pointer activation.')
   }
-  const focus = ['Focus entry must surface the same public focus state on both platforms.']
+  const focus = [
+    'Focus entry must surface the same public focus state on both platforms.',
+  ]
   if (inputNames.has('autofocus')) {
-    focus.push('autofocus input must map to initial focus on Web and equivalent Avalonia focus behavior.')
+    focus.push(
+      'autofocus input must map to initial focus on Web and equivalent Avalonia focus behavior.',
+    )
   }
   const a11y = []
   if (hasInteractiveSurface) {
     a11y.push('Interactive surfaces must expose an accessible name and role.')
   }
   if (contentRegions.length > 0) {
-    a11y.push('Content regions must preserve accessible text content semantics.')
+    a11y.push(
+      'Content regions must preserve accessible text content semantics.',
+    )
   }
   const motion = ['Honor user reduced-motion preference.']
   if (inputNames.has('loading')) {
-    motion.push('Loading transitions must not trap focus and must remain within the motion budget.')
+    motion.push(
+      'Loading transitions must not trap focus and must remain within the motion budget.',
+    )
   }
   const perf = [
     'Render and interaction budgets must match the component performance contract.',
@@ -719,7 +841,9 @@ const markdownEditorSection = () => ({
 })
 
 const contractCoverage = (members) => {
-  const counts = Object.fromEntries(MEMBER_STATUSES.map((status) => [status, 0]))
+  const counts = Object.fromEntries(
+    MEMBER_STATUSES.map((status) => [status, 0]),
+  )
   for (const member of members) counts[member.status] += 1
   const total = members.length
   const mapped = counts['aligned-candidate'] + counts['partial']
@@ -733,19 +857,55 @@ const contractCoverage = (members) => {
   }
 }
 
-const contractForComponent = ({ component, avaloniaType, gate }) => {
+const semanticBindingKey = (component, kind, web) =>
+  `${component}\u0000${kind}\u0000${web}`
+
+const semanticBindingIndex = (registry) =>
+  new Map(
+    (registry?.mappings ?? []).map((binding) => [
+      semanticBindingKey(binding.component, binding.kind, binding.web),
+      binding,
+    ]),
+  )
+
+const contractForComponent = ({
+  component,
+  avaloniaType,
+  gate,
+  semanticBindings,
+}) => {
   // Keep the full export name in the stable id so distinct public exports such
   // as ElCollectionSummary and FsusCollectionSummary never collide.
   const contractKebab = toKebab(component.name)
   const classification = component.classification ?? 'portable'
+  const bindingFor = (kind, web) =>
+    semanticBindings.get(semanticBindingKey(component.name, kind, web))
   const inputs = (component.semantic?.props ?? []).map((prop) =>
-    inputMember({ contractKebab, prop, avaloniaType, classification }),
+    inputMember({
+      contractKebab,
+      prop,
+      avaloniaType,
+      classification,
+      binding: bindingFor('input', prop.name),
+    }),
   )
   const outputs = (component.emits ?? []).map((emit) =>
-    outputMember({ contractKebab, emit, avaloniaType, classification }),
+    outputMember({
+      contractKebab,
+      emit,
+      avaloniaType,
+      classification,
+      binding: bindingFor('output', emit),
+    }),
   )
   const operations = (component.exposed ?? []).map((exposed) =>
-    operationMember({ contractKebab, exposed, avaloniaType, classification }),
+    operationMember({
+      contractKebab,
+      exposed,
+      avaloniaType,
+      classification,
+      binding: bindingFor('operation', exposed),
+    }),
   )
   const contentRegions = (component.slots ?? []).map((slot) =>
     contentRegionMember({ contractKebab, slot, avaloniaType, classification }),
@@ -758,9 +918,18 @@ const contractForComponent = ({ component, avaloniaType, gate }) => {
     exportStatus = gate?.requiredStatus ?? 'partial'
   } else if (classification === 'web-only') {
     exportStatus = 'web-only'
-  } else if (inputs.some((input) => input.status === 'partial') || outputs.some((output) => output.status === 'partial') || operations.some((operation) => operation.status === 'partial')) {
+  } else if (
+    inputs.some((input) => input.status === 'partial') ||
+    outputs.some((output) => output.status === 'partial') ||
+    operations.some((operation) => operation.status === 'partial')
+  ) {
     exportStatus = 'partial'
-  } else if (inputs.some((input) => input.status === 'missing') || outputs.some((output) => output.status === 'missing') || operations.some((operation) => operation.status === 'missing') || contentRegions.some((region) => region.status === 'missing')) {
+  } else if (
+    inputs.some((input) => input.status === 'missing') ||
+    outputs.some((output) => output.status === 'missing') ||
+    operations.some((operation) => operation.status === 'missing') ||
+    contentRegions.some((region) => region.status === 'missing')
+  ) {
     exportStatus = 'missing'
   } else {
     exportStatus = 'aligned-candidate'
@@ -768,10 +937,24 @@ const contractForComponent = ({ component, avaloniaType, gate }) => {
 
   const members = [...inputs, ...outputs, ...operations, ...contentRegions]
   const avaloniaExtras = avaloniaType
-    ? extractAvaloniaExtras({ contractKebab, component, avaloniaType, inputs, outputs, operations, contentRegions })
+    ? extractAvaloniaExtras({
+        contractKebab,
+        component,
+        avaloniaType,
+        inputs,
+        outputs,
+        operations,
+        contentRegions,
+      })
     : []
   const states = deriveStates({ component, inputs, outputs })
-  const requirements = deriveRequirements({ component, inputs, outputs, operations, contentRegions })
+  const requirements = deriveRequirements({
+    component,
+    inputs,
+    outputs,
+    operations,
+    contentRegions,
+  })
 
   const contract = {
     id: `component-v2.${contractKebab}`,
@@ -791,7 +974,11 @@ const contractForComponent = ({ component, avaloniaType, gate }) => {
         memberRef: memberRef('component'),
       },
       avalonia: avaloniaType
-        ? { status: 'bound', package: 'FsusUI.Avalonia', type: avaloniaType.name }
+        ? {
+            status: 'bound',
+            package: 'FsusUI.Avalonia',
+            type: avaloniaType.name,
+          }
         : { status: 'unbound', package: null, type: null },
     },
     inputs,
@@ -801,7 +988,10 @@ const contractForComponent = ({ component, avaloniaType, gate }) => {
     states,
     requirements,
     platformDifferences: members
-      .filter((member) => member.status !== 'aligned-candidate' && member.status !== 'web-only')
+      .filter(
+        (member) =>
+          member.status !== 'aligned-candidate' && member.status !== 'web-only',
+      )
       .map((member) => ({
         member: member.name,
         kind: member.kind,
@@ -811,9 +1001,12 @@ const contractForComponent = ({ component, avaloniaType, gate }) => {
     avaloniaExtras,
     scenarioIds: [
       ...members.flatMap((member) => member.scenarioIds),
-      ...states.states.map((state) =>
-        `scenario.v2.${contractKebab}.state.${toKebab(state.name)}`),
-      ...requirements.keyboard.map(() => `scenario.v2.${contractKebab}.keyboard`),
+      ...states.states.map(
+        (state) => `scenario.v2.${contractKebab}.state.${toKebab(state.name)}`,
+      ),
+      ...requirements.keyboard.map(
+        () => `scenario.v2.${contractKebab}.keyboard`,
+      ),
       ...requirements.pointer.map(() => `scenario.v2.${contractKebab}.pointer`),
       ...requirements.focus.map(() => `scenario.v2.${contractKebab}.focus`),
       ...requirements.a11y.map(() => `scenario.v2.${contractKebab}.a11y`),
@@ -841,19 +1034,17 @@ const extractAvaloniaExtras = ({
   operations,
   contentRegions,
 }) => {
-  const matchedWebNames = new Set([
-    ...inputs.map((input) => input.web.member),
-    ...outputs.map((output) => output.web.member),
-    ...operations.map((operation) => operation.web.member),
-    ...contentRegions.map((region) => region.web.member),
+  const matchedAvaloniaNames = new Set([
+    ...inputs.map((input) => input.avalonia?.member).filter(Boolean),
+    ...outputs.map((output) => output.avalonia?.member).filter(Boolean),
+    ...operations
+      .map((operation) => operation.avalonia?.member)
+      .filter(Boolean),
+    ...contentRegions.map((region) => region.avalonia?.member).filter(Boolean),
   ])
   const extras = []
   const addExtra = (member) => {
-    const normalized = normalizeMemberName(member.name)
-    const matched = [...matchedWebNames].some(
-      (webName) => normalizeMemberName(webName) === normalized,
-    )
-    if (matched) return
+    if (matchedAvaloniaNames.has(member.name)) return
     extras.push({
       member: member.name,
       kind: 'avalonia-extra',
@@ -868,7 +1059,9 @@ const extractAvaloniaExtras = ({
   for (const property of avaloniaType.properties ?? []) addExtra(property)
   for (const event of avaloniaType.events ?? []) addExtra(event)
   for (const method of avaloniaType.methods ?? []) addExtra(method)
-  return extras.sort((first, second) => first.member.localeCompare(second.member))
+  return extras.sort((first, second) =>
+    first.member.localeCompare(second.member),
+  )
 }
 
 const avaloniaOnlyType = ({ type, packageId }) => ({
@@ -912,6 +1105,7 @@ export const buildRegistry = ({
   avaloniaThemesBaseline,
   avaloniaIconsBaseline,
   gate,
+  semanticMemberBindings = { mappings: [] },
 }) => {
   const baselines = {
     avalonia: avaloniaBaseline,
@@ -919,13 +1113,19 @@ export const buildRegistry = ({
     avaloniaIcons: avaloniaIconsBaseline,
   }
   const typeIndex = avaloniaSemanticIndex(baselines)
+  const semanticBindings = semanticBindingIndex(semanticMemberBindings)
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
   const contracts = []
   for (const component of vueBaseline.components ?? []) {
     const avaloniaType = findAvaloniaType(component.name, typeIndex)
     contracts.push(
-      contractForComponent({ component, avaloniaType, gate }),
+      contractForComponent({
+        component,
+        avaloniaType,
+        gate,
+        semanticBindings,
+      }),
     )
   }
   contracts.sort((first, second) => first.id.localeCompare(second.id))
@@ -933,9 +1133,13 @@ export const buildRegistry = ({
   const avaloniaOnlyTypes = []
   for (const type of typeIndex.values()) {
     if (mappedTypes.has(type.name)) continue
-    avaloniaOnlyTypes.push(avaloniaOnlyType({ type, packageId: type.packageId }))
+    avaloniaOnlyTypes.push(
+      avaloniaOnlyType({ type, packageId: type.packageId }),
+    )
   }
-  avaloniaOnlyTypes.sort((first, second) => first.type.localeCompare(second.type))
+  avaloniaOnlyTypes.sort((first, second) =>
+    first.type.localeCompare(second.type),
+  )
 
   const allMembers = contracts.flatMap((contract) => [
     ...contract.inputs,
@@ -943,7 +1147,9 @@ export const buildRegistry = ({
     ...contract.operations,
     ...contract.contentRegions,
   ])
-  const coverage = Object.fromEntries(MEMBER_STATUSES.map((status) => [status, 0]))
+  const coverage = Object.fromEntries(
+    MEMBER_STATUSES.map((status) => [status, 0]),
+  )
   for (const member of allMembers) coverage[member.status] += 1
   coverage.total = allMembers.length
   coverage.mappedPercent =
@@ -993,6 +1199,10 @@ export const buildRegistry = ({
         path: MARKDOWN_EDITOR_GATE_PATH,
         hash: sha256(read(path.join(root, MARKDOWN_EDITOR_GATE_PATH))),
       },
+      semanticMemberBindings: {
+        path: SEMANTIC_MEMBER_BINDINGS_PATH,
+        hash: sha256(read(path.join(root, SEMANTIC_MEMBER_BINDINGS_PATH))),
+      },
     },
     rules: {
       componentMappingBasis:
@@ -1005,13 +1215,18 @@ export const buildRegistry = ({
         'strip Changed suffix',
         'kebab-case',
       ],
+      semanticMemberBindings:
+        'explicit platform-neutral semantic ids bind non-equivalent framework member names before normalized candidate matching',
       statusDerivation: {
-        alignedCandidate: 'real member matched with no type/default/nullability/enum/payload drift',
-        partial: 'real member matched but semantic drift or non-comparable typing',
+        alignedCandidate:
+          'real member matched with no type/default/nullability/enum/payload drift',
+        partial:
+          'real member matched but semantic drift or non-comparable typing',
         missing: 'no real counterpart member on the other platform',
         webOnly: 'explicit web-only registration with governance',
       },
-      aligned: 'final aligned status is never hand-written; only aligned-candidate is derived',
+      aligned:
+        'final aligned status is never hand-written; only aligned-candidate is derived',
     },
     componentMap,
     contracts,
@@ -1026,10 +1241,112 @@ const validateGovernance = (governance, context, errors) => {
     return
   }
   for (const field of GOVERNANCE_FIELDS) {
-    if (typeof governance[field] !== 'string' || governance[field].trim() === '') {
+    if (
+      typeof governance[field] !== 'string' ||
+      governance[field].trim() === ''
+    ) {
       errors.push(`${context} governance missing ${field}`)
     }
   }
+}
+
+const vueMembersForKind = (component, kind) => {
+  if (kind === 'input') {
+    return (component.semantic?.props ?? []).map((item) => item.name)
+  }
+  if (kind === 'output') return component.emits ?? []
+  if (kind === 'operation') return component.exposed ?? []
+  if (kind === 'contentRegion') {
+    return (component.slots ?? []).map((item) => item.name)
+  }
+  return []
+}
+
+const avaloniaMembersForKind = (type, kind) => {
+  if (kind === 'input') {
+    return [...(type.avaloniaProperties ?? []), ...(type.properties ?? [])].map(
+      (item) => item.name,
+    )
+  }
+  if (kind === 'output') return (type.events ?? []).map((item) => item.name)
+  if (kind === 'operation') return (type.methods ?? []).map((item) => item.name)
+  if (kind === 'contentRegion') {
+    return type.contentProperty ? [type.contentProperty] : []
+  }
+  return []
+}
+
+export const validateSemanticMemberBindings = ({
+  registry,
+  vueBaseline,
+  avaloniaBaselines,
+}) => {
+  const errors = []
+  if (registry?.schemaVersion !== 1) {
+    errors.push('semantic member bindings schemaVersion must be 1')
+  }
+  if (!Array.isArray(registry?.mappings)) {
+    return [...errors, 'semantic member bindings mappings must be an array']
+  }
+  const typeIndex = avaloniaSemanticIndex(avaloniaBaselines)
+  const components = new Map(
+    (vueBaseline.components ?? []).map((component) => [
+      component.name,
+      component,
+    ]),
+  )
+  const seenBindings = new Set()
+  const seenSemantics = new Set()
+  for (const binding of registry.mappings) {
+    const context =
+      `semantic binding ${binding?.component ?? '<unknown>'}/` +
+      `${binding?.kind ?? '<unknown>'}/${binding?.web ?? '<unknown>'}`
+    for (const field of ['component', 'semantic', 'kind', 'web', 'avalonia']) {
+      if (
+        typeof binding?.[field] !== 'string' ||
+        binding[field].trim() === ''
+      ) {
+        errors.push(`${context} missing ${field}`)
+      }
+    }
+    if (
+      !['input', 'output', 'operation', 'contentRegion'].includes(binding?.kind)
+    ) {
+      errors.push(`${context} has invalid kind ${binding?.kind}`)
+      continue
+    }
+    const key = semanticBindingKey(binding.component, binding.kind, binding.web)
+    if (seenBindings.has(key)) errors.push(`${context} is duplicated`)
+    seenBindings.add(key)
+    const semanticKey = `${binding.component}\u0000${binding.kind}\u0000${binding.semantic}`
+    if (seenSemantics.has(semanticKey)) {
+      errors.push(`${context} duplicates semantic id ${binding.semantic}`)
+    }
+    seenSemantics.add(semanticKey)
+    const component = components.get(binding.component)
+    if (!component) {
+      errors.push(`${context} references an unknown Vue component`)
+      continue
+    }
+    if (!vueMembersForKind(component, binding.kind).includes(binding.web)) {
+      errors.push(`${context} references a missing real Vue member`)
+    }
+    const avaloniaType = findAvaloniaType(component.name, typeIndex)
+    if (!avaloniaType) {
+      errors.push(`${context} has no real Avalonia component type`)
+      continue
+    }
+    if (
+      !avaloniaMembersForKind(avaloniaType, binding.kind).includes(
+        binding.avalonia,
+      )
+    ) {
+      errors.push(
+        `${context} references a missing real Avalonia member ${binding.avalonia}`,
+      )
+    }
+  }
+  return errors
 }
 
 const validateMember = (member, contractId, errors) => {
@@ -1044,20 +1361,33 @@ const validateMember = (member, contractId, errors) => {
     validateGovernance(member.governance, context, errors)
   }
   if (member.status === 'aligned-candidate' && member.governance != null) {
-    errors.push(`${context} aligned-candidate must not carry an override governance`)
+    errors.push(
+      `${context} aligned-candidate must not carry an override governance`,
+    )
   }
   if (member.status === 'aligned-candidate') {
     for (const key of COMPARISON_KEY) {
       if (member.drift?.[key] != null) {
-        errors.push(`${context} claims aligned-candidate with ${key} drift: ${member.drift[key]}`)
+        errors.push(
+          `${context} claims aligned-candidate with ${key} drift: ${member.drift[key]}`,
+        )
       }
     }
   }
-  if (
-    member.status === 'aligned-candidate' &&
-    member.avalonia == null
-  ) {
-    errors.push(`${context} claims aligned-candidate without a real Avalonia member (auto counterpart)`)
+  if (member.status === 'aligned-candidate' && member.avalonia == null) {
+    errors.push(
+      `${context} claims aligned-candidate without a real Avalonia member (auto counterpart)`,
+    )
+  }
+  if (member.bindingBasis === 'explicit-semantic') {
+    if (typeof member.semantic !== 'string' || member.semantic.trim() === '') {
+      errors.push(`${context} explicit semantic binding is missing semantic id`)
+    }
+    if (member.avalonia == null) {
+      errors.push(
+        `${context} explicit semantic binding is missing its Avalonia member`,
+      )
+    }
   }
 }
 
@@ -1082,11 +1412,15 @@ const validateMarkdownEditor = (contract, gate, errors) => {
     JSON.stringify(editor.capabilities ?? []) !==
     JSON.stringify(MARKDOWN_EDITOR_CAPABILITIES)
   ) {
-    errors.push(`${contract.id} MarkdownEditor capability set must be the six canonical values`)
+    errors.push(
+      `${contract.id} MarkdownEditor capability set must be the six canonical values`,
+    )
   }
   const serialized = JSON.stringify(editor)
   if (serialized.includes('"write"')) {
-    errors.push(`${contract.id} MarkdownEditor must not reference write anywhere`)
+    errors.push(
+      `${contract.id} MarkdownEditor must not reference write anywhere`,
+    )
   }
   if (gate?.blocked) {
     const required = gate.requiredStatus ?? 'partial'
@@ -1164,7 +1498,9 @@ export const validateContract = (contract, gate, errors) => {
     contractErrors.push(`${contract.id} missing required scenario ids`)
   }
   if (/"aligned"\s*:\s*true/.test(JSON.stringify(contract))) {
-    contractErrors.push(`${contract.id} must not hand-write final aligned: true`)
+    contractErrors.push(
+      `${contract.id} must not hand-write final aligned: true`,
+    )
   }
   validateMarkdownEditor(contract, gate, contractErrors)
   return contractErrors
@@ -1218,9 +1554,11 @@ const main = () => {
   const checkMode = args.has('--check')
   const registryPath = path.join(root, CONTRACT_V2_REGISTRY_PATH)
   const gatePath = path.join(root, MARKDOWN_EDITOR_GATE_PATH)
+  const semanticBindingsPath = path.join(root, SEMANTIC_MEMBER_BINDINGS_PATH)
 
-  if (!exists(gatePath)) {
-    console.error(`${MARKDOWN_EDITOR_GATE_PATH} must exist`)
+  for (const requiredPath of [gatePath, semanticBindingsPath]) {
+    if (exists(requiredPath)) continue
+    console.error(`${path.relative(root, requiredPath)} must exist`)
     process.exitCode = 1
     return
   }
@@ -1236,12 +1574,30 @@ const main = () => {
     path.join(root, AVALONIA_SEMANTIC_PATHS.avaloniaIcons),
   )
   const gate = parseJson(gatePath)
+  const semanticMemberBindings = parseJson(semanticBindingsPath)
+  const avaloniaBaselines = {
+    avalonia: avaloniaBaseline,
+    avaloniaThemes: avaloniaThemesBaseline,
+    avaloniaIcons: avaloniaIconsBaseline,
+  }
+  const bindingErrors = validateSemanticMemberBindings({
+    registry: semanticMemberBindings,
+    vueBaseline,
+    avaloniaBaselines,
+  })
+  if (bindingErrors.length > 0) {
+    console.error('semantic member binding validation failed:')
+    for (const error of bindingErrors) console.error(`- ${error}`)
+    process.exitCode = 1
+    return
+  }
   const registry = buildRegistry({
     vueBaseline,
     avaloniaBaseline,
     avaloniaThemesBaseline,
     avaloniaIconsBaseline,
     gate,
+    semanticMemberBindings,
   })
   const errors = validateRegistry(registry, gate)
   if (errors.length > 0) {
@@ -1254,7 +1610,9 @@ const main = () => {
   const output = stableJson(registry)
   if (checkMode) {
     if (!exists(registryPath)) {
-      console.error(`${CONTRACT_V2_REGISTRY_PATH} is missing; run pnpm run contract-v2:generate`)
+      console.error(
+        `${CONTRACT_V2_REGISTRY_PATH} is missing; run pnpm run contract-v2:generate`,
+      )
       process.exitCode = 1
       return
     }

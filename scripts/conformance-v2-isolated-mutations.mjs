@@ -60,6 +60,17 @@ const gate = (subcommand, args) => [
   process.execPath,
   ['scripts/conformance-v2-evidence.mjs', subcommand, ...args],
 ]
+const prepareAvaloniaSemanticCheck = () => {
+  const result = run('dotnet', [
+    'restore',
+    'dotnet/FsusUI.Avalonia.ApiTool/FsusUI.Avalonia.ApiTool.csproj',
+    '--force-evaluate',
+  ])
+  if (result.status !== 0)
+    throw new Error(
+      `Avalonia semantic mutation restore failed: ${result.stderr || result.stdout}`,
+    )
+}
 
 const cases = [
   {
@@ -128,6 +139,7 @@ const cases = [
           : `${locator}Mutation`,
       ),
     command: ['pnpm', ['run', 'avalonia:semantic:check']],
+    prepare: prepareAvaloniaSemanticCheck,
     expected:
       id === 'avalonia-property-removed' ||
       id === 'avalonia-default-nullability-modified'
@@ -355,6 +367,7 @@ try {
   for (const entry of cases) {
     reset()
     entry.inject()
+    entry.prepare?.()
     const diff = run('git', ['diff', '--no-ext-diff', '--', entry.file])
     const [command, args] = entry.command
     const result = run(command, args)

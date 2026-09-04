@@ -14,18 +14,19 @@ explicit or when semantic drift is hidden.
 
 ## Artifacts
 
-| Artifact                | Path                                                            | Role                                                                             |
-| ----------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Registry                | `spec/components/contracts/v2/contract-v2.json`                 | Generated, committed, verified                                                   |
-| Gate                    | `spec/components/contracts/v2/markdown-editor-gate.json`        | MarkdownEditor blocking state                                                    |
-| Runtime projection      | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
-| Runtime projection docs | `docs/api/markdown-runtime-projection.md`                       | Consumer-facing runtime API                                                      |
-| Interaction trace docs  | `docs/api/markdown-interaction-trace.md`                        | Real-browser Web trace schema and Contract V2 binding                            |
-| Editor input            | `spec/components/contracts/v2/markdown-editor-input.json`       | Unique #327–#331 input pipeline and acceptance exports                           |
-| Editor input docs       | `docs/api/markdown-editor-input.md`                             | Consumer-facing input contract                                                   |
-| Generator + comparator  | `scripts/contract-v2.mjs`                                       | `generate` / `--check` / exported validators                                     |
-| Mutation fixtures       | `tests/fixtures/contract-v2/`                                   | Kill-fixtures for every forbidden pattern                                        |
-| Tests                   | `tests/contract-v2.test.mjs`                                    | `node --test` suite                                                              |
+| Artifact                 | Path                                                            | Role                                                                             |
+| ------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Registry                 | `spec/components/contracts/v2/contract-v2.json`                 | Generated, committed, verified                                                   |
+| Gate                     | `spec/components/contracts/v2/markdown-editor-gate.json`        | MarkdownEditor blocking state                                                    |
+| Semantic member bindings | `spec/components/contracts/v2/semantic-member-bindings.json`    | Explicit platform-neutral mappings for framework members whose names differ      |
+| Runtime projection       | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
+| Runtime projection docs  | `docs/api/markdown-runtime-projection.md`                       | Consumer-facing runtime API                                                      |
+| Interaction trace docs   | `docs/api/markdown-interaction-trace.md`                        | Real-browser Web trace schema and Contract V2 binding                            |
+| Editor input             | `spec/components/contracts/v2/markdown-editor-input.json`       | Unique #327–#331 input pipeline and acceptance exports                           |
+| Editor input docs        | `docs/api/markdown-editor-input.md`                             | Consumer-facing input contract                                                   |
+| Generator + comparator   | `scripts/contract-v2.mjs`                                       | `generate` / `--check` / exported validators                                     |
+| Mutation fixtures        | `tests/fixtures/contract-v2/`                                   | Kill-fixtures for every forbidden pattern                                        |
+| Tests                    | `tests/contract-v2.test.mjs`                                    | `node --test` suite                                                              |
 
 ## Generation
 
@@ -41,9 +42,13 @@ baseline change without regeneration fails `contract-v2:check`.
 
 ## Member mapping
 
-Every Vue public export receives exactly one contract. For each real member the
-generator either finds a real Avalonia member (name-equality after the narrow
-`Is/Can/Has` + `Changed` + kebab normalization) or explicitly records a gap.
+Every Vue public export receives exactly one contract. Explicit platform-neutral
+semantic bindings are resolved first; for example, `document` binds Web
+`modelValue` to Avalonia `Document`. The generator validates both endpoints
+against their independent baselines and rejects stale or duplicate mappings.
+Members without an explicit mapping remain candidate-matched by name equality
+after the narrow `Is/Can/Has` + `Changed` + kebab normalization, or are recorded
+as gaps.
 Each member carries exactly one status:
 
 | Status              | Meaning                                                                                       |

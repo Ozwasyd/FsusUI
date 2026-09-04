@@ -4,9 +4,14 @@ import path from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
 import {
+  buildRegistry,
   validateRegistry,
+  validateSemanticMemberBindings,
+  AVALONIA_SEMANTIC_PATHS,
   MARKDOWN_EDITOR_GATE_PATH,
   CONTRACT_V2_REGISTRY_PATH,
+  SEMANTIC_MEMBER_BINDINGS_PATH,
+  VUE_BASELINE_PATH,
 } from '../scripts/contract-v2.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -22,6 +27,18 @@ const gate = JSON.parse(
 )
 const committedRegistry = JSON.parse(
   fs.readFileSync(path.join(root, CONTRACT_V2_REGISTRY_PATH), 'utf8'),
+)
+const vueBaseline = JSON.parse(
+  fs.readFileSync(path.join(root, VUE_BASELINE_PATH), 'utf8'),
+)
+const avaloniaBaselines = Object.fromEntries(
+  Object.entries(AVALONIA_SEMANTIC_PATHS).map(([key, relativePath]) => [
+    key,
+    JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8')),
+  ]),
+)
+const semanticMemberBindings = JSON.parse(
+  fs.readFileSync(path.join(root, SEMANTIC_MEMBER_BINDINGS_PATH), 'utf8'),
 )
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
@@ -95,6 +112,61 @@ test('valid Contract V2 fixture registry passes validation', () => {
 test('committed Contract V2 registry passes validation with the committed gate', () => {
   const errors = validateRegistry(committedRegistry, gate)
   assert.deepEqual(errors, [])
+})
+
+test('explicit semantic member bindings resolve real members from both baselines', () => {
+  assert.deepEqual(
+    validateSemanticMemberBindings({
+      registry: semanticMemberBindings,
+      vueBaseline,
+      avaloniaBaselines,
+    }),
+    [],
+  )
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+  const markdownEditor = registry.contracts.find(
+    (contract) => contract.component.name === 'ElMarkdownEditor',
+  )
+  const document = markdownEditor.inputs.find(
+    (input) => input.semantic === 'document',
+  )
+  assert.equal(document.web.member, 'modelValue')
+  assert.equal(document.avalonia.member, 'Document')
+  assert.equal(document.bindingBasis, 'explicit-semantic')
+  assert.equal(
+    markdownEditor.avaloniaExtras.some((extra) => extra.member === 'Document'),
+    false,
+  )
+})
+
+test('explicit semantic member bindings reject stale and duplicate endpoints', () => {
+  const stale = clone(semanticMemberBindings)
+  stale.mappings[0].avalonia = 'MissingDocument'
+  assert.match(
+    validateSemanticMemberBindings({
+      registry: stale,
+      vueBaseline,
+      avaloniaBaselines,
+    }).join('\n'),
+    /missing real Avalonia member MissingDocument/,
+  )
+
+  const duplicate = clone(semanticMemberBindings)
+  duplicate.mappings.push(clone(duplicate.mappings[0]))
+  const errors = validateSemanticMemberBindings({
+    registry: duplicate,
+    vueBaseline,
+    avaloniaBaselines,
+  }).join('\n')
+  assert.match(errors, /is duplicated/)
+  assert.match(errors, /duplicates semantic id document/)
 })
 
 for (const mutation of mutations) {
