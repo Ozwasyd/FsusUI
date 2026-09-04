@@ -47,6 +47,7 @@ const reset = () => {
   for (const file of [
     'web-a11y/manifest.json',
     'avalonia.json',
+    'comparison.json',
     'alignment.json',
   ]) {
     const source = path.join(root, '.tmp/conformance-v2', file)
@@ -222,6 +223,57 @@ const cases = [
     ]),
     expected: `required-step.${action}`,
   })),
+  {
+    id: 'execution-record-source-forged',
+    file: '.tmp/conformance-v2/web-a11y/manifest.json',
+    inject: () =>
+      mutateJson('.tmp/conformance-v2/web-a11y/manifest.json', (value) => {
+        value.executionCoverage.records[0].source.name = 'markdown.not-observed'
+      }),
+    command: gate('compare', [
+      '--web',
+      '.tmp/conformance-v2/web-a11y/manifest.json',
+      '--avalonia',
+      '.tmp/conformance-v2/avalonia.json',
+      '--out',
+      '.tmp/conformance-v2/mutated-comparison.json',
+    ]),
+    expected: 'source event not observed',
+  },
+  ...[
+    [
+      'execution-ledger-member-deleted',
+      (value) => value.executionCoverage.records.splice(0, 1),
+      'executionCoverage.outputHash invalid',
+    ],
+    [
+      'execution-ledger-identity-forged',
+      (value) => (value.executionCoverage.identity.candidate = 'forged'),
+      'executionCoverage.identity mismatch',
+    ],
+    [
+      'execution-ledger-metadata-only',
+      (value) => (value.executionCoverage.real = false),
+      'executionCoverage metadata-only',
+    ],
+  ].map(([id, mutation, expected]) => ({
+    id,
+    file: '.tmp/conformance-v2/comparison.json',
+    inject: () => mutateJson('.tmp/conformance-v2/comparison.json', mutation),
+    command: gate('derive', [
+      '--contract',
+      'spec/components/contracts/v2/contract-v2.json',
+      '--comparison',
+      '.tmp/conformance-v2/comparison.json',
+      '--candidate',
+      'git',
+      '--out',
+      '.tmp/conformance-v2/mutated-alignment.json',
+      '--gaps',
+      '.tmp/conformance-v2/mutated-gaps.json',
+    ]),
+    expected,
+  })),
   ...[
     [
       'focus-drift',
@@ -273,12 +325,12 @@ const cases = [
     [
       'identity-hash-mismatch',
       (value) => (value.identity.contractHash = 'stale'),
-      'identity.contractHash',
+      'executionCoverage.identity mismatch',
     ],
     [
       'checkpoint-mismatch',
       (value) => (value.identity.checkpoint = 'other'),
-      'identity.checkpoint',
+      'executionCoverage.identity mismatch',
     ],
     [
       'fixture-only-a11y',

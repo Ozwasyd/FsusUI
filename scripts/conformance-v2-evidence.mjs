@@ -51,6 +51,139 @@ const fail = (message) => {
   throw new Error(message)
 }
 
+const executionCoverageSchema = 'fsusui.member-execution-coverage.v2'
+const semanticEventCoverage = new Map([
+  [
+    'markdown.transaction',
+    {
+      kind: 'output',
+      member: 'transaction',
+      scenarioId: 'scenario.v2.el-markdown-editor.output.transaction',
+    },
+  ],
+  [
+    'markdown.selection-change',
+    {
+      kind: 'output',
+      member: 'selection-change',
+      scenarioId: 'scenario.v2.el-markdown-editor.output.selection-change',
+    },
+  ],
+  [
+    'markdown.history-change',
+    {
+      kind: 'output',
+      member: 'history-change',
+      scenarioId: 'scenario.v2.el-markdown-editor.output.history-change',
+    },
+  ],
+])
+const operationCoverage = {
+  web: new Map([
+    [
+      'ElMarkdownEditor.dispatchTransaction',
+      {
+        kind: 'operation',
+        member: 'dispatchTransaction',
+        scenarioId:
+          'scenario.v2.el-markdown-editor.operation.dispatch-transaction',
+      },
+    ],
+    [
+      'ElMarkdownEditor.undo',
+      {
+        kind: 'operation',
+        member: 'undo',
+        scenarioId: 'scenario.v2.el-markdown-editor.operation.undo',
+      },
+    ],
+  ]),
+  avalonia: new Map([
+    [
+      'FsusMarkdownEditor.DispatchTransaction',
+      {
+        kind: 'operation',
+        member: 'dispatchTransaction',
+        scenarioId:
+          'scenario.v2.el-markdown-editor.operation.dispatch-transaction',
+      },
+    ],
+    [
+      'FsusMarkdownEditor.Undo',
+      {
+        kind: 'operation',
+        member: 'undo',
+        scenarioId: 'scenario.v2.el-markdown-editor.operation.undo',
+      },
+    ],
+  ]),
+}
+const executionCoverageKey = ({ kind, member, scenarioId }) =>
+  `${kind}:${member}@${scenarioId}`
+const executionCoverageWithoutHash = (coverage) => {
+  const { outputHash: _outputHash, ...canonical } = coverage
+  return canonical
+}
+export const executionCoverageHash = (coverage) =>
+  digest(executionCoverageWithoutHash(coverage))
+export const sealExecutionCoverage = (coverage) => ({
+  ...executionCoverageWithoutHash(coverage),
+  outputHash: executionCoverageHash(coverage),
+})
+
+const validateEvidenceExecutionCoverage = (evidence, platform) => {
+  const coverage = evidence.executionCoverage
+  if (coverage?.schema !== executionCoverageSchema)
+    fail(`${platform}.executionCoverage.schema invalid`)
+  if (coverage.real !== true)
+    fail(`${platform}.executionCoverage metadata-only`)
+  try {
+    assert.deepStrictEqual(coverage.identity, evidence.identity)
+  } catch {
+    fail(`${platform}.executionCoverage.identity mismatch`)
+  }
+  if (!Array.isArray(coverage.records) || coverage.records.length === 0)
+    fail(`${platform}.executionCoverage.records missing`)
+
+  const records = new Map()
+  for (const [index, record] of coverage.records.entries()) {
+    const context = `${platform}.executionCoverage.records[${index}]`
+    const source = record?.source
+    let expected
+    if (source?.kind === 'event') {
+      expected = semanticEventCoverage.get(source.name)
+      const observedEvents =
+        platform === 'web'
+          ? evidence.publicState?.eventNames
+          : evidence.events?.map((entry) => entry.name)
+      if (!expected || !observedEvents?.includes(source.name))
+        fail(`${context}.source event not observed`)
+    } else if (source?.kind === 'step') {
+      const step = evidence.steps?.find((entry) => entry.index === source.index)
+      if (
+        !step ||
+        step.action !== source.action ||
+        step.target !== source.target ||
+        step.observation?.passed !== true
+      ) {
+        fail(`${context}.source step not observed`)
+      }
+      expected = operationCoverage[platform].get(source.target)
+      if (!expected) fail(`${context}.source step is not a covered operation`)
+    } else {
+      fail(`${context}.source invalid`)
+    }
+    for (const field of ['kind', 'member', 'scenarioId']) {
+      if (record[field] !== expected[field])
+        fail(`${context}.${field} does not match observed source`)
+    }
+    const key = executionCoverageKey(record)
+    if (records.has(key)) fail(`${context} duplicates ${key}`)
+    records.set(key, record)
+  }
+  return records
+}
+
 export function validateOverride(entry, index = 0) {
   for (const field of governedOverride) {
     if (typeof entry?.[field] !== 'string' || !entry[field].trim()) {
@@ -145,6 +278,7 @@ export function validateEvidence(evidence, platform) {
   }
   for (const [index, entry] of (evidence.platformDifferences ?? []).entries())
     validateOverride(entry, index)
+  validateEvidenceExecutionCoverage(evidence, platform)
   return evidence
 }
 
@@ -314,17 +448,132 @@ export function compareEvidence(web, avalonia) {
   ]) {
     same(left.a11y[field], right.a11y[field], `accessibility.markdown.${field}`)
   }
+  const evidenceDigests = { web: digest(web), avalonia: digest(avalonia) }
+  const webCoverage = validateEvidenceExecutionCoverage(web, 'web')
+  const avaloniaCoverage = validateEvidenceExecutionCoverage(
+    avalonia,
+    'avalonia',
+  )
+  const coverageRecords = [...webCoverage]
+    .filter(([key]) => avaloniaCoverage.has(key))
+    .map(([key, record]) => ({
+      kind: record.kind,
+      member: record.member,
+      scenarioId: record.scenarioId,
+      webSource: record.source,
+      avaloniaSource: avaloniaCoverage.get(key).source,
+    }))
+    .sort((first, second) =>
+      executionCoverageKey(first).localeCompare(executionCoverageKey(second)),
+    )
+  const executionCoverage = sealExecutionCoverage({
+    schema: executionCoverageSchema,
+    identity: web.identity,
+    real: true,
+    evidenceDigests,
+    records: coverageRecords,
+  })
   return {
     schema: 'fsusui.conformance-comparison.v2',
     verdict: 'pass',
     identity: web.identity,
-    evidenceDigests: { web: digest(web), avalonia: digest(avalonia) },
+    evidenceDigests,
+    executionCoverage,
     compared: [
       'public-state',
       'transition-order',
       'accessibility',
       'performance',
     ],
+  }
+}
+
+const contractExecutionRequirements = (contract) =>
+  [
+    ['input', contract.inputs],
+    ['output', contract.outputs],
+    ['operation', contract.operations],
+    ['contentRegion', contract.contentRegions],
+  ].flatMap(([kind, members]) =>
+    (members ?? [])
+      .filter((member) =>
+        ['aligned-candidate', 'partial'].includes(member.status),
+      )
+      .flatMap((member) =>
+        (member.scenarioIds ?? []).map((scenarioId) => ({
+          kind,
+          member: member.name,
+          scenarioId,
+        })),
+      ),
+  )
+
+const validateComparisonExecutionCoverage = (comparison, contract) => {
+  if (comparison.schema !== 'fsusui.conformance-comparison.v2')
+    fail(`comparison.${contract.id}.schema invalid`)
+  if (comparison.verdict !== 'pass')
+    fail(`comparison.${contract.id}.verdict failed`)
+  const coverage = comparison.executionCoverage
+  if (coverage?.schema !== executionCoverageSchema)
+    fail(`comparison.${contract.id}.executionCoverage.schema invalid`)
+  if (coverage.real !== true)
+    fail(`comparison.${contract.id}.executionCoverage metadata-only`)
+  try {
+    assert.deepStrictEqual(coverage.identity, comparison.identity)
+  } catch {
+    fail(`comparison.${contract.id}.executionCoverage.identity mismatch`)
+  }
+  try {
+    assert.deepStrictEqual(coverage.evidenceDigests, comparison.evidenceDigests)
+  } catch {
+    fail(`comparison.${contract.id}.executionCoverage.evidenceDigests mismatch`)
+  }
+  if (coverage.outputHash !== executionCoverageHash(coverage))
+    fail(`comparison.${contract.id}.executionCoverage.outputHash invalid`)
+  if (!Array.isArray(coverage.records))
+    fail(`comparison.${contract.id}.executionCoverage.records missing`)
+
+  const knownMembers = new Map(
+    [
+      ['input', contract.inputs],
+      ['output', contract.outputs],
+      ['operation', contract.operations],
+      ['contentRegion', contract.contentRegions],
+    ].flatMap(([kind, members]) =>
+      (members ?? []).flatMap((member) =>
+        (member.scenarioIds ?? []).map((scenarioId) => [
+          executionCoverageKey({
+            kind,
+            member: member.name,
+            scenarioId,
+          }),
+          member,
+        ]),
+      ),
+    ),
+  )
+  const observed = new Set()
+  for (const [index, record] of coverage.records.entries()) {
+    const key = executionCoverageKey(record)
+    if (!knownMembers.has(key))
+      fail(
+        `comparison.${contract.id}.executionCoverage.records[${index}] unknown ${key}`,
+      )
+    if (observed.has(key))
+      fail(
+        `comparison.${contract.id}.executionCoverage.records[${index}] duplicates ${key}`,
+      )
+    if (!record.webSource || !record.avaloniaSource)
+      fail(
+        `comparison.${contract.id}.executionCoverage.records[${index}] source binding missing`,
+      )
+    observed.add(key)
+  }
+  const required =
+    contractExecutionRequirements(contract).map(executionCoverageKey)
+  return {
+    observedMembers: [...observed].sort(),
+    missingCoverageMembers: required.filter((key) => !observed.has(key)).sort(),
   }
 }
 
@@ -384,6 +633,9 @@ export function deriveAlignment(registry, comparison = null) {
   for (const contract of registry.contracts ?? []) {
     const coverage = contract.coverage ?? {}
     const contractComparison = comparisons.get(contract.id)
+    const executionCoverage = contractComparison
+      ? validateComparisonExecutionCoverage(contractComparison, contract)
+      : null
     let status
     if (contract.component?.exportStatus === 'web-only') status = 'web-only'
     else if (contract.bindings?.avalonia?.status === 'unbound')
@@ -392,7 +644,8 @@ export function deriveAlignment(registry, comparison = null) {
       status = 'partial'
     else if (
       contract.component?.exportStatus === 'aligned-candidate' &&
-      contractComparison?.verdict === 'pass'
+      contractComparison?.verdict === 'pass' &&
+      executionCoverage.missingCoverageMembers.length === 0
     )
       status = 'aligned'
     else status = 'blocked'
@@ -403,9 +656,16 @@ export function deriveAlignment(registry, comparison = null) {
         status,
         missingMembers: coverage.missing ?? 0,
         partialMembers: coverage.partial ?? 0,
-        missingArtifacts: contractComparison
-          ? []
-          : ['same-identity-cross-platform-evidence'],
+        missingCoverageMembers: executionCoverage?.missingCoverageMembers ?? [],
+        missingArtifacts: [
+          ...(contractComparison
+            ? []
+            : ['same-identity-cross-platform-evidence']),
+          ...(contractComparison &&
+          executionCoverage.missingCoverageMembers.length > 0
+            ? ['required-member-execution-coverage']
+            : []),
+        ],
       })
     }
   }

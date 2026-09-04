@@ -51,6 +51,14 @@ const runnerHash = crypto
       resolve(repositoryRoot, 'scripts/conformance-v2-evidence.mjs'),
     ),
   )
+  .update(
+    readFileSync(
+      resolve(
+        repositoryRoot,
+        'dotnet/FsusUI.Avalonia.Demo/ConformanceV2Runner.cs',
+      ),
+    ),
+  )
   .digest('hex')
 
 const cdpValue = (property) => property?.value?.value ?? property?.value ?? null
@@ -442,6 +450,99 @@ const main = async () => {
         ? 'button'
         : active?.getAttribute('role') || active?.tagName.toLowerCase() || null
     })
+    const steps = [
+      {
+        index: 0,
+        action: 'render',
+        target: 'ElMarkdownEditor',
+        focusTarget: initialFocus,
+        binding: identity,
+        observation: {
+          actual: { value: initialState.markdown.value },
+          passed: initialState.markdown.value === 'Trace start',
+        },
+      },
+      {
+        index: 1,
+        action: 'operation',
+        target: 'ElMarkdownEditor.dispatchTransaction',
+        focusTarget: dispatchedFocus,
+        binding: identity,
+        observation: {
+          actual: dispatchedState.markdown.lastOperation,
+          passed:
+            dispatchedState.markdown.lastOperation?.accepted === true &&
+            dispatchedState.markdown.lastOperation?.value ===
+              'Trace start exposed',
+        },
+      },
+      {
+        index: 2,
+        action: 'keyboard',
+        target: 'ElMarkdownEditor.undo',
+        focusTarget: undoFocus,
+        binding: identity,
+        observation: {
+          actual: publicState.markdown.lastOperation,
+          passed:
+            publicState.markdown.lastOperation?.accepted === true &&
+            publicState.markdown.lastOperation?.value === 'Trace start',
+        },
+      },
+    ]
+    const eventCoverage = [
+      [
+        'markdown.transaction',
+        'transaction',
+        'scenario.v2.el-markdown-editor.output.transaction',
+      ],
+      [
+        'markdown.selection-change',
+        'selection-change',
+        'scenario.v2.el-markdown-editor.output.selection-change',
+      ],
+      [
+        'markdown.history-change',
+        'history-change',
+        'scenario.v2.el-markdown-editor.output.history-change',
+      ],
+    ]
+      .filter(([name]) => publicState.eventNames.includes(name))
+      .map(([name, member, scenarioId]) => ({
+        kind: 'output',
+        member,
+        scenarioId,
+        source: { kind: 'event', name },
+      }))
+    const operationCoverage = [
+      [
+        'ElMarkdownEditor.dispatchTransaction',
+        'dispatchTransaction',
+        'scenario.v2.el-markdown-editor.operation.dispatch-transaction',
+      ],
+      [
+        'ElMarkdownEditor.undo',
+        'undo',
+        'scenario.v2.el-markdown-editor.operation.undo',
+      ],
+    ]
+      .map(([target, member, scenarioId]) => ({
+        step: steps.find((entry) => entry.target === target),
+        member,
+        scenarioId,
+      }))
+      .filter(({ step }) => step?.observation.passed === true)
+      .map(({ step, member, scenarioId }) => ({
+        kind: 'operation',
+        member,
+        scenarioId,
+        source: {
+          kind: 'step',
+          index: step.index,
+          action: step.action,
+          target: step.target,
+        },
+      }))
     const evidence = {
       schema: 'fsusui.conformance-evidence.v2',
       kind: 'native-screen-reader-linux-orca-atspi',
@@ -461,46 +562,13 @@ const main = async () => {
           .filter((node) => ['textbox', 'button'].includes(cdpValue(node.role)))
           .map((node, index) => normalizeCdpNode(node, index + 1)),
       },
-      steps: [
-        {
-          index: 0,
-          action: 'render',
-          target: 'ElMarkdownEditor',
-          focusTarget: initialFocus,
-          binding: identity,
-          observation: {
-            actual: { value: initialState.markdown.value },
-            passed: initialState.markdown.value === 'Trace start',
-          },
-        },
-        {
-          index: 1,
-          action: 'operation',
-          target: 'ElMarkdownEditor.dispatchTransaction',
-          focusTarget: dispatchedFocus,
-          binding: identity,
-          observation: {
-            actual: dispatchedState.markdown.lastOperation,
-            passed:
-              dispatchedState.markdown.lastOperation?.accepted === true &&
-              dispatchedState.markdown.lastOperation?.value ===
-                'Trace start exposed',
-          },
-        },
-        {
-          index: 2,
-          action: 'keyboard',
-          target: 'ElMarkdownEditor.undo',
-          focusTarget: undoFocus,
-          binding: identity,
-          observation: {
-            actual: publicState.markdown.lastOperation,
-            passed:
-              publicState.markdown.lastOperation?.accepted === true &&
-              publicState.markdown.lastOperation?.value === 'Trace start',
-          },
-        },
-      ],
+      steps,
+      executionCoverage: {
+        schema: 'fsusui.member-execution-coverage.v2',
+        identity,
+        real: true,
+        records: [...eventCoverage, ...operationCoverage],
+      },
       publicState,
       focusTarget,
       performance: {

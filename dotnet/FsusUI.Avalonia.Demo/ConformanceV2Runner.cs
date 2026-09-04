@@ -108,6 +108,7 @@ internal static class ConformanceV2Runner
     var executionId = $"conformance-v2-{candidate}";
     const string checkpoint = "markdown-after-undo";
     var events = new List<object>();
+    var observedSemanticEvents = new HashSet<string>(StringComparer.Ordinal);
     var steps = new List<object>();
     var stopwatch = Stopwatch.StartNew();
 
@@ -123,26 +124,38 @@ internal static class ConformanceV2Runner
       name = "input.value-changed",
       payload = new { args.OldValue, args.NewValue },
     });
-    editor.Transaction += (_, args) => events.Add(new
+    editor.Transaction += (_, args) =>
     {
-      name = "markdown.transaction",
-      payload = new
+      observedSemanticEvents.Add("markdown.transaction");
+      events.Add(new
       {
-        args.Result.Accepted,
-        args.Result.Revision,
-        args.Transaction.Origin,
-      },
-    });
-    editor.SelectionChange += (_, args) => events.Add(new
+        name = "markdown.transaction",
+        payload = new
+        {
+          args.Result.Accepted,
+          args.Result.Revision,
+          args.Transaction.Origin,
+        },
+      });
+    };
+    editor.SelectionChange += (_, args) =>
     {
-      name = "markdown.selection-change",
-      payload = new { args.Revision, args.Selection },
-    });
-    editor.HistoryChange += (_, args) => events.Add(new
+      observedSemanticEvents.Add("markdown.selection-change");
+      events.Add(new
+      {
+        name = "markdown.selection-change",
+        payload = new { args.Revision, args.Selection },
+      });
+    };
+    editor.HistoryChange += (_, args) =>
     {
-      name = "markdown.history-change",
-      payload = args.History,
-    });
+      observedSemanticEvents.Add("markdown.history-change");
+      events.Add(new
+      {
+        name = "markdown.history-change",
+        payload = args.History,
+      });
+    };
 
     window.UpdateLayout();
     RecordStep(steps, "render", "Window", new
@@ -233,6 +246,7 @@ internal static class ConformanceV2Runner
       Origin: "programmatic",
       Selection: new FsusMarkdownEditorSelection(19, 19),
       DocumentIdentity: identity));
+    var dispatchStepIndex = steps.Count;
     RecordStep(steps, "operation", "FsusMarkdownEditor.DispatchTransaction", new
     {
       actual = dispatch,
@@ -240,6 +254,7 @@ internal static class ConformanceV2Runner
     }, "FsusMarkdownEditor");
 
     var undo = editor.Undo();
+    var undoStepIndex = steps.Count;
     RecordStep(steps, "keyboard", "FsusMarkdownEditor.Undo", new
     {
       actual = undo,
@@ -298,6 +313,70 @@ internal static class ConformanceV2Runner
       motion = "full",
       runnerHash,
     };
+    var executionCoverageRecords = new List<object>();
+    foreach (var (eventName, member, scenarioId) in new[]
+    {
+      (
+        "markdown.transaction",
+        "transaction",
+        "scenario.v2.el-markdown-editor.output.transaction"
+      ),
+      (
+        "markdown.selection-change",
+        "selection-change",
+        "scenario.v2.el-markdown-editor.output.selection-change"
+      ),
+      (
+        "markdown.history-change",
+        "history-change",
+        "scenario.v2.el-markdown-editor.output.history-change"
+      ),
+    })
+    {
+      if (!observedSemanticEvents.Contains(eventName))
+      {
+        continue;
+      }
+      executionCoverageRecords.Add(new
+      {
+        kind = "output",
+        member,
+        scenarioId,
+        source = new { kind = "event", name = eventName },
+      });
+    }
+    if (dispatch.Accepted)
+    {
+      executionCoverageRecords.Add(new
+      {
+        kind = "operation",
+        member = "dispatchTransaction",
+        scenarioId = "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
+        source = new
+        {
+          kind = "step",
+          index = dispatchStepIndex,
+          action = "operation",
+          target = "FsusMarkdownEditor.DispatchTransaction",
+        },
+      });
+    }
+    if (undo.Accepted)
+    {
+      executionCoverageRecords.Add(new
+      {
+        kind = "operation",
+        member = "undo",
+        scenarioId = "scenario.v2.el-markdown-editor.operation.undo",
+        source = new
+        {
+          kind = "step",
+          index = undoStepIndex,
+          action = "keyboard",
+          target = "FsusMarkdownEditor.Undo",
+        },
+      });
+    }
     var absoluteOutput = Path.GetFullPath(outputPath);
     Directory.CreateDirectory(Path.GetDirectoryName(absoluteOutput)!);
     var screenshotPath = Path.Combine(Path.GetDirectoryName(absoluteOutput)!, "avalonia.png");
@@ -325,6 +404,13 @@ internal static class ConformanceV2Runner
         windowTitle = window.Title,
       },
       identity = evidenceIdentity,
+      executionCoverage = new
+      {
+        schema = "fsusui.member-execution-coverage.v2",
+        identity = evidenceIdentity,
+        real = true,
+        records = executionCoverageRecords,
+      },
       environment = new
       {
         os = Environment.OSVersion.ToString(),
