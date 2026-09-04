@@ -51,6 +51,22 @@ internal static class SourceSemanticVerifier
       "ActionCommand",
       nullable: true,
       canWrite: true);
+    AssertPseudoClass(
+      current,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      ":dragging",
+      declared: true,
+      bound: true);
+    AssertClassBinding(
+      current,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "fsus-size-md",
+      "Size");
+    AssertClassBinding(
+      current,
+      "FsusUI.Avalonia.Controls.FsusDropZone",
+      "fsus-loading",
+      "IsLoading");
 
     var sliderSource = File.ReadAllText(Path.Combine(repoRoot, SliderSource));
     var changedLiteral = WithOverride(
@@ -70,6 +86,61 @@ internal static class SourceSemanticVerifier
     Assert(
       changedLiteral.InputTreeHash != current.InputTreeHash,
       "literal source mutation must change inputTreeHash");
+
+    var changedPseudoDeclaration = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      SliderSource,
+      ReplaceFirst(
+        sliderSource,
+        "[PseudoClasses(\":dragging\", \":disabled\")]",
+        "[PseudoClasses(\":pressed\", \":disabled\")]"));
+    AssertPseudoClass(
+      changedPseudoDeclaration,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      ":pressed",
+      declared: true,
+      bound: false);
+    Assert(
+      changedPseudoDeclaration.InputTreeHash != current.InputTreeHash,
+      "pseudo-class declaration mutation must change inputTreeHash");
+
+    var changedPseudoBinding = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      SliderSource,
+      ReplaceFirst(
+        sliderSource,
+        "PseudoClasses.Set(\":dragging\", isDragging);",
+        "PseudoClasses.Set(\":pressed\", isDragging);"));
+    AssertPseudoClass(
+      changedPseudoBinding,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      ":pressed",
+      declared: false,
+      bound: true);
+    Assert(
+      changedPseudoBinding.InputTreeHash != current.InputTreeHash,
+      "pseudo-class binding mutation must change inputTreeHash");
+
+    var dropZoneSource = File.ReadAllText(
+      Path.Combine(repoRoot, "dotnet/FsusUI.Avalonia/Controls/FsusDropZone.cs"));
+    var changedClassCondition = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      "dotnet/FsusUI.Avalonia/Controls/FsusDropZone.cs",
+      ReplaceFirst(
+        dropZoneSource,
+        "FsusComponentClasses.Ensure(this, \"fsus-loading\", IsLoading);",
+        "FsusComponentClasses.Ensure(this, \"fsus-loading\", IsError);"));
+    AssertClassBinding(
+      changedClassCondition,
+      "FsusUI.Avalonia.Controls.FsusDropZone",
+      "fsus-loading",
+      "IsError");
+    Assert(
+      changedClassCondition.InputTreeHash != current.InputTreeHash,
+      "class-state condition mutation must change inputTreeHash");
 
     var complexDefault = WithOverride(
       repoRoot,
@@ -195,7 +266,7 @@ internal static class SourceSemanticVerifier
       expected: null);
 
     Console.WriteLine(
-      "source-semantics verification passed: current literal/default/required/content/generic/command metadata and 8 real-source mutations");
+      "source-semantics verification passed: current literal/default/required/content/generic/command/state metadata and 11 real-source mutations");
   }
 
   private static SourceSemanticIndex Extract(string repoRoot, string project) =>
@@ -285,6 +356,37 @@ internal static class SourceSemanticVerifier
     Assert(command.CanRead, $"{typeName}.{commandName} canRead");
     Assert(command.CanWrite == canWrite, $"{typeName}.{commandName} canWrite");
     Assert(!command.IsStatic, $"{typeName}.{commandName} isStatic");
+  }
+
+  private static void AssertPseudoClass(
+    SourceSemanticIndex index,
+    string typeName,
+    string pseudoClass,
+    bool declared,
+    bool bound)
+  {
+    var type = Type(index, typeName);
+    Assert(
+      type.DeclaredPseudoClasses.Contains(pseudoClass, StringComparer.Ordinal) == declared,
+      $"{typeName}.{pseudoClass} pseudo-class declaration");
+    Assert(
+      type.PseudoClassBindings.Any(binding =>
+        binding.NameKnown &&
+        binding.Name == pseudoClass) == bound,
+      $"{typeName}.{pseudoClass} pseudo-class binding");
+  }
+
+  private static void AssertClassBinding(
+    SourceSemanticIndex index,
+    string typeName,
+    string className,
+    string condition)
+  {
+    var binding = Type(index, typeName).ClassBindings.Single(candidate =>
+      candidate.NameKnown &&
+      candidate.Name == className &&
+      candidate.ConditionExpression == condition);
+    Assert(binding.Kind.Length > 0, $"{typeName}.{className} class kind");
   }
 
   private static SourceTypeSemantics Type(SourceSemanticIndex index, string typeName)

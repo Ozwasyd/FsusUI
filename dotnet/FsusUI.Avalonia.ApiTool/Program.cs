@@ -87,10 +87,10 @@ internal static class Program
     return new SemanticBaseline
     {
       PackageId = packageId,
-      BaselineVersion = "2.1.0",
+      BaselineVersion = "2.2.0",
       Source = new BaselineSource
       {
-        ToolVersion = "FsusUI.Avalonia.ApiTool@1.5.0",
+        ToolVersion = "FsusUI.Avalonia.ApiTool@1.6.0",
         AssemblyVersion = version,
         InputTreeHash = sourceSemantics.InputTreeHash,
         CompilerOptionsHash = sourceSemantics.CompilerOptionsHash,
@@ -169,11 +169,75 @@ internal static class Program
       Properties = properties,
       AvaloniaProperties = avaloniaProperties,
       Commands = commands.Count > 0 ? commands : null,
+      StateContract = ExtractStateContract(sourceTypeSemantics),
       Events = events,
       Methods = ExtractMethods(type),
       EnumMembers = type.IsEnum ? ExtractEnumMembers(type) : null,
     };
   }
+
+  private static SemanticStateContract? ExtractStateContract(
+    SourceTypeSemantics? sourceSemantics)
+  {
+    if (sourceSemantics is null ||
+        sourceSemantics.DeclaredPseudoClasses.Count == 0 &&
+        sourceSemantics.PseudoClassBindings.Count == 0 &&
+        sourceSemantics.ClassBindings.Count == 0)
+    {
+      return null;
+    }
+
+    var declaredPseudoClasses = sourceSemantics.DeclaredPseudoClasses
+      .OrderBy(name => name, StringComparer.Ordinal)
+      .ToList();
+    var pseudoClassBindings = sourceSemantics.PseudoClassBindings
+      .Select(StateBinding)
+      .ToList();
+    var classBindings = sourceSemantics.ClassBindings
+      .Select(StateBinding)
+      .ToList();
+    var boundPseudoClasses = pseudoClassBindings
+      .Where(binding => binding.NameKnown)
+      .Select(binding => binding.Name!)
+      .Distinct(StringComparer.Ordinal)
+      .OrderBy(name => name, StringComparer.Ordinal)
+      .ToList();
+    return new SemanticStateContract
+    {
+      PseudoClassDeclarationAuthority =
+        declaredPseudoClasses.Count > 0
+          ? "avalonia-pseudo-classes-attribute"
+          : null,
+      DeclaredPseudoClasses = declaredPseudoClasses,
+      PseudoClassBindings = pseudoClassBindings,
+      PseudoClassContractKnown = declaredPseudoClasses.Count > 0,
+      PseudoClassContractComplete =
+        declaredPseudoClasses.Count > 0 &&
+        pseudoClassBindings.All(binding => binding.NameKnown) &&
+        declaredPseudoClasses.SequenceEqual(
+          boundPseudoClasses,
+          StringComparer.Ordinal),
+      ClassBindingAuthority = "roslyn-control-instance-operation",
+      ClassContractDeclared = false,
+      ClassBindings = classBindings,
+      ClassNamesResolved = classBindings.All(binding => binding.NameKnown),
+    };
+  }
+
+  private static SemanticStateBinding StateBinding(
+    SourceStateBindingSemantics binding) =>
+    new()
+    {
+      Kind = binding.Kind,
+      Action = binding.Action,
+      NameKnown = binding.NameKnown,
+      Name = binding.Name,
+      NameExpression = binding.NameExpression,
+      ConditionExpression = binding.ConditionExpression,
+      PublicDependencies = binding.PublicDependencies,
+      SourceMember = binding.SourceMember,
+      Provider = binding.Provider,
+    };
 
   private static string TypeKind(Type type)
   {
@@ -535,6 +599,8 @@ internal sealed class SemanticType
 
   public List<SemanticCommand>? Commands { get; init; }
 
+  public SemanticStateContract? StateContract { get; init; }
+
   public List<SemanticEvent> Events { get; init; } = [];
 
   public List<SemanticMethod> Methods { get; init; } = [];
@@ -588,6 +654,48 @@ internal sealed class SemanticCommand
   public bool Deprecated { get; init; }
 
   public string? DeprecationMessage { get; init; }
+}
+
+internal sealed class SemanticStateContract
+{
+  public string? PseudoClassDeclarationAuthority { get; init; }
+
+  public List<string> DeclaredPseudoClasses { get; init; } = [];
+
+  public List<SemanticStateBinding> PseudoClassBindings { get; init; } = [];
+
+  public bool PseudoClassContractKnown { get; init; }
+
+  public bool PseudoClassContractComplete { get; init; }
+
+  public string ClassBindingAuthority { get; init; } = "";
+
+  public bool ClassContractDeclared { get; init; }
+
+  public List<SemanticStateBinding> ClassBindings { get; init; } = [];
+
+  public bool ClassNamesResolved { get; init; }
+}
+
+internal sealed class SemanticStateBinding
+{
+  public string Kind { get; init; } = "";
+
+  public string Action { get; init; } = "";
+
+  public bool NameKnown { get; init; }
+
+  public string? Name { get; init; }
+
+  public string? NameExpression { get; init; }
+
+  public string? ConditionExpression { get; init; }
+
+  public List<string> PublicDependencies { get; init; } = [];
+
+  public string SourceMember { get; init; } = "";
+
+  public string Provider { get; init; } = "";
 }
 
 internal sealed class SemanticContentRegion

@@ -10,6 +10,7 @@ import {
   buildRegistry,
   compareMembers,
   avaloniaPublicSurfaces,
+  avaloniaStateContractFingerprint,
   validateAvaloniaSurfaceRegistration,
   validateRegistry,
   validateSemanticMemberBindings,
@@ -145,8 +146,8 @@ test('committed Contract V2 registry passes validation with the committed gate',
 
 test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
   for (const [key, baseline] of Object.entries(avaloniaBaselines)) {
-    assert.equal(baseline.baselineVersion, '2.1.0')
-    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.5.0')
+    assert.equal(baseline.baselineVersion, '2.2.0')
+    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.6.0')
     assert.match(baseline.source.inputTreeHash, sha256Pattern)
     assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
     assert.match(baseline.source.dependencyVersionHash, sha256Pattern)
@@ -226,6 +227,153 @@ test('Avalonia semantic output hash rejects payload drift', () => {
   const currentHash = avaloniaBaselines.avalonia.source.outputHash
   const mutation = source.replace('"deprecated": false', '"deprecated": true')
   assert.notEqual(avaloniaOutputHash(mutation), currentHash)
+})
+
+test('Avalonia semantic baseline distinguishes declared pseudo-class contracts from observed class implementation', () => {
+  const stateTypes = avaloniaBaselines.avalonia.semanticTypes.filter(
+    (type) => type.stateContract,
+  )
+  const declaredPseudoClasses = stateTypes.flatMap(
+    (type) => type.stateContract.declaredPseudoClasses,
+  )
+  const pseudoClassBindings = stateTypes.flatMap(
+    (type) => type.stateContract.pseudoClassBindings,
+  )
+  const classBindings = stateTypes.flatMap(
+    (type) => type.stateContract.classBindings,
+  )
+  assert.equal(stateTypes.length, 127)
+  assert.equal(declaredPseudoClasses.length, 7)
+  assert.equal(pseudoClassBindings.length, 7)
+  assert.equal(classBindings.length, 742)
+  assert.equal(
+    stateTypes.filter(
+      (type) => type.stateContract.pseudoClassContractKnown === true,
+    ).length,
+    2,
+  )
+  assert.equal(
+    stateTypes.filter(
+      (type) => type.stateContract.pseudoClassContractComplete === true,
+    ).length,
+    2,
+  )
+  assert.ok(
+    stateTypes.every(
+      (type) =>
+        type.stateContract.classBindingAuthority ===
+          'roslyn-control-instance-operation' &&
+        type.stateContract.classContractDeclared === false,
+    ),
+  )
+
+  const slider = avaloniaBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusSlider',
+  )
+  assert.equal(
+    slider.stateContract.pseudoClassDeclarationAuthority,
+    'avalonia-pseudo-classes-attribute',
+  )
+  assert.equal(slider.stateContract.pseudoClassContractKnown, true)
+  assert.equal(slider.stateContract.pseudoClassContractComplete, true)
+  assert.deepEqual(slider.stateContract.declaredPseudoClasses, [
+    ':disabled',
+    ':dragging',
+  ])
+  assert.ok(
+    slider.stateContract.pseudoClassBindings.some(
+      (binding) =>
+        binding.name === ':dragging' &&
+        binding.conditionExpression === 'isDragging',
+    ),
+  )
+  assert.equal(
+    slider.stateContract.classBindingAuthority,
+    'roslyn-control-instance-operation',
+  )
+  assert.equal(slider.stateContract.classContractDeclared, false)
+  assert.ok(
+    slider.stateContract.classBindings.some(
+      (binding) =>
+        binding.name === 'fsus-size-md' &&
+        binding.conditionExpression === 'Size' &&
+        binding.publicDependencies.includes(
+          'FsusUI.Avalonia.Controls.FsusSlider.Size',
+        ),
+    ),
+  )
+
+  const button = avaloniaBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusButton',
+  )
+  assert.equal(button.stateContract.pseudoClassDeclarationAuthority, undefined)
+  assert.equal(button.stateContract.pseudoClassContractKnown, false)
+  assert.equal(button.stateContract.pseudoClassContractComplete, false)
+  assert.equal(button.stateContract.classContractDeclared, false)
+
+  const unresolved = avaloniaBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusVirtualList',
+  )
+  assert.equal(unresolved.stateContract.classNamesResolved, false)
+  assert.ok(
+    unresolved.stateContract.classBindings.some(
+      (binding) => binding.nameKnown === false && binding.nameExpression,
+    ),
+  )
+})
+
+test('pseudo-class and class-state mutations invalidate Contract V2 state identities', () => {
+  const changedPseudoBaselines = clone(avaloniaBaselines)
+  const changedSlider = changedPseudoBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusSlider',
+  )
+  const currentSliderFingerprint =
+    avaloniaStateContractFingerprint(changedSlider)
+  changedSlider.stateContract.declaredPseudoClasses[1] = ':pressed'
+  assert.notEqual(
+    avaloniaStateContractFingerprint(changedSlider),
+    currentSliderFingerprint,
+  )
+  const changedPseudoErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedPseudoBaselines,
+  }).errors.join('\n')
+  assert.match(
+    changedPseudoErrors,
+    /ElSlider.*has stale state contract fingerprint/,
+  )
+  assert.match(
+    changedPseudoErrors,
+    /component-v2\.el-slider has stale Avalonia state contract binding/,
+  )
+
+  const changedClassBaselines = clone(avaloniaBaselines)
+  const changedDropZone = changedClassBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusDropZone',
+  )
+  changedDropZone.stateContract.classBindings.find(
+    (binding) => binding.name === 'fsus-loading',
+  ).conditionExpression = 'IsError'
+  const changedClassErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedClassBaselines,
+  }).errors.join('\n')
+  assert.match(
+    changedClassErrors,
+    /avalonia-only type FsusUI\.Avalonia\.Controls\.FsusDropZone has stale stateContractFingerprint/,
+  )
+
+  const deletedIdentity = clone(committedRegistry)
+  delete deletedIdentity.componentMap.find(
+    (entry) => entry.vue.name === 'ElSlider',
+  ).avalonia.stateContractFingerprint
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: deletedIdentity,
+      avaloniaBaselines,
+    }).errors.join('\n'),
+    /ElSlider.*has stale state contract fingerprint/,
+  )
 })
 
 test('Avalonia semantic baseline retains real generic constraints and command surfaces', () => {

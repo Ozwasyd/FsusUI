@@ -1058,6 +1058,67 @@ const avaloniaTypeSurfaceHash = (type) =>
     }),
   )
 
+const canonicalStateBinding = (binding) => ({
+  kind: binding.kind ?? null,
+  action: binding.action ?? null,
+  nameKnown: knownBoolean(binding.nameKnown),
+  name: binding.name ?? null,
+  nameExpression: binding.nameExpression ?? null,
+  conditionExpression: binding.conditionExpression ?? null,
+  publicDependencies: [...(binding.publicDependencies ?? [])].sort(),
+  sourceMember: binding.sourceMember ?? null,
+  provider: binding.provider ?? null,
+})
+
+export const canonicalAvaloniaStateContract = (type) => {
+  const state = type?.stateContract
+  if (!state) return null
+  const sortBindings = (bindings) =>
+    (bindings ?? [])
+      .map(canonicalStateBinding)
+      .sort((first, second) =>
+        JSON.stringify(first).localeCompare(JSON.stringify(second)),
+      )
+  return {
+    pseudoClassDeclarationAuthority:
+      state.pseudoClassDeclarationAuthority ?? null,
+    declaredPseudoClasses: [...(state.declaredPseudoClasses ?? [])].sort(),
+    pseudoClassBindings: sortBindings(state.pseudoClassBindings),
+    pseudoClassContractKnown: knownBoolean(state.pseudoClassContractKnown),
+    pseudoClassContractComplete: knownBoolean(
+      state.pseudoClassContractComplete,
+    ),
+    classBindingAuthority: state.classBindingAuthority ?? null,
+    classContractDeclared: knownBoolean(state.classContractDeclared),
+    classBindings: sortBindings(state.classBindings),
+    classNamesResolved: knownBoolean(state.classNamesResolved),
+  }
+}
+
+export const avaloniaStateContractFingerprint = (type) => {
+  const state = canonicalAvaloniaStateContract(type)
+  return state ? sha256(JSON.stringify(state)) : null
+}
+
+const avaloniaStateContractRef = (type) => {
+  const fingerprint = avaloniaStateContractFingerprint(type)
+  if (!fingerprint) return null
+  return {
+    baseline: AVALONIA_SEMANTIC_PATHS[type.packageId],
+    fingerprint,
+    pseudoClassContractKnown: knownBoolean(
+      type.stateContract.pseudoClassContractKnown,
+    ),
+    pseudoClassContractComplete: knownBoolean(
+      type.stateContract.pseudoClassContractComplete,
+    ),
+    classContractDeclared: knownBoolean(
+      type.stateContract.classContractDeclared,
+    ),
+    classNamesResolved: knownBoolean(type.stateContract.classNamesResolved),
+  }
+}
+
 const findAvaloniaType = (componentName, typeIndex) => {
   const kebab = kebabName(componentName)
   for (const [fullName, type] of typeIndex) {
@@ -1799,6 +1860,9 @@ const contractForComponent = ({
     operations,
     contentRegions,
   })
+  const stateContract = avaloniaType
+    ? avaloniaStateContractRef(avaloniaType)
+    : null
 
   const contract = {
     id: `component-v2.${contractKebab}`,
@@ -1822,6 +1886,7 @@ const contractForComponent = ({
             status: 'bound',
             package: 'FsusUI.Avalonia',
             type: avaloniaType.name,
+            ...(stateContract ? { stateContract } : {}),
           }
         : { status: 'unbound', package: null, type: null },
     },
@@ -2010,32 +2075,39 @@ const extractAvaloniaExtras = ({
   )
 }
 
-const avaloniaOnlyType = ({ type, packageId }) => ({
-  type: type.name,
-  kind: type.kind,
-  packageId,
-  baseline: AVALONIA_SEMANTIC_PATHS[packageId],
-  memberCount: avaloniaPublicSurfaces(type).length,
-  surfaceHash: avaloniaTypeSurfaceHash(type),
-  scenarioIds: [
-    `scenario.v2.avalonia-only.${toKebab(type.name.split('.').pop() ?? type.name)}`,
-  ],
-  governance: defaultGovernance(
-    'Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.',
-  ),
-})
+const avaloniaOnlyType = ({ type, packageId }) => {
+  const stateContractFingerprint = avaloniaStateContractFingerprint(type)
+  return {
+    type: type.name,
+    kind: type.kind,
+    packageId,
+    baseline: AVALONIA_SEMANTIC_PATHS[packageId],
+    memberCount: avaloniaPublicSurfaces(type).length,
+    surfaceHash: avaloniaTypeSurfaceHash(type),
+    ...(stateContractFingerprint ? { stateContractFingerprint } : {}),
+    scenarioIds: [
+      `scenario.v2.avalonia-only.${toKebab(type.name.split('.').pop() ?? type.name)}`,
+    ],
+    governance: defaultGovernance(
+      'Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.',
+    ),
+  }
+}
 
 export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
   const map = []
   for (const component of vueBaseline.components ?? []) {
     const avaloniaType = findAvaloniaType(component.name, typeIndex)
     if (!avaloniaType) continue
+    const stateContractFingerprint =
+      avaloniaStateContractFingerprint(avaloniaType)
     map.push({
       vue: { name: component.name, module: component.module },
       avalonia: {
         type: avaloniaType.name,
         packageId: avaloniaType.packageId,
         surfaceHash: avaloniaTypeSurfaceHash(avaloniaType),
+        ...(stateContractFingerprint ? { stateContractFingerprint } : {}),
       },
       basis: 'name-equality',
     })
@@ -2117,7 +2189,7 @@ export const buildRegistry = ({
     owner: CONTRACT_V2_OWNER,
     generatedBy: {
       tool: 'scripts/contract-v2.mjs',
-      toolVersion: '1.3.0',
+      toolVersion: '1.4.0',
     },
     baselines: {
       web: {
@@ -2693,10 +2765,22 @@ export const validateAvaloniaSurfaceRegistration = ({
     if (mapping.avalonia?.surfaceHash !== avaloniaTypeSurfaceHash(type)) {
       errors.push(`${context} has stale public surface hash`)
     }
+    if (
+      (mapping.avalonia?.stateContractFingerprint ?? null) !==
+      avaloniaStateContractFingerprint(type)
+    ) {
+      errors.push(`${context} has stale state contract fingerprint`)
+    }
     const contract = contracts.get(componentName)
     if (!contract) {
       errors.push(`${context} has no component contract`)
       continue
+    }
+    if (
+      JSON.stringify(contract.bindings?.avalonia?.stateContract ?? null) !==
+      JSON.stringify(avaloniaStateContractRef(type))
+    ) {
+      errors.push(`${contract.id} has stale Avalonia state contract binding`)
     }
 
     const surfaces = avaloniaPublicSurfaces(type)
@@ -2805,8 +2889,9 @@ export const validateAvaloniaSurfaceRegistration = ({
       'baseline',
       'memberCount',
       'surfaceHash',
+      'stateContractFingerprint',
     ]) {
-      if (entry[field] !== expected[field]) {
+      if ((entry[field] ?? null) !== (expected[field] ?? null)) {
         errors.push(`${context} has stale ${field}`)
       }
     }

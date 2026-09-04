@@ -49,6 +49,14 @@ The compiler baseline retains declared generic parameter constraints and public
 `ICommand` properties. Command entries carry their exact nullable/read/write
 surface and merge any CLR, Styled, or Direct property registration metadata;
 unknown invocation parameters or `CanExecute` behavior are not inferred.
+It also retains `[PseudoClasses]` declarations and Roslyn-bound mutations of
+the containing control's `PseudoClasses`/`Classes` collections. A pseudo-class
+is a known public contract only when the compiled attribute declares it and
+the observed bindings agree. Ordinary class names have no equivalent Avalonia
+declaration authority in the current source, so they are explicitly marked as
+`roslyn-control-instance-operation` implementation observations with
+`classContractDeclared: false`; unresolved expressions remain unresolved and
+cannot promote alignment.
 
 The unified `conformance:v2` command reports a stable stage name driven by each
 subprocess exit code. It checks the compiler-derived Web baseline, the
@@ -186,7 +194,10 @@ its surface kind and hash; overloads with the same public name receive distinct
 scenario IDs. An
 Avalonia-only type records the count and hash of its complete public surface;
 each mapped type records the same hash in `componentMap`.
+State metadata has a separate canonical fingerprint in both `componentMap` and
+the bound component contract. This keeps state drift freshness-bound without
+misrepresenting observed internal styling classes as public member surfaces.
 The Contract V2 gate recomputes both inventories and fails when a type or member
-is missing, duplicated, stale, or simultaneously mapped and extra. The semantic
-baselines contain public symbols only, so internal implementation details do
-not enter this registry.
+is missing, duplicated, stale, or simultaneously mapped and extra. Only public
+symbols enter the member-surface inventory; the separately labelled state
+fingerprint cannot create a member, counterpart, or aligned status.
