@@ -17,9 +17,11 @@ public partial class App : Application
     {
       desktop.MainWindow = ConformanceV2Runner.IsConfigured
         ? ConformanceV2Runner.CreateWindow(desktop)
-        : RenderPerformanceRunner.IsConfigured
-          ? RenderPerformanceRunner.CreateWindow(desktop)
-          : new MainWindow();
+        : ImeHarnessRunner.IsConfigured
+          ? ImeHarnessRunner.CreateWindow(desktop)
+          : RenderPerformanceRunner.IsConfigured
+            ? RenderPerformanceRunner.CreateWindow(desktop)
+            : new MainWindow();
     }
 
     base.OnFrameworkInitializationCompleted();

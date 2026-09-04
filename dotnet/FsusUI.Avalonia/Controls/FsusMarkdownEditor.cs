@@ -462,10 +462,11 @@ public class FsusMarkdownEditor : TemplatedControl
       InputElement.GotFocusEvent,
       OnSelfGotFocus,
       RoutingStrategies.Bubble);
-    inputOwner.AddHandler(
+    AddHandler(
       TextInputMethodClientRequestedEvent,
       OnInputMethodClientRequested,
-      RoutingStrategies.Direct | RoutingStrategies.Bubble);
+      RoutingStrategies.Bubble,
+      handledEventsToo: true);
     inputOwner.AddHandler(
       InputElement.KeyDownEvent,
       OnInputPreviewKeyDown,
@@ -677,6 +678,7 @@ public class FsusMarkdownEditor : TemplatedControl
 
     var expectedProjection = projectionView;
     var expectedScroll = scrollViewer;
+    var boundedAnchor = Math.Clamp(anchor, 0, store.Value.Length);
     var generation = ++scrollRestoreGeneration;
     void Restore()
     {
@@ -688,7 +690,7 @@ public class FsusMarkdownEditor : TemplatedControl
       }
       expectedScroll.Offset = new Vector(
         horizontalOffset,
-        expectedProjection.GetVisualLineTopForSource(anchor));
+        expectedProjection.GetVisualLineTopForSource(boundedAnchor));
     }
 
     Restore();
@@ -821,7 +823,12 @@ public class FsusMarkdownEditor : TemplatedControl
       // observed input event. No timers: the contract forbids timeout dedup.
       // A composition that was aborted by a document switch also keeps the
       // pending end so its late commit is rejected as orphaned.
-      if (nativeMachine.Composing || nativeMachine.Phase is FsusMarkdownNativePhase.Aborted or FsusMarkdownNativePhase.Draining)
+      if (nativeMachine.Composing)
+      {
+        ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd, null);
+        pendingCompositionEnd = true;
+      }
+      else if (nativeMachine.Phase is FsusMarkdownNativePhase.Aborted or FsusMarkdownNativePhase.Draining)
       {
         pendingCompositionEnd = true;
       }
@@ -860,6 +867,20 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd, null);
     }
+    if (nativeMachine.Phase == FsusMarkdownNativePhase.Committing)
+    {
+      _ = nativeMachine.Apply(new FsusMarkdownNativeEventInput
+      {
+        Kind = FsusMarkdownNativeEventKind.Input,
+        InputType = "insertCompositionText",
+        Value = store.Value,
+        PreviousValue = store.Value,
+        Revision = store.Revision,
+        Selection = store.Selection,
+        DocumentIdentity = store.Identity,
+        CurrentIdentity = store.Identity,
+      });
+    }
   }
 
   private void OnInputPreviewKeyDown(object? sender, KeyEventArgs args)
@@ -878,12 +899,8 @@ public class FsusMarkdownEditor : TemplatedControl
     }
     if (nativeMachine.FreezeSmartInput)
     {
-      // Composition active: freeze structural transforms. Plain characters
-      // continue into the native preedit; block intents stay rejected.
-      if (args.Key is Key.Enter or Key.Back or Key.Delete or Key.Tab)
-      {
-        args.Handled = true;
-      }
+      // Composition active: freeze editor structural transforms while leaving
+      // every key unhandled for the platform IME's candidate/preedit logic.
       return;
     }
     var key = MapBlockInputKey(args.Key, args.KeyModifiers);
@@ -919,7 +936,10 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       return;
     }
-    if (pendingCompositionEnd)
+    if (pendingCompositionEnd ||
+      nativeMachine.Phase is FsusMarkdownNativePhase.Composing or
+        FsusMarkdownNativePhase.Committing or FsusMarkdownNativePhase.Aborted or
+        FsusMarkdownNativePhase.Draining)
     {
       // The IME cleared the preedit and the commit text follows in the same
       // turn — unless the composition was aborted by a document switch, in
@@ -931,6 +951,17 @@ public class FsusMarkdownEditor : TemplatedControl
         {
           Kind = FsusMarkdownNativeEventKind.CompositionEnd,
           Data = inserted,
+          Value = store.Value,
+          PreviousValue = store.Value,
+          Revision = store.Revision,
+          Selection = store.Selection,
+          DocumentIdentity = store.Identity,
+          CurrentIdentity = store.Identity,
+        });
+        _ = nativeMachine.Apply(new FsusMarkdownNativeEventInput
+        {
+          Kind = FsusMarkdownNativeEventKind.Input,
+          InputType = "insertCompositionText",
           Value = store.Value,
           PreviousValue = store.Value,
           Revision = store.Revision,
@@ -952,8 +983,12 @@ public class FsusMarkdownEditor : TemplatedControl
         DocumentIdentity = store.Identity,
         CurrentIdentity = store.Identity,
       });
-      var caretStart = Math.Min(inputOwner.SelectionStart, inputOwner.SelectionEnd);
-      var caretEnd = Math.Max(inputOwner.SelectionStart, inputOwner.SelectionEnd);
+      // Avalonia's TextBox selection can temporarily include the native
+      // preedit span even though that span is not part of the source document.
+      // The transaction must use the frozen source selection captured by the
+      // store, otherwise a multi-code-unit preedit can index past store.Value.
+      var caretStart = Math.Min(store.Selection.Start, store.Selection.End);
+      var caretEnd = Math.Max(store.Selection.Start, store.Selection.End);
       var postValue = store.Value[..caretStart] + inserted + store.Value[caretEnd..];
       var postSelection = new FsusMarkdownEditorSelection(
         caretStart + inserted.Length,
@@ -1185,6 +1220,21 @@ public class FsusMarkdownEditor : TemplatedControl
   public IReadOnlyList<FsusMarkdownNativeTraceEntry> NativeTrace => nativeMachine.Trace;
 
   public string NativePhase => FsusMarkdownNativeEventMachine.PhaseToken(nativeMachine.Phase);
+
+  /// <summary>
+  /// Candidate-window anchor reported by the native text-input owner, in the
+  /// coordinate space of <see cref="NativeCandidateCaretVisual"/>. Avalonia's
+  /// platform IME transforms this rectangle through the current window scale
+  /// and viewport offset; FsusUI never computes a parallel caret position.
+  /// </summary>
+  internal Rect NativeCandidateCaretRect => imeClient?.CursorRectangle ?? default;
+
+  /// <summary>
+  /// Visual that owns <see cref="NativeCandidateCaretRect"/>. Harnesses use
+  /// this with Avalonia's visual transform to verify DPI and scrolled viewport
+  /// placement without replacing the platform text-input client.
+  /// </summary>
+  internal Visual? NativeCandidateCaretVisual => imeClient?.TextViewVisual;
 
   /// <summary>
   /// Provenance of the captured native input evidence. The default marks

@@ -26,7 +26,12 @@ or attachment IO.
 | #331 acceptance | `evaluateMarkdownInputAcceptance` | Same-candidate gate |
 
 `driveMarkdownNativeHarnessTrace` is the #319 read/drive surface. Synthetic
-Chromium/Firefox/WebKit scripts are not native OS IME evidence.
+Chromium/Firefox/WebKit scripts are not native OS IME evidence. Avalonia's
+Linux acceptance uses the headful `--ime-harness` demo route, a stock
+`TextBox` platform probe, libpinyin through ibus, and XTest events through the
+live X server; the structured receipt records the candidate SHA, platform
+provenance, raw key events, native-machine trace, transaction count, caret,
+DPI, and viewport offset.
 
 Public editor mode is exactly `source` / `live` / `split` / `preview`. Live
 capability tokens are exactly the six frozen values from
@@ -107,7 +112,8 @@ Native IME, screen-reader hardware, and the 375/1440 zoom matrix stay leftover.
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects
 consumer keydown, DOM mutation, HTML-first paste, pair drift, double insert,
-and full-document normalize. Source/live/split fingerprints must match.
+stale composition commits, synthetic-only IME evidence, and full-document
+normalize. Source/live/split fingerprints must match.
 Unedited BOM, CRLF, Tab, trailing spaces, hard breaks, CJK, ZWJ emoji,
 combining marks, and RTL bytes must stay put.
 
@@ -118,4 +124,6 @@ combining marks, and RTL bytes must stay put.
 - HTML-first clipboard or data URL insert
 - pair-set drift (`«»`, auto-strong, extra fences)
 - timeout or second paste/input path that double-inserts
+- synthetic/headless composition traces presented as OS-level IME evidence
+- a composition commit bound to a stale document identity, epoch, revision, or selection
 - normalizing the whole document on ordinary input

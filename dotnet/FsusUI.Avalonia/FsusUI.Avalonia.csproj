@@ -18,5 +18,6 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="FsusUI.Avalonia.HeadlessTests" />
+    <InternalsVisibleTo Include="FsusUI.Avalonia.Demo" />
   </ItemGroup>
 </Project>

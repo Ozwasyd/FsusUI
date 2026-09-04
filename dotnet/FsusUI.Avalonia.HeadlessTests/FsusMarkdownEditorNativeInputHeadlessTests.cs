@@ -36,6 +36,8 @@ public class FsusMarkdownEditorNativeInputHeadlessTests
       Dispatcher.UIThread.RunJobs();
       var (client, transactionCount) = RequestClient(editor);
       Assert.IsType<FsusMarkdownEditorTextInputMethodClient>(client);
+      Assert.True(editor.NativeCandidateCaretRect.Height > 0);
+      Assert.NotNull(editor.NativeCandidateCaretVisual);
 
       client!.SetPreeditText("你");
       Assert.Equal("composing", editor.NativePhase);
@@ -53,6 +55,105 @@ public class FsusMarkdownEditorNativeInputHeadlessTests
       Assert.Equal("idle", editor.NativePhase);
       Assert.Equal(1, transactionCount());
       Assert.Equal(1, editor.TransactionStore.History.UndoDepth);
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public void NativeCommitBeforePreeditClearUsesTheFrozenSourceSelectionOnce()
+  {
+    var (window, editor) = CreateEditor();
+    try
+    {
+      editor.Focus();
+      Dispatcher.UIThread.RunJobs();
+      var (client, transactionCount) = RequestClient(editor);
+      client!.SetPreeditText("你好");
+
+      // Linux ibus can deliver committed TextInput before clearing preedit.
+      // The TextBox selection includes the preedit span at this point, so the
+      // editor must use its frozen source selection instead.
+      window.KeyTextInput("你好");
+      client.SetPreeditText(null);
+      Dispatcher.UIThread.RunJobs();
+
+      Assert.Equal("你好", editor.Document);
+      Assert.Equal("idle", editor.NativePhase);
+      Assert.Equal(1, transactionCount());
+      Assert.Equal(1, editor.TransactionStore.History.UndoDepth);
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public void EmptyPreeditThenNonTextKeyClosesCancellationWithoutTransaction()
+  {
+    var (window, editor) = CreateEditor();
+    try
+    {
+      editor.Focus();
+      Dispatcher.UIThread.RunJobs();
+      var (client, transactionCount) = RequestClient(editor);
+      client!.SetPreeditText("ni");
+      client.SetPreeditText(null);
+      Assert.Equal("committing", editor.NativePhase);
+
+      window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+      window.KeyRelease(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+      Dispatcher.UIThread.RunJobs();
+
+      Assert.Equal(string.Empty, editor.Document);
+      Assert.Equal("idle", editor.NativePhase);
+      Assert.Equal(0, transactionCount());
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public void ShrinkingScrolledDocumentBoundsTheRestoredSourceAnchor()
+  {
+    var (window, editor) = CreateEditor();
+    try
+    {
+      editor.Document = string.Join('\n', Enumerable.Range(0, 80).Select(index => $"line {index}"));
+      Dispatcher.UIThread.RunJobs();
+      editor.ScrollPosition = new Vector(0, Math.Max(1, editor.ScrollExtentHeight - editor.ScrollViewportHeight));
+      Dispatcher.UIThread.RunJobs();
+      Assert.True(editor.ScrollPosition.Y > 0);
+
+      var error = Record.Exception(() => editor.Document = string.Empty);
+      Dispatcher.UIThread.RunJobs();
+
+      Assert.Null(error);
+      Assert.Equal(string.Empty, editor.Document);
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public void ImeDecoratorForwardsTheNativeCandidateCaretOwnerAndRectangle()
+  {
+    var (window, editor) = CreateEditor();
+    try
+    {
+      var textBox = editor.inputOwner ?? throw new InvalidOperationException();
+      var decorated = new FsusMarkdownEditorTextInputMethodClient(
+        new FakeTextInputMethodClient(textBox));
+
+      Assert.Equal(new Rect(12, 24, 2, 18), decorated.CursorRectangle);
+      Assert.Same(textBox, decorated.TextViewVisual);
     }
     finally
     {
@@ -354,7 +455,7 @@ public class FsusMarkdownEditorNativeInputHeadlessTests
 
     public override string SurroundingText => string.Empty;
 
-    public override Rect CursorRectangle => default;
+    public override Rect CursorRectangle => new(12, 24, 2, 18);
 
     public override TextSelection Selection { get; set; }
   }
