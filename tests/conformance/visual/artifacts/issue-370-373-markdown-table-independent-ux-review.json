@@ -1,7 +1,7 @@
 {
   "schema": "fsusui-design-conformance.independent-ux-review.v1",
-  "candidateSha": "74c069ad60a7f82916c5dfe29e1ffdf6b074f900",
-  "candidateDigest": "1d33c649125ddf94766f9d2ade69a51ac47774dadea2b4e4cf9f725da396d664",
+  "candidateSha": "35b0e6c8c1c5cf2ec6f4d7db672e7886bc0cf9c6",
+  "candidateDigest": "a67a62c1189f972de0319e50b61b25a9badb488b668718abe5b863f3e11c40d8",
   "productionFixture": true,
   "reviewedPaths": [
     "tests/conformance/visual/artifacts/issue-370-373-markdown-table/table-context-keyboard-focus.png",
