@@ -1,7 +1,7 @@
 {
   "schema": "fsusui-design-conformance.classification-evidence.v1",
   "issues": [370, 371, 372, 373],
-  "candidateSha": "e87a691b8fa7dd83e611c3dd791a3791cb3b5752",
+  "candidateSha": "be610bf37f6d20188862442d515fd69ed6f25e91",
   "decision": {
     "uiDecisionClass": "interaction-judgment",
     "verificationClass": "ux-path",
