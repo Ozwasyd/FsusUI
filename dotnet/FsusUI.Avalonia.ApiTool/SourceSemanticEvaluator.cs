@@ -11,7 +11,7 @@ namespace FsusUI.Avalonia.ApiTool;
 
 internal sealed class SourceSemanticEvaluator
 {
-  private const string EvaluatorVersion = "source-semantics-v4";
+  private const string EvaluatorVersion = "source-semantics-v5";
 
   private static readonly CSharpParseOptions ParseOptions =
     new(languageVersion: LanguageVersion.Latest, documentationMode: DocumentationMode.Parse);
@@ -61,6 +61,7 @@ internal sealed class SourceSemanticEvaluator
 
     var types = new Dictionary<string, MutableSourceTypeSemantics>(StringComparer.Ordinal);
     IndexTypeSemantics(compilation.Assembly.GlobalNamespace, types);
+    var automationPeerOwners = IndexAutomationPeerOwners(compilation, syntaxTrees);
     foreach (var tree in syntaxTrees)
     {
       var model = compilation.GetSemanticModel(tree);
@@ -80,6 +81,12 @@ internal sealed class SourceSemanticEvaluator
           DefaultKnown = defaultValue.Known,
           DefaultValue = defaultValue.Value,
         };
+        IndexAutomationProviderProperty(
+          model,
+          property,
+          symbol,
+          automationPeerOwners,
+          types);
       }
 
       foreach (var field in root.DescendantNodes().OfType<FieldDeclarationSyntax>())
@@ -121,6 +128,12 @@ internal sealed class SourceSemanticEvaluator
 
         var type = GetOrCreate(types, ReflectionTypeName(containingType));
         IndexStateMutation(compilation, model, operation, type);
+        IndexAutomationPropertyWrite(
+          model,
+          operation,
+          containingType,
+          automationPeerOwners,
+          types);
       }
     }
 
@@ -147,6 +160,9 @@ internal sealed class SourceSemanticEvaluator
             .ToList(),
           ClassBindings = pair.Value.ClassBindings
             .OrderBy(StateBindingSortKey, StringComparer.Ordinal)
+            .ToList(),
+          AutomationMappings = pair.Value.AutomationMappings
+            .OrderBy(AutomationMappingSortKey, StringComparer.Ordinal)
             .ToList(),
           ContentProperties = pair.Value.ContentProperties
             .OrderBy(name => name, StringComparer.Ordinal)
@@ -394,6 +410,177 @@ internal sealed class SourceSemanticEvaluator
         .ToList(),
     };
 
+  private static Dictionary<INamedTypeSymbol, INamedTypeSymbol>
+    IndexAutomationPeerOwners(
+      Compilation compilation,
+      IEnumerable<SyntaxTree> syntaxTrees)
+  {
+    var owners = new Dictionary<INamedTypeSymbol, INamedTypeSymbol>(
+      SymbolEqualityComparer.Default);
+    var ambiguous = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+    foreach (var tree in syntaxTrees)
+    {
+      var model = compilation.GetSemanticModel(tree);
+      foreach (var method in tree.GetRoot()
+        .DescendantNodes()
+        .OfType<MethodDeclarationSyntax>())
+      {
+        if (model.GetDeclaredSymbol(method) is not IMethodSymbol
+          {
+            Name: "OnCreateAutomationPeer",
+          } methodSymbol ||
+            methodSymbol.ContainingType.DeclaredAccessibility != Accessibility.Public)
+        {
+          continue;
+        }
+
+        foreach (var creation in method.DescendantNodesAndSelf()
+          .OfType<ObjectCreationExpressionSyntax>())
+        {
+          if (model.GetOperation(creation) is not IObjectCreationOperation
+            {
+              Type: INamedTypeSymbol peerType,
+            } ||
+              !DerivesFrom(peerType, "Avalonia.Automation.Peers.AutomationPeer"))
+          {
+            continue;
+          }
+
+          if (owners.TryGetValue(peerType, out var existingOwner) &&
+              !SymbolEqualityComparer.Default.Equals(
+                existingOwner,
+                methodSymbol.ContainingType))
+          {
+            ambiguous.Add(peerType);
+            owners.Remove(peerType);
+            continue;
+          }
+          if (!ambiguous.Contains(peerType))
+          {
+            owners[peerType] = methodSymbol.ContainingType;
+          }
+        }
+      }
+    }
+    return owners;
+  }
+
+  private static bool DerivesFrom(INamedTypeSymbol type, string baseTypeName)
+  {
+    for (var current = type; current is not null; current = current.BaseType)
+    {
+      if (current.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat) ==
+          baseTypeName)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static void IndexAutomationProviderProperty(
+    SemanticModel model,
+    PropertyDeclarationSyntax declaration,
+    IPropertySymbol property,
+    IReadOnlyDictionary<INamedTypeSymbol, INamedTypeSymbol> peerOwners,
+    Dictionary<string, MutableSourceTypeSemantics> types)
+  {
+    if (!peerOwners.TryGetValue(property.ContainingType, out var ownerType) ||
+        AutomationProviderSemantic(property) is not
+        { } providerSemantic)
+    {
+      return;
+    }
+
+    var operation = PropertyValueOperation(model, declaration);
+    var value = EvaluateOperationValue(operation, property.Type);
+    GetOrCreate(types, ReflectionTypeName(ownerType)).AutomationMappings.Add(
+      new SourceAutomationMappingSemantics
+      {
+        Semantic = providerSemantic.Semantic,
+        Provider = providerSemantic.Provider,
+        Authority = "roslyn-automation-provider-interface",
+        TargetKind = "automation-peer-owner",
+        TargetExpression = "OnCreateAutomationPeer:this",
+        ValueKnown = value.Known,
+        Value = value.Value,
+        ValueExpression =
+          value.Known
+            ? null
+            : NormalizedExpression(operation) ??
+              declaration.NormalizeWhitespace().ToFullString(),
+        PublicDependencies = AutomationPublicDependencies(operation),
+        SourceMember =
+          $"{ReflectionTypeName(property.ContainingType)}.{property.Name}",
+      });
+  }
+
+  private static (string Semantic, string Provider)?
+    AutomationProviderSemantic(IPropertySymbol property)
+  {
+    foreach (var contract in property.ContainingType.AllInterfaces
+      .OrderBy(
+        item => item.ToDisplayString(
+          SymbolDisplayFormat.CSharpErrorMessageFormat),
+        StringComparer.Ordinal))
+    {
+      var contractName = contract.ToDisplayString(
+        SymbolDisplayFormat.CSharpErrorMessageFormat);
+      foreach (var contractProperty in contract.GetMembers()
+        .OfType<IPropertySymbol>()
+        .Where(member => member.Name == property.Name))
+      {
+        if (!SymbolEqualityComparer.Default.Equals(
+          property.ContainingType.FindImplementationForInterfaceMember(
+            contractProperty),
+          property))
+        {
+          continue;
+        }
+
+        var semantic = (contractName, contractProperty.Name) switch
+        {
+          ("Avalonia.Automation.Provider.IValueProvider", "Value") => "value",
+          ("Avalonia.Automation.Provider.IRangeValueProvider", "Value") => "value",
+          ("Avalonia.Automation.Provider.IValueProvider", "IsReadOnly") => "state",
+          ("Avalonia.Automation.Provider.IRangeValueProvider", "IsReadOnly") => "state",
+          ("Avalonia.Automation.Provider.ISelectionItemProvider", "IsSelected") => "state",
+          ("Avalonia.Automation.Provider.IExpandCollapseProvider", "ExpandCollapseState") => "state",
+          ("Avalonia.Automation.Provider.IToggleProvider", "ToggleState") => "state",
+          ("Avalonia.Automation.Provider.ISelectionProvider", "CanSelectMultiple") => "state",
+          ("Avalonia.Automation.Provider.ISelectionProvider", "IsSelectionRequired") => "state",
+          _ => null,
+        };
+        if (semantic is not null)
+        {
+          return (semantic, $"{contractName}.{contractProperty.Name}");
+        }
+      }
+    }
+    return null;
+  }
+
+  private static IOperation? PropertyValueOperation(
+    SemanticModel model,
+    PropertyDeclarationSyntax declaration)
+  {
+    if (declaration.ExpressionBody?.Expression is { } expression)
+    {
+      return model.GetOperation(expression);
+    }
+    var getter = declaration.AccessorList?.Accessors.FirstOrDefault(
+      accessor => accessor.IsKind(SyntaxKind.GetAccessorDeclaration));
+    if (getter?.ExpressionBody?.Expression is { } getterExpression)
+    {
+      return model.GetOperation(getterExpression);
+    }
+    var returnExpression = getter?.Body?.DescendantNodes()
+      .OfType<ReturnStatementSyntax>()
+      .Select(statement => statement.Expression)
+      .FirstOrDefault(expression => expression is not null);
+    return returnExpression is null ? null : model.GetOperation(returnExpression);
+  }
+
   private static bool IsCommandType(ITypeSymbol type) =>
     TypeName(type) == "System.Windows.Input.ICommand" ||
     type is INamedTypeSymbol named &&
@@ -515,6 +702,96 @@ internal sealed class SourceSemanticEvaluator
     }
   }
 
+  private static void IndexAutomationPropertyWrite(
+    SemanticModel model,
+    IInvocationOperation operation,
+    INamedTypeSymbol containingType,
+    IReadOnlyDictionary<INamedTypeSymbol, INamedTypeSymbol> peerOwners,
+    Dictionary<string, MutableSourceTypeSemantics> types)
+  {
+    if (operation.TargetMethod.ContainingType.ToDisplayString(
+          SymbolDisplayFormat.CSharpErrorMessageFormat) !=
+        "Avalonia.Automation.AutomationProperties")
+    {
+      return;
+    }
+
+    var semantic = operation.TargetMethod.Name switch
+    {
+      "SetControlTypeOverride" => "role",
+      "SetName" => "name",
+      "SetItemStatus" => "state",
+      "SetHelpText" => "help-text",
+      "SetAccessibilityView" => "accessibility-view",
+      "SetLiveSetting" => "live-setting",
+      _ => null,
+    };
+    if (semantic is null ||
+        AutomationOwner(containingType, peerOwners) is not { } ownerType)
+    {
+      return;
+    }
+
+    var target = operation.Arguments
+      .OrderBy(argument => argument.Parameter?.Ordinal ?? int.MaxValue)
+      .FirstOrDefault()?.Value;
+    var valueArgument = operation.Arguments
+      .OrderBy(argument => argument.Parameter?.Ordinal ?? int.MaxValue)
+      .Skip(1)
+      .FirstOrDefault();
+    if (target is null || valueArgument is null)
+    {
+      return;
+    }
+
+    var value = EvaluateOperationValue(
+      valueArgument.Value,
+      valueArgument.Parameter?.Type);
+    GetOrCreate(types, ReflectionTypeName(ownerType)).AutomationMappings.Add(
+      new SourceAutomationMappingSemantics
+      {
+        Semantic = semantic,
+        Provider = $"AutomationProperties.{operation.TargetMethod.Name}",
+        Authority = "roslyn-automation-attached-property-write",
+        TargetKind =
+          IsContainingInstance(target)
+            ? "public-control-this"
+            : peerOwners.ContainsKey(containingType)
+              ? "automation-peer-owned-element"
+              : "owned-element-expression",
+        TargetExpression = NormalizedExpression(target),
+        ValueKnown = value.Known,
+        Value = value.Value,
+        ValueExpression =
+          value.Known
+            ? null
+            : NormalizedExpression(valueArgument.Value),
+        PublicDependencies = AutomationPublicDependencies(valueArgument.Value),
+        SourceMember =
+          $"{ReflectionTypeName(containingType)}." +
+          $"{model.GetEnclosingSymbol(operation.Syntax.SpanStart)?.Name ?? "<unknown>"}",
+      });
+  }
+
+  private static INamedTypeSymbol? AutomationOwner(
+    INamedTypeSymbol containingType,
+    IReadOnlyDictionary<INamedTypeSymbol, INamedTypeSymbol> peerOwners)
+  {
+    if (peerOwners.TryGetValue(containingType, out var peerOwner))
+    {
+      return peerOwner;
+    }
+
+    for (var current = containingType; current is not null; current = current.ContainingType)
+    {
+      if (current.DeclaredAccessibility == Accessibility.Public)
+      {
+        return current;
+      }
+    }
+    return null;
+  }
+
   private static IArgumentOperation? Argument(
     IInvocationOperation operation,
     string name) =>
@@ -617,6 +894,11 @@ internal sealed class SourceSemanticEvaluator
         .OrderBy(name => name, StringComparer.Ordinal)
         .ToList();
 
+  private static List<string> AutomationPublicDependencies(IOperation? operation) =>
+    PublicDependencies(operation)
+      .Where(name => name.StartsWith("FsusUI.", StringComparison.Ordinal))
+      .ToList();
+
   private static IEnumerable<IOperation> Walk(IOperation operation)
   {
     yield return operation;
@@ -686,6 +968,17 @@ internal sealed class SourceSemanticEvaluator
       binding.ConditionExpression,
       binding.SourceMember,
       binding.Provider);
+
+  private static string AutomationMappingSortKey(
+    SourceAutomationMappingSemantics mapping) =>
+    string.Join(
+      "\0",
+      mapping.Semantic,
+      mapping.Provider,
+      mapping.TargetKind,
+      mapping.TargetExpression,
+      mapping.ValueKnown ? mapping.Value : mapping.ValueExpression,
+      mapping.SourceMember);
 
   private static string ReflectionTypeName(INamedTypeSymbol type)
   {
@@ -785,6 +1078,33 @@ internal sealed class SourceSemanticEvaluator
       : KnownConstant.Unknown;
   }
 
+  private static KnownConstant EvaluateOperationValue(
+    IOperation? operation,
+    ITypeSymbol? targetType)
+  {
+    while (operation is IConversionOperation conversion)
+    {
+      operation = conversion.Operand;
+    }
+    if (operation is null)
+    {
+      return KnownConstant.Unknown;
+    }
+
+    if (operation is IFieldReferenceOperation
+      {
+        Field.ContainingType.TypeKind: Microsoft.CodeAnalysis.TypeKind.Enum,
+      } field)
+    {
+      return new KnownConstant(true, field.Field.Name);
+    }
+    if (operation.ConstantValue is { HasValue: true } constant)
+    {
+      return EncodeConstant(constant.Value, targetType ?? operation.Type);
+    }
+    return KnownConstant.Unknown;
+  }
+
   private static KnownConstant EncodeConstant(object? value, ITypeSymbol? type)
   {
     if (value is null)
@@ -849,6 +1169,8 @@ internal sealed class SourceSemanticEvaluator
 
     public List<SourceStateBindingSemantics> ClassBindings { get; } = [];
 
+    public List<SourceAutomationMappingSemantics> AutomationMappings { get; } = [];
+
     public HashSet<string> ContentProperties { get; } =
       new(StringComparer.Ordinal);
   }
@@ -884,6 +1206,8 @@ internal sealed class SourceTypeSemantics
   public List<SourceStateBindingSemantics> PseudoClassBindings { get; init; } = [];
 
   public List<SourceStateBindingSemantics> ClassBindings { get; init; } = [];
+
+  public List<SourceAutomationMappingSemantics> AutomationMappings { get; init; } = [];
 
   public List<string> ContentProperties { get; init; } = [];
 }
@@ -941,6 +1265,29 @@ internal sealed class SourceStateBindingSemantics
   public string SourceMember { get; init; } = "";
 
   public string Provider { get; init; } = "";
+}
+
+internal sealed class SourceAutomationMappingSemantics
+{
+  public string Semantic { get; init; } = "";
+
+  public string Provider { get; init; } = "";
+
+  public string Authority { get; init; } = "";
+
+  public string TargetKind { get; init; } = "";
+
+  public string? TargetExpression { get; init; }
+
+  public bool ValueKnown { get; init; }
+
+  public object? Value { get; init; }
+
+  public string? ValueExpression { get; init; }
+
+  public List<string> PublicDependencies { get; init; } = [];
+
+  public string SourceMember { get; init; } = "";
 }
 
 internal sealed class SourcePropertySemantics

@@ -1,14 +1,14 @@
 {
   "packageId": "FsusUI.Avalonia.Themes",
-  "baselineVersion": "2.2.0",
+  "baselineVersion": "2.3.0",
   "source": {
-    "toolVersion": "FsusUI.Avalonia.ApiTool@1.6.0",
+    "toolVersion": "FsusUI.Avalonia.ApiTool@1.7.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "930d912d50ed01ec1509fd701682cc61dc929193aa4a9d62168066b306e2fc73",
-    "compilerOptionsHash": "b55601673826309cfdf18c9dd3bfde035372887aae11591b6fd5072b626ac188",
+    "inputTreeHash": "1c999cf76a733042bf77959d0ebeb75728a42ccdcb0b0d493b6954a9256f3bbe",
+    "compilerOptionsHash": "e354646dae1a711a933b0acd5350e730ad2c3d450fa0719cffa9902173cad7f9",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "5a9059277222aee5ab894e4fb49450ae43a10b78853af86bc1b74a054ccd0ca3"
+    "outputHash": "b28d3fa97096aaa0f03dc1877820b843e856a08a791bec50779582c017186dbc"
   },
   "semanticTypes": [
     {
@@ -195,6 +195,56 @@
           }
         ],
         "classNamesResolved": false
+      },
+      "automationContract": {
+        "observationAuthorities": [
+          "roslyn-automation-attached-property-write"
+        ],
+        "contractDeclared": false,
+        "runtimeTreeVerified": false,
+        "mappingComplete": false,
+        "observedSemantics": [
+          "name",
+          "role",
+          "state"
+        ],
+        "mappings": [
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "public-control-this",
+            "targetExpression": "this",
+            "valueKnown": false,
+            "valueExpression": "accessibleName",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusThemeModeToggle.SyncState"
+          },
+          {
+            "semantic": "role",
+            "provider": "AutomationProperties.SetControlTypeOverride",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "public-control-this",
+            "targetExpression": "this",
+            "valueKnown": true,
+            "value": "Group",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusThemeModeToggle.SyncState"
+          },
+          {
+            "semantic": "state",
+            "provider": "AutomationProperties.SetItemStatus",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "public-control-this",
+            "targetExpression": "this",
+            "valueKnown": false,
+            "valueExpression": "$\u0022{ModeName(currentMode)}, {VisibleLabels.Count.ToString(CultureInfo.InvariantCulture)} modes\u0022",
+            "publicDependencies": [
+              "FsusUI.Avalonia.Controls.FsusThemeModeToggle.VisibleLabels"
+            ],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusThemeModeToggle.SyncState"
+          }
+        ]
       },
       "events": [
         {

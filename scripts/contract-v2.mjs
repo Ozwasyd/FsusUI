@@ -1119,6 +1119,60 @@ const avaloniaStateContractRef = (type) => {
   }
 }
 
+const canonicalAutomationMapping = (mapping) => ({
+  semantic: mapping.semantic ?? null,
+  provider: mapping.provider ?? null,
+  authority: mapping.authority ?? null,
+  targetKind: mapping.targetKind ?? null,
+  targetExpression: mapping.targetExpression ?? null,
+  valueKnown: knownBoolean(mapping.valueKnown),
+  value: mapping.value ?? null,
+  valueExpression: mapping.valueExpression ?? null,
+  publicDependencies: [...(mapping.publicDependencies ?? [])].sort(),
+  sourceMember: mapping.sourceMember ?? null,
+})
+
+export const canonicalAvaloniaAutomationContract = (type) => {
+  const automation = type?.automationContract
+  if (!automation) return null
+  return {
+    observationAuthorities: [
+      ...(automation.observationAuthorities ?? []),
+    ].sort(),
+    contractDeclared: knownBoolean(automation.contractDeclared),
+    runtimeTreeVerified: knownBoolean(automation.runtimeTreeVerified),
+    mappingComplete: knownBoolean(automation.mappingComplete),
+    observedSemantics: [...(automation.observedSemantics ?? [])].sort(),
+    mappings: (automation.mappings ?? [])
+      .map(canonicalAutomationMapping)
+      .sort((first, second) =>
+        JSON.stringify(first).localeCompare(JSON.stringify(second)),
+      ),
+  }
+}
+
+export const avaloniaAutomationContractFingerprint = (type) => {
+  const automation = canonicalAvaloniaAutomationContract(type)
+  return automation ? sha256(JSON.stringify(automation)) : null
+}
+
+const avaloniaAutomationContractRef = (type) => {
+  const fingerprint = avaloniaAutomationContractFingerprint(type)
+  if (!fingerprint) return null
+  return {
+    baseline: AVALONIA_SEMANTIC_PATHS[type.packageId],
+    fingerprint,
+    contractDeclared: knownBoolean(type.automationContract.contractDeclared),
+    runtimeTreeVerified: knownBoolean(
+      type.automationContract.runtimeTreeVerified,
+    ),
+    mappingComplete: knownBoolean(type.automationContract.mappingComplete),
+    observedSemantics: [
+      ...(type.automationContract.observedSemantics ?? []),
+    ].sort(),
+  }
+}
+
 const findAvaloniaType = (componentName, typeIndex) => {
   const kebab = kebabName(componentName)
   for (const [fullName, type] of typeIndex) {
@@ -1863,6 +1917,9 @@ const contractForComponent = ({
   const stateContract = avaloniaType
     ? avaloniaStateContractRef(avaloniaType)
     : null
+  const automationContract = avaloniaType
+    ? avaloniaAutomationContractRef(avaloniaType)
+    : null
 
   const contract = {
     id: `component-v2.${contractKebab}`,
@@ -1887,6 +1944,7 @@ const contractForComponent = ({
             package: 'FsusUI.Avalonia',
             type: avaloniaType.name,
             ...(stateContract ? { stateContract } : {}),
+            ...(automationContract ? { automationContract } : {}),
           }
         : { status: 'unbound', package: null, type: null },
     },
@@ -2077,6 +2135,8 @@ const extractAvaloniaExtras = ({
 
 const avaloniaOnlyType = ({ type, packageId }) => {
   const stateContractFingerprint = avaloniaStateContractFingerprint(type)
+  const automationContractFingerprint =
+    avaloniaAutomationContractFingerprint(type)
   return {
     type: type.name,
     kind: type.kind,
@@ -2085,6 +2145,7 @@ const avaloniaOnlyType = ({ type, packageId }) => {
     memberCount: avaloniaPublicSurfaces(type).length,
     surfaceHash: avaloniaTypeSurfaceHash(type),
     ...(stateContractFingerprint ? { stateContractFingerprint } : {}),
+    ...(automationContractFingerprint ? { automationContractFingerprint } : {}),
     scenarioIds: [
       `scenario.v2.avalonia-only.${toKebab(type.name.split('.').pop() ?? type.name)}`,
     ],
@@ -2101,6 +2162,8 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
     if (!avaloniaType) continue
     const stateContractFingerprint =
       avaloniaStateContractFingerprint(avaloniaType)
+    const automationContractFingerprint =
+      avaloniaAutomationContractFingerprint(avaloniaType)
     map.push({
       vue: { name: component.name, module: component.module },
       avalonia: {
@@ -2108,6 +2171,9 @@ export const buildComponentMap = ({ vueBaseline, typeIndex }) => {
         packageId: avaloniaType.packageId,
         surfaceHash: avaloniaTypeSurfaceHash(avaloniaType),
         ...(stateContractFingerprint ? { stateContractFingerprint } : {}),
+        ...(automationContractFingerprint
+          ? { automationContractFingerprint }
+          : {}),
       },
       basis: 'name-equality',
     })
@@ -2189,7 +2255,7 @@ export const buildRegistry = ({
     owner: CONTRACT_V2_OWNER,
     generatedBy: {
       tool: 'scripts/contract-v2.mjs',
-      toolVersion: '1.4.0',
+      toolVersion: '1.5.0',
     },
     baselines: {
       web: {
@@ -2771,6 +2837,12 @@ export const validateAvaloniaSurfaceRegistration = ({
     ) {
       errors.push(`${context} has stale state contract fingerprint`)
     }
+    if (
+      (mapping.avalonia?.automationContractFingerprint ?? null) !==
+      avaloniaAutomationContractFingerprint(type)
+    ) {
+      errors.push(`${context} has stale automation contract fingerprint`)
+    }
     const contract = contracts.get(componentName)
     if (!contract) {
       errors.push(`${context} has no component contract`)
@@ -2781,6 +2853,15 @@ export const validateAvaloniaSurfaceRegistration = ({
       JSON.stringify(avaloniaStateContractRef(type))
     ) {
       errors.push(`${contract.id} has stale Avalonia state contract binding`)
+    }
+    if (
+      JSON.stringify(
+        contract.bindings?.avalonia?.automationContract ?? null,
+      ) !== JSON.stringify(avaloniaAutomationContractRef(type))
+    ) {
+      errors.push(
+        `${contract.id} has stale Avalonia automation contract binding`,
+      )
     }
 
     const surfaces = avaloniaPublicSurfaces(type)
@@ -2890,6 +2971,7 @@ export const validateAvaloniaSurfaceRegistration = ({
       'memberCount',
       'surfaceHash',
       'stateContractFingerprint',
+      'automationContractFingerprint',
     ]) {
       if ((entry[field] ?? null) !== (expected[field] ?? null)) {
         errors.push(`${context} has stale ${field}`)

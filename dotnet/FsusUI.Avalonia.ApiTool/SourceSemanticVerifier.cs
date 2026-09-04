@@ -67,6 +67,38 @@ internal static class SourceSemanticVerifier
       "FsusUI.Avalonia.Controls.FsusDropZone",
       "fsus-loading",
       "IsLoading");
+    AssertAutomationMapping(
+      current,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "role",
+      "AutomationProperties.SetControlTypeOverride",
+      valueKnown: true,
+      expectedValue: "Slider",
+      expectedExpression: null);
+    AssertAutomationMapping(
+      current,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "name",
+      "AutomationProperties.SetName",
+      valueKnown: false,
+      expectedValue: null,
+      expectedExpression: "AccessibleName");
+    AssertAutomationMapping(
+      current,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "value",
+      "Avalonia.Automation.Provider.IRangeValueProvider.Value",
+      valueKnown: false,
+      expectedValue: null,
+      expectedExpression: "owner.Value");
+    AssertAutomationMapping(
+      current,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "state",
+      "Avalonia.Automation.Provider.IRangeValueProvider.IsReadOnly",
+      valueKnown: false,
+      expectedValue: null,
+      expectedExpression: "!owner.CanInteract");
 
     var sliderSource = File.ReadAllText(Path.Combine(repoRoot, SliderSource));
     var changedLiteral = WithOverride(
@@ -122,6 +154,83 @@ internal static class SourceSemanticVerifier
     Assert(
       changedPseudoBinding.InputTreeHash != current.InputTreeHash,
       "pseudo-class binding mutation must change inputTreeHash");
+
+    var changedAutomationRole = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      SliderSource,
+      ReplaceFirst(
+        sliderSource,
+        "AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Slider);",
+        "AutomationProperties.SetControlTypeOverride(this, AutomationControlType.ProgressBar);"));
+    AssertAutomationMapping(
+      changedAutomationRole,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "role",
+      "AutomationProperties.SetControlTypeOverride",
+      valueKnown: true,
+      expectedValue: "ProgressBar",
+      expectedExpression: null);
+    Assert(
+      changedAutomationRole.InputTreeHash != current.InputTreeHash,
+      "automation role source mutation must change inputTreeHash");
+
+    var removedAutomationName = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      SliderSource,
+      ReplaceFirst(
+        sliderSource,
+        "AutomationProperties.SetName(\n      this,\n      string.IsNullOrWhiteSpace(AccessibleName) ? \"Slider\" : AccessibleName);",
+        "AutomationProperties.SetHelpText(\n      this,\n      string.IsNullOrWhiteSpace(AccessibleName) ? \"Slider\" : AccessibleName);"));
+    AssertNoAutomationMapping(
+      removedAutomationName,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "name",
+      "AutomationProperties.SetName");
+    Assert(
+      removedAutomationName.InputTreeHash != current.InputTreeHash,
+      "automation name deletion must change inputTreeHash");
+
+    var changedAutomationValue = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      SliderSource,
+      ReplaceFirst(
+        sliderSource,
+        "public double Value => owner.Value;",
+        "public double Value => owner.Max;"));
+    AssertAutomationMapping(
+      changedAutomationValue,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "value",
+      "Avalonia.Automation.Provider.IRangeValueProvider.Value",
+      valueKnown: false,
+      expectedValue: null,
+      expectedExpression: "owner.Max");
+    Assert(
+      changedAutomationValue.InputTreeHash != current.InputTreeHash,
+      "automation value source mutation must change inputTreeHash");
+
+    var changedAutomationState = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      SliderSource,
+      ReplaceFirst(
+        sliderSource,
+        "public bool IsReadOnly => !owner.CanInteract;",
+        "public bool IsReadOnly => owner.CanInteract;"));
+    AssertAutomationMapping(
+      changedAutomationState,
+      "FsusUI.Avalonia.Controls.FsusSlider",
+      "state",
+      "Avalonia.Automation.Provider.IRangeValueProvider.IsReadOnly",
+      valueKnown: false,
+      expectedValue: null,
+      expectedExpression: "owner.CanInteract");
+    Assert(
+      changedAutomationState.InputTreeHash != current.InputTreeHash,
+      "automation state source mutation must change inputTreeHash");
 
     var dropZoneSource = File.ReadAllText(
       Path.Combine(repoRoot, "dotnet/FsusUI.Avalonia/Controls/FsusDropZone.cs"));
@@ -266,7 +375,7 @@ internal static class SourceSemanticVerifier
       expected: null);
 
     Console.WriteLine(
-      "source-semantics verification passed: current literal/default/required/content/generic/command/state metadata and 11 real-source mutations");
+      "source-semantics verification passed: current literal/default/required/content/generic/command/state/automation metadata and 15 real-source mutations");
   }
 
   private static SourceSemanticIndex Extract(string repoRoot, string project) =>
@@ -388,6 +497,45 @@ internal static class SourceSemanticVerifier
       candidate.ConditionExpression == condition);
     Assert(binding.Kind.Length > 0, $"{typeName}.{className} class kind");
   }
+
+  private static void AssertAutomationMapping(
+    SourceSemanticIndex index,
+    string typeName,
+    string semantic,
+    string provider,
+    bool valueKnown,
+    object? expectedValue,
+    string? expectedExpression)
+  {
+    var mapping = Type(index, typeName).AutomationMappings.Single(candidate =>
+      candidate.Semantic == semantic &&
+      candidate.Provider == provider);
+    Assert(mapping.ValueKnown == valueKnown, $"{typeName}.{semantic} valueKnown");
+    Assert(
+      Equals(mapping.Value, expectedValue),
+      $"{typeName}.{semantic} automation value");
+    Assert(
+      expectedExpression is null
+        ? mapping.ValueExpression is null
+        : mapping.ValueExpression?.Contains(
+          expectedExpression,
+          StringComparison.Ordinal) == true,
+      $"{typeName}.{semantic} automation expression");
+    Assert(
+      mapping.Authority.StartsWith("roslyn-automation-", StringComparison.Ordinal),
+      $"{typeName}.{semantic} automation authority");
+  }
+
+  private static void AssertNoAutomationMapping(
+    SourceSemanticIndex index,
+    string typeName,
+    string semantic,
+    string provider) =>
+    Assert(
+      !Type(index, typeName).AutomationMappings.Any(candidate =>
+        candidate.Semantic == semantic &&
+        candidate.Provider == provider),
+      $"{typeName}.{semantic} automation mapping must be absent");
 
   private static SourceTypeSemantics Type(SourceSemanticIndex index, string typeName)
   {

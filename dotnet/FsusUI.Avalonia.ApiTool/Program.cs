@@ -87,10 +87,10 @@ internal static class Program
     return new SemanticBaseline
     {
       PackageId = packageId,
-      BaselineVersion = "2.2.0",
+      BaselineVersion = "2.3.0",
       Source = new BaselineSource
       {
-        ToolVersion = "FsusUI.Avalonia.ApiTool@1.6.0",
+        ToolVersion = "FsusUI.Avalonia.ApiTool@1.7.0",
         AssemblyVersion = version,
         InputTreeHash = sourceSemantics.InputTreeHash,
         CompilerOptionsHash = sourceSemantics.CompilerOptionsHash,
@@ -170,6 +170,7 @@ internal static class Program
       AvaloniaProperties = avaloniaProperties,
       Commands = commands.Count > 0 ? commands : null,
       StateContract = ExtractStateContract(sourceTypeSemantics),
+      AutomationContract = ExtractAutomationContract(sourceTypeSemantics),
       Events = events,
       Methods = ExtractMethods(type),
       EnumMembers = type.IsEnum ? ExtractEnumMembers(type) : null,
@@ -238,6 +239,48 @@ internal static class Program
       SourceMember = binding.SourceMember,
       Provider = binding.Provider,
     };
+
+  private static SemanticAutomationContract? ExtractAutomationContract(
+    SourceTypeSemantics? sourceSemantics)
+  {
+    if (sourceSemantics?.AutomationMappings.Count is not > 0)
+    {
+      return null;
+    }
+
+    var mappings = sourceSemantics.AutomationMappings
+      .Select(mapping => new SemanticAutomationMapping
+      {
+        Semantic = mapping.Semantic,
+        Provider = mapping.Provider,
+        Authority = mapping.Authority,
+        TargetKind = mapping.TargetKind,
+        TargetExpression = mapping.TargetExpression,
+        ValueKnown = mapping.ValueKnown,
+        Value = mapping.Value,
+        ValueExpression = mapping.ValueExpression,
+        PublicDependencies = mapping.PublicDependencies,
+        SourceMember = mapping.SourceMember,
+      })
+      .ToList();
+    return new SemanticAutomationContract
+    {
+      ObservationAuthorities = mappings
+        .Select(mapping => mapping.Authority)
+        .Distinct(StringComparer.Ordinal)
+        .OrderBy(authority => authority, StringComparer.Ordinal)
+        .ToList(),
+      ContractDeclared = false,
+      RuntimeTreeVerified = false,
+      MappingComplete = false,
+      ObservedSemantics = mappings
+        .Select(mapping => mapping.Semantic)
+        .Distinct(StringComparer.Ordinal)
+        .OrderBy(semantic => semantic, StringComparer.Ordinal)
+        .ToList(),
+      Mappings = mappings,
+    };
+  }
 
   private static string TypeKind(Type type)
   {
@@ -601,6 +644,8 @@ internal sealed class SemanticType
 
   public SemanticStateContract? StateContract { get; init; }
 
+  public SemanticAutomationContract? AutomationContract { get; init; }
+
   public List<SemanticEvent> Events { get; init; } = [];
 
   public List<SemanticMethod> Methods { get; init; } = [];
@@ -696,6 +741,44 @@ internal sealed class SemanticStateBinding
   public string SourceMember { get; init; } = "";
 
   public string Provider { get; init; } = "";
+}
+
+internal sealed class SemanticAutomationContract
+{
+  public List<string> ObservationAuthorities { get; init; } = [];
+
+  public bool ContractDeclared { get; init; }
+
+  public bool RuntimeTreeVerified { get; init; }
+
+  public bool MappingComplete { get; init; }
+
+  public List<string> ObservedSemantics { get; init; } = [];
+
+  public List<SemanticAutomationMapping> Mappings { get; init; } = [];
+}
+
+internal sealed class SemanticAutomationMapping
+{
+  public string Semantic { get; init; } = "";
+
+  public string Provider { get; init; } = "";
+
+  public string Authority { get; init; } = "";
+
+  public string TargetKind { get; init; } = "";
+
+  public string? TargetExpression { get; init; }
+
+  public bool ValueKnown { get; init; }
+
+  public object? Value { get; init; }
+
+  public string? ValueExpression { get; init; }
+
+  public List<string> PublicDependencies { get; init; } = [];
+
+  public string SourceMember { get; init; } = "";
 }
 
 internal sealed class SemanticContentRegion
