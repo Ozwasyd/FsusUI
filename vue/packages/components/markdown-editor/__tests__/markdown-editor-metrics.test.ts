@@ -67,6 +67,23 @@ describe('markdown editor locale-aware source metrics', () => {
     expect(incremental.codeUnitLength).toBe(next.length)
   })
 
+  it('bounds a middle edit in a 100k no-space CJK source', () => {
+    const source = '你'.repeat(100_000)
+    const session = createMarkdownEditorMetricsSession({ locale: 'zh-CN' })
+    session.calculate(source)
+    const next = `${source.slice(0, 50_000)}好${source.slice(50_000)}`
+    const incremental = session.calculate(next, {
+      change: { from: 50_000, insert: '好', to: 50_000 },
+    })
+    const full = calculateMarkdownEditorMetrics(next, { locale: 'zh-CN' })
+
+    expect(incremental.scannedCodeUnits).toBeLessThan(1_024)
+    expect({ ...incremental, scannedCodeUnits: 0 }).toEqual({
+      ...full,
+      scannedCodeUnits: 0,
+    })
+  })
+
   it('matches a full calculation across word, Unicode, newline, byte, and selection boundaries', () => {
     const options = { includeBytes: true, locale: 'en' }
     const session = createMarkdownEditorMetricsSession(options)
@@ -103,16 +120,24 @@ describe('markdown editor locale-aware source metrics', () => {
     expect(unchanged.caretLine).toBe(1)
   })
 
-  it('keeps the incremental branch free of a whole-source line rescan', () => {
+  it('keeps the incremental branch free of whole-source reconstruction or line rescans', () => {
     const implementation = readFileSync(
       'vue/packages/components/markdown-editor/src/markdown-editor-metrics.ts',
       'utf8',
     )
+    const incrementalStart = implementation.indexOf(
+      'const mode = segmenterMode(merged)',
+    )
     const incrementalBranch = implementation.slice(
-      implementation.indexOf('if (next === source)'),
-      implementation.indexOf('return metrics\n  }', implementation.indexOf('if (next === source)')),
+      incrementalStart,
+      implementation.indexOf(
+        'return metrics\n  }\n\n  return {',
+        incrementalStart,
+      ),
     )
     expect(incrementalBranch).not.toContain('lineStartsInRaw(next)')
+    expect(incrementalBranch).not.toContain('source.slice(0, change.from)')
+    expect(incrementalBranch).not.toContain('source.slice(change.to)')
     expect(incrementalBranch).toContain('updateLineStarts')
   })
 

@@ -95,18 +95,60 @@ const lineColumnAt = (starts: readonly number[], offset: number) => {
 
 const whitespaceCount = (value: string) => value.match(/\s/gu)?.length ?? 0
 
+const SEGMENT_CONTEXT_CODE_UNITS = 64
+
+const isHighSurrogate = (value: string | undefined) =>
+  value !== undefined && /[\uD800-\uDBFF]/u.test(value)
+
+const isLowSurrogate = (value: string | undefined) =>
+  value !== undefined && /[\uDC00-\uDFFF]/u.test(value)
+
 const segmentWindow = (
   source: string,
   from: number,
   to: number,
 ) => {
+  const lowerBound = Math.max(0, from - SEGMENT_CONTEXT_CODE_UNITS)
+  const upperBound = Math.min(source.length, to + SEGMENT_CONTEXT_CODE_UNITS)
   let start = from
-  while (start > 0 && !/\s/u.test(source[start - 1]!)) start -= 1
-  while (start > 0 && /\s/u.test(source[start - 1]!)) start -= 1
+  while (start > lowerBound && !/\s/u.test(source[start - 1]!)) start -= 1
+  while (start > lowerBound && /\s/u.test(source[start - 1]!)) start -= 1
   let end = to
-  while (end < source.length && !/\s/u.test(source[end]!)) end += 1
-  while (end < source.length && /\s/u.test(source[end]!)) end += 1
+  while (end < upperBound && !/\s/u.test(source[end]!)) end += 1
+  while (end < upperBound && /\s/u.test(source[end]!)) end += 1
+  if (isLowSurrogate(source[start]) && isHighSurrogate(source[start - 1])) {
+    start -= 1
+  }
+  if (isHighSurrogate(source[end - 1]) && isLowSurrogate(source[end])) {
+    end += 1
+  }
   return { start, end }
+}
+
+const isUsableIncrementalChange = (
+  source: string,
+  next: string,
+  change: MarkdownEditorMetricsChange,
+) => {
+  if (
+    !Number.isInteger(change.from) ||
+    !Number.isInteger(change.to) ||
+    change.from < 0 ||
+    change.to < change.from ||
+    change.to > source.length ||
+    next.length !==
+      source.length - (change.to - change.from) + change.insert.length ||
+    next.slice(change.from, change.from + change.insert.length) !==
+      change.insert
+  ) {
+    return false
+  }
+  const prefixMatches =
+    change.from === 0 || source[change.from - 1] === next[change.from - 1]
+  const suffixMatches =
+    change.to === source.length ||
+    source[change.to] === next[change.from + change.insert.length]
+  return prefixMatches && suffixMatches
 }
 
 const newlineEndsInRaw = (raw: string, base: number, source: string) => {
@@ -254,7 +296,7 @@ export const createMarkdownEditorMetricsSession = (
       !change ||
       source.length === 0 ||
       nextConfiguration !== configuration ||
-      next !== `${source.slice(0, change.from)}${change.insert}${source.slice(change.to)}`
+      !isUsableIncrementalChange(source, next, change)
     ) {
       source = next
       lineStarts = lineStartsInRaw(next)
@@ -264,7 +306,7 @@ export const createMarkdownEditorMetricsSession = (
       configuration = nextConfiguration
       return metrics
     }
-    if (next === source) {
+    if (change.from === change.to && change.insert.length === 0) {
       metrics = finish(next, merged, {
         graphemeCount: metrics.graphemeCount,
         wordCount: metrics.wordCount,
