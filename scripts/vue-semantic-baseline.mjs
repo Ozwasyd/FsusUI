@@ -4,6 +4,7 @@ import crypto from 'node:crypto'
 import babelParser from '@babel/parser'
 import { parse as parseSfc } from 'vue/compiler-sfc'
 import { extractStructuredEmitPayloads } from './vue-structured-emit-payload.mjs'
+import { extractStructuredExposedSignatures } from './vue-structured-exposed-signature.mjs'
 
 const { parse: babelParse } = babelParser
 
@@ -1186,6 +1187,7 @@ export const extractComponentSemantics = ({
   moduleSources,
   vueSource,
   structuredEmitNames = [],
+  structuredExposedNames = [],
 }) => {
   const resolver = new SemanticResolver(root, moduleSources)
   const vueRel = vueSource ? vueSource.relativePath : null
@@ -1407,6 +1409,28 @@ export const extractComponentSemantics = ({
   const propsSorted = uniqueBy(props)
   const emitsSorted = uniqueBy(emits)
   const exposedSorted = uniqueBy(exposed)
+  const requestedExposedNames = [...structuredExposedNames]
+  if (vueModule?.setup && requestedExposedNames.length > 0) {
+    const structured = extractStructuredExposedSignatures({
+      root,
+      sourceRelativePath: vueRel,
+      scriptContent: vueModule.setup,
+      memberNames: requestedExposedNames,
+    })
+    for (const member of exposedSorted) {
+      const resolved = structured.get(member.name)
+      if (!resolved) continue
+      member.signatureStatus = resolved.kind
+      member.signatureReason = resolved.reason ?? null
+      if (resolved.kind === 'callable') {
+        member.parameters = resolved.parameters
+        member.returnType = resolved.returnType
+      } else {
+        member.parameters = []
+        member.returnType = null
+      }
+    }
+  }
 
   return {
     semanticProps: propsSorted,
