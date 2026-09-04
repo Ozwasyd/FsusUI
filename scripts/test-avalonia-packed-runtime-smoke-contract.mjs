@@ -70,6 +70,12 @@ mutate(
 )
 mutate(
   runner,
+  (text) =>
+    text.replace('!fsusUiCandidatePackagePattern.test(entry.name)', 'true'),
+  'stale cached candidate accepted',
+)
+mutate(
+  runner,
   (text) => text.replace("smokeArguments('jit'", "smokeArguments('debug'"),
   'JIT mode omitted',
 )
@@ -109,5 +115,5 @@ mutate(
 )
 
 console.log(
-  'Avalonia packed runtime smoke mutations killed: missing candidate, candidate digest, JIT mode, trimmed publish, Markdown automation, runtime logs, external restore source, and display cleanup.',
+  'Avalonia packed runtime smoke mutations killed: missing candidate, candidate digest, stale cached candidate, JIT mode, trimmed publish, Markdown automation, runtime logs, external restore source, and display cleanup.',
 )

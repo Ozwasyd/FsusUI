@@ -42,6 +42,16 @@ requireMatch(
 )
 requireMatch(
   runner,
+  /includeCandidatePackages\s*\|\|\s*!fsusUiCandidatePackagePattern\.test\(entry\.name\)/u,
+  'packed runtime must exclude stale FsusUI candidates from the dependency cache',
+)
+requireMatch(
+  runner,
+  /seedLocalFeed\(path\.resolve\(candidateRoot\),\s*\{\s*includeCandidatePackages:\s*true\s*\}\)/u,
+  'packed runtime must seed the supplied candidate explicitly',
+)
+requireMatch(
+  runner,
   /'-p:PublishAot=false'[\s\S]*?'-p:PublishTrimmed=false'[\s\S]*?'-p:SelfContained=false'/u,
   'packed JIT mode must remain framework-dependent and non-AOT',
 )

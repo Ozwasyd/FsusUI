@@ -124,11 +124,22 @@ assert.equal(
   'candidate manifest digest mismatch',
 )
 
-const seedLocalFeed = (directory) => {
+const fsusUiCandidatePackagePattern =
+  /^fsusui\.avalonia(?:\.themes|\.icons)?\..*\.nupkg$/iu
+const seedLocalFeed = (
+  directory,
+  { includeCandidatePackages = false } = {},
+) => {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const candidate = path.join(directory, entry.name)
-    if (entry.isDirectory()) seedLocalFeed(candidate)
-    else if (entry.isFile() && entry.name.endsWith('.nupkg')) {
+    if (entry.isDirectory())
+      seedLocalFeed(candidate, { includeCandidatePackages })
+    else if (
+      entry.isFile() &&
+      entry.name.endsWith('.nupkg') &&
+      (includeCandidatePackages ||
+        !fsusUiCandidatePackagePattern.test(entry.name))
+    ) {
       copyFileSync(candidate, path.join(feed, entry.name))
     }
   }
@@ -142,7 +153,7 @@ const globalPackages = realpathSync(
   globalPackagesOutput.slice(globalPackagesOutput.indexOf(':') + 1).trim(),
 )
 seedLocalFeed(globalPackages)
-seedLocalFeed(path.resolve(candidateRoot))
+seedLocalFeed(path.resolve(candidateRoot), { includeCandidatePackages: true })
 
 const candidatePackages = readdirSync(feed)
   .filter(

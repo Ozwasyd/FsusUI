@@ -60,13 +60,20 @@ mutate(
 )
 mutate(
   'scripts/test-avalonia-aot-smoke.mjs',
-  (text) => text.replace(/'publish',\s*consumerProject/u, "'run', consumerProject"),
+  (text) =>
+    text.replace(/'publish',\s*consumerProject/u, "'run', consumerProject"),
   'JIT run',
 )
 mutate(
   'scripts/test-avalonia-aot-smoke.mjs',
   (text) => text.replace("'--runtime-mode',\n  'nativeaot',", ''),
   'missing NativeAOT runtime mode',
+)
+mutate(
+  'scripts/test-avalonia-aot-smoke.mjs',
+  (text) =>
+    text.replace('!fsusUiCandidatePackagePattern.test(entry.name)', 'true'),
+  'stale cached candidate accepted',
 )
 mutate(
   'tests/fixtures/avalonia-aot-smoke/NuGet.Config',
@@ -79,12 +86,20 @@ mutate(
 )
 mutate(
   project,
-  (text) => text.replace('<SelfContained>true</SelfContained>', '<SelfContained>false</SelfContained>'),
+  (text) =>
+    text.replace(
+      '<SelfContained>true</SelfContained>',
+      '<SelfContained>false</SelfContained>',
+    ),
   'runtime dependency',
 )
 mutate(
   project,
-  (text) => text.replace('<InvariantGlobalization>false</InvariantGlobalization>', '<InvariantGlobalization>true</InvariantGlobalization>'),
+  (text) =>
+    text.replace(
+      '<InvariantGlobalization>false</InvariantGlobalization>',
+      '<InvariantGlobalization>true</InvariantGlobalization>',
+    ),
   'invariant globalization',
 )
 
@@ -109,18 +124,20 @@ mutate(
 )
 mutate(
   'scripts/test-avalonia-aot-smoke.mjs',
-  (text) => text.replace(
-    "await stopSpawnedChild(xvfb, 'Xvfb')",
-    "xvfb?.kill('SIGTERM')",
-  ),
+  (text) =>
+    text.replace(
+      "await stopSpawnedChild(xvfb, 'Xvfb')",
+      "xvfb?.kill('SIGTERM')",
+    ),
   'unawaited Xvfb cleanup',
 )
 mutate(
   'scripts/test-avalonia-aot-smoke.mjs',
-  (text) => text.replace(
-    "await stopProcessId(sessionBusPid, 'isolated desktop session bus')",
-    "process.kill(sessionBusPid, 'SIGTERM')",
-  ),
+  (text) =>
+    text.replace(
+      "await stopProcessId(sessionBusPid, 'isolated desktop session bus')",
+      "process.kill(sessionBusPid, 'SIGTERM')",
+    ),
   'unawaited session-bus cleanup',
 )
 mutate(
@@ -130,5 +147,5 @@ mutate(
 )
 
 console.log(
-  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, missing NativeAOT runtime mode, external network, runtime dependency, invariant globalization, unread Xvfb output, child timeout, unbounded negative control, unawaited cleanup, and zombie process polling.',
+  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, missing NativeAOT runtime mode, stale cached candidate, external network, runtime dependency, invariant globalization, unread Xvfb output, child timeout, unbounded negative control, unawaited cleanup, and zombie process polling.',
 )
