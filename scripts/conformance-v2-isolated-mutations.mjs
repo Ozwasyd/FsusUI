@@ -86,6 +86,18 @@ const cases = [
     expected: 'Vue public props drift',
   },
   {
+    id: 'root-command-vue-baseline-drift',
+    file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+        '  documentIdentity: {\n    type: definePropType<MarkdownEditorDocumentIdentity>(Object),\n    default: undefined,\n  },\n',
+        '',
+      ),
+    command: ['pnpm', ['run', 'conformance:v2']],
+    expected: '[conformance-v2] FAIL baseline:web exit=1',
+  },
+  {
     id: 'vue-event-modified',
     file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
     inject: () =>
@@ -150,6 +162,19 @@ const cases = [
             ? 'CS1003'
             : 'baseline',
   })),
+  {
+    id: 'root-command-avalonia-baseline-drift',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusMarkdownEditor.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusMarkdownEditor.cs',
+        'public partial class FsusMarkdownEditor : TemplatedControl\n{',
+        'public partial class FsusMarkdownEditor : TemplatedControl\n{\n  public string RootCommandMutationMember { get; set; } = string.Empty;',
+      ),
+    command: ['pnpm', ['run', 'conformance:v2']],
+    prepare: prepareAvaloniaSemanticCheck,
+    expected: '[conformance-v2] FAIL baseline:avalonia exit=1',
+  },
   ...[
     ['runner-skips-click', 'pointer'],
     ['runner-skips-keyboard', 'keyboard'],

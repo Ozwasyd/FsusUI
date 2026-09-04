@@ -34,11 +34,21 @@ explicit or when semantic drift is hidden.
 pnpm run contract-v2:generate   # rebuild spec/components/contracts/v2/contract-v2.json
 pnpm run contract-v2:check      # fail on drift from the committed registry
 pnpm run test:contract-v2       # mutation fixture suite
+pnpm run conformance:v2         # baseline through real execution and readiness
 pnpm run conformance:contracts  # v1 + v2 + mutation tests + doc gates
 ```
 
 The registry records SHA-256 hashes of every baseline it consumes, so any
 baseline change without regeneration fails `contract-v2:check`.
+
+The unified `conformance:v2` command reports a stable stage name driven by each
+subprocess exit code. It checks the compiler-derived Web baseline, the
+Roslyn-derived Avalonia semantic baseline, Contract V2 mapping and coverage
+before building or launching either runtime. It then executes the real Web and
+Avalonia scenarios and runs differential comparison, alignment derivation,
+stable readiness, and negative mutations. A public API mutation therefore
+stops at `baseline:web` or `baseline:avalonia` instead of reaching runtime with
+stale evidence.
 
 ## Member mapping
 
