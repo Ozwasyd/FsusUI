@@ -169,6 +169,98 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
   assert.match(errors, /duplicates semantic id document/)
 })
 
+test('real operation signatures are retained and fail closed when not comparable', () => {
+  const registry = buildRegistry({
+    vueBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+  const markdownEditor = registry.contracts.find(
+    (contract) => contract.component.name === 'ElMarkdownEditor',
+  )
+  const navigate = markdownEditor.operations.find(
+    (operation) => operation.semantic === 'search-navigate',
+  )
+
+  assert.deepEqual(navigate.web.signature.parameters, [
+    {
+      name: 'direction',
+      type: "'next' | 'previous'",
+      optional: false,
+      rest: false,
+    },
+  ])
+  assert.equal(navigate.avalonia.signature.parameters.length, 1)
+  assert.equal(navigate.status, 'partial')
+  assert.match(navigate.drift.operationSignature, /web return type unavailable/)
+  assert.match(
+    navigate.drift.operationSignature,
+    /parameter 1 type not comparable/,
+  )
+})
+
+test('real baseline mutations expose operation parameter drift', () => {
+  const buildWithMutation = (methodName, mutate) => {
+    const avaloniaBaseline = clone(avaloniaBaselines.avalonia)
+    const markdownEditor = avaloniaBaseline.semanticTypes.find(
+      (type) => type.name === 'FsusUI.Avalonia.Controls.FsusMarkdownEditor',
+    )
+    const method = markdownEditor.methods.find(
+      (candidate) => candidate.name === methodName,
+    )
+    mutate(method)
+    return buildRegistry({
+      vueBaseline,
+      avaloniaBaseline,
+      avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+      avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+      semanticMemberBindings,
+      gate,
+    }).contracts.find(
+      (contract) => contract.component.name === 'ElMarkdownEditor',
+    )
+  }
+
+  const countDrift = buildWithMutation('NavigateSearch', (method) => {
+    method.parameters.push({
+      name: 'wrap',
+      type: 'System.Boolean',
+      optional: true,
+    })
+  }).operations.find((operation) => operation.semantic === 'search-navigate')
+  assert.match(
+    countDrift.drift.operationSignature,
+    /parameter count mismatch: web 1 vs avalonia 2/,
+  )
+
+  const optionalityDrift = buildWithMutation('NavigateSearch', (method) => {
+    method.parameters[0].optional = true
+  }).operations.find((operation) => operation.semantic === 'search-navigate')
+  assert.match(
+    optionalityDrift.drift.operationSignature,
+    /parameter 1 optionality mismatch: web false vs avalonia true/,
+  )
+
+  const orderDrift = buildWithMutation('RevealHeading', (method) => {
+    method.parameters.reverse()
+  }).operations.find((operation) => operation.semantic === 'reveal-heading')
+  assert.match(
+    orderDrift.drift.operationSignature,
+    /parameter 1 type mismatch: web string vs avalonia number/,
+  )
+
+  const typeDrift = buildWithMutation('RevealHeading', (method) => {
+    method.parameters[0].type = 'System.Boolean'
+  }).operations.find((operation) => operation.semantic === 'reveal-heading')
+  assert.match(
+    typeDrift.drift.operationSignature,
+    /parameter 1 type mismatch: web string vs avalonia boolean/,
+  )
+})
+
 for (const mutation of mutations) {
   test(`mutation fixture kills ${mutation.name}`, () => {
     const mutated = applyMutation(validRegistry, mutation)

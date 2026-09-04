@@ -3017,7 +3017,24 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "focusStartInput",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                },
+                {
+                  "name": "isIgnoreFocusEvent",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -3044,7 +3061,18 @@
           "kind": "operation",
           "web": {
             "member": "handleBlurInput",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": "FocusEvent",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -3071,7 +3099,11 @@
           "kind": "operation",
           "web": {
             "member": "handleClose",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -3098,7 +3130,18 @@
           "kind": "operation",
           "web": {
             "member": "handleFocusInput",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": "FocusEvent",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -3125,7 +3168,11 @@
           "kind": "operation",
           "web": {
             "member": "handleOpen",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -3152,7 +3199,24 @@
           "kind": "operation",
           "web": {
             "member": "onPick",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": "any",
+                  "optional": true,
+                  "rest": false
+                },
+                {
+                  "name": "visible",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -4188,7 +4252,11 @@
           "kind": "operation",
           "web": {
             "member": "update",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "web-only",
@@ -4215,7 +4283,11 @@
           "kind": "operation",
           "web": {
             "member": "updateRoot",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "web-only",
@@ -6217,7 +6289,11 @@
           "kind": "operation",
           "web": {
             "member": "activated",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6244,7 +6320,11 @@
           "kind": "operation",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6271,7 +6351,11 @@
           "kind": "operation",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6298,7 +6382,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6325,7 +6413,11 @@
           "kind": "operation",
           "web": {
             "member": "handleKeyEnter",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6352,7 +6444,18 @@
           "kind": "operation",
           "web": {
             "member": "handleSelect",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": "any",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6379,7 +6482,18 @@
           "kind": "operation",
           "web": {
             "member": "highlight",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": "number",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6406,7 +6520,11 @@
           "kind": "operation",
           "web": {
             "member": "highlightedIndex",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6433,7 +6551,11 @@
           "kind": "operation",
           "web": {
             "member": "inputRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6460,7 +6582,11 @@
           "kind": "operation",
           "web": {
             "member": "loading",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6487,7 +6613,11 @@
           "kind": "operation",
           "web": {
             "member": "popperRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -6514,7 +6644,11 @@
           "kind": "operation",
           "web": {
             "member": "suggestions",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -8499,7 +8633,11 @@
           "kind": "operation",
           "web": {
             "member": "content",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -10176,7 +10314,11 @@
           "kind": "operation",
           "web": {
             "member": "disabled",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -10203,7 +10345,11 @@
           "kind": "operation",
           "web": {
             "member": "ref",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -10230,7 +10376,11 @@
           "kind": "operation",
           "web": {
             "member": "shouldAddSpace",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -10257,7 +10407,11 @@
           "kind": "operation",
           "web": {
             "member": "size",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -10284,7 +10438,11 @@
           "kind": "operation",
           "web": {
             "member": "type",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -11033,7 +11191,7 @@
         "name": "ElCalendar",
         "module": "calendar",
         "classification": "native-adapter",
-        "exportStatus": "missing"
+        "exportStatus": "partial"
       },
       "bindings": {
         "web": {
@@ -11190,7 +11348,11 @@
           "kind": "operation",
           "web": {
             "member": "calculateValidatedDateRange",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -11217,7 +11379,18 @@
           "kind": "operation",
           "web": {
             "member": "pickDay",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "day",
+                  "type": "Dayjs",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -11244,7 +11417,18 @@
           "kind": "operation",
           "web": {
             "member": "selectDate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "type",
+                  "type": "CalendarDateType",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": {
             "member": "SelectDate",
@@ -11259,26 +11443,35 @@
               ]
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable; parameter 1 type not comparable: web unknown vs avalonia DateOnly",
             "enumValues": null
           },
           "scenarioIds": [
             "scenario.v2.el-calendar.operation.select-date"
           ],
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "selectedDay",
           "kind": "operation",
           "web": {
             "member": "selectedDay",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -11483,6 +11676,17 @@
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "selectDate",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -11753,8 +11957,8 @@
       ],
       "coverage": {
         "total": 11,
-        "alignedCandidate": 1,
-        "partial": 0,
+        "alignedCandidate": 0,
+        "partial": 1,
         "missing": 10,
         "webOnly": 0,
         "mappedPercent": 9.1
@@ -12309,7 +12513,7 @@
         "name": "ElCarousel",
         "module": "carousel",
         "classification": "native-adapter",
-        "exportStatus": "missing"
+        "exportStatus": "partial"
       },
       "bindings": {
         "web": {
@@ -12811,7 +13015,11 @@
           "kind": "operation",
           "web": {
             "member": "next",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": {
             "member": "Next",
@@ -12820,26 +13028,35 @@
               "parameters": []
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable",
             "enumValues": null
           },
           "scenarioIds": [
             "scenario.v2.el-carousel.operation.next"
           ],
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "prev",
           "kind": "operation",
           "web": {
             "member": "prev",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -12866,7 +13083,11 @@
           "kind": "operation",
           "web": {
             "member": "setActiveItem",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -13074,6 +13295,17 @@
           }
         },
         {
+          "member": "next",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "prev",
           "kind": "operation",
           "status": "missing",
@@ -13228,8 +13460,8 @@
       ],
       "coverage": {
         "total": 16,
-        "alignedCandidate": 2,
-        "partial": 0,
+        "alignedCandidate": 1,
+        "partial": 1,
         "missing": 14,
         "webOnly": 0,
         "mappedPercent": 12.5
@@ -14339,7 +14571,11 @@
           "kind": "operation",
           "web": {
             "member": "cascaderPanelRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -14366,7 +14602,11 @@
           "kind": "operation",
           "web": {
             "member": "contentRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -14393,7 +14633,18 @@
           "kind": "operation",
           "web": {
             "member": "getCheckedNodes",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "leafOnly",
+                  "type": "boolean",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -14420,7 +14671,18 @@
           "kind": "operation",
           "web": {
             "member": "togglePopperVisible",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "visible",
+                  "type": "boolean",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -19274,7 +19536,11 @@
           "kind": "operation",
           "web": {
             "member": "activeNames",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -19301,7 +19567,11 @@
           "kind": "operation",
           "web": {
             "member": "setActiveNames",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -19668,7 +19938,11 @@
           "kind": "operation",
           "web": {
             "member": "isActive",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -21618,7 +21892,11 @@
           "kind": "operation",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -21645,7 +21923,11 @@
           "kind": "operation",
           "web": {
             "member": "color",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -21672,7 +21954,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -21699,7 +21985,11 @@
           "kind": "operation",
           "web": {
             "member": "hide",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -21726,7 +22016,11 @@
           "kind": "operation",
           "web": {
             "member": "show",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -24660,7 +24954,11 @@
           "kind": "operation",
           "web": {
             "member": "displayValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -26482,7 +26780,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -30340,7 +30642,11 @@
           "kind": "operation",
           "web": {
             "member": "dialogContentRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -30367,7 +30673,11 @@
           "kind": "operation",
           "web": {
             "member": "visible",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -35392,7 +35702,18 @@
           "kind": "operation",
           "web": {
             "member": "clearValidate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "props",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -35419,7 +35740,18 @@
           "kind": "operation",
           "web": {
             "member": "resetFields",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "properties",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": {
             "member": "ResetFields",
@@ -35434,26 +35766,42 @@
               ]
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable; parameter 1 type not comparable: web unknown vs avalonia array",
             "enumValues": null
           },
           "scenarioIds": [
             "scenario.v2.el-form.operation.reset-fields"
           ],
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "scrollToField",
           "kind": "operation",
           "web": {
             "member": "scrollToField",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "prop",
+                  "type": "FormItemProp",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -35480,7 +35828,18 @@
           "kind": "operation",
           "web": {
             "member": "validate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": "FormValidationResult",
+              "parameters": [
+                {
+                  "name": "callback",
+                  "type": "FormValidateCallback",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -35507,7 +35866,24 @@
           "kind": "operation",
           "web": {
             "member": "validateField",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "modelProps",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                },
+                {
+                  "name": "callback",
+                  "type": null,
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -35759,6 +36135,17 @@
           }
         },
         {
+          "member": "resetFields",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "scrollToField",
           "kind": "operation",
           "status": "missing",
@@ -35955,8 +36342,8 @@
       ],
       "coverage": {
         "total": 21,
-        "alignedCandidate": 2,
-        "partial": 1,
+        "alignedCandidate": 1,
+        "partial": 2,
         "missing": 18,
         "webOnly": 0,
         "mappedPercent": 14.3
@@ -36443,7 +36830,11 @@
           "kind": "operation",
           "web": {
             "member": "clearValidate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -36470,7 +36861,11 @@
           "kind": "operation",
           "web": {
             "member": "resetField",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": {
             "member": "ResetField",
@@ -36479,26 +36874,35 @@
               "parameters": []
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable",
             "enumValues": null
           },
           "scenarioIds": [
             "scenario.v2.el-form-item.operation.reset-field"
           ],
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "size",
           "kind": "operation",
           "web": {
             "member": "size",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -36525,7 +36929,24 @@
           "kind": "operation",
           "web": {
             "member": "validate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "trigger",
+                  "type": null,
+                  "optional": false,
+                  "rest": false
+                },
+                {
+                  "name": "callback",
+                  "type": null,
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -36552,7 +36973,11 @@
           "kind": "operation",
           "web": {
             "member": "validateMessage",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -36579,7 +37004,11 @@
           "kind": "operation",
           "web": {
             "member": "validateState",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -36826,6 +37255,17 @@
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "resetField",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -37124,8 +37564,8 @@
       ],
       "coverage": {
         "total": 20,
-        "alignedCandidate": 3,
-        "partial": 3,
+        "alignedCandidate": 2,
+        "partial": 4,
         "missing": 14,
         "webOnly": 0,
         "mappedPercent": 30
@@ -40100,7 +40540,18 @@
           "kind": "operation",
           "web": {
             "member": "setActiveItem",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": "number",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -42921,7 +43372,11 @@
           "kind": "operation",
           "web": {
             "member": "autosize",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -42948,7 +43403,11 @@
           "kind": "operation",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -42975,7 +43434,11 @@
           "kind": "operation",
           "web": {
             "member": "clear",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -43002,7 +43465,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -43029,7 +43496,11 @@
           "kind": "operation",
           "web": {
             "member": "input",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -43056,7 +43527,11 @@
           "kind": "operation",
           "web": {
             "member": "ref",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -43083,7 +43558,11 @@
           "kind": "operation",
           "web": {
             "member": "resizeTextarea",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -43110,7 +43589,11 @@
           "kind": "operation",
           "web": {
             "member": "select",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -43137,7 +43620,11 @@
           "kind": "operation",
           "web": {
             "member": "textarea",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -43164,7 +43651,11 @@
           "kind": "operation",
           "web": {
             "member": "textareaStyle",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -44990,7 +45481,11 @@
           "kind": "operation",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -45017,7 +45512,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -49926,7 +50425,18 @@
           "kind": "operation",
           "web": {
             "member": "applyAttachmentResult",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "result",
+                  "type": "MarkdownAttachmentProviderResult",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -49953,7 +50463,11 @@
           "kind": "operation",
           "web": {
             "member": "closeCommandPalette",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -49980,7 +50494,11 @@
           "kind": "operation",
           "web": {
             "member": "closeSearch",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -50007,7 +50525,18 @@
           "kind": "operation",
           "web": {
             "member": "dispatchTransaction",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "transaction",
+                  "type": "MarkdownEditorTransaction",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": {
             "member": "DispatchTransaction",
@@ -50022,13 +50551,13 @@
               ]
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable; parameter 1 type not comparable: web unknown vs avalonia FsusMarkdownEditorTransaction",
             "enumValues": null
           },
           "scenarioIds": [
@@ -50036,14 +50565,36 @@
           ],
           "semantic": "dispatch-transaction",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "insertMarkdownAtCursor",
           "kind": "operation",
           "web": {
             "member": "insertMarkdownAtCursor",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "markdown",
+                  "type": "string",
+                  "optional": false,
+                  "rest": false
+                },
+                {
+                  "name": "options",
+                  "type": "MarkdownEditorInsertOptions",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -50070,7 +50621,11 @@
           "kind": "operation",
           "web": {
             "member": "openCommandPalette",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -50097,7 +50652,18 @@
           "kind": "operation",
           "web": {
             "member": "openSearch",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "replace",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -50124,7 +50690,11 @@
           "kind": "operation",
           "web": {
             "member": "redo",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": {
             "member": "Redo",
@@ -50133,13 +50703,13 @@
               "parameters": []
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable",
             "enumValues": null
           },
           "scenarioIds": [
@@ -50147,14 +50717,36 @@
           ],
           "semantic": "redo",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "revealHeading",
           "kind": "operation",
           "web": {
             "member": "revealHeading",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "nodeId",
+                  "type": "string",
+                  "optional": false,
+                  "rest": false
+                },
+                {
+                  "name": "options",
+                  "type": "Parameters<typeof revealHeadingOutline>[4]",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": {
             "member": "RevealHeading",
@@ -50179,13 +50771,13 @@
               ]
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable; parameter count mismatch: web 2 vs avalonia 3; parameter 2 optionality mismatch: web true vs avalonia false; parameter 2 type not comparable: web unknown vs avalonia FsusMarkdownDocumentIdentity",
             "enumValues": null
           },
           "scenarioIds": [
@@ -50193,14 +50785,36 @@
           ],
           "semantic": "reveal-heading",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "revealSourceRange",
           "kind": "operation",
           "web": {
             "member": "revealSourceRange",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "range",
+                  "type": "{ start: number; end: number }",
+                  "optional": false,
+                  "rest": false
+                },
+                {
+                  "name": "options",
+                  "type": "Parameters<typeof revealSourceRangeOutline>[2]",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": {
             "member": "RevealSourceRange",
@@ -50230,13 +50844,13 @@
               ]
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable; parameter count mismatch: web 2 vs avalonia 4; parameter 1 type not comparable: web unknown vs avalonia FsusMarkdownSourceRange; parameter 2 optionality mismatch: web true vs avalonia false; parameter 2 type not comparable: web unknown vs avalonia FsusMarkdownDocumentIdentity",
             "enumValues": null
           },
           "scenarioIds": [
@@ -50244,14 +50858,30 @@
           ],
           "semantic": "reveal-source-range",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "searchNavigate",
           "kind": "operation",
           "web": {
             "member": "searchNavigate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "direction",
+                  "type": "'next' | 'previous'",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": {
             "member": "NavigateSearch",
@@ -50266,13 +50896,13 @@
               ]
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable; parameter 1 type not comparable: web unknown|unknown vs avalonia FsusMarkdownSearchDirection",
             "enumValues": null
           },
           "scenarioIds": [
@@ -50280,14 +50910,23 @@
           ],
           "semantic": "search-navigate",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "searchReplaceAll",
           "kind": "operation",
           "web": {
             "member": "searchReplaceAll",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -50314,7 +50953,11 @@
           "kind": "operation",
           "web": {
             "member": "searchReplaceCurrent",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -50341,7 +50984,11 @@
           "kind": "operation",
           "web": {
             "member": "searchUi",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -50368,7 +51015,11 @@
           "kind": "operation",
           "web": {
             "member": "undo",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": {
             "member": "Undo",
@@ -50377,13 +51028,13 @@
               "parameters": []
             }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
             "eventPayload": null,
-            "operationSignature": null,
+            "operationSignature": "web return type unavailable",
             "enumValues": null
           },
           "scenarioIds": [
@@ -50391,14 +51042,23 @@
           ],
           "semantic": "undo",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "writingAidsController",
           "kind": "operation",
           "web": {
             "member": "writingAidsController",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -51142,6 +51802,17 @@
           }
         },
         {
+          "member": "dispatchTransaction",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "insertMarkdownAtCursor",
           "kind": "operation",
           "status": "missing",
@@ -51175,6 +51846,50 @@
           }
         },
         {
+          "member": "redo",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "revealHeading",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "revealSourceRange",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "searchNavigate",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "searchReplaceAll",
           "kind": "operation",
           "status": "missing",
@@ -51202,6 +51917,17 @@
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "undo",
+          "kind": "operation",
+          "status": "partial",
+          "governance": {
+            "reason": "Real operation exists on both sides but the signature is not comparable or drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -51847,8 +52573,8 @@
       ],
       "coverage": {
         "total": 74,
-        "alignedCandidate": 10,
-        "partial": 7,
+        "alignedCandidate": 4,
+        "partial": 13,
         "missing": 57,
         "webOnly": 0,
         "mappedPercent": 23
@@ -52385,7 +53111,11 @@
           "kind": "operation",
           "web": {
             "member": "rootEl",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -53971,7 +54701,11 @@
           "kind": "operation",
           "web": {
             "member": "bottom",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -53998,7 +54732,11 @@
           "kind": "operation",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -54025,7 +54763,11 @@
           "kind": "operation",
           "web": {
             "member": "visible",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -58068,7 +58810,11 @@
           "kind": "operation",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -58095,7 +58841,11 @@
           "kind": "operation",
           "web": {
             "member": "visible",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -63590,7 +64340,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -63617,7 +64371,11 @@
           "kind": "operation",
           "web": {
             "member": "inputRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -63644,7 +64402,11 @@
           "kind": "operation",
           "web": {
             "member": "reset",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -66280,7 +67042,11 @@
           "kind": "operation",
           "web": {
             "member": "hide",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -66307,7 +67073,11 @@
           "kind": "operation",
           "web": {
             "member": "popperRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -67843,7 +68613,11 @@
           "kind": "operation",
           "web": {
             "member": "hide",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -67870,7 +68644,11 @@
           "kind": "operation",
           "web": {
             "member": "popperRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -68614,7 +69392,11 @@
           "kind": "operation",
           "web": {
             "member": "arrowRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "web-only",
@@ -68761,7 +69543,11 @@
           "kind": "operation",
           "web": {
             "member": "arrowRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "web-only",
@@ -68908,7 +69694,11 @@
           "kind": "operation",
           "web": {
             "member": "arrowRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "web-only",
@@ -74481,7 +75271,11 @@
           "kind": "operation",
           "web": {
             "member": "resetCurrentValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -74508,7 +75302,24 @@
           "kind": "operation",
           "web": {
             "member": "setCurrentValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": "number",
+                  "optional": false,
+                  "rest": false
+                },
+                {
+                  "name": "event",
+                  "type": "MouseEvent",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -78584,7 +79395,11 @@
           "kind": "operation",
           "web": {
             "member": "handleScroll",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -78611,7 +79426,24 @@
           "kind": "operation",
           "web": {
             "member": "scrollTo",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "arg1",
+                  "type": "number | ScrollToOptions",
+                  "optional": false,
+                  "rest": false
+                },
+                {
+                  "name": "arg2",
+                  "type": "number",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -78638,7 +79470,18 @@
           "kind": "operation",
           "web": {
             "member": "setScrollLeft",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": "number",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -78665,7 +79508,18 @@
           "kind": "operation",
           "web": {
             "member": "setScrollTop",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": "number",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -78692,7 +79546,11 @@
           "kind": "operation",
           "web": {
             "member": "update",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -78719,7 +79577,11 @@
           "kind": "operation",
           "web": {
             "member": "wrapRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -85623,7 +86485,11 @@
           "kind": "operation",
           "web": {
             "member": "uiLoading",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -87140,7 +88006,11 @@
           "kind": "operation",
           "web": {
             "member": "onSliderClick",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -88596,7 +89466,11 @@
           "kind": "operation",
           "web": {
             "member": "displayValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -91771,7 +92645,11 @@
           "kind": "operation",
           "web": {
             "member": "checked",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -91798,7 +92676,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": "void",
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -93839,7 +94721,11 @@
           "kind": "operation",
           "web": {
             "member": "ref",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -93866,7 +94752,11 @@
           "kind": "operation",
           "web": {
             "member": "update",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -98578,7 +99468,24 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "focusStartInput",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                },
+                {
+                  "name": "isIgnoreFocusEvent",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -98605,7 +99512,18 @@
           "kind": "operation",
           "web": {
             "member": "handleBlurInput",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": "FocusEvent",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -98632,7 +99550,11 @@
           "kind": "operation",
           "web": {
             "member": "handleClose",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -98659,7 +99581,18 @@
           "kind": "operation",
           "web": {
             "member": "handleFocusInput",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": "FocusEvent",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -98686,7 +99619,11 @@
           "kind": "operation",
           "web": {
             "member": "handleOpen",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -98713,7 +99650,24 @@
           "kind": "operation",
           "web": {
             "member": "onPick",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": "any",
+                  "optional": true,
+                  "rest": false
+                },
+                {
+                  "name": "visible",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -100193,7 +101147,11 @@
           "kind": "operation",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -100220,7 +101178,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -101972,7 +102934,11 @@
           "kind": "operation",
           "web": {
             "member": "contentRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -101999,7 +102965,11 @@
           "kind": "operation",
           "web": {
             "member": "hide",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -102026,7 +102996,18 @@
           "kind": "operation",
           "web": {
             "member": "isFocusInsideContent",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": "FocusEvent",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -102053,7 +103034,11 @@
           "kind": "operation",
           "web": {
             "member": "onClose",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -102080,7 +103065,11 @@
           "kind": "operation",
           "web": {
             "member": "onOpen",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -102107,7 +103096,11 @@
           "kind": "operation",
           "web": {
             "member": "popperRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -102134,7 +103127,11 @@
           "kind": "operation",
           "web": {
             "member": "updatePopper",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -103196,7 +104193,18 @@
           "kind": "operation",
           "web": {
             "member": "clearQuery",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "which",
+                  "type": "TransferDirection",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -103223,7 +104231,11 @@
           "kind": "operation",
           "web": {
             "member": "leftPanel",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -103250,7 +104262,11 @@
           "kind": "operation",
           "web": {
             "member": "rightPanel",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -108108,7 +109124,11 @@
           "kind": "operation",
           "web": {
             "member": "abort",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -108135,7 +109155,11 @@
           "kind": "operation",
           "web": {
             "member": "clearFiles",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -108162,7 +109186,11 @@
           "kind": "operation",
           "web": {
             "member": "handleRemove",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -108189,7 +109217,11 @@
           "kind": "operation",
           "web": {
             "member": "handleStart",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -108216,7 +109248,11 @@
           "kind": "operation",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -125723,7 +126759,11 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -125750,7 +126790,11 @@
           "kind": "operation",
           "web": {
             "member": "inputRef",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -125777,7 +126821,11 @@
           "kind": "operation",
           "web": {
             "member": "reset",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -135292,7 +136340,24 @@
           "kind": "operation",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "focusStartInput",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                },
+                {
+                  "name": "isIgnoreFocusEvent",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -135319,7 +136384,18 @@
           "kind": "operation",
           "web": {
             "member": "handleBlurInput",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": "FocusEvent",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -135346,7 +136422,11 @@
           "kind": "operation",
           "web": {
             "member": "handleClose",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -135373,7 +136453,18 @@
           "kind": "operation",
           "web": {
             "member": "handleFocusInput",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": "FocusEvent",
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -135400,7 +136491,11 @@
           "kind": "operation",
           "web": {
             "member": "handleOpen",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": []
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -135427,7 +136522,24 @@
           "kind": "operation",
           "web": {
             "member": "onPick",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "returnType": null,
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": "any",
+                  "optional": true,
+                  "rest": false
+                },
+                {
+                  "name": "visible",
+                  "type": null,
+                  "optional": true,
+                  "rest": false
+                }
+              ]
+            }
           },
           "avalonia": null,
           "status": "missing",
@@ -142393,8 +143505,8 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 66,
-    "partial": 86,
+    "aligned-candidate": 56,
+    "partial": 96,
     "missing": 2029,
     "web-only": 20,
     "total": 2201,

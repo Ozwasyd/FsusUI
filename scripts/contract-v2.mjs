@@ -102,6 +102,7 @@ const CLR_TO_CATEGORY = {
   'System.DateTimeOffset': 'date',
   'System.Uri': 'string',
   'System.Guid': 'string',
+  'System.Void': 'void',
 }
 
 export const categoriesFromClrType = (type) => {
@@ -166,6 +167,7 @@ export const categoriesFromVueProp = (prop) => {
         )
           return 'boolean'
         if (normalized === 'number') return 'number'
+        if (normalized === 'void') return 'void'
         if (normalized.endsWith('[]') || normalized.startsWith('SingleOrRange'))
           return 'array'
         if (normalized.includes('Component') || normalized.includes('VNode'))
@@ -228,6 +230,69 @@ const emptyDrift = () =>
 const setDrift = (drift, key, detail) => {
   drift[key] = detail
   return drift
+}
+
+const compareOperationSignatures = (web, avalonia) => {
+  if (!web) return 'web signature unavailable'
+  if (!avalonia) return 'avalonia signature unavailable'
+
+  const differences = []
+  if (!web.returnType) {
+    differences.push('web return type unavailable')
+  } else {
+    const webReturn = categoriesFromVueProp({
+      runtimeType: web.returnType,
+      semanticType: web.returnType,
+    })
+    const avaloniaReturn = categoriesFromClrType(avalonia.returnType)
+    const compatible = categoriesOverlap(webReturn, avaloniaReturn)
+    if (compatible !== true) {
+      differences.push(
+        `return type ${compatible === false ? 'mismatch' : 'not comparable'}: web ${webReturn.join('|')} vs avalonia ${avaloniaReturn.join('|')}`,
+      )
+    }
+  }
+
+  const webParameters = web.parameters ?? []
+  const avaloniaParameters = avalonia.parameters ?? []
+  if (webParameters.length !== avaloniaParameters.length) {
+    differences.push(
+      `parameter count mismatch: web ${webParameters.length} vs avalonia ${avaloniaParameters.length}`,
+    )
+  }
+  const comparableCount = Math.min(
+    webParameters.length,
+    avaloniaParameters.length,
+  )
+  for (let index = 0; index < comparableCount; index += 1) {
+    const webParameter = webParameters[index]
+    const avaloniaParameter = avaloniaParameters[index]
+    if (
+      Boolean(webParameter.optional) !== Boolean(avaloniaParameter.optional)
+    ) {
+      differences.push(
+        `parameter ${index + 1} optionality mismatch: web ${Boolean(webParameter.optional)} vs avalonia ${Boolean(avaloniaParameter.optional)}`,
+      )
+    }
+    if (webParameter.rest === true) {
+      differences.push(
+        `parameter ${index + 1} rest semantics unavailable on avalonia`,
+      )
+    }
+    const webType = categoriesFromVueProp({
+      runtimeType: webParameter.type,
+      semanticType: webParameter.type,
+    })
+    const avaloniaType = categoriesFromClrType(avaloniaParameter.type)
+    const compatible = categoriesOverlap(webType, avaloniaType)
+    if (compatible !== true) {
+      differences.push(
+        `parameter ${index + 1} type ${compatible === false ? 'mismatch' : 'not comparable'}: web ${webType.join('|')} vs avalonia ${avaloniaType.join('|')}`,
+      )
+    }
+  }
+
+  return differences.length > 0 ? differences.join('; ') : null
 }
 
 // Compare a single Vue member against a real Avalonia member and record every
@@ -304,23 +369,12 @@ export const compareMembers = ({ web, avalonia, kind }) => {
   }
 
   if (kind === 'operation') {
-    const webSignature = web.signature
-    const avaloniaSignature = avalonia?.signature
-    if (webSignature && avaloniaSignature) {
-      const signatureCompatible = categoriesOverlap(
-        categoriesFromClrType(avaloniaSignature.returnType),
-        categoriesFromVueProp({
-          runtimeType: webSignature.returnType,
-          semanticType: webSignature.returnType,
-        }),
-      )
-      if (signatureCompatible === false) {
-        setDrift(
-          drift,
-          'operationSignature',
-          `web return ${webSignature.returnType} vs avalonia return ${avaloniaSignature.returnType}`,
-        )
-      }
+    const difference = compareOperationSignatures(
+      web.signature,
+      avalonia?.signature,
+    )
+    if (difference) {
+      setDrift(drift, 'operationSignature', difference)
     }
   }
 
@@ -381,6 +435,22 @@ const avaloniaMethodRef = (method) => ({
       optional: Boolean(parameter.optional),
     })),
   },
+})
+
+const webMethodRef = (member, semantic) => ({
+  member,
+  baseline: VUE_BASELINE_PATH,
+  signature: semantic
+    ? {
+        returnType: semantic.returnType ?? null,
+        parameters: (semantic.parameters ?? []).map((parameter) => ({
+          name: parameter.name,
+          type: parameter.type ?? null,
+          optional: Boolean(parameter.optional),
+          rest: Boolean(parameter.rest),
+        })),
+      }
+    : null,
 })
 
 const avaloniaSemanticIndex = (baselines) => {
@@ -604,6 +674,7 @@ const outputMember = ({
 const operationMember = ({
   contractKebab,
   exposed,
+  semantic,
   avaloniaType,
   classification,
   binding,
@@ -612,7 +683,7 @@ const operationMember = ({
     return {
       name: exposed,
       kind: 'operation',
-      web: { member: exposed, baseline: VUE_BASELINE_PATH },
+      web: webMethodRef(exposed, semantic),
       avalonia: null,
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
@@ -644,7 +715,7 @@ const operationMember = ({
     )
   } else {
     const comparison = compareMembers({
-      web: { categories: ['unknown'], signature: null },
+      web: webMethodRef(exposed, semantic),
       avalonia: avaloniaMethodRef(avalonia),
       kind: 'operation',
     })
@@ -659,7 +730,7 @@ const operationMember = ({
   return {
     name: exposed,
     kind: 'operation',
-    web: { member: exposed, baseline: VUE_BASELINE_PATH },
+    web: webMethodRef(exposed, semantic),
     avalonia: avalonia ? avaloniaMethodRef(avalonia) : null,
     status,
     drift,
@@ -902,6 +973,9 @@ const contractForComponent = ({
     operationMember({
       contractKebab,
       exposed,
+      semantic: (component.semantic?.exposed ?? []).find(
+        (member) => member.name === exposed,
+      ),
       avaloniaType,
       classification,
       binding: bindingFor('operation', exposed),

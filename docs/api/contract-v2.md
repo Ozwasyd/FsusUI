@@ -79,8 +79,11 @@ carry at least one scenario coverage id.
 - **Default drift**: literal defaults are compared across platforms; mismatch fails.
 - **Nullability drift**: declared nullability must agree when both sides are known.
 - **Event payload drift**: payload types are compared when both sides expose them.
-- **Operation signature drift**: return categories are compared when both sides
-  expose signatures.
+- **Operation signature drift**: compiler/Roslyn return and ordered parameter
+  signatures are compared by the existing primitive/array categories, parameter
+  count, optionality, and rest semantics. Framework or domain wrapper types are
+  not guessed equivalent; an unavailable or non-comparable type keeps the member
+  `partial`.
 - **Enum value drift**: Vue `values` sets must intersect the Avalonia enum member
   names when both are known.
 - **Scenario coverage**: a required semantic without a scenario coverage id fails.
