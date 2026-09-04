@@ -1004,6 +1004,7 @@ internal static class ImeHarnessRunner
         throw new InvalidOperationException(
           $"No keycode maps to keysym '{keysymName}' in the current keymap");
       }
+      RawKeyLog.Add($"xtest:{keysymName}:{(press ? "down" : "up")}");
       var sent = XTestFakeKeyEvent(display, keycode, press, 0);
       if (sent == 0)
       {
