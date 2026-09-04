@@ -129,6 +129,7 @@
         ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml"
       ],
       "versioning": "docker",

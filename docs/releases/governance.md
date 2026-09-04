@@ -224,6 +224,37 @@ workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前�
 
 ## 5. 发布后核验
 
+For a stable `latest` release, `publish-npm.yml` performs the automated
+post-publish verification before the manual checks below. It consumes the
+successful `fsusblog-consumer-gate` artifact produced by the #318 gate and
+binds its digest to the immutable candidate and manifest before `npm publish`.
+After an actual publish (never an idempotent skip), it polls the canonical npm
+registry, downloads the registry-provided tarball, verifies SHA-512 integrity,
+candidate SHA-256, package name/version, and the `latest` dist-tag, then sends
+the strict `fsusui-npm-published-v1` event. Preview, next, and other prerelease
+channels never enter this path.
+
+The payload contract is
+[`spec/releases/fsusui-npm-published-v1.schema.json`](../../spec/releases/fsusui-npm-published-v1.schema.json).
+The sanitized artifact contract is
+[`spec/releases/fsusui-release-dispatch-receipt.schema.json`](../../spec/releases/fsusui-release-dispatch-receipt.schema.json).
+The sender uses only `FSUS_RELEASE_TRAIN_APP_ID` and
+`FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY`: it mints a metadata-only token scoped to
+FsusUI and a separate FsusBlog-only token with metadata read, contents write,
+and pull requests write. Missing, insufficient, or additional token permissions
+fail before dispatch. PATs and the workflow `GITHUB_TOKEN` are not cross-repo
+dispatch credentials.
+
+The local deterministic registry/App/dispatch matrix is:
+
+```bash
+pnpm check:npm-release-workflow
+```
+
+These tests are implementation evidence only. They do not claim a real npm
+publication, GitHub App installation, repository dispatch, or downstream
+migration.
+
 发布后至少检查：
 
 - GitHub Actions run 成功

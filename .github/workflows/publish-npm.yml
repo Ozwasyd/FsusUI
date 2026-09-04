@@ -115,6 +115,12 @@ jobs:
         with:
           name: fsusui-npm-candidate
           path: .npm-candidate
+      - name: Download successful FsusBlog consumer gate receipt
+        if: needs.plan.outputs.dist-tag == 'latest'
+        uses: actions/download-artifact@v4
+        with:
+          name: fsusblog-consumer-gate
+          path: .cross-gate
       - name: Verify locked candidate identity
         run: |
           test -n "${{ needs.quality.outputs.release-readiness-digest }}"
@@ -126,6 +132,18 @@ jobs:
             --version '${{ needs.plan.outputs.version }}' \
             --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json)"
           test "${candidate_group}" = "${{ needs.plan.outputs.concurrency-group }}"
+      - name: Verify stable release against the #318 receipt
+        if: needs.plan.outputs.dist-tag == 'latest'
+        run: |
+          test -s .cross-gate/fsusblog-consumer-gate.receipt.sha256
+          cross_gate_digest="$(awk '{ print $1 }' .cross-gate/fsusblog-consumer-gate.receipt.sha256)"
+          node scripts/fsusui-release-dispatch.mjs verify \
+            --candidate .npm-candidate/fsusui-npm-candidate.tgz \
+            --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json \
+            --cross-gate-receipt .cross-gate/fsusblog-consumer-gate.receipt.json \
+            --cross-gate-receipt-sha256 "$cross_gate_digest" \
+            --source-commit "$GITHUB_SHA" \
+            --release-tag "$GITHUB_REF_NAME"
       - name: Read npm channel state after lock
         id: npm_state
         run: |
@@ -143,8 +161,37 @@ jobs:
             --candidate-exists '${{ steps.npm_state.outputs.candidate_exists }}' \
             --github-output
       - name: Publish to npm
+        id: publish
         if: steps.monotonicity.outputs.action == 'publish'
-        run: npm publish ./.npm-candidate/fsusui-npm-candidate.tgz --access public --tag '${{ needs.plan.outputs.dist-tag }}'
+        run: |
+          npm publish ./.npm-candidate/fsusui-npm-candidate.tgz --access public --tag '${{ needs.plan.outputs.dist-tag }}'
+          echo "published=true" >> "$GITHUB_OUTPUT"
+      - name: Verify stable npm publication and dispatch the release event
+        if: steps.publish.outputs.published == 'true' && needs.plan.outputs.dist-tag == 'latest'
+        env:
+          FSUS_RELEASE_TRAIN_APP_ID: ${{ vars.FSUS_RELEASE_TRAIN_APP_ID }}
+          FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY: ${{ secrets.FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY }}
+        run: |
+          cross_gate_digest="$(awk '{ print $1 }' .cross-gate/fsusblog-consumer-gate.receipt.sha256)"
+          node scripts/fsusui-release-dispatch.mjs dispatch \
+            --candidate .npm-candidate/fsusui-npm-candidate.tgz \
+            --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json \
+            --cross-gate-receipt .cross-gate/fsusblog-consumer-gate.receipt.json \
+            --cross-gate-receipt-sha256 "$cross_gate_digest" \
+            --source-commit "$GITHUB_SHA" \
+            --release-tag "$GITHUB_REF_NAME" \
+            --dist-tag '${{ needs.plan.outputs.dist-tag }}' \
+            --publish-run-id "$GITHUB_RUN_ID" \
+            --npm-tarball-out .release-dispatch/npm-published.tgz \
+            --receipt-out .release-dispatch/fsusui-release-dispatch.receipt.json
+      - name: Upload sanitized release dispatch receipt
+        if: steps.publish.outputs.published == 'true' && needs.plan.outputs.dist-tag == 'latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fsusui-release-dispatch-${{ github.run_id }}
+          path: .release-dispatch/fsusui-release-dispatch.receipt.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Report skipped publish
         if: steps.monotonicity.outputs.action == 'skip'
         run: |

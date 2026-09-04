@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ozwasyd/FsusUI/spec/releases/fsusui-npm-published-v1.schema.json",
+  "title": "FsusUI stable npm publication dispatch payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "package",
+    "version",
+    "distTag",
+    "registry",
+    "sourceRepository",
+    "sourceCommit",
+    "releaseTag",
+    "candidateSha256",
+    "candidateManifestSha256",
+    "crossGateReceiptSha256",
+    "npmIntegrity",
+    "npmTarballSha256",
+    "publishRunId"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "package": { "const": "@ozwasyd/element-plus" },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "distTag": { "const": "latest" },
+    "registry": { "const": "https://registry.npmjs.org/" },
+    "sourceRepository": { "const": "Ozwasyd/FsusUI" },
+    "sourceCommit": { "$ref": "#/$defs/fullSha" },
+    "releaseTag": {
+      "type": "string",
+      "pattern": "^v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "candidateSha256": { "$ref": "#/$defs/sha256" },
+    "candidateManifestSha256": { "$ref": "#/$defs/sha256" },
+    "crossGateReceiptSha256": { "$ref": "#/$defs/sha256" },
+    "npmIntegrity": {
+      "type": "string",
+      "pattern": "^sha512-[A-Za-z0-9+/]+={0,2}$"
+    },
+    "npmTarballSha256": { "$ref": "#/$defs/sha256" },
+    "publishRunId": { "type": "string", "pattern": "^[1-9][0-9]*$" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "fullSha": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+  }
+}
