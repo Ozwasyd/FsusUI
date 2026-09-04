@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "eee6fb02dcb668ba2cb4835cc3877b83db6bafd9",
+    "commitSha": "2a7fd39fd9569afef581e9cf9285c0e8c7a8968c",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "ffcdc1b47ffa9cece9c37b967aed6cbce77b8416b7d2010256e9eb57d50b3dcd",
+    "inputTreeHash": "4d70c19c6cc9b54a467da8cc01d19a80f4a621ee18c812148621e5c129d4da1f",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "93c3f5b04b2ffd73bcb71a39659e37b5a6da061826eb2b6b9f9f90e6e1018935"
+    "outputHash": "7948576c9d18504421248c413f8a0312d2bf5d49102a2381071302ddeaf7e861"
   },
   "summary": {
     "componentModules": 93,
@@ -20,7 +20,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 488,
+    "cssVariables": 487,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -33610,17 +33610,13 @@
       "classification": "portable"
     },
     {
-      "name": "--fsus-motion-content",
-      "files": ["vue/packages/theme-chalk/src/common/transition.scss"],
-      "classification": "portable"
-    },
-    {
       "name": "--fsus-motion-control",
       "files": [
         "vue/packages/theme-chalk/src/alert.scss",
         "vue/packages/theme-chalk/src/base.scss",
         "vue/packages/theme-chalk/src/calendar.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/common/transition.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
@@ -33827,7 +33823,6 @@
         "vue/packages/theme-chalk/src/image-viewer.scss",
         "vue/packages/theme-chalk/src/message-box.scss",
         "vue/packages/theme-chalk/src/message.scss",
-        "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/scrollbar.scss",
         "vue/packages/theme-chalk/src/tab-pane.scss",
         "vue/packages/theme-chalk/src/tabs.scss",
@@ -34003,6 +33998,7 @@
         "vue/packages/theme-chalk/src/collapse.scss",
         "vue/packages/theme-chalk/src/color-picker.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/common/transition.scss",
         "vue/packages/theme-chalk/src/dialog.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
