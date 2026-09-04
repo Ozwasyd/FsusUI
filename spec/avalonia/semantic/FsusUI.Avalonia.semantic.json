@@ -1,12 +1,14 @@
 {
   "packageId": "FsusUI.Avalonia",
-  "baselineVersion": "1.0.0",
+  "baselineVersion": "2.0.0",
   "source": {
-    "tool": "FsusUI.Avalonia.ApiTool@1.3.0",
+    "toolVersion": "FsusUI.Avalonia.ApiTool@1.4.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "ef1ccbb8536a91668875a4d3afbce40bd155421b43e923d523f5953b1f230fa7",
+    "inputTreeHash": "8bc85f2455b32a50fbca5cb8c6208a10b1bc784b6bbbfdc00ced2c4381f126cc",
     "compilerOptionsHash": "a2e88fe9ebd590171080438846d719d90b904b854e46a43a2c1beae52d55f38b",
-    "dependencyVersionsHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e"
+    "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
+    "contractSchemaVersion": "2.0.0",
+    "outputHash": "2305fbdc9fb4f9c5110b0825f8af4a69435fc83f471da1c72a802dbb308fc923"
   },
   "semanticTypes": [
     {

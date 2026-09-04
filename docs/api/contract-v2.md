@@ -40,6 +40,11 @@ pnpm run conformance:contracts  # v1 + v2 + mutation tests + doc gates
 
 The registry records SHA-256 hashes of every baseline it consumes, so any
 baseline change without regeneration fails `contract-v2:check`.
+Each Avalonia semantic baseline also self-verifies its compiler input tree,
+compiler options, dependency versions, Contract V2 schema, and semantic payload.
+Its `outputHash` is computed from the canonical baseline with only
+`source.outputHash` replaced by the empty string; changing a semantic member
+without regenerating the baseline therefore fails before mapping.
 
 The unified `conformance:v2` command reports a stable stage name driven by each
 subprocess exit code. It checks the compiler-derived Web baseline, the
