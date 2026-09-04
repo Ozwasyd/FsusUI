@@ -78,7 +78,8 @@ Each member carries exactly one status:
 
 A member with a status other than `aligned-candidate` must carry governance
 (`reason`, `owner`, `testPolicy`, `reviewPolicy`). Every required member must
-carry at least one scenario coverage id.
+declare at least one scenario id. A declared id is a coverage requirement, not
+evidence that the scenario ran.
 
 ## Comparator guarantees
 
@@ -118,7 +119,15 @@ carry at least one scenario coverage id.
   broadly applied to every Vue slot.
 - **Enum value drift**: Vue `values` sets must intersect the Avalonia enum member
   names when both are known.
-- **Scenario coverage**: a required semantic without a scenario coverage id fails.
+- **Scenario declaration**: a required semantic without a scenario id fails.
+- **Executed member coverage**: Web and Avalonia runners record only members
+  observed through successful real steps or emitted events. The comparator
+  intersects those records and seals the ledger against the exact
+  candidate/contract/baseline/scenario identity and both evidence digests.
+  Derivation validates every ledger key against the Contract V2 member and its
+  declared scenario id. Missing executed coverage remains an explicit gap and
+  prevents an otherwise complete contract from becoming `aligned`; forged,
+  metadata-only, stale, duplicate, or unknown records fail closed.
 - **Vue public coverage**: every compiler-baseline component and every semantic
   input, output, operation, and content region must appear exactly once in the
   corresponding Contract V2 section with its baseline binding and an explicit
