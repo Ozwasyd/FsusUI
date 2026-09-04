@@ -30,6 +30,7 @@ import {
 import {
   evaluateMarkdownTableInputMutations,
   evaluateMarkdownTablePasteFormatMutations,
+  MARKDOWN_TABLE_PASTE_BUDGET,
   parseMarkdownTableData,
   parseMarkdownTableTsv,
   planMarkdownTableFormat,
@@ -65,9 +66,13 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       expect(p20!.rows).toHaveLength(50)
 
       const escaped = parseMarkdownTableBlock(
-        '| a\\|b | `c | d` | normal |\n| --- | --- | --- |\n',
+        '| a\\|b | `c | d` | [link](https://example.com) |\n| --- | --- | --- |\n',
       )
-      expect(escaped?.header).toEqual(['a\\|b', '`c | d`', 'normal'])
+      expect(escaped?.header).toEqual([
+        'a\\|b',
+        '`c | d`',
+        '[link](https://example.com)',
+      ])
     })
 
     it('performs row insert above/below, delete, and move operations', () => {
@@ -365,6 +370,76 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       ).toBeNull()
     })
 
+    it('distinguishes native cell-text motion from boundary navigation', () => {
+      const source = '| h1 | h2 |\n| --- | --- |\n| a1 | a2 |\n| b1 | b2 |\n'
+      const table = createMarkdownTableEntries(
+        stabilizeMarkdownEditorProjection(createMarkdownEditorProjection(source), doc),
+      )[0]!
+      const cell = (row: number, column: number): MarkdownTableCellIdentity => ({
+        tableId: table.id,
+        row,
+        column,
+        status: 'current',
+      })
+      const intent = (
+        key: string,
+        row: number,
+        column: number,
+        cellOffset: number,
+        cellText: string,
+      ) =>
+        resolveMarkdownTableInputIntent({
+          source,
+          selection: { start: 0, end: 0, direction: 'none' },
+          documentIdentity: doc,
+          cell: cell(row, column),
+          cellOffset,
+          cellText,
+          key,
+        })
+
+      expect(intent('ArrowLeft', 1, 1, 1, 'a2').nextCell).toMatchObject({
+        row: 1,
+        column: 1,
+      })
+      expect(intent('ArrowLeft', 1, 1, 0, 'a2').nextCell).toMatchObject({
+        row: 1,
+        column: 0,
+      })
+      expect(intent('ArrowRight', 1, 0, 1, 'a1').nextCell).toMatchObject({
+        row: 1,
+        column: 0,
+      })
+      expect(intent('ArrowRight', 1, 0, 2, 'a1').nextCell).toMatchObject({
+        row: 1,
+        column: 1,
+      })
+      expect(intent('ArrowUp', 1, 1, 0, 'a2').nextCell).toMatchObject({
+        row: 0,
+        column: 1,
+      })
+      expect(intent('ArrowDown', 1, 1, 0, 'a2').nextCell).toMatchObject({
+        row: 2,
+        column: 1,
+      })
+      expect(intent('Home', 1, 1, 0, 'a2').nextCell).toMatchObject({
+        row: 1,
+        column: 0,
+      })
+      expect(intent('End', 1, 0, 2, 'a1').nextCell).toMatchObject({
+        row: 1,
+        column: 1,
+      })
+      expect(intent('ArrowUp', 0, 0, 0, 'h1')).toMatchObject({
+        action: 'exit-backward',
+        screenReaderText: 'Exited table upward',
+      })
+      expect(intent('ArrowDown', 2, 1, 0, 'b2')).toMatchObject({
+        action: 'exit-forward',
+        screenReaderText: 'Exited table downward',
+      })
+    })
+
     it('handles empty cells and explicit row/column/table selections atomically', () => {
       const source = '| h1 | h2 |\n| --- | --- |\n|  | value |\n'
       const table = createMarkdownTableEntries(
@@ -491,6 +566,14 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       expect(parseMarkdownTableData('plain,comma')).toEqual({
         rejected: 'not-table',
       })
+      expect(parseMarkdownTableData('a\tb\nc', 'text/tab-separated-values')).toEqual({
+        columns: 2,
+        rowCount: 2,
+        rows: [
+          ['a', 'b'],
+          ['c', ''],
+        ],
+      })
       const controller = new AbortController()
       controller.abort()
       expect(
@@ -504,6 +587,19 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       expect(parseMarkdownTableData(hugeData, 'text/csv')).toEqual({
         rejected: 'budget-exceeded',
       })
+      const tooManyColumns = Array.from(
+        { length: MARKDOWN_TABLE_PASTE_BUDGET.columns + 1 },
+        () => 'x',
+      ).join('\t')
+      expect(
+        parseMarkdownTableData(tooManyColumns, 'text/tab-separated-values'),
+      ).toEqual({ rejected: 'budget-exceeded' })
+      expect(
+        parseMarkdownTableData(
+          'x'.repeat(MARKDOWN_TABLE_PASTE_BUDGET.sourceUnits + 1),
+          'text/csv',
+        ),
+      ).toEqual({ rejected: 'budget-exceeded' })
     })
 
     it('pastes data expanding columns and rows into a single history transaction', () => {

@@ -350,7 +350,10 @@
       >
         {{ JSON.stringify(markdownTransactionSelection) }}
       </output>
-      <output data-testid="markdown-attachment-batch">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-attachment-batch"
+      >
         {{ JSON.stringify(markdownAttachmentBatchSnapshot) }}
       </output>
     </section>
@@ -2577,7 +2580,7 @@ const markdownTransactionValue = ref(
           ? 'Paragraph ^intro'
           : markdownCommandSurfacesFixture
             ? '/bol'
-            : 'A😀éאב\n- 列表',
+            : 'A😀éאב\n- 列表',
 )
 const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({
   canRedo: false,

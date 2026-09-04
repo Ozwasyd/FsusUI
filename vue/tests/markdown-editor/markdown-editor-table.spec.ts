@@ -100,6 +100,7 @@ test('renders and operates the source-anchored table context surface', async ({
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')
   const editor = fixture.locator('.el-markdown-editor')
   const textarea = editor.locator('textarea')
+  await expect(fixture.getByTestId('markdown-attachment-batch')).toHaveCount(0)
   await expect(textarea).toBeVisible()
   await expect(textarea).toHaveValue(table)
   await selectTableCell(textarea, table, 'Documentation migration')
@@ -219,6 +220,12 @@ test('freezes table navigation during deterministic IME simulation', async ({
   })
   await textarea.dispatchEvent('compositionend', { data: '编' })
   await expect(textarea).toHaveValue(/编Documentation migration/)
+  const composedValue = await textarea.inputValue()
+  await textarea.press('Control+z')
+  await expect(textarea).toHaveValue(table)
+  await textarea.press('Control+Shift+z')
+  await expect(textarea).toHaveValue(composedValue)
+  await expect(fixture.getByRole('button', { name: '表格操作' })).toBeVisible()
   await textarea.press('Tab')
   await expect
     .poll(() =>

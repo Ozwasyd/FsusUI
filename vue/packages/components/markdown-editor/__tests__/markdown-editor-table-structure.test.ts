@@ -12,8 +12,14 @@ import {
 import {
   evaluateMarkdownTableMutations,
   planMarkdownTableAlignColumn,
+  planMarkdownTableDelete,
+  planMarkdownTableDeleteColumn,
+  planMarkdownTableDeleteRow,
   planMarkdownTableInsert,
   planMarkdownTableInsertColumn,
+  planMarkdownTableInsertRow,
+  planMarkdownTableMoveColumn,
+  planMarkdownTableMoveRow,
   resolveMarkdownTableCellAtOffset,
   resolveMarkdownTableCell,
 } from '../src/markdown-editor-table-structure'
@@ -119,6 +125,54 @@ describe('markdown table structural transactions', () => {
     expect(result.value.startsWith('before  \n\n')).toBe(true)
     expect(result.value.endsWith('\nafter  \n')).toBe(true)
     expect(store.undo().value).toBe(source)
+  })
+
+  it('keeps every structural operation scoped, mapped, and undoable', () => {
+    const source =
+      'before  \n\n| h1 | h2 | h3 |\n| --- | --- | --- |\n| a1 | a2 | a3 |\n| b1 | b2 | b3 |\n| c1 | c2 | c3 |\n\nafter  \n'
+    const table = createMarkdownTableEntries(
+      stabilizeMarkdownEditorProjection(
+        createMarkdownEditorProjection(source),
+        document,
+      ),
+    )[0]!
+    const operations = [
+      () => planMarkdownTableInsertRow(source, document, table.id, 1, 'below', 0),
+      () => planMarkdownTableDeleteRow(source, document, table.id, 1, 0),
+      () => planMarkdownTableMoveRow(source, document, table.id, 1, 'down', 0),
+      () => planMarkdownTableInsertColumn(source, document, table.id, 0, 'right', 0),
+      () => planMarkdownTableDeleteColumn(source, document, table.id, 1, 0),
+      () => planMarkdownTableMoveColumn(source, document, table.id, 0, 'right', 0),
+      () => planMarkdownTableAlignColumn(source, document, table.id, 1, 'right', 0),
+      () => planMarkdownTableDelete(source, document, table.id, 0),
+    ]
+
+    for (const createPlan of operations) {
+      const plan = createPlan()
+      expect('changes' in plan).toBe(true)
+      if (!('changes' in plan)) continue
+      expect(plan.changes).toHaveLength(1)
+      expect(plan.changes[0]).toMatchObject({
+        from: table.range.start,
+        to: table.range.end,
+      })
+
+      const afterRange = {
+        start: source.indexOf('after'),
+        end: source.indexOf('after') + 'after'.length,
+      }
+      const mappedAfter = createMarkdownEditorPositionMap(plan.changes, {
+        source,
+      }).rebase(afterRange)
+      expect(mappedAfter).toBeDefined()
+
+      const store = new MarkdownEditorTransactionStore(source)
+      const result = store.dispatch(plan)
+      expect(result.accepted).toBe(true)
+      expect(result.history.undoDepth).toBe(1)
+      expect(result.value.slice(mappedAfter!.start, mappedAfter!.end)).toBe('after')
+      expect(store.undo().value).toBe(source)
+    }
   })
 
   it('retains opaque cell identity while remapping parser-owned anchors', () => {
