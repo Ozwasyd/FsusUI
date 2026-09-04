@@ -78,7 +78,13 @@ carry at least one scenario coverage id.
   are compared against Vue runtime/semantic categories; definite mismatch fails.
 - **Default drift**: literal defaults are compared across platforms; mismatch fails.
 - **Nullability drift**: declared nullability must agree when both sides are known.
-- **Event payload drift**: payload types are compared when both sides expose them.
+- **Event payload drift**: explicitly bound Vue outputs use the TypeScript
+  checker to retain their shallow source-interface fields (bounded to 64),
+  optionality, and nullability. The comparator checks those fields against
+  Roslyn EventArgs properties. A single EventArgs property is unwrapped only
+  when its name matches the single Vue payload parameter and both shapes are
+  available. Recursive, framework, unresolved, multi-parameter, and rest
+  payloads remain `partial`; wrapper type names are never guessed equivalent.
 - **Operation signature drift**: compiler/Roslyn return and ordered parameter
   signatures are compared by the existing primitive/array categories, parameter
   count, optionality, and rest semantics. Framework or domain wrapper types are

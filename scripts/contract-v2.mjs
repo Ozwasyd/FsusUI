@@ -295,6 +295,97 @@ const compareOperationSignatures = (web, avalonia) => {
   return differences.length > 0 ? differences.join('; ') : null
 }
 
+const payloadFieldKey = (name) => toKebab(name ?? '')
+
+const comparePayloadFields = (webShape, avaloniaShape) => {
+  if (webShape?.kind !== 'object') {
+    return `web payload shape unavailable: ${webShape?.reason ?? 'unknown type'}`
+  }
+  if (avaloniaShape?.kind !== 'object') {
+    return `avalonia event args shape unavailable: ${avaloniaShape?.reason ?? 'unknown type'}`
+  }
+
+  const differences = []
+  const avaloniaFields = new Map(
+    avaloniaShape.fields.map((field) => [payloadFieldKey(field.name), field]),
+  )
+  const webFields = new Map(
+    webShape.fields.map((field) => [payloadFieldKey(field.name), field]),
+  )
+  for (const webField of webShape.fields) {
+    const key = payloadFieldKey(webField.name)
+    const avaloniaField = avaloniaFields.get(key)
+    if (!avaloniaField) {
+      differences.push(`missing avalonia field ${webField.name}`)
+      continue
+    }
+    if (Boolean(webField.optional) !== Boolean(avaloniaField.optional)) {
+      differences.push(
+        `field ${webField.name} optionality mismatch: web ${Boolean(webField.optional)} vs avalonia ${Boolean(avaloniaField.optional)}`,
+      )
+    }
+    if (Boolean(webField.nullable) !== Boolean(avaloniaField.nullable)) {
+      differences.push(
+        `field ${webField.name} nullability mismatch: web ${Boolean(webField.nullable)} vs avalonia ${Boolean(avaloniaField.nullable)}`,
+      )
+    }
+    const webCategories = categoriesFromVueProp({
+      runtimeType: webField.type,
+      semanticType: webField.type,
+    })
+    const avaloniaCategories = categoriesFromClrType(avaloniaField.type)
+    const compatible = categoriesOverlap(webCategories, avaloniaCategories)
+    if (compatible !== true) {
+      differences.push(
+        `field ${webField.name} type ${compatible === false ? 'mismatch' : 'not comparable'}: web ${webCategories.join('|')} vs avalonia ${avaloniaCategories.join('|')}`,
+      )
+    }
+  }
+  for (const avaloniaField of avaloniaShape.fields) {
+    if (!webFields.has(payloadFieldKey(avaloniaField.name))) {
+      differences.push(`extra avalonia field ${avaloniaField.name}`)
+    }
+  }
+  return differences.length > 0 ? differences.join('; ') : null
+}
+
+const compareEventPayloads = (web, avalonia) => {
+  if (!Array.isArray(web?.payload)) return 'web payload signature unavailable'
+  if (web.payload.length !== 1) {
+    return `web payload parameter count ${web.payload.length} is not comparable to Avalonia EventArgs`
+  }
+  const parameter = web.payload[0]
+  const differences = []
+  if (parameter.rest === true) {
+    differences.push('web rest payload is not comparable to Avalonia EventArgs')
+  }
+  if (parameter.optional === true) {
+    differences.push(
+      'web optional payload is not comparable to Avalonia EventArgs',
+    )
+  }
+
+  let avaloniaShape = avalonia?.argsShape
+  if (
+    avaloniaShape?.kind === 'object' &&
+    avaloniaShape.fields.length === 1 &&
+    payloadFieldKey(avaloniaShape.fields[0].name) ===
+      payloadFieldKey(parameter.name) &&
+    avaloniaShape.fields[0].shape?.kind === 'object'
+  ) {
+    const wrapper = avaloniaShape.fields[0]
+    if (Boolean(parameter.nullable) !== Boolean(wrapper.nullable)) {
+      differences.push(
+        `payload ${parameter.name} nullability mismatch: web ${Boolean(parameter.nullable)} vs avalonia ${Boolean(wrapper.nullable)}`,
+      )
+    }
+    avaloniaShape = wrapper.shape
+  }
+  const fieldDifference = comparePayloadFields(parameter.shape, avaloniaShape)
+  if (fieldDifference) differences.push(fieldDifference)
+  return differences.length > 0 ? differences.join('; ') : null
+}
+
 // Compare a single Vue member against a real Avalonia member and record every
 // drift that would be required to fail. Returns null when no counterpart exists.
 export const compareMembers = ({ web, avalonia, kind }) => {
@@ -351,20 +442,9 @@ export const compareMembers = ({ web, avalonia, kind }) => {
   }
 
   if (kind === 'output') {
-    const webPayload = web.payloadType
-    const avaloniaPayload = avalonia?.argsType
-    if (webPayload && avaloniaPayload) {
-      const payloadCompatible = categoriesOverlap(
-        categoriesFromClrType(avaloniaPayload),
-        [webPayload.toLowerCase()],
-      )
-      if (payloadCompatible === false) {
-        setDrift(
-          drift,
-          'eventPayload',
-          `web payload ${webPayload} vs avalonia payload ${avaloniaPayload}`,
-        )
-      }
+    const difference = compareEventPayloads(web, avalonia)
+    if (difference) {
+      setDrift(drift, 'eventPayload', difference)
     }
   }
 
@@ -420,11 +500,87 @@ const avaloniaPropRef = (property) => ({
   enumMembers: property.enumMembers ?? undefined,
 })
 
-const avaloniaEventRef = (event) => ({
-  member: event.name,
-  categories: categoriesFromClrType(event.argsType),
-  argsType: event.argsType,
+const webEventRef = (member, semantic) => ({
+  member,
+  baseline: VUE_BASELINE_PATH,
+  payload: semantic?.payload ?? null,
+  payloadShapeStatus: semantic?.payloadShapeStatus ?? null,
+  payloadShapeReason: semantic?.payloadShapeReason ?? null,
 })
+
+const avaloniaPayloadShape = (
+  typeName,
+  typeIndex,
+  depth = 0,
+  seen = new Set(),
+) => {
+  const normalized = (typeName ?? '').replace(/[?&]$/u, '')
+  if (!normalized) {
+    return { kind: 'unknown', type: null, reason: 'event args type is empty' }
+  }
+  if (seen.has(normalized)) {
+    return {
+      kind: 'unknown',
+      type: normalized,
+      reason: 'recursive event args type',
+    }
+  }
+  const type = typeIndex.get(normalized)
+  if (!type) {
+    return {
+      kind: 'unknown',
+      type: normalized,
+      reason: 'framework or unresolved event args type',
+    }
+  }
+  const nextSeen = new Set(seen)
+  nextSeen.add(normalized)
+  const properties = (type.properties ?? []).filter(
+    (property) => property.canRead !== false && property.isStatic !== true,
+  )
+  if (properties.length === 0 || properties.length > 64) {
+    return {
+      kind: 'unknown',
+      type: normalized,
+      reason:
+        properties.length === 0
+          ? 'event args type has no readable fields'
+          : 'event args type exceeds the 64-field comparison bound',
+    }
+  }
+  return {
+    kind: 'object',
+    type: normalized,
+    fields: properties
+      .map((property) => ({
+        name: property.name,
+        type: property.type,
+        optional: false,
+        nullable: Boolean(property.nullable),
+        shape:
+          depth < 1 && typeIndex.has(property.type)
+            ? avaloniaPayloadShape(
+                property.type,
+                typeIndex,
+                depth + 1,
+                nextSeen,
+              )
+            : undefined,
+      }))
+      .sort((first, second) => first.name.localeCompare(second.name)),
+  }
+}
+
+const avaloniaEventRef = (event, typeIndex) => {
+  const argsType =
+    event.argsType?.match(/^System\.EventHandler<(.+)>$/u)?.[1] ?? null
+  return {
+    member: event.name,
+    categories: categoriesFromClrType(event.argsType),
+    argsType: event.argsType,
+    argsShape: avaloniaPayloadShape(argsType, typeIndex),
+  }
+}
 
 const avaloniaMethodRef = (method) => ({
   member: method.name,
@@ -607,15 +763,18 @@ const inputMember = ({
 const outputMember = ({
   contractKebab,
   emit,
+  semantic,
   avaloniaType,
+  typeIndex,
   classification,
   binding,
 }) => {
+  const web = webEventRef(emit, binding ? semantic : null)
   if (!avaloniaType) {
     return {
       name: emit,
       kind: 'output',
-      web: { member: emit, baseline: VUE_BASELINE_PATH },
+      web,
       avalonia: null,
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
@@ -647,8 +806,8 @@ const outputMember = ({
     )
   } else {
     const comparison = compareMembers({
-      web: { categories: ['unknown'], payloadType: null },
-      avalonia: avaloniaEventRef(avalonia),
+      web,
+      avalonia: avaloniaEventRef(avalonia, typeIndex),
       kind: 'output',
     })
     drift = comparison.drift
@@ -662,8 +821,8 @@ const outputMember = ({
   return {
     name: emit,
     kind: 'output',
-    web: { member: emit, baseline: VUE_BASELINE_PATH },
-    avalonia: avalonia ? avaloniaEventRef(avalonia) : null,
+    web,
+    avalonia: avalonia ? avaloniaEventRef(avalonia, typeIndex) : null,
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'output', emit)],
@@ -943,6 +1102,7 @@ const semanticBindingIndex = (registry) =>
 const contractForComponent = ({
   component,
   avaloniaType,
+  typeIndex,
   gate,
   semanticBindings,
 }) => {
@@ -965,7 +1125,11 @@ const contractForComponent = ({
     outputMember({
       contractKebab,
       emit,
+      semantic: (component.semantic?.emits ?? []).find(
+        (member) => member.name === emit,
+      ),
       avaloniaType,
+      typeIndex,
       classification,
       binding: bindingFor('output', emit),
     }),
@@ -1198,6 +1362,7 @@ export const buildRegistry = ({
       contractForComponent({
         component,
         avaloniaType,
+        typeIndex,
         gate,
         semanticBindings,
       }),

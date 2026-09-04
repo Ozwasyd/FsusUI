@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
+import ts from 'typescript'
 import { fileURLToPath } from 'node:url'
 import {
   buildRegistry,
@@ -13,6 +14,7 @@ import {
   SEMANTIC_MEMBER_BINDINGS_PATH,
   VUE_BASELINE_PATH,
 } from '../scripts/contract-v2.mjs'
+import { extractStructuredEmitPayloads } from '../scripts/vue-structured-emit-payload.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const fixtureDirectory = path.join(root, 'tests/fixtures/contract-v2')
@@ -258,6 +260,176 @@ test('real baseline mutations expose operation parameter drift', () => {
   assert.match(
     typeDrift.drift.operationSignature,
     /parameter 1 type mismatch: web string vs avalonia boolean/,
+  )
+})
+
+test('real mapped event payload shapes fail closed on field drift', () => {
+  const buildWithBaselines = (
+    nextVueBaseline = vueBaseline,
+    nextAvaloniaBaseline = avaloniaBaselines.avalonia,
+  ) =>
+    buildRegistry({
+      vueBaseline: nextVueBaseline,
+      avaloniaBaseline: nextAvaloniaBaseline,
+      avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+      avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+      semanticMemberBindings,
+      gate,
+    }).contracts.find(
+      (contract) => contract.component.name === 'ElMarkdownEditor',
+    )
+  const mappedOutputs = buildWithBaselines().outputs.filter(
+    (output) => output.bindingBasis === 'explicit-semantic',
+  )
+  assert.deepEqual(
+    mappedOutputs.map((output) => [output.semantic, output.status]),
+    [
+      ['history-change', 'partial'],
+      ['selection-change', 'partial'],
+      ['transaction', 'partial'],
+    ],
+  )
+
+  const missingField = clone(vueBaseline)
+  const missingHistoryShape = missingField.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.emits.find((emit) => emit.name === 'history-change')
+    .payload[0].shape
+  missingHistoryShape.fields = missingHistoryShape.fields.filter(
+    (field) => field.name !== 'canRedo',
+  )
+  const missingFieldDrift = buildWithBaselines(missingField).outputs.find(
+    (output) => output.semantic === 'history-change',
+  )
+  assert.match(
+    missingFieldDrift.drift.eventPayload,
+    /extra avalonia field CanRedo/,
+  )
+
+  const nullableField = clone(vueBaseline)
+  nullableField.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.emits.find((emit) => emit.name === 'history-change')
+    .payload[0].shape.fields.find(
+      (field) => field.name === 'redoDepth',
+    ).nullable = true
+  const nullableDrift = buildWithBaselines(nullableField).outputs.find(
+    (output) => output.semantic === 'history-change',
+  )
+  assert.match(
+    nullableDrift.drift.eventPayload,
+    /field redoDepth nullability mismatch: web true vs avalonia false/,
+  )
+
+  const avaloniaTypeDrift = clone(avaloniaBaselines.avalonia)
+  avaloniaTypeDrift.semanticTypes
+    .find(
+      (type) =>
+        type.name === 'FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryState',
+    )
+    .properties.find((property) => property.name === 'RedoDepth').type =
+    'System.String'
+  const typeDrift = buildWithBaselines(
+    vueBaseline,
+    avaloniaTypeDrift,
+  ).outputs.find((output) => output.semantic === 'history-change')
+  assert.match(
+    typeDrift.drift.eventPayload,
+    /field redoDepth type mismatch: web number vs avalonia string/,
+  )
+
+  const unknownShape = clone(vueBaseline)
+  unknownShape.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.emits.find(
+      (emit) => emit.name === 'history-change',
+    ).payload[0].shape = {
+    kind: 'unknown',
+    type: 'RecursivePayload',
+    reason: 'recursive payload type',
+  }
+  const unknownDrift = buildWithBaselines(unknownShape).outputs.find(
+    (output) => output.semantic === 'history-change',
+  )
+  assert.match(
+    unknownDrift.drift.eventPayload,
+    /web payload shape unavailable: recursive payload type/,
+  )
+})
+
+test('real Vue source payload type mutation reaches the comparator', () => {
+  const entryRelativePath =
+    'vue/packages/components/markdown-editor/src/markdown-editor.ts'
+  const transactionRelativePath =
+    'vue/packages/components/markdown-editor/src/markdown-editor-transaction.ts'
+  const entrySource = fs.readFileSync(
+    path.join(root, entryRelativePath),
+    'utf8',
+  )
+  const transactionSource = fs.readFileSync(
+    path.join(root, transactionRelativePath),
+    'utf8',
+  )
+  const sourceFile = ts.createSourceFile(
+    entryRelativePath,
+    entrySource,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  )
+  let emitsObject = null
+  const visit = (node) => {
+    if (
+      ts.isVariableDeclaration(node) &&
+      node.name.getText(sourceFile) === 'markdownEditorEmits' &&
+      ts.isObjectLiteralExpression(node.initializer)
+    ) {
+      emitsObject = node.initializer
+      return
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(sourceFile)
+  assert.ok(emitsObject)
+
+  const mutatedSource = transactionSource.replace(
+    'readonly redoDepth: number',
+    'readonly redoDepth: string',
+  )
+  assert.notEqual(mutatedSource, transactionSource)
+  const extracted = extractStructuredEmitPayloads({
+    root,
+    sourceRelativePath: entryRelativePath,
+    objectStart: emitsObject.getStart(sourceFile),
+    objectEnd: emitsObject.end,
+    eventNames: ['history-change'],
+    sourceOverrides: new Map([[transactionRelativePath, mutatedSource]]),
+  }).get('history-change')
+  const redoDepth = extracted.parameters[0].shape.fields.find(
+    (field) => field.name === 'redoDepth',
+  )
+  assert.equal(redoDepth.type, 'string')
+
+  const mutatedBaseline = clone(vueBaseline)
+  const history = mutatedBaseline.components
+    .find((component) => component.name === 'ElMarkdownEditor')
+    .semantic.emits.find((emit) => emit.name === 'history-change')
+  history.payload = extracted.parameters
+  const output = buildRegistry({
+    vueBaseline: mutatedBaseline,
+    avaloniaBaseline: avaloniaBaselines.avalonia,
+    avaloniaThemesBaseline: avaloniaBaselines.avaloniaThemes,
+    avaloniaIconsBaseline: avaloniaBaselines.avaloniaIcons,
+    semanticMemberBindings,
+    gate,
+  })
+    .contracts.find(
+      (contract) => contract.component.name === 'ElMarkdownEditor',
+    )
+    .outputs.find((candidate) => candidate.semantic === 'history-change')
+  assert.match(
+    output.drift.eventPayload,
+    /field redoDepth type mismatch: web string vs avalonia number/,
   )
 })
 

@@ -1,17 +1,18 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "e623e2d3774b0e21a4962aa136011c9b47efe314",
+    "commitSha": "bef76aa1fe8a18efaa9f9217f7b95ec7e9e03ea2",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
-    "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
+    "toolVersion": "avalonia-vue-public-api-baseline@1.1.0+vue-semantic-baseline@1.1.0",
     "inputTreeHash": "d2dc9c1ce7ef4b4ea943a08cb936be52f6e3b220c76a1667e977088374575a12",
-    "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
+    "compilerOptionsHash": "ad086d07c67821ced42f49be0b2a655f4e9a93ede6aa2cdef9fbb56e9c07fac8",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
+    "structuredOutputSelectionHash": "dcb0a0555b218071cd84b8376257f189c11cf19265b3f40e974fa4f36cd99faf",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "a9c073f23b382a215a3ab5a4efc2ebf173da7bdc1cde4c9717aa7470a74d0e0c"
+    "outputHash": "fa7df1c3f43069c8c0e4a3985c9b6dee8cf72dd1d5e19be0ecc88010b9054843"
   },
   "summary": {
     "componentModules": 93,
@@ -11686,9 +11687,48 @@
                 "name": "history",
                 "type": "MarkdownEditorHistoryState",
                 "optional": false,
-                "rest": false
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "object",
+                  "type": "MarkdownEditorHistoryState",
+                  "fields": [
+                    {
+                      "name": "canRedo",
+                      "type": "boolean",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "canUndo",
+                      "type": "boolean",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "redoDepth",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "retainedUnits",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "undoDepth",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "payloadShapeStatus": "callable",
+            "payloadShapeReason": null
           },
           {
             "name": "mode-change",
@@ -11741,9 +11781,30 @@
                 "name": "event",
                 "type": "MarkdownEditorSelectionEvent",
                 "optional": false,
-                "rest": false
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "object",
+                  "type": "MarkdownEditorSelectionEvent",
+                  "fields": [
+                    {
+                      "name": "revision",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "selection",
+                      "type": "MarkdownEditorResolvedSelection",
+                      "optional": false,
+                      "nullable": false
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "payloadShapeStatus": "callable",
+            "payloadShapeReason": null
           },
           {
             "name": "submit",
@@ -11763,9 +11824,78 @@
                 "name": "event",
                 "type": "MarkdownEditorTransactionEvent",
                 "optional": false,
-                "rest": false
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "object",
+                  "type": "MarkdownEditorTransactionEvent",
+                  "fields": [
+                    {
+                      "name": "accepted",
+                      "type": "boolean",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "beforeRevision",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "documentIdentity",
+                      "type": "MarkdownEditorDocumentIdentity",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "history",
+                      "type": "MarkdownEditorHistoryState",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "positionMap",
+                      "type": "MarkdownEditorPositionMap | undefined",
+                      "optional": true,
+                      "nullable": false
+                    },
+                    {
+                      "name": "reason",
+                      "type": "MarkdownEditorTransactionRejection | undefined",
+                      "optional": true,
+                      "nullable": false
+                    },
+                    {
+                      "name": "revision",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "selection",
+                      "type": "MarkdownEditorResolvedSelection",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "transaction",
+                      "type": "MarkdownEditorTransaction",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "value",
+                      "type": "string",
+                      "optional": false,
+                      "nullable": false
+                    }
+                  ]
+                }
               }
-            ]
+            ],
+            "payloadShapeStatus": "callable",
+            "payloadShapeReason": null
           },
           {
             "name": "update:modelValue",

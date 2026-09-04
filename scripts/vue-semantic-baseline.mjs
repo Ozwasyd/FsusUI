@@ -3,6 +3,7 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import babelParser from '@babel/parser'
 import { parse as parseSfc } from 'vue/compiler-sfc'
+import { extractStructuredEmitPayloads } from './vue-structured-emit-payload.mjs'
 
 const { parse: babelParse } = babelParser
 
@@ -656,6 +657,7 @@ export const extractComponentSemantics = ({
   root,
   moduleSources,
   vueSource,
+  structuredEmitNames = [],
 }) => {
   const resolver = new SemanticResolver(root, moduleSources)
   const vueRel = vueSource ? vueSource.relativePath : null
@@ -669,17 +671,17 @@ export const extractComponentSemantics = ({
   const resolveCallArg = (argNode, fromRel) => {
     if (!argNode) return null
     const unwrapped = unwrapExpression(argNode)
-    if (unwrapped.type === 'ObjectExpression') return { object: unwrapped, source: resolver.readSource(fromRel) || '' }
-    if (unwrapped.type === 'ArrayExpression') return { array: unwrapped, source: resolver.readSource(fromRel) || '' }
+    if (unwrapped.type === 'ObjectExpression') return { object: unwrapped, source: resolver.readSource(fromRel) || '', sourceRel: fromRel }
+    if (unwrapped.type === 'ArrayExpression') return { array: unwrapped, source: resolver.readSource(fromRel) || '', sourceRel: fromRel }
     if (unwrapped.type === 'Identifier') {
       const resolved = resolver.resolveIdentifier(unwrapped.name, fromRel)
       if (!resolved?.node) return null
       const source = resolver.readSource(resolved.relPath) || ''
-      if (resolved.node.type === 'ObjectExpression') return { object: resolved.node, source }
-      if (resolved.node.type === 'ArrayExpression') return { array: resolved.node, source }
+      if (resolved.node.type === 'ObjectExpression') return { object: resolved.node, source, sourceRel: resolved.relPath }
+      if (resolved.node.type === 'ArrayExpression') return { array: resolved.node, source, sourceRel: resolved.relPath }
       if (resolved.node.type === 'CallExpression' && resolved.node.callee?.type === 'Identifier' && resolved.node.callee.name === 'buildProps') {
         const arg = unwrapExpression(resolved.node.arguments?.[0])
-        if (arg?.type === 'ObjectExpression') return { object: arg, source }
+        if (arg?.type === 'ObjectExpression') return { object: arg, source, sourceRel: resolved.relPath }
       }
     }
     return null
@@ -690,7 +692,7 @@ export const extractComponentSemantics = ({
     return parser.parseBuildPropsObject(objectNode)
   }
 
-  const collectEmitsFromObject = (objectNode, source, fromRel) => {
+  const collectEmitsFromObject = (objectNode, source, fromRel, sourceRel = fromRel) => {
     const result = []
     for (const property of objectNode.properties || []) {
       if (property.type !== 'ObjectProperty') continue
@@ -705,6 +707,20 @@ export const extractComponentSemantics = ({
       if (!name) continue
       const payload = payloadFromFunction(property.value, source)
       result.push({ name, payload })
+    }
+    const structured = extractStructuredEmitPayloads({
+      root,
+      sourceRelativePath: sourceRel,
+      objectStart: objectNode.start,
+      objectEnd: objectNode.end,
+      eventNames: structuredEmitNames,
+    })
+    for (const emit of result) {
+      const resolved = structured.get(emit.name)
+      if (!resolved) continue
+      emit.payloadShapeStatus = resolved.kind
+      emit.payloadShapeReason = resolved.reason ?? null
+      if (resolved.kind === 'callable') emit.payload = resolved.parameters
     }
     return result
   }
@@ -724,7 +740,7 @@ export const extractComponentSemantics = ({
         if (resolved?.object) props.push(...collectPropsFromObject(resolved.object, resolved.source, fromRel))
       } else if (macro === 'defineEmits') {
         const resolved = resolveCallArg(arg, fromRel)
-        if (resolved?.object) emits.push(...collectEmitsFromObject(resolved.object, resolved.source, fromRel))
+        if (resolved?.object) emits.push(...collectEmitsFromObject(resolved.object, resolved.source, fromRel, resolved.sourceRel))
         if (resolved?.array) emits.push(...collectEmitsFromArray(resolved.array))
       } else if (macro === 'defineExpose' && arg?.type === 'ObjectExpression') {
         for (const property of arg.properties || []) {

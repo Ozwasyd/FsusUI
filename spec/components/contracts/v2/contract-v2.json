@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "656ededfe5f9ae70b55fbdbb7211bd9fbf434eef5b0c19f0461ebb0cf5a8cf95",
+      "hash": "ea94ef2f724e4be433ccfdd14a3cf25ab88dd626b42660da1cd21726ff7fc7a9",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -4232,7 +4232,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "web-only",
@@ -4259,7 +4262,10 @@
           "kind": "output",
           "web": {
             "member": "scroll",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "web-only",
@@ -4844,7 +4850,10 @@
           "kind": "output",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -6158,7 +6167,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -6185,7 +6197,10 @@
           "kind": "output",
           "web": {
             "member": "[INPUT_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -6212,7 +6227,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -6239,7 +6257,10 @@
           "kind": "output",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -6266,7 +6287,10 @@
           "kind": "output",
           "web": {
             "member": "clear",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -6293,7 +6317,10 @@
           "kind": "output",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -6320,7 +6347,10 @@
           "kind": "output",
           "web": {
             "member": "select",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -8000,7 +8030,10 @@
           "kind": "output",
           "web": {
             "member": "error",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -8276,7 +8309,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "web-only",
@@ -10382,7 +10418,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -11391,7 +11430,10 @@
           "kind": "output",
           "web": {
             "member": "[INPUT_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -11418,7 +11460,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -13101,7 +13146,10 @@
           "kind": "output",
           "web": {
             "member": "change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -14514,7 +14562,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -14541,7 +14592,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -14568,7 +14622,10 @@
           "kind": "output",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -14595,7 +14652,10 @@
           "kind": "output",
           "web": {
             "member": "expandChange",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -14622,7 +14682,10 @@
           "kind": "output",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -14649,7 +14712,10 @@
           "kind": "output",
           "web": {
             "member": "removeTag",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -14676,7 +14742,10 @@
           "kind": "output",
           "web": {
             "member": "visibleChange",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -15905,7 +15974,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -15932,7 +16004,10 @@
           "kind": "output",
           "web": {
             "member": "update:checked",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -16681,7 +16756,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -16708,7 +16786,10 @@
           "kind": "output",
           "web": {
             "member": "change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -17680,7 +17761,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -17707,7 +17791,10 @@
           "kind": "output",
           "web": {
             "member": "change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -18471,7 +18558,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -18498,7 +18588,10 @@
           "kind": "output",
           "web": {
             "member": "change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -19667,7 +19760,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -19694,7 +19790,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -21967,7 +22066,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -21994,7 +22096,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -22021,7 +22126,10 @@
           "kind": "output",
           "web": {
             "member": "activeChange",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -22048,7 +22156,10 @@
           "kind": "output",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -22075,7 +22186,10 @@
           "kind": "output",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -23809,7 +23923,10 @@
           "kind": "output",
           "web": {
             "member": "select",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -24500,7 +24617,10 @@
           "kind": "output",
           "web": {
             "member": "copy",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -24527,7 +24647,10 @@
           "kind": "output",
           "web": {
             "member": "copy-error",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -25136,7 +25259,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -25163,7 +25289,10 @@
           "kind": "output",
           "web": {
             "member": "finish",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -26502,7 +26631,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -26529,7 +26661,10 @@
           "kind": "output",
           "web": {
             "member": "row-click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -27009,7 +27144,10 @@
           "kind": "output",
           "web": {
             "member": "minDate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -30755,7 +30893,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -30782,7 +30923,10 @@
           "kind": "output",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -30809,7 +30953,10 @@
           "kind": "output",
           "web": {
             "member": "closeAutoFocus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -30836,7 +30983,10 @@
           "kind": "output",
           "web": {
             "member": "closed",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -30863,7 +31013,10 @@
           "kind": "output",
           "web": {
             "member": "open",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -30890,7 +31043,10 @@
           "kind": "output",
           "web": {
             "member": "openAutoFocus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -30917,7 +31073,10 @@
           "kind": "output",
           "web": {
             "member": "opened",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -36020,7 +36179,10 @@
           "kind": "output",
           "web": {
             "member": "validate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -39700,7 +39862,10 @@
           "kind": "output",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -39727,7 +39892,10 @@
           "kind": "output",
           "web": {
             "member": "error",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -39754,7 +39922,10 @@
           "kind": "output",
           "web": {
             "member": "load",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -39781,7 +39952,10 @@
           "kind": "output",
           "web": {
             "member": "show",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -39808,7 +39982,10 @@
           "kind": "output",
           "web": {
             "member": "switch",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -40851,7 +41028,10 @@
           "kind": "output",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -40878,7 +41058,10 @@
           "kind": "output",
           "web": {
             "member": "rotate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -40905,7 +41088,10 @@
           "kind": "output",
           "web": {
             "member": "switch",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43468,7 +43654,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43495,7 +43684,10 @@
           "kind": "output",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43522,7 +43714,10 @@
           "kind": "output",
           "web": {
             "member": "change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43549,7 +43744,10 @@
           "kind": "output",
           "web": {
             "member": "clear",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43576,7 +43774,10 @@
           "kind": "output",
           "web": {
             "member": "compositionend",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43603,7 +43804,10 @@
           "kind": "output",
           "web": {
             "member": "compositionstart",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43630,7 +43834,10 @@
           "kind": "output",
           "web": {
             "member": "compositionupdate",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43657,7 +43864,10 @@
           "kind": "output",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43684,7 +43894,10 @@
           "kind": "output",
           "web": {
             "member": "input",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43711,7 +43924,10 @@
           "kind": "output",
           "web": {
             "member": "keydown",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43738,7 +43954,10 @@
           "kind": "output",
           "web": {
             "member": "mouseenter",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -43765,7 +43984,10 @@
           "kind": "output",
           "web": {
             "member": "mouseleave",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -45783,7 +46005,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -45810,7 +46035,10 @@
           "kind": "output",
           "web": {
             "member": "[INPUT_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -45837,7 +46065,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -45864,7 +46095,10 @@
           "kind": "output",
           "web": {
             "member": "blur",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -45891,7 +46125,10 @@
           "kind": "output",
           "web": {
             "member": "focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -47463,7 +47700,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -48272,7 +48512,10 @@
           "kind": "output",
           "web": {
             "member": "select",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -48299,7 +48542,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -48326,7 +48572,10 @@
           "kind": "output",
           "web": {
             "member": "update:selectedPoint",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50508,7 +50757,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50535,7 +50787,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50562,7 +50817,10 @@
           "kind": "output",
           "web": {
             "member": "command",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50589,7 +50847,10 @@
           "kind": "output",
           "web": {
             "member": "embed-open-source",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50616,7 +50877,10 @@
           "kind": "output",
           "web": {
             "member": "embed-retry",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50643,7 +50907,10 @@
           "kind": "output",
           "web": {
             "member": "features-activated",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50670,21 +50937,116 @@
           "kind": "output",
           "web": {
             "member": "history-change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": [
+              {
+                "name": "history",
+                "type": "MarkdownEditorHistoryState",
+                "optional": false,
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "object",
+                  "type": "MarkdownEditorHistoryState",
+                  "fields": [
+                    {
+                      "name": "canRedo",
+                      "type": "boolean",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "canUndo",
+                      "type": "boolean",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "redoDepth",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "retainedUnits",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "undoDepth",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    }
+                  ]
+                }
+              }
+            ],
+            "payloadShapeStatus": "callable",
+            "payloadShapeReason": null
           },
           "avalonia": {
             "member": "HistoryChange",
             "categories": [
               "function"
             ],
-            "argsType": "System.EventHandler<FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryChangedEventArgs>"
+            "argsType": "System.EventHandler<FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryChangedEventArgs>",
+            "argsShape": {
+              "kind": "object",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryChangedEventArgs",
+              "fields": [
+                {
+                  "name": "History",
+                  "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryState",
+                  "optional": false,
+                  "nullable": true,
+                  "shape": {
+                    "kind": "object",
+                    "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryState",
+                    "fields": [
+                      {
+                        "name": "CanRedo",
+                        "type": "System.Boolean",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "CanUndo",
+                        "type": "System.Boolean",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "RedoDepth",
+                        "type": "System.Int32",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "RetainedUnits",
+                        "type": "System.Int32",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "UndoDepth",
+                        "type": "System.Int32",
+                        "optional": false,
+                        "nullable": false
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
-            "eventPayload": null,
+            "eventPayload": "payload history nullability mismatch: web false vs avalonia true",
             "operationSignature": null,
             "enumValues": null
           },
@@ -50693,14 +51055,22 @@
           ],
           "semantic": "history-change",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real event exists on both sides but payload semantics are not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "mode-change",
           "kind": "output",
           "web": {
             "member": "mode-change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50727,7 +51097,10 @@
           "kind": "output",
           "web": {
             "member": "render-complete",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50754,7 +51127,10 @@
           "kind": "output",
           "web": {
             "member": "render-error",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50781,7 +51157,10 @@
           "kind": "output",
           "web": {
             "member": "save",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50808,21 +51187,92 @@
           "kind": "output",
           "web": {
             "member": "selection-change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": [
+              {
+                "name": "event",
+                "type": "MarkdownEditorSelectionEvent",
+                "optional": false,
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "object",
+                  "type": "MarkdownEditorSelectionEvent",
+                  "fields": [
+                    {
+                      "name": "revision",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "selection",
+                      "type": "MarkdownEditorResolvedSelection",
+                      "optional": false,
+                      "nullable": false
+                    }
+                  ]
+                }
+              }
+            ],
+            "payloadShapeStatus": "callable",
+            "payloadShapeReason": null
           },
           "avalonia": {
             "member": "SelectionChange",
             "categories": [
               "function"
             ],
-            "argsType": "System.EventHandler<FsusUI.Avalonia.Controls.FsusMarkdownEditorSelectionChangedEventArgs>"
+            "argsType": "System.EventHandler<FsusUI.Avalonia.Controls.FsusMarkdownEditorSelectionChangedEventArgs>",
+            "argsShape": {
+              "kind": "object",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelectionChangedEventArgs",
+              "fields": [
+                {
+                  "name": "Revision",
+                  "type": "System.Int32",
+                  "optional": false,
+                  "nullable": false
+                },
+                {
+                  "name": "Selection",
+                  "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
+                  "optional": false,
+                  "nullable": true,
+                  "shape": {
+                    "kind": "object",
+                    "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
+                    "fields": [
+                      {
+                        "name": "Direction",
+                        "type": "System.String",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "End",
+                        "type": "System.Int32",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "Start",
+                        "type": "System.Int32",
+                        "optional": false,
+                        "nullable": false
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
-            "eventPayload": null,
+            "eventPayload": "field selection nullability mismatch: web false vs avalonia true; field selection type not comparable: web unknown vs avalonia FsusMarkdownEditorSelection",
             "operationSignature": null,
             "enumValues": null
           },
@@ -50831,14 +51281,22 @@
           ],
           "semantic": "selection-change",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real event exists on both sides but payload semantics are not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "submit",
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -50865,21 +51323,242 @@
           "kind": "output",
           "web": {
             "member": "transaction",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": [
+              {
+                "name": "event",
+                "type": "MarkdownEditorTransactionEvent",
+                "optional": false,
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "object",
+                  "type": "MarkdownEditorTransactionEvent",
+                  "fields": [
+                    {
+                      "name": "accepted",
+                      "type": "boolean",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "beforeRevision",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "documentIdentity",
+                      "type": "MarkdownEditorDocumentIdentity",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "history",
+                      "type": "MarkdownEditorHistoryState",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "positionMap",
+                      "type": "MarkdownEditorPositionMap | undefined",
+                      "optional": true,
+                      "nullable": false
+                    },
+                    {
+                      "name": "reason",
+                      "type": "MarkdownEditorTransactionRejection | undefined",
+                      "optional": true,
+                      "nullable": false
+                    },
+                    {
+                      "name": "revision",
+                      "type": "number",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "selection",
+                      "type": "MarkdownEditorResolvedSelection",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "transaction",
+                      "type": "MarkdownEditorTransaction",
+                      "optional": false,
+                      "nullable": false
+                    },
+                    {
+                      "name": "value",
+                      "type": "string",
+                      "optional": false,
+                      "nullable": false
+                    }
+                  ]
+                }
+              }
+            ],
+            "payloadShapeStatus": "callable",
+            "payloadShapeReason": null
           },
           "avalonia": {
             "member": "Transaction",
             "categories": [
               "function"
             ],
-            "argsType": "System.EventHandler<FsusUI.Avalonia.Controls.FsusMarkdownEditorTransactionEventArgs>"
+            "argsType": "System.EventHandler<FsusUI.Avalonia.Controls.FsusMarkdownEditorTransactionEventArgs>",
+            "argsShape": {
+              "kind": "object",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransactionEventArgs",
+              "fields": [
+                {
+                  "name": "Result",
+                  "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+                  "optional": false,
+                  "nullable": true,
+                  "shape": {
+                    "kind": "object",
+                    "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+                    "fields": [
+                      {
+                        "name": "Accepted",
+                        "type": "System.Boolean",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "BeforeRevision",
+                        "type": "System.Int32",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "CanRedo",
+                        "type": "System.Boolean",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "CanUndo",
+                        "type": "System.Boolean",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "DocumentIdentity",
+                        "type": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "History",
+                        "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistoryState",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "PositionMap",
+                        "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorPositionMap",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "Reason",
+                        "type": "System.String",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "Revision",
+                        "type": "System.Int32",
+                        "optional": false,
+                        "nullable": false
+                      },
+                      {
+                        "name": "Selection",
+                        "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "Value",
+                        "type": "System.String",
+                        "optional": false,
+                        "nullable": true
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "Transaction",
+                  "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransaction",
+                  "optional": false,
+                  "nullable": true,
+                  "shape": {
+                    "kind": "object",
+                    "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransaction",
+                    "fields": [
+                      {
+                        "name": "Changes",
+                        "type": "System.Collections.Generic.IReadOnlyList<FsusUI.Avalonia.Controls.FsusMarkdownEditorChange>",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "DocumentIdentity",
+                        "type": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "ExpectedRevision",
+                        "type": "System.Int32?",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "ExternalUpdate",
+                        "type": "System.String",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "History",
+                        "type": "System.String",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "Metadata",
+                        "type": "System.Collections.Generic.IReadOnlyDictionary<System.String, System.Object>",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "Origin",
+                        "type": "System.String",
+                        "optional": false,
+                        "nullable": true
+                      },
+                      {
+                        "name": "Selection",
+                        "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
+                        "optional": false,
+                        "nullable": true
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           },
-          "status": "aligned-candidate",
+          "status": "partial",
           "drift": {
             "type": null,
             "default": null,
             "nullability": null,
-            "eventPayload": null,
+            "eventPayload": "missing avalonia field accepted; missing avalonia field beforeRevision; missing avalonia field documentIdentity; missing avalonia field history; missing avalonia field positionMap; missing avalonia field reason; missing avalonia field revision; missing avalonia field selection; field transaction nullability mismatch: web false vs avalonia true; field transaction type not comparable: web unknown vs avalonia FsusMarkdownEditorTransaction; missing avalonia field value; extra avalonia field Result",
             "operationSignature": null,
             "enumValues": null
           },
@@ -50888,14 +51567,22 @@
           ],
           "semantic": "transaction",
           "bindingBasis": "explicit-semantic",
-          "governance": null
+          "governance": {
+            "reason": "Real event exists on both sides but payload semantics are not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         },
         {
           "name": "upload-image",
           "kind": "output",
           "web": {
             "member": "upload-image",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -52202,6 +52889,17 @@
           }
         },
         {
+          "member": "history-change",
+          "kind": "output",
+          "status": "partial",
+          "governance": {
+            "reason": "Real event exists on both sides but payload semantics are not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "mode-change",
           "kind": "output",
           "status": "missing",
@@ -52246,11 +52944,33 @@
           }
         },
         {
+          "member": "selection-change",
+          "kind": "output",
+          "status": "partial",
+          "governance": {
+            "reason": "Real event exists on both sides but payload semantics are not comparable or drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "submit",
           "kind": "output",
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "transaction",
+          "kind": "output",
+          "status": "partial",
+          "governance": {
+            "reason": "Real event exists on both sides but payload semantics are not comparable or drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -53072,8 +53792,8 @@
       ],
       "coverage": {
         "total": 74,
-        "alignedCandidate": 4,
-        "partial": 13,
+        "alignedCandidate": 1,
+        "partial": 16,
         "missing": 57,
         "webOnly": 0,
         "mappedPercent": 23
@@ -53887,7 +54607,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -53914,7 +54637,10 @@
           "kind": "output",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -53941,7 +54667,10 @@
           "kind": "output",
           "web": {
             "member": "open",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -53968,7 +54697,10 @@
           "kind": "output",
           "web": {
             "member": "select",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -54295,7 +55027,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -55196,7 +55931,10 @@
           "kind": "output",
           "web": {
             "member": "destroy",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -58523,7 +59261,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -59352,7 +60093,10 @@
           "kind": "output",
           "web": {
             "member": "destroy",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -60488,7 +61232,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -60736,7 +61483,10 @@
           "kind": "output",
           "web": {
             "member": "back",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -62844,7 +63594,10 @@
           "kind": "output",
           "web": {
             "member": "alternative",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -62871,7 +63624,10 @@
           "kind": "output",
           "web": {
             "member": "cancel",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -62898,7 +63654,10 @@
           "kind": "output",
           "web": {
             "member": "error",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -62925,7 +63684,10 @@
           "kind": "output",
           "web": {
             "member": "expired",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -62952,7 +63714,10 @@
           "kind": "output",
           "web": {
             "member": "refresh",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -62979,7 +63744,10 @@
           "kind": "output",
           "web": {
             "member": "reissue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -63006,7 +63774,10 @@
           "kind": "output",
           "web": {
             "member": "rendered",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -63033,7 +63804,10 @@
           "kind": "output",
           "web": {
             "member": "retry",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -63060,7 +63834,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -63087,7 +63864,10 @@
           "kind": "output",
           "web": {
             "member": "verified",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -64804,7 +65584,10 @@
           "kind": "output",
           "web": {
             "member": "alternative",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -64831,7 +65614,10 @@
           "kind": "output",
           "web": {
             "member": "refresh",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -64858,7 +65644,10 @@
           "kind": "output",
           "web": {
             "member": "reissue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -64885,7 +65674,10 @@
           "kind": "output",
           "web": {
             "member": "retry",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -64912,7 +65704,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -64939,7 +65734,10 @@
           "kind": "output",
           "web": {
             "member": "update:modelValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -66260,7 +67058,10 @@
           "kind": "output",
           "web": {
             "member": "cancel",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -66287,7 +67088,10 @@
           "kind": "output",
           "web": {
             "member": "confirm",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -67567,7 +68371,10 @@
           "kind": "output",
           "web": {
             "member": "after-enter",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -67594,7 +68401,10 @@
           "kind": "output",
           "web": {
             "member": "after-leave",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -67621,7 +68431,10 @@
           "kind": "output",
           "web": {
             "member": "before-enter",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -67648,7 +68461,10 @@
           "kind": "output",
           "web": {
             "member": "before-leave",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -67675,7 +68491,10 @@
           "kind": "output",
           "web": {
             "member": "update:visible",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -69160,7 +69979,10 @@
           "kind": "output",
           "web": {
             "member": "after-enter",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -69187,7 +70009,10 @@
           "kind": "output",
           "web": {
             "member": "after-leave",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -69214,7 +70039,10 @@
           "kind": "output",
           "web": {
             "member": "before-enter",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -69241,7 +70069,10 @@
           "kind": "output",
           "web": {
             "member": "before-leave",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -69268,7 +70099,10 @@
           "kind": "output",
           "web": {
             "member": "update:visible",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -72653,7 +73487,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -72680,7 +73517,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -72707,7 +73547,10 @@
           "kind": "output",
           "web": {
             "member": "search",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -72734,7 +73577,10 @@
           "kind": "output",
           "web": {
             "member": "search-focus",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -72761,7 +73607,10 @@
           "kind": "output",
           "web": {
             "member": "update:searchQuery",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -73956,7 +74805,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -73983,7 +74835,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -75981,7 +76836,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -76008,7 +76866,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -80173,7 +81034,10 @@
           "kind": "output",
           "web": {
             "member": "scroll",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -82186,7 +83050,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -82213,7 +83080,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -88839,7 +89709,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -88866,7 +89739,10 @@
           "kind": "output",
           "web": {
             "member": "[INPUT_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -88893,7 +89769,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -91557,7 +92436,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -92147,7 +93029,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -93532,7 +94417,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -93559,7 +94447,10 @@
           "kind": "output",
           "web": {
             "member": "[INPUT_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -93586,7 +94477,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -96309,7 +97203,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -96336,7 +97233,10 @@
           "kind": "output",
           "web": {
             "member": "close",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -97677,7 +98577,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -97704,7 +98607,10 @@
           "kind": "output",
           "web": {
             "member": "update:modelValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -98306,7 +99212,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -98333,7 +99242,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -105176,7 +106088,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -105203,7 +106118,10 @@
           "kind": "output",
           "web": {
             "member": "[LEFT_CHECK_CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -105230,7 +106148,10 @@
           "kind": "output",
           "web": {
             "member": "[RIGHT_CHECK_CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -105257,7 +106178,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -108740,7 +109664,10 @@
           "kind": "output",
           "web": {
             "member": "check",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -108767,7 +109694,10 @@
           "kind": "output",
           "web": {
             "member": "click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -108794,7 +109724,10 @@
           "kind": "output",
           "web": {
             "member": "toggle",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -109547,7 +110480,10 @@
           "kind": "output",
           "web": {
             "member": "change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -109574,7 +110510,10 @@
           "kind": "output",
           "web": {
             "member": "update:modelValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -113798,7 +114737,10 @@
           "kind": "output",
           "web": {
             "member": "select",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -114489,7 +115431,10 @@
           "kind": "output",
           "web": {
             "member": "copy",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -114516,7 +115461,10 @@
           "kind": "output",
           "web": {
             "member": "copy-error",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -115842,7 +116790,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -115869,7 +116820,10 @@
           "kind": "output",
           "web": {
             "member": "row-click",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -121917,7 +122871,10 @@
           "kind": "output",
           "web": {
             "member": "select",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -121944,7 +122901,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -121971,7 +122931,10 @@
           "kind": "output",
           "web": {
             "member": "update:selectedPoint",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -124365,7 +125328,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -125965,7 +126931,10 @@
           "kind": "output",
           "web": {
             "member": "alternative",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -125992,7 +126961,10 @@
           "kind": "output",
           "web": {
             "member": "cancel",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -126019,7 +126991,10 @@
           "kind": "output",
           "web": {
             "member": "error",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -126046,7 +127021,10 @@
           "kind": "output",
           "web": {
             "member": "expired",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -126073,7 +127051,10 @@
           "kind": "output",
           "web": {
             "member": "refresh",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -126100,7 +127081,10 @@
           "kind": "output",
           "web": {
             "member": "reissue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -126127,7 +127111,10 @@
           "kind": "output",
           "web": {
             "member": "rendered",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -126154,7 +127141,10 @@
           "kind": "output",
           "web": {
             "member": "retry",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -126181,7 +127171,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -126208,7 +127201,10 @@
           "kind": "output",
           "web": {
             "member": "verified",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -127925,7 +128921,10 @@
           "kind": "output",
           "web": {
             "member": "alternative",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -127952,7 +128951,10 @@
           "kind": "output",
           "web": {
             "member": "refresh",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -127979,7 +128981,10 @@
           "kind": "output",
           "web": {
             "member": "reissue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -128006,7 +129011,10 @@
           "kind": "output",
           "web": {
             "member": "retry",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -128033,7 +129041,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -128060,7 +129071,10 @@
           "kind": "output",
           "web": {
             "member": "update:modelValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -131638,7 +132652,10 @@
           "kind": "output",
           "web": {
             "member": "[CHANGE_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -131665,7 +132682,10 @@
           "kind": "output",
           "web": {
             "member": "[UPDATE_MODEL_EVENT]",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -134066,7 +135086,10 @@
           "kind": "output",
           "web": {
             "member": "submit",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -134093,7 +135116,10 @@
           "kind": "output",
           "web": {
             "member": "update:modelValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -135261,7 +136287,10 @@
           "kind": "output",
           "web": {
             "member": "change",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -135288,7 +136317,10 @@
           "kind": "output",
           "web": {
             "member": "update:modelValue",
-            "baseline": "spec/baselines/vue-current.json"
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
           },
           "avalonia": null,
           "status": "missing",
@@ -144933,8 +145965,8 @@
     }
   ],
   "coverage": {
-    "aligned-candidate": 56,
-    "partial": 96,
+    "aligned-candidate": 53,
+    "partial": 99,
     "missing": 2029,
     "web-only": 20,
     "total": 2201,

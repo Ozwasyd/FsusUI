@@ -576,7 +576,13 @@ const fallbackPropsAndEmits = (sources, exportName) => {
   }
 }
 
-const parseComponent = (root, moduleName, exportName, classification) => {
+const parseComponent = (
+  root,
+  moduleName,
+  exportName,
+  classification,
+  structuredEmitNames,
+) => {
   const sources = loadModuleSources(root, moduleName)
   const vueSource = sourceForComponent(sources, exportName)
   const fromVue = vueSource
@@ -591,6 +597,7 @@ const parseComponent = (root, moduleName, exportName, classification) => {
     moduleSources: sources,
     vueSource,
     exportName,
+    structuredEmitNames,
   })
 
   return {
@@ -668,6 +675,20 @@ const parseServicesAndDirectives = (
 
 export const buildArtifacts = (root, options = {}) => {
   const classifications = loadClassifications(root)
+  const semanticBindingsPath = path.join(
+    root,
+    'spec/components/contracts/v2/semantic-member-bindings.json',
+  )
+  const structuredOutputs = new Map()
+  if (exists(semanticBindingsPath)) {
+    const semanticBindings = parseJson(semanticBindingsPath)
+    for (const binding of semanticBindings.mappings ?? []) {
+      if (binding.kind !== 'output') continue
+      const names = structuredOutputs.get(binding.component) ?? new Set()
+      names.add(binding.web)
+      structuredOutputs.set(binding.component, names)
+    }
+  }
   const packageJson = parseJson(
     path.join(root, 'vue/packages/element-plus/package.json'),
   )
@@ -684,7 +705,13 @@ export const buildArtifacts = (root, options = {}) => {
     const publicExports = parsePublicExports(root, moduleName)
     for (const exportName of publicExports) {
       components.push(
-        parseComponent(root, moduleName, exportName, classification),
+        parseComponent(
+          root,
+          moduleName,
+          exportName,
+          classification,
+          structuredOutputs.get(exportName) ?? [],
+        ),
       )
     }
   }
@@ -738,12 +765,22 @@ export const buildArtifacts = (root, options = {}) => {
     ).length
   }
 
-  const semanticVersion = '1.0.0'
+  const semanticVersion = '1.1.0'
   const compilerOptionsHash = sha256(
     stableJson({
       parser: ['@babel/parser'],
       plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes', 'topLevelAwait'],
       sfcCompiler: 'vue/compiler-sfc',
+      typeChecker: {
+        implementation: 'typescript',
+        configHash: hashFiles(root, [
+          'vue/tsconfig.base.json',
+          'vue/tsconfig.web.json',
+        ]),
+        structuredEmitScope: 'explicit semantic output bindings',
+        maxFields: 64,
+        maxDepth: 1,
+      },
     }),
   )
   const dependencyVersionHash = sha256(
@@ -763,6 +800,9 @@ export const buildArtifacts = (root, options = {}) => {
     'vue/packages/element-plus/package.json',
     'spec/baselines/vue-public-api-classifications.json',
   ])
+  const structuredOutputSelectionHash = hashFiles(root, [
+    'spec/components/contracts/v2/semantic-member-bindings.json',
+  ])
 
   const baseline = {
     schemaVersion: 1,
@@ -776,6 +816,7 @@ export const buildArtifacts = (root, options = {}) => {
       inputTreeHash,
       compilerOptionsHash,
       dependencyVersionHash,
+      structuredOutputSelectionHash,
       contractSchemaVersion: '2.0.0',
       outputHash: '',
     },
