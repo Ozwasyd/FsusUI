@@ -21,6 +21,13 @@ public static class Program
       return;
     }
 
+    if (args.Contains("--markdown-accessibility-harness", StringComparer.OrdinalIgnoreCase))
+    {
+      MarkdownAccessibilityHarnessRunner.Configure(args);
+      BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+      return;
+    }
+
     if (args.Contains("--render-performance", StringComparer.OrdinalIgnoreCase))
     {
       RenderPerformanceRunner.Configure(args);
@@ -49,6 +56,13 @@ public static class Program
       {
         RenderingMode = [X11RenderingMode.Software],
         EnableIme = true,
+      });
+    }
+    else if (MarkdownAccessibilityHarnessRunner.IsConfigured && OperatingSystem.IsLinux())
+    {
+      builder.With(new X11PlatformOptions
+      {
+        RenderingMode = [X11RenderingMode.Software],
       });
     }
     else if ((RenderPerformanceRunner.IsConfigured || ConformanceV2Runner.IsConfigured) &&

@@ -6,6 +6,18 @@ export interface MarkdownParserSyntaxRange {
   readonly end: number
 }
 
+export type MarkdownParserTableAlignment =
+  | 'none'
+  | 'left'
+  | 'center'
+  | 'right'
+
+export interface MarkdownParserTableRow {
+  readonly start: number
+  readonly end: number
+  readonly cells: readonly MarkdownParserSyntaxRange[]
+}
+
 export interface MarkdownParserSyntaxNode {
   readonly kind: string
   readonly start: number
@@ -17,6 +29,9 @@ export interface MarkdownParserSyntaxNode {
   readonly parentStart?: number
   readonly parentEnd?: number
   readonly children?: readonly MarkdownParserSyntaxRange[]
+  readonly tableRows?: readonly MarkdownParserTableRow[]
+  readonly tableSeparatorRow?: number
+  readonly tableAlignments?: readonly MarkdownParserTableAlignment[]
 }
 
 type SyntaxCollectExports = {

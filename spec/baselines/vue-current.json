@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "1e2a9c55e68a4fa72f58f28dbf15e371f231690b",
+    "commitSha": "ba866da9a56e1a147d06c51076f7e77485c70ab4",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.3.0+vue-semantic-baseline@1.3.0",
-    "inputTreeHash": "d2dc9c1ce7ef4b4ea943a08cb936be52f6e3b220c76a1667e977088374575a12",
+    "inputTreeHash": "5b2e329102953647d0703c7c815093f6dcf2dc67bfc7546a0ae529afcebe5199",
     "compilerOptionsHash": "df8ab8fc92c4ac95499d96bf7c98a51113b92d232707866dd35e1c588d75bb7c",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "dcb0a0555b218071cd84b8376257f189c11cf19265b3f40e974fa4f36cd99faf",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "2a0cd166f1ffecd47104e4aadbe7f63aa800e5feddd7a64dfaf27952fd5c7886"
+    "outputHash": "ef72dc5dd7d2378c7e1f6c5097e7ceaeb1316574c1afef40b419b2f9a38d7d25"
   },
   "summary": {
     "componentModules": 93,
@@ -42437,6 +42437,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/inbox-primitives.scss",
         "vue/packages/theme-chalk/src/link.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss",
         "vue/packages/theme-chalk/src/mixins/mixins.scss",

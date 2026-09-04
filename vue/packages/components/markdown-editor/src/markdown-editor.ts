@@ -27,6 +27,7 @@ import type {
   MarkdownNativeWritingToolsMode,
   MarkdownSpellcheckMode,
 } from './markdown-editor-language-tools'
+import { createMarkdownTableCommands } from './markdown-editor-table-acceptance'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { buildProps, definePropType } from '@element-plus/utils'
 
@@ -1600,6 +1601,7 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     enabled: (context) => context.syntax?.status !== 'malformed',
     run: () => ({ focus: 'surface', surface: 'anchor-properties' }),
   },
+  ...createMarkdownTableCommands(),
 ]
 
 export const isMarkdownEditorCommandVisible = (

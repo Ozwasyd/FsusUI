@@ -61,6 +61,39 @@ requireMatch(runner, /DOTNET_ROOT:\s*missingDotnetRoot/u, 'the runtime-free laun
 requireMatch(runner, /no-external-sources/u, 'the local-only restore receipt is required')
 requireMatch(
   runner,
+  /spawn\(\s*'\/usr\/bin\/Xvfb',\s*\[[^\]]+\],\s*\{\s*stdio:\s*'ignore',?\s*\},?\s*\)/u,
+  'Xvfb output must not use unread child-process pipes',
+)
+requireMatch(
+  runner,
+  /result\.error,[\s\S]*?result\.signal,[\s\S]*?result\.status/u,
+  'child timeout, signal, and missing status must fail closed',
+)
+requireMatch(
+  runner,
+  /killSignal:\s*'SIGKILL'/u,
+  'timed-out child processes must be terminated deterministically',
+)
+if ((runner.match(/timeout:\s*negativeControlTimeout/gu) ?? []).length !== 4) {
+  failures.push('all four negative controls require the bounded timeout')
+}
+requireMatch(
+  runner,
+  /await stopSpawnedChild\(xvfb,\s*'Xvfb'\)/u,
+  'Xvfb cleanup must wait for child termination',
+)
+requireMatch(
+  runner,
+  /await stopProcessId\(sessionBusPid,\s*'isolated desktop session bus'\)/u,
+  'session-bus cleanup must wait for process termination',
+)
+requireMatch(
+  runner,
+  /readFileSync\(`\/proc\/\$\{pid\}\/stat`,\s*'utf8'\)[\s\S]*?processState !== 'Z'/u,
+  'session-bus cleanup must recognize a terminated zombie in PID-namespace runs',
+)
+requireMatch(
+  runner,
   /if \(!existsSync\(alias\)\)/u,
   'RID pack aliases must reuse an existing native pack link',
 )

@@ -4,7 +4,10 @@
     :class="{ 'is-compact': compact, 'is-boundary': boundary }"
     v-bind="auditRootDataAttributes"
   >
-    <header class="audit-page__header">
+    <header
+      v-if="!markdownEditorTableEvidenceFixture"
+      class="audit-page__header"
+    >
       <h1>{{ auditTitle }}</h1>
       <p>{{ auditComponentNames.length }} components · {{ auditState }}</p>
     </header>
@@ -14,7 +17,11 @@
       No modal-class geometry patches, no test-only forks, no selector overrides.
       Profile overrides are applied by tests via #260 CSS variables on :root.
     -->
-    <section class="audit-safe-area-lab" v-bind="safeAreaDataAttributes.lab">
+    <section
+      v-if="!markdownEditorTableEvidenceFixture"
+      class="audit-safe-area-lab"
+      v-bind="safeAreaDataAttributes.lab"
+    >
       <h2 class="audit-safe-area-lab__title">Safe-area surfaces</h2>
       <div class="audit-safe-area-lab__controls">
         <el-button
@@ -195,16 +202,16 @@
           epoch: 1,
           id: `markdown-command-${markdownContextualSurface ?? 'default'}`,
         }"
-        :default-mode="
-          markdownPasteGate === 'preview-only' ? 'preview' : 'source'
-        "
+        :default-mode="markdownEditorDefaultMode"
         :disabled="markdownPasteGate === 'disabled'"
         :locale-text="markdownCommandLocaleText"
         :interaction-profile="markdownEditorInteractionProfile"
         :min-rows="6"
         :mobile-layout="markdownCommandMobileLayout"
         :show-actions="false"
-        :show-mode-switcher="markdownLanguageToolsFixture"
+        :show-mode-switcher="
+          markdownLanguageToolsFixture || markdownEditorModeMatrixFixture
+        "
         :status-density="markdownCommandStatusDensity"
         :surfaces="
           markdownCommandSurfacesFixture
@@ -221,7 +228,10 @@
         @transaction="recordMarkdownTransaction"
         @upload-image="recordMarkdownAttachmentBatch"
       />
-      <div aria-label="Markdown transaction controls">
+      <div
+        v-if="!markdownEditorTableEvidenceFixture"
+        aria-label="Markdown transaction controls"
+      >
         <button
           v-if="markdownCommandSurfacesFixture"
           type="button"
@@ -310,22 +320,40 @@
           Load image figure
         </button>
       </div>
-      <output data-testid="markdown-editor-value">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-value"
+      >
         {{ markdownTransactionValue.length }}
       </output>
-      <output data-testid="markdown-editor-revision">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-revision"
+      >
         {{ markdownTransactionRevision }}
       </output>
-      <output data-testid="markdown-editor-history">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-history"
+      >
         {{ JSON.stringify(markdownTransactionHistory) }}
       </output>
-      <output data-testid="markdown-editor-last-transaction">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-last-transaction"
+      >
         {{ JSON.stringify(markdownLastTransaction) }}
       </output>
-      <output data-testid="markdown-editor-selection">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-selection"
+      >
         {{ JSON.stringify(markdownTransactionSelection) }}
       </output>
-      <output data-testid="markdown-attachment-batch">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-attachment-batch"
+      >
         {{ JSON.stringify(markdownAttachmentBatchSnapshot) }}
       </output>
     </section>
@@ -491,7 +519,7 @@
       }}</output>
     </section>
 
-    <div class="audit-grid">
+    <div v-if="!markdownEditorTableEvidenceFixture" class="audit-grid">
       <AuditCard name="FixedSizeList" :state="auditState">
         <div class="audit-virtual-frame audit-virtual-frame--list">
           <fixed-size-list
@@ -2217,6 +2245,70 @@ const markdownWritingAidsOptions = {
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownEditorTableFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownEditorTable') === '1'
+const markdownEditorTableEvidenceFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get(
+    'markdownEditorTableEvidence',
+  ) === '1'
+const markdownEditorTableMatrixFixture =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get(
+        'markdownEditorTableMatrix',
+      )
+    : null
+const markdownEditorModeMatrixFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownEditorModeMatrix') ===
+    '1'
+const markdownEditorRequestedMode =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownEditorMode')
+    : null
+const markdownTableMatrix = (rows: number, columns: number) => {
+  const header = Array.from(
+    { length: columns },
+    (_, column) => `Column ${column + 1}`,
+  )
+  const separator = Array.from({ length: columns }, () => '---')
+  const body = Array.from({ length: rows }, (_, row) =>
+    Array.from(
+      { length: columns },
+      (_, column) => `r${row + 1}c${column + 1}`,
+    ),
+  )
+  return [header, separator, ...body]
+    .map((cells) => `| ${cells.join(' | ')} |`)
+    .join('\n')
+}
+const defaultMarkdownTable = [
+  '| Project | Owner | Status |',
+  '| --- | --- | --- |',
+  '| Documentation migration | Editorial systems | In review |',
+  '| Runtime projection | Platform team | Ready |',
+].join('\n')
+const markdownEditorTableValue =
+  markdownEditorTableMatrixFixture === '20x50'
+    ? markdownTableMatrix(50, 20)
+    : markdownEditorTableMatrixFixture === '1x1'
+      ? markdownTableMatrix(1, 1)
+      : markdownEditorTableMatrixFixture === 'large'
+        ? [
+            ...Array.from(
+              { length: 500 },
+              (_, index) => `Paragraph before table ${index + 1}.`,
+            ),
+            '',
+            defaultMarkdownTable,
+            '',
+            ...Array.from(
+              { length: 500 },
+              (_, index) => `Paragraph after table ${index + 1}.`,
+            ),
+          ].join('\n')
+        : defaultMarkdownTable
 const markdownSearchEmbedFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownSearchEmbed') ===
@@ -2438,6 +2530,14 @@ const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
     : null
+const markdownEditorDefaultMode =
+  markdownPasteGate === 'preview-only'
+    ? 'preview'
+    : markdownEditorRequestedMode === 'live' ||
+        markdownEditorRequestedMode === 'split' ||
+        markdownEditorRequestedMode === 'preview'
+      ? markdownEditorRequestedMode
+      : 'source'
 const markdownPasteGateAttributes = computed(() =>
   markdownPasteGate === 'readonly' ? { readonly: true } : {},
 )
@@ -2560,13 +2660,15 @@ const revealMissingMarkdownHeading = () => {
 const markdownTransactionValue = ref(
   markdownEditorImeFixture
     ? ''
-    : markdownContextualSurface === 'link'
-      ? '[Docs](https://old.test "Title")'
-      : markdownContextualSurface === 'anchor'
-        ? 'Paragraph ^intro'
-        : markdownCommandSurfacesFixture
-          ? '/bol'
-          : 'A😀éאב\n- 列表',
+    : markdownEditorTableFixture
+      ? markdownEditorTableValue
+      : markdownContextualSurface === 'link'
+        ? '[Docs](https://old.test "Title")'
+        : markdownContextualSurface === 'anchor'
+          ? 'Paragraph ^intro'
+          : markdownCommandSurfacesFixture
+            ? '/bol'
+            : 'A😀éאב\n- 列表',
 )
 const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({
   canRedo: false,

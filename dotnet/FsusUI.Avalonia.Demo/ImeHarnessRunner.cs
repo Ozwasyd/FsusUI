@@ -766,16 +766,24 @@ internal static class ImeHarnessRunner
 
   private static ImeProvenance BuildProvenance(FsusMarkdownEditor editor)
   {
+    var display = Environment.GetEnvironmentVariable("DISPLAY") ?? "unset";
+    var xServer = ImeHarnessPlatformProvenance.DetectXServer(display);
     return new ImeProvenance
     {
       Kind = "linux-x11-ibus",
-      Platform = "X11 (Avalonia.Desktop UsePlatformDetect) via XWayland on a GNOME Wayland session",
+      Platform = xServer is null
+        ? $"unverified X11 display {display} (Avalonia.Desktop UsePlatformDetect)"
+        : $"{xServer.Kind} {xServer.Display} (Avalonia.Desktop UsePlatformDetect)",
       InputMethod = "ibus (XIM bridge: ibus-x11)",
       InputMethodEngine = "unknown",
       Injection = "XTestFakeKeyEvent (libXtst) — real key events through the X server input pipeline",
-      Display = Environment.GetEnvironmentVariable("DISPLAY") ?? "unset",
+      Display = display,
       SessionType = Environment.GetEnvironmentVariable("XDG_SESSION_TYPE") ?? "unset",
+      ScreenScaleFactors =
+        Environment.GetEnvironmentVariable("AVALONIA_SCREEN_SCALE_FACTORS") ?? "system",
       XModifiers = Environment.GetEnvironmentVariable("XMODIFIERS") ?? "unset",
+      XServerKind = xServer?.Kind ?? "unverified",
+      XServerPid = xServer?.ProcessId,
       HostOs = Environment.OSVersion.ToString(),
       CandidateSha = candidate,
       EditorProvenance = editor.NativeInputProvenance,
@@ -790,6 +798,9 @@ internal static class ImeHarnessRunner
     provenance.EditorProvenance == "linux-x11-ibus:libpinyin" &&
     provenance.Display is not ("" or "unset") &&
     provenance.XModifiers == "@im=ibus" &&
+    ImeHarnessPlatformProvenance.IsAcceptedXServer(
+      provenance.XServerKind,
+      provenance.XServerPid) &&
     provenance.CandidateSha.Length == 40 &&
     provenance.CandidateSha.All(Uri.IsHexDigit) &&
     provenance.RawKeyEvents is { Count: > 0 } &&
@@ -876,7 +887,13 @@ internal static class ImeHarnessRunner
 
     public string SessionType { get; set; } = "";
 
+    public string ScreenScaleFactors { get; set; } = "";
+
     public string XModifiers { get; set; } = "";
+
+    public string XServerKind { get; set; } = "";
+
+    public int? XServerPid { get; set; }
 
     public string HostOs { get; set; } = "";
 

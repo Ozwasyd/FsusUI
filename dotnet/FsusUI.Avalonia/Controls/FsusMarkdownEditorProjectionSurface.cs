@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -218,10 +219,38 @@ internal sealed class FsusMarkdownEditorProjectionState
     new(false, revision, [], [], [], reason);
 }
 
+internal sealed record FsusMarkdownViewportDiagnostics(
+  bool IsVirtualized,
+  int TotalLogicalLines,
+  int RealizedLogicalLines,
+  int RealizedVisualLines,
+  int RealizedCharacterCount,
+  int RetainedLayoutCount,
+  double EstimatedExtentHeight,
+  int FullIndexBuildCount,
+  int IncrementalIndexUpdateCount);
+
 internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Controls.Primitives.TemplatedControl
 {
+  private const int VirtualizationCharacterThreshold = 100_000;
+  private const int VirtualizationLineThreshold = 3_000;
+  private const int VirtualizationOverscanLines = 12;
+
   private TextLayout? layout;
   private string text = string.Empty;
+  private string layoutText = string.Empty;
+  private readonly List<int> lineStarts = [0];
+  private readonly List<double> lineTops = [0, 0];
+  private int layoutStart;
+  private int layoutEnd;
+  private int layoutStartLine;
+  private int layoutEndLine;
+  private double layoutOriginY;
+  private double viewportOffsetY;
+  private double viewportHeight = 640;
+  private double lineMetricsWidth = double.NaN;
+  private int fullIndexBuildCount;
+  private int incrementalIndexUpdateCount;
   private FsusMarkdownProjectionMap? map;
   private IReadOnlyList<FsusMarkdownProjectionSpan>? spans;
   private IReadOnlyList<ValueSpan<TextRunProperties>>? styleOverrides;
@@ -233,12 +262,73 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
   private IReadOnlyList<FsusMarkdownSourceRange> focusExemptRanges = [];
   private bool focusPresentationEnabled;
 
+  internal FsusMarkdownViewportDiagnostics ViewportDiagnostics => new(
+    IsVirtualized,
+    lineStarts.Count,
+    Math.Max(0, layoutEndLine - layoutStartLine),
+    layout?.TextLines.Count ?? 0,
+    Math.Max(0, layoutEnd - layoutStart),
+    layout is null ? 0 : 1,
+    lineTops.Count == 0 ? 0 : lineTops[^1],
+    fullIndexBuildCount,
+    incrementalIndexUpdateCount);
+
+  internal FsusMarkdownSourceRange VisibleSourceRange
+  {
+    get
+    {
+      EnsureLayout(Math.Max(Bounds.Width, 1));
+      if (map is null || layout is null)
+      {
+        return new(0, 0);
+      }
+      if (!IsVirtualized)
+      {
+        var first = text.Length;
+        var last = text.Length;
+        var lineTop = 0d;
+        var foundFirst = false;
+        foreach (var line in layout.TextLines)
+        {
+          var lineBottom = lineTop + line.Height;
+          if (!foundFirst && lineBottom >= viewportOffsetY)
+          {
+            first = Math.Max(0, line.FirstTextSourceIndex);
+            foundFirst = true;
+          }
+          if (lineTop <= viewportOffsetY + viewportHeight)
+          {
+            last = Math.Min(
+              text.Length,
+              line.FirstTextSourceIndex + line.Length);
+          }
+          else
+          {
+            break;
+          }
+          lineTop = lineBottom;
+        }
+        return new(
+          map.VisualToSource(first, -1),
+          map.VisualToSource(last, 1));
+      }
+      return new(
+        map.VisualToSource(Math.Clamp(layoutStart, 0, text.Length), -1),
+        map.VisualToSource(Math.Clamp(layoutEnd, 0, text.Length), 1));
+    }
+  }
+
+  private bool IsVirtualized =>
+    text.Length >= VirtualizationCharacterThreshold ||
+    lineStarts.Count >= VirtualizationLineThreshold;
+
   public void Update(
     string displayText,
     FsusMarkdownProjectionMap? projectionMap,
     FsusMarkdownEditorSelection sourceSelection,
     IReadOnlyList<FsusMarkdownProjectionSpan>? projectionSpans)
   {
+    var previousText = text;
     var presentationChanged =
       !string.Equals(text, displayText, StringComparison.Ordinal) ||
       !ReferenceEquals(map, projectionMap) ||
@@ -249,12 +339,49 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
     selection = sourceSelection;
     if (presentationChanged)
     {
+      if (!string.Equals(previousText, displayText, StringComparison.Ordinal))
+      {
+        UpdateLineIndex(previousText, displayText);
+        lineMetricsWidth = double.NaN;
+      }
       styleOverrides = null;
       decorations = null;
       layout = null;
+      lineMetricsWidth = double.NaN;
       InvalidateMeasure();
     }
     InvalidateVisual();
+  }
+
+  public void UpdateViewport(double offsetY, double height)
+  {
+    var nextOffset = Math.Max(0, offsetY);
+    var nextHeight = Math.Max(FontSize * 1.5, height);
+    if (Math.Abs(viewportOffsetY - nextOffset) < 0.5 &&
+      Math.Abs(viewportHeight - nextHeight) < 0.5)
+    {
+      return;
+    }
+    viewportOffsetY = nextOffset;
+    viewportHeight = nextHeight;
+    if (IsVirtualized)
+    {
+      layout = null;
+      InvalidateVisual();
+    }
+  }
+
+  public void ReleaseRetainedState()
+  {
+    layout = null;
+    layoutText = string.Empty;
+    styleOverrides = null;
+    decorations = null;
+    layoutStart = 0;
+    layoutEnd = 0;
+    layoutStartLine = 0;
+    layoutEndLine = 0;
+    lineMetricsWidth = double.NaN;
   }
 
   public void UpdateAdjacent(
@@ -275,21 +402,22 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
   public int HitTestSource(Point point)
   {
     EnsureLayout(Math.Max(Bounds.Width, 1));
-    if (layout is null || map is null || text.Length == 0)
+    if (layout is null || map is null || layoutText.Length == 0)
     {
       return 0;
     }
     var bestOffset = 0;
     var bestDistance = double.PositiveInfinity;
-    for (var offset = 0; offset <= text.Length; offset += 1)
+    var localPoint = point.WithY(point.Y - layoutOriginY);
+    for (var offset = 0; offset <= layoutText.Length; offset += 1)
     {
       var rectangle = layout.HitTestTextPosition(offset);
-      var dx = point.X < rectangle.Left
-        ? rectangle.Left - point.X
-        : point.X > rectangle.Right ? point.X - rectangle.Right : 0;
-      var dy = point.Y < rectangle.Top
-        ? rectangle.Top - point.Y
-        : point.Y > rectangle.Bottom ? point.Y - rectangle.Bottom : 0;
+      var dx = localPoint.X < rectangle.Left
+        ? rectangle.Left - localPoint.X
+        : localPoint.X > rectangle.Right ? localPoint.X - rectangle.Right : 0;
+      var dy = localPoint.Y < rectangle.Top
+        ? rectangle.Top - localPoint.Y
+        : localPoint.Y > rectangle.Bottom ? localPoint.Y - rectangle.Bottom : 0;
       var distance = dx * dx + dy * dy;
       if (distance < bestDistance)
       {
@@ -297,11 +425,17 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
         bestOffset = offset;
       }
     }
-    return map.VisualToSource(bestOffset, 1);
+    return map.VisualToSource(layoutStart + bestOffset, 1);
   }
 
   internal int GetSourceLineAnchor(double visualY)
   {
+    if (IsVirtualized)
+    {
+      EnsureLineMetrics(Math.Max(Bounds.Width, 1));
+      var line = FindLineForY(visualY);
+      return map?.VisualToSource(lineStarts[line], 1) ?? 0;
+    }
     EnsureLayout(Math.Max(Bounds.Width, 1));
     if (layout is null || map is null || layout.TextLines.Count == 0)
     {
@@ -326,12 +460,21 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
 
   internal double GetVisualLineTopForSource(int sourceOffset)
   {
-    EnsureLayout(Math.Max(Bounds.Width, 1));
-    if (layout is null || map is null)
+    if (map is null)
     {
       return 0;
     }
     var visualOffset = map.SourceToVisual(sourceOffset, -1);
+    if (IsVirtualized)
+    {
+      EnsureLineMetrics(Math.Max(Bounds.Width, 1));
+      return lineTops[FindLineIndex(visualOffset)];
+    }
+    EnsureLayout(Math.Max(Bounds.Width, 1));
+    if (layout is null)
+    {
+      return 0;
+    }
     return Math.Max(
       0,
       layout.HitTestTextPosition(Math.Clamp(visualOffset, 0, text.Length)).Top);
@@ -340,9 +483,14 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
   protected override Size MeasureOverride(Size availableSize)
   {
     EnsureLayout(double.IsInfinity(availableSize.Width) ? 640 : Math.Max(availableSize.Width, 1));
-    return layout is null
-      ? new Size(0, FontSize * 1.5)
-      : new Size(layout.WidthIncludingTrailingWhitespace, Math.Max(layout.Height, FontSize * 1.5));
+    if (layout is null)
+    {
+      return new Size(0, EstimatedLineHeight);
+    }
+    var height = IsVirtualized
+      ? Math.Max(EstimatedLineHeight, lineTops[^1])
+      : Math.Max(layout.Height, EstimatedLineHeight);
+    return new Size(layout.WidthIncludingTrailingWhitespace, height);
   }
 
   public override void Render(DrawingContext context)
@@ -354,14 +502,26 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       return;
     }
 
-    var visualStart = map?.SourceToVisual(selection.Start, -1) ?? 0;
-    var visualEnd = map?.SourceToVisual(selection.End, 1) ?? visualStart;
+    var globalVisualStart = map?.SourceToVisual(selection.Start, -1) ?? 0;
+    var globalVisualEnd = map?.SourceToVisual(selection.End, 1) ?? globalVisualStart;
+    using var translated = context.PushTransform(
+      Matrix.CreateTranslation(0, layoutOriginY));
+    var visualStart = Math.Clamp(
+      globalVisualStart - layoutStart,
+      0,
+      layoutText.Length);
+    var visualEnd = Math.Clamp(
+      globalVisualEnd - layoutStart,
+      0,
+      layoutText.Length);
     DrawSearchHighlights(context, layout);
-    if (visualEnd > visualStart)
+    if (visualEnd > visualStart &&
+      globalVisualEnd > layoutStart &&
+      globalVisualStart < layoutEnd)
     {
       var selectionBrush = new SolidColorBrush(Color.FromArgb(72, 66, 133, 244));
-      for (var offset = Math.Clamp(visualStart, 0, text.Length);
-        offset < Math.Clamp(visualEnd, 0, text.Length);
+      for (var offset = visualStart;
+        offset < visualEnd;
         offset += 1)
       {
         var start = layout.HitTestTextPosition(offset);
@@ -375,9 +535,11 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       }
     }
     DrawProjectionText(context, layout);
-    if (visualStart == visualEnd)
+    if (globalVisualStart == globalVisualEnd &&
+      globalVisualStart >= layoutStart &&
+      globalVisualStart <= layoutEnd)
     {
-      var caret = layout.HitTestTextPosition(Math.Clamp(visualStart, 0, text.Length));
+      var caret = layout.HitTestTextPosition(visualStart);
       context.DrawLine(
         new Pen(Foreground ?? Brushes.Black, 1),
         new Point(caret.Left, caret.Top),
@@ -396,8 +558,14 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
     for (var index = 0; index < searchMatches.Count; index += 1)
     {
       var range = searchMatches[index].SourceRange;
-      var start = Math.Clamp(map.SourceToVisual(range.Start, -1), 0, text.Length);
-      var end = Math.Clamp(map.SourceToVisual(range.End, 1), 0, text.Length);
+      var start = Math.Clamp(
+        map.SourceToVisual(range.Start, -1) - layoutStart,
+        0,
+        layoutText.Length);
+      var end = Math.Clamp(
+        map.SourceToVisual(range.End, 1) - layoutStart,
+        0,
+        layoutText.Length);
       if (end <= start)
       {
         continue;
@@ -436,8 +604,14 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
     }
     foreach (var range in focusActiveRanges.Concat(focusExemptRanges))
     {
-      var start = Math.Clamp(map.SourceToVisual(range.Start, -1), 0, text.Length);
-      var end = Math.Clamp(map.SourceToVisual(range.End, 1), 0, text.Length);
+      var start = Math.Clamp(
+        map.SourceToVisual(range.Start, -1) - layoutStart,
+        0,
+        layoutText.Length);
+      var end = Math.Clamp(
+        map.SourceToVisual(range.End, 1) - layoutStart,
+        0,
+        layoutText.Length);
       if (end <= start)
       {
         continue;
@@ -481,6 +655,7 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       styleOverrides = null;
       decorations = null;
       layout = null;
+      lineMetricsWidth = double.NaN;
       InvalidateMeasure();
       InvalidateVisual();
     }
@@ -492,9 +667,11 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
     {
       return;
     }
-    BuildProsePresentation();
+    EnsureLineMetrics(width);
+    ResolveLayoutWindow();
+    BuildProsePresentation(layoutStart, layoutEnd);
     layout = new TextLayout(
-      text,
+      layoutText,
       new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
       FontSize,
       Foreground ?? Brushes.Black,
@@ -513,13 +690,48 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       null);
   }
 
+  private double EstimatedLineHeight => Math.Max(1, FontSize * 1.5);
+
+  private void ResolveLayoutWindow()
+  {
+    if (!IsVirtualized)
+    {
+      layoutStart = 0;
+      layoutEnd = text.Length;
+      layoutStartLine = 0;
+      layoutEndLine = lineStarts.Count;
+      layoutOriginY = 0;
+      layoutText = text;
+      return;
+    }
+
+    var firstVisibleLine = Math.Clamp(
+      FindLineForY(viewportOffsetY),
+      0,
+      Math.Max(0, lineStarts.Count - 1));
+    var lastVisibleLine = Math.Clamp(
+      FindLineForY(viewportOffsetY + viewportHeight) + 1,
+      firstVisibleLine,
+      lineStarts.Count);
+    layoutStartLine = Math.Max(0, firstVisibleLine - VirtualizationOverscanLines);
+    layoutEndLine = Math.Min(
+      lineStarts.Count,
+      lastVisibleLine + VirtualizationOverscanLines);
+    layoutStart = lineStarts[layoutStartLine];
+    layoutEnd = layoutEndLine < lineStarts.Count
+      ? lineStarts[layoutEndLine]
+      : text.Length;
+    layoutOriginY = lineTops[layoutStartLine];
+    layoutText = text[layoutStart..layoutEnd];
+  }
+
   /// <summary>
   /// Resolves the fsus-prose-equivalent presentation for the committed
   /// projection spans: typography runs per SemanticKind plus the quote and
   /// list decorations. Presentation is theme-driven; every value resolves
   /// through a theme resource with a light/dark-safe fallback.
   /// </summary>
-  private void BuildProsePresentation()
+  private void BuildProsePresentation(int windowStart, int windowEnd)
   {
     styleOverrides = null;
     decorations = null;
@@ -550,8 +762,8 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       {
         continue;
       }
-      visualStart = Math.Clamp(visualStart, 0, text.Length);
-      visualEnd = Math.Clamp(visualEnd, 0, text.Length);
+      visualStart = Math.Clamp(visualStart, windowStart, windowEnd) - windowStart;
+      visualEnd = Math.Clamp(visualEnd, windowStart, windowEnd) - windowStart;
       if (visualEnd <= visualStart)
       {
         continue;
@@ -656,6 +868,180 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
     return levels;
   }
 
+  private void UpdateLineIndex(string previous, string current)
+  {
+    if (previous.Length == 0 || lineStarts.Count == 0)
+    {
+      RebuildLineIndex(current);
+      return;
+    }
+    if (string.Equals(previous, current, StringComparison.Ordinal))
+    {
+      return;
+    }
+
+    var prefix = 0;
+    while (prefix < previous.Length &&
+      prefix < current.Length &&
+      previous[prefix] == current[prefix])
+    {
+      prefix += 1;
+    }
+    var previousSuffix = previous.Length;
+    var currentSuffix = current.Length;
+    while (previousSuffix > prefix &&
+      currentSuffix > prefix &&
+      previous[previousSuffix - 1] == current[currentSuffix - 1])
+    {
+      previousSuffix -= 1;
+      currentSuffix -= 1;
+    }
+
+    var prefixLine = FindLineIndex(prefix);
+    var rebuildStart = lineStarts[prefixLine];
+    var suffixLine = LowerBound(lineStarts, previousSuffix);
+    var previousAnchor = suffixLine < lineStarts.Count
+      ? lineStarts[suffixLine]
+      : previous.Length;
+    var delta = current.Length - previous.Length;
+    var currentAnchor = previousAnchor + delta;
+    if (currentAnchor < rebuildStart ||
+      currentAnchor < 0 ||
+      currentAnchor > current.Length ||
+      !previous.AsSpan(previousAnchor).SequenceEqual(current.AsSpan(currentAnchor)))
+    {
+      RebuildLineIndex(current);
+      return;
+    }
+
+    var next = new List<int>(lineStarts.Count + 4);
+    for (var index = 0; index <= prefixLine && index < lineStarts.Count; index += 1)
+    {
+      next.Add(lineStarts[index]);
+    }
+    for (var index = rebuildStart; index < currentAnchor; index += 1)
+    {
+      if (current[index] == '\n' &&
+        index + 1 < currentAnchor &&
+        (next.Count == 0 || next[^1] != index + 1))
+      {
+        next.Add(index + 1);
+      }
+    }
+    for (var index = suffixLine; index < lineStarts.Count; index += 1)
+    {
+      var shifted = lineStarts[index] + delta;
+      if (shifted >= 0 &&
+        shifted <= current.Length &&
+        (next.Count == 0 || next[^1] != shifted))
+      {
+        next.Add(shifted);
+      }
+    }
+    if (next.Count == 0 || next[0] != 0)
+    {
+      RebuildLineIndex(current);
+      return;
+    }
+    lineStarts.Clear();
+    lineStarts.AddRange(next);
+    lineMetricsWidth = double.NaN;
+    incrementalIndexUpdateCount += 1;
+  }
+
+  private void RebuildLineIndex(string source)
+  {
+    lineStarts.Clear();
+    lineStarts.Add(0);
+    for (var index = 0; index < source.Length; index += 1)
+    {
+      if (source[index] == '\n' && index + 1 < source.Length)
+      {
+        lineStarts.Add(index + 1);
+      }
+    }
+    lineMetricsWidth = double.NaN;
+    fullIndexBuildCount += 1;
+  }
+
+  private void EnsureLineMetrics(double width)
+  {
+    if (!double.IsNaN(lineMetricsWidth) &&
+      Math.Abs(lineMetricsWidth - width) < 0.5 &&
+      lineTops.Count == lineStarts.Count + 1)
+    {
+      return;
+    }
+    lineMetricsWidth = width;
+    lineTops.Clear();
+    lineTops.Add(0);
+    var latinColumnWidth = Math.Max(1, FontSize * 0.56);
+    var cjkColumnWidth = Math.Max(latinColumnWidth, FontSize);
+    for (var line = 0; line < lineStarts.Count; line += 1)
+    {
+      var start = lineStarts[line];
+      var end = line + 1 < lineStarts.Count
+        ? Math.Max(start, lineStarts[line + 1] - 1)
+        : text.Length;
+      var columns = 0d;
+      foreach (var rune in text.AsSpan(start, Math.Max(0, end - start)).EnumerateRunes())
+      {
+        columns += rune.Value >= 0x2E80 ? cjkColumnWidth : latinColumnWidth;
+      }
+      var wraps = Math.Max(1, (int)Math.Ceiling(columns / Math.Max(1, width)));
+      lineTops.Add(lineTops[^1] + (wraps * EstimatedLineHeight));
+    }
+  }
+
+  private int FindLineForY(double visualY)
+  {
+    var target = Math.Max(0, visualY);
+    var low = 0;
+    var high = Math.Max(0, lineTops.Count - 1);
+    while (low < high)
+    {
+      var middle = low + ((high - low) / 2);
+      if (lineTops[middle + 1] <= target)
+      {
+        low = middle + 1;
+      }
+      else
+      {
+        high = middle;
+      }
+    }
+    return Math.Clamp(low, 0, Math.Max(0, lineStarts.Count - 1));
+  }
+
+  private int FindLineIndex(int visualOffset)
+  {
+    var insertion = LowerBound(lineStarts, Math.Clamp(visualOffset, 0, text.Length));
+    if (insertion < lineStarts.Count && lineStarts[insertion] == visualOffset)
+    {
+      return insertion;
+    }
+    return Math.Max(0, insertion - 1);
+  }
+
+  private static int LowerBound(IReadOnlyList<int> values, int target)
+  {
+    var low = 0;
+    var high = values.Count;
+    while (low < high)
+    {
+      var middle = low + ((high - low) / 2);
+      if (values[middle] < target)
+      {
+        low = middle + 1;
+      }
+      else
+      {
+        high = middle;
+      }
+    }
+    return low;
+  }
+
   private IBrush? ResolveBrush(string key) =>
     this.TryFindResource(key, out var resource) && resource is IBrush brush ? brush : null;
 
@@ -710,7 +1096,7 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       var top = first.Value.Top;
       var bottom = last?.Bottom ?? first.Value.Bottom;
       context.FillRectangle(
-        new Pen(brush, 2).Brush,
+        brush,
         new Rect(Math.Max(0, first.Value.Left - 8), top, 2, Math.Max(2, bottom - top)));
     }
   }

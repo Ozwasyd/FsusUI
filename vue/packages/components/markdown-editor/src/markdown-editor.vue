@@ -298,6 +298,7 @@
       :data-markdown-atomic-status="liveAtomic?.state || undefined"
       :data-markdown-layout-action="liveLayout.action"
       :data-markdown-layout-smooth="liveLayout.smooth ? 'true' : 'false'"
+      @scroll="handlePreviewScroll"
     >
       <pre
         v-if="writingAidsFocusState.enabled"
@@ -344,6 +345,7 @@
         @click="handlePointerReveal"
         @compositionend="handleCompositionEnd"
         @compositionstart="handleCompositionStart"
+        @contextmenu="handleTableContextMenu"
         @copy="handleCopy"
         @cut="handleCut"
         @dragover.prevent
@@ -481,6 +483,48 @@
           </button>
         </div>
       </form>
+
+      <div
+        v-if="currentTableCell && !editingBlocked"
+        :class="ns.e('table-context')"
+      >
+        <button
+          ref="tableMenuTriggerRef"
+          type="button"
+          :class="ns.e('table-menu-trigger')"
+          aria-haspopup="menu"
+          :aria-controls="tableMenuId"
+          :aria-expanded="tableMenuOpen"
+          aria-label="表格操作"
+          @click="toggleTableMenu"
+        >
+          表格操作
+        </button>
+        <div
+          v-if="tableMenuOpen"
+          :id="tableMenuId"
+          ref="tableMenuRef"
+          :class="ns.e('table-menu')"
+          role="menu"
+          aria-label="表格操作"
+          @keydown="handleTableMenuKeydown"
+        >
+          <button
+            v-for="action in tableContextActions"
+            :key="action.key"
+            type="button"
+            role="menuitem"
+            :title="action.title"
+            :aria-label="action.title"
+            @click="runTableContextAction(action.key)"
+          >
+            {{ action.label }}
+          </button>
+        </div>
+      </div>
+      <span :class="ns.e('visually-hidden')" aria-live="polite">
+        {{ tableAnnouncement }}
+      </span>
 
       <div
         v-if="liveDecorations.length"
@@ -653,7 +697,7 @@
         :loading-text="localeText.states.loading"
         mode="editor"
         @features-activated="emitRenderEvent('features-activated', $event)"
-        @render-complete="handleRendererComplete($event)"
+        @render-complete="handlePreviewRenderComplete($event)"
         @render-error="emitRenderEvent('render-error', $event)"
       />
     </div>
@@ -1261,6 +1305,24 @@ import {
   type MarkdownLiveLayoutTrigger,
   type MarkdownLiveVirtualWindow,
 } from './markdown-editor-live-layout'
+import {
+  planMarkdownTableAlignColumn,
+  planMarkdownTableDeleteColumn,
+  planMarkdownTableDeleteRow,
+  planMarkdownTableInsertColumn,
+  planMarkdownTableInsertRow,
+  planMarkdownTableMoveColumn,
+  planMarkdownTableMoveRow,
+  resolveMarkdownTableCellAtOffset,
+  resolveMarkdownTableCellCoordinates,
+  type MarkdownTableCellIdentity,
+} from './markdown-editor-table-structure'
+import {
+  planMarkdownTableFormat,
+  planMarkdownTablePaste,
+  resolveMarkdownTableInputIntent,
+} from './markdown-editor-table-input'
+import { resolveMarkdownTableContextActions } from './markdown-editor-table-acceptance'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
 import {
@@ -1348,7 +1410,12 @@ const pasteAsMarkdownBusy = ref(false)
 const pasteAsMarkdownDescriptionId = `${useId()}-paste-as-markdown-description`
 const pasteAsMarkdownTitleId = `${useId()}-paste-as-markdown-title`
 const pasteAsMarkdownHelpId = `${useId()}-paste-as-markdown-help`
+const tableMenuId = `${useId()}-table-menu`
 const commandsExpanded = ref(false)
+const tableMenuOpen = ref(false)
+const tableMenuRef = ref<HTMLElement | null>(null)
+const tableMenuTriggerRef = ref<HTMLButtonElement | null>(null)
+const retainedPreviewScrollLeft = ref(0)
 const visualViewportHeight = ref(0)
 const visualViewportOffsetTop = ref(0)
 const toolbarRef = ref<HTMLElement | null>(null)
@@ -1404,6 +1471,13 @@ provideMarkdownHeavyFeatureDocumentContext({
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)
+const currentTableCell = ref<MarkdownTableCellIdentity | null>(null)
+const tableAnnouncement = ref('')
+const tableContextActions = computed(() =>
+  resolveMarkdownTableContextActions().filter(
+    (action) => action.key !== 'delete-row' || currentTableCell.value?.row !== 0,
+  ),
+)
 const nativeCompositionValue = ref(transactionStore.value)
 const writingAidsController: MarkdownEditorWritingAidsController =
   createWritingAidsController({
@@ -1769,6 +1843,8 @@ const liveLayout = ref<MarkdownLiveLayoutPlan>(
 let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
 let restoringViewport = false
 let restoringTypewriter = false
+let typewriterScrollTarget: number | null = null
+let typewriterScrollSmooth = false
 let typewriterLayoutAdjustment = false
 let typewriterLayoutFrame: number | undefined
 let textareaLayoutHeight = 0
@@ -1882,6 +1958,7 @@ const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
   }, 200)
 }
 const suspendTypewriterForUserScroll = () => {
+  typewriterScrollTarget = null
   writingAidsController.handleUserScroll()
   writingAidsState.value = writingAidsController.state
 }
@@ -1923,6 +2000,13 @@ const handleLayoutScroll = () => {
   const textarea = textareaRef.value
   if (textarea) syncFocusLayerScroll(textarea.scrollTop)
   if (restoringSelection || restoringViewport || restoringTypewriter) return
+  if (textarea && typewriterScrollTarget !== null) {
+    const reachedTarget =
+      Math.abs(textarea.scrollTop - typewriterScrollTarget) <= 1
+    if (reachedTarget) typewriterScrollTarget = null
+    if (reachedTarget || typewriterScrollSmooth) return
+    typewriterScrollTarget = null
+  }
   if (
     textarea &&
     (textarea.clientHeight !== textareaLayoutHeight ||
@@ -1936,6 +2020,20 @@ const handleLayoutScroll = () => {
   if (typewriterLayoutAdjustment) return
   suspendTypewriterForUserScroll()
   markLayoutGesture('scrollbar')
+}
+const previewElement = () => {
+  const current = previewRendererRef.value
+  if (!current) return null
+  return current instanceof HTMLElement ? current : (current.$el ?? null)
+}
+const handlePreviewScroll = () => {
+  retainedPreviewScrollLeft.value = previewElement()?.scrollLeft ?? 0
+}
+const restorePreviewScroll = () => {
+  void nextTick(() => {
+    const preview = previewElement()
+    if (preview) preview.scrollLeft = retainedPreviewScrollLeft.value
+  })
 }
 const cssLength = (element: HTMLElement, property: string) => {
   const value = Number.parseFloat(
@@ -2010,6 +2108,9 @@ const applyTypewriterScroll = (
       target.scrollTop,
       Math.max(0, textarea.scrollHeight - textarea.clientHeight),
     )
+    typewriterScrollTarget = scrollTop
+    typewriterScrollSmooth =
+      trigger !== 'async-layout' && target.smooth
     textarea.scrollTo({
       behavior:
         trigger === 'async-layout' ? 'auto' : target.smooth ? 'smooth' : 'auto',
@@ -2019,11 +2120,15 @@ const applyTypewriterScroll = (
       syncFocusLayerScroll(textarea.scrollTop)
     })
   } else {
+    typewriterScrollTarget = target.scrollTop
+    typewriterScrollSmooth = false
     textarea.scrollTop = target.scrollTop
     syncFocusLayerScroll(target.scrollTop)
   }
   requestAnimationFrame(() => {
-    restoringTypewriter = false
+    requestAnimationFrame(() => {
+      restoringTypewriter = false
+    })
   })
 }
 const refreshLiveReveal = (
@@ -2418,6 +2523,45 @@ const captureSelection = (breakMerge = true) => {
   return selection
 }
 
+const refreshCurrentTableCell = (offset = transactionStore.selection.start) => {
+  const previousCellId = currentTableCell.value?.cellId
+  const nextCell = resolveMarkdownTableCellAtOffset(
+    transactionStore.value,
+    documentIdentity,
+    offset,
+  )
+  currentTableCell.value = nextCell
+  if (!nextCell || (previousCellId && nextCell.cellId !== previousCellId)) {
+    tableMenuOpen.value = false
+  }
+  return nextCell
+}
+
+const selectTableCell = async (cell: MarkdownTableCellIdentity) => {
+  const resolved = resolveMarkdownTableCellCoordinates(
+    transactionStore.value,
+    documentIdentity,
+    cell.tableId,
+    cell.row,
+    cell.column,
+    cell.cellId,
+  )
+  if (!resolved?.anchor) {
+    currentTableCell.value = null
+    return
+  }
+  currentTableCell.value = resolved
+  transactionStore.setSelection(
+    {
+      direction: 'none',
+      end: resolved.anchor.end,
+      start: resolved.anchor.start,
+    },
+    true,
+  )
+  await restoreTextareaSelection(transactionStore.selection)
+}
+
 const captureAttachmentFiles = (
   sourceKind: MarkdownAttachmentSourceKind,
   files: readonly File[],
@@ -2561,7 +2705,7 @@ watch(
     beforeInputSnapshot = undefined
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
-    dispatchEditorOperation({
+    const result = dispatchEditorOperation({
       allowBlocked: true,
       emitValue: false,
       internalPropReset: true,
@@ -2586,6 +2730,10 @@ watch(
         },
       },
     })
+    if (result.accepted) {
+      currentTableCell.value = null
+      tableMenuOpen.value = false
+    }
   },
 )
 
@@ -3752,6 +3900,68 @@ const applyClipboardTransfer = (
 }
 
 const handlePaste = (event: ClipboardEvent) => {
+  const cell = refreshCurrentTableCell(captureSelection(false).start)
+  const clipboard = event.clipboardData
+  if (
+    cell &&
+    clipboard &&
+    clipboard.files.length === 0 &&
+    !isComposing.value &&
+    !editingBlocked.value
+  ) {
+    const tsv = clipboard.getData('text/tab-separated-values')
+    const csv = clipboard.getData('text/csv')
+    const plain = clipboard.getData('text/plain')
+    const carriesHtml = Array.from(clipboard.types).includes('text/html')
+    const payload = tsv || csv || (carriesHtml ? '' : plain)
+    const mime = tsv
+      ? 'text/tab-separated-values'
+      : csv
+        ? 'text/csv'
+        : undefined
+    if (payload.includes('\t') || mime === 'text/csv') {
+      const transfer = markdownClipboardItemsFromDataTransfer(clipboard)
+      const clipboardPlan = resolveMarkdownClipboardPaste({
+        composing: isComposing.value,
+        disabled: editingBlocked.value,
+        documentIdentity,
+        files: transfer.files,
+        items: transfer.items,
+        mode: currentMode.value,
+        origin: 'paste',
+        revision: transactionStore.revision,
+        selection: transactionStore.selection,
+        source: transactionStore.value,
+      })
+      const plan = planMarkdownTablePaste(
+        transactionStore.value,
+        documentIdentity,
+        cell.tableId,
+        cell,
+        payload,
+        mime,
+        transactionStore.revision,
+      )
+      if ('changes' in plan) {
+        event.preventDefault()
+        pendingClipboardIdentity = clipboardPlan.identity
+        pendingInputOrigin = 'paste'
+        nativeMachine.apply({
+          clipboardIdentity: clipboardPlan.identity,
+          documentIdentity,
+          kind: 'paste',
+          origin: 'paste',
+          revision: transactionStore.revision,
+        })
+        const result = dispatchTransaction(plan)
+        if (result.accepted) {
+          tableAnnouncement.value = 'Pasted table data'
+          void selectTableCell(cell)
+        }
+        return
+      }
+    }
+  }
   applyClipboardTransfer(event, 'paste', event.clipboardData)
 }
 
@@ -3835,6 +4045,7 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshCurrentTableCell()
   refreshWritingAidsDocument()
   writingAidsController.handleSelectionChange()
   writingAidsState.value = writingAidsController.state
@@ -3855,6 +4066,7 @@ const handleSelectionMove = () => {
 
 const handleSelectionDragStart = () => {
   if (isComposing.value) return
+  typewriterScrollTarget = null
   writingAidsController.handleSelectionDragStart()
   writingAidsState.value = writingAidsController.state
 }
@@ -3867,6 +4079,7 @@ const handleSelectionDragEnd = () => {
 const handlePointerReveal = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshCurrentTableCell()
   refreshWritingAidsDocument()
   if (currentMode.value === 'live') {
     applyLiveSelectionMotion('pointer-click', {
@@ -3877,6 +4090,225 @@ const handlePointerReveal = () => {
     intent: 'pointer',
     pointerOffset: transactionStore.selection.start,
   })
+}
+
+const handleTableContextMenu = (event: MouseEvent) => {
+  const cell = refreshCurrentTableCell(captureSelection(false).start)
+  if (!cell || editingBlocked.value) return
+  event.preventDefault()
+  tableAnnouncement.value = `Table row ${cell.row + 1}, column ${cell.column + 1}`
+  tableMenuOpen.value = true
+  void nextTick(() =>
+    tableMenuRef.value?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus(),
+  )
+}
+
+const focusTableMenuItem = (index: number) => {
+  const items = Array.from(
+    tableMenuRef.value?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? [],
+  )
+  if (!items.length) return
+  items[(index + items.length) % items.length]?.focus()
+}
+
+const closeTableMenu = (restoreTrigger = false) => {
+  tableMenuOpen.value = false
+  if (restoreTrigger) {
+    void nextTick(() => tableMenuTriggerRef.value?.focus())
+  }
+}
+
+const toggleTableMenu = () => {
+  tableMenuOpen.value = !tableMenuOpen.value
+  if (tableMenuOpen.value) {
+    void nextTick(() => focusTableMenuItem(0))
+  }
+}
+
+const handleTableMenuKeydown = (event: KeyboardEvent) => {
+  const items = Array.from(
+    tableMenuRef.value?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? [],
+  )
+  const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement)
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeTableMenu(true)
+    return
+  }
+  if (event.key === 'Tab') {
+    tableMenuOpen.value = false
+    return
+  }
+  const targetIndex =
+    event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? items.length - 1
+        : event.key === 'ArrowDown'
+          ? currentIndex + 1
+          : event.key === 'ArrowUp'
+            ? currentIndex - 1
+            : null
+  if (targetIndex === null) return
+  event.preventDefault()
+  focusTableMenuItem(targetIndex)
+}
+
+const runTableContextAction = (key: string) => {
+  const cell = currentTableCell.value
+  if (!cell || editingBlocked.value || isComposing.value) return
+  const source = transactionStore.value
+  const revision = transactionStore.revision
+  let plan: MarkdownEditorTransaction | { readonly rejected: string }
+  switch (key) {
+    case 'insert-row-above':
+      plan = planMarkdownTableInsertRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        'above',
+        revision,
+        cell.column,
+      )
+      break
+    case 'insert-row-below':
+      plan = planMarkdownTableInsertRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        'below',
+        revision,
+        cell.column,
+      )
+      break
+    case 'move-row-up':
+    case 'move-row-down':
+      plan = planMarkdownTableMoveRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        key === 'move-row-up' ? 'up' : 'down',
+        revision,
+        cell.column,
+      )
+      break
+    case 'delete-row':
+      plan = planMarkdownTableDeleteRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        revision,
+        cell.column,
+      )
+      break
+    case 'insert-col-left':
+      plan = planMarkdownTableInsertColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        'left',
+        revision,
+        cell.row,
+      )
+      break
+    case 'insert-col-right':
+      plan = planMarkdownTableInsertColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        'right',
+        revision,
+        cell.row,
+      )
+      break
+    case 'move-col-left':
+    case 'move-col-right':
+      plan = planMarkdownTableMoveColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        key === 'move-col-left' ? 'left' : 'right',
+        revision,
+        cell.row,
+      )
+      break
+    case 'delete-col':
+      plan = planMarkdownTableDeleteColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        revision,
+        cell.row,
+      )
+      break
+    case 'align-left':
+    case 'align-center':
+    case 'align-right':
+      plan = planMarkdownTableAlignColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        key.slice('align-'.length) as 'left' | 'center' | 'right',
+        revision,
+        cell.row,
+      )
+      break
+    case 'format-table':
+      plan = planMarkdownTableFormat(
+        source,
+        documentIdentity,
+        cell.tableId,
+        revision,
+        cell,
+      )
+      break
+    default:
+      return
+  }
+  if (!('changes' in plan)) return
+  const targetCell = (
+    plan.metadata?.markdownTable as
+      | {
+          readonly targetCell?: Readonly<{ row: number; column: number }>
+        }
+      | undefined
+  )?.targetCell
+  const result = dispatchTransaction(plan)
+  if (!result.accepted) return
+  tableAnnouncement.value = tableContextActions.value.find(
+    (action) => action.key === key,
+  )?.title ?? 'Table updated'
+  closeTableMenu()
+  const nextCell = targetCell
+    ? resolveMarkdownTableCellCoordinates(
+        transactionStore.value,
+        documentIdentity,
+        cell.tableId,
+        targetCell.row,
+        targetCell.column,
+      )
+    : resolveMarkdownTableCellAtOffset(
+        transactionStore.value,
+        documentIdentity,
+        result.selection.start,
+      )
+  currentTableCell.value = nextCell
+    ? Object.freeze({
+        ...nextCell,
+        ...(!key.startsWith('delete-') && cell.cellId
+          ? { cellId: cell.cellId }
+          : {}),
+      })
+    : null
 }
 
 const handleBlur = () => {
@@ -4242,6 +4674,8 @@ const toggleCommands = async () => {
 const setMode = (mode: MarkdownEditorMode) => {
   if (editingBlocked.value || isComposing.value) return
 
+  const preview = previewElement()
+  if (preview) retainedPreviewScrollLeft.value = preview.scrollLeft
   transactionStore.breakMergeGroup()
   const nextMode = normalizeModeForLayout(mode)
   const retained = retainMarkdownLiveSelection({
@@ -4258,6 +4692,7 @@ const setMode = (mode: MarkdownEditorMode) => {
   applyLiveLayout('mode-switch')
   refreshLiveWindow('mode-switch')
   refreshLiveReveal()
+  restorePreviewScroll()
 }
 
 const modeLabel = (mode: MarkdownEditorMode) => localeText.value.modes[mode]
@@ -4372,6 +4807,12 @@ const emitRenderEvent = (
     return
   }
   emit('render-error', payload)
+}
+
+const handlePreviewRenderComplete = (payload: unknown) => {
+  emitRenderEvent('render-complete', payload)
+  restorePreviewScroll()
+  void nextTick(syncRenderedSearchHighlights)
 }
 
 const handleRendererComplete = (payload: unknown) => {
@@ -4936,7 +5377,12 @@ const handleKeydown = (event: KeyboardEvent) => {
     openSearch(searchAction === 'open-replace')
     return
   }
-  if (event.key === 'PageUp' || event.key === 'PageDown') {
+  if (
+    event.key === 'PageUp' ||
+    event.key === 'PageDown' ||
+    ((event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End'))
+  ) {
     suspendTypewriterForUserScroll()
   }
 
@@ -4959,6 +5405,48 @@ const handleKeydown = (event: KeyboardEvent) => {
         executeSlashCommand(command)
       }
       return
+    }
+  }
+
+  if (!event.altKey && !event.ctrlKey && !event.metaKey) {
+    const selection = captureSelection(false)
+    const cell = refreshCurrentTableCell(selection.start)
+    const tableKey =
+      event.key === 'Tab' && event.shiftKey
+        ? 'Shift+Tab'
+        : event.key === 'Enter' && event.shiftKey
+          ? 'Shift+Enter'
+          : event.key
+    if (cell?.anchor) {
+      const plan = resolveMarkdownTableInputIntent({
+        cell,
+        cellOffset: Math.max(0, selection.start - cell.anchor.start),
+        cellText: transactionStore.value.slice(cell.anchor.start, cell.anchor.end),
+        compositionActive: isComposing.value,
+        documentIdentity,
+        expectedRevision: transactionStore.revision,
+        key: tableKey,
+        selection,
+        source: transactionStore.value,
+      })
+      const moved =
+        plan.nextCell.row !== cell.row ||
+        plan.nextCell.column !== cell.column ||
+        plan.nextCell.status !== cell.status
+      if (plan.transaction || moved || tableKey === 'Tab' || tableKey === 'Shift+Tab') {
+        event.preventDefault()
+        if (plan.transaction) {
+          const result = dispatchTransaction(plan.transaction)
+          if (!result.accepted) return
+        }
+        tableAnnouncement.value = plan.screenReaderText
+        if (plan.nextCell.status === 'current') {
+          void selectTableCell(plan.nextCell)
+        } else {
+          currentTableCell.value = null
+        }
+        return
+      }
     }
   }
 

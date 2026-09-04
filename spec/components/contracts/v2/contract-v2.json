@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "1704acd49993288f8c86d6c861985972a1b8136b134aa9e512ca4185380e154a",
+      "hash": "3df7882b73ab7b14886107f3f854fd67d65d8aeedc4804d52307aeadeabb6a66",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "901863e968cff7154047dff722ef31a94e6e0cdeef4cf675bde29fbaf63da49a",
+      "hash": "0a93a8b67f1e0ed538767b2bee70d31f0c109ddf299761eb93be10e3c777c6d0",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {

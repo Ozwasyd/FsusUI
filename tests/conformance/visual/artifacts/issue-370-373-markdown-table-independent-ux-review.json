@@ -1,0 +1,31 @@
+{
+  "schema": "fsusui-design-conformance.independent-ux-review.v1",
+  "candidateSha": "8e3e392cfd4efeb042071d0eecbe6f2fbff40e6f",
+  "candidateDigest": "1e80b1c8694c7dba0d740c095790e819a6ce3e55f59ebc8fc987b3f8944a96a6",
+  "productionFixture": true,
+  "reviewedPaths": [
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/table-context-keyboard-focus.png",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/table-context-light.png",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/table-context-mobile-compact.png",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/table-context-dark.png",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/table-context-rtl-zoom-touch-simulation.png",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/table-20x50-split-scroll.png",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/desktop-keyboard-containment.json",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/mobile-touch-target-containment.json",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/dark-keyboard-containment.json",
+    "tests/conformance/visual/artifacts/issue-370-373-markdown-table/rtl-200pct-simulated-touch-containment.json"
+  ],
+  "findings": [
+    "The compact menu stays inside the editor in desktop, mobile, dark, RTL, and 200 percent zoom states.",
+    "Keyboard focus remains visible and the menu exposes the complete row, column, alignment, and formatting action chain.",
+    "The 20 by 50 split view keeps the wide table scrollable inside the editor without changing the surrounding layout.",
+    "Chromium, Firefox, and WebKit completed the same 21-test interaction matrix."
+  ],
+  "simulationLimitations": [
+    "Touch input and 200 percent zoom were deterministically simulated in local browsers; no physical touch hardware was used.",
+    "Screen-reader semantics were checked through live-region assertions and browser accessibility roles; no external screen-reader application was used."
+  ],
+  "modifiedImplementationPaths": [],
+  "blockers": [],
+  "status": "accepted"
+}
