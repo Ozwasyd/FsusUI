@@ -66,6 +66,7 @@
         ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
@@ -111,6 +112,7 @@
       "files": [
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
@@ -157,6 +159,7 @@
       "files": [
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
@@ -173,6 +176,7 @@
       "files": [
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
