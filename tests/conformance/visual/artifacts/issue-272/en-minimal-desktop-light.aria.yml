@@ -1,0 +1,12 @@
+- region "EN Markdown editor":
+  - button "EN bold"
+  - button "EN italic"
+  - button "EN heading"
+  - button "EN quote"
+  - button "EN code"
+  - button "EN link"
+  - button "EN 2 format tools": EN format tools 2
+  - textbox "EN source editor":
+    - /placeholder: ""
+    - text: 你好 world RTL مرحبا Unicode 👨‍👩‍👧‍👦
+  - text: 28 EN characters 5 EN words

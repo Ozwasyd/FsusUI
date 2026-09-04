@@ -111,6 +111,7 @@ describe('motion primitives', () => {
       'toast-receipt',
       'banner-receipt',
       'lightbox-focus',
+      'list-settle',
       'index-list-settle',
       'reading-title-settle',
       'media-develop',

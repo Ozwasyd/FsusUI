@@ -44,20 +44,20 @@ export const motionPresetAliases = {
   'route-fade': 'route-settle',
   'card-hover': 'paper-settle',
   // zoom-in-* overlay/menu/popover transitions
-  'zoom-in-center': 'dialog-settle',
+  'zoom-in-center': 'surface-settle',
   'zoom-in-top': 'sheet-settle',
   'zoom-in-bottom': 'sheet-settle',
   'zoom-in-left': 'sheet-settle',
-  'el-zoom-in-center': 'dialog-settle',
+  'el-zoom-in-center': 'surface-settle',
   'el-zoom-in-top': 'sheet-settle',
   'el-zoom-in-bottom': 'sheet-settle',
   'el-zoom-in-left': 'sheet-settle',
   // generic fade / collapse / list
   'el-fade-in-linear': 'surface-settle',
   'el-fade-in': 'surface-settle',
-  'collapse-transition': 'index-list-settle',
-  'list': 'index-list-settle',
-  'list-inline': 'index-list-settle',
+  'collapse-transition': 'list-settle',
+  list: 'list-settle',
+  'list-inline': 'list-settle',
 } as const satisfies Record<MotionLegacyPresetName, MotionPresetName>
 
 // Each preset picks a pattern + tier from the M3 4×2 scale. The runtime
@@ -218,6 +218,24 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     reduced: terminal,
     leaveFrom: { opacity: '1', transform: 'scale(1)' },
     leaveTo: { opacity: '0', transform: 'scale(0.99)' },
+  },
+  'list-settle': {
+    name: 'list-settle',
+    pattern: 'standard',
+    tier: 'short',
+    surfaces: ['list-table-surface', 'admin-operation-surface'],
+    forbiddenSurfaces: ['reading-surface'],
+    from: {
+      opacity: '0',
+      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
+    },
+    to: { opacity: '1', transform: none },
+    reduced: terminal,
+    leaveFrom: { opacity: '1', transform: none },
+    leaveTo: {
+      opacity: '0',
+      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
+    },
   },
   'index-list-settle': {
     name: 'index-list-settle',

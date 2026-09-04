@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
 
 import {
   defaultMarkdownEditorCommands,
@@ -101,12 +102,12 @@ const projectedLink = (source: string) => {
 const makeContext = (
   overrides?: Partial<MarkdownEditorCommandContext>,
 ): MarkdownEditorCommandContext => ({
-    dispatch: {
-      dispatch: () => ({
-        accepted: true,
-        beforeRevision: 0,
-        documentIdentity: { epoch: 1, id: 'doc-1' },
-        history: {
+  dispatch: {
+    dispatch: () => ({
+      accepted: true,
+      beforeRevision: 0,
+      documentIdentity: { epoch: 1, id: 'doc-1' },
+      history: {
         canRedo: false,
         canUndo: false,
         redoDepth: 0,
@@ -400,6 +401,11 @@ describe('Issue #433: Locale authority, command/mode/capability, and zero write 
             format: `${locale}-format`,
             insert: `${locale}-insert`,
           },
+          search: { find: `${locale}-find` },
+          attachments: { region: `${locale}-attachments` },
+          imageProperties: { region: `${locale}-image-properties` },
+          embeds: { region: `${locale}-embeds` },
+          atomic: { editSource: (kind) => `${locale}-${kind}-edit-source` },
         }),
     )
     expect(new Set(locales.map((locale) => locale.editorAria)).size).toBe(8)
@@ -407,6 +413,11 @@ describe('Issue #433: Locale authority, command/mode/capability, and zero write 
     expect(
       new Set(locales.map((locale) => locale.commandGroups.format)).size,
     ).toBe(8)
+    expect(new Set(locales.map((locale) => locale.search.find)).size).toBe(8)
+    expect(
+      new Set(locales.map((locale) => locale.attachments.region)).size,
+    ).toBe(8)
+    expect(new Set(locales.map((locale) => locale.embeds.region)).size).toBe(8)
     expect(
       locales.every(
         (locale) =>
@@ -423,6 +434,25 @@ describe('Issue #433: Locale authority, command/mode/capability, and zero write 
     })
     expect(longLocale.overflow).toHaveLength(120)
     expect(longLocale.commandPalette.searchPlaceholder).toHaveLength(160)
+  })
+
+  it('keeps editor-owned production DOM copy out of the component template', () => {
+    const component = readFileSync(
+      'vue/packages/components/markdown-editor/src/markdown-editor.vue',
+      'utf8',
+    )
+    const forbidden = [
+      'placeholder="Find"',
+      'aria-label="Attachments"',
+      'aria-label="Image properties"',
+      'aria-label="Embedded content"',
+      '>Replace All<',
+      '>Remove image<',
+      '>Edit source<',
+      'Destination rejected:',
+      'Image properties rejected:',
+    ]
+    for (const literal of forbidden) expect(component).not.toContain(literal)
   })
 
   it('kills locale authority mutations with behavior-derived differences', () => {

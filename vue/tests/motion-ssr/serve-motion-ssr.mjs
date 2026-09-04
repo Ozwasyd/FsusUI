@@ -27,10 +27,19 @@ const server = createHttpServer(async (request, response) => {
 
   if (request.url?.startsWith('/ssr-motion')) {
     try {
+      const requestedMode = new URL(
+        request.url,
+        `http://${request.headers.host}`,
+      ).searchParams.get('mode')
+      const resolvedMode = ['enabled', 'reduced', 'disabled'].includes(
+        requestedMode,
+      )
+        ? requestedMode
+        : undefined
       const entry = await vite.ssrLoadModule('/src/ssr-motion-server.ts')
       const rendered = await entry.render()
       const template = `<!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN"${resolvedMode ? ` data-fsus-motion="${resolvedMode}"` : ''}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

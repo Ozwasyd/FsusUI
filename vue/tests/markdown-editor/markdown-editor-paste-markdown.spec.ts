@@ -60,7 +60,7 @@ const openFixture = async (
 }
 
 const pasteAsMarkdownEntry = async (page: Page, fixture: Locator) => {
-  const entry = fixture.getByRole('button', { name: 'Paste as Markdown' })
+  const entry = fixture.getByRole('button', { name: '粘贴为 Markdown' })
   if (!(await entry.isVisible().catch(() => false))) {
     const overflow = fixture.locator('.el-markdown-editor__command-more')
     if (await overflow.isVisible().catch(() => false)) await overflow.click()
@@ -72,7 +72,7 @@ const pasteAsMarkdownEntry = async (page: Page, fixture: Locator) => {
 const visiblePasteAsMarkdownDialog = (page: Page) =>
   page
     .locator('.el-markdown-editor__paste-backdrop:visible')
-    .getByRole('dialog', { name: 'Paste as Markdown' })
+    .getByRole('dialog', { name: '粘贴为 Markdown' })
 
 const openPasteAsMarkdown = async (page: Page, fixture: Locator) => {
   const entry = await pasteAsMarkdownEntry(page, fixture)
@@ -269,25 +269,25 @@ test('keeps ordinary Ctrl+V unchanged and opens only the explicit command', asyn
   ).toBe(1)
   await expect(textarea).toHaveValue(initialValue)
   await expect(
-    surface.getByRole('region', { name: /Markdown preview/i }),
+    surface.getByRole('region', { name: 'Markdown 预览' }),
   ).toContainText('flattened')
   await expect(
-    surface.getByRole('region', { name: /source diff/i }),
+    surface.getByRole('region', { name: '源码差异' }),
   ).toBeVisible()
   const warnings = surface.getByRole('list', {
-    name: /conversion warnings/i,
+    name: '转换警告',
   })
   await expect(warnings).toContainText(/removed/i)
   await expect(warnings).toContainText(/flattened/i)
   await expect(warnings).toContainText(/unsupported/i)
   await expect(
-    surface.getByRole('button', { name: /paste plain text/i }),
+    surface.getByRole('button', { name: '粘贴纯文本' }),
   ).toBeVisible()
   await expect(
-    surface.getByRole('button', { name: /import markdown/i }),
+    surface.getByRole('button', { name: '导入 Markdown' }),
   ).toBeVisible()
 
-  const cancel = surface.getByRole('button', { name: /cancel/i })
+  const cancel = surface.getByRole('button', { name: '取消' })
   await cancel.focus()
   await cancel.press('Enter')
   await expect(surface).toHaveCount(0)
@@ -314,7 +314,7 @@ test('confirms one separate-history transaction and returns selection for one un
     target.setSelectionRange(target.value.length, target.value.length)
   })
   const surface = await openPasteAsMarkdown(page, fixture)
-  await surface.getByRole('button', { name: /import markdown/i }).click()
+  await surface.getByRole('button', { name: '导入 Markdown' }).click()
 
   await expect(textarea).toHaveValue(`${initialValue}**Imported**`)
   await expect(textarea).toBeFocused()
@@ -371,9 +371,9 @@ test('rejects a stale preview instead of inserting at the new caret', async ({
     control?.click()
   })
   await expect(textarea).toHaveValue(`${initialValue}【程序插入】`)
-  await surface.getByRole('button', { name: /import markdown/i }).click()
+  await surface.getByRole('button', { name: '导入 Markdown' }).click()
   await expect(textarea).toHaveValue(`${initialValue}【程序插入】`)
-  await expect(surface.getByRole('alert')).toContainText(/stale|changed/i)
+  await expect(surface.getByRole('alert')).toContainText('文档或选区已变化')
 })
 
 for (const gate of ['disabled', 'preview-only', 'readonly'] as const) {
@@ -387,9 +387,11 @@ for (const gate of ['disabled', 'preview-only', 'readonly'] as const) {
     const { fixture } = await openFixture(page, gate)
     const entry = await pasteAsMarkdownEntry(page, fixture)
     await expect(entry).toBeDisabled()
-    await expect(entry).toHaveAccessibleDescription(
-      new RegExp(gate.replace('-', ' '), 'i'),
-    )
+    await expect(entry).toHaveAccessibleDescription({
+      disabled: '编辑器已禁用。',
+      'preview-only': '仅预览模式下不可用。',
+      readonly: '编辑器为只读状态。',
+    }[gate])
   })
 }
 
@@ -403,7 +405,7 @@ test('makes composition-active an explicit gate', async ({ page }) => {
   await textarea.dispatchEvent('compositionstart')
   const entry = await pasteAsMarkdownEntry(page, fixture)
   await expect(entry).toBeDisabled()
-  await expect(entry).toHaveAccessibleDescription(/composition/i)
+  await expect(entry).toHaveAccessibleDescription('文字组合输入期间不可用。')
 })
 
 test.describe('touch path', () => {
@@ -586,7 +588,7 @@ test.describe('touch path', () => {
       const tray = fixture.locator('.el-markdown-editor__command-tray')
       await expect(tray).toBeVisible()
       const entry = tray.getByRole('button', {
-        name: 'Paste as Markdown',
+        name: '粘贴为 Markdown',
       })
       await expect(entry).toBeVisible()
       const entryTarget = await entry.boundingBox()
@@ -596,7 +598,7 @@ test.describe('touch path', () => {
       await entry.tap()
       const surface = visiblePasteAsMarkdownDialog(page)
       await expect(surface).toBeVisible()
-      await surface.getByRole('button', { name: /import markdown/i }).tap()
+      await surface.getByRole('button', { name: '导入 Markdown' }).tap()
       await expect(textarea).toHaveValue(`${initialValue}**Touch import**`)
       await expect(textarea).toBeFocused()
     }
@@ -679,15 +681,15 @@ test('records the issue 395 viewport, zoom, theme, long-warning, and accessibili
       document.documentElement.style.zoom = String(zoom)
     }, scenario.zoom)
     await expect(
-      surface.getByRole('list', { name: /conversion warnings/i }),
+      surface.getByRole('list', { name: '转换警告' }),
     ).toContainText('unsupported')
     await expect(
-      surface.getByRole('list', { name: /conversion warnings/i }),
+      surface.getByRole('list', { name: '转换警告' }),
     ).toContainText('unsafe-url')
     expect(forbiddenRequests).toEqual([])
 
     const importAction = surface.getByRole('button', {
-      name: /import markdown/i,
+      name: '导入 Markdown',
     })
     await importAction.scrollIntoViewIfNeeded()
     await importAction.focus()

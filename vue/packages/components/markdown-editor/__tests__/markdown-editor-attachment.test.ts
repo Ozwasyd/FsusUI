@@ -344,6 +344,7 @@ describe('attachment lifecycle, transactions, and undo (#376)', () => {
       'hello world',
       batch.anchor,
       batch,
+      (name) => `Uploading ${name}...`,
     )
     expect(plan.transaction.changes).toHaveLength(1)
     const inserted = plan.transaction.changes[0]!.insert
@@ -470,6 +471,13 @@ describe('attachment atomic presentation and total acceptance (#377)', () => {
       kind: 'image',
       status: 'progress',
       progress: 45,
+      copy: {
+        actions: { cancel: 'Cancel', remove: 'Remove', retry: 'Retry' },
+        status: (name, status, percent) =>
+          status === 'rejected'
+            ? `${name} upload failed`
+            : `${name}: ${percent}% uploaded`,
+      },
     })
 
     expect(pendingPresentation.compact).toBe(true)
@@ -492,6 +500,13 @@ describe('attachment atomic presentation and total acceptance (#377)', () => {
       kind: 'file',
       status: 'rejected',
       progress: 0,
+      copy: {
+        actions: { cancel: 'Cancel', remove: 'Remove', retry: 'Retry' },
+        status: (name, status, percent) =>
+          status === 'rejected'
+            ? `${name} upload failed`
+            : `${name}: ${percent}% uploaded`,
+      },
     })
     expect(failedPresentation.actions.some((a) => a.key === 'retry')).toBe(true)
     expect(failedPresentation.actions.some((a) => a.key === 'remove')).toBe(
