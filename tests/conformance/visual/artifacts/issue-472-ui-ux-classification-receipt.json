@@ -28,14 +28,14 @@
     "authorityDigest": "de2900d25a427fa7ad9e5609c1dcb4c368cee9bd03fb20816bd38093cc04eede",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "81240e107ced87d0d5a2896f8d738483325be139",
-  "candidateDigest": "d2c8a4dc311602d048f8d67e4ad38e6ccda25e8d7aab38554994b799e41b9390",
+  "candidateSha": "8fe4b5b935190372e3e14c1b5cee22810251fd67",
+  "candidateDigest": "6b27eee2bfc0434543dd4648ad882e3b80157fb05ed50c06b9e07b95980415ec",
   "stateEvidenceMatrix": [
     {
       "state": "enabled, reduced and disabled live Vue transition phases with rapid, nested, interrupt, reverse, reorder and cleanup paths",
       "viewport": "Chromium 1280x1100 production SSR fixture",
       "theme": "light",
-      "evidenceDigest": "12354faaa0cef2e1563e125dad0132e3a186073419d271e948a4644f9eb2a5c0"
+      "evidenceDigest": "1d34f85ca5faba85acc5af52372a946e71f357d08ab64e9f4bd81023f829d39f"
     },
     {
       "state": "terminal DOM, focus and layout after all legacy consumers complete",
@@ -47,7 +47,7 @@
       "state": "local 60 and 120Hz timer-cadence sampling under four-times Chromium CPU throttle",
       "viewport": "Chromium 1280x1100 production SSR fixture",
       "theme": "light",
-      "evidenceDigest": "dffb4da7e383dc1dc08b6daad1df6c2b393748f0ce2c8b251dbefe42cc1c34cc"
+      "evidenceDigest": "7a5e4db41eb65ea4ac8711c629af1a89130568152ee67d9c6ab886fa1292d680"
     },
     {
       "state": "machine registry ownership and eleven independent semantic mutations",
@@ -72,5 +72,5 @@
   "classificationEvidenceDigest": "e1a147d59e73c6531f6deda100cb7f1da7e8ade317618c3fe3bca9ca19aa6963",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "ffa9e977af673daca84fc4b19c21c37debe0183cda02e5c7762d566273c4922d"
+  "receiptDigest": "d52defbc32b96fbbdeeb6b2a06e6126477bf7f489648149336e888b9e254eb77"
 }

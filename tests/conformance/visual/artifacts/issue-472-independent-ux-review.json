@@ -4,15 +4,15 @@
   "parentIssue": 308,
   "childIssues": [469, 470, 471, 472],
   "evidenceClass": "independent-rendered-evidence-review",
-  "candidateSha": "81240e107ced87d0d5a2896f8d738483325be139",
-  "candidateDigest": "d2c8a4dc311602d048f8d67e4ad38e6ccda25e8d7aab38554994b799e41b9390",
-  "classificationReceiptDigest": "ffa9e977af673daca84fc4b19c21c37debe0183cda02e5c7762d566273c4922d",
+  "candidateSha": "8fe4b5b935190372e3e14c1b5cee22810251fd67",
+  "candidateDigest": "6b27eee2bfc0434543dd4648ad882e3b80157fb05ed50c06b9e07b95980415ec",
+  "classificationReceiptDigest": "d52defbc32b96fbbdeeb6b2a06e6126477bf7f489648149336e888b9e254eb77",
   "productionFixture": true,
   "implementationModifiedPaths": [],
   "exactHead": {
     "base": "c2ac6caa35cb63ae1e4f85ea46c74ffb45afbcea",
     "requiredBaseAncestor": "918aa27c",
-    "candidate": "81240e107ced87d0d5a2896f8d738483325be139"
+    "candidate": "8fe4b5b935190372e3e14c1b5cee22810251fd67"
   },
   "focusedTests": [
     {
@@ -46,25 +46,35 @@
       "notes": "Documentation architecture and generated token artifacts remained current."
     }
   ],
+  "broaderGate": {
+    "command": "pnpm run verify:pr-fast",
+    "status": "failed-current-main-drift",
+    "motionOwnedRemediation": "The changed Upload and transition source digests in spec/components/component-surface-semantic-registry.json were synchronized.",
+    "remainingFailures": [
+      "origin/main package.json hashes to bad90c96c94d819e482bdefcd3bc22131d8b49dbc81da8ac3001c965dda6a43b while origin/main config/dependencies/migration-baseline.json still expects 075bd07790ecb6cebe4f985c83711c8a213f63b8bfc2daa42360e564e2e69c0d",
+      "origin/main generated dark tokens use uppercase hexadecimal while origin/main scripts/check-package-build-smoke.mjs compares lowercase text without case normalization",
+      "origin/main component semantic registry carries a stale digest for vue/packages/theme-chalk/src/inbox-primitives.scss"
+    ]
+  },
   "runtimeMatrix": [
     {
       "mode": "enabled",
       "traceEntries": 277,
-      "activePhaseEntries": 165,
+      "activePhaseEntries": 169,
       "maxDurationMs": 300,
       "maxDelayMs": 0
     },
     {
       "mode": "reduced",
-      "traceEntries": 279,
-      "activePhaseEntries": 157,
+      "traceEntries": 282,
+      "activePhaseEntries": 165,
       "maxDurationMs": 1,
       "maxDelayMs": 0
     },
     {
       "mode": "disabled",
       "traceEntries": 282,
-      "activePhaseEntries": 164,
+      "activePhaseEntries": 165,
       "maxDurationMs": 1,
       "maxDelayMs": 0
     }
@@ -83,7 +93,7 @@
   "inspectedArtifacts": [
     {
       "path": "tests/conformance/visual/artifacts/issue-472/legacy-motion-runtime-trace.json",
-      "digest": "12354faaa0cef2e1563e125dad0132e3a186073419d271e948a4644f9eb2a5c0"
+      "digest": "1d34f85ca5faba85acc5af52372a946e71f357d08ab64e9f4bd81023f829d39f"
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-472/legacy-motion-terminal-render.png",
@@ -91,7 +101,7 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-472/local-motion-cadence-simulation.json",
-      "digest": "dffb4da7e383dc1dc08b6daad1df6c2b393748f0ce2c8b251dbefe42cc1c34cc"
+      "digest": "7a5e4db41eb65ea4ac8711c629af1a89130568152ee67d9c6ab886fa1292d680"
     }
   ],
   "limitations": [
