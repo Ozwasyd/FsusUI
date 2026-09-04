@@ -400,12 +400,12 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 399)
+  assert.equal(mappings.length, 400)
   assert.deepEqual(semanticCounts, {
     role: 106,
     name: 123,
     value: 3,
-    state: 109,
+    state: 110,
     'help-text': 25,
     'accessibility-view': 22,
     'live-setting': 11,
@@ -413,7 +413,7 @@ test('Avalonia automation baseline separates source observations from declared a
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'public-control-this')
       .length,
-    321,
+    322,
   )
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'automation-peer-owner')
@@ -469,6 +469,22 @@ test('Avalonia automation baseline separates source observations from declared a
         mapping.provider ===
           'Avalonia.Automation.Provider.IRangeValueProvider.IsReadOnly' &&
         mapping.valueExpression === '!owner.CanInteract',
+    ),
+  )
+  const input = automationTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusInput',
+  )
+  assert.ok(
+    input.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'state' &&
+        mapping.provider === 'AutomationProperties.SetItemStatus' &&
+        mapping.targetKind === 'public-control-this' &&
+        mapping.valueKnown === false &&
+        mapping.valueExpression.includes('invalid=') &&
+        mapping.publicDependencies.includes(
+          'FsusUI.Avalonia.Controls.FsusInput.IsInvalid',
+        ),
     ),
   )
 })

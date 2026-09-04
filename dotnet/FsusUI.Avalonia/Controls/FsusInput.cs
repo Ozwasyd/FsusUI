@@ -193,7 +193,9 @@ public class FsusInput : TextBox
       SyncInnerContent();
     }
 
-    if (change.Property == AccessibleNameProperty)
+    if (
+      change.Property == AccessibleNameProperty ||
+      change.Property == IsInvalidProperty)
     {
       SyncAutomation();
     }
@@ -239,6 +241,9 @@ public class FsusInput : TextBox
 
     AutomationProperties.SetAccessibilityView(this, AccessibilityView.Control);
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Edit);
+    AutomationProperties.SetItemStatus(
+      this,
+      $"invalid={IsInvalid.ToString(CultureInfo.InvariantCulture).ToLowerInvariant()}");
   }
 
   protected virtual void EmitValueChanged(string? oldValue, string? newValue)

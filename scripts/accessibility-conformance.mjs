@@ -18,6 +18,7 @@ const runtimeVerificationPath =
   '.tmp/conformance-v2/accessibility/avalonia-generated-verification.json'
 const runtimeHelperPath =
   'dotnet/FsusUI.Avalonia.HeadlessTests/AccessibilityRuntimeEvidence.cs'
+const rootConformanceRunnerPath = 'scripts/run-conformance-v2.mjs'
 const invalidFixturePath =
   'tests/fixtures/accessibility-conformance/invalid-cases.json'
 
@@ -113,7 +114,11 @@ const collectAccessibilityOverrides = () => {
 }
 
 const csString = (value) =>
-  `"${String(value).replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`
+  `"${String(value)
+    .replaceAll('\\', '\\\\')
+    .replaceAll('"', '\\"')
+    .replaceAll('\r', '\\r')
+    .replaceAll('\n', '\\n')}"`
 
 const csNullable = (value, render) =>
   value === null || value === undefined ? 'null' : render(value)
@@ -346,138 +351,295 @@ const validateData = (contracts, snapshotData, overrides) => {
   }
 }
 
+const runtimeFactoryControls = new Set([
+  'FsusAlert',
+  'FsusButton',
+  'FsusCheckbox',
+  'FsusDataTable',
+  'FsusDialog',
+  'FsusDrawer',
+  'FsusDropdown',
+  'FsusForm',
+  'FsusIconButton',
+  'FsusImageViewer',
+  'FsusInboxLayout',
+  'FsusInput',
+  'FsusInputNumber',
+  'FsusLink',
+  'FsusMarkdownEditor',
+  'FsusMenu',
+  'FsusMessageBox',
+  'FsusMetricList',
+  'FsusPerceptionChallenge',
+  'FsusPerceptionCharacterChallenge',
+  'FsusPopconfirm',
+  'FsusPopover',
+  'FsusPublicShell',
+  'FsusRadio',
+  'FsusResponsiveCollection',
+  'FsusSettingsSection',
+  'FsusSiteHeader',
+  'FsusSwitch',
+  'FsusTableV2',
+  'FsusTabs',
+  'FsusTextEditor',
+  'FsusTextarea',
+  'FsusTextViewer',
+  'FsusThemeModeToggle',
+  'FsusTooltip',
+  'FsusTree',
+  'FsusTreeTable',
+  'FsusVirtualList',
+])
+
+const runtimeGovernanceValid = (entry, context, errors) => {
+  for (const field of ['reason', 'owner', 'testPolicy', 'reviewAfter']) {
+    if (typeof entry?.[field] !== 'string' || !entry[field].trim()) {
+      errors.push(`${context} missing ${field}`)
+    }
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(entry?.reviewAfter ?? '')) {
+    errors.push(`${context} reviewAfter must be YYYY-MM-DD`)
+  }
+}
+
+const validateRootAccessibilityStage = (source) => {
+  const required =
+    "run('execution:avalonia-accessibility', 'pnpm', ['run', 'a11y:runtime'])"
+  return source.split(required).length === 2
+    ? []
+    : [
+        'root conformance must execute the Avalonia accessibility runtime stage exactly once',
+      ]
+}
+
+const resolveRuntimeScenarios = (
+  snapshotData,
+  runtimeData,
+  contractRegistry,
+) => {
+  const errors = []
+  if (runtimeData.schemaVersion !== 2) {
+    errors.push('Avalonia runtime scenario schemaVersion must be 2')
+  }
+  if (runtimeData.coverage !== 'all-declared-snapshots') {
+    errors.push(
+      'Avalonia runtime coverage must include all declared accessibility snapshots',
+    )
+  }
+  const contractBindings = new Map()
+  for (const binding of runtimeData.contractBindings ?? []) {
+    const context = `runtime contract binding ${binding?.snapshotId ?? '<unknown>'}`
+    if (
+      typeof binding?.snapshotId !== 'string' ||
+      !snapshotData.snapshots.some(
+        (snapshot) => snapshot.id === binding.snapshotId,
+      )
+    ) {
+      errors.push(`${context} references unknown snapshot`)
+    }
+    if (contractBindings.has(binding?.snapshotId)) {
+      errors.push(`${context} is duplicated`)
+    }
+    if (typeof binding?.contractId !== 'string' || !binding.contractId) {
+      errors.push(`${context} missing contractId`)
+    }
+    contractBindings.set(binding?.snapshotId, binding?.contractId)
+  }
+  const bindingGaps = new Map()
+  for (const gap of runtimeData.bindingGaps ?? []) {
+    const context = `runtime binding gap ${gap?.snapshotId ?? '<unknown>'}`
+    if (
+      typeof gap?.snapshotId !== 'string' ||
+      !snapshotData.snapshots.some((snapshot) => snapshot.id === gap.snapshotId)
+    ) {
+      errors.push(`${context} references unknown snapshot`)
+    }
+    if (bindingGaps.has(gap?.snapshotId)) {
+      errors.push(`${context} is duplicated`)
+    }
+    runtimeGovernanceValid(gap, context, errors)
+    bindingGaps.set(gap?.snapshotId, gap)
+  }
+  const implementationGaps = new Map()
+  runtimeGovernanceValid(
+    {
+      ...runtimeData.implementationGapPolicy,
+      reason: 'Generated from each exact observed field disposition.',
+    },
+    'runtime implementation gap policy',
+    errors,
+  )
+  const expandedImplementationGaps = Object.entries(
+    runtimeData.implementationGapObservations ?? {},
+  ).flatMap(([snapshotId, observations]) =>
+    Object.entries(observations).map(([field, observed]) => {
+      const control = snapshotData.snapshots.find(
+        (snapshot) => snapshot.id === snapshotId,
+      )?.control
+      return {
+        snapshotId,
+        field,
+        observed,
+        reason:
+          observed === null
+            ? `The current ${control} AutomationPeer does not expose ${field}.`
+            : `The current ${control} AutomationPeer exposes ${JSON.stringify(observed)} instead of the declared value for ${field}.`,
+        ...runtimeData.implementationGapPolicy,
+      }
+    }),
+  )
+  for (const gap of expandedImplementationGaps) {
+    const context = `runtime implementation gap ${gap?.snapshotId ?? '<unknown>'}.${gap?.field ?? '<unknown>'}`
+    if (
+      typeof gap?.snapshotId !== 'string' ||
+      !snapshotData.snapshots.some((snapshot) => snapshot.id === gap.snapshotId)
+    ) {
+      errors.push(`${context} references unknown snapshot`)
+    }
+    if (
+      typeof gap?.field !== 'string' ||
+      ![
+        'role',
+        'name',
+        'value',
+        'selection',
+        'caret',
+        'tree.children',
+        'tree.roles',
+        'focus.tabOrder',
+        'states.disabled',
+        'states.selected',
+        'states.checkedState',
+        'states.expanded',
+        'states.invalid',
+      ].includes(gap.field)
+    ) {
+      errors.push(`${context} uses unsupported field`)
+    }
+    if (!Object.hasOwn(gap ?? {}, 'observed')) {
+      errors.push(`${context} missing observed`)
+    }
+    runtimeGovernanceValid(gap, context, errors)
+    const key = `${gap?.snapshotId}:${gap?.field}`
+    if (implementationGaps.has(key)) {
+      errors.push(`${context} is duplicated`)
+    }
+    implementationGaps.set(key, gap)
+  }
+
+  const scenarios = snapshotData.snapshots.map((snapshot) => {
+    const context = `runtime scenario avalonia-${snapshot.id}`
+    if (!runtimeFactoryControls.has(snapshot.control)) {
+      errors.push(`${context} has no explicit production-control factory`)
+    }
+    const matches = contractRegistry.contracts.filter(
+      (contract) =>
+        contract.bindings?.avalonia?.status === 'bound' &&
+        contract.bindings.avalonia.type?.split('.').at(-1) === snapshot.control,
+    )
+    const exactMatches = matches.filter((contract) =>
+      contract.scenarioIds?.some((scenarioId) => scenarioId.endsWith('.a11y')),
+    )
+    const preferredContractId = contractBindings.get(snapshot.id)
+    const preferred = preferredContractId
+      ? exactMatches.find((contract) => contract.id === preferredContractId)
+      : null
+    if (preferredContractId && !preferred) {
+      errors.push(`${context} explicit Contract V2 binding is invalid`)
+    }
+    if (exactMatches.length > 1 && !preferred) {
+      errors.push(`${context} has ambiguous Contract V2 accessibility bindings`)
+    }
+    const contract = preferred ?? exactMatches[0]
+    const bindingGap = bindingGaps.get(snapshot.id)
+    if (contract && bindingGap) {
+      errors.push(`${context} has a stale Contract V2 binding gap`)
+    } else if (!contract && !bindingGap) {
+      errors.push(`${context} is missing a Contract V2 binding gap`)
+    }
+    const gaps = [...implementationGaps.values()].filter(
+      (gap) => gap.snapshotId === snapshot.id,
+    )
+    return {
+      id: `avalonia-${snapshot.id}`,
+      contractId: contract?.id ?? null,
+      contractScenarioId:
+        contract?.scenarioIds.find((scenarioId) =>
+          scenarioId.endsWith('.a11y'),
+        ) ?? null,
+      checkpoint:
+        snapshot.id === 'markdown-editor-atomic'
+          ? 'automation-peer-atomic-projection'
+          : 'automation-peer-mounted',
+      snapshotId: snapshot.id,
+      factory: snapshot.control,
+      bindingDisposition: contract ? 'exact' : 'unbound',
+      bindingGap: bindingGap ?? null,
+      implementationGaps: gaps,
+    }
+  })
+  for (const snapshotId of bindingGaps.keys()) {
+    if (!scenarios.some((scenario) => scenario.snapshotId === snapshotId)) {
+      errors.push(`runtime binding gap ${snapshotId} is orphaned`)
+    }
+  }
+  for (const snapshotId of contractBindings.keys()) {
+    if (!scenarios.some((scenario) => scenario.snapshotId === snapshotId)) {
+      errors.push(`runtime contract binding ${snapshotId} is orphaned`)
+    }
+  }
+  return { scenarios, errors }
+}
+
 const validateRuntimeScenarios = (
   contracts,
   snapshotData,
   runtimeData,
   contractRegistry,
 ) => {
-  const errors = []
-  const scenarioIds = new Set()
-  const requiredScenarios = new Map([
-    ['avalonia-button-primary', 'button'],
-    ['avalonia-input-invalid', 'input'],
-    ['avalonia-checkbox-checked', 'checkbox'],
-    ['avalonia-switch-checked', 'switch'],
-    ['avalonia-markdown-editor-atomic', 'markdown-editor-atomic'],
-  ])
-  const supportedFactories = new Set(requiredScenarios.values())
-  const supportedImplementationGapFields = new Map([
-    ['states.invalid', 'invalidState'],
-  ])
-  if (runtimeData.schemaVersion !== 1) {
-    errors.push('Avalonia runtime scenario schemaVersion must be 1')
+  const resolved = resolveRuntimeScenarios(
+    snapshotData,
+    runtimeData,
+    contractRegistry,
+  )
+  const errors = [...resolved.errors]
+  const rootRunner = read(rootConformanceRunnerPath)
+  const requiredRootStage =
+    "run('execution:avalonia-accessibility', 'pnpm', ['run', 'a11y:runtime'])"
+  errors.push(...validateRootAccessibilityStage(rootRunner))
+  const bypassedRootRunner = rootRunner.replace(requiredRootStage, '')
+  if (validateRootAccessibilityStage(bypassedRootRunner).length === 0) {
+    throw new Error('root accessibility runtime bypass mutation survived')
   }
-  if (!Array.isArray(runtimeData.scenarios)) {
-    errors.push('Avalonia runtime scenarios must be an array')
-    return errors
-  }
-  for (const scenario of runtimeData.scenarios) {
-    const context = `runtime scenario ${scenario.id ?? '<unknown>'}`
-    for (const field of [
-      'id',
-      'contractId',
-      'scenarioId',
-      'checkpoint',
-      'snapshotId',
-      'factory',
-    ]) {
-      if (typeof scenario[field] !== 'string' || !scenario[field].trim()) {
-        errors.push(`${context} missing ${field}`)
+  for (const scenario of resolved.scenarios) {
+    const contract = contracts.controls.find(
+      (entry) =>
+        entry.id ===
+        snapshotData.snapshots.find(
+          (snapshot) => snapshot.id === scenario.snapshotId,
+        )?.component,
+    )
+    for (const gap of scenario.implementationGaps) {
+      const contractField =
+        {
+          role: 'role',
+          name: 'accessibleName',
+          value: 'value',
+          'states.disabled': 'disabledState',
+          'states.selected': 'selectedState',
+          'states.checkedState': 'checkedState',
+          'states.expanded': 'expandedState',
+          'states.invalid': 'invalidState',
+        }[gap.field] ?? ''
+      if (
+        contractField !== 'role' &&
+        contract?.[contractField] !== 'required'
+      ) {
+        errors.push(
+          `runtime implementation gap ${gap.snapshotId}.${gap.field} is not a required contract field`,
+        )
       }
-    }
-    if (scenarioIds.has(scenario.id)) {
-      errors.push(`${context} duplicates id`)
-    }
-    scenarioIds.add(scenario.id)
-    if (!supportedFactories.has(scenario.factory)) {
-      errors.push(`${context} uses unsupported factory ${scenario.factory}`)
-    }
-    const snapshot = snapshotData.snapshots.find(
-      (entry) => entry.id === scenario.snapshotId,
-    )
-    if (!snapshot) {
-      errors.push(
-        `${context} references unknown snapshot ${scenario.snapshotId}`,
-      )
-      continue
-    }
-    const accessibilityContract = contracts.controls.find(
-      (entry) => entry.id === snapshot.component,
-    )
-    if (!accessibilityContract) {
-      errors.push(`${context} has no accessibility contract`)
-    } else {
-      const gapFields = new Set()
-      for (const gap of scenario.implementationGaps ?? []) {
-        const field = gap?.field
-        if (!supportedImplementationGapFields.has(field)) {
-          errors.push(`${context} implementation gap ${field} is unsupported`)
-          continue
-        }
-        if (gapFields.has(field)) {
-          errors.push(`${context} implementation gap ${field} is duplicated`)
-        }
-        gapFields.add(field)
-        for (const governanceField of [
-          'reason',
-          'owner',
-          'testPolicy',
-          'reviewAfter',
-        ]) {
-          if (
-            typeof gap[governanceField] !== 'string' ||
-            !gap[governanceField].trim()
-          ) {
-            errors.push(
-              `${context} implementation gap ${field} missing ${governanceField}`,
-            )
-          }
-        }
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(gap.reviewAfter ?? '')) {
-          errors.push(
-            `${context} implementation gap ${field} reviewAfter must be YYYY-MM-DD`,
-          )
-        }
-        const contractField = supportedImplementationGapFields.get(field)
-        if (accessibilityContract[contractField] !== 'required') {
-          errors.push(
-            `${context} implementation gap ${field} is not a required contract field`,
-          )
-        }
-      }
-    }
-    const contract = contractRegistry.contracts.find(
-      (entry) => entry.id === scenario.contractId,
-    )
-    if (!contract) {
-      errors.push(
-        `${context} references unknown Contract V2 ${scenario.contractId}`,
-      )
-      continue
-    }
-    if (!contract.scenarioIds?.includes(scenario.scenarioId)) {
-      errors.push(
-        `${context} scenario ${scenario.scenarioId} is not declared by ${scenario.contractId}`,
-      )
-    }
-    if (contract.bindings?.avalonia?.status !== 'bound') {
-      errors.push(`${context} Contract V2 Avalonia binding is not bound`)
-    }
-    if (
-      contract.bindings?.avalonia?.type?.split('.').at(-1) !== snapshot.control
-    ) {
-      errors.push(`${context} control does not match Contract V2 Avalonia type`)
-    }
-  }
-  for (const [id, factory] of requiredScenarios) {
-    const scenario = runtimeData.scenarios.find((entry) => entry.id === id)
-    if (!scenario) {
-      errors.push(`required Avalonia runtime scenario ${id} is missing`)
-    } else if (scenario.factory !== factory) {
-      errors.push(
-        `required Avalonia runtime scenario ${id} must use ${factory}`,
-      )
     }
   }
   return errors
@@ -528,7 +690,7 @@ const validateInvalidFixtures = (contracts, snapshotData, overrides) => {
 const renderAutomationReport = (
   contracts,
   snapshotData,
-  runtimeData,
+  runtimeScenarios,
   results,
 ) =>
   `${JSON.stringify(
@@ -560,7 +722,13 @@ const renderAutomationReport = (
         ).length,
         metadataOnlyGeneratedTests: 0,
         metadataOnlyRuntimeCoverage: 0,
-        realRuntimeScenarioDeclarations: runtimeData.scenarios.length,
+        realRuntimeScenarioDeclarations: runtimeScenarios.length,
+        exactContractRuntimeBindings: runtimeScenarios.filter(
+          (scenario) => scenario.bindingDisposition === 'exact',
+        ).length,
+        unboundRuntimeDispositions: runtimeScenarios.filter(
+          (scenario) => scenario.bindingDisposition === 'unbound',
+        ).length,
         appiumReleaseGates: snapshotData.appiumReleaseGates.length,
         allowedByOverride: results.reduce(
           (count, result) => count + result.allowedByOverride.length,
@@ -574,7 +742,7 @@ const renderAutomationReport = (
         real: false,
         countsAsRuntimeCoverage: false,
       })),
-      declaredRuntimeScenarios: runtimeData.scenarios.map((scenario) => ({
+      declaredRuntimeScenarios: runtimeScenarios.map((scenario) => ({
         ...scenario,
         realEvidenceArtifact: runtimeEvidencePath,
         evidenceKind: 'runtime-input-declaration',
@@ -613,9 +781,9 @@ const renderAppiumGateArtifact = (gate) =>
     2,
   )}\n`
 
-const renderAvaloniaTests = (results, runtimeData) => {
+const renderAvaloniaTests = (results, runtimeScenarios) => {
   const resultById = new Map(results.map((result) => [result.id, result]))
-  const rows = runtimeData.scenarios
+  const rows = runtimeScenarios
     .map((scenario) => {
       const result = resultById.get(scenario.snapshotId)
       if (!result) {
@@ -628,6 +796,7 @@ const renderAvaloniaTests = (results, runtimeData) => {
           (gap) =>
             `new AccessibilityRuntimeGap(${[
               csString(gap.field),
+              csString(JSON.stringify(gap.observed)),
               csString(gap.reason),
               csString(gap.owner),
               csString(gap.testPolicy),
@@ -637,16 +806,19 @@ const renderAvaloniaTests = (results, runtimeData) => {
         .join(', ')
       return `    yield return new AccessibilityRuntimeScenario(${[
         csString(scenario.id),
-        csString(scenario.contractId),
-        csString(scenario.scenarioId),
+        csNullable(scenario.contractId, csString),
+        csNullable(scenario.contractScenarioId, csString),
         csString(scenario.checkpoint),
         csString(scenario.snapshotId),
         csString(scenario.factory),
+        csString(scenario.bindingDisposition),
         csString(result.role),
         csString(result.accessibleName),
         csNullable(result.value, csString),
         csNullable(result.states?.disabled, csBoolean),
+        csNullable(result.states?.selected, csBoolean),
         csNullable(result.states?.checked, csBoolean),
+        csNullable(result.states?.expanded, csBoolean),
         csNullable(result.states?.invalid, csBoolean),
         result.tabOrder ?? 0,
         `[${implementationGaps}]`,
@@ -698,17 +870,22 @@ const renderAll = () => {
       `accessibility conformance failed:\n- ${result.errors.join('\n- ')}`,
     )
   }
+  const runtimeScenarios = resolveRuntimeScenarios(
+    snapshotData,
+    runtimeData,
+    contractRegistry,
+  ).scenarios
 
   const files = {
     [outputPaths.report]: renderAutomationReport(
       contracts,
       snapshotData,
-      runtimeData,
+      runtimeScenarios,
       result.snapshotResults,
     ),
     [outputPaths.avaloniaTests]: renderAvaloniaTests(
       result.snapshotResults,
-      runtimeData,
+      runtimeScenarios,
     ),
   }
   for (const snapshot of snapshotData.snapshots) {
@@ -781,6 +958,7 @@ const runtimeRunnerHash = () => {
     outputPaths.avaloniaTests,
     runtimeHelperPath,
     runtimeScenarioPath,
+    rootConformanceRunnerPath,
   ]) {
     hash.update(fs.readFileSync(path.join(root, relativePath)))
   }
@@ -793,6 +971,10 @@ const normalizeContractRole = (role) =>
       'text-input': 'edit',
       spinbutton: 'spinner',
       radio: 'radiobutton',
+      tablist: 'tab',
+      link: 'hyperlink',
+      grid: 'datagrid',
+      textbox: 'edit',
     })[role] ?? role
   ).toLowerCase()
 
@@ -817,6 +999,11 @@ const validateRuntimeEvidence = (evidenceSet) => {
   const snapshotData = readJson(snapshotPath)
   const runtimeData = readJson(runtimeScenarioPath)
   const registry = readJson('spec/components/contracts/v2/contract-v2.json')
+  const runtimeScenarios = resolveRuntimeScenarios(
+    snapshotData,
+    runtimeData,
+    registry,
+  ).scenarios
   const current = {
     candidate: git('rev-parse', 'HEAD'),
     contractHash: sha256(read('spec/components/contracts/v2/contract-v2.json')),
@@ -854,28 +1041,35 @@ const validateRuntimeEvidence = (evidenceSet) => {
     return { errors, results }
   }
   const evidenceByScenario = new Map(
-    evidenceSet.evidence.map((entry) => [entry.identity?.scenario, entry]),
+    evidenceSet.evidence.map((entry) => [
+      entry.identity?.runtimeScenario,
+      entry,
+    ]),
   )
   if (evidenceByScenario.size !== evidenceSet.evidence.length) {
     errors.push('runtime evidence contains duplicate scenario identities')
   }
-  for (const scenario of runtimeData.scenarios) {
+  for (const scenario of runtimeScenarios) {
     const context = `runtime evidence ${scenario.id}`
-    const evidence = evidenceByScenario.get(scenario.scenarioId)
+    const evidence = evidenceByScenario.get(scenario.id)
     const snapshot = snapshotData.snapshots.find(
       (entry) => entry.id === scenario.snapshotId,
     )
     const contract = contracts.controls.find(
       (entry) => entry.id === snapshot?.component,
     )
-    const contractV2 = registry.contracts.find(
-      (entry) => entry.id === scenario.contractId,
-    )
-    if (!evidence || !snapshot || !contract || !contractV2) {
+    const contractV2 = scenario.contractId
+      ? registry.contracts.find((entry) => entry.id === scenario.contractId)
+      : null
+    if (!evidence || !snapshot || !contract) {
       errors.push(`${context} authority binding missing`)
       continue
     }
-    if (!contractV2.scenarioIds?.includes(scenario.scenarioId)) {
+    if (
+      scenario.bindingDisposition === 'exact' &&
+      (!contractV2 ||
+        !contractV2.scenarioIds?.includes(scenario.contractScenarioId))
+    ) {
       errors.push(`${context} Contract V2 scenario binding missing`)
     }
     if (
@@ -892,6 +1086,15 @@ const validateRuntimeEvidence = (evidenceSet) => {
     ) {
       errors.push(`${context} must not promote cross-platform alignment`)
     }
+    for (const [field, value] of Object.entries({
+      snapshotId: scenario.snapshotId,
+      factory: scenario.factory,
+      bindingDisposition: scenario.bindingDisposition,
+    })) {
+      if (evidence.scenarioInput?.[field] !== value) {
+        errors.push(`${context} scenario input ${field} mismatch`)
+      }
+    }
     if (
       evidence.runtime?.realControl !== true ||
       evidence.runtime?.headless !== true ||
@@ -907,7 +1110,8 @@ const validateRuntimeEvidence = (evidenceSet) => {
       accessibilityContractHash: current.accessibilityContractHash,
       declaredSnapshotHash: current.declaredSnapshotHash,
       runtimeScenarioSetHash: current.scenarioSetHash,
-      scenario: scenario.scenarioId,
+      runtimeScenario: scenario.id,
+      contractScenario: scenario.contractScenarioId,
       contract: scenario.contractId,
       checkpoint: scenario.checkpoint,
       runnerHash: current.runnerHash,
@@ -985,18 +1189,31 @@ const validateRuntimeEvidence = (evidenceSet) => {
     }
     const mismatches = []
     const unavailableFields = []
+    const problemActual = new Map()
+    const mismatch = (field, message, actual) => {
+      mismatches.push(message)
+      problemActual.set(field, actual)
+    }
     const expectedRole = normalizeContractRole(contract.role)
     if (rootNode.role !== expectedRole) {
-      mismatches.push(`role expected=${expectedRole} actual=${rootNode.role}`)
+      mismatch(
+        'role',
+        `role expected=${expectedRole} actual=${rootNode.role}`,
+        rootNode.role,
+      )
     }
     if (rootNode.name !== snapshot.accessibleName) {
-      mismatches.push(
+      mismatch(
+        'name',
         `name expected=${JSON.stringify(snapshot.accessibleName)} actual=${JSON.stringify(rootNode.name)}`,
+        rootNode.name,
       )
     }
     if (contract.value === 'required' && rootNode.value !== snapshot.value) {
-      mismatches.push(
+      mismatch(
+        'value',
         `value expected=${JSON.stringify(snapshot.value)} actual=${JSON.stringify(rootNode.value)}`,
+        rootNode.value,
       )
     }
     for (const field of ['disabled', 'selected', 'expanded', 'invalid']) {
@@ -1005,8 +1222,13 @@ const validateRuntimeEvidence = (evidenceSet) => {
       const expected = snapshot.states[field]
       if (actual === null || actual === undefined) {
         unavailableFields.push(`states.${field}`)
+        problemActual.set(`states.${field}`, actual ?? null)
       } else if (actual !== expected) {
-        mismatches.push(`states.${field} expected=${expected} actual=${actual}`)
+        mismatch(
+          `states.${field}`,
+          `states.${field} expected=${expected} actual=${actual}`,
+          actual,
+        )
       }
     }
     if (contract.checkedState === 'required') {
@@ -1019,65 +1241,89 @@ const validateRuntimeEvidence = (evidenceSet) => {
             : null
       if (actual === null || actual === undefined) {
         unavailableFields.push('states.checkedState')
+        problemActual.set('states.checkedState', actual ?? null)
       } else if (actual !== expected) {
-        mismatches.push(
+        mismatch(
+          'states.checkedState',
           `states.checkedState expected=${expected} actual=${actual}`,
+          actual,
         )
       }
     }
     if (rootNode.focus?.tabOrder !== snapshot.tabOrder) {
-      mismatches.push(
+      mismatch(
+        'focus.tabOrder',
         `focus.tabOrder expected=${snapshot.tabOrder} actual=${rootNode.focus?.tabOrder}`,
+        rootNode.focus?.tabOrder ?? null,
       )
     }
-    if (scenario.factory === 'markdown-editor-atomic') {
-      if (rootNode.selection === null || rootNode.caret === null) {
-        mismatches.push('MarkdownEditor selection/caret peer status missing')
+    if (scenario.factory === 'FsusMarkdownEditor') {
+      if (rootNode.selection === null) {
+        mismatch(
+          'selection',
+          'MarkdownEditor selection peer status missing',
+          null,
+        )
+      }
+      if (rootNode.caret === null) {
+        mismatch('caret', 'MarkdownEditor caret peer status missing', null)
       }
       if (rootNode.children.length === 0) {
-        mismatches.push('MarkdownEditor atomic AutomationPeer children missing')
+        mismatch(
+          'tree.children',
+          'MarkdownEditor atomic AutomationPeer children missing',
+          [],
+        )
       }
       const descendantRoles = nodes.slice(1).map((node) => node.role)
       if (
         !descendantRoles.includes('group') ||
         !descendantRoles.includes('button')
       ) {
-        mismatches.push(
+        mismatch(
+          'tree.roles',
           'MarkdownEditor atomic group/action AutomationPeer tree missing',
+          descendantRoles,
         )
       }
     }
-    if (mismatches.length > 0) {
-      errors.push(...mismatches.map((message) => `${context} ${message}`))
-    }
-    const declaredGapFields = new Set(
-      (scenario.implementationGaps ?? []).map((gap) => gap.field),
+    const declaredGaps = new Map(
+      (scenario.implementationGaps ?? []).map((gap) => [gap.field, gap]),
     )
-    for (const field of unavailableFields) {
-      if (!declaredGapFields.has(field)) {
-        errors.push(`${context} unavailable field ${field} is undeclared`)
+    for (const [field, actual] of problemActual) {
+      const gap = declaredGaps.get(field)
+      if (!gap) {
+        errors.push(`${context} problem field ${field} is undeclared`)
+      } else if (JSON.stringify(actual) !== JSON.stringify(gap.observed)) {
+        errors.push(
+          `${context} implementation gap ${field} observed value drift`,
+        )
       }
     }
-    for (const field of declaredGapFields) {
-      if (!unavailableFields.includes(field)) {
+    for (const field of declaredGaps.keys()) {
+      if (!problemActual.has(field)) {
         errors.push(`${context} implementation gap ${field} is stale`)
       }
     }
     results.push({
       id: scenario.id,
       contract: scenario.contractId,
-      scenario: scenario.scenarioId,
+      contractScenario: scenario.contractScenarioId,
+      bindingDisposition: scenario.bindingDisposition,
+      bindingGap: scenario.bindingGap,
       real: true,
       availableFieldsMatch: mismatches.length === 0,
-      contractMatch: mismatches.length === 0 && unavailableFields.length === 0,
-      complete: unavailableFields.length === 0,
+      contractMatch:
+        problemActual.size === 0 && scenario.bindingDisposition === 'exact',
+      complete:
+        problemActual.size === 0 && scenario.bindingDisposition === 'exact',
       unavailableFields,
       implementationGaps: scenario.implementationGaps ?? [],
       mismatches,
       nodeCount: nodes.length,
     })
   }
-  if (evidenceByScenario.size !== runtimeData.scenarios.length) {
+  if (evidenceByScenario.size !== runtimeScenarios.length) {
     errors.push('runtime evidence scenario count does not match declarations')
   }
   return { errors, results }
@@ -1109,37 +1355,54 @@ const verifyRuntimeEvidence = () => {
     )
   }
   const find = (candidate, scenarioId) =>
-    candidate.evidence.find((entry) => entry.identity.scenario === scenarioId)
+    candidate.evidence.find(
+      (entry) => entry.identity.runtimeScenario === scenarioId,
+    )
   const mutations = [
     [
       'role-drift',
       (candidate) => {
         candidate.evidence[0].accessibility.nodes[0].role = 'article'
       },
-      'role expected=',
+      'problem field role is undeclared',
+    ],
+    [
+      'normalized-role-drift',
+      (candidate) => {
+        const tabs = find(candidate, 'avalonia-tabs-main')
+        tabs.accessibility.nodes[0].role = 'tablist'
+      },
+      'problem field role is undeclared',
     ],
     [
       'name-drift',
       (candidate) => {
         candidate.evidence[0].accessibility.nodes[0].name = 'Fixture name'
       },
-      'name expected=',
+      'problem field name is undeclared',
     ],
     [
       'state-drift',
       (candidate) => {
         candidate.evidence[0].accessibility.nodes[0].states.disabled = true
       },
-      'states.disabled expected=',
+      'problem field states.disabled is undeclared',
+    ],
+    [
+      'tab-order-drift',
+      (candidate) => {
+        candidate.evidence[0].accessibility.nodes[0].focus.tabOrder = 999
+      },
+      'problem field focus.tabOrder is undeclared',
     ],
     [
       'tree-drift',
       (candidate) => {
-        const markdown = find(candidate, 'scenario.v2.el-markdown-editor.a11y')
+        const markdown = find(candidate, 'avalonia-markdown-editor-atomic')
         markdown.accessibility.nodes[0].children = []
         markdown.accessibility.nodes.splice(1)
       },
-      'atomic AutomationPeer children missing',
+      'problem field tree.children is undeclared',
     ],
     [
       'identity-drift',
@@ -1149,20 +1412,59 @@ const verifyRuntimeEvidence = () => {
       'identity contractHash mismatch',
     ],
     [
+      'binding-disposition-drift',
+      (candidate) => {
+        const unbound = candidate.evidence.find(
+          (entry) => entry.scenarioInput.bindingDisposition === 'unbound',
+        )
+        unbound.scenarioInput.bindingDisposition = 'exact'
+      },
+      'scenario input bindingDisposition mismatch',
+    ],
+    [
       'undeclared-required-field',
       (candidate) => {
-        const markdown = find(candidate, 'scenario.v2.el-markdown-editor.a11y')
+        const markdown = find(candidate, 'avalonia-markdown-editor-atomic')
         markdown.accessibility.nodes[0].states.invalid = null
       },
-      'unavailable field states.invalid is undeclared',
+      'problem field states.invalid is undeclared',
     ],
     [
       'stale-implementation-gap',
       (candidate) => {
-        const input = find(candidate, 'scenario.v2.el-input.a11y')
-        input.accessibility.nodes[0].states.invalid = false
+        const form = find(candidate, 'avalonia-form-display-name')
+        form.accessibility.nodes[0].role = 'group'
       },
-      'implementation gap states.invalid is stale',
+      'implementation gap role is stale',
+    ],
+    [
+      'observed-gap-drift',
+      (candidate) => {
+        const form = find(candidate, 'avalonia-form-display-name')
+        form.accessibility.nodes[0].role = 'pane'
+      },
+      'implementation gap role observed value drift',
+    ],
+    [
+      'omitted-scenario',
+      (candidate) => {
+        candidate.evidence.pop()
+      },
+      'authority binding missing',
+    ],
+    [
+      'duplicate-scenario',
+      (candidate) => {
+        candidate.evidence.push(deepClone(candidate.evidence[0]))
+      },
+      'duplicate scenario identities',
+    ],
+    [
+      'unconstructed-control',
+      (candidate) => {
+        candidate.evidence[0].runtime.realControl = false
+      },
+      'did not construct a real headless control',
     ],
   ]
   for (const [name, mutate, expected] of mutations) {

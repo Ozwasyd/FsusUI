@@ -183,6 +183,7 @@ public class FsusControlTests
     Assert.Equal(
       AutomationControlType.Edit,
       AutomationProperties.GetControlTypeOverride(input));
+    Assert.Equal("invalid=true", AutomationProperties.GetItemStatus(input));
 
     input.ClearText();
 
@@ -193,6 +194,7 @@ public class FsusControlTests
     input.IsInvalid = false;
 
     Assert.Equal(new[] { false }, validationStates);
+    Assert.Equal("invalid=false", AutomationProperties.GetItemStatus(input));
   }
 
   [Fact]

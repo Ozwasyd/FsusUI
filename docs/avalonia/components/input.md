@@ -12,6 +12,8 @@ behavior, validation state, and IME composition guards.
 
 `modelValue`, `clearable`, `disabled`, `readonly`, validation, prefix, suffix,
 and change events map to typed properties and events on the Avalonia controls.
+`FsusInput`, `FsusTextarea`, and `FsusInputNumber` expose `IsInvalid` as
+`invalid=true` or `invalid=false` through their automation item status.
 
 ## Supported Platform Differences
 
