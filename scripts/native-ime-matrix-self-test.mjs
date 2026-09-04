@@ -67,6 +67,25 @@ const webkitTarget = computeX11Target({
 assert.equal(webkitTarget.x, 1088)
 assert.equal(webkitTarget.y, 496)
 
+const hidpiChromiumTarget = computeX11Target({
+  windowGeometry: [160, 26, 2576, 2226],
+  innerWidth: 1280,
+  innerHeight: 1100,
+  devicePixelRatio: 2,
+  rect: { x: 25, y: 345, width: 1215, height: 185.5625 },
+})
+assert.equal(hidpiChromiumTarget.x, 1441)
+assert.equal(hidpiChromiumTarget.y, 928)
+
+const compositorScaledChromiumTarget = computeX11Target({
+  windowGeometry: [160, 26, 2576, 2226],
+  innerWidth: 1280,
+  innerHeight: 1100,
+  devicePixelRatio: 1,
+  rect: { x: 25, y: 345, width: 1215, height: 185.5625 },
+})
+assert.deepEqual(compositorScaledChromiumTarget, hidpiChromiumTarget)
+
 assert.equal(BROWSER_PROFILES.webkit.windowClass, 'MiniBrowser')
 assert.equal(typeof resolveOfficialFirefox(), 'string')
 assert.equal(BROWSER_PROFILES.firefox.firefoxUserPrefs['security.sandbox.content.level'], 0)

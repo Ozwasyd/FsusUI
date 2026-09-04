@@ -339,7 +339,13 @@ def main():
             fail('input-not-delivered', str(exc))
 
     focus = dpy.get_input_focus()
+    pointer = root.query_pointer()
     result['focus'] = {'window': focus.focus.id if focus.focus else None}
+    result['pointer'] = {
+        'root_x': pointer.root_x,
+        'root_y': pointer.root_y,
+        'child': pointer.child.id if pointer.child else None,
+    }
     result['keys'] = args.keys
     status(result)
     dpy.close()
