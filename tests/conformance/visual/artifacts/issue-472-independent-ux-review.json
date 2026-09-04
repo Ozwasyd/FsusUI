@@ -11,7 +11,7 @@
   "implementationModifiedPaths": [],
   "exactHead": {
     "base": "c2ac6caa35cb63ae1e4f85ea46c74ffb45afbcea",
-    "requiredBaseAncestor": "918aa27c",
+    "requiredBaseAncestor": "918aa27c1f2850cc7cc65fbac690067ee3b0eef7",
     "candidate": "8fe4b5b935190372e3e14c1b5cee22810251fd67"
   },
   "focusedTests": [
