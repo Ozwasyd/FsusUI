@@ -89,6 +89,11 @@ requireMatch(
 )
 requireMatch(
   runner,
+  /readFileSync\(`\/proc\/\$\{pid\}\/stat`,\s*'utf8'\)[\s\S]*?processState !== 'Z'/u,
+  'session-bus cleanup must recognize a terminated zombie in PID-namespace runs',
+)
+requireMatch(
+  runner,
   /if \(!existsSync\(alias\)\)/u,
   'RID pack aliases must reuse an existing native pack link',
 )

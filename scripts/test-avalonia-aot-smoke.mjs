@@ -533,6 +533,18 @@ const stopSpawnedChild = async (child, label) => {
   }
   throw new Error(`${label} did not terminate after SIGKILL`)
 }
+const isProcessRunning = (pid) => {
+  try {
+    const stat = readFileSync(`/proc/${pid}/stat`, 'utf8')
+    const processState = stat
+      .slice(stat.lastIndexOf(')') + 2)
+      .split(' ', 1)[0]
+    return processState !== 'Z'
+  } catch (error) {
+    if (error?.code === 'ENOENT') return false
+    throw error
+  }
+}
 const stopProcessId = async (pid, label) => {
   const signal = (value) => {
     try {
@@ -543,15 +555,16 @@ const stopProcessId = async (pid, label) => {
       throw error
     }
   }
+  if (!isProcessRunning(pid)) return
   if (!signal('SIGTERM')) return
   for (let attempt = 0; attempt < 40; attempt += 1) {
     await delay(50)
-    if (!signal(0)) return
+    if (!isProcessRunning(pid)) return
   }
   if (!signal('SIGKILL')) return
   for (let attempt = 0; attempt < 40; attempt += 1) {
     await delay(50)
-    if (!signal(0)) return
+    if (!isProcessRunning(pid)) return
   }
   throw new Error(`${label} did not terminate after SIGKILL`)
 }

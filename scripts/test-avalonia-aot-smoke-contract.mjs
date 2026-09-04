@@ -118,7 +118,12 @@ mutate(
   ),
   'unawaited session-bus cleanup',
 )
+mutate(
+  'scripts/test-avalonia-aot-smoke.mjs',
+  (text) => text.replace("processState !== 'Z'", 'true'),
+  'zombie session bus treated as running',
+)
 
 console.log(
-  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, external network, runtime dependency, invariant globalization, unread Xvfb output, child timeout, unbounded negative control, and unawaited cleanup.',
+  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, external network, runtime dependency, invariant globalization, unread Xvfb output, child timeout, unbounded negative control, unawaited cleanup, and zombie process polling.',
 )
