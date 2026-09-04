@@ -323,7 +323,12 @@ export const planMarkdownTableInsertRow = (
     rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
   }
   return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
-    row: insertAtBodyIndex + 1,
+    row:
+      rowIndex <= 0
+        ? 0
+        : position === 'above'
+          ? rowIndex + 1
+          : rowIndex,
     column: currentColumn,
   })
 }
@@ -458,7 +463,7 @@ export const planMarkdownTableInsertColumn = (
   }
   return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
     row: currentRow,
-    column: insertIndex,
+    column: position === 'left' ? columnIndex + 1 : columnIndex,
   })
 }
 

@@ -177,6 +177,29 @@ export const resolveMarkdownTableInputIntent = (
     }
   }
 
+  const resolvedCell = resolveMarkdownTableCellCoordinates(
+    source,
+    documentIdentity,
+    cell.tableId,
+    cell.row,
+    cell.column,
+  )
+  if (
+    !cell.cellId ||
+    !cell.anchor ||
+    !resolvedCell?.anchor ||
+    resolvedCell.anchor.start !== cell.anchor.start ||
+    resolvedCell.anchor.end !== cell.anchor.end
+  ) {
+    return {
+      action: 'noop',
+      transaction: null,
+      nextCell: { ...cell, status: 'invalid' },
+      screenReaderText: '',
+      rejected: 'stale',
+    }
+  }
+
   const slice = source.slice(table.range.start, table.range.end)
   const parsed = parseMarkdownTableBlock(slice)
   if (!parsed) {
@@ -903,7 +926,7 @@ export const planMarkdownTablePaste = (
   if (
     !currentCell.cellId ||
     !currentCell.anchor ||
-    resolvedCell?.cellId !== currentCell.cellId ||
+    !resolvedCell?.anchor ||
     resolvedCell.anchor?.start !== currentCell.anchor.start ||
     resolvedCell.anchor.end !== currentCell.anchor.end
   ) {
@@ -1050,7 +1073,7 @@ export const planMarkdownTableFormat = (
       currentCell.tableId !== tableId ||
       !currentCell.cellId ||
       !currentCell.anchor ||
-      resolvedCell?.cellId !== currentCell.cellId ||
+      !resolvedCell?.anchor ||
       resolvedCell.anchor?.start !== currentCell.anchor.start ||
       resolvedCell.anchor.end !== currentCell.anchor.end
     ) {
@@ -1117,11 +1140,13 @@ export const evaluateMarkdownTableInputMutations = () => {
     documentIdentity,
     source.indexOf('h1'),
   )!
-  const lastCell: MarkdownTableCellIdentity = Object.freeze({
-    ...firstCell,
-    column: 1,
-    row: 1,
-  })
+  const lastCell = resolveMarkdownTableCellCoordinates(
+    source,
+    documentIdentity,
+    firstCell.tableId,
+    1,
+    1,
+  )!
   const selection = Object.freeze({
     direction: 'none' as const,
     end: source.indexOf('h1'),
@@ -1134,8 +1159,13 @@ export const evaluateMarkdownTableInputMutations = () => {
     selection,
     source,
   })
-  const wrongTable = resolveMarkdownTableInputIntent({
-    cell: { ...firstCell, tableId: `${firstCell.tableId}:stale` },
+  const nakedIndex = resolveMarkdownTableInputIntent({
+    cell: {
+      column: firstCell.column,
+      row: firstCell.row,
+      status: 'current',
+      tableId: firstCell.tableId,
+    },
     documentIdentity,
     key: 'Tab',
     selection,
@@ -1175,11 +1205,9 @@ export const evaluateMarkdownTableInputMutations = () => {
       }),
       Object.freeze({
         kind: 'naked-index' as const,
-        equivalent: wrongTable.action === authority.action,
+        equivalent: nakedIndex.action === authority.action,
         accepted:
-          wrongTable.action !== 'noop' ||
-          (wrongTable.rejected !== 'missing' &&
-            wrongTable.rejected !== 'stale'),
+          nakedIndex.action !== 'noop' || nakedIndex.rejected !== 'stale',
         detail: 'row/column coordinates cannot authorize a stale table identity',
       }),
       Object.freeze({

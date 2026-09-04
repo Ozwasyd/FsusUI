@@ -164,14 +164,44 @@ describe('markdown table structural transactions', () => {
       const mappedAfter = createMarkdownEditorPositionMap(plan.changes, {
         source,
       }).rebase(afterRange)
-      expect(mappedAfter).toBeDefined()
+      expect(mappedAfter.status).not.toBe('deleted')
+      if (mappedAfter.status === 'deleted') continue
 
       const store = new MarkdownEditorTransactionStore(source)
       const result = store.dispatch(plan)
       expect(result.accepted).toBe(true)
       expect(result.history.undoDepth).toBe(1)
-      expect(result.value.slice(mappedAfter!.start, mappedAfter!.end)).toBe('after')
+      expect(result.value.slice(mappedAfter.start, mappedAfter.end)).toBe('after')
       expect(store.undo().value).toBe(source)
+    }
+  })
+
+  it('keeps the current cell selected across insert and move operations', () => {
+    const source =
+      '| h1 | h2 | h3 |\n| --- | --- | --- |\n| a1 | a2 | a3 |\n| b1 | b2 | b3 |\n'
+    const table = createMarkdownTableEntries(
+      stabilizeMarkdownEditorProjection(
+        createMarkdownEditorProjection(source),
+        document,
+      ),
+    )[0]!
+    const plans = [
+      planMarkdownTableInsertRow(source, document, table.id, 1, 'above', 0, 1),
+      planMarkdownTableInsertRow(source, document, table.id, 1, 'below', 0, 1),
+      planMarkdownTableMoveRow(source, document, table.id, 1, 'down', 0, 1),
+      planMarkdownTableInsertColumn(source, document, table.id, 1, 'left', 0, 1),
+      planMarkdownTableInsertColumn(source, document, table.id, 1, 'right', 0, 1),
+      planMarkdownTableMoveColumn(source, document, table.id, 1, 'right', 0, 1),
+    ]
+
+    for (const plan of plans) {
+      expect('changes' in plan).toBe(true)
+      if (!('changes' in plan)) continue
+      const result = new MarkdownEditorTransactionStore(source).dispatch(plan)
+      expect(result.accepted).toBe(true)
+      expect(result.value.slice(result.selection.start, result.selection.end)).toBe(
+        'a2',
+      )
     }
   })
 

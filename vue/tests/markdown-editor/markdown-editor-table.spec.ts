@@ -124,7 +124,7 @@ test('renders and operates the source-anchored table context surface', async ({
   await trigger.click()
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
   await expect(menu).toBeVisible()
-  await expect(menu.getByRole('menuitem')).toHaveCount(10)
+  await expect(menu.getByRole('menuitem')).toHaveCount(14)
   await expect(menu.getByRole('menuitem', { name: '在上方插入行' })).toBeFocused()
   await page.keyboard.press('ArrowDown')
   await expect(menu.getByRole('menuitem', { name: '在下方插入行' })).toBeFocused()
@@ -152,6 +152,17 @@ test('renders and operates the source-anchored table context surface', async ({
   await menu.getByRole('menuitem', { name: '在下方插入行' }).click()
   await expect(textarea).toHaveValue(/\n\| {2}\| {2}\| {2}\|\n/)
   await expect(menu).toBeHidden()
+
+  await trigger.click()
+  await menu.getByRole('menuitem', { name: '下移当前行' }).click()
+  await expect(textarea).toHaveValue(
+    /\| {2}\| {2}\| {2}\|\n\| Documentation migration \| Editorial systems \| In review \|/,
+  )
+  await trigger.click()
+  await menu.getByRole('menuitem', { name: '右移当前列' }).click()
+  await expect(textarea).toHaveValue(
+    /^\| Project \| Status \| Owner \|[\s\S]*\| Documentation migration \| In review \| Editorial systems \|/,
+  )
 
   await fixture.screenshot({ path: testInfo.outputPath('table-context-light.png') })
 
@@ -253,13 +264,9 @@ test('pastes one table transaction, undoes once, and exits to source caret', asy
   await textarea.evaluate((element) => {
     const transfer = new DataTransfer()
     transfer.setData('text/tab-separated-values', 'A\tB\nC\tD')
-    element.dispatchEvent(
-      new ClipboardEvent('paste', {
-        bubbles: true,
-        cancelable: true,
-        clipboardData: transfer,
-      }),
-    )
+    const event = new Event('paste', { bubbles: true, cancelable: true })
+    Object.defineProperty(event, 'clipboardData', { value: transfer })
+    element.dispatchEvent(event)
   })
   await expect(textarea).toHaveValue(/\| A \| B \| Ready \|/)
   await expect(textarea).toHaveValue(/\| C \| D \| {2}\|/)
@@ -267,6 +274,19 @@ test('pastes one table transaction, undoes once, and exits to source caret', asy
     '"undoDepth":1',
   )
 
+  const trigger = fixture.getByRole('button', { name: '表格操作' })
+  await expect(trigger).toBeVisible()
+  await trigger.click()
+  await fixture
+    .getByRole('menu', { name: '表格操作' })
+    .getByRole('menuitem', { name: '格式化表格' })
+    .click()
+  await expect(fixture.getByTestId('markdown-editor-history')).toContainText(
+    '"undoDepth":2',
+  )
+
+  await fixture.getByTestId('markdown-undo').click()
+  await expect(textarea).toHaveValue(/\| A \| B \| Ready \|/)
   await fixture.getByTestId('markdown-undo').click()
   await expect(textarea).toHaveValue(table)
 

@@ -10,6 +10,8 @@ import {
   planMarkdownTableInsert,
   planMarkdownTableInsertColumn,
   planMarkdownTableInsertRow,
+  planMarkdownTableMoveColumn,
+  planMarkdownTableMoveRow,
   resolveMarkdownTableCellAtOffset,
   type MarkdownTableCellIdentity,
 } from './markdown-editor-table-structure'
@@ -131,6 +133,76 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       },
     },
     {
+      key: 'table-move-row-up',
+      label: 'Move row up',
+      group: 'table',
+      title: 'Move current row up',
+      presentation: ['palette'],
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => {
+        const cell = findCurrentCell(context)
+        if (!cell) return false
+        return 'changes' in planMarkdownTableMoveRow(
+          context.value,
+          context.documentIdentity,
+          cell.tableId,
+          cell.row,
+          'up',
+          context.revision,
+          cell.column,
+        )
+      },
+      run: (context) => {
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
+        const plan = planMarkdownTableMoveRow(
+          context.value,
+          context.documentIdentity,
+          cell.tableId,
+          cell.row,
+          'up',
+          context.revision,
+          cell.column,
+        )
+        return 'changes' in plan ? { transaction: plan } : {}
+      },
+    },
+    {
+      key: 'table-move-row-down',
+      label: 'Move row down',
+      group: 'table',
+      title: 'Move current row down',
+      presentation: ['palette'],
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => {
+        const cell = findCurrentCell(context)
+        if (!cell) return false
+        return 'changes' in planMarkdownTableMoveRow(
+          context.value,
+          context.documentIdentity,
+          cell.tableId,
+          cell.row,
+          'down',
+          context.revision,
+          cell.column,
+        )
+      },
+      run: (context) => {
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
+        const plan = planMarkdownTableMoveRow(
+          context.value,
+          context.documentIdentity,
+          cell.tableId,
+          cell.row,
+          'down',
+          context.revision,
+          cell.column,
+        )
+        return 'changes' in plan ? { transaction: plan } : {}
+      },
+    },
+    {
       key: 'table-insert-col-left',
       label: 'Insert column left',
       group: 'table',
@@ -191,6 +263,76 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
           cell.tableId,
           cell.column,
           context.revision,
+        )
+        return 'changes' in plan ? { transaction: plan } : {}
+      },
+    },
+    {
+      key: 'table-move-col-left',
+      label: 'Move column left',
+      group: 'table',
+      title: 'Move current column left',
+      presentation: ['palette'],
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => {
+        const cell = findCurrentCell(context)
+        if (!cell) return false
+        return 'changes' in planMarkdownTableMoveColumn(
+          context.value,
+          context.documentIdentity,
+          cell.tableId,
+          cell.column,
+          'left',
+          context.revision,
+          cell.row,
+        )
+      },
+      run: (context) => {
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
+        const plan = planMarkdownTableMoveColumn(
+          context.value,
+          context.documentIdentity,
+          cell.tableId,
+          cell.column,
+          'left',
+          context.revision,
+          cell.row,
+        )
+        return 'changes' in plan ? { transaction: plan } : {}
+      },
+    },
+    {
+      key: 'table-move-col-right',
+      label: 'Move column right',
+      group: 'table',
+      title: 'Move current column right',
+      presentation: ['palette'],
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => {
+        const cell = findCurrentCell(context)
+        if (!cell) return false
+        return 'changes' in planMarkdownTableMoveColumn(
+          context.value,
+          context.documentIdentity,
+          cell.tableId,
+          cell.column,
+          'right',
+          context.revision,
+          cell.row,
+        )
+      },
+      run: (context) => {
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
+        const plan = planMarkdownTableMoveColumn(
+          context.value,
+          context.documentIdentity,
+          cell.tableId,
+          cell.column,
+          'right',
+          context.revision,
+          cell.row,
         )
         return 'changes' in plan ? { transaction: plan } : {}
       },
@@ -323,6 +465,20 @@ export const resolveMarkdownTableContextActions = (
       minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
     },
     {
+      key: 'move-row-up',
+      label: '上移当前行',
+      title: '上移当前行',
+      group: 'row',
+      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
+    },
+    {
+      key: 'move-row-down',
+      label: '下移当前行',
+      title: '下移当前行',
+      group: 'row',
+      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
+    },
+    {
       key: 'delete-row',
       label: '删除当前行',
       title: '删除当前行',
@@ -340,6 +496,20 @@ export const resolveMarkdownTableContextActions = (
       key: 'insert-col-right',
       label: '在右侧插入列',
       title: '在右侧插入列',
+      group: 'column',
+      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
+    },
+    {
+      key: 'move-col-left',
+      label: '左移当前列',
+      title: '左移当前列',
+      group: 'column',
+      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
+    },
+    {
+      key: 'move-col-right',
+      label: '右移当前列',
+      title: '右移当前列',
       group: 'column',
       minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
     },

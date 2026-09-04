@@ -25,6 +25,7 @@ import {
   planMarkdownTableMoveRow,
   resolveMarkdownTableCell,
   resolveMarkdownTableCellAtOffset,
+  resolveMarkdownTableCellCoordinates,
   type MarkdownTableCellIdentity,
 } from '../src/markdown-editor-table-structure'
 import {
@@ -49,6 +50,13 @@ import { defaultMarkdownEditorCommands } from '../src/markdown-editor'
 import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
 
 const doc = { id: 'test-doc', epoch: 1 }
+
+const tableCellAt = (
+  source: string,
+  tableId: string,
+  row: number,
+  column: number,
+) => resolveMarkdownTableCellCoordinates(source, doc, tableId, row, column)!
 
 describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
   describe('#370: Structural transactions and cell projection', () => {
@@ -249,7 +257,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         source,
         selection: { start: 0, end: 0, direction: 'none' },
         documentIdentity: doc,
-        cell: { tableId: table.id, row: 0, column: 0, status: 'current' },
+        cell: tableCellAt(source, table.id, 0, 0),
         key: 'Tab',
       })
       expect(res1.action).toBe('navigate')
@@ -261,7 +269,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         source,
         selection: { start: 0, end: 0, direction: 'none' },
         documentIdentity: doc,
-        cell: { tableId: table.id, row: 0, column: 1, status: 'current' },
+        cell: tableCellAt(source, table.id, 0, 1),
         key: 'Tab',
       })
       expect(res2.action).toBe('navigate')
@@ -273,7 +281,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         source,
         selection: { start: 0, end: 0, direction: 'none' },
         documentIdentity: doc,
-        cell: { tableId: table.id, row: 1, column: 1, status: 'current' },
+        cell: tableCellAt(source, table.id, 1, 1),
         key: 'Tab',
       })
       expect(res3.action).toBe('append-row')
@@ -304,7 +312,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         source,
         selection: { start: 0, end: 0, direction: 'none' },
         documentIdentity: doc,
-        cell: { tableId: table.id, row: 0, column: 0, status: 'current' },
+        cell: tableCellAt(source, table.id, 0, 0),
         key: 'Shift+Tab',
       })
       expect(res0.action).toBe('exit-backward')
@@ -325,7 +333,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         source,
         selection: { start: 0, end: 0, direction: 'none' },
         documentIdentity: doc,
-        cell: { tableId: table.id, row: 0, column: 1, status: 'current' },
+        cell: tableCellAt(source, table.id, 0, 1),
         key: 'Enter',
       })
       expect(enterRes.action).toBe('navigate')
@@ -337,7 +345,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         source,
         selection: { start: 10, end: 10, direction: 'none' },
         documentIdentity: doc,
-        cell: { tableId: table.id, row: 0, column: 0, status: 'current' },
+        cell: tableCellAt(source, table.id, 0, 0),
         key: 'Shift+Enter',
       })
       expect(breakRes.action).toBe('insert-line-break')
@@ -356,7 +364,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         source,
         selection: { start: 0, end: 0, direction: 'none' },
         documentIdentity: doc,
-        cell: { tableId: table.id, row: 0, column: 0, status: 'current' },
+        cell: tableCellAt(source, table.id, 0, 0),
         key: 'Escape',
       })
       expect(escRes.nextCell.status).toBe('invalid')
@@ -375,12 +383,8 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       const table = createMarkdownTableEntries(
         stabilizeMarkdownEditorProjection(createMarkdownEditorProjection(source), doc),
       )[0]!
-      const cell = (row: number, column: number): MarkdownTableCellIdentity => ({
-        tableId: table.id,
-        row,
-        column,
-        status: 'current',
-      })
+      const cell = (row: number, column: number): MarkdownTableCellIdentity =>
+        tableCellAt(source, table.id, row, column)
       const intent = (
         key: string,
         row: number,
@@ -517,11 +521,13 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
     })
 
     it('prevents cell switching during CJK IME composition and passes input mutations fixture', () => {
+      const source = '| a |\n| --- |\n| b |\n'
+      const cell = resolveMarkdownTableCellAtOffset(source, doc, source.indexOf('a'))!
       const res = resolveMarkdownTableInputIntent({
-        source: '| a |\n| --- |\n| b |\n',
+        source,
         selection: { start: 0, end: 0, direction: 'none' },
         documentIdentity: doc,
-        cell: { tableId: 'syn:1', row: 0, column: 0, status: 'current' },
+        cell,
         key: 'Tab',
         compositionActive: true,
       })
@@ -673,10 +679,22 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       const commands = createMarkdownTableCommands()
       expect(commands.some((c) => c.key === 'table-insert')).toBe(true)
       expect(commands.some((c) => c.key === 'table-format')).toBe(true)
+      expect(commands.some((c) => c.key === 'table-move-row-up')).toBe(true)
+      expect(commands.some((c) => c.key === 'table-move-row-down')).toBe(true)
+      expect(commands.some((c) => c.key === 'table-move-col-left')).toBe(true)
+      expect(commands.some((c) => c.key === 'table-move-col-right')).toBe(true)
       expect(defaultMarkdownEditorCommands.some((c) => c.key === 'table-insert')).toBe(true)
 
       const actions = resolveMarkdownTableContextActions()
       expect(actions.length).toBeGreaterThanOrEqual(6)
+      expect(actions.map((action) => action.key)).toEqual(
+        expect.arrayContaining([
+          'move-row-up',
+          'move-row-down',
+          'move-col-left',
+          'move-col-right',
+        ]),
+      )
       expect(actions.every((a) => a.minTouchTarget >= MARKDOWN_TABLE_TOUCH_TARGET_MIN)).toBe(
         true,
       )

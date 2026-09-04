@@ -1288,6 +1288,8 @@ import {
   planMarkdownTableDeleteRow,
   planMarkdownTableInsertColumn,
   planMarkdownTableInsertRow,
+  planMarkdownTableMoveColumn,
+  planMarkdownTableMoveRow,
   resolveMarkdownTableCellAtOffset,
   resolveMarkdownTableCellCoordinates,
   type MarkdownTableCellIdentity,
@@ -4118,6 +4120,18 @@ const runTableContextAction = (key: string) => {
         cell.column,
       )
       break
+    case 'move-row-up':
+    case 'move-row-down':
+      plan = planMarkdownTableMoveRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        key === 'move-row-up' ? 'up' : 'down',
+        revision,
+        cell.column,
+      )
+      break
     case 'delete-row':
       plan = planMarkdownTableDeleteRow(
         source,
@@ -4146,6 +4160,18 @@ const runTableContextAction = (key: string) => {
         cell.tableId,
         cell.column,
         'right',
+        revision,
+        cell.row,
+      )
+      break
+    case 'move-col-left':
+    case 'move-col-right':
+      plan = planMarkdownTableMoveColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        key === 'move-col-left' ? 'left' : 'right',
         revision,
         cell.row,
       )
@@ -4186,13 +4212,40 @@ const runTableContextAction = (key: string) => {
       return
   }
   if (!('changes' in plan)) return
+  const targetCell = (
+    plan.metadata?.markdownTable as
+      | {
+          readonly targetCell?: Readonly<{ row: number; column: number }>
+        }
+      | undefined
+  )?.targetCell
   const result = dispatchTransaction(plan)
   if (!result.accepted) return
   tableAnnouncement.value = tableContextActions.value.find(
     (action) => action.key === key,
   )?.title ?? 'Table updated'
   closeTableMenu()
-  void selectTableCell(cell)
+  const nextCell = targetCell
+    ? resolveMarkdownTableCellCoordinates(
+        transactionStore.value,
+        documentIdentity,
+        cell.tableId,
+        targetCell.row,
+        targetCell.column,
+      )
+    : resolveMarkdownTableCellAtOffset(
+        transactionStore.value,
+        documentIdentity,
+        result.selection.start,
+      )
+  currentTableCell.value = nextCell
+    ? Object.freeze({
+        ...nextCell,
+        ...(!key.startsWith('delete-') && cell.cellId
+          ? { cellId: cell.cellId }
+          : {}),
+      })
+    : null
 }
 
 const handleBlur = () => {
