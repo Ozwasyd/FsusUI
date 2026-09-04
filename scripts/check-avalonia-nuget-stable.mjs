@@ -340,6 +340,12 @@ const validatePackedConsumerSample = () => {
     )
   }
 
+  const isolatedPackages = path.join(
+    root,
+    'dotnet/artifacts/packed-consumer-packages',
+  )
+  fs.rmSync(isolatedPackages, { recursive: true, force: true })
+
   execFileSync(
     'dotnet',
     [
@@ -349,6 +355,8 @@ const validatePackedConsumerSample = () => {
       artifactRoot,
       '--source',
       nugetOrg,
+      '--packages',
+      isolatedPackages,
     ],
     { stdio: 'pipe' },
   )

@@ -86,6 +86,10 @@ mutate(
   'dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj',
   (text) => text.replace(/\s*<IsAotCompatible>true<\/IsAotCompatible>/i, ''),
 )
+mutate(
+  'dotnet/FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj',
+  (text) => text.replace(/\s*<EnableAotAnalyzer>true<\/EnableAotAnalyzer>/i, ''),
+)
 mutate('spec/avalonia/aot-library-findings.json', () =>
   JSON.stringify({ allowFailure: true, findings: [] }),
 )
