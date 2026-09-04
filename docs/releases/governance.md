@@ -266,6 +266,16 @@ simulator proves the fail-closed contract; the real installation and its
 administrator-owned evidence remain external and must not be inferred from a
 local pass.
 
+Release quality invokes the reusable
+`.github/workflows/_fsusblog-consumer-gate.yml` only from a trusted release-tag
+context. The workflow resolves the current FsusBlog default branch through the
+API exactly once, freezes its full 40-character head SHA, checks out that SHA
+with credentials disabled after checkout, and runs the formal
+`verify:fsusui-candidate` entry against an absolute path to the downloaded local
+tarball. It records exact Node/npm/Vue/Vite/TypeScript/vue-tsc versions and
+requires a clean, unchanged FsusBlog checkout both before and after the command.
+It never resolves the candidate from a registry and never changes FsusBlog.
+
 发布后至少检查：
 
 - GitHub Actions run 成功
