@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import {
+  chmodSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { test } from 'node:test'
@@ -112,6 +119,83 @@ test('missing or malformed producer evidence becomes skipped fail-closed gates',
   const malformed = readProducerEvidence(malformedPath, digest)
   assert.equal(malformed.evidenceStatus, 'invalid')
   assert.ok(malformed.gates.every((gate) => gate.status === 'skipped'))
+})
+
+test('local FsusBlog command simulation emits exact per-gate evidence', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'fsusblog-runner-'))
+  const repository = path.join(root, 'fsusblog')
+  const frontend = path.join(repository, 'src/frontend')
+  const bin = path.join(root, 'bin')
+  mkdirSync(frontend, { recursive: true })
+  mkdirSync(bin)
+  writeFileSync(
+    path.join(frontend, 'package-lock.json'),
+    canonicalJson({
+      packages: {
+        'node_modules/vue': { version: '3.5.32' },
+        'node_modules/vite': { version: '7.3.1' },
+        'node_modules/typescript': { version: '6.0.2' },
+        'node_modules/vue-tsc': { version: '3.2.6' },
+      },
+    }),
+  )
+  execFileSync('git', ['init', '--quiet'], { cwd: repository })
+  execFileSync('git', ['config', 'user.name', 'Fixture'], { cwd: repository })
+  execFileSync('git', ['config', 'user.email', 'fixture@example.test'], {
+    cwd: repository,
+  })
+  execFileSync('git', ['add', '.'], { cwd: repository })
+  execFileSync('git', ['commit', '--quiet', '-m', 'fixture'], {
+    cwd: repository,
+  })
+  const candidate = path.join(root, 'fsusui-npm-candidate.tgz')
+  writeFileSync(candidate, 'immutable-candidate')
+  const fakeNpm = path.join(bin, 'npm')
+  writeFileSync(
+    fakeNpm,
+    `#!/usr/bin/env node
+const fs = require('node:fs')
+const crypto = require('node:crypto')
+if (process.argv.includes('--version')) {
+  process.stdout.write('11.5.1\\n')
+  process.exit(0)
+}
+const candidate = process.env.FSUSBLOG_FSUSUI_CANDIDATE
+const evidence = process.env.FSUSBLOG_FSUSUI_CANDIDATE_EVIDENCE
+const sha256 = crypto.createHash('sha256').update(fs.readFileSync(candidate)).digest('hex')
+const names = ${JSON.stringify(REQUIRED_GATES)}
+fs.writeFileSync(evidence, JSON.stringify({
+  schemaVersion: 1,
+  candidateSha256: sha256,
+  gates: names.map((name, index) => ({ name, status: 'success', durationMs: index + 1 })),
+}))
+`,
+  )
+  chmodSync(fakeNpm, 0o755)
+  const output = path.join(root, 'fsusblog-consumer-run.json')
+  execFileSync(
+    process.execPath,
+    [
+      path.resolve('scripts/fsusblog-consumer-runner.mjs'),
+      '--repository',
+      repository,
+      '--candidate',
+      candidate,
+      '--output',
+      output,
+    ],
+    { env: { ...process.env, PATH: `${bin}:${process.env.PATH}` } },
+  )
+  const record = JSON.parse(readFileSync(output, 'utf8'))
+  assert.equal(record.commandStatus, 'success')
+  assert.equal(record.evidenceStatus, 'valid')
+  assert.deepEqual(
+    record.gates.map((gate) => gate.name),
+    REQUIRED_GATES,
+  )
+  assert.equal(record.candidateSha256Before, record.candidateSha256After)
+  assert.equal(record.workingTreeBefore, 'clean')
+  assert.equal(record.workingTreeAfter, 'clean')
 })
 
 test('success receipt binds every required gate and stable digest', () => {
