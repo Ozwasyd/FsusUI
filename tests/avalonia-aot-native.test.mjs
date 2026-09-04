@@ -68,6 +68,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     PackageVersion: '1.0.0',
     CandidateSha256: candidateSha256,
     Rid: 'linux-x64',
+    RuntimeMode: 'nativeaot',
     OperatingSystem: 'Linux',
     ProcessArchitecture: 'X64',
     DotnetVersion: '10.0.0',
@@ -141,6 +142,10 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
   assert.throws(
     () => validateReport({ ...report, NativeLogErrorCount: 1 }),
     /native log/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, RuntimeMode: 'jit' }),
+    /runtime mode/u,
   )
   assert.throws(
     () => validateReport({ ...report, PartialCapabilities: [] }),

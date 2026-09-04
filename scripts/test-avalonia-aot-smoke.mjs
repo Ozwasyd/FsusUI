@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global setTimeout */
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import {
@@ -499,6 +500,8 @@ const smokeArguments = (targetReport, extra = []) => [
   candidateDigest,
   '--rid',
   rid,
+  '--runtime-mode',
+  'nativeaot',
   '--scenarios',
   stableScenarios.join(','),
   '--native-dependencies',

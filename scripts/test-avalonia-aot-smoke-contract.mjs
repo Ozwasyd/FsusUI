@@ -64,6 +64,11 @@ mutate(
   'JIT run',
 )
 mutate(
+  'scripts/test-avalonia-aot-smoke.mjs',
+  (text) => text.replace("'--runtime-mode',\n  'nativeaot',", ''),
+  'missing NativeAOT runtime mode',
+)
+mutate(
   'tests/fixtures/avalonia-aot-smoke/NuGet.Config',
   (text) =>
     text.replace(
@@ -125,5 +130,5 @@ mutate(
 )
 
 console.log(
-  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, external network, runtime dependency, invariant globalization, unread Xvfb output, child timeout, unbounded negative control, unawaited cleanup, and zombie process polling.',
+  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, missing NativeAOT runtime mode, external network, runtime dependency, invariant globalization, unread Xvfb output, child timeout, unbounded negative control, unawaited cleanup, and zombie process polling.',
 )
