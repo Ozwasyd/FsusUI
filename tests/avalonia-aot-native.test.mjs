@@ -255,4 +255,15 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
       }),
     /PR workflow missing/u,
   )
+  assert.throws(
+    () =>
+      validateWorkflowContracts({
+        ...files,
+        publish: files.publish.replace(
+          'needs: [quality, plan, preflight, fsusblog-consumer]',
+          'needs: [plan, preflight, fsusblog-consumer]',
+        ),
+      }),
+    /release readiness/u,
+  )
 })

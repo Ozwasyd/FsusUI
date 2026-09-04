@@ -284,7 +284,9 @@ export const validateWorkflowContracts = ({
     if (!caller.includes(term)) throw new Error(`PR workflow missing ${term}`)
   if (
     !publish.includes('release-readiness-digest') ||
-    !publish.includes('needs: [quality, plan, preflight]')
+    !publish.includes(
+      'needs: [quality, plan, preflight, fsusblog-consumer]',
+    )
   )
     throw new Error('publish workflow must remain bound to release readiness')
   return true
