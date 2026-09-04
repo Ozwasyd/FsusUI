@@ -87,6 +87,11 @@ carry at least one scenario coverage id.
 - **Enum value drift**: Vue `values` sets must intersect the Avalonia enum member
   names when both are known.
 - **Scenario coverage**: a required semantic without a scenario coverage id fails.
+- **Vue public coverage**: every compiler-baseline component and every semantic
+  input, output, operation, and content region must appear exactly once in the
+  corresponding Contract V2 section with its baseline binding and an explicit
+  status. Extra, missing, duplicate, cross-kind, or misclassified web-only
+  entries fail the gate.
 - **Governance**: an override/omission missing any governance field fails.
 
 ## Fixed rules enforced by the validator

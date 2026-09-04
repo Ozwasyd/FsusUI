@@ -400,6 +400,7 @@ const memberRef = (kind) => ({
 
 const webPropRef = (prop) => ({
   member: prop.name,
+  baseline: VUE_BASELINE_PATH,
   categories: categoriesFromVueProp(prop),
   runtimeType: prop.runtimeType ?? null,
   semanticType: prop.semanticType ?? null,

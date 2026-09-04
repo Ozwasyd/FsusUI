@@ -7,11 +7,168 @@ import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8')
-const baseline = JSON.parse(read('spec/baselines/vue-current.json'))
-const expected = baseline.components.find(
-  (component) => component.name === 'ElMarkdownEditor',
-)
-if (!expected) throw new Error('ElMarkdownEditor Vue baseline missing')
+const VUE_BASELINE_PATH = 'spec/baselines/vue-current.json'
+const CONTRACT_V2_PATH = 'spec/components/contracts/v2/contract-v2.json'
+const MEMBER_STATUSES = ['aligned-candidate', 'partial', 'missing', 'web-only']
+const MEMBER_SECTIONS = [
+  {
+    kind: 'input',
+    contractSection: 'inputs',
+    baselineMembers: (component) =>
+      (component.semantic?.props ?? []).map((prop) => prop.name),
+  },
+  {
+    kind: 'output',
+    contractSection: 'outputs',
+    baselineMembers: (component) => component.emits ?? [],
+  },
+  {
+    kind: 'operation',
+    contractSection: 'operations',
+    baselineMembers: (component) => component.exposed ?? [],
+  },
+  {
+    kind: 'contentRegion',
+    contractSection: 'contentRegions',
+    baselineMembers: (component) =>
+      (component.slots ?? []).map((slot) =>
+        typeof slot === 'string' ? slot : slot.name,
+      ),
+  },
+]
+
+const duplicates = (values) => {
+  const seen = new Set()
+  const repeated = new Set()
+  for (const value of values) {
+    if (seen.has(value)) repeated.add(value)
+    seen.add(value)
+  }
+  return [...repeated].sort()
+}
+
+export const validateVuePublicCoverage = ({ baseline, registry }) => {
+  const errors = []
+  const components = baseline.components ?? []
+  const contracts = registry.contracts ?? []
+  const baselineNames = components.map((component) => component.name)
+  const contractNames = contracts.map((contract) => contract.component?.name)
+
+  for (const name of duplicates(baselineNames)) {
+    errors.push(`Vue baseline has duplicate component ${name}`)
+  }
+  for (const name of duplicates(contractNames)) {
+    errors.push(`Contract V2 has duplicate component ${name}`)
+  }
+
+  const contractsByComponent = new Map(
+    contracts.map((contract) => [contract.component?.name, contract]),
+  )
+  const baselineNameSet = new Set(baselineNames)
+  let auditedMembers = 0
+  let webOnlyMembers = 0
+
+  for (const component of components) {
+    const contract = contractsByComponent.get(component.name)
+    if (!contract) {
+      errors.push(`Vue component ${component.name} is missing from Contract V2`)
+      continue
+    }
+    if (contract.component?.module !== component.module) {
+      errors.push(
+        `${component.name} module mismatch: baseline ${component.module} vs Contract V2 ${contract.component?.module}`,
+      )
+    }
+    if (contract.component?.classification !== component.classification) {
+      errors.push(
+        `${component.name} classification mismatch: baseline ${component.classification} vs Contract V2 ${contract.component?.classification}`,
+      )
+    }
+
+    for (const section of MEMBER_SECTIONS) {
+      const expectedNames = section.baselineMembers(component)
+      const members = contract[section.contractSection] ?? []
+      const actualNames = members.map((member) => member.name)
+      auditedMembers += expectedNames.length
+
+      for (const name of duplicates(expectedNames)) {
+        errors.push(
+          `${component.name} Vue baseline has duplicate ${section.kind} ${name}`,
+        )
+      }
+      for (const name of duplicates(actualNames)) {
+        errors.push(
+          `${component.name} Contract V2 has duplicate ${section.kind} ${name}`,
+        )
+      }
+
+      const expectedSet = new Set(expectedNames)
+      const actualSet = new Set(actualNames)
+      for (const name of expectedSet) {
+        if (!actualSet.has(name)) {
+          errors.push(
+            `${component.name} ${section.kind} ${name} is missing from Contract V2`,
+          )
+        }
+      }
+      for (const name of actualSet) {
+        if (!expectedSet.has(name)) {
+          errors.push(
+            `${component.name} Contract V2 has extra ${section.kind} ${name}`,
+          )
+        }
+      }
+
+      for (const member of members) {
+        const context = `${component.name} ${section.kind} ${member.name ?? '<unknown>'}`
+        if (member.kind !== section.kind) {
+          errors.push(
+            `${context} has kind ${member.kind ?? '<unknown>'}, expected ${section.kind}`,
+          )
+        }
+        if (member.web?.member !== member.name) {
+          errors.push(
+            `${context} web member ${member.web?.member ?? '<unknown>'} does not match its Contract V2 name`,
+          )
+        }
+        if (member.web?.baseline !== VUE_BASELINE_PATH) {
+          errors.push(`${context} is not bound to the Vue compiler baseline`)
+        }
+        if (!MEMBER_STATUSES.includes(member.status)) {
+          errors.push(`${context} has invalid status ${member.status}`)
+        }
+        if (component.classification === 'web-only') {
+          webOnlyMembers += 1
+          if (member.status !== 'web-only') {
+            errors.push(
+              `${context} must be uniquely registered as web-only, got ${member.status}`,
+            )
+          }
+        } else if (member.status === 'web-only') {
+          errors.push(
+            `${context} claims web-only outside a web-only Vue component`,
+          )
+        }
+      }
+    }
+  }
+
+  for (const contract of contracts) {
+    const name = contract.component?.name
+    if (!baselineNameSet.has(name)) {
+      errors.push(
+        `Contract V2 component ${name ?? '<unknown>'} has no Vue baseline export`,
+      )
+    }
+  }
+
+  return {
+    errors,
+    auditedComponents: components.length,
+    auditedMembers,
+    webOnlyMembers,
+  }
+}
 
 const propertyName = (property, source) =>
   property.name
@@ -91,20 +248,41 @@ const exposedMembers = () => {
   if (!result) throw new Error('defineExpose AST declaration missing')
   return result.sort()
 }
-const source = read(
-  'vue/packages/components/markdown-editor/src/markdown-editor.ts',
-)
-const actual = {
-  props: objectMembers(source, 'markdownEditorProps', 'markdown-editor.ts'),
-  emits: objectMembers(source, 'markdownEditorEmits', 'markdown-editor.ts'),
-  exposed: exposedMembers(),
-}
-for (const field of ['props', 'emits', 'exposed']) {
-  const wanted = [...expected[field]].sort()
-  if (JSON.stringify(actual[field]) !== JSON.stringify(wanted)) {
+const main = () => {
+  const baseline = JSON.parse(read(VUE_BASELINE_PATH))
+  const registry = JSON.parse(read(CONTRACT_V2_PATH))
+  const coverage = validateVuePublicCoverage({ baseline, registry })
+  if (coverage.errors.length > 0) {
     throw new Error(
-      `Vue public ${field} drift expected=${JSON.stringify(wanted)} actual=${JSON.stringify(actual[field])}`,
+      `Vue public Contract V2 coverage failed:\n${coverage.errors.join('\n')}`,
     )
   }
+
+  const expected = baseline.components.find(
+    (component) => component.name === 'ElMarkdownEditor',
+  )
+  if (!expected) throw new Error('ElMarkdownEditor Vue baseline missing')
+  const source = read(
+    'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+  )
+  const actual = {
+    props: objectMembers(source, 'markdownEditorProps', 'markdown-editor.ts'),
+    emits: objectMembers(source, 'markdownEditorEmits', 'markdown-editor.ts'),
+    exposed: exposedMembers(),
+  }
+  for (const field of ['props', 'emits', 'exposed']) {
+    const wanted = [...expected[field]].sort()
+    if (JSON.stringify(actual[field]) !== JSON.stringify(wanted)) {
+      throw new Error(
+        `Vue public ${field} drift expected=${JSON.stringify(wanted)} actual=${JSON.stringify(actual[field])}`,
+      )
+    }
+  }
+  console.log(
+    `Contract V2 Vue public gate passed: ${coverage.auditedComponents} components, ${coverage.auditedMembers} members, ${coverage.webOnlyMembers} web-only members`,
+  )
 }
-console.log('Contract V2 Vue public AST gate passed')
+
+if (path.resolve(process.argv[1] ?? '') === fileURLToPath(import.meta.url)) {
+  main()
+}
