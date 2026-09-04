@@ -128,6 +128,46 @@ describe('markdown native event machine', () => {
     expect(applied.machine.phase).toBe('idle')
   })
 
+  it('deduplicates WebKit Hangul insertFromComposition followed by a late compositionend', () => {
+    const machine = createMarkdownEditorNativeEventMachine({
+      documentIdentity: { epoch: 0, id: 'doc' },
+    })
+    const plans = [
+      machine.apply({ kind: 'compositionstart' }),
+      machine.apply({ data: '', kind: 'compositionend', value: '' }),
+      machine.apply({
+        data: '안녕',
+        inputType: 'insertFromComposition',
+        isComposing: true,
+        kind: 'beforeinput',
+        previousValue: '',
+      }),
+      machine.apply({
+        data: '안녕',
+        inputType: 'insertFromComposition',
+        isComposing: true,
+        kind: 'input',
+        previousValue: '',
+        value: '안녕',
+      }),
+      machine.apply({
+        data: '안녕',
+        kind: 'compositionend',
+        previousValue: '안녕',
+        value: '안녕',
+      }),
+    ]
+
+    expect(plans.map((plan) => plan.action)).toEqual([
+      'ignore',
+      'ignore',
+      'snapshot',
+      'commit',
+      'dedup',
+    ])
+    expect(plans.filter((plan) => plan.action === 'commit')).toHaveLength(1)
+  })
+
   it('does not dispatch pair or list transforms while composing', () => {
     const machine = createMarkdownEditorNativeEventMachine()
     machine.apply({ kind: 'compositionstart' })
