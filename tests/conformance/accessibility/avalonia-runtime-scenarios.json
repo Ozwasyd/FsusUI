@@ -96,22 +96,17 @@
       "states.expanded": null
     },
     "tabs-main": {
-      "role": "tab",
       "states.selected": null
     },
     "menu-main": {
       "states.selected": null,
       "states.expanded": null
     },
-    "link-release-notes": {
-      "role": "hyperlink"
-    },
     "alert-live-region": {
       "role": "text",
       "value": null
     },
     "tabs-stable23": {
-      "role": "tab",
       "states.selected": null
     },
     "menu-stable23": {
@@ -151,7 +146,6 @@
       "states.expanded": null
     },
     "data-table-stable33": {
-      "role": "datagrid",
       "value": null,
       "states.selected": null,
       "states.expanded": null
@@ -160,7 +154,6 @@
       "value": null
     },
     "table-v2-stable34": {
-      "role": "datagrid",
       "value": null
     },
     "tree-stable35": {
@@ -170,7 +163,6 @@
       "states.checkedState": null
     },
     "tree-table-stable35": {
-      "role": "datagrid",
       "value": null,
       "states.selected": null,
       "states.expanded": null
@@ -180,7 +172,6 @@
       "value": null
     },
     "text-editor-stable37": {
-      "role": "edit",
       "value": null,
       "states.selected": null
     },

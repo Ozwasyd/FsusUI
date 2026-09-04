@@ -206,7 +206,7 @@ internal static class AccessibilityRuntimeEvidence
         control.GetType().Name,
         "root",
         null,
-        scenario.TabOrder,
+        control.TabIndex,
         nodes);
       try
       {
@@ -475,6 +475,10 @@ internal static class AccessibilityRuntimeEvidence
       "text-input" => "edit",
       "spinbutton" => "spinner",
       "radio" => "radiobutton",
+      "tablist" => "tab",
+      "link" => "hyperlink",
+      "grid" => "datagrid",
+      "textbox" => "edit",
       _ => scenario.Role,
     };
     Compare("role", expectedRole, root.Role);

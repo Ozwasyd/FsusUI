@@ -12,7 +12,7 @@
     },
     {
       "path": "tests/conformance/accessibility/avalonia-runtime-scenarios.json",
-      "sha256": "e080da94c8816c520dc6406d08cca3c9233b7dad4bb2d95bdc4e22d933e6a1d5"
+      "sha256": "dc5f0d4d3b70cdbbcdbb88db641066626a9201fac302285a386110a7be855f9d"
     }
   ],
   "requiredContractFields": [
@@ -1285,15 +1285,6 @@
       "implementationGaps": [
         {
           "snapshotId": "tabs-main",
-          "field": "role",
-          "observed": "tab",
-          "reason": "The current FsusTabs AutomationPeer exposes \"tab\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "tabs-main",
           "field": "states.selected",
           "observed": null,
           "reason": "The current FsusTabs AutomationPeer does not expose states.selected.",
@@ -1374,17 +1365,7 @@
       "factory": "FsusLink",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "link-release-notes",
-          "field": "role",
-          "observed": "hyperlink",
-          "reason": "The current FsusLink AutomationPeer exposes \"hyperlink\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -1436,15 +1417,6 @@
       "bindingDisposition": "exact",
       "bindingGap": null,
       "implementationGaps": [
-        {
-          "snapshotId": "tabs-stable23",
-          "field": "role",
-          "observed": "tab",
-          "reason": "The current FsusTabs AutomationPeer exposes \"tab\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
         {
           "snapshotId": "tabs-stable23",
           "field": "states.selected",
@@ -1794,15 +1766,6 @@
       "implementationGaps": [
         {
           "snapshotId": "data-table-stable33",
-          "field": "role",
-          "observed": "datagrid",
-          "reason": "The current FsusDataTable AutomationPeer exposes \"datagrid\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "data-table-stable33",
           "field": "value",
           "observed": null,
           "reason": "The current FsusDataTable AutomationPeer does not expose value.",
@@ -1883,15 +1846,6 @@
         "reviewAfter": "2026-12-05"
       },
       "implementationGaps": [
-        {
-          "snapshotId": "table-v2-stable34",
-          "field": "role",
-          "observed": "datagrid",
-          "reason": "The current FsusTableV2 AutomationPeer exposes \"datagrid\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
         {
           "snapshotId": "table-v2-stable34",
           "field": "value",
@@ -1977,15 +1931,6 @@
         "reviewAfter": "2026-12-05"
       },
       "implementationGaps": [
-        {
-          "snapshotId": "tree-table-stable35",
-          "field": "role",
-          "observed": "datagrid",
-          "reason": "The current FsusTreeTable AutomationPeer exposes \"datagrid\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
         {
           "snapshotId": "tree-table-stable35",
           "field": "value",
@@ -2077,15 +2022,6 @@
         "reviewAfter": "2026-12-05"
       },
       "implementationGaps": [
-        {
-          "snapshotId": "text-editor-stable37",
-          "field": "role",
-          "observed": "edit",
-          "reason": "The current FsusTextEditor AutomationPeer exposes \"edit\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
         {
           "snapshotId": "text-editor-stable37",
           "field": "value",

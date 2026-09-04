@@ -971,6 +971,10 @@ const normalizeContractRole = (role) =>
       'text-input': 'edit',
       spinbutton: 'spinner',
       radio: 'radiobutton',
+      tablist: 'tab',
+      link: 'hyperlink',
+      grid: 'datagrid',
+      textbox: 'edit',
     })[role] ?? role
   ).toLowerCase()
 
@@ -1363,6 +1367,14 @@ const verifyRuntimeEvidence = () => {
       'problem field role is undeclared',
     ],
     [
+      'normalized-role-drift',
+      (candidate) => {
+        const tabs = find(candidate, 'avalonia-tabs-main')
+        tabs.accessibility.nodes[0].role = 'tablist'
+      },
+      'problem field role is undeclared',
+    ],
+    [
       'name-drift',
       (candidate) => {
         candidate.evidence[0].accessibility.nodes[0].name = 'Fixture name'
@@ -1375,6 +1387,13 @@ const verifyRuntimeEvidence = () => {
         candidate.evidence[0].accessibility.nodes[0].states.disabled = true
       },
       'problem field states.disabled is undeclared',
+    ],
+    [
+      'tab-order-drift',
+      (candidate) => {
+        candidate.evidence[0].accessibility.nodes[0].focus.tabOrder = 999
+      },
+      'problem field focus.tabOrder is undeclared',
     ],
     [
       'tree-drift',
