@@ -949,7 +949,9 @@ const main = async () => {
           { capture: true, once: true },
         )
       })
-      await page.locator(editorSelector).evaluate((textarea) => textarea.blur())
+      await page.evaluate((selector) => {
+        document.querySelector(selector)?.blur()
+      }, editorSelector)
       const beforeDocumentId = before.documentId
 
       const x11Pid = evidence.window?.pid ?? browserPid.pid
