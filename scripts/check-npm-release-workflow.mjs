@@ -19,12 +19,20 @@ const receiptSchema = JSON.parse(
 for (const fragment of [
   'release:concurrency:plan',
   'needs: [quality, plan]',
-  'needs: [quality, plan, preflight]',
   'group: ${{ needs.plan.outputs.concurrency-group }}',
   '--candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json',
   'Check channel monotonicity before lock',
   'Check channel monotonicity after lock',
   "if: steps.monotonicity.outputs.action == 'publish'",
+  'fsusblog-consumer:',
+  'uses: ./.github/workflows/_fsusblog-consumer-gate.yml',
+  'matrix-artifact-name: consumer-matrix-release',
+  'candidate-digest: ${{ needs.quality.outputs.npm-candidate-digest }}',
+  'needs: [quality, plan, fsusblog-consumer]',
+  'needs: [quality, plan, preflight, fsusblog-consumer]',
+  "test '${{ needs.fsusblog-consumer.outputs.receipt-status }}' = 'success'",
+  'verify-cross-repo-receipt.mjs',
+  "--receipt-digest '${{ needs.fsusblog-consumer.outputs.receipt-sha256 }}'",
 ]) {
   assert.ok(
     publish.includes(fragment),

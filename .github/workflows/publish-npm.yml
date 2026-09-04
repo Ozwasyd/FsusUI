@@ -48,10 +48,23 @@ jobs:
     with:
       group: release
 
+  fsusblog-consumer:
+    needs: [quality, plan]
+    uses: ./.github/workflows/_fsusblog-consumer-gate.yml
+    with:
+      candidate-artifact-name: fsusui-npm-candidate
+      candidate-manifest-name: fsusui-npm-candidate.manifest.json
+      candidate-digest: ${{ needs.quality.outputs.npm-candidate-digest }}
+      quality-candidate-digest: ${{ needs.quality.outputs.npm-candidate-digest }}
+      matrix-artifact-name: consumer-matrix-release
+      target-repository: Ozwasyd/FsusBlog
+    secrets:
+      FSUS_CROSS_REPO_APP_PRIVATE_KEY: ${{ secrets.FSUS_CROSS_REPO_APP_PRIVATE_KEY }}
+
   preflight:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [quality, plan]
+    needs: [quality, plan, fsusblog-consumer]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -64,6 +77,10 @@ jobs:
         with:
           name: fsusui-npm-candidate
           path: .npm-candidate
+      - uses: actions/download-artifact@v4
+        with:
+          name: fsusblog-consumer-gate
+          path: .cross-gate
       - name: Verify candidate and release plan before lock
         run: |
           test -n "${{ needs.quality.outputs.release-readiness-digest }}"
@@ -75,6 +92,14 @@ jobs:
             --version '${{ needs.plan.outputs.version }}' \
             --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json)"
           test "${candidate_group}" = "${{ needs.plan.outputs.concurrency-group }}"
+          test '${{ needs.fsusblog-consumer.outputs.receipt-status }}' = 'success'
+          node scripts/verify-cross-repo-receipt.mjs \
+            --receipt .cross-gate/fsusblog-consumer-gate.receipt.json \
+            --receipt-digest '${{ needs.fsusblog-consumer.outputs.receipt-sha256 }}' \
+            --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json \
+            --candidate-digest '${{ needs.quality.outputs.npm-candidate-digest }}' \
+            --source-commit "$GITHUB_SHA" \
+            --release-tag "$GITHUB_REF_NAME"
       - name: Read npm channel state before lock
         id: npm_state
         run: |
@@ -93,7 +118,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [quality, plan, preflight]
+    needs: [quality, plan, preflight, fsusblog-consumer]
     concurrency:
       group: ${{ needs.plan.outputs.concurrency-group }}
       cancel-in-progress: false
@@ -116,7 +141,6 @@ jobs:
           name: fsusui-npm-candidate
           path: .npm-candidate
       - name: Download successful FsusBlog consumer gate receipt
-        if: needs.plan.outputs.dist-tag == 'latest'
         uses: actions/download-artifact@v4
         with:
           name: fsusblog-consumer-gate
@@ -136,7 +160,8 @@ jobs:
         if: needs.plan.outputs.dist-tag == 'latest'
         run: |
           test -s .cross-gate/fsusblog-consumer-gate.receipt.sha256
-          cross_gate_digest="$(awk '{ print $1 }' .cross-gate/fsusblog-consumer-gate.receipt.sha256)"
+          cross_gate_digest='${{ needs.fsusblog-consumer.outputs.receipt-sha256 }}'
+          test "$cross_gate_digest" = "$(awk '{ print $1 }' .cross-gate/fsusblog-consumer-gate.receipt.sha256)"
           node scripts/fsusui-release-dispatch.mjs verify \
             --candidate .npm-candidate/fsusui-npm-candidate.tgz \
             --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json \
@@ -172,7 +197,7 @@ jobs:
           FSUS_RELEASE_TRAIN_APP_ID: ${{ vars.FSUS_RELEASE_TRAIN_APP_ID }}
           FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY: ${{ secrets.FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY }}
         run: |
-          cross_gate_digest="$(awk '{ print $1 }' .cross-gate/fsusblog-consumer-gate.receipt.sha256)"
+          cross_gate_digest='${{ needs.fsusblog-consumer.outputs.receipt-sha256 }}'
           node scripts/fsusui-release-dispatch.mjs dispatch \
             --candidate .npm-candidate/fsusui-npm-candidate.tgz \
             --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json \

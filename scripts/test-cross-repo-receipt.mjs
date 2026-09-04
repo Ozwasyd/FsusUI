@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { test } from 'node:test'
 import {
   createCrossGateReceipt,
   REQUIRED_GATES,
   validateCrossGateReceipt,
 } from './cross-repo-receipt.mjs'
+import { canonicalJson } from './fsusui-release-dispatch-lib.mjs'
+import { verifyReceiptBinding } from './verify-cross-repo-receipt.mjs'
 
 const digest = 'a'.repeat(64)
 const bindingRecord = {
@@ -103,5 +106,43 @@ test('failure diagnostics remain sanitized codes', () => {
   assert.doesNotMatch(
     JSON.stringify(result.receipt),
     /authorization|bearer|private key|\.npmrc/iu,
+  )
+})
+
+test('publish binding rejects failed, tampered, or mismatched receipts', () => {
+  const result = createCrossGateReceipt(inputs())
+  const manifestBytes = canonicalJson({
+    artifact: { sha256: digest },
+    package: { name: '@ozwasyd/element-plus', version: '1.2.3' },
+  })
+  const actualManifestDigest = createHash('sha256')
+    .update(manifestBytes)
+    .digest('hex')
+  const boundReceipt = structuredClone(result.receipt)
+  boundReceipt.candidate.manifestSha256 = actualManifestDigest
+  const boundBytes = canonicalJson(boundReceipt)
+  const boundDigest = createHash('sha256').update(boundBytes).digest('hex')
+  assert.equal(
+    verifyReceiptBinding({
+      receiptBytes: boundBytes,
+      manifestBytes,
+      expectedReceiptSha256: boundDigest,
+      expectedCandidateSha256: digest,
+      sourceCommit: bindingRecord.binding.sourceCommit,
+      releaseTag: bindingRecord.binding.releaseTag,
+    }).candidateSha256,
+    digest,
+  )
+  assert.throws(
+    () =>
+      verifyReceiptBinding({
+        receiptBytes: boundBytes,
+        manifestBytes,
+        expectedReceiptSha256: '9'.repeat(64),
+        expectedCandidateSha256: digest,
+        sourceCommit: bindingRecord.binding.sourceCommit,
+        releaseTag: bindingRecord.binding.releaseTag,
+      }),
+    /digest mismatch/u,
   )
 })

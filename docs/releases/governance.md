@@ -291,6 +291,12 @@ clean-tree pre/post state, candidate pre/post SHA-256, UTC interval, and workflo
 run identity. A failed or skipped command, dirty tree, candidate mutation, or
 identity mismatch produces only sanitized failure diagnostics and can never be
 consumed as success.
+`publish-npm.yml` invokes this gate after release quality and makes both
+preflight and publish explicitly depend on its successful job/output. Before
+the channel lock it revalidates the receipt digest, candidate/manifest identity,
+source commit, and release tag. No failed, skipped, missing, stale, or tampered
+receipt can reach `npm publish`; the established monotonicity, provenance, and
+immutable-candidate checks remain mandatory.
 
 发布后至少检查：
 
