@@ -283,6 +283,15 @@ Mutation, replacement, repack, missing profile, receipt tamper, source-SHA
 drift, or registry substitution fails the job; there is no previous-candidate
 fallback.
 
+The reusable gate emits `fsusblog-consumer-gate.receipt.json` and its SHA-256
+sidecar under the closed schema
+[`spec/releases/fsusblog-consumer-gate-receipt.schema.json`](../../spec/releases/fsusblog-consumer-gate-receipt.schema.json).
+Success binds the pinned FsusBlog SHA, exact toolchain, all five #1921 sub-gates,
+clean-tree pre/post state, candidate pre/post SHA-256, UTC interval, and workflow
+run identity. A failed or skipped command, dirty tree, candidate mutation, or
+identity mismatch produces only sanitized failure diagnostics and can never be
+consumed as success.
+
 发布后至少检查：
 
 - GitHub Actions run 成功

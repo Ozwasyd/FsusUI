@@ -41,6 +41,12 @@ on:
       candidate-binding-sha256:
         description: Digest of the same-candidate cross-repository binding.
         value: ${{ jobs.consumer.outputs.candidate-binding-sha256 }}
+      receipt-status:
+        description: Success only when the formal FsusBlog gate and all bindings pass.
+        value: ${{ jobs.consumer.outputs.receipt-status }}
+      receipt-sha256:
+        description: SHA-256 of the sanitized FsusBlog consumer receipt.
+        value: ${{ jobs.consumer.outputs.receipt-sha256 }}
 
 permissions:
   contents: read
@@ -54,6 +60,8 @@ jobs:
       default-branch: ${{ steps.resolve.outputs.default_branch }}
       commit-sha: ${{ steps.resolve.outputs.commit_sha }}
       candidate-binding-sha256: ${{ steps.binding-before.outputs.digest }}
+      receipt-status: ${{ steps.receipt.outputs.status }}
+      receipt-sha256: ${{ steps.receipt.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -161,12 +169,11 @@ jobs:
           npm --version
           node -e "const p=require('./src/frontend/package.json'); for (const n of ['vue','vite','typescript','vue-tsc']) { const v=p.dependencies?.[n] ?? p.devDependencies?.[n]; if (!v) process.exit(1); console.log(n + '=' + v) }"
       - name: Run the formal FsusBlog candidate consumer entry
-        working-directory: fsusblog
-        env:
-          CANDIDATE_PATH: ${{ github.workspace }}/candidate/fsusui-npm-candidate.tgz
         run: |
-          test "${CANDIDATE_PATH#/}" != "$CANDIDATE_PATH"
-          npm --prefix src/frontend run verify:fsusui-candidate -- --tarball "$CANDIDATE_PATH"
+          node fsusui/scripts/fsusblog-consumer-runner.mjs \
+            --repository fsusblog \
+            --candidate "$GITHUB_WORKSPACE/candidate/fsusui-npm-candidate.tgz" \
+            --output fsusblog-consumer-run.json
       - name: Verify pinned checkout and clean postcondition
         if: always()
         working-directory: fsusblog
@@ -191,6 +198,28 @@ jobs:
             --output candidate-binding-after.json)"
           test "$digest" = '${{ steps.binding-before.outputs.digest }}'
           cmp candidate-binding-before.json candidate-binding-after.json
+      - name: Generate strict sanitized FsusBlog consumer receipt
+        id: receipt
+        if: always()
+        run: |
+          node fsusui/scripts/cross-repo-receipt.mjs \
+            --binding candidate-binding-before.json \
+            --run-record fsusblog-consumer-run.json \
+            --default-branch '${{ steps.resolve.outputs.default_branch }}' \
+            --commit-sha '${{ steps.resolve.outputs.commit_sha }}' \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --output cross-gate/fsusblog-consumer-gate.receipt.json
+      - name: Upload sanitized FsusBlog consumer receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fsusblog-consumer-gate
+          path: |
+            cross-gate/fsusblog-consumer-gate.receipt.json
+            cross-gate/fsusblog-consumer-gate.receipt.sha256
+          if-no-files-found: error
+          retention-days: 30
       - name: Upload sanitized App evidence
         uses: actions/upload-artifact@v4
         with:

@@ -38,8 +38,10 @@ const validate = (source) => {
     'git status --porcelain',
     "p.scripts?.['verify:fsusui-candidate']",
     "for (const n of ['vue','vite','typescript','vue-tsc'])",
-    'npm --prefix src/frontend run verify:fsusui-candidate -- --tarball "$CANDIDATE_PATH"',
-    'test "${CANDIDATE_PATH#/}" != "$CANDIDATE_PATH"',
+    'fsusblog-consumer-runner.mjs',
+    'cross-repo-receipt.mjs',
+    'name: fsusblog-consumer-gate',
+    'fsusblog-consumer-gate.receipt.sha256',
     'if: always()',
   ]) {
     assert.ok(
