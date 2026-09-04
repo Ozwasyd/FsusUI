@@ -116,6 +116,12 @@ public partial class FsusMarkdownEditor : TemplatedControl
   private FsusMarkdownEditorTextInputMethodClient? imeClient;
   private bool pendingCompositionEnd;
 
+  private sealed record FsusMarkdownPasteSnapshot(
+    string Source,
+    FsusMarkdownEditorSelection Selection,
+    int Revision,
+    FsusMarkdownDocumentIdentity DocumentIdentity);
+
   public FsusMarkdownEditor()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-markdown-editor");
@@ -1073,18 +1079,35 @@ public partial class FsusMarkdownEditor : TemplatedControl
     {
       return;
     }
-    var dataTransfer = await topLevel.Clipboard.TryGetDataAsync();
+    await HandlePasteCoreAsync(
+      origin,
+      async () => await topLevel.Clipboard.TryGetDataAsync());
+  }
+
+  internal async Task HandlePasteCoreAsync(
+    string origin,
+    Func<Task<IAsyncDataTransfer?>> readClipboardAsync)
+  {
+    var snapshot = new FsusMarkdownPasteSnapshot(
+      store.Value,
+      store.Selection,
+      store.Revision,
+      store.Identity);
+    var dataTransfer = await readClipboardAsync();
     if (dataTransfer is null)
     {
       return;
     }
     using (dataTransfer)
     {
-      await ReadPastePayloadAsync(dataTransfer, origin);
+      await ReadPastePayloadAsync(dataTransfer, origin, snapshot);
     }
   }
 
-  private async Task ReadPastePayloadAsync(IAsyncDataTransfer dataTransfer, string origin)
+  private async Task ReadPastePayloadAsync(
+    IAsyncDataTransfer dataTransfer,
+    string origin,
+    FsusMarkdownPasteSnapshot snapshot)
   {
     var markdownFormat = DataFormat.CreateStringPlatformFormat("text/markdown");
     var htmlFormat = DataFormat.CreateStringPlatformFormat("text/html");
@@ -1141,9 +1164,13 @@ public partial class FsusMarkdownEditor : TemplatedControl
     {
       return;
     }
+    if (snapshot.Selection != store.Selection)
+    {
+      return;
+    }
     var plan = FsusMarkdownEditorClipboardInput.Resolve(new FsusMarkdownClipboardPasteContext(
-      Source: store.Value,
-      Selection: store.Selection,
+      Source: snapshot.Source,
+      Selection: snapshot.Selection,
       Items: items,
       Files: files,
       Origin: origin,
@@ -1152,7 +1179,9 @@ public partial class FsusMarkdownEditor : TemplatedControl
       Disabled: !IsEnabled,
       Mode: Mode,
       Revision: store.Revision,
-      CurrentIdentity: store.Identity));
+      ExpectedRevision: snapshot.Revision,
+      CurrentIdentity: store.Identity,
+      DocumentIdentity: snapshot.DocumentIdentity));
     nativeMachine.Apply(new FsusMarkdownNativeEventInput
     {
       Kind = origin == "drop" ? FsusMarkdownNativeEventKind.Drop : FsusMarkdownNativeEventKind.Paste,

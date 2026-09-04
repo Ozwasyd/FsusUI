@@ -291,6 +291,113 @@ public class FsusMarkdownEditorNativeInputHeadlessTests
   }
 
   [AvaloniaFact]
+  public async Task DelayedPasteRejectsSameSourceFromDifferentDocument()
+  {
+    var (window, editor) = CreateEditor();
+    try
+    {
+      editor.DocumentIdentity = new FsusMarkdownDocumentIdentity("doc-a", 1);
+      editor.Document = "same";
+      Dispatcher.UIThread.RunJobs();
+      var transactions = 0;
+      editor.Transaction += (_, _) => transactions += 1;
+      var clipboard = new TaskCompletionSource<IAsyncDataTransfer?>(
+        TaskCreationOptions.RunContinuationsAsynchronously);
+
+      var paste = editor.HandlePasteCoreAsync("paste", () => clipboard.Task);
+      editor.Document = "other";
+      editor.DocumentIdentity = new FsusMarkdownDocumentIdentity("doc-b", 2);
+      editor.Document = "same";
+      Dispatcher.UIThread.RunJobs();
+      var transactionsBeforeClipboardCompletes = transactions;
+
+      clipboard.SetResult(PlainTextTransfer(" stale"));
+      await paste;
+      Dispatcher.UIThread.RunJobs();
+
+      Assert.Equal("same", editor.Document);
+      Assert.Equal(
+        new FsusMarkdownDocumentIdentity("doc-b", 2),
+        editor.TransactionStore.Identity);
+      Assert.Equal(transactionsBeforeClipboardCompletes, transactions);
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public async Task DelayedPasteRejectsRevisionChange()
+  {
+    var (window, editor) = CreateEditor();
+    try
+    {
+      editor.Document = "before";
+      Dispatcher.UIThread.RunJobs();
+      var transactions = 0;
+      editor.Transaction += (_, _) => transactions += 1;
+      var clipboard = new TaskCompletionSource<IAsyncDataTransfer?>(
+        TaskCreationOptions.RunContinuationsAsynchronously);
+
+      var paste = editor.HandlePasteCoreAsync("paste", () => clipboard.Task);
+      editor.Document = "after";
+      Dispatcher.UIThread.RunJobs();
+      var transactionsBeforeClipboardCompletes = transactions;
+
+      clipboard.SetResult(PlainTextTransfer(" stale"));
+      await paste;
+      Dispatcher.UIThread.RunJobs();
+
+      Assert.Equal("after", editor.Document);
+      Assert.Equal(transactionsBeforeClipboardCompletes, transactions);
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public async Task DelayedPasteRejectsSelectionChange()
+  {
+    var (window, editor) = CreateEditor();
+    try
+    {
+      editor.Document = "before";
+      Dispatcher.UIThread.RunJobs();
+      var textBox = editor.inputOwner ?? throw new InvalidOperationException();
+      textBox.Focus();
+      Dispatcher.UIThread.RunJobs();
+      window.KeyPress(Key.Home, RawInputModifiers.None, PhysicalKey.Home, null);
+      window.KeyRelease(Key.Home, RawInputModifiers.None, PhysicalKey.Home, null);
+      Dispatcher.UIThread.RunJobs();
+      Assert.Equal(0, editor.TransactionStore.Selection.Start);
+      var transactions = 0;
+      editor.Transaction += (_, _) => transactions += 1;
+      var clipboard = new TaskCompletionSource<IAsyncDataTransfer?>(
+        TaskCreationOptions.RunContinuationsAsynchronously);
+
+      var paste = editor.HandlePasteCoreAsync("paste", () => clipboard.Task);
+      window.KeyPress(Key.End, RawInputModifiers.None, PhysicalKey.End, null);
+      window.KeyRelease(Key.End, RawInputModifiers.None, PhysicalKey.End, null);
+      Dispatcher.UIThread.RunJobs();
+      Assert.Equal(editor.Document.Length, editor.TransactionStore.Selection.Start);
+
+      clipboard.SetResult(PlainTextTransfer(" stale"));
+      await paste;
+      Dispatcher.UIThread.RunJobs();
+
+      Assert.Equal("before", editor.Document);
+      Assert.Equal(0, transactions);
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
   public void PairInsertionMatchesTheFrozenWebSemantics()
   {
     var (window, editor) = CreateEditor();
@@ -388,6 +495,15 @@ public class FsusMarkdownEditorNativeInputHeadlessTests
     args.Client = new FakeTextInputMethodClient(textBox);
     textBox.RaiseEvent(args);
     return (args.Client, () => count);
+  }
+
+  private static IAsyncDataTransfer PlainTextTransfer(string text)
+  {
+    var transfer = new DataTransfer();
+    var item = new DataTransferItem();
+    item.Set(DataFormat.Text, text);
+    transfer.Add(item);
+    return transfer;
   }
 
   private static (Window Window, FsusMarkdownEditor Editor) CreateEditor()
