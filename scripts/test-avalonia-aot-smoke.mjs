@@ -470,6 +470,9 @@ const runtimeFreeEnvironment = {
   PATH: path.join(temporaryRoot, 'no-runtime-path'),
   LANG: 'C.UTF-8',
   DBUS_SESSION_BUS_ADDRESS: sessionBusAddress,
+  ...(process.env.FSUSUI_AOT_DIAGNOSTIC === '1'
+    ? { FSUSUI_AOT_DIAGNOSTIC: '1' }
+    : {}),
 }
 const smokeArguments = (targetReport, extra = []) => [
   '--smoke',

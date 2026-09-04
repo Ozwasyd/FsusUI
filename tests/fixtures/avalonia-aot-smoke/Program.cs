@@ -80,17 +80,34 @@ internal static class Program
     }
   }
 
-  private static AppBuilder BuildAvaloniaApp() =>
-    AppBuilder
+  private static AppBuilder BuildAvaloniaApp()
+  {
+    var builder = AppBuilder
       .Configure<SmokeApplication>()
       .UsePlatformDetect()
       .LogToDelegate(
         message =>
         {
+          if (Environment.GetEnvironmentVariable("FSUSUI_AOT_DIAGNOSTIC") == "1")
+          {
+            Console.Error.WriteLine($"[avalonia-aot-diagnostic] {message}");
+          }
           if (SanitizeLogArea(message) is { } area) nativeLogErrors.Add(area);
         },
         LogEventLevel.Warning
       );
+    if (OperatingSystem.IsLinux())
+    {
+      builder.With(new X11PlatformOptions
+      {
+        RenderingMode = [X11RenderingMode.Software],
+        UseDBusMenu = false,
+        UseDBusFilePicker = false,
+        EnableSessionManagement = false,
+      });
+    }
+    return builder;
+  }
 
   internal static void RunSmoke(IClassicDesktopStyleApplicationLifetime desktop)
   {
@@ -517,7 +534,14 @@ internal static class Program
     textEditor.SetText("hello");
     textEditor.Select(5, 0);
     textEditor.TypeText(" world");
-    var virtualList = new FsusVirtualList { AccessibleName = "AOT virtual list", ItemCount = 100, ItemProvider = index => $"Row {index}" };
+    var virtualList = new FsusVirtualList
+    {
+      AccessibleName = "AOT virtual list",
+      ItemCount = 100,
+      ItemProvider = index => $"Row {index}",
+      Height = 160,
+      ViewportSize = 160,
+    };
     virtualList.ScrollToIndex(50);
     var tree = new FsusTree { AccessibleName = "AOT tree" };
     var treeRoot = new FsusTreeNode("root", "Root");
@@ -849,7 +873,7 @@ internal sealed class AotProjectionProducer(
             new(7, 15),
             FsusMarkdownProjectionSpanKind.Atomic,
             "Widget",
-            "embedded-widget"),
+            "embed"),
         ],
         request.FeatureRevision),
       []));

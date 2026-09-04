@@ -45,6 +45,10 @@ export const validateScenarioBindings = (source) => {
     'ControlAutomationPeer.CreatePeerForElement(markdownEditor)',
     'largeMarkdownSource.Length >= 100_000',
     'largeVisuals.Length < 64',
+    'RenderingMode = [X11RenderingMode.Software]',
+    'UseDBusMenu = false',
+    'ViewportSize = 160',
+    '"embed"',
     'catch (Exception error)',
   ])
     if (!source.includes(evidence))

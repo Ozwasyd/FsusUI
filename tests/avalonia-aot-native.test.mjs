@@ -47,6 +47,18 @@ test('stable registry owns the native scenario set', () => {
       ),
     /binding mismatch/u,
   )
+  for (const mutation of [
+    source.replace(
+      'RenderingMode = [X11RenderingMode.Software]',
+      'RenderingMode = [X11RenderingMode.Glx]',
+    ),
+    source.replace('ViewportSize = 160', 'ViewportSize = 3_200'),
+    source.replace('"embed"', '"embedded-widget"'),
+  ])
+    assert.throws(
+      () => validateScenarioBindings(mutation),
+      /behavior evidence missing/u,
+    )
 })
 
 test('report rejects stale identity, skipped behavior and incomplete registry coverage', () => {
