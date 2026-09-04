@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "issue": 272,
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "5dfb0f0ef4613849751a7badc3cd8f7cbac01051",
+  "candidateDigest": "ff0a64a89aa492ae110464304c6af17d37d88e29c4cbf37ab56da3adc160d06e",
+  "classificationReceiptDigest": "126e35b77b96e349205cd4b30b7813e2f93f3f33e6690da570c66ebc6a054f33",
+  "productionFixture": true,
+  "implementationModifiedPaths": [],
+  "focusedTests": [
+    {
+      "command": "focused Vitest selection for #433/#434/#435",
+      "passed": 126,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "focused production Playwright Chromium and Firefox interaction specs",
+      "passed": 46,
+      "failed": 0,
+      "skipped": 2
+    }
+  ],
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "The inspected desktop light render with statusDensity none contains no footer, separator, empty shell, or extra metrics accessibility node.",
+      "The inspected minimal light and 200 percent zoom dark renders retain one restrained status line with exactly two metrics and preserve the editor as the primary surface.",
+      "The inspected 375px long-locale detailed render uses a compact definition list whose full labels wrap without shrinking to 10 or 11px, turning into badges, or reducing the editor body to an unusable area.",
+      "The inspected 375px RTL dark render preserves RTL content and toolbar order while keeping the detailed metrics readable without horizontal overflow.",
+      "The five inspected accessibility trees each expose one editor region and one textbox; detailed metrics occur once as term-definition pairs, minimal metrics occur once as text, and none exposes no metrics representation."
+    ]
+  },
+  "inspectedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/zh-cn-none-desktop-light.png",
+      "digest": "5688fd631e030345366a2c8c4c625300e298f3b9b04486e82190f1d3d07b6a31"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/en-minimal-desktop-light.png",
+      "digest": "4c68aa90b2970295fff48304890634f4d190d878099c76e37369533353811d69"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/ja-minimal-desktop-dark-zoom-200.png",
+      "digest": "aaccfec50b7bb5cc19cb7eb4007d871d6a997e5833feec82da1bfc7d83383bfe"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/long-detailed-mobile-light.png",
+      "digest": "d9dfdaa83e096730f4af76b1dc34ebf9ee6dab9c3ebf7e95213add8096863325"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/ar-detailed-mobile-dark.png",
+      "digest": "da57d6fe89be962292f2805301f66bd88a3aa862cbf366ec4994bcc0c3117f37"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/zh-cn-none-desktop-light.aria.yml",
+      "digest": "2f63a1b65e42a4abd56e5e8becfe21beab156ff24065a8e2c86af418beb5f010"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/en-minimal-desktop-light.aria.yml",
+      "digest": "fb6d84c1b544d850e87a8052be2b697d66266f254ed95848697dccc2c89d81ba"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/ja-minimal-desktop-dark-zoom-200.aria.yml",
+      "digest": "c85c6f4667818caadaf93440248e19857b9de816005854ccaefd23c0eb1be045"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/long-detailed-mobile-light.aria.yml",
+      "digest": "09bf6cda9b5d0e6075c73eb051c90c45820f178e27238841b18c1b2f5931db23"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-272/ar-detailed-mobile-dark.aria.yml",
+      "digest": "efd5d49d01b344c15ac67aacb565e79efdd5542fee9f732d04a16d8c6e278e12"
+    }
+  ],
+  "limitations": [
+    "Rendered evidence was inspected from deterministic local production fixtures; no physical assistive-technology session is claimed.",
+    "The two skipped Playwright cases are evidence-gated issue-395 tests outside the #272 dependency chain."
+  ]
+}

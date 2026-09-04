@@ -1,0 +1,21 @@
+- region "A deliberately extended localization fixture that preserves every semantic label Markdown editor":
+  - button "A deliberately extended localization fixture that preserves every semantic label bold"
+  - button "A deliberately extended localization fixture that preserves every semantic label italic"
+  - button "A deliberately extended localization fixture that preserves every semantic label 6 format tools": A deliberately extended localization fixture that preserves every semantic label format tools 6
+  - textbox "A deliberately extended localization fixture that preserves every semantic label source editor":
+    - /placeholder: ""
+    - text: 你好 world RTL مرحبا Unicode 👨‍👩‍👧‍👦
+  - term: A deliberately extended localization fixture that preserves every semantic label line
+  - definition: "3"
+  - term: A deliberately extended localization fixture that preserves every semantic label column
+  - definition: "19"
+  - term: A deliberately extended localization fixture that preserves every semantic label lines
+  - definition: "3"
+  - term: A deliberately extended localization fixture that preserves every semantic label characters
+  - definition: "28"
+  - term: A deliberately extended localization fixture that preserves every semantic label words
+  - definition: "5"
+  - term: A deliberately extended localization fixture that preserves every semantic label selected
+  - definition: "0"
+  - term: A deliberately extended localization fixture that preserves every semantic label bytes
+  - definition: "61"
