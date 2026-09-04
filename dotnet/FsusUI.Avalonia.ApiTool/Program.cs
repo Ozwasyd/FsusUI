@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Avalonia;
@@ -55,6 +57,7 @@ internal static class Program
         repoRoot,
         Path.Combine(repoRoot, projectDirectory));
       var baseline = Extract(anchor.Assembly, id, sourceSemantics);
+      baseline.Source.OutputHash = ComputeOutputHash(baseline);
       var json = JsonSerializer.Serialize(baseline, JsonOptions);
       var outputPath = Path.Combine(outputDir, $"{id}.semantic.json");
       File.WriteAllText(outputPath, $"{json}\n");
@@ -84,17 +87,26 @@ internal static class Program
     return new SemanticBaseline
     {
       PackageId = packageId,
-      BaselineVersion = "1.0.0",
+      BaselineVersion = "2.0.0",
       Source = new BaselineSource
       {
-        Tool = "FsusUI.Avalonia.ApiTool@1.3.0",
+        ToolVersion = "FsusUI.Avalonia.ApiTool@1.4.0",
         AssemblyVersion = version,
         InputTreeHash = sourceSemantics.InputTreeHash,
         CompilerOptionsHash = sourceSemantics.CompilerOptionsHash,
-        DependencyVersionsHash = sourceSemantics.DependencyVersionsHash,
+        DependencyVersionHash = sourceSemantics.DependencyVersionsHash,
+        ContractSchemaVersion = "2.0.0",
       },
       SemanticTypes = types,
     };
+  }
+
+  private static string ComputeOutputHash(SemanticBaseline baseline)
+  {
+    baseline.Source.OutputHash = "";
+    var payload = $"{JsonSerializer.Serialize(baseline, JsonOptions)}\n";
+    return Convert.ToHexString(
+      SHA256.HashData(Encoding.UTF8.GetBytes(payload))).ToLowerInvariant();
   }
 
   private static SemanticType ExtractType(
@@ -406,7 +418,7 @@ internal sealed class SemanticBaseline
 
 internal sealed class BaselineSource
 {
-  public string Tool { get; init; } = "";
+  public string ToolVersion { get; init; } = "";
 
   public string AssemblyVersion { get; init; } = "";
 
@@ -414,7 +426,11 @@ internal sealed class BaselineSource
 
   public string CompilerOptionsHash { get; init; } = "";
 
-  public string DependencyVersionsHash { get; init; } = "";
+  public string DependencyVersionHash { get; init; } = "";
+
+  public string ContractSchemaVersion { get; init; } = "";
+
+  public string OutputHash { get; set; } = "";
 }
 
 internal sealed class SemanticType

@@ -20,10 +20,13 @@ compares a property whose compiled type is an enum only with a compiler-known
 Vue literal-value set. The normalized sets must be equal; an unresolved union,
 expression-backed value, or missing enum type remains `partial`.
 
-Each baseline also records hashes for its input tree, compiler options, and
-dependency assembly identities. The freshness check regenerates the baseline
-and runs real-source mutations for literal defaults, CLR initializers, required
-modifiers, and non-constant expressions.
+Each baseline records `toolVersion`, hashes for its input tree, compiler
+options, and dependency assembly identities, plus the Contract V2 schema
+version. `outputHash` covers the complete canonical semantic payload with only
+the hash field itself replaced by the empty string. The freshness check
+regenerates and self-verifies the baseline, then runs real-source mutations for
+literal defaults, CLR initializers, required modifiers, and non-constant
+expressions.
 
 ## Regeneration
 

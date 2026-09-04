@@ -1,12 +1,14 @@
 {
   "packageId": "FsusUI.Avalonia.Themes",
-  "baselineVersion": "1.0.0",
+  "baselineVersion": "2.0.0",
   "source": {
-    "tool": "FsusUI.Avalonia.ApiTool@1.3.0",
+    "toolVersion": "FsusUI.Avalonia.ApiTool@1.4.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "2632dd8f4a0fea4aed92422acc92f6d5bbf7914fa9dfcae077eef58440a7bcd5",
+    "inputTreeHash": "24268251e7fd4533474db50a19ddc426c71762d3c2a958f3d7655d67ed6dac99",
     "compilerOptionsHash": "a2e88fe9ebd590171080438846d719d90b904b854e46a43a2c1beae52d55f38b",
-    "dependencyVersionsHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e"
+    "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
+    "contractSchemaVersion": "2.0.0",
+    "outputHash": "350e83cc3488e52b73855c39fe6ba0b8a75702cbe3f7b68c8d20fc487988d118"
   },
   "semanticTypes": [
     {

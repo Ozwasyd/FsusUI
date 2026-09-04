@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
@@ -43,10 +44,16 @@ const committedRegistry = JSON.parse(
 const vueBaseline = JSON.parse(
   fs.readFileSync(path.join(root, VUE_BASELINE_PATH), 'utf8'),
 )
-const avaloniaBaselines = Object.fromEntries(
+const avaloniaBaselineSources = Object.fromEntries(
   Object.entries(AVALONIA_SEMANTIC_PATHS).map(([key, relativePath]) => [
     key,
-    JSON.parse(fs.readFileSync(path.join(root, relativePath), 'utf8')),
+    fs.readFileSync(path.join(root, relativePath), 'utf8'),
+  ]),
+)
+const avaloniaBaselines = Object.fromEntries(
+  Object.entries(avaloniaBaselineSources).map(([key, source]) => [
+    key,
+    JSON.parse(source),
   ]),
 )
 const semanticMemberBindings = JSON.parse(
@@ -55,6 +62,12 @@ const semanticMemberBindings = JSON.parse(
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 const sha256Pattern = /^[0-9a-f]{64}$/u
+const outputHashPattern = /("outputHash": ")[a-f0-9]{64}(")/gu
+const avaloniaOutputHash = (source) =>
+  crypto
+    .createHash('sha256')
+    .update(source.replace(outputHashPattern, '$1$2'))
+    .digest('hex')
 
 const replaceAtPath = (value, pointer, replacement) => {
   const segments = pointer
@@ -130,11 +143,18 @@ test('committed Contract V2 registry passes validation with the committed gate',
 })
 
 test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
-  for (const baseline of Object.values(avaloniaBaselines)) {
-    assert.equal(baseline.source.tool, 'FsusUI.Avalonia.ApiTool@1.3.0')
+  for (const [key, baseline] of Object.entries(avaloniaBaselines)) {
+    assert.equal(baseline.baselineVersion, '2.0.0')
+    assert.equal(baseline.source.toolVersion, 'FsusUI.Avalonia.ApiTool@1.4.0')
     assert.match(baseline.source.inputTreeHash, sha256Pattern)
     assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
-    assert.match(baseline.source.dependencyVersionsHash, sha256Pattern)
+    assert.match(baseline.source.dependencyVersionHash, sha256Pattern)
+    assert.equal(baseline.source.contractSchemaVersion, '2.0.0')
+    assert.match(baseline.source.outputHash, sha256Pattern)
+    assert.equal(
+      baseline.source.outputHash,
+      avaloniaOutputHash(avaloniaBaselineSources[key]),
+    )
   }
   const properties = avaloniaBaselines.avalonia.semanticTypes.flatMap(
     (type) => type.properties,
@@ -198,6 +218,13 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.ok(
     enumMembers.every((member) => typeof member.deprecated === 'boolean'),
   )
+})
+
+test('Avalonia semantic output hash rejects payload drift', () => {
+  const source = avaloniaBaselineSources.avalonia
+  const currentHash = avaloniaBaselines.avalonia.source.outputHash
+  const mutation = source.replace('"deprecated": false', '"deprecated": true')
+  assert.notEqual(avaloniaOutputHash(mutation), currentHash)
 })
 
 test('Vue compiler AST retains dynamic names and scoped slot payload structure', () => {
