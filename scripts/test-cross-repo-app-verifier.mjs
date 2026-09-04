@@ -32,8 +32,8 @@ const bodyOf = async (request) => {
   return JSON.parse(Buffer.concat(chunks).toString('utf8'))
 }
 
-const service = async ({ permissions, missingRepository } = {}) => {
-  const state = { tokenRequests: 0 }
+const service = async ({ permissions, missingRepository, allowWrite } = {}) => {
+  const state = { readTokenRequests: 0, deniedWriteRequests: 0 }
   const appPermissions = permissions ?? { metadata: 'read', contents: 'read' }
   const server = createServer(async (request, response) => {
     const url = new URL(request.url, 'http://fixture/')
@@ -50,9 +50,19 @@ const service = async ({ permissions, missingRepository } = {}) => {
       /^\/app\/installations\/(10|20)\/access_tokens$/u,
     )
     if (request.method === 'POST' && token) {
-      state.tokenRequests += 1
       const requestBody = await bodyOf(request)
       const name = requestBody.repositories[0]
+      if (requestBody.permissions?.contents === 'write') {
+        state.deniedWriteRequests += 1
+        return allowWrite
+          ? json(response, 201, {
+              token: 'unexpected-write-token',
+              permissions: { metadata: 'read', contents: 'write' },
+              repositories: [{ full_name: `Ozwasyd/${name}` }],
+            })
+          : json(response, 422, { message: 'permission not granted' })
+      }
+      state.readTokenRequests += 1
       return json(response, 201, {
         token: `token-${name}`,
         permissions: appPermissions,
@@ -95,13 +105,19 @@ test('read-only App verifies both exact repository installations', async () => {
     ['Ozwasyd/FsusUI', 'Ozwasyd/FsusBlog'],
   )
   assert.equal(evidence.checks.writeCapability, 'absent')
-  assert.equal(fixture.state.tokenRequests, 2)
+  assert.equal(fixture.state.readTokenRequests, 2)
+  assert.equal(fixture.state.deniedWriteRequests, 2)
   assert.doesNotMatch(JSON.stringify(evidence), /token|private|authorization/iu)
 })
 
 test('untrusted context never reads credentials or calls the App API', async () => {
   const result = await verifyCrossRepoApp({ trustedContext: false })
   assert.deepEqual(result, { status: 'skipped-untrusted' })
+})
+
+test('unexpected write capability fails the verification', async () => {
+  const fixture = await service({ allowWrite: true })
+  await assert.rejects(verify(fixture.apiBase), /denial probe failed/u)
 })
 
 test('missing configuration and installation fail closed', async () => {

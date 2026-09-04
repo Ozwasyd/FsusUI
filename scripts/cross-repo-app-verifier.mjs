@@ -117,6 +117,29 @@ const tokenFor = async ({
   return body.token
 }
 
+const assertWriteTokenDenied = async ({
+  fetchFn,
+  apiBase,
+  repository,
+  installationId,
+  jwt,
+}) => {
+  const shortName = repository.split('/')[1]
+  const response = await fetchFn(
+    new URL(`app/installations/${installationId}/access_tokens`, apiBase),
+    {
+      method: 'POST',
+      headers: { ...headers(jwt), 'content-type': 'application/json' },
+      body: JSON.stringify({
+        repositories: [shortName],
+        permissions: { contents: 'write' },
+      }),
+    },
+  )
+  if (response.ok || ![403, 422].includes(response.status))
+    throw new Error(`${repository} write-capability denial probe failed.`)
+}
+
 export function validateCrossRepoAppEvidence(evidence) {
   assertExactKeys(
     evidence,
@@ -219,6 +242,13 @@ export async function verifyCrossRepoApp({
       { headers: headers(token) },
       `${repository} contents smoke`,
     )
+    await assertWriteTokenDenied({
+      fetchFn,
+      apiBase,
+      repository,
+      installationId,
+      jwt,
+    })
     repositories.push({ repository, installationId, selection: 'selected' })
   }
   return validateCrossRepoAppEvidence({
