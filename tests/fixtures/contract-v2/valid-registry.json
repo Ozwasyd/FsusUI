@@ -194,7 +194,7 @@
         "name": "ElMarkdownEditor",
         "module": "markdown-editor",
         "classification": "native-adapter",
-        "exportStatus": "partial"
+        "exportStatus": "missing"
       },
       "bindings": {
         "web": {
@@ -303,9 +303,8 @@
         "canonical": true
       },
       "markdownEditorGate": {
-        "blocked": true,
-        "blockedBy": [338, 339, 340, 341, 342, 343],
-        "requiredStatus": "partial"
+        "blocked": false,
+        "blockedBy": []
       },
       "scenarioIds": [
         "scenario.v2.el-markdown-editor.input.mode",

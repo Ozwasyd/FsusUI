@@ -1598,6 +1598,13 @@ const contractCoverage = (members) => {
   }
 }
 
+const deriveExportStatus = ({ classification, members }) => {
+  if (classification === 'web-only') return 'web-only'
+  if (members.some((member) => member.status === 'partial')) return 'partial'
+  if (members.some((member) => member.status === 'missing')) return 'missing'
+  return 'aligned-candidate'
+}
+
 const semanticBindingKey = (component, kind, web) =>
   `${component}\u0000${kind}\u0000${web}`
 
@@ -1692,32 +1699,12 @@ const contractForComponent = ({
     }),
   )
 
-  const isMarkdownEditor = component.name === 'ElMarkdownEditor'
-  const gateBlocked = isMarkdownEditor && Boolean(gate?.blocked)
-  let exportStatus
-  if (gateBlocked) {
-    exportStatus = gate?.requiredStatus ?? 'partial'
-  } else if (classification === 'web-only') {
-    exportStatus = 'web-only'
-  } else if (
-    inputs.some((input) => input.status === 'partial') ||
-    outputs.some((output) => output.status === 'partial') ||
-    operations.some((operation) => operation.status === 'partial') ||
-    contentRegions.some((region) => region.status === 'partial')
-  ) {
-    exportStatus = 'partial'
-  } else if (
-    inputs.some((input) => input.status === 'missing') ||
-    outputs.some((output) => output.status === 'missing') ||
-    operations.some((operation) => operation.status === 'missing') ||
-    contentRegions.some((region) => region.status === 'missing')
-  ) {
-    exportStatus = 'missing'
-  } else {
-    exportStatus = 'aligned-candidate'
-  }
-
   const members = [...inputs, ...outputs, ...operations, ...contentRegions]
+  const isMarkdownEditor = component.name === 'ElMarkdownEditor'
+  const gateBlocked = isMarkdownEditor && gate?.blocked === true
+  const exportStatus = gateBlocked
+    ? (gate?.requiredStatus ?? 'partial')
+    : deriveExportStatus({ classification, members })
   const avaloniaExtras = avaloniaType
     ? extractAvaloniaExtras({
         contractKebab,
@@ -1802,9 +1789,11 @@ const contractForComponent = ({
   if (isMarkdownEditor) {
     contract.markdownEditor = markdownEditorSection()
     contract.markdownEditorGate = {
-      blocked: Boolean(gate?.blocked),
+      blocked: gate?.blocked === true,
       blockedBy: gate?.blockedBy ?? [],
-      requiredStatus: gate?.requiredStatus ?? 'partial',
+      ...(gate?.blocked === true
+        ? { requiredStatus: gate?.requiredStatus ?? 'partial' }
+        : {}),
     }
   }
   return contract
@@ -2359,6 +2348,48 @@ const validateMember = (member, contractId, classification, errors) => {
   }
 }
 
+const validateMarkdownEditorGate = (gate, errors) => {
+  if (typeof gate !== 'object' || gate == null) {
+    errors.push('MarkdownEditor gate must be an object')
+    return
+  }
+  if (gate.schemaVersion !== 1) {
+    errors.push('MarkdownEditor gate schemaVersion must be 1')
+  }
+  if (gate.component !== 'ElMarkdownEditor') {
+    errors.push('MarkdownEditor gate must target ElMarkdownEditor')
+  }
+  if (typeof gate.blocked !== 'boolean') {
+    errors.push('MarkdownEditor gate blocked must be a boolean')
+  }
+  if (!Array.isArray(gate.blockedBy)) {
+    errors.push('MarkdownEditor gate blockedBy must be an array')
+  } else {
+    const blockers = new Set()
+    for (const blocker of gate.blockedBy) {
+      if (!Number.isInteger(blocker) || blocker <= 0) {
+        errors.push(
+          'MarkdownEditor gate blockedBy must contain positive issue numbers',
+        )
+      } else if (blockers.has(blocker)) {
+        errors.push(`MarkdownEditor gate blockedBy duplicates #${blocker}`)
+      }
+      blockers.add(blocker)
+    }
+    if (gate.blocked === false && gate.blockedBy.length > 0) {
+      errors.push(
+        'MarkdownEditor gate blocked=false cannot retain stale blockedBy entries',
+      )
+    }
+    if (gate.blocked === true && gate.blockedBy.length === 0) {
+      errors.push('MarkdownEditor gate blocked=true requires blockedBy entries')
+    }
+  }
+  if (typeof gate.reason !== 'string' || gate.reason.trim() === '') {
+    errors.push('MarkdownEditor gate must record a non-empty reason')
+  }
+}
+
 const validateMarkdownEditor = (contract, gate, errors) => {
   if (contract.component?.name !== 'ElMarkdownEditor') return
   const editor = contract.markdownEditor
@@ -2390,16 +2421,36 @@ const validateMarkdownEditor = (contract, gate, errors) => {
       `${contract.id} MarkdownEditor must not reference write anywhere`,
     )
   }
-  if (gate?.blocked) {
-    const required = gate.requiredStatus ?? 'partial'
-    if (contract.component.exportStatus !== required) {
-      errors.push(
-        `${contract.id} must stay ${required} while #${(gate.blockedBy ?? []).join(', #')} are open`,
-      )
-    }
-    if (contract.markdownEditorGate?.blocked !== true) {
-      errors.push(`${contract.id} markdownEditorGate must record blocked=true`)
-    }
+  const embeddedGate = contract.markdownEditorGate
+  const expectedGate = {
+    blocked: gate?.blocked === true,
+    blockedBy: gate?.blockedBy ?? [],
+    ...(gate?.blocked === true
+      ? { requiredStatus: gate?.requiredStatus ?? 'partial' }
+      : {}),
+  }
+  if (JSON.stringify(embeddedGate) !== JSON.stringify(expectedGate)) {
+    errors.push(
+      `${contract.id} markdownEditorGate disagrees with the authoritative gate`,
+    )
+  }
+  const members = [
+    ...(contract.inputs ?? []),
+    ...(contract.outputs ?? []),
+    ...(contract.operations ?? []),
+    ...(contract.contentRegions ?? []),
+  ]
+  const expectedStatus =
+    gate?.blocked === true
+      ? (gate?.requiredStatus ?? 'partial')
+      : deriveExportStatus({
+          classification: contract.component?.classification,
+          members,
+        })
+  if (contract.component?.exportStatus !== expectedStatus) {
+    errors.push(
+      `${contract.id} exportStatus ${contract.component?.exportStatus ?? '<unknown>'} disagrees with derived status ${expectedStatus}`,
+    )
   }
 }
 
@@ -2701,6 +2752,7 @@ export const validateRegistry = (
   { avaloniaBaselines = null } = {},
 ) => {
   const errors = []
+  validateMarkdownEditorGate(gate, errors)
   if (registry.schemaVersion !== CONTRACT_V2_SCHEMA_VERSION) {
     errors.push('registry schemaVersion must be 2')
   }

@@ -30,7 +30,7 @@
     },
     "markdownEditorGate": {
       "path": "spec/components/contracts/v2/markdown-editor-gate.json",
-      "hash": "a551ec5f504655ea8e2e3261699138ed7beac5f45b8c4fe6d37ed4f9b515c72b"
+      "hash": "ed617c0d511f8050386f73971ad501b50f7b83ddf343c2834b317cc72ce6973d"
     },
     "semanticMemberBindings": {
       "path": "spec/components/contracts/v2/semantic-member-bindings.json",
@@ -62505,12 +62505,8 @@
         "canonical": true
       },
       "markdownEditorGate": {
-        "blocked": true,
-        "blockedBy": [
-          342,
-          343
-        ],
-        "requiredStatus": "partial"
+        "blocked": false,
+        "blockedBy": []
       }
     },
     {
