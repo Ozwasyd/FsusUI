@@ -16,10 +16,20 @@ import {
 import type { MarkdownSearchMatch } from '../../../wasm/markdown-search-model'
 
 const identity = Object.freeze({ epoch: 1, id: 'search-doc' })
+const englishSearchCopy = Object.freeze({
+  findAndReplaceAria: 'Find and replace in document',
+  findAria: 'Find in document',
+  noMatches: 'No matches',
+  replaceWithAria: 'Replace with',
+  results: (current: number, total: number) => `${current} of ${total}`,
+  truncatedResults: (count: number) => `${count.toLocaleString()}+ matches`,
+})
 
 describe('markdown search UI and cross-mode highlight/reveal', () => {
   it('resolves compact search UI state and handles screen reader accessibility', () => {
-    const closed = resolveMarkdownSearchUi(false, '', 0)
+    const closed = resolveMarkdownSearchUi(false, '', 0, {
+      copy: englishSearchCopy,
+    })
     expect(closed.open).toBe(false)
     expect(closed.compact).toBe(true)
     expect(closed.card).toBe(false)
@@ -33,6 +43,7 @@ describe('markdown search UI and cross-mode highlight/reveal', () => {
       mode: 'plain-case',
       replaceOpen: true,
       replaceText: 'world',
+      copy: englishSearchCopy,
     })
     expect(open.open).toBe(true)
     expect(open.query).toBe('hello')
@@ -47,11 +58,14 @@ describe('markdown search UI and cross-mode highlight/reveal', () => {
 
     const truncated = resolveMarkdownSearchUi(true, 'a', 10_000, {
       truncated: true,
+      copy: englishSearchCopy,
     })
     expect(truncated.truncated).toBe(true)
     expect(truncated.statusText).toContain('10,000+ matches')
 
-    const empty = resolveMarkdownSearchUi(true, 'nonexistent', 0)
+    const empty = resolveMarkdownSearchUi(true, 'nonexistent', 0, {
+      copy: englishSearchCopy,
+    })
     expect(empty.statusText).toBe('No matches')
   })
 
@@ -293,6 +307,7 @@ describe('markdown search UI and cross-mode highlight/reveal', () => {
   it('mounts search bar in MarkdownEditor component and runs find/replace workflow', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: {
+        localeText: { search: englishSearchCopy },
         modelValue: 'apple banana apple cherry apple',
       },
     })

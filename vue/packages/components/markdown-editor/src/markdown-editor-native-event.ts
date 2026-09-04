@@ -336,6 +336,23 @@ export const createMarkdownEditorNativeEventMachine = (options: {
         return next
       }
       if (phase !== 'composing') {
+        const value = event.value ?? ''
+        const previous = event.previousValue ?? ''
+        if (
+          lastCommitValue !== undefined &&
+          value === lastCommitValue &&
+          previous === lastCommitValue
+        ) {
+          lastCommitValue = undefined
+          snapshot = undefined
+          const next = planOf('dedup', phase, {
+            composition: true,
+            freezeSmartInput: false,
+            identity: lastIdentity,
+          })
+          pushTrace(event, next)
+          return next
+        }
         if (event.data) {
           phase = 'idle'
           lastCommitValue = (event.previousValue ?? '') + event.data

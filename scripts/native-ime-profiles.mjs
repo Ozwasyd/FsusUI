@@ -155,6 +155,7 @@ export const BROWSER_PROFILES = {
     args: [
       '--no-sandbox',
       '--disable-dev-shm-usage',
+      '--ozone-platform=x11',
       '--no-first-run',
       '--no-default-browser-check',
       '--window-size=1280,1100',
@@ -203,14 +204,21 @@ export const computeX11Target = ({
   windowGeometry,
   innerWidth,
   innerHeight,
+  devicePixelRatio = 1,
   rect,
 }) => {
   const [windowX, windowY, windowWidth, windowHeight] = windowGeometry
-  const topChrome = Math.max(0, windowHeight - innerHeight)
-  const leftChrome = Math.max(0, windowWidth - innerWidth)
+  // X11 may expose a physical window geometry even when Chromium reports a
+  // CSS devicePixelRatio of 1 (for example under a 200% desktop scale). Infer
+  // that compositor scale from the mapped width, while retaining DPR for
+  // browsers that report it accurately.
+  const geometryScale = Math.max(1, Math.round(windowWidth / innerWidth))
+  const scale = Math.max(1, devicePixelRatio, geometryScale)
+  const topChrome = Math.max(0, windowHeight - innerHeight * scale)
+  const leftChrome = Math.max(0, windowWidth - innerWidth * scale)
   return {
-    x: Math.round(windowX + leftChrome + rect.x + rect.width / 2),
-    y: Math.round(windowY + topChrome + rect.y + rect.height / 2),
+    x: Math.round(windowX + leftChrome + (rect.x + rect.width / 2) * scale),
+    y: Math.round(windowY + topChrome + (rect.y + rect.height / 2) * scale),
   }
 }
 

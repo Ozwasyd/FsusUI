@@ -1,0 +1,12 @@
+- region "JA Markdown editor":
+  - button "JA bold"
+  - button "JA italic"
+  - button "JA heading"
+  - button "JA quote"
+  - button "JA code"
+  - button "JA link"
+  - button "JA 2 format tools": JA format tools 2
+  - textbox "JA source editor":
+    - /placeholder: ""
+    - text: 你好 world RTL مرحبا Unicode 👨‍👩‍👧‍👦
+  - text: 28 JA characters 5 JA words

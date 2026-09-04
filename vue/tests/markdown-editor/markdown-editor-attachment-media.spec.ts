@@ -3,7 +3,7 @@ import type { Locator, Page } from '@playwright/test'
 
 const openFixture = async (
   page: Page,
-  options: { interactionProfile?: 'keyboard'; modeMatrix?: boolean } = {},
+  options: { interactionProfile?: 'keyboard'; showModes?: boolean } = {},
 ) => {
   const parameters = new URLSearchParams({
     audit: 'ui-states',
@@ -15,9 +15,7 @@ const openFixture = async (
       options.interactionProfile,
     )
   }
-  if (options.modeMatrix) {
-    parameters.set('markdownEditorModeMatrix', '1')
-  }
+  if (options.showModes) parameters.set('markdownLanguageTools', '1')
   await page.goto(`/?${parameters.toString()}`, {
     waitUntil: 'domcontentloaded',
   })
@@ -80,7 +78,7 @@ test('renders and operates the attachment lifecycle with local pointer, touch, a
     { name: 'notes-文档.txt', order: 1 },
   ])
 
-  const list = editor.getByRole('list', { name: 'Attachments' })
+  const list = editor.getByRole('list', { name: '附件' })
   await expect(list.getByRole('listitem')).toHaveCount(2)
   await expect(
     list.getByText('diagram-long-accessible-name.png', { exact: true }),
@@ -90,12 +88,12 @@ test('renders and operates the attachment lifecycle with local pointer, touch, a
   await expect(liveStatuses).toHaveCount(2)
 
   await fixture.getByTestId('markdown-attachment-progress').click()
-  await expect(liveStatuses.first()).toContainText('50% uploaded')
+  await expect(liveStatuses.first()).toContainText('已上传 50%')
 
   const cancelSecond = list
     .getByRole('listitem')
     .nth(1)
-    .getByRole('button', { name: 'Cancel' })
+    .getByRole('button', { name: '取消' })
   const target = await cancelSecond.boundingBox()
   expect(target?.width).toBeGreaterThanOrEqual(44)
   expect(target?.height).toBeGreaterThanOrEqual(44)
@@ -110,16 +108,16 @@ test('renders and operates the attachment lifecycle with local pointer, touch, a
     isPrimary: true,
   })
   await cancelSecond.click()
-  await expect(liveStatuses.nth(1)).toContainText('upload cancelled')
+  await expect(liveStatuses.nth(1)).toContainText('上传已取消')
   await expect(
-    list.getByRole('listitem').nth(1).getByRole('button', { name: 'Retry' }),
+    list.getByRole('listitem').nth(1).getByRole('button', { name: '重试' }),
   ).toBeVisible()
   await expect(
-    list.getByRole('listitem').nth(1).getByRole('button', { name: 'Remove' }),
+    list.getByRole('listitem').nth(1).getByRole('button', { name: '移除' }),
   ).toBeVisible()
 
   await fixture.getByTestId('markdown-attachment-resolve').click()
-  await expect(liveStatuses.first()).toContainText('upload complete')
+  await expect(liveStatuses.first()).toContainText('上传完成')
   await expect(editor.locator('textarea')).toHaveValue(
     /!\[Resolved attachment\]\(\/fixtures\/resolved-attachment\.png\)/,
   )
@@ -136,13 +134,13 @@ test('renders and operates the attachment lifecycle with local pointer, touch, a
     reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
   }))
   expect(accessibilitySnapshot).toMatchObject({
-    listLabel: 'Attachments',
+    listLabel: '附件',
     reducedMotion: true,
   })
   expect(accessibilitySnapshot.liveRegions).toEqual(
     expect.arrayContaining([
-      expect.objectContaining({ text: expect.stringContaining('upload complete') }),
-      expect.objectContaining({ text: expect.stringContaining('upload cancelled') }),
+      expect.objectContaining({ text: expect.stringContaining('上传完成') }),
+      expect.objectContaining({ text: expect.stringContaining('上传已取消') }),
     ]),
   )
   await testInfo.attach('attachment-accessibility-simulation.json', {
@@ -212,7 +210,7 @@ test('maps a simulated pointer drop through the source anchor and prevents brows
     end: 3,
   })
   await expect(editor.locator('textarea')).toHaveValue(
-    /^Anc!\[Uploading drop-image\.png\.\.\.\]\(\)/,
+    /^Anc!\[正在上传 drop-image\.png…\]\(\)/,
   )
   await testInfo.attach('attachment-drop-zoom-simulation.png', {
     body: await editor.screenshot({ animations: 'disabled' }),
@@ -236,7 +234,7 @@ test('applies image property and caption figure commands through the production 
   await page.emulateMedia({ reducedMotion: 'reduce' })
   const fixture = await openFixture(page, {
     interactionProfile: 'keyboard',
-    modeMatrix: true,
+    showModes: true,
   })
   const editor = fixture.locator('.el-markdown-editor')
   const textarea = editor.locator('textarea')
@@ -250,20 +248,20 @@ test('applies image property and caption figure commands through the production 
     element.setSelectionRange(5, 5)
     element.dispatchEvent(new Event('select', { bubbles: true }))
   })
-  const properties = editor.getByRole('form', { name: 'Image properties' })
+  const properties = editor.getByRole('form', { name: '图像属性' })
   await expect(properties).toBeVisible()
-  await properties.getByLabel('Destination').fill('javascript:alert(1)')
-  await properties.getByRole('button', { name: 'Apply' }).click()
+  await properties.getByLabel('目标地址').fill('javascript:alert(1)')
+  await properties.getByRole('button', { name: '应用' }).click()
   await expect(properties.getByRole('alert')).toContainText('blocked-scheme')
   await expect(textarea).toHaveValue(
     '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]',
   )
 
-  await properties.getByLabel('Alternative text').fill('可访问 alt 😀')
-  await properties.getByLabel('Destination').fill('/safe/new.png')
-  await properties.getByLabel('Title').fill('updated title')
-  await properties.getByLabel('Caption').fill('更新说明 😀 RTL אב')
-  await properties.getByRole('button', { name: 'Apply' }).click()
+  await properties.getByLabel('替代文本').fill('可访问 alt 😀')
+  await properties.getByLabel('目标地址').fill('/safe/new.png')
+  await properties.getByLabel('标题').fill('updated title')
+  await properties.getByLabel('题注').fill('更新说明 😀 RTL אב')
+  await properties.getByRole('button', { name: '应用' }).click()
   const edited =
     '![可访问 alt 😀](/safe/new.png "updated title")\n::caption[更新说明 😀 RTL אב]'
   await expect(textarea).toHaveValue(edited)
@@ -290,7 +288,7 @@ test('applies image property and caption figure commands through the production 
   }
 
   await expect(properties).toBeVisible()
-  await properties.getByRole('button', { name: 'Remove image' }).click()
+  await properties.getByRole('button', { name: '移除图像' }).click()
   await expect(textarea).toHaveValue('')
   await fixture.getByTestId('markdown-undo').click()
   await expect(textarea).toHaveValue(edited)

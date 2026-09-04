@@ -1,6 +1,4 @@
-import {
-  type MarkdownDocumentIdentity,
-} from '../../../wasm/markdown-runtime'
+import { type MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
 import {
   type MarkdownSearchMatch,
   type MarkdownSearchMode,
@@ -24,6 +22,14 @@ export interface MarkdownSearchUiOptions {
   readonly mode?: MarkdownSearchMode
   readonly truncated?: boolean
   readonly navigationOwner?: MarkdownOutlineNavigationOwner
+  readonly copy?: Readonly<{
+    findAndReplaceAria: string
+    findAria: string
+    noMatches: string
+    replaceWithAria: string
+    results: (current: number, total: number) => string
+    truncatedResults: (count: number) => string
+  }>
 }
 
 export interface MarkdownSearchUiAria {
@@ -68,23 +74,28 @@ export const resolveMarkdownSearchUi = (
   const mode: MarkdownSearchMode = options.mode ?? 'plain'
   const truncated = Boolean(options.truncated)
 
-  let statusText = 'No matches'
+  const copy = options.copy
+  let statusText = copy?.noMatches ?? ''
   if (truncated) {
-    statusText = `${hitCount.toLocaleString()}+ matches`
+    statusText = copy?.truncatedResults(hitCount) ?? String(hitCount)
   } else if (hitCount > 0) {
-    const currentNum = currentIndex !== null && currentIndex >= 0 ? currentIndex + 1 : 1
-    statusText = `${currentNum} of ${hitCount}`
+    const currentNum =
+      currentIndex !== null && currentIndex >= 0 ? currentIndex + 1 : 1
+    statusText =
+      copy?.results(currentNum, hitCount) ?? `${currentNum}/${hitCount}`
   } else if (query.length === 0) {
-    statusText = '0 of 0'
+    statusText = copy?.results(0, 0) ?? '0/0'
   }
 
   const aria: MarkdownSearchUiAria = Object.freeze({
     role: 'search' as const,
-    ariaLabel: replaceOpen ? 'Find and replace in document' : 'Find in document',
+    ariaLabel: replaceOpen
+      ? (copy?.findAndReplaceAria ?? '')
+      : (copy?.findAria ?? ''),
     statusAriaLive: 'polite' as const,
     statusText,
-    queryAriaLabel: 'Find in document',
-    replaceAriaLabel: 'Replace with',
+    queryAriaLabel: copy?.findAria ?? '',
+    replaceAriaLabel: copy?.replaceWithAria ?? '',
   })
 
   return Object.freeze({
