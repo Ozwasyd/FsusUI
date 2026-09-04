@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "scenarios": [
+    {
+      "id": "avalonia-button-primary",
+      "contractId": "component-v2.el-button",
+      "scenarioId": "scenario.v2.el-button.a11y",
+      "checkpoint": "automation-peer-mounted",
+      "snapshotId": "button-primary",
+      "factory": "button"
+    },
+    {
+      "id": "avalonia-input-invalid",
+      "contractId": "component-v2.el-input",
+      "scenarioId": "scenario.v2.el-input.a11y",
+      "checkpoint": "automation-peer-mounted",
+      "snapshotId": "input-invalid",
+      "factory": "input",
+      "implementationGaps": [
+        {
+          "field": "states.invalid",
+          "reason": "The current FsusInput AutomationPeer does not expose IsInvalid through a provider or item status.",
+          "owner": "FsusUI Avalonia",
+          "testPolicy": "Real peer capture must keep this scenario partial while the required field is unavailable; undeclared missing fields and stale declarations fail.",
+          "reviewAfter": "2026-12-05"
+        }
+      ]
+    },
+    {
+      "id": "avalonia-checkbox-checked",
+      "contractId": "component-v2.el-checkbox",
+      "scenarioId": "scenario.v2.el-checkbox.a11y",
+      "checkpoint": "automation-peer-mounted",
+      "snapshotId": "checkbox-accept",
+      "factory": "checkbox"
+    },
+    {
+      "id": "avalonia-switch-checked",
+      "contractId": "component-v2.el-switch",
+      "scenarioId": "scenario.v2.el-switch.a11y",
+      "checkpoint": "automation-peer-mounted",
+      "snapshotId": "switch-alerts",
+      "factory": "switch"
+    },
+    {
+      "id": "avalonia-markdown-editor-atomic",
+      "contractId": "component-v2.el-markdown-editor",
+      "scenarioId": "scenario.v2.el-markdown-editor.a11y",
+      "checkpoint": "automation-peer-atomic-projection",
+      "snapshotId": "markdown-editor-atomic",
+      "factory": "markdown-editor-atomic"
+    }
+  ]
+}

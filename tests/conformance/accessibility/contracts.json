@@ -534,6 +534,20 @@
       "invalidState": "required",
       "expectedStates": { "disabled": false, "invalid": true },
       "keyboardNavigation": ["Tab", "ShiftTab", "Enter"]
+    },
+    {
+      "id": "markdown-editor",
+      "publicName": "FsusMarkdownEditor",
+      "role": "edit",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "required",
+      "expectedStates": { "disabled": false, "invalid": false },
+      "keyboardNavigation": ["Tab"]
     }
   ]
 }

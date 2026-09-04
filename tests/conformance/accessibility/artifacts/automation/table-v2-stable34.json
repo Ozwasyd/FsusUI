@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "table-v2-stable34",
     "component": "table-v2",
     "platform": "avalonia",
     "control": "FsusTableV2",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "grid",
     "accessibleName": "Large table",
     "value": "100000 rows, 80 columns, row 99951 column 71",

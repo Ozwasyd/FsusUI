@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "popconfirm-stable25",
     "component": "popconfirm",
     "platform": "avalonia",
     "control": "FsusPopconfirm",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "dialog",
     "accessibleName": "Delete article?",
     "value": null,

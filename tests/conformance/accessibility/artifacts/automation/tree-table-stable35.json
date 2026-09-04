@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "tree-table-stable35",
     "component": "tree-table",
     "platform": "avalonia",
     "control": "FsusTreeTable",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "grid",
     "accessibleName": "Tree table",
     "value": "36 tree rows, 4 columns, row level and expanded state exposed",

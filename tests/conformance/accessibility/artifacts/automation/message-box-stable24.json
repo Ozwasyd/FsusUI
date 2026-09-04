@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "message-box-stable24",
     "component": "message-box",
     "platform": "avalonia",
     "control": "FsusMessageBox",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "dialog",
     "accessibleName": "Delete permanently?",
     "value": null,
