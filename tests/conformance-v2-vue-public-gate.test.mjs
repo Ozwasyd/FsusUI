@@ -105,6 +105,28 @@ test('a real registry member kind drift fails Vue public coverage', () => {
   )
 })
 
+test('content-region compiler metadata drift fails Vue public coverage', () => {
+  const mutatedBaseline = clone(baseline)
+  const defaultRegion = mutatedBaseline.components
+    .find((component) => component.name === 'ElSelectV2')
+    .slots.find((slot) => slot.name === 'default')
+  defaultRegion.payloadComplete = true
+  assert.match(
+    errorsFor({ mutatedBaseline }),
+    /ElSelectV2 contentRegion default stale compiler payloadComplete/,
+  )
+
+  const implicitAvalonia = clone(registry)
+  const defaultContractRegion = implicitAvalonia.contracts
+    .find((contract) => contract.component.name === 'ElSelectV2')
+    .contentRegions.find((region) => region.name === 'default')
+  defaultContractRegion.avalonia = { member: 'Content', content: true }
+  assert.match(
+    errorsFor({ mutatedRegistry: implicitAvalonia }),
+    /claims an Avalonia content region without an explicit semantic binding/,
+  )
+})
+
 test('a real registry cross-kind duplicate fails Vue public coverage', () => {
   const duplicateAcrossKind = clone(registry)
   const button = duplicateAcrossKind.contracts.find(

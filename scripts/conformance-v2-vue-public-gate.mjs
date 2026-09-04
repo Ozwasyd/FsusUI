@@ -134,6 +134,56 @@ export const validateVuePublicCoverage = ({ baseline, registry }) => {
         if (member.web?.baseline !== VUE_BASELINE_PATH) {
           errors.push(`${context} is not bound to the Vue compiler baseline`)
         }
+        if (section.kind === 'contentRegion') {
+          const slot = (component.slots ?? []).find(
+            (candidate) => candidate.name === member.name,
+          )
+          const expectedPayload = (slot?.payload ?? []).map((field) => ({
+            name: field.name,
+            expression: field.expression ?? null,
+            type: field.type ?? null,
+          }))
+          const actualPayload = member.web?.payload ?? []
+          for (const [field, expected, actual] of [
+            ['nameKnown', slot?.nameKnown === true, member.web?.nameKnown],
+            ['scoped', slot?.scoped === true, member.web?.scoped],
+            [
+              'payloadComplete',
+              slot?.payloadComplete === true,
+              member.web?.payloadComplete,
+            ],
+            ['contentType', slot?.contentType ?? null, member.web?.contentType],
+          ]) {
+            if (actual !== expected) {
+              errors.push(
+                `${context} stale compiler ${field}: baseline ${JSON.stringify(expected)} vs Contract V2 ${JSON.stringify(actual)}`,
+              )
+            }
+          }
+          if (
+            JSON.stringify(actualPayload) !== JSON.stringify(expectedPayload)
+          ) {
+            errors.push(`${context} stale compiler scoped payload fields`)
+          }
+          if (
+            member.avalonia != null &&
+            member.bindingBasis !== 'explicit-semantic'
+          ) {
+            errors.push(
+              `${context} claims an Avalonia content region without an explicit semantic binding`,
+            )
+          }
+          if (
+            member.status === 'aligned-candidate' &&
+            (slot?.nameKnown !== true ||
+              slot?.payloadComplete !== true ||
+              !slot?.contentType)
+          ) {
+            errors.push(
+              `${context} claims aligned-candidate with unknown compiler content metadata`,
+            )
+          }
+        }
         if (!MEMBER_STATUSES.includes(member.status)) {
           errors.push(`${context} has invalid status ${member.status}`)
         }

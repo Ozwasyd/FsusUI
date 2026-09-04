@@ -87,7 +87,7 @@ internal static class Program
       BaselineVersion = "1.0.0",
       Source = new BaselineSource
       {
-        Tool = "FsusUI.Avalonia.ApiTool@1.1.0",
+        Tool = "FsusUI.Avalonia.ApiTool@1.2.0",
         AssemblyVersion = version,
         InputTreeHash = sourceSemantics.InputTreeHash,
         CompilerOptionsHash = sourceSemantics.CompilerOptionsHash,
@@ -102,11 +102,15 @@ internal static class Program
     SourceSemanticIndex sourceSemantics)
   {
     var kind = TypeKind(type);
-    var contentProperty = FindContentProperty(type);
     sourceSemantics.Types.TryGetValue(
       type.FullName ?? type.Name,
       out var sourceTypeSemantics);
+    var properties = ExtractProperties(type, sourceTypeSemantics);
     var avaloniaProperties = ExtractAvaloniaProperties(type, sourceTypeSemantics);
+    var contentRegions = ExtractContentRegions(
+      properties,
+      avaloniaProperties,
+      sourceTypeSemantics);
     var routedEvents = ExtractRoutedEvents(type);
     var clrEvents = ExtractClrEvents(type);
     var events = routedEvents
@@ -121,8 +125,10 @@ internal static class Program
       BaseType = type.BaseType is null ? null : TypeName(type.BaseType),
       IsAbstract = type.IsAbstract,
       IsSealed = type.IsSealed,
-      ContentProperty = contentProperty,
-      Properties = ExtractProperties(type, sourceTypeSemantics),
+      ContentProperty =
+        contentRegions.Count == 1 ? contentRegions[0].Name : null,
+      ContentRegions = contentRegions,
+      Properties = properties,
       AvaloniaProperties = avaloniaProperties,
       Events = events,
       Methods = ExtractMethods(type),
@@ -140,31 +146,34 @@ internal static class Program
     return "class";
   }
 
-  private static string? FindContentProperty(Type type)
+  private static List<SemanticContentRegion> ExtractContentRegions(
+    IReadOnlyList<SemanticProperty> properties,
+    IReadOnlyList<SemanticAvaloniaProperty> avaloniaProperties,
+    SourceTypeSemantics? sourceSemantics)
   {
-    try
-    {
-      foreach (var attribute in type.GetCustomAttributes(true))
+    var contentProperties = sourceSemantics?.ContentProperties
+      .ToHashSet(StringComparer.Ordinal) ?? [];
+    var avaloniaByName = avaloniaProperties.ToDictionary(
+      property => property.Name,
+      StringComparer.Ordinal);
+    return properties
+      .Where(property => contentProperties.Contains(property.Name))
+      .Select(property =>
       {
-        var attributeType = attribute.GetType();
-        if (attributeType.FullName != "Avalonia.Metadata.ContentAttribute")
+        avaloniaByName.TryGetValue(property.Name, out var avaloniaProperty);
+        return new SemanticContentRegion
         {
-          continue;
-        }
-
-        var nameProperty = attributeType.GetProperty("Name");
-        if (nameProperty is not null)
-        {
-          return nameProperty.GetValue(attribute) as string;
-        }
-      }
-    }
-    catch
-    {
-      // Attribute reflection must never fail baseline extraction.
-    }
-
-    return null;
+          Name = property.Name,
+          Type = property.Type,
+          Nullable = property.Nullable,
+          CanRead = property.CanRead,
+          CanWrite = property.CanWrite,
+          Required = property.Required,
+          PropertyKind = avaloniaProperty?.Kind ?? "clr",
+        };
+      })
+      .OrderBy(region => region.Name, StringComparer.Ordinal)
+      .ToList();
   }
 
   private static List<SemanticProperty> ExtractProperties(
@@ -407,6 +416,8 @@ internal sealed class SemanticType
 
   public string? ContentProperty { get; init; }
 
+  public List<SemanticContentRegion> ContentRegions { get; init; } = [];
+
   public List<SemanticProperty> Properties { get; init; } = [];
 
   public List<SemanticAvaloniaProperty> AvaloniaProperties { get; init; } = [];
@@ -416,6 +427,23 @@ internal sealed class SemanticType
   public List<SemanticMethod> Methods { get; init; } = [];
 
   public List<SemanticEnumMember>? EnumMembers { get; init; }
+}
+
+internal sealed class SemanticContentRegion
+{
+  public string Name { get; init; } = "";
+
+  public string Type { get; init; } = "";
+
+  public bool Nullable { get; init; }
+
+  public bool CanRead { get; init; }
+
+  public bool CanWrite { get; init; }
+
+  public bool? Required { get; init; }
+
+  public string PropertyKind { get; init; } = "";
 }
 
 internal sealed class SemanticProperty

@@ -3,9 +3,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
 import ts from 'typescript'
+import { parse as parseSfc } from 'vue/compiler-sfc'
 import { fileURLToPath } from 'node:url'
 import {
   buildRegistry,
+  compareMembers,
   validateAvaloniaSurfaceRegistration,
   validateRegistry,
   validateSemanticMemberBindings,
@@ -15,7 +17,9 @@ import {
   SEMANTIC_MEMBER_BINDINGS_PATH,
   VUE_BASELINE_PATH,
 } from '../scripts/contract-v2.mjs'
+import { validateVuePublicCoverage } from '../scripts/conformance-v2-vue-public-gate.mjs'
 import { extractStructuredEmitPayloads } from '../scripts/vue-structured-emit-payload.mjs'
+import { extractTemplateSlots } from '../scripts/vue-semantic-baseline.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const fixtureDirectory = path.join(root, 'tests/fixtures/contract-v2')
@@ -122,7 +126,7 @@ test('committed Contract V2 registry passes validation with the committed gate',
 
 test('Avalonia semantic baselines retain compiler and input freshness identity', () => {
   for (const baseline of Object.values(avaloniaBaselines)) {
-    assert.equal(baseline.source.tool, 'FsusUI.Avalonia.ApiTool@1.1.0')
+    assert.equal(baseline.source.tool, 'FsusUI.Avalonia.ApiTool@1.2.0')
     assert.match(baseline.source.inputTreeHash, sha256Pattern)
     assert.match(baseline.source.compilerOptionsHash, sha256Pattern)
     assert.match(baseline.source.dependencyVersionsHash, sha256Pattern)
@@ -142,6 +146,198 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     avaloniaProperties.filter((property) => property.defaultKnown).length,
     294,
+  )
+  const contentRegions = avaloniaBaselines.avalonia.semanticTypes.flatMap(
+    (type) =>
+      (type.contentRegions ?? []).map((region) => ({
+        ownerType: type.name,
+        ...region,
+      })),
+  )
+  assert.deepEqual(
+    contentRegions.map((region) => [
+      region.ownerType,
+      region.name,
+      region.propertyKind,
+    ]),
+    [
+      ['FsusUI.Avalonia.Controls.FsusActivityRailSection', 'Content', 'clr'],
+      [
+        'FsusUI.Avalonia.Controls.FsusActivityRailShell',
+        'MainContent',
+        'styled',
+      ],
+      ['FsusUI.Avalonia.Controls.FsusSettingsCategory', 'Content', 'clr'],
+    ],
+  )
+  for (const region of contentRegions) {
+    assert.equal(region.type, 'System.Object')
+    assert.equal(region.nullable, true)
+    assert.equal(region.canRead, true)
+    assert.equal(region.canWrite, true)
+    assert.equal(region.required, false)
+  }
+})
+
+test('Vue compiler AST retains dynamic names and scoped slot payload structure', () => {
+  const component = (name) =>
+    vueBaseline.components.find((candidate) => candidate.name === name)
+
+  assert.deepEqual(component('ElCountdown').slots, [
+    {
+      name: '$dynamic:name',
+      nameKnown: false,
+      scoped: false,
+      payload: [],
+      payloadComplete: true,
+      nameExpression: 'name',
+    },
+  ])
+  assert.deepEqual(
+    component('ElSelectV2').slots.map((slot) => [
+      slot.name,
+      slot.scoped,
+      slot.payloadComplete,
+    ]),
+    [
+      ['default', true, false],
+      ['empty', false, true],
+      ['prefix', false, true],
+    ],
+  )
+  assert.equal(
+    component('ElSkeleton').slots.find((slot) => slot.name === 'default')
+      .payloadComplete,
+    false,
+  )
+  assert.deepEqual(
+    component('ElCalendar').slots.find((slot) => slot.name === 'header')
+      .payload,
+    [{ name: 'date', expression: 'i18nDate', type: null }],
+  )
+})
+
+test('real Vue slot source mutation reaches compiler baseline coverage', () => {
+  const relativePath = 'vue/packages/components/select-v2/src/select.vue'
+  const source = fs.readFileSync(path.join(root, relativePath), 'utf8')
+  const mutatedSource = source.replace(
+    '<slot name="empty">',
+    '<slot name="empty-mutated">',
+  )
+  assert.notEqual(mutatedSource, source)
+  const { descriptor, errors } = parseSfc(mutatedSource, {
+    filename: relativePath,
+  })
+  assert.deepEqual(errors, [])
+  const slots = extractTemplateSlots(descriptor.template?.ast)
+  assert.ok(slots.some((slot) => slot.name === 'empty-mutated'))
+  assert.ok(!slots.some((slot) => slot.name === 'empty'))
+
+  const mutatedBaseline = clone(vueBaseline)
+  mutatedBaseline.components.find(
+    (component) => component.name === 'ElSelectV2',
+  ).slots = slots
+  const coverage = validateVuePublicCoverage({
+    baseline: mutatedBaseline,
+    registry: committedRegistry,
+  })
+  assert.match(
+    coverage.errors.join('\n'),
+    /ElSelectV2 contentRegion empty-mutated is missing from Contract V2/,
+  )
+  assert.match(
+    coverage.errors.join('\n'),
+    /ElSelectV2 Contract V2 has extra contentRegion empty/,
+  )
+})
+
+test('content-region comparator fails closed on unknown and drifted structure', () => {
+  const compatibleWeb = {
+    nameKnown: true,
+    scoped: false,
+    payload: [],
+    payloadComplete: true,
+    contentType: 'Object',
+  }
+  const compatibleAvalonia = {
+    content: true,
+    type: 'System.Object',
+    nullable: true,
+    canRead: true,
+    canWrite: true,
+    required: false,
+    propertyKind: 'styled',
+  }
+  assert.equal(
+    compareMembers({
+      web: compatibleWeb,
+      avalonia: compatibleAvalonia,
+      kind: 'contentRegion',
+    }).compatible,
+    true,
+  )
+
+  const mutations = [
+    [
+      { ...compatibleWeb, nameKnown: false },
+      compatibleAvalonia,
+      /name is dynamic or unavailable/,
+    ],
+    [
+      { ...compatibleWeb, payloadComplete: false },
+      compatibleAvalonia,
+      /payload is incomplete or spread-bound/,
+    ],
+    [
+      { ...compatibleWeb, contentType: 'String' },
+      compatibleAvalonia,
+      /content value type mismatch/,
+    ],
+    [
+      compatibleWeb,
+      { ...compatibleAvalonia, nullable: false },
+      /avalonia nullable=false/,
+    ],
+    [
+      compatibleWeb,
+      { ...compatibleAvalonia, canWrite: false },
+      /canWrite=false/,
+    ],
+    [
+      {
+        ...compatibleWeb,
+        scoped: true,
+        payload: [{ name: 'row', type: 'String' }],
+      },
+      compatibleAvalonia,
+      /avalonia scoped content payload shape unavailable/,
+    ],
+  ]
+  for (const [web, avalonia, expected] of mutations) {
+    const comparison = compareMembers({
+      web,
+      avalonia,
+      kind: 'contentRegion',
+    })
+    assert.equal(comparison.compatible, false)
+    assert.match(comparison.drift.contentRegion, expected)
+  }
+})
+
+test('content-region baseline mutation invalidates Avalonia-only surface identity', () => {
+  const changedBaselines = clone(avaloniaBaselines)
+  changedBaselines.avalonia.semanticTypes
+    .find(
+      (type) => type.name === 'FsusUI.Avalonia.Controls.FsusActivityRailShell',
+    )
+    .contentRegions.find((region) => region.name === 'MainContent').nullable =
+    false
+  assert.match(
+    validateAvaloniaSurfaceRegistration({
+      registry: committedRegistry,
+      avaloniaBaselines: changedBaselines,
+    }).errors.join('\n'),
+    /FsusActivityRailShell has stale surfaceHash/,
   )
 })
 

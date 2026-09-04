@@ -11,7 +11,7 @@ namespace FsusUI.Avalonia.ApiTool;
 
 internal sealed class SourceSemanticEvaluator
 {
-  private const string EvaluatorVersion = "source-semantics-v1";
+  private const string EvaluatorVersion = "source-semantics-v2";
 
   private static readonly CSharpParseOptions ParseOptions =
     new(languageVersion: LanguageVersion.Latest, documentationMode: DocumentationMode.Parse);
@@ -125,6 +125,9 @@ internal sealed class SourceSemanticEvaluator
         {
           Properties = pair.Value.Properties,
           AvaloniaProperties = pair.Value.AvaloniaProperties,
+          ContentProperties = pair.Value.ContentProperties
+            .OrderBy(name => name, StringComparer.Ordinal)
+            .ToList(),
         },
         StringComparer.Ordinal),
       InputTreeHash = HashFiles(inputFiles),
@@ -291,6 +294,10 @@ internal sealed class SourceSemanticEvaluator
           Required = property.IsRequired,
           DefaultKnown = false,
         };
+        if (HasContentAttribute(property))
+        {
+          type.ContentProperties.Add(property.Name);
+        }
       }
     }
 
@@ -315,6 +322,12 @@ internal sealed class SourceSemanticEvaluator
       ? string.Join("+", containingTypes)
       : $"{namespaceName}.{string.Join("+", containingTypes)}";
   }
+
+  private static bool HasContentAttribute(IPropertySymbol property) =>
+    property.GetAttributes().Any(attribute =>
+      attribute.AttributeClass?.ToDisplayString(
+        SymbolDisplayFormat.CSharpErrorMessageFormat) ==
+      "Avalonia.Metadata.ContentAttribute");
 
   private static bool TryAvaloniaPropertyKind(ITypeSymbol type, out string kind)
   {
@@ -443,6 +456,9 @@ internal sealed class SourceSemanticEvaluator
 
     public Dictionary<string, SourceAvaloniaPropertySemantics> AvaloniaProperties { get; } =
       new(StringComparer.Ordinal);
+
+    public HashSet<string> ContentProperties { get; } =
+      new(StringComparer.Ordinal);
   }
 }
 
@@ -465,6 +481,8 @@ internal sealed class SourceTypeSemantics
 
   public Dictionary<string, SourceAvaloniaPropertySemantics> AvaloniaProperties { get; init; } =
     new(StringComparer.Ordinal);
+
+  public List<string> ContentProperties { get; init; } = [];
 }
 
 internal sealed class SourcePropertySemantics

@@ -6,6 +6,8 @@ internal static class SourceSemanticVerifier
   private const string ThemesProject = "dotnet/FsusUI.Avalonia.Themes";
   private const string SliderSource =
     "dotnet/FsusUI.Avalonia/Controls/FsusValuePickerControls.cs";
+  private const string ActivityRailSource =
+    "dotnet/FsusUI.Avalonia/Controls/FsusActivityRailShell.cs";
   private const string MarkdownEventSource =
     "dotnet/FsusUI.Avalonia/Controls/FsusMarkdownNativeEventMachine.cs";
   private const string ThemeSource =
@@ -30,6 +32,11 @@ internal static class SourceSemanticVerifier
       current,
       "FsusUI.Avalonia.Controls.FsusMarkdownNativeEventInput",
       "Kind",
+      expected: true);
+    AssertContentProperty(
+      current,
+      "FsusUI.Avalonia.Controls.FsusActivityRailShell",
+      "MainContent",
       expected: true);
 
     var sliderSource = File.ReadAllText(Path.Combine(repoRoot, SliderSource));
@@ -65,6 +72,24 @@ internal static class SourceSemanticVerifier
       "Max",
       known: false,
       expected: null);
+
+    var activityRailSource = File.ReadAllText(Path.Combine(repoRoot, ActivityRailSource));
+    var removedContentAttribute = WithOverride(
+      repoRoot,
+      AvaloniaProject,
+      ActivityRailSource,
+      ReplaceFirst(
+        activityRailSource,
+        "  [Content]\n  public object? MainContent",
+        "  public object? MainContent"));
+    AssertContentProperty(
+      removedContentAttribute,
+      "FsusUI.Avalonia.Controls.FsusActivityRailShell",
+      "MainContent",
+      expected: false);
+    Assert(
+      removedContentAttribute.InputTreeHash != current.InputTreeHash,
+      "content attribute source mutation must change inputTreeHash");
 
     var markdownSource = File.ReadAllText(Path.Combine(repoRoot, MarkdownEventSource));
     var removedRequired = WithOverride(
@@ -120,7 +145,7 @@ internal static class SourceSemanticVerifier
       expected: null);
 
     Console.WriteLine(
-      "source-semantics verification passed: current literal/default/required metadata and 5 real-source mutations");
+      "source-semantics verification passed: current literal/default/required/content metadata and 6 real-source mutations");
   }
 
   private static SourceSemanticIndex Extract(string repoRoot, string project) =>
@@ -171,6 +196,17 @@ internal static class SourceSemanticVerifier
     Assert(
       Type(index, typeName).Properties[propertyName].Required == expected,
       $"{typeName}.{propertyName} required");
+
+  private static void AssertContentProperty(
+    SourceSemanticIndex index,
+    string typeName,
+    string propertyName,
+    bool expected) =>
+    Assert(
+      Type(index, typeName).ContentProperties.Contains(
+        propertyName,
+        StringComparer.Ordinal) == expected,
+      $"{typeName}.{propertyName} content property");
 
   private static SourceTypeSemantics Type(SourceSemanticIndex index, string typeName)
   {

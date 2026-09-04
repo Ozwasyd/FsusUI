@@ -4,7 +4,10 @@ import path from 'node:path'
 import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { extractComponentSemantics } from './vue-semantic-baseline.mjs'
+import {
+  extractComponentSemantics,
+  sourceForComponent as compilerSourceForComponent,
+} from './vue-semantic-baseline.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const defaultRoot = path.resolve(scriptDir, '..')
@@ -47,7 +50,8 @@ const hashFiles = (root, files) => {
   return hash.digest('hex')
 }
 
-const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex')
+const sha256 = (value) =>
+  crypto.createHash('sha256').update(value).digest('hex')
 
 const walkFiles = (dir, predicate = () => true) => {
   if (!exists(dir)) return []
@@ -286,27 +290,6 @@ const parseOptionsApiObjects = (vueSource, key) => {
     if (object) results.push(object)
   }
   return results
-}
-
-const parseSlotTags = (vueSource) => {
-  const slots = []
-  for (const match of vueSource.matchAll(/<slot\b([^>]*)>/g)) {
-    const attrs = match[1]
-    const nameMatch = attrs.match(/\bname\s*=\s*["']([^"']+)["']/)
-    slots.push({
-      name: nameMatch ? nameMatch[1] : 'default',
-      scoped: /\s(:|v-bind:)[\w-]+/.test(attrs),
-    })
-  }
-  const byName = new Map()
-  for (const slot of slots) {
-    const current = byName.get(slot.name)
-    byName.set(slot.name, {
-      name: slot.name,
-      scoped: Boolean(current?.scoped || slot.scoped),
-    })
-  }
-  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name))
 }
 
 const parseDeprecatedApis = (root) => {
@@ -585,6 +568,7 @@ const parseComponent = (
 ) => {
   const sources = loadModuleSources(root, moduleName)
   const vueSource = sourceForComponent(sources, exportName)
+  const slotVueSource = compilerSourceForComponent(sources, exportName)
   const fromVue = vueSource
     ? collectPropsAndEmits(sources, vueSource.content)
     : { props: [], emits: [] }
@@ -599,6 +583,15 @@ const parseComponent = (
     exportName,
     structuredEmitNames,
   })
+  const slotSemantics =
+    slotVueSource === vueSource
+      ? semantics
+      : extractComponentSemantics({
+          root,
+          moduleSources: sources,
+          vueSource: slotVueSource,
+          exportName,
+        })
 
   return {
     name: exportName,
@@ -606,13 +599,13 @@ const parseComponent = (
     classification,
     props: uniqueSorted([...fromVue.props, ...fallback.props]),
     emits: uniqueSorted([...fromVue.emits, ...fallback.emits]),
-    slots: vueSource ? parseSlotTags(vueSource.content) : [],
+    slots: slotSemantics.semanticSlots,
     exposed: vueSource ? parseDefineExpose(vueSource.content) : [],
     semantic: {
       props: semantics.semanticProps,
       emits: semantics.semanticEmits,
       exposed: semantics.semanticExposed,
-      slots: semantics.semanticSlots,
+      slots: slotSemantics.semanticSlots,
     },
   }
 }
@@ -765,12 +758,22 @@ export const buildArtifacts = (root, options = {}) => {
     ).length
   }
 
-  const semanticVersion = '1.1.0'
+  const semanticVersion = '1.2.0'
   const compilerOptionsHash = sha256(
     stableJson({
       parser: ['@babel/parser'],
-      plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes', 'topLevelAwait'],
-      sfcCompiler: 'vue/compiler-sfc',
+      plugins: [
+        'typescript',
+        'jsx',
+        'decorators-legacy',
+        'importAttributes',
+        'topLevelAwait',
+      ],
+      sfcCompiler: {
+        implementation: 'vue/compiler-sfc',
+        templateAst: true,
+        slotPayloadTypes: 'unknown-unless-compiler-proven',
+      },
       typeChecker: {
         implementation: 'typescript',
         configHash: hashFiles(root, [
@@ -785,17 +788,36 @@ export const buildArtifacts = (root, options = {}) => {
   )
   const dependencyVersionHash = sha256(
     stableJson({
-      vue: read(path.join(defaultRoot, 'node_modules/vue/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
-      '@vue/compiler-sfc': read(path.join(defaultRoot, 'node_modules/@vue/compiler-sfc/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
-      '@babel/parser': read(path.join(defaultRoot, 'node_modules/@babel/parser/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
-      typescript: read(path.join(defaultRoot, 'node_modules/typescript/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
+      vue: read(path.join(defaultRoot, 'node_modules/vue/package.json')).match(
+        /"version":\s*"([^"]+)"/,
+      )?.[1],
+      '@vue/compiler-sfc': read(
+        path.join(defaultRoot, 'node_modules/@vue/compiler-sfc/package.json'),
+      ).match(/"version":\s*"([^"]+)"/)?.[1],
+      '@babel/parser': read(
+        path.join(defaultRoot, 'node_modules/@babel/parser/package.json'),
+      ).match(/"version":\s*"([^"]+)"/)?.[1],
+      typescript: read(
+        path.join(defaultRoot, 'node_modules/typescript/package.json'),
+      ).match(/"version":\s*"([^"]+)"/)?.[1],
     }),
   )
   const inputTreeHash = hashFiles(root, [
-    ...walkFiles(path.join(root, 'vue/packages/components'), (file) => /\.(ts|vue|json)$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(path.join(root, 'vue/packages/hooks'), (file) => /\.ts$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(path.join(root, 'vue/packages/constants'), (file) => /\.ts$/.test(file)).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(path.join(root, 'vue/packages/utils'), (file) => /\.ts$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/components'),
+      (file) => /\.(ts|vue|json)$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/hooks'),
+      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(path.join(root, 'vue/packages/constants'), (file) =>
+      /\.ts$/.test(file),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/utils'),
+      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
     'vue/packages/components/motion.ts',
     'vue/packages/element-plus/package.json',
     'spec/baselines/vue-public-api-classifications.json',

@@ -2,10 +2,10 @@
   "packageId": "FsusUI.Avalonia",
   "baselineVersion": "1.0.0",
   "source": {
-    "tool": "FsusUI.Avalonia.ApiTool@1.1.0",
+    "tool": "FsusUI.Avalonia.ApiTool@1.2.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "a95bd21c33256b85902cd53315236a722b0d4a5c471d82ece656aceabd5bc4d7",
-    "compilerOptionsHash": "ecffd3b7b5f35d1069422f1c890f32f99495e519da68b530f910d121bf7085a1",
+    "inputTreeHash": "a1e332bf11ec7be6b79f5b3240dc6ecb3b329385429c51a53f6fb9571d008909",
+    "compilerOptionsHash": "a2e88fe9ebd590171080438846d719d90b904b854e46a43a2c1beae52d55f38b",
     "dependencyVersionsHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e"
   },
   "semanticTypes": [
@@ -15,6 +15,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Index",
@@ -47,6 +48,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -72,6 +74,18 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -181,6 +195,18 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "MainContent",
+      "contentRegions": [
+        {
+          "name": "MainContent",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "styled"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -492,6 +518,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "InteractionSource",
@@ -544,6 +571,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CurrentOffset",
@@ -650,6 +678,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsAffixed",
@@ -672,6 +701,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionContent",
@@ -821,6 +851,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -854,6 +885,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -1149,6 +1181,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1194,6 +1227,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1223,6 +1257,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusRegion",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1234,6 +1269,7 @@
       "baseType": "System.MulticastDelegate",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1292,6 +1328,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -1337,6 +1374,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusSelect",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsLoading",
@@ -1570,6 +1608,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FallbackText",
@@ -1653,6 +1692,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1674,6 +1714,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ScrollOffset",
@@ -1758,6 +1799,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -1859,6 +1901,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -1919,6 +1962,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Header",
@@ -1984,6 +2028,7 @@
       "baseType": "Avalonia.Controls.Button",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -2270,6 +2315,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Size",
@@ -2326,6 +2372,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -2355,6 +2402,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -2532,6 +2580,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Date",
@@ -2633,6 +2682,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionContent",
@@ -2750,6 +2800,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -2837,6 +2888,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -2848,6 +2900,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -3026,6 +3079,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Children",
@@ -3078,6 +3132,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActivePathValues",
@@ -3208,6 +3263,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "SelectedLabels",
@@ -3240,6 +3296,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Checked",
@@ -3278,6 +3335,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewChecked",
@@ -3310,6 +3368,7 @@
       "baseType": "Avalonia.Controls.CheckBox",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -3417,6 +3476,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Checked",
@@ -3497,6 +3557,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewChecked",
@@ -3529,6 +3590,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "SelectedValues",
@@ -3603,6 +3665,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ItemValue",
@@ -3645,6 +3708,7 @@
       "baseType": "Avalonia.Controls.Primitives.TemplatedControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -4328,6 +4392,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -4349,6 +4414,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentIdentity",
@@ -4401,6 +4467,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -4434,6 +4501,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Kind",
@@ -4505,6 +4573,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Index",
@@ -4576,6 +4645,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Column",
@@ -4647,6 +4717,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AnchorLine",
@@ -4718,6 +4789,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "End",
@@ -4794,6 +4866,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Caret",
@@ -4826,6 +4899,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "EffectiveSpan",
@@ -4959,6 +5033,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accordion",
@@ -5014,6 +5089,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Disabled",
@@ -5097,6 +5173,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewActiveNames",
@@ -5129,6 +5206,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -5275,6 +5353,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -5796,6 +5875,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Result",
@@ -5818,6 +5898,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CommandId",
@@ -5860,6 +5941,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -5881,6 +5963,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Category",
@@ -5966,6 +6049,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Commands",
@@ -6006,6 +6090,7 @@
       "baseType": "System.MulticastDelegate",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6074,6 +6159,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Category",
@@ -6220,6 +6306,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6253,6 +6340,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6278,6 +6366,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6319,6 +6408,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Gap",
@@ -6357,6 +6447,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -6589,6 +6680,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6600,6 +6692,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusContextMenuEntry",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accelerator",
@@ -6699,6 +6792,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionKey",
@@ -6731,6 +6825,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AnchorBounds",
@@ -6817,6 +6912,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusContextMenuEntry",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6828,6 +6924,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6896,6 +6993,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6929,6 +7027,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsCompleted",
@@ -6981,6 +7080,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -6992,6 +7092,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FocusedKey",
@@ -7047,6 +7148,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsDisabled",
@@ -7148,6 +7250,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsDisabled",
@@ -7207,6 +7310,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -7283,6 +7387,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Severity",
@@ -7306,6 +7411,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusTable",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DisplayText",
@@ -7760,6 +7866,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Budget",
@@ -7856,6 +7963,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DefaultVirtualizationBudget",
@@ -7898,6 +8006,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ColumnIndex",
@@ -7954,6 +8063,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Column",
@@ -8055,6 +8165,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CellRenderer",
@@ -8167,6 +8278,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ColumnCount",
@@ -8283,6 +8395,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -8308,6 +8421,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -8382,6 +8496,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Expanded",
@@ -8483,6 +8598,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -8508,6 +8624,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AllocationsKb",
@@ -8579,6 +8696,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -8611,6 +8729,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -8804,6 +8923,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Date",
@@ -8860,6 +8980,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -8937,6 +9058,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DisplayText",
@@ -8979,6 +9101,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -9008,6 +9131,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionLabel",
@@ -9030,6 +9154,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -9101,6 +9226,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FocusedKey",
@@ -9133,6 +9259,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusModalSurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsBodyScrollable",
@@ -9181,6 +9308,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -9277,6 +9405,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "MaxValue",
@@ -9310,6 +9439,7 @@
       "baseType": "Avalonia.Controls.Separator",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Title",
@@ -9340,6 +9470,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -9433,6 +9564,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -9501,6 +9633,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusTabPane",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CloseAccessibleName",
@@ -9567,6 +9700,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -9596,6 +9730,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Cancel",
@@ -9648,6 +9783,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Anchor",
@@ -9710,6 +9846,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -9735,6 +9872,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Document",
@@ -9797,6 +9935,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusTabs",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CanScrollBackward",
@@ -10012,6 +10151,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusModalSurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Placement",
@@ -10043,6 +10183,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -10072,6 +10213,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accepts",
@@ -10529,6 +10671,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Menu",
@@ -10568,6 +10711,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Header",
@@ -10625,6 +10769,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FocusedKey",
@@ -10692,6 +10837,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionContent",
@@ -10773,6 +10919,7 @@
       "baseType": "Avalonia.Interactivity.RoutedEventArgs",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DragEffects",
@@ -10835,6 +10982,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusRegion",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -10846,6 +10994,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Fields",
@@ -10995,6 +11144,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11036,6 +11186,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11073,6 +11224,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ControlType",
@@ -11159,6 +11311,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11192,6 +11345,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Error",
@@ -11259,6 +11413,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Status",
@@ -11339,6 +11494,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FieldName",
@@ -11381,6 +11537,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AsyncValidator",
@@ -11667,6 +11824,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11692,6 +11850,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FieldName",
@@ -11748,6 +11907,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Errors",
@@ -11780,6 +11940,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11809,6 +11970,7 @@
       "baseType": "System.MulticastDelegate",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11867,6 +12029,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusRegion",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -11878,6 +12041,7 @@
       "baseType": "Avalonia.Controls.Shapes.Path",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -11986,6 +12150,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusButton",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsDecorativeIcon",
@@ -12024,6 +12189,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -12180,6 +12346,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -12213,6 +12380,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ErrorMessage",
@@ -12328,6 +12496,7 @@
       "baseType": "System.MulticastDelegate",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -12396,6 +12565,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -12425,6 +12595,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -12757,6 +12928,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Translation",
@@ -12789,6 +12961,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -12800,6 +12973,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "MobilePane",
@@ -12823,6 +12997,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -12848,6 +13023,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -12859,6 +13035,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FiredCount",
@@ -12901,6 +13078,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -12912,6 +13090,7 @@
       "baseType": "Avalonia.Controls.TextBox",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -13106,6 +13285,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusInput",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Maximum",
@@ -13232,6 +13412,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -13264,6 +13445,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -13296,6 +13478,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Items",
@@ -13318,6 +13501,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -13389,6 +13573,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Items",
@@ -13411,6 +13596,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -13440,6 +13626,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -13469,6 +13656,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -13502,6 +13690,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusButton",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NavigateUri",
@@ -13539,6 +13728,7 @@
       "baseType": "Avalonia.Controls.Primitives.TemplatedControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -13641,6 +13831,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ReducedMotion",
@@ -13680,6 +13871,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsClosed",
@@ -13732,6 +13924,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActiveScopes",
@@ -13789,6 +13982,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "LastSubmittedPayload",
@@ -13835,6 +14029,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusRegion",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -13846,6 +14041,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Data",
@@ -13932,6 +14128,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Composing",
@@ -14033,6 +14230,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Action",
@@ -14134,6 +14332,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "End",
@@ -14220,6 +14419,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Intent",
@@ -14291,6 +14491,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentIdentity",
@@ -14407,6 +14608,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Name",
@@ -14478,6 +14680,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Text",
@@ -14534,6 +14737,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Composing",
@@ -14770,6 +14974,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Action",
@@ -14901,6 +15106,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Epoch",
@@ -14957,6 +15163,7 @@
       "baseType": "Avalonia.Controls.Primitives.TemplatedControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CapabilityState",
@@ -15679,6 +15886,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -15703,6 +15911,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "From",
@@ -15774,6 +15983,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -15799,6 +16009,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -15835,6 +16046,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "MergeDirection",
@@ -15891,6 +16103,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accepted",
@@ -16072,6 +16285,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "RedoDepth",
@@ -16139,6 +16353,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "History",
@@ -16161,6 +16376,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AfterSelection",
@@ -16322,6 +16538,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Identity",
@@ -16438,6 +16655,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CanRedo",
@@ -16539,6 +16757,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Changes",
@@ -16595,6 +16814,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -16624,6 +16844,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "HtmlExport",
@@ -16680,6 +16901,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -16709,6 +16931,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -16733,6 +16956,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -16786,6 +17010,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Direction",
@@ -16857,6 +17082,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Revision",
@@ -16889,6 +17115,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accepted",
@@ -16960,6 +17187,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -16985,6 +17213,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Changes",
@@ -17131,6 +17360,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Result",
@@ -17163,6 +17393,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "History",
@@ -17389,6 +17620,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "BaseUri",
@@ -17505,6 +17737,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Detail",
@@ -17586,6 +17819,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Deleted",
@@ -17657,6 +17891,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -17706,6 +17941,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ClipboardIdentity",
@@ -17865,6 +18101,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -17914,6 +18151,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Composing",
@@ -18047,6 +18285,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Action",
@@ -18189,6 +18428,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -18222,6 +18462,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Action",
@@ -18311,6 +18552,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accepted",
@@ -18397,6 +18639,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Code",
@@ -18453,6 +18696,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ContentRange",
@@ -18584,6 +18828,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentIdentity",
@@ -18655,6 +18900,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Composing",
@@ -18801,6 +19047,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Kind",
@@ -18857,6 +19104,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Action",
@@ -18928,6 +19176,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentIdentity",
@@ -19014,6 +19263,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Detail",
@@ -19080,6 +19330,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accepted",
@@ -19196,6 +19447,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "VisualLength",
@@ -19253,6 +19505,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "SemanticKinds",
@@ -19320,6 +19573,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ContractVersion",
@@ -19436,6 +19690,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -19457,6 +19712,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accepted",
@@ -19513,6 +19769,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Descriptor",
@@ -19599,6 +19856,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Coordinates",
@@ -19661,6 +19919,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentIdentity",
@@ -19762,6 +20021,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DisplayText",
@@ -19878,6 +20138,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -19907,6 +20168,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -19940,6 +20202,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accepted",
@@ -20026,6 +20289,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -20047,6 +20311,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NodeId",
@@ -20118,6 +20383,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -20147,6 +20413,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CurrentIndex",
@@ -20218,6 +20485,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Mode",
@@ -20289,6 +20557,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentIdentity",
@@ -20341,6 +20610,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentIdentity",
@@ -20427,6 +20697,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NormalizedSource",
@@ -20501,6 +20772,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "End",
@@ -20557,6 +20829,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -20578,6 +20851,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Accepted",
@@ -20649,6 +20923,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -20694,6 +20969,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentIdentity",
@@ -20756,6 +21032,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActiveRanges",
@@ -20842,6 +21119,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -20883,6 +21161,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "State",
@@ -20905,6 +21184,7 @@
       "baseType": "Avalonia.Controls.Menu",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -21013,6 +21293,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusMenuNode",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21024,6 +21305,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusMenuNode",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Items",
@@ -21046,6 +21328,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21071,6 +21354,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Header",
@@ -21153,6 +21437,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusDialog",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CancelText",
@@ -21267,6 +21552,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "BeforeClose",
@@ -21356,6 +21642,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21385,6 +21672,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21409,6 +21697,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Author",
@@ -21480,6 +21769,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Duration",
@@ -21571,6 +21861,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActiveMessages",
@@ -21611,6 +21902,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Bubbles",
@@ -21633,6 +21925,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Duration",
@@ -21728,6 +22021,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -21814,6 +22108,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Items",
@@ -21836,6 +22131,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsInteractionEnabled",
@@ -21897,6 +22193,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21922,6 +22219,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21955,6 +22253,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CancellationToken",
@@ -21997,6 +22296,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Reason",
@@ -22019,6 +22319,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "BeforeClose",
@@ -22393,6 +22694,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActiveSubscriptionCount",
@@ -22559,6 +22861,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleDescription",
@@ -22806,6 +23109,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -22854,6 +23158,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Default",
@@ -22905,6 +23210,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -22926,6 +23232,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -22963,6 +23270,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -23314,6 +23622,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -23343,6 +23652,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Action",
@@ -23395,6 +23705,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -23417,6 +23728,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "SelectedKey",
@@ -23439,6 +23751,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionCommand",
@@ -23595,6 +23908,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionCommand",
@@ -23706,6 +24020,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActiveNotifications",
@@ -23746,6 +24061,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -23778,6 +24094,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "GroupLabel",
@@ -23830,6 +24147,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsDisabled",
@@ -23872,6 +24190,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewPage",
@@ -23904,6 +24223,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionContent",
@@ -24016,6 +24336,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewPageSize",
@@ -24048,6 +24369,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -24158,6 +24480,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CurrentPage",
@@ -24200,6 +24523,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -24229,6 +24553,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -24394,6 +24719,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -24423,6 +24749,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -24488,6 +24815,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ChallengeId",
@@ -24560,6 +24888,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsReleased",
@@ -24609,6 +24938,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActiveMode",
@@ -24756,6 +25086,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Audio",
@@ -24805,6 +25136,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -24826,6 +25158,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FinalRaster",
@@ -24895,6 +25228,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -24927,6 +25261,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Category",
@@ -25180,6 +25515,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -25329,6 +25665,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPopover",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CancelText",
@@ -25422,6 +25759,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -25433,6 +25771,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -25549,6 +25888,7 @@
       "baseType": "Avalonia.Controls.ProgressBar",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -25650,6 +25990,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -25846,6 +26187,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -25867,6 +26209,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Href",
@@ -25938,6 +26281,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Href",
@@ -26039,6 +26383,7 @@
       "baseType": "Avalonia.Controls.RadioButton",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -26129,6 +26474,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "SelectedValue",
@@ -26232,6 +26578,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -26264,6 +26611,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -26372,6 +26720,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ContainerId",
@@ -26473,6 +26822,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -26491,6 +26841,7 @@
       "baseType": "System.MulticastDelegate",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -26559,6 +26910,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsDisabled",
@@ -26581,6 +26933,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Item",
@@ -26637,6 +26990,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -26775,6 +27129,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -26846,6 +27201,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -26875,6 +27231,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActionContent",
@@ -26974,6 +27331,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Severity",
@@ -26997,6 +27355,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -27022,6 +27381,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Breakpoint",
@@ -27094,6 +27454,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -27212,6 +27573,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Offset",
@@ -27234,6 +27596,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -27700,6 +28063,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusSelect",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -27711,6 +28075,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -27743,6 +28108,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Control",
@@ -27804,6 +28170,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -27833,6 +28200,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -27862,6 +28230,18 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -27988,6 +28368,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusSettingsSection",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -27999,6 +28380,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -28070,6 +28452,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Items",
@@ -28092,6 +28475,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -28148,6 +28532,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "EmptyText",
@@ -28180,6 +28565,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -28201,6 +28587,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Items",
@@ -28223,6 +28610,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -28234,6 +28622,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "FocusedKey",
@@ -28289,6 +28678,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -28661,6 +29051,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DisplayText",
@@ -28843,6 +29234,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -28872,6 +29264,7 @@
       "baseType": "Avalonia.Controls.Primitives.TemplatedControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -29236,6 +29629,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Message",
@@ -29268,6 +29662,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -29297,6 +29692,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -29329,6 +29725,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -29471,6 +29868,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AnimationPolicy",
@@ -29530,6 +29928,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -29555,6 +29954,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -29768,6 +30168,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Label",
@@ -29824,6 +30225,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -29849,6 +30251,7 @@
       "baseType": "Avalonia.Controls.StackPanel",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Align",
@@ -29926,6 +30329,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -30008,6 +30412,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Tone",
@@ -30031,6 +30436,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -30064,6 +30470,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Description",
@@ -30156,6 +30563,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -30189,6 +30597,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ActiveIndex",
@@ -30237,6 +30646,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusMenuNode",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsOpen",
@@ -30278,6 +30688,7 @@
       "baseType": "Avalonia.Controls.ToggleSwitch",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -30358,6 +30769,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -30390,6 +30802,7 @@
       "baseType": "Avalonia.Controls.TabItem",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -30420,6 +30833,7 @@
       "baseType": "Avalonia.Interactivity.RoutedEventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "InteractionSource",
@@ -30462,6 +30876,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -30494,6 +30909,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -30905,6 +31321,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "MemoryKb",
@@ -31006,6 +31423,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Budget",
@@ -31102,6 +31520,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ColumnIndex",
@@ -31146,6 +31565,7 @@
       "baseType": "Avalonia.Controls.TabControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -31249,6 +31669,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IconContent",
@@ -31365,6 +31786,7 @@
       "baseType": "Avalonia.Controls.TextBlock",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -31431,6 +31853,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -31464,6 +31887,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Kind",
@@ -31550,6 +31974,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -31936,6 +32361,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "DocumentChars",
@@ -32037,6 +32463,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Budget",
@@ -32133,6 +32560,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "End",
@@ -32209,6 +32637,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusPerceptionChallenge",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "LastSubmittedPayload",
@@ -32250,6 +32679,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -32283,6 +32713,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -32469,6 +32900,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Budget",
@@ -32535,6 +32967,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "MemoryKb",
@@ -32606,6 +33039,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusInput",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -32617,6 +33051,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Composer",
@@ -32649,6 +33084,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "NewValue",
@@ -32681,6 +33117,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -32862,6 +33299,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -33043,6 +33481,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsDisabled",
@@ -33114,6 +33553,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -33174,6 +33614,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Status",
@@ -33207,6 +33648,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -33232,6 +33674,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -33265,6 +33708,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -33276,6 +33720,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -33528,6 +33973,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsDisabled",
@@ -33570,6 +34016,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -33937,6 +34384,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Budget",
@@ -34033,6 +34481,7 @@
       "baseType": "System.MulticastDelegate",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -34101,6 +34550,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsExpanded",
@@ -34143,6 +34593,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -34168,6 +34619,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -34230,6 +34682,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -34292,6 +34745,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -34313,6 +34767,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -34375,6 +34830,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -34396,6 +34852,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Exception",
@@ -34438,6 +34895,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -34467,6 +34925,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Children",
@@ -34529,6 +34988,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Handled",
@@ -34571,6 +35031,7 @@
       "baseType": "Avalonia.Interactivity.RoutedEventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AnchorBounds",
@@ -34623,6 +35084,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Checked",
@@ -34754,6 +35216,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Level",
@@ -34840,6 +35303,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -34957,6 +35421,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AddedKeys",
@@ -34999,6 +35464,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -35020,6 +35486,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -35146,6 +35613,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "MemoryKb",
@@ -35232,6 +35700,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Budget",
@@ -35328,6 +35797,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusTree",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsVirtualized",
@@ -35437,6 +35907,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "LazyLoadLatencyMs",
@@ -35538,6 +36009,7 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsConfirmed",
@@ -35583,6 +36055,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -35742,6 +36215,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ContentType",
@@ -35845,6 +36319,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -35874,6 +36349,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsInvalid",
@@ -35906,6 +36382,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Index",
@@ -35977,6 +36454,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -36505,6 +36983,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "MemoryKb",
@@ -36591,6 +37070,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Budget",
@@ -36672,6 +37152,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Content",
@@ -36743,6 +37224,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ContainerId",
@@ -36786,6 +37268,7 @@
       "baseType": "System.MulticastDelegate",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -36854,6 +37337,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -36879,6 +37363,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -36900,6 +37385,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Count",
@@ -36956,6 +37442,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -36967,6 +37454,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -37057,6 +37545,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Origin",
@@ -37128,6 +37617,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Capabilities",
@@ -37253,6 +37743,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AddToDictionary",
@@ -37352,6 +37843,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Detail",
@@ -37430,6 +37922,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -37459,6 +37952,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -37512,6 +38006,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Command",
@@ -37561,6 +38056,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -37690,6 +38186,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -37711,6 +38208,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "EditCapabilities",
@@ -37820,6 +38318,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Request",
@@ -37842,6 +38341,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Children",
@@ -37901,6 +38401,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -37950,6 +38451,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "GenerateDocumentOutline",
@@ -38011,6 +38513,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "BytesWritten",
@@ -38101,6 +38604,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -38130,6 +38634,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -38151,6 +38656,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -38207,6 +38713,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "IsValid",
@@ -38272,6 +38779,7 @@
       "kind": "interface",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Capabilities",
@@ -38348,6 +38856,7 @@
       "kind": "interface",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -38376,6 +38885,7 @@
       "kind": "interface",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Capabilities",
@@ -38432,6 +38942,7 @@
       "kind": "interface",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -38460,6 +38971,7 @@
       "kind": "interface",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Capabilities",
@@ -38541,6 +39053,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "BorderControlWidthThickness",
@@ -40091,6 +40604,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CultureName",
@@ -40162,6 +40676,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Locale",
@@ -40184,6 +40699,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Culture",
@@ -40332,6 +40848,7 @@
       "baseType": "Avalonia.Controls.TextBlock",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Key",
@@ -40354,6 +40871,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -40375,6 +40893,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -40404,6 +40923,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CancellationToken",
@@ -40475,6 +40995,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Bounds",
@@ -40587,6 +41108,7 @@
       "baseType": "Avalonia.Controls.Panel",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "BaseZIndex",
@@ -40808,6 +41330,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "HostCount",
@@ -40889,6 +41412,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AnchorBounds",
@@ -41023,6 +41547,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -41071,6 +41596,7 @@
       "kind": "interface",
       "isAbstract": true,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],

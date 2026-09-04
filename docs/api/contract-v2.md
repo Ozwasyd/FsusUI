@@ -98,6 +98,15 @@ carry at least one scenario coverage id.
   count, optionality, and rest semantics. Framework or domain wrapper types are
   not guessed equivalent; an unavailable or non-comparable type keeps the member
   `partial`.
+- **Content-region drift**: Vue slot outlets come from the Vue SFC compiler AST,
+  including static versus dynamic names, scoped payload field names, and whether
+  a spread/dynamic binding makes the payload incomplete. Avalonia content
+  regions come from Roslyn-confirmed property-level `ContentAttribute` metadata
+  with their CLR/Styled kind, type, nullability, and read/write surface. Only an
+  explicit member-scoped semantic binding may pair the two. Dynamic names,
+  unknown content types, incomplete payloads, or scoped payloads without a
+  compiler-proven Avalonia shape remain `partial`; a `ContentProperty` is never
+  broadly applied to every Vue slot.
 - **Enum value drift**: Vue `values` sets must intersect the Avalonia enum member
   names when both are known.
 - **Scenario coverage**: a required semantic without a scenario coverage id fails.

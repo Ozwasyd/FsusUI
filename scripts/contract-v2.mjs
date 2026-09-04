@@ -224,6 +224,7 @@ const COMPARISON_KEY = [
   'nullability',
   'eventPayload',
   'operationSignature',
+  'contentRegion',
   'enumValues',
 ]
 
@@ -410,6 +411,92 @@ const compareEventPayloads = (web, avalonia) => {
   return differences.length > 0 ? differences.join('; ') : null
 }
 
+const compareContentRegions = (web, avalonia) => {
+  const differences = []
+  if (web?.nameKnown !== true) {
+    differences.push('web content-region name is dynamic or unavailable')
+  }
+  if (typeof web?.scoped !== 'boolean') {
+    differences.push('web content-region scope metadata unavailable')
+  }
+  if (!Array.isArray(web?.payload)) {
+    differences.push('web content-region payload metadata unavailable')
+  } else if (web.payloadComplete !== true) {
+    differences.push('web content-region payload is incomplete or spread-bound')
+  }
+  if (!web?.contentType) {
+    differences.push('web content value type metadata unavailable')
+  } else {
+    const webCategories = categoriesFromVueProp({
+      runtimeType: web.contentType,
+      semanticType: web.contentType,
+    })
+    const avaloniaCategories = categoriesFromClrType(avalonia?.type)
+    const compatible = categoriesOverlap(webCategories, avaloniaCategories)
+    if (compatible !== true) {
+      differences.push(
+        `content value type ${compatible === false ? 'mismatch' : 'not comparable'}: web ${webCategories.join('|')} vs avalonia ${avaloniaCategories.join('|')}`,
+      )
+    }
+  }
+  if (avalonia?.content !== true) {
+    differences.push('avalonia member is not a compiler-proven content region')
+  }
+  if (typeof avalonia?.nullable !== 'boolean') {
+    differences.push('avalonia content-region nullability unavailable')
+  } else if (avalonia.nullable !== true) {
+    differences.push('web content can be absent but avalonia nullable=false')
+  }
+  if (typeof avalonia?.canRead !== 'boolean') {
+    differences.push('avalonia content-region read metadata unavailable')
+  } else if (!avalonia.canRead) {
+    differences.push('avalonia content-region canRead=false')
+  }
+  if (typeof avalonia?.canWrite !== 'boolean') {
+    differences.push('avalonia content-region write metadata unavailable')
+  } else if (!avalonia.canWrite) {
+    differences.push('avalonia content-region canWrite=false')
+  }
+  if (web?.scoped === true) {
+    if (!Array.isArray(avalonia?.payload)) {
+      differences.push('avalonia scoped content payload shape unavailable')
+    } else {
+      const webPayload = new Map(
+        web.payload.map((field) => [payloadFieldKey(field.name), field]),
+      )
+      const avaloniaPayload = new Map(
+        avalonia.payload.map((field) => [payloadFieldKey(field.name), field]),
+      )
+      for (const field of web.payload) {
+        const counterpart = avaloniaPayload.get(payloadFieldKey(field.name))
+        if (!counterpart) {
+          differences.push(
+            `missing avalonia scoped payload field ${field.name}`,
+          )
+          continue
+        }
+        const webCategories = categoriesFromVueProp({
+          runtimeType: field.type,
+          semanticType: field.type,
+        })
+        const avaloniaCategories = categoriesFromClrType(counterpart.type)
+        const compatible = categoriesOverlap(webCategories, avaloniaCategories)
+        if (compatible !== true) {
+          differences.push(
+            `scoped payload field ${field.name} type ${compatible === false ? 'mismatch' : 'not comparable'}: web ${webCategories.join('|')} vs avalonia ${avaloniaCategories.join('|')}`,
+          )
+        }
+      }
+      for (const field of avalonia.payload) {
+        if (!webPayload.has(payloadFieldKey(field.name))) {
+          differences.push(`extra avalonia scoped payload field ${field.name}`)
+        }
+      }
+    }
+  }
+  return differences.length > 0 ? differences.join('; ') : null
+}
+
 // Compare a single Vue member against a real Avalonia member and record every
 // drift that would be required to fail. Returns null when no counterpart exists.
 export const compareMembers = ({ web, avalonia, kind }) => {
@@ -515,6 +602,13 @@ export const compareMembers = ({ web, avalonia, kind }) => {
     )
     if (difference) {
       setDrift(drift, 'operationSignature', difference)
+    }
+  }
+
+  if (kind === 'contentRegion') {
+    const difference = compareContentRegions(web, avalonia)
+    if (difference) {
+      setDrift(drift, 'contentRegion', difference)
     }
   }
 
@@ -676,6 +770,35 @@ const webMethodRef = (member, semantic) => ({
     : null,
 })
 
+const webContentRegionRef = (slot) => ({
+  member: slot.name,
+  baseline: VUE_BASELINE_PATH,
+  nameKnown: slot.nameKnown === true,
+  nameExpression: slot.nameExpression ?? null,
+  scoped: knownBoolean(slot.scoped),
+  payload: Array.isArray(slot.payload)
+    ? slot.payload.map((field) => ({
+        name: field.name,
+        expression: field.expression ?? null,
+        type: field.type ?? null,
+      }))
+    : null,
+  payloadComplete: slot.payloadComplete === true,
+  contentType: slot.contentType ?? null,
+})
+
+const avaloniaContentRegionRef = (region) => ({
+  member: region.name,
+  content: true,
+  type: region.type ?? null,
+  nullable: knownBoolean(region.nullable),
+  canRead: knownBoolean(region.canRead),
+  canWrite: knownBoolean(region.canWrite),
+  required: knownBoolean(region.required),
+  propertyKind: region.propertyKind ?? null,
+  payload: Array.isArray(region.payload) ? region.payload : null,
+})
+
 const avaloniaSemanticIndex = (baselines) => {
   const index = new Map()
   for (const [packageId] of Object.entries(AVALONIA_SEMANTIC_PATHS)) {
@@ -689,7 +812,7 @@ const avaloniaSemanticIndex = (baselines) => {
 const canonicalAvaloniaPropertySurface = (
   property,
   avaloniaProperty,
-  contentProperty,
+  contentRegions,
 ) => ({
   kind: 'property',
   member: property.name,
@@ -702,7 +825,8 @@ const canonicalAvaloniaPropertySurface = (
   defaultKnown: property.defaultKnown === true,
   defaultValue:
     property.defaultKnown === true ? (property.defaultValue ?? null) : null,
-  isContentProperty: contentProperty === property.name,
+  isContentProperty: contentRegions.has(property.name),
+  contentRegion: contentRegions.get(property.name) ?? null,
   avaloniaProperty: avaloniaProperty
     ? {
         kind: avaloniaProperty.kind,
@@ -717,7 +841,7 @@ const canonicalAvaloniaPropertySurface = (
     : null,
 })
 
-const canonicalAvaloniaPropertyOnlySurface = (property, contentProperty) => ({
+const canonicalAvaloniaPropertyOnlySurface = (property, contentRegions) => ({
   kind: 'avalonia-property',
   member: property.name,
   propertyKind: property.kind,
@@ -726,7 +850,8 @@ const canonicalAvaloniaPropertyOnlySurface = (property, contentProperty) => ({
   defaultKnown: property.defaultKnown === true,
   defaultValue:
     property.defaultKnown === true ? (property.defaultValue ?? null) : null,
-  isContentProperty: contentProperty === property.name,
+  isContentProperty: contentRegions.has(property.name),
+  contentRegion: contentRegions.get(property.name) ?? null,
 })
 
 const canonicalAvaloniaEventSurface = (event) => ({
@@ -762,11 +887,27 @@ export const avaloniaPublicSurfaces = (type) => {
       property,
     ]),
   )
+  const contentRegions = new Map(
+    (type.contentRegions ?? []).map((region) => [
+      region.name,
+      {
+        type: region.type ?? null,
+        nullable: knownBoolean(region.nullable),
+        canRead: knownBoolean(region.canRead),
+        canWrite: knownBoolean(region.canWrite),
+        required: knownBoolean(region.required),
+        propertyKind: region.propertyKind ?? null,
+      },
+    ]),
+  )
+  if (contentRegions.size === 0 && type.contentProperty) {
+    contentRegions.set(type.contentProperty, null)
+  }
   const surfaces = (type.properties ?? []).map((property) =>
     canonicalAvaloniaPropertySurface(
       property,
       avaloniaProperties.get(property.name),
-      type.contentProperty,
+      contentRegions,
     ),
   )
   const clrPropertyNames = new Set(
@@ -775,7 +916,7 @@ export const avaloniaPublicSurfaces = (type) => {
   for (const property of type.avaloniaProperties ?? []) {
     if (clrPropertyNames.has(property.name)) continue
     surfaces.push(
-      canonicalAvaloniaPropertyOnlySurface(property, type.contentProperty),
+      canonicalAvaloniaPropertyOnlySurface(property, contentRegions),
     )
   }
   surfaces.push(
@@ -1129,21 +1270,20 @@ const contentRegionMember = ({
   slot,
   avaloniaType,
   classification,
+  binding,
 }) => {
+  const web = webContentRegionRef(slot)
   if (!avaloniaType) {
     return {
       name: slot.name,
       kind: 'contentRegion',
       scoped: Boolean(slot.scoped),
-      web: {
-        member: slot.name,
-        scoped: Boolean(slot.scoped),
-        baseline: VUE_BASELINE_PATH,
-      },
+      web,
       avalonia: null,
       status: classification === 'web-only' ? 'web-only' : 'missing',
       drift: emptyDrift(),
       scenarioIds: [scenarioId(contractKebab, 'content-region', slot.name)],
+      ...bindingMetadata(binding),
       governance:
         classification === 'web-only'
           ? defaultGovernance(
@@ -1154,11 +1294,14 @@ const contentRegionMember = ({
             ),
     }
   }
-  const avalonia = avaloniaType?.contentProperty
-    ? { member: avaloniaType.contentProperty, content: true }
+  const avalonia = binding
+    ? ((avaloniaType.contentRegions ?? []).find(
+        (region) => region.name === binding.avalonia,
+      ) ?? null)
     : null
   let status
   let governance = null
+  let drift = emptyDrift()
   if (classification === 'web-only') {
     status = 'web-only'
     governance = defaultGovernance(
@@ -1167,24 +1310,34 @@ const contentRegionMember = ({
   } else if (!avalonia) {
     status = 'missing'
     governance = defaultGovernance(
-      'No matching real Avalonia content region in the semantic baseline.',
+      binding
+        ? 'The explicit Avalonia content region is missing from the semantic baseline.'
+        : 'No explicit semantic binding selects a real Avalonia content region.',
     )
   } else {
-    status = 'aligned-candidate'
+    const comparison = compareMembers({
+      web,
+      avalonia: avaloniaContentRegionRef(avalonia),
+      kind: 'contentRegion',
+    })
+    drift = comparison.drift
+    status = comparison.compatible ? 'aligned-candidate' : 'partial'
+    if (status === 'partial') {
+      governance = defaultGovernance(
+        'Real content regions exist on both sides but type, scope, payload, nullability, or access semantics are not comparable.',
+      )
+    }
   }
   return {
     name: slot.name,
     kind: 'contentRegion',
     scoped: Boolean(slot.scoped),
-    web: {
-      member: slot.name,
-      scoped: Boolean(slot.scoped),
-      baseline: VUE_BASELINE_PATH,
-    },
-    avalonia,
+    web,
+    avalonia: avalonia ? avaloniaContentRegionRef(avalonia) : null,
     status,
-    drift: emptyDrift(),
+    drift,
     scenarioIds: [scenarioId(contractKebab, 'content-region', slot.name)],
+    ...bindingMetadata(binding),
     governance,
   }
 }
@@ -1371,7 +1524,13 @@ const contractForComponent = ({
     }),
   )
   const contentRegions = (component.slots ?? []).map((slot) =>
-    contentRegionMember({ contractKebab, slot, avaloniaType, classification }),
+    contentRegionMember({
+      contractKebab,
+      slot,
+      avaloniaType,
+      classification,
+      binding: bindingFor('contentRegion', slot.name),
+    }),
   )
 
   const isMarkdownEditor = component.name === 'ElMarkdownEditor'
@@ -1384,7 +1543,8 @@ const contractForComponent = ({
   } else if (
     inputs.some((input) => input.status === 'partial') ||
     outputs.some((output) => output.status === 'partial') ||
-    operations.some((operation) => operation.status === 'partial')
+    operations.some((operation) => operation.status === 'partial') ||
+    contentRegions.some((region) => region.status === 'partial')
   ) {
     exportStatus = 'partial'
   } else if (
@@ -1519,6 +1679,10 @@ const resolveAvaloniaSurfaceClaims = ({
       if (section === 'operations') {
         candidates = candidates.filter((surface) =>
           methodSignatureMatchesSurface(member.avalonia.signature, surface),
+        )
+      } else if (section === 'contentRegions') {
+        candidates = candidates.filter(
+          (surface) => surface.isContentProperty === true,
         )
       }
       const context =
@@ -1808,7 +1972,7 @@ const avaloniaMembersForKind = (type, kind) => {
   if (kind === 'output') return (type.events ?? []).map((item) => item.name)
   if (kind === 'operation') return (type.methods ?? []).map((item) => item.name)
   if (kind === 'contentRegion') {
-    return type.contentProperty ? [type.contentProperty] : []
+    return (type.contentRegions ?? []).map((item) => item.name)
   }
   return []
 }

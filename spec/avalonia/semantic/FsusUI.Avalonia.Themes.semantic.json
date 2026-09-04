@@ -2,10 +2,10 @@
   "packageId": "FsusUI.Avalonia.Themes",
   "baselineVersion": "1.0.0",
   "source": {
-    "tool": "FsusUI.Avalonia.ApiTool@1.1.0",
+    "tool": "FsusUI.Avalonia.ApiTool@1.2.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "74ce24ba6565accf1e3bec8c4768053d6820d9fae3712351446b5d793fb0defd",
-    "compilerOptionsHash": "ecffd3b7b5f35d1069422f1c890f32f99495e519da68b530f910d121bf7085a1",
+    "inputTreeHash": "bca717129b2d246177fa6ff7e3d56da1cc2deb0dd384c53957b58d41e40677c2",
+    "compilerOptionsHash": "a2e88fe9ebd590171080438846d719d90b904b854e46a43a2c1beae52d55f38b",
     "dependencyVersionsHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e"
   },
   "semanticTypes": [
@@ -15,6 +15,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -40,6 +41,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Mode",
@@ -62,6 +64,7 @@
       "baseType": "Avalonia.Controls.ContentControl",
       "isAbstract": false,
       "isSealed": false,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccessibleName",
@@ -176,6 +179,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Dark",
@@ -255,6 +259,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -276,6 +281,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -301,6 +307,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -326,6 +333,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -355,6 +363,7 @@
       "baseType": "System.EventArgs",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CurrentEffectiveMode",
@@ -407,6 +416,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -428,6 +438,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Delay",
@@ -649,6 +660,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -682,6 +694,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Index",
@@ -744,6 +757,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "EffectiveMode",
@@ -835,6 +849,7 @@
       "baseType": "System.ValueType",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Scale",
@@ -922,6 +937,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Opacity",
@@ -988,6 +1004,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1013,6 +1030,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "CurrentOptions",
@@ -1070,6 +1088,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "AccentOverride",
@@ -1182,6 +1201,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "Background",
@@ -1271,6 +1291,7 @@
       "baseType": "System.Object",
       "isAbstract": true,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1282,6 +1303,7 @@
       "baseType": "System.Enum",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -1303,6 +1325,7 @@
       "baseType": "System.Object",
       "isAbstract": false,
       "isSealed": true,
+      "contentRegions": [],
       "properties": [
         {
           "name": "ApplicationFontFamilies",
