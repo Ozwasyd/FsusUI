@@ -325,12 +325,12 @@ const cases = [
     [
       'identity-hash-mismatch',
       (value) => (value.identity.contractHash = 'stale'),
-      'identity.contractHash',
+      'executionCoverage.identity mismatch',
     ],
     [
       'checkpoint-mismatch',
       (value) => (value.identity.checkpoint = 'other'),
-      'identity.checkpoint',
+      'executionCoverage.identity mismatch',
     ],
     [
       'fixture-only-a11y',
