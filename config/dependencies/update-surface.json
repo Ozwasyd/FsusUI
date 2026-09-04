@@ -67,6 +67,7 @@
         ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
@@ -126,6 +127,7 @@
         ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
@@ -175,6 +177,7 @@
         ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
@@ -192,6 +195,7 @@
         ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
