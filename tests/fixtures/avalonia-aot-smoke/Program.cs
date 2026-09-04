@@ -34,6 +34,10 @@ internal static class Program
     try
     {
       options = SmokeOptions.Parse(args);
+      if (options.RuntimeMode is not ("jit" or "trimmed" or "nativeaot"))
+      {
+        throw new ArgumentException($"Unsupported runtime mode: {options.RuntimeMode}");
+      }
       report = new SmokeReport
       {
         SchemaVersion = "fsusui.avalonia-aot-smoke-report.v1",
@@ -42,6 +46,7 @@ internal static class Program
         PackageVersion = options.PackageVersion,
         CandidateSha256 = options.CandidateSha256,
         Rid = options.Rid,
+        RuntimeMode = options.RuntimeMode,
         OperatingSystem = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
         ProcessArchitecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),
         DotnetVersion = Environment.Version.ToString(),
@@ -56,7 +61,7 @@ internal static class Program
         NativeDependencies = options.NativeDependencies,
         PackageDigests = options.PackageDigests,
         PartialCapabilities = ["FsusMarkdownEditor:required-after-issue-343"],
-        RuntimeIndependent = true,
+        RuntimeIndependent = options.RuntimeMode != "jit",
         StartedAtUtc = DateTimeOffset.UtcNow,
       };
       if (!options.Smoke || options.ReportPath is null)
@@ -795,6 +800,7 @@ internal sealed record SmokeOptions
   public string PackageVersion { get; init; } = "";
   public string CandidateSha256 { get; init; } = "";
   public string Rid { get; init; } = "";
+  public string RuntimeMode { get; init; } = "nativeaot";
   public IReadOnlyList<string> ExpectedScenarios { get; init; } = [];
   public IReadOnlyList<string> NativeDependencies { get; init; } = [];
   public IReadOnlyList<string> PackageDigests { get; init; } = [];
@@ -818,6 +824,7 @@ internal sealed record SmokeOptions
       PackageVersion = ValueAfter("--package-version") ?? "",
       CandidateSha256 = ValueAfter("--candidate-digest") ?? "",
       Rid = ValueAfter("--rid") ?? "",
+      RuntimeMode = ValueAfter("--runtime-mode") ?? "nativeaot",
       ExpectedScenarios = (ValueAfter("--scenarios") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
       NativeDependencies = (ValueAfter("--native-dependencies") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
       PackageDigests = (ValueAfter("--package-digests") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
@@ -995,6 +1002,7 @@ internal sealed record SmokeReport
   public string PackageVersion { get; init; } = "";
   public string CandidateSha256 { get; init; } = "";
   public string Rid { get; init; } = "";
+  public string RuntimeMode { get; init; } = "nativeaot";
   public string? OperatingSystem { get; init; }
   public string? DotnetVersion { get; init; }
   public string? AvaloniaVersion { get; init; }

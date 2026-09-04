@@ -80,6 +80,8 @@ export const validateReport = (report, expected) => {
     throw new Error('smoke report candidate mismatch')
   if (expected?.rid && report.Rid !== expected.rid)
     throw new Error('smoke report RID mismatch')
+  if (report.RuntimeMode !== 'nativeaot')
+    throw new Error('smoke report runtime mode must be nativeaot')
   const ids = report.Scenarios.map((item) => item.Id)
   const required = stableFamilies()
   if (

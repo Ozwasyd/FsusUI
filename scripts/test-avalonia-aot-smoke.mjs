@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global setTimeout */
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import {
@@ -126,12 +127,22 @@ const globalPackagesOutput = execute(
 const globalPackages = realpathSync(
   globalPackagesOutput.slice(globalPackagesOutput.indexOf(':') + 1).trim(),
 )
-const seedLocalFeed = (directory) => {
+const fsusUiCandidatePackagePattern =
+  /^fsusui\.avalonia(?:\.themes|\.icons)?\..*\.nupkg$/iu
+const seedLocalFeed = (
+  directory,
+  { includeCandidatePackages = false } = {},
+) => {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const candidate = path.join(directory, entry.name)
     if (entry.isDirectory()) {
-      seedLocalFeed(candidate)
-    } else if (entry.isFile() && entry.name.endsWith('.nupkg')) {
+      seedLocalFeed(candidate, { includeCandidatePackages })
+    } else if (
+      entry.isFile() &&
+      entry.name.endsWith('.nupkg') &&
+      (includeCandidatePackages ||
+        !fsusUiCandidatePackagePattern.test(entry.name))
+    ) {
       copyFileSync(candidate, path.join(feed, entry.name))
     }
   }
@@ -237,7 +248,9 @@ writeFileSync(nugetConfig, configFor(feed))
 
 const suppliedCandidateRoot = process.env.FSUSUI_AOT_CANDIDATE_ROOT
 if (suppliedCandidateRoot) {
-  seedLocalFeed(path.resolve(suppliedCandidateRoot))
+  seedLocalFeed(path.resolve(suppliedCandidateRoot), {
+    includeCandidatePackages: true,
+  })
 } else {
   for (const project of publicProjects) {
     execute(
@@ -499,6 +512,8 @@ const smokeArguments = (targetReport, extra = []) => [
   candidateDigest,
   '--rid',
   rid,
+  '--runtime-mode',
+  'nativeaot',
   '--scenarios',
   stableScenarios.join(','),
   '--native-dependencies',
@@ -536,9 +551,7 @@ const stopSpawnedChild = async (child, label) => {
 const isProcessRunning = (pid) => {
   try {
     const stat = readFileSync(`/proc/${pid}/stat`, 'utf8')
-    const processState = stat
-      .slice(stat.lastIndexOf(')') + 2)
-      .split(' ', 1)[0]
+    const processState = stat.slice(stat.lastIndexOf(')') + 2).split(' ', 1)[0]
     return processState !== 'Z'
   } catch (error) {
     if (error?.code === 'ENOENT') return false
