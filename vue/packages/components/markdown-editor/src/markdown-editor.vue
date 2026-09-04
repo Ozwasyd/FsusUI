@@ -324,7 +324,7 @@
         :placeholder="effectivePlaceholder"
         :rows="minRows"
         :tabindex="liveSurface.inputVisible ? undefined : -1"
-        :value="editorValue"
+        :value="isComposing ? nativeCompositionValue : editorValue"
         :spellcheck="languageCapability.spellcheck"
         :lang="languageCapability.lang || undefined"
         @beforeinput="handleBeforeInput"
@@ -1381,6 +1381,7 @@ provideMarkdownHeavyFeatureDocumentContext({
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)
+const nativeCompositionValue = ref(transactionStore.value)
 const writingAidsController: MarkdownEditorWritingAidsController =
   createWritingAidsController({
     writingAids: props.writingAids,
@@ -3508,6 +3509,9 @@ const handleInput = (event: Event) => {
   const target = event.target
   if (!(target instanceof HTMLTextAreaElement)) return
   const inputEvent = event instanceof InputEvent ? event : undefined
+  if (nativeMachine.composing || inputEvent?.isComposing) {
+    nativeCompositionValue.value = target.value
+  }
   const snapshot =
     beforeInputSnapshot?.value === transactionStore.value
       ? beforeInputSnapshot
@@ -3568,7 +3572,10 @@ const handleInput = (event: Event) => {
   pendingInputOrigin = undefined
 }
 
-const handleCompositionStart = () => {
+const handleCompositionStart = (event: CompositionEvent) => {
+  const target = event.target
+  nativeCompositionValue.value =
+    target instanceof HTMLTextAreaElement ? target.value : transactionStore.value
   nativeMachine.apply({
     disabled: editingBlocked.value,
     documentIdentity,
