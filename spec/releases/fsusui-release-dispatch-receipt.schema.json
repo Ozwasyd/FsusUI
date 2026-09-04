@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ozwasyd/FsusUI/spec/releases/fsusui-release-dispatch-receipt.schema.json",
+  "title": "Sanitized FsusUI release dispatch receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "eventType",
+    "payload",
+    "payloadSha256",
+    "dispatch"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "eventType": { "const": "fsusui-npm-published-v1" },
+    "payload": {
+      "$ref": "./fsusui-npm-published-v1.schema.json"
+    },
+    "payloadSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "dispatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "status", "httpStatus"],
+      "properties": {
+        "repository": { "const": "Ozwasyd/FsusBlog" },
+        "status": { "const": "sent" },
+        "httpStatus": { "const": 204 }
+      }
+    }
+  }
+}
