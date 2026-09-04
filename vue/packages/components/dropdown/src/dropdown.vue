@@ -168,7 +168,7 @@ export default defineComponent({
       transition: dropdownTransitionName.value,
       teleported: props.teleported,
       pure: true,
-      persistent: true,
+      persistent: false,
     }))
     const tooltipEvents = {
       'before-show': handleBeforeShowTooltip,

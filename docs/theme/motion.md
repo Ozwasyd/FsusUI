@@ -82,6 +82,20 @@ collapse pseudo-element animation to `1ms`; product styles do not need global
 `::view-transition-*` overrides. Temporary shared names are runtime-owned and
 must not be persisted in markup, URLs, storage, or application logs.
 
+## Legacy Vue Transition Names
+
+The compatibility transition names used by existing Tag, Badge, list, Menu,
+Dropdown, Popover, and anchored-overlay consumers resolve through the
+[legacy transition semantic registry](../../spec/motion/legacy-transition-registry.json).
+That registry is the machine-readable inventory for recipe ownership,
+consumers, Vue phase states, placement branches, and terminal motion. Legacy
+names do not create a second visual path: inline feedback is opacity-only,
+lists use at most 8px of travel without stagger, and anchored overlays compose
+4–8px translate/scale motion with Popper's layout transform. Reduced and
+disabled modes retain Vue lifecycle timing at exactly `1ms` with zero delay
+and remove only the motion-owned translate/scale, preserving layout transforms
+such as Badge and Popper positioning.
+
 ## Reading Surface Contract
 
 Mark long-form content with `.fsus-reading-surface` or

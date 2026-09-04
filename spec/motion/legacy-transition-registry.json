@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "sourceIssue": 469,
+  "durations": [
+    "--fsus-motion-control-fast",
+    "--fsus-motion-control",
+    "--fsus-motion-overlay",
+    "--fsus-motion-panel"
+  ],
+  "terminal": {
+    "duration": "1ms",
+    "delay": "0ms",
+    "transform": "none"
+  },
+  "recipes": [
+    {
+      "id": "legacy-inline-feedback",
+      "names": ["zoom-in-center", "el-zoom-in-center"],
+      "preset": "surface-settle",
+      "source": "vue/packages/theme-chalk/src/common/transition.scss",
+      "consumers": [
+        "vue/packages/components/badge/src/badge.vue",
+        "vue/packages/components/tag/src/tag.vue"
+      ],
+      "states": ["enter-active", "enter-from", "leave-active", "leave-to"],
+      "placements": [],
+      "maxDistancePx": 4,
+      "minimumScale": 1
+    },
+    {
+      "id": "legacy-anchored-overlay",
+      "names": ["zoom-in-top", "el-zoom-in-top"],
+      "preset": "sheet-settle",
+      "source": "vue/packages/theme-chalk/src/common/transition.scss",
+      "consumers": [
+        "vue/packages/components/autocomplete/src/autocomplete.vue",
+        "vue/packages/components/cascader/src/cascader.vue",
+        "vue/packages/components/color-picker/src/color-picker.vue",
+        "vue/packages/components/dropdown/src/dropdown.vue",
+        "vue/packages/components/form/src/form-item.vue",
+        "vue/packages/components/menu/src/sub-menu.ts",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select/src/select.vue",
+        "vue/packages/components/time-picker/src/common/picker.vue",
+        "vue/packages/components/time-picker/src/time-picker-com/panel-time-pick.vue",
+        "vue/packages/components/tooltip/src/tooltip.vue"
+      ],
+      "states": ["enter-active", "enter-from", "leave-active", "leave-to"],
+      "placements": ["top", "right", "bottom", "left"],
+      "maxDistancePx": 8,
+      "minimumScale": 0.98
+    },
+    {
+      "id": "legacy-bottom-overlay",
+      "names": ["zoom-in-bottom", "el-zoom-in-bottom"],
+      "preset": "sheet-settle",
+      "source": "vue/packages/theme-chalk/src/common/transition.scss",
+      "consumers": [],
+      "states": ["enter-active", "enter-from", "leave-active", "leave-to"],
+      "placements": ["bottom"],
+      "maxDistancePx": 8,
+      "minimumScale": 0.98
+    },
+    {
+      "id": "legacy-collapsed-menu",
+      "names": ["zoom-in-left", "el-zoom-in-left"],
+      "preset": "sheet-settle",
+      "source": "vue/packages/theme-chalk/src/common/transition.scss",
+      "consumers": ["vue/packages/components/menu/src/sub-menu.ts"],
+      "states": ["enter-active", "enter-from", "leave-active", "leave-to"],
+      "placements": ["right", "left"],
+      "maxDistancePx": 8,
+      "minimumScale": 0.98
+    },
+    {
+      "id": "legacy-list",
+      "names": ["list", "list-inline", "el-list"],
+      "preset": "list-settle",
+      "source": "vue/packages/theme-chalk/src/common/transition.scss",
+      "consumers": [],
+      "states": ["enter-active", "enter-from", "leave-active", "leave-to"],
+      "placements": [],
+      "maxDistancePx": 8,
+      "minimumScale": 1
+    },
+    {
+      "id": "upload-list",
+      "names": ["el-upload-list"],
+      "preset": "list-settle",
+      "source": "vue/packages/theme-chalk/src/upload.scss",
+      "consumers": ["vue/packages/components/upload/src/upload-list.vue"],
+      "states": [
+        "enter-active",
+        "enter-from",
+        "leave-active",
+        "leave-to",
+        "move"
+      ],
+      "placements": [],
+      "maxDistancePx": 8,
+      "minimumScale": 1
+    }
+  ]
+}
