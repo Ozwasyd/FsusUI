@@ -47,6 +47,18 @@ test('stable registry owns the native scenario set', () => {
       ),
     /binding mismatch/u,
   )
+  for (const mutation of [
+    source.replace(
+      'RenderingMode = [X11RenderingMode.Software]',
+      'RenderingMode = [X11RenderingMode.Glx]',
+    ),
+    source.replace('ViewportSize = 160', 'ViewportSize = 3_200'),
+    source.replace('"embed"', '"embedded-widget"'),
+  ])
+    assert.throws(
+      () => validateScenarioBindings(mutation),
+      /behavior evidence missing/u,
+    )
 })
 
 test('report rejects stale identity, skipped behavior and incomplete registry coverage', () => {
@@ -68,6 +80,16 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     NativeDependencies: ['libc.so.6'],
     PackageDigests: [`FsusUI.Avalonia.nupkg:${'d'.repeat(64)}`],
     PartialCapabilities: ['FsusMarkdownEditor:required-after-issue-343'],
+    MarkdownAutomationReady: true,
+    MarkdownVirtualizationReady: true,
+    MarkdownDocumentCharacters: 240_000,
+    MarkdownBlockCount: 10_000,
+    MarkdownHeadingCount: 10_000,
+    MarkdownAutomationNodeCount: 1,
+    MarkdownVisualCount: 12,
+    MarkdownLayoutMilliseconds: 21.5,
+    MarkdownManagedBytesDelta: 8192,
+    RenderScaling: 1.5,
     RuntimeIndependent: true,
     StartedAtUtc: '2026-01-01T00:00:00Z',
     EndedAtUtc: '2026-01-01T00:00:01Z',
@@ -123,6 +145,18 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
   assert.throws(
     () => validateReport({ ...report, PartialCapabilities: [] }),
     /MarkdownEditor as partial/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownAutomationReady: false }),
+    /automation evidence/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownVisualCount: 64 }),
+    /virtualization evidence/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownHeadingCount: 9_999 }),
+    /virtualization evidence/u,
   )
 })
 
@@ -220,5 +254,16 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
         caller: files.caller.replace('rid: linux-x64', 'rid: win-x64'),
       }),
     /PR workflow missing/u,
+  )
+  assert.throws(
+    () =>
+      validateWorkflowContracts({
+        ...files,
+        publish: files.publish.replace(
+          'needs: [quality, plan, preflight, fsusblog-consumer]',
+          'needs: [plan, preflight, fsusblog-consumer]',
+        ),
+      }),
+    /release readiness/u,
   )
 })

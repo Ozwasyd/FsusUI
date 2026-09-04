@@ -7,10 +7,26 @@ Component ID: `markdown-editor`
 Use `FsusMarkdownEditor` for the public native Source and Live surface.
 Document, identity, mode, chrome, locale, status density, transaction commands,
 and canonical projection commits share one native input and selection owner.
-Split/Preview, off-host platform IME coverage, and atomic-node automation
-actions remain partial. The editor itself exposes native Edit/Value automation
-semantics; its value is writable only while the control is enabled and not
-read-only, and the whole document is not a live region.
+Split/Preview and off-host platform IME coverage remain partial. The editor
+exposes native Edit/Value automation semantics, including its selection,
+caret, read-only, disabled, invalid, mode, and capability state. Its value is
+writable only while the control is enabled and not read-only, and the whole
+document is not a live region.
+
+Canonical atomic projection spans are represented as bounded, non-focusable
+automation groups instead of paragraph controls or duplicated decoration.
+Each group exposes its semantic name, rendered value, source range, and
+actions to enter before or after, enter Source mode, select or copy the source,
+and delete it. These actions use the editor's existing selection, native
+clipboard, and transaction owners and do not add Tab stops.
+
+Documents of at least 100,000 UTF-16 code units or 3,000 logical lines use a
+viewport-sized native `TextLayout` window with overscan. Wrapped visual-line
+height is included in the extent estimate, atomic automation nodes are limited
+to the visible source window, and an ordinary edit updates the retained line
+index incrementally. Detaching the editor releases retained layout and native
+event handlers; theme, locale, density, DPI/layout, mode, and document changes
+invalidate or rebuild the affected viewport state.
 
 ## Editor page scrolling
 
@@ -252,9 +268,9 @@ editor.Mode = FsusMarkdownEditorMode.Live;
 
 ## Known Limitations
 
-Split/Preview presentation, off-host native IME matrix coverage, atomic-node
-AutomationPeer actions, and final AOT
-acceptance remain partial. When no current canonical snapshot exists, Live
+Split/Preview presentation, off-host native IME matrix coverage, physical
+screen-reader evidence, and final packed AOT/alignment acceptance remain
+partial. When no current canonical snapshot exists, Live
 mode intentionally presents localized/current raw source fallback and reports
 `source-fallback`.
 The shipped producer contract does not include the future native shared

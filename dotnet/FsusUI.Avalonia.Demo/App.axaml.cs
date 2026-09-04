@@ -19,9 +19,11 @@ public partial class App : Application
         ? ConformanceV2Runner.CreateWindow(desktop)
         : ImeHarnessRunner.IsConfigured
           ? ImeHarnessRunner.CreateWindow(desktop)
-          : RenderPerformanceRunner.IsConfigured
-            ? RenderPerformanceRunner.CreateWindow(desktop)
-            : new MainWindow();
+          : MarkdownAccessibilityHarnessRunner.IsConfigured
+            ? MarkdownAccessibilityHarnessRunner.CreateWindow(desktop)
+            : RenderPerformanceRunner.IsConfigured
+              ? RenderPerformanceRunner.CreateWindow(desktop)
+              : new MainWindow();
     }
 
     base.OnFrameworkInitializationCompleted();
