@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "tree-stable35",
     "component": "tree",
     "platform": "avalonia",
     "control": "FsusTree",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "tree",
     "accessibleName": "Release tree",
     "value": "4 nodes, level 2 child selected checked expanded",

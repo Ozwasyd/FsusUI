@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "settings-primitives-stable39",
     "component": "settings-primitives",
     "platform": "avalonia",
     "control": "FsusSettingsSection",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "group",
     "accessibleName": "Workspace settings",
     "value": "loading dense mobile settings section, nav, danger zone, typed confirm",

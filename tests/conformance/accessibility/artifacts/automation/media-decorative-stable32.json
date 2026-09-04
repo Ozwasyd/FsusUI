@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "media-decorative-stable32",
     "component": "media-decorative",
     "platform": "avalonia",
     "control": "FsusImageViewer",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "image",
     "accessibleName": "Gallery",
     "value": "image 1 of 3",

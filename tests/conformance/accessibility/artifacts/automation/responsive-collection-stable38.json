@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "responsive-collection-stable38",
     "component": "responsive-collection",
     "platform": "avalonia",
     "control": "FsusResponsiveCollection",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "list",
     "accessibleName": "Article list",
     "value": "desktop and compact branches, stable item keys, focus second",

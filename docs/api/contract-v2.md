@@ -166,6 +166,17 @@ evidence that the scenario ran.
   declared scenario id. Missing executed coverage remains an explicit gap and
   prevents an otherwise complete contract from becoming `aligned`; forged,
   metadata-only, stale, duplicate, or unknown records fail closed.
+- **Accessibility execution**: static accessibility snapshots are
+  `declared-expectation` inputs and contribute no runtime coverage. The
+  Avalonia runtime lane constructs real controls under Avalonia Headless and
+  records the resulting `AutomationPeer`/provider tree with the exact
+  candidate, Contract V2, both semantic baselines, accessibility authorities,
+  scenario set, runner, source tree, and clean-workspace identity. Fields that
+  a peer does not expose remain explicit `null` and keep that scenario partial;
+  each such field requires a scoped implementation-gap reason, owner, test
+  policy, and review date, with exact-set validation against the real capture.
+  Headless peer evidence is not OS screen-reader evidence and cannot promote
+  cross-platform alignment.
 - **Vue public coverage**: every compiler-baseline component and every semantic
   input, output, operation, and content region must appear exactly once in the
   corresponding Contract V2 section with its baseline binding and an explicit

@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "tooltip-stable25",
     "component": "tooltip",
     "platform": "avalonia",
     "control": "FsusTooltip",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "tooltip",
     "accessibleName": "Publish help",
     "value": null,

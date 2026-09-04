@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "metric-primitives-stable39",
     "component": "metric-primitives",
     "platform": "avalonia",
     "control": "FsusMetricList",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "list",
     "accessibleName": "Metric list",
     "value": "error dense metric list, distribution bars, diagnostics, copyable detail",
