@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Input.TextInput;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -1403,6 +1404,28 @@ public partial class FsusMarkdownEditor : TemplatedControl
   /// </summary>
   internal Visual? NativeCandidateCaretVisual => imeClient?.TextViewVisual;
 
+  internal Task<Exception?> PendingAtomicCopy { get; private set; } =
+    Task.FromResult<Exception?>(null);
+
+  internal static async Task<Exception?> TrySetAtomicClipboardTextAsync(
+    Func<string, Task>? writeTextAsync,
+    string text)
+  {
+    if (writeTextAsync is null)
+    {
+      return null;
+    }
+    try
+    {
+      await writeTextAsync(text);
+      return null;
+    }
+    catch (Exception exception)
+    {
+      return exception;
+    }
+  }
+
   /// <summary>
   /// Provenance of the captured native input evidence. The default marks
   /// headless runs as synthetic; only the real Linux IME harness (X11/ibus or
@@ -1646,13 +1669,7 @@ public partial class FsusMarkdownEditor : TemplatedControl
 
     public void MoveTo(int sourceOffset, bool sourceMode)
     {
-      var previous = Editor.store.Selection;
-      var next = new FsusMarkdownEditorSelection(sourceOffset, sourceOffset);
-      if (Editor.store.SetSelection(next) && Editor.store.Selection != previous)
-      {
-        Editor.SelectionChange?.Invoke(Editor, new(Editor.store.Revision, Editor.store.Selection));
-        Editor.UpdateProjectionSelection();
-      }
+      SetSelection(new(sourceOffset, sourceOffset));
       if (sourceMode)
       {
         Editor.Mode = FsusMarkdownEditorMode.Source;
@@ -1663,15 +1680,9 @@ public partial class FsusMarkdownEditor : TemplatedControl
 
     public void SelectSource()
     {
-      var previous = Editor.store.Selection;
-      var next = new FsusMarkdownEditorSelection(
+      SetSelection(new(
         Span.SourceRange.Start,
-        Span.SourceRange.End);
-      if (Editor.store.SetSelection(next) && Editor.store.Selection != previous)
-      {
-        Editor.SelectionChange?.Invoke(Editor, new(Editor.store.Revision, Editor.store.Selection));
-        Editor.UpdateProjectionSelection();
-      }
+        Span.SourceRange.End));
       _ = Editor.Focus();
       Editor.SyncAutomationState();
     }
@@ -1679,7 +1690,25 @@ public partial class FsusMarkdownEditor : TemplatedControl
     public void CopySource()
     {
       SelectSource();
-      Editor.inputOwner?.Copy();
+      var clipboard = TopLevel.GetTopLevel(Editor)?.Clipboard;
+      Editor.PendingAtomicCopy = TrySetAtomicClipboardTextAsync(
+        clipboard is null ? null : clipboard.SetTextAsync,
+        Editor.store.Value[Span.SourceRange.Start..Span.SourceRange.End]);
+    }
+
+    private void SetSelection(FsusMarkdownEditorSelection selection)
+    {
+      if (Editor.inputOwner is not null)
+      {
+        Editor.SetNativeSelection(selection);
+        return;
+      }
+      var previous = Editor.store.Selection;
+      if (Editor.store.SetSelection(selection) && Editor.store.Selection != previous)
+      {
+        Editor.SelectionChange?.Invoke(Editor, new(Editor.store.Revision, Editor.store.Selection));
+        Editor.UpdateProjectionSelection();
+      }
     }
 
     public void Delete()

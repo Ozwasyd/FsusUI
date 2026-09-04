@@ -7,6 +7,7 @@ using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -21,7 +22,7 @@ namespace FsusUI.Avalonia.HeadlessTests;
 public class FsusMarkdownEditorAccessibilityVirtualizationTests
 {
   [AvaloniaFact]
-  public void AutomationTreeRejectsMetadataOnlyParagraphTabsLiveRegionsAndUnboundedAtoms()
+  public async Task AutomationTreeExposesDynamicStateAndInvokableAtomicActions()
   {
     var source = string.Join(
       "\n",
@@ -67,8 +68,24 @@ public class FsusMarkdownEditorAccessibilityVirtualizationTests
     var peer = ControlAutomationPeer.CreatePeerForElement(editor);
     var snapshot = Capture(peer, editor);
     var atomicNodes = peer.GetChildren()!;
+    var initialSelection = editor.TransactionStore.Selection;
     Assert.InRange(atomicNodes.Count, 1, 63);
+    Assert.Equal("Markdown editor", snapshot.Name);
+    Assert.Equal(source, snapshot.Value);
+    Assert.Contains(
+      $"selection={initialSelection.Start}:{initialSelection.End}",
+      snapshot.ItemStatus);
+    Assert.Contains($"caret={initialSelection.End}", snapshot.ItemStatus);
+    Assert.Contains("readonly=false", snapshot.ItemStatus);
+    Assert.Contains("disabled=false", snapshot.ItemStatus);
+    Assert.Contains("invalid=false", snapshot.ItemStatus);
+    Assert.Contains("mode=live", snapshot.ItemStatus);
+    Assert.Contains("capability=aligned", snapshot.ItemStatus);
     Assert.Equal("Diagram 0", atomicNodes[0].GetProvider<IValueProvider>()?.Value);
+    Assert.Equal("image", atomicNodes[0].GetName());
+    Assert.Contains(
+      $"source=0:{spans[0].SourceRange.End}",
+      atomicNodes[0].GetItemStatus());
     var atomicActions = atomicNodes[0].GetChildren()!;
     Assert.True(IsAccepted(snapshot));
     Assert.Equal(
@@ -79,6 +96,55 @@ public class FsusMarkdownEditorAccessibilityVirtualizationTests
       Assert.False(action.IsKeyboardFocusable());
       Assert.NotNull(action.GetProvider<IInvokeProvider>());
     });
+
+    Invoke(atomicActions, "enter-after");
+    Assert.Equal(
+      new FsusMarkdownEditorSelection(
+        spans[0].SourceRange.End,
+        spans[0].SourceRange.End),
+      editor.TransactionStore.Selection);
+    Assert.Contains(
+      $"selection={spans[0].SourceRange.End}:{spans[0].SourceRange.End}",
+      peer.GetItemStatus());
+    Assert.Contains($"caret={spans[0].SourceRange.End}", peer.GetItemStatus());
+    Invoke(atomicActions, "enter-before");
+    Assert.Equal(new FsusMarkdownEditorSelection(0, 0), editor.TransactionStore.Selection);
+    Invoke(atomicActions, "edit-source");
+    Assert.Equal(FsusMarkdownEditorMode.Source, editor.Mode);
+    Assert.Contains("mode=source", peer.GetItemStatus());
+
+    editor.Mode = FsusMarkdownEditorMode.Live;
+    Invoke(atomicActions, "select-source");
+    Assert.Equal(
+      new FsusMarkdownEditorSelection(0, spans[0].SourceRange.End),
+      editor.TransactionStore.Selection);
+    Invoke(atomicActions, "copy");
+    Assert.Null(await editor.PendingAtomicCopy);
+    Assert.Equal(
+      source[..spans[0].SourceRange.End],
+      await window.Clipboard!.TryGetTextAsync());
+
+    editor.IsReadOnly = true;
+    Dispatcher.UIThread.RunJobs();
+    snapshot = Capture(peer, editor);
+    Assert.True(snapshot.IsReadOnly);
+    Assert.Contains("readonly=true", snapshot.ItemStatus);
+    Assert.Contains("Read-only", snapshot.HelpText);
+    Assert.Throws<InvalidOperationException>(() =>
+      peer.GetProvider<IValueProvider>()!.SetValue("forbidden"));
+    editor.IsReadOnly = false;
+    editor.IsEnabled = false;
+    Dispatcher.UIThread.RunJobs();
+    Assert.Contains("disabled=true", peer.GetItemStatus());
+    Assert.False(peer.IsEnabled());
+    editor.IsEnabled = true;
+    DataValidationErrors.SetError(editor, new InvalidOperationException("invalid"));
+    editor.CapabilityState = "source-fallback";
+    Dispatcher.UIThread.RunJobs();
+    Assert.Contains("invalid=true", peer.GetItemStatus());
+    Assert.Contains("capability=source-fallback", peer.GetItemStatus());
+    DataValidationErrors.ClearErrors(editor);
+
     Assert.False(IsAccepted(snapshot with { HasValueProvider = false }));
     Assert.False(IsAccepted(snapshot with { ParagraphTabStops = 1 }));
     Assert.False(IsAccepted(snapshot with { LiveSetting = AutomationLiveSetting.Polite }));
@@ -99,7 +165,52 @@ public class FsusMarkdownEditorAccessibilityVirtualizationTests
       laterNodes,
       node => node.GetProvider<IValueProvider>()?.Value == "Diagram 119");
 
+    scroll.Offset = default;
+    Dispatcher.UIThread.RunJobs();
+    Arrange(window, editor);
+    atomicNodes = peer.GetChildren()!;
+    atomicActions = Assert.Single(
+      atomicNodes,
+      node => node.GetProvider<IValueProvider>()?.Value == "Diagram 0")
+      .GetChildren()!;
+    Invoke(atomicActions, "delete");
+    Assert.False(editor.Document.StartsWith("![Diagram 0]", StringComparison.Ordinal));
+
     window.Close();
+  }
+
+  [AvaloniaFact]
+  public async Task AtomicCopyIsBoundedWhenClipboardIsUnavailableOrFails()
+  {
+    const string source = "`code`";
+    var identity = new FsusMarkdownDocumentIdentity("automation-copy", 1);
+    var editor = new FsusMarkdownEditor
+    {
+      Document = source,
+      DocumentIdentity = identity,
+      Mode = FsusMarkdownEditorMode.Live,
+    };
+    Assert.True(editor.CommitProjection(new(
+      identity,
+      0,
+      source,
+      [new(
+        "atomic-code",
+        new(0, source.Length),
+        FsusMarkdownProjectionSpanKind.Atomic,
+        "code",
+        "inline-code")])).Accepted);
+    var peer = ControlAutomationPeer.CreatePeerForElement(editor);
+    var atomic = Assert.Single(peer.GetChildren()!);
+
+    Invoke(atomic.GetChildren()!, "copy");
+    Assert.Null(await editor.PendingAtomicCopy);
+    Assert.Equal(new FsusMarkdownEditorSelection(0, source.Length), editor.TransactionStore.Selection);
+
+    var error = await FsusMarkdownEditor.TrySetAtomicClipboardTextAsync(
+      _ => Task.FromException(new InvalidOperationException("clipboard failed")),
+      source);
+    Assert.IsType<InvalidOperationException>(error);
   }
 
   [AvaloniaFact]
@@ -173,6 +284,27 @@ public class FsusMarkdownEditorAccessibilityVirtualizationTests
     Assert.Equal(fullBuilds, edited.FullIndexBuildCount);
     Assert.True(edited.IncrementalIndexUpdateCount > incrementalBuilds);
     Assert.Equal(1, edited.RetainedLayoutCount);
+    Assert.True(IsViewportAccepted(ToViewportSnapshot(edited, source.Length)));
+    Assert.False(IsViewportAccepted(
+      ToViewportSnapshot(edited, source.Length) with
+      {
+        RealizedCharacterCount = source.Length,
+      }));
+    Assert.False(IsViewportAccepted(
+      ToViewportSnapshot(edited, source.Length) with
+      {
+        RealizedLogicalLines = edited.TotalLogicalLines,
+      }));
+    Assert.False(IsViewportAccepted(
+      ToViewportSnapshot(edited, source.Length) with
+      {
+        FullIndexBuildCount = edited.FullIndexBuildCount + 1,
+      }));
+    Assert.False(IsViewportAccepted(
+      ToViewportSnapshot(edited, source.Length) with
+      {
+        RetainedLayoutCount = 2,
+      }));
 
     var repositoryRoot = FindRepositoryRoot();
     var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
@@ -308,9 +440,15 @@ public class FsusMarkdownEditorAccessibilityVirtualizationTests
     FsusMarkdownEditor editor)
   {
     var children = peer.GetChildren() ?? [];
+    var value = peer.GetProvider<IValueProvider>();
     return new(
       peer.GetAutomationControlType(),
-      peer.GetProvider<IValueProvider>() is not null,
+      peer.GetName(),
+      value?.Value,
+      peer.GetHelpText(),
+      peer.GetItemStatus() ?? string.Empty,
+      value is not null,
+      value?.IsReadOnly ?? true,
       AutomationProperties.GetLiveSetting(editor),
       children.Count,
       children.Count(child => child.IsKeyboardFocusable()));
@@ -318,10 +456,45 @@ public class FsusMarkdownEditorAccessibilityVirtualizationTests
 
   private static bool IsAccepted(AccessibilitySnapshot snapshot) =>
     snapshot.Role == AutomationControlType.Edit &&
+    snapshot.Name == "Markdown editor" &&
+    snapshot.Value is not null &&
+    snapshot.ItemStatus.Contains("selection=", StringComparison.Ordinal) &&
+    snapshot.ItemStatus.Contains("caret=", StringComparison.Ordinal) &&
+    snapshot.ItemStatus.Contains("readonly=", StringComparison.Ordinal) &&
+    snapshot.ItemStatus.Contains("disabled=", StringComparison.Ordinal) &&
+    snapshot.ItemStatus.Contains("invalid=", StringComparison.Ordinal) &&
+    snapshot.ItemStatus.Contains("mode=", StringComparison.Ordinal) &&
+    snapshot.ItemStatus.Contains("capability=", StringComparison.Ordinal) &&
     snapshot.HasValueProvider &&
     snapshot.LiveSetting == AutomationLiveSetting.Off &&
     snapshot.AtomicNodeCount <= 64 &&
     snapshot.ParagraphTabStops == 0;
+
+  private static void Invoke(
+    IReadOnlyList<AutomationPeer> actions,
+    string name) =>
+    Assert.Single(actions, action => action.GetName() == name)
+      .GetProvider<IInvokeProvider>()!
+      .Invoke();
+
+  private static ViewportSnapshot ToViewportSnapshot(
+    FsusMarkdownViewportDiagnostics diagnostics,
+    int documentCharacters) =>
+    new(
+      diagnostics.IsVirtualized,
+      diagnostics.TotalLogicalLines,
+      diagnostics.RealizedLogicalLines,
+      diagnostics.RealizedCharacterCount,
+      diagnostics.RetainedLayoutCount,
+      diagnostics.FullIndexBuildCount,
+      documentCharacters);
+
+  private static bool IsViewportAccepted(ViewportSnapshot snapshot) =>
+    snapshot.IsVirtualized &&
+    snapshot.RealizedLogicalLines < snapshot.TotalLogicalLines &&
+    snapshot.RealizedCharacterCount < snapshot.DocumentCharacters / 4 &&
+    snapshot.RetainedLayoutCount == 1 &&
+    snapshot.FullIndexBuildCount == 1;
 
   private static string FindRepositoryRoot(
     [CallerFilePath] string sourceFile = "")
@@ -349,8 +522,22 @@ public class FsusMarkdownEditorAccessibilityVirtualizationTests
 
   private sealed record AccessibilitySnapshot(
     AutomationControlType Role,
+    string? Name,
+    string? Value,
+    string? HelpText,
+    string ItemStatus,
     bool HasValueProvider,
+    bool IsReadOnly,
     AutomationLiveSetting LiveSetting,
     int AtomicNodeCount,
     int ParagraphTabStops);
+
+  private sealed record ViewportSnapshot(
+    bool IsVirtualized,
+    int TotalLogicalLines,
+    int RealizedLogicalLines,
+    int RealizedCharacterCount,
+    int RetainedLayoutCount,
+    int FullIndexBuildCount,
+    int DocumentCharacters);
 }
