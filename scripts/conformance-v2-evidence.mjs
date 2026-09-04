@@ -543,6 +543,24 @@ const mutationCases = (positive) => [
       ),
   ],
   [
+    'avalonia-atomic-actions-missing',
+    'avalonia.accessibility atomic actions missing',
+    () =>
+      validateEvidence(
+        {
+          ...positive.avalonia,
+          accessibility: {
+            ...positive.avalonia.accessibility,
+            markdown: {
+              ...positive.avalonia.accessibility.markdown,
+              atomicActionCount: 2,
+            },
+          },
+        },
+        'avalonia',
+      ),
+  ],
+  [
     'focus-drift',
     'state.focus mismatch',
     () => same('markdown', 'button', 'state.focus'),

@@ -76,6 +76,24 @@ if (!Array.isArray(evidence.steps) || evidence.steps.length < 4) {
     'Avalonia evidence did not execute the required interaction steps',
   )
 }
+const atomicActions = evidence.accessibility?.nodes?.filter(
+  (node) =>
+    node.control === 'FsusMarkdownAtomicAction' &&
+    node.action?.invokable === true,
+)
+if (
+  !Array.isArray(atomicActions) ||
+  atomicActions.length !==
+    evidence.accessibility?.markdown?.atomicActionCount ||
+  atomicActions.length < 3
+) {
+  throw new Error(
+    'Avalonia evidence did not expose the real invokable atomic action peers',
+  )
+}
+if (!atomicActions.some((node) => node.action?.sourceEntry === true)) {
+  throw new Error('Avalonia evidence did not expose the source entry action')
+}
 console.log(
-  `[conformance-v2] avalonia real-window trace passed steps=${evidence.steps.length} candidate=${candidate}`,
+  `[conformance-v2] avalonia real-window trace passed steps=${evidence.steps.length} atomicActions=${atomicActions.length} candidate=${candidate}`,
 )
