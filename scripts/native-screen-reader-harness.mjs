@@ -312,6 +312,7 @@ const main = async () => {
       .locator('[data-markdown-atomic-actions]')
       .first()
       .waitFor({ state: 'attached' })
+    const interactionElapsedMilliseconds = performance.now() - interactionStart
     const cdp = await page.context().newCDPSession(page)
     const browserAccessibility = await cdp.send('Accessibility.getFullAXTree')
     const screenshotPath = join(options.out, 'browser.png')
@@ -435,7 +436,6 @@ const main = async () => {
       motion: 'full',
       runnerHash,
     }
-    const elapsedMilliseconds = performance.now() - interactionStart
     const focusTarget = await page.evaluate(() => {
       const active = document.activeElement
       return active?.tagName === 'BUTTON'
@@ -505,9 +505,9 @@ const main = async () => {
       focusTarget,
       performance: {
         identity,
-        elapsedMilliseconds,
+        elapsedMilliseconds: interactionElapsedMilliseconds,
         budgetMilliseconds: 2000,
-        passed: elapsedMilliseconds < 2000,
+        passed: interactionElapsedMilliseconds < 2000,
       },
       visual: {
         identity,

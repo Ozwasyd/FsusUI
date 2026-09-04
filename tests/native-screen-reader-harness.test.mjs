@@ -1,9 +1,14 @@
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
 import test from 'node:test'
+import { fileURLToPath } from 'node:url'
 import {
   parseAtspiResult,
   resolveAtspiBusAddress,
 } from '../scripts/native-screen-reader-harness.mjs'
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 test('AT-SPI bus resolution preserves an explicit address', () => {
   let called = false
@@ -121,4 +126,22 @@ test('AT-SPI helper output rejects invalid JSON and accepts real results', () =>
     }),
     { ok: true, markdownEditableCount: 1 },
   )
+})
+
+test('interaction performance stops before accessibility evidence collection', () => {
+  const source = fs.readFileSync(
+    path.join(root, 'scripts/native-screen-reader-harness.mjs'),
+    'utf8',
+  )
+  const interactionEnd = source.indexOf(
+    'const interactionElapsedMilliseconds =',
+  )
+  const browserTreeCollection = source.indexOf(
+    "cdp.send('Accessibility.getFullAXTree')",
+  )
+  const atspiCollection = source.indexOf("const atspi = spawnSync('python3'")
+
+  assert.notEqual(interactionEnd, -1)
+  assert.ok(interactionEnd < browserTreeCollection)
+  assert.ok(interactionEnd < atspiCollection)
 })
