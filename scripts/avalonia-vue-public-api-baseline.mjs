@@ -559,6 +559,7 @@ const parseComponent = (
   exportName,
   classification,
   structuredEmitNames,
+  structuredExposedNames,
 ) => {
   const sources = loadModuleSources(root, moduleName)
   const vueSource = sourceForComponent(sources, exportName)
@@ -576,6 +577,7 @@ const parseComponent = (
     vueSource,
     exportName,
     structuredEmitNames,
+    structuredExposedNames,
   })
   const slotSemantics =
     slotVueSource === vueSource
@@ -667,13 +669,20 @@ export const buildArtifacts = (root, options = {}) => {
     'spec/components/contracts/v2/semantic-member-bindings.json',
   )
   const structuredOutputs = new Map()
+  const structuredOperations = new Map()
   if (exists(semanticBindingsPath)) {
     const semanticBindings = parseJson(semanticBindingsPath)
     for (const binding of semanticBindings.mappings ?? []) {
-      if (binding.kind !== 'output') continue
-      const names = structuredOutputs.get(binding.component) ?? new Set()
-      names.add(binding.web)
-      structuredOutputs.set(binding.component, names)
+      if (binding.kind === 'output') {
+        const names = structuredOutputs.get(binding.component) ?? new Set()
+        names.add(binding.web)
+        structuredOutputs.set(binding.component, names)
+      }
+      if (binding.kind === 'operation') {
+        const names = structuredOperations.get(binding.component) ?? new Set()
+        names.add(binding.web)
+        structuredOperations.set(binding.component, names)
+      }
     }
   }
   const packageJson = parseJson(
@@ -698,6 +707,7 @@ export const buildArtifacts = (root, options = {}) => {
           exportName,
           classification,
           structuredOutputs.get(exportName) ?? [],
+          structuredOperations.get(exportName) ?? [],
         ),
       )
     }
@@ -752,7 +762,7 @@ export const buildArtifacts = (root, options = {}) => {
     ).length
   }
 
-  const semanticVersion = '1.3.0'
+  const semanticVersion = '1.4.0'
   const compilerOptionsHash = sha256(
     stableJson({
       parser: ['@babel/parser'],
@@ -775,6 +785,7 @@ export const buildArtifacts = (root, options = {}) => {
           'vue/tsconfig.web.json',
         ]),
         structuredEmitScope: 'explicit semantic output bindings',
+        structuredExposedScope: 'explicit semantic operation bindings',
         maxFields: 64,
         maxDepth: 1,
       },

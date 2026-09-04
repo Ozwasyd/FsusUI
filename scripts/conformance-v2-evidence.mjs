@@ -366,31 +366,46 @@ export function validateMarkdownEvidence(candidate) {
 }
 
 export function deriveAlignment(registry, comparison = null) {
+  const comparisonList = Array.isArray(comparison?.comparisons)
+    ? comparison.comparisons
+    : comparison
+      ? [comparison]
+      : []
+  const comparisons = new Map()
+  for (const candidate of comparisonList) {
+    const contract = candidate?.identity?.contract
+    if (!contract) fail('comparison.identity.contract missing')
+    if (comparisons.has(contract))
+      fail(`comparison.${contract} duplicated in comparison set`)
+    comparisons.set(contract, candidate)
+  }
   const statuses = []
   const gaps = []
   for (const contract of registry.contracts ?? []) {
     const coverage = contract.coverage ?? {}
+    const contractComparison = comparisons.get(contract.id)
     let status
-    if (contract.bindings?.avalonia?.status === 'unbound') status = 'missing'
+    if (contract.component?.exportStatus === 'web-only') status = 'web-only'
+    else if (contract.bindings?.avalonia?.status === 'unbound')
+      status = 'missing'
     else if ((coverage.missing ?? 0) > 0 || (coverage.partial ?? 0) > 0)
       status = 'partial'
     else if (
-      comparison?.verdict === 'pass' &&
-      comparison.identity.contract === contract.id
+      contract.component?.exportStatus === 'aligned-candidate' &&
+      contractComparison?.verdict === 'pass'
     )
       status = 'aligned'
     else status = 'blocked'
     statuses.push({ id: contract.id, status, source: 'derived' })
-    if (status !== 'aligned') {
+    if (!['aligned', 'web-only'].includes(status)) {
       gaps.push({
         contract: contract.id,
         status,
         missingMembers: coverage.missing ?? 0,
         partialMembers: coverage.partial ?? 0,
-        missingArtifacts:
-          comparison?.identity.contract === contract.id
-            ? []
-            : ['same-identity-cross-platform-evidence'],
+        missingArtifacts: contractComparison
+          ? []
+          : ['same-identity-cross-platform-evidence'],
       })
     }
   }

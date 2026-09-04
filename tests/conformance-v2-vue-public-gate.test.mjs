@@ -12,6 +12,9 @@ const clone = (value) => JSON.parse(JSON.stringify(value))
 
 const baseline = readJson('spec/baselines/vue-current.json')
 const registry = readJson('spec/components/contracts/v2/contract-v2.json')
+const semanticMemberBindings = readJson(
+  'spec/components/contracts/v2/semantic-member-bindings.json',
+)
 
 const errorsFor = ({
   mutatedBaseline = baseline,
@@ -28,22 +31,28 @@ test('real Vue baseline and Contract V2 have complete public-member coverage', (
     (total, component) =>
       total +
       (component.semantic?.props?.length ?? 0) +
-      (component.emits?.length ?? 0) +
-      (component.exposed?.length ?? 0) +
+      ((component.semantic?.emits?.length ?? 0) ||
+        (component.emits?.length ?? 0)) +
+      ((component.semantic?.exposed?.length ?? 0) ||
+        (component.exposed?.length ?? 0)) +
       (component.slots?.length ?? 0),
     0,
   )
-  const expectedWebOnlyMembers = baseline.components
+  const componentLevelWebOnlyMembers = baseline.components
     .filter((component) => component.classification === 'web-only')
     .reduce(
       (total, component) =>
         total +
         (component.semantic?.props?.length ?? 0) +
-        (component.emits?.length ?? 0) +
-        (component.exposed?.length ?? 0) +
+        ((component.semantic?.emits?.length ?? 0) ||
+          (component.emits?.length ?? 0)) +
+        ((component.semantic?.exposed?.length ?? 0) ||
+          (component.exposed?.length ?? 0)) +
         (component.slots?.length ?? 0),
       0,
     )
+  const expectedWebOnlyMembers =
+    componentLevelWebOnlyMembers + semanticMemberBindings.dispositions.length
   assert.deepEqual(result.errors, [])
   assert.equal(result.auditedComponents, baseline.components.length)
   assert.equal(result.auditedMembers, expectedMembers)
@@ -215,5 +224,17 @@ test('a real web-only status drift fails Vue public coverage', () => {
   assert.match(
     errorsFor({ mutatedRegistry: webOnlyDrift }),
     /must be uniquely registered as web-only, got missing/,
+  )
+})
+
+test('a member-level web-only disposition cannot be synthesized in Contract V2', () => {
+  const dispositionDrift = clone(registry)
+  const member = dispositionDrift.contracts
+    .find((contract) => contract.component.name === 'ElMarkdownEditor')
+    .inputs.find((input) => input.name === 'textareaId')
+  delete member.dispositionBasis
+  assert.match(
+    errorsFor({ mutatedRegistry: dispositionDrift }),
+    /claims web-only without an exact governed member disposition/u,
   )
 })

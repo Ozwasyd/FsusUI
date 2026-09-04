@@ -20,12 +20,18 @@ const MEMBER_SECTIONS = [
   {
     kind: 'output',
     contractSection: 'outputs',
-    baselineMembers: (component) => component.emits ?? [],
+    baselineMembers: (component) =>
+      (component.semantic?.emits ?? []).length > 0
+        ? component.semantic.emits.map((emit) => emit.name)
+        : (component.emits ?? []),
   },
   {
     kind: 'operation',
     contractSection: 'operations',
-    baselineMembers: (component) => component.exposed ?? [],
+    baselineMembers: (component) =>
+      (component.semantic?.exposed ?? []).length > 0
+        ? component.semantic.exposed.map((exposed) => exposed.name)
+        : (component.exposed ?? []),
   },
   {
     kind: 'contentRegion',
@@ -224,9 +230,19 @@ export const validateVuePublicCoverage = ({ baseline, registry }) => {
             )
           }
         } else if (member.status === 'web-only') {
-          errors.push(
-            `${context} claims web-only outside a web-only Vue component`,
-          )
+          webOnlyMembers += 1
+          if (
+            member.dispositionBasis !== 'explicit-member-disposition' ||
+            !member.platformAlternative ||
+            !member.governance?.reason ||
+            !member.governance?.owner ||
+            !member.governance?.testPolicy ||
+            !member.governance?.reviewPolicy
+          ) {
+            errors.push(
+              `${context} claims web-only without an exact governed member disposition`,
+            )
+          }
         }
       }
     }

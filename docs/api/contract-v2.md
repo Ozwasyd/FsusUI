@@ -18,7 +18,7 @@ explicit or when semantic drift is hidden.
 | ------------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Registry                 | `spec/components/contracts/v2/contract-v2.json`                 | Generated, committed, verified                                                   |
 | Gate                     | `spec/components/contracts/v2/markdown-editor-gate.json`        | MarkdownEditor blocking state                                                    |
-| Semantic member bindings | `spec/components/contracts/v2/semantic-member-bindings.json`    | Explicit platform-neutral mappings for framework members whose names differ      |
+| Semantic member bindings | `spec/components/contracts/v2/semantic-member-bindings.json`    | Exact platform-neutral mappings and reviewed member-level Web-only dispositions  |
 | Runtime projection       | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
 | Runtime projection docs  | `docs/api/markdown-runtime-projection.md`                       | Consumer-facing runtime API                                                      |
 | Interaction trace docs   | `docs/api/markdown-interaction-trace.md`                        | Real-browser Web trace schema and Contract V2 binding                            |
@@ -58,7 +58,10 @@ semantic bindings are resolved first; for example, `document` binds Web
 against their independent baselines and rejects stale or duplicate mappings.
 Members without an explicit mapping remain candidate-matched by name equality
 after the narrow `Is/Can/Has` + `Changed` + kebab normalization, or are recorded
-as gaps.
+as gaps. A member-level Web-only disposition must name one real compiler
+baseline member and record its owner, test policy, review policy, reason, and
+native alternative. Wildcards, unknown members, duplicate dispositions, and
+collisions with a semantic mapping are rejected.
 Each member carries exactly one status:
 
 | Status              | Meaning                                                                                                       |
@@ -93,11 +96,12 @@ carry at least one scenario coverage id.
   when its name matches the single Vue payload parameter and both shapes are
   available. Recursive, framework, unresolved, multi-parameter, and rest
   payloads remain `partial`; wrapper type names are never guessed equivalent.
-- **Operation signature drift**: compiler/Roslyn return and ordered parameter
-  signatures are compared by the existing primitive/array categories, parameter
-  count, optionality, and rest semantics. Framework or domain wrapper types are
-  not guessed equivalent; an unavailable or non-comparable type keeps the member
-  `partial`.
+- **Operation signature drift**: explicitly bound Vue operations use the
+  TypeScript checker to retain inferred return and ordered parameter signatures,
+  which are compared with Roslyn signatures by the existing primitive/array
+  categories, parameter count, optionality, and rest semantics. Non-callable or
+  unresolved exposed values and framework or domain wrapper types are not
+  guessed equivalent; they remain `partial`.
 - **Content-region drift**: Vue slot outlets come from the Vue SFC compiler AST,
   including static versus dynamic names, scoped payload field names, and whether
   a spread/dynamic binding makes the payload incomplete. Avalonia content
