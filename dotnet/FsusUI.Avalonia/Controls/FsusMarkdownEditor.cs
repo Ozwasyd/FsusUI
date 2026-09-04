@@ -231,11 +231,14 @@ public partial class FsusMarkdownEditor : TemplatedControl
     if (previousScrollViewer is not null && previousScrollViewer != scrollViewer)
     {
       previousScrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
+      previousScrollViewer.ScrollChanged -= OnScrollChanged;
     }
     if (scrollViewer is not null)
     {
       scrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
       scrollViewer.LayoutUpdated += OnScrollLayoutUpdated;
+      scrollViewer.ScrollChanged -= OnScrollChanged;
+      scrollViewer.ScrollChanged += OnScrollChanged;
     }
     lastAppliedContentFloor = double.NaN;
     BuildNativeSurface();
@@ -556,6 +559,7 @@ public partial class FsusMarkdownEditor : TemplatedControl
     if (scrollViewer is not null)
     {
       scrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
+      scrollViewer.ScrollChanged -= OnScrollChanged;
     }
     if (inputOwner is not null)
     {
@@ -715,6 +719,9 @@ public partial class FsusMarkdownEditor : TemplatedControl
     UpdateInputOwnerViewport();
     InvalidateAutomationChildren();
   }
+
+  private void OnScrollChanged(object? sender, ScrollChangedEventArgs args) =>
+    OnScrollLayoutUpdated(sender, args);
 
   private void UpdateScrollContentFloor()
   {
@@ -1612,8 +1619,7 @@ public partial class FsusMarkdownEditor : TemplatedControl
         return null;
       }
 
-      if (Editor.projectionView is { } view &&
-        view.ViewportDiagnostics.IsVirtualized)
+      if (Editor.projectionView is { } view)
       {
         var visible = view.VisibleSourceRange;
         atomicSpans = atomicSpans
@@ -1670,6 +1676,12 @@ public partial class FsusMarkdownEditor : TemplatedControl
       Editor.SyncAutomationState();
     }
 
+    public void CopySource()
+    {
+      SelectSource();
+      Editor.inputOwner?.Copy();
+    }
+
     public void Delete()
     {
       if (Editor.IsReadOnly || !Editor.IsEnabled)
@@ -1723,6 +1735,7 @@ public partial class FsusMarkdownEditor : TemplatedControl
       Action("enter-after", () => Node.MoveTo(Node.Span.SourceRange.End, false)),
       Action("edit-source", () => Node.MoveTo(Node.Span.SourceRange.Start, true)),
       Action("select-source", Node.SelectSource),
+      Action("copy", Node.CopySource),
       Action("delete", Node.Delete),
     ];
 

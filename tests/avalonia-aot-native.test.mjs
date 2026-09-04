@@ -68,6 +68,16 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     NativeDependencies: ['libc.so.6'],
     PackageDigests: [`FsusUI.Avalonia.nupkg:${'d'.repeat(64)}`],
     PartialCapabilities: ['FsusMarkdownEditor:required-after-issue-343'],
+    MarkdownAutomationReady: true,
+    MarkdownVirtualizationReady: true,
+    MarkdownDocumentCharacters: 240_000,
+    MarkdownBlockCount: 10_000,
+    MarkdownHeadingCount: 10_000,
+    MarkdownAutomationNodeCount: 1,
+    MarkdownVisualCount: 12,
+    MarkdownLayoutMilliseconds: 21.5,
+    MarkdownManagedBytesDelta: 8192,
+    RenderScaling: 1.5,
     RuntimeIndependent: true,
     StartedAtUtc: '2026-01-01T00:00:00Z',
     EndedAtUtc: '2026-01-01T00:00:01Z',
@@ -123,6 +133,18 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
   assert.throws(
     () => validateReport({ ...report, PartialCapabilities: [] }),
     /MarkdownEditor as partial/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownAutomationReady: false }),
+    /automation evidence/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownVisualCount: 64 }),
+    /virtualization evidence/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownHeadingCount: 9_999 }),
+    /virtualization evidence/u,
   )
 })
 

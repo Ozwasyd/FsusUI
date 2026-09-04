@@ -37,12 +37,12 @@
     {
       "id": "avalonia-index",
       "path": "docs/avalonia/README.md",
-      "digest": "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506"
+      "digest": "4993c8a075f89b5e2f9abf172469887a9135994fe222a18a1449deedb41e3a23"
     },
     {
       "id": "avalonia-markdown-editor",
       "path": "docs/avalonia/components/markdown-editor.md",
-      "digest": "b61ccc7874817faa6138fe1253cdf9730950938ef3772ac75b7b63f4fabf34ed"
+      "digest": "fc4ba16f5a9c9dfd8b8868e1a2d1ece65a8e8f4fcc082f04a452ebde05d9c696"
     },
     {
       "id": "avalonia-virtualization",
@@ -60,13 +60,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "567cb881c8c7b919af68e255edf8ec53165aa84e",
+    "revision": "1c842867c080aeb644758db15c888f38dccec3f1",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "cfcaa8b4de02e0844699cfeb08411107b4b46f3b99640a650b86250200ec0369",
+    "authorityDigest": "066b929de0956bd6469ff28df1407ac2ffc59c6231fb76c4299b94dcb5716901",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "567cb881c8c7b919af68e255edf8ec53165aa84e",
-  "candidateDigest": "5ade5bcc337d818b0f39c868433bf5473637a2b50ee4940342d65921bb55ea6e",
+  "candidateSha": "1c842867c080aeb644758db15c888f38dccec3f1",
+  "candidateDigest": "20646f33a221824b905695829443577e9fdfe7c5d65b7b35d333bf993f87e7b7",
   "stateEvidenceMatrix": [
     {
       "state": "baseline Source editor surface",
@@ -88,7 +88,7 @@
     "packed NuGet JIT, trimmed and Native AOT MarkdownEditor smoke on the available Linux host"
   ],
   "outOfScope": [
-    "issue 341 input intent, native clipboard IO and OS IME composition implementation",
+    "reimplementation of issue 341 input intent, native clipboard IO or OS IME composition behavior already merged into the baseline",
     "issue 285 Contract V2 comparator, dual-platform evidence infrastructure or handwritten aligned status",
     "Windows or macOS native evidence",
     "new visual tokens, component chrome or a parallel Markdown renderer"
@@ -96,5 +96,5 @@
   "classificationEvidenceDigest": "ec5fe5dbe5824a7e98ed80c56f1efaa2ee52c17b5027186050d9ae7794487013",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "7a09efcdae4866009b4b6308a76daca3d596d49e955134371f4b63c46e7d7c1f"
+  "receiptDigest": "c7b2a99d06ccda1bbd6d1dec832582e41b869890bc5e75c87f6ee49cf8222ba5"
 }

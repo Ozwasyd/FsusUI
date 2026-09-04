@@ -62,14 +62,42 @@ public class FsusMarkdownEditorAccessibilityVirtualizationTests
       source,
       spans)).Accepted);
     Dispatcher.UIThread.RunJobs();
+    Arrange(window, editor);
 
     var peer = ControlAutomationPeer.CreatePeerForElement(editor);
     var snapshot = Capture(peer, editor);
+    var atomicNodes = peer.GetChildren()!;
+    Assert.InRange(atomicNodes.Count, 1, 63);
+    Assert.Equal("Diagram 0", atomicNodes[0].GetProvider<IValueProvider>()?.Value);
+    var atomicActions = atomicNodes[0].GetChildren()!;
     Assert.True(IsAccepted(snapshot));
+    Assert.Equal(
+      ["enter-before", "enter-after", "edit-source", "select-source", "copy", "delete"],
+      atomicActions.Select(action => action.GetName()).ToArray());
+    Assert.All(atomicActions, action =>
+    {
+      Assert.False(action.IsKeyboardFocusable());
+      Assert.NotNull(action.GetProvider<IInvokeProvider>());
+    });
     Assert.False(IsAccepted(snapshot with { HasValueProvider = false }));
     Assert.False(IsAccepted(snapshot with { ParagraphTabStops = 1 }));
     Assert.False(IsAccepted(snapshot with { LiveSetting = AutomationLiveSetting.Polite }));
     Assert.False(IsAccepted(snapshot with { AtomicNodeCount = 65 }));
+
+    var scroll = Assert.Single(
+      editor.GetVisualDescendants().OfType<ScrollViewer>(),
+      candidate => candidate.Name == "PART_Scroll");
+    scroll.Offset = new Vector(0, scroll.Extent.Height);
+    Dispatcher.UIThread.RunJobs();
+    Arrange(window, editor);
+    var laterNodes = peer.GetChildren()!;
+    Assert.InRange(laterNodes.Count, 1, 63);
+    Assert.DoesNotContain(
+      laterNodes,
+      node => node.GetProvider<IValueProvider>()?.Value == "Diagram 0");
+    Assert.Contains(
+      laterNodes,
+      node => node.GetProvider<IValueProvider>()?.Value == "Diagram 119");
 
     window.Close();
   }

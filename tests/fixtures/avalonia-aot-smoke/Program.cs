@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Logging;
+using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Platform;
@@ -143,20 +144,6 @@ internal static class Program
         Mode = FsusMarkdownEditorMode.Live,
         Height = 140,
       };
-      var projectionRequest = new FsusMarkdownProjectionRequestedEventArgs(
-        projectionIdentity,
-        0,
-        markdownEditor.Document,
-        0,
-        markdownEditor.SourceCoordinateMap);
-      var projectionCommit = FsusMarkdownProjectionProducerContract
-        .ProduceAndCommitAsync(
-          markdownEditor,
-          new AotProjectionProducer(projectionIdentity),
-          projectionRequest)
-        .AsTask()
-        .GetAwaiter()
-        .GetResult();
       var webViewAdapterReady = ExerciseWebViewAdapter();
       var documents = new FsusDocumentTabs();
       documents.AddDocument(new FsusDocumentTab
@@ -271,6 +258,20 @@ internal static class Program
               report.CodeEditorReady =
                 codeEditor.Selection == new FsusCodeEditorSelection(9, 15) &&
                 codeEditor.HighlightSpans.Count > 0;
+              var projectionRequest = new FsusMarkdownProjectionRequestedEventArgs(
+                projectionIdentity,
+                markdownEditor.TransactionStore.Revision,
+                markdownEditor.Document,
+                markdownEditor.ProjectionFeatureRevision,
+                markdownEditor.SourceCoordinateMap);
+              var projectionCommit = FsusMarkdownProjectionProducerContract
+                .ProduceAndCommitAsync(
+                  markdownEditor,
+                  new AotProjectionProducer(projectionIdentity),
+                  projectionRequest)
+                .AsTask()
+                .GetAwaiter()
+                .GetResult();
               report.MarkdownProjectionProducerReady =
                 projectionCommit.Accepted &&
                 markdownEditor.CapabilityState == "aligned";
@@ -278,16 +279,22 @@ internal static class Program
                 ControlAutomationPeer.CreatePeerForElement(markdownEditor);
               var markdownAtomicNodes = markdownPeer.GetChildren() ?? [];
               var markdownAtomicNode = markdownAtomicNodes.SingleOrDefault();
+              var markdownAtomicActions = markdownAtomicNode?.GetChildren() ?? [];
               report.MarkdownAutomationNodeCount = markdownAtomicNodes.Count;
               report.MarkdownAutomationReady =
                 markdownPeer.GetAutomationControlType() == AutomationControlType.Edit &&
                 markdownPeer.GetProvider<IValueProvider>()?.Value == markdownEditor.Document &&
-                markdownPeer.GetItemStatus().Contains("multiline=true", StringComparison.Ordinal) &&
+                (markdownPeer.GetItemStatus() ?? string.Empty)
+                  .Contains("multiline=true", StringComparison.Ordinal) &&
                 markdownAtomicNode is not null &&
                 markdownAtomicNode.GetAutomationControlType() == AutomationControlType.Group &&
                 markdownAtomicNode.GetProvider<IValueProvider>()?.Value == "Widget" &&
-                markdownAtomicNode.GetChildren()?.Count == 5 &&
-                markdownAtomicNode.GetChildren()!.All(action =>
+                markdownAtomicActions.Count == 6 &&
+                markdownAtomicActions.Any(action =>
+                  action.GetName() == "copy") &&
+                markdownAtomicActions.Any(action =>
+                  action.GetName() == "delete") &&
+                markdownAtomicActions.All(action =>
                   action.GetProvider<IInvokeProvider>() is not null &&
                   !action.IsKeyboardFocusable());
               var largeVisuals = largeMarkdownEditor.GetVisualDescendants().ToArray();
@@ -733,28 +740,16 @@ internal static class Program
   }
 }
 
-internal sealed class SmokeApplication : Application
+internal sealed partial class SmokeApplication : Application
 {
   public override void Initialize()
   {
-    base.Initialize();
+    AvaloniaXamlLoader.Load(this);
     new FsusThemeManager().Apply(Resources, new()
     {
       Variant = FsusThemeVariant.Light,
       MotionMode = FsusMotionMode.Reduced,
     });
-    Resources.MergedDictionaries.Add(
-      new ResourceInclude(new Uri("avares://FsusUI.Avalonia.Themes"))
-      {
-        Source = new Uri(
-          "avares://FsusUI.Avalonia.Themes/Themes/FsusLight.axaml"),
-      });
-    Styles.Add(
-      new StyleInclude(new Uri("avares://FsusUI.Avalonia.Themes"))
-      {
-        Source = new Uri(
-          "avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
   }
 
   public override void OnFrameworkInitializationCompleted()

@@ -68,7 +68,7 @@ public class MarkdownEditorInteractionTraceTests
     Assert.Contains("source=0:6", atomic.GetItemStatus());
     var actions = atomic.GetChildren()!;
     Assert.Equal(
-      ["enter-before", "enter-after", "edit-source", "select-source", "delete"],
+      ["enter-before", "enter-after", "edit-source", "select-source", "copy", "delete"],
       actions.Select(action => action.GetName()).ToArray());
     Assert.All(actions, action =>
     {
@@ -91,6 +91,10 @@ public class MarkdownEditorInteractionTraceTests
     Assert.Equal(FsusMarkdownEditorMode.Source, editor.Mode);
     editor.Mode = FsusMarkdownEditorMode.Live;
     actions[4].GetProvider<IInvokeProvider>()!.Invoke();
+    Assert.Equal(
+      new FsusMarkdownEditorSelection(0, editor.Document.Length),
+      editor.TransactionStore.Selection);
+    actions[5].GetProvider<IInvokeProvider>()!.Invoke();
     Assert.Equal(string.Empty, editor.Document);
   }
 

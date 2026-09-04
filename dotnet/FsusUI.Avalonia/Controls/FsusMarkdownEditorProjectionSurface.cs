@@ -278,9 +278,39 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
     get
     {
       EnsureLayout(Math.Max(Bounds.Width, 1));
-      if (map is null)
+      if (map is null || layout is null)
       {
         return new(0, 0);
+      }
+      if (!IsVirtualized)
+      {
+        var first = text.Length;
+        var last = text.Length;
+        var lineTop = 0d;
+        var foundFirst = false;
+        foreach (var line in layout.TextLines)
+        {
+          var lineBottom = lineTop + line.Height;
+          if (!foundFirst && lineBottom >= viewportOffsetY)
+          {
+            first = Math.Max(0, line.FirstTextSourceIndex);
+            foundFirst = true;
+          }
+          if (lineTop <= viewportOffsetY + viewportHeight)
+          {
+            last = Math.Min(
+              text.Length,
+              line.FirstTextSourceIndex + line.Length);
+          }
+          else
+          {
+            break;
+          }
+          lineTop = lineBottom;
+        }
+        return new(
+          map.VisualToSource(first, -1),
+          map.VisualToSource(last, 1));
       }
       return new(
         map.VisualToSource(Math.Clamp(layoutStart, 0, text.Length), -1),

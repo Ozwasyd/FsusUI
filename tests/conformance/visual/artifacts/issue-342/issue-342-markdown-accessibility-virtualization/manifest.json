@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "issue": 342,
+  "generatedBy": "FsusMarkdownEditorAccessibilityVirtualizationTests.LargeWrappedDocumentUsesBoundedViewportAcrossThemeDpiAndLifecycleChanges",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "productionFixture": true,
+    "limitation": "Local deterministic DPI render simulation; no physical display or operating-system screen reader is claimed."
+  },
+  "document": {
+    "characters": 412999,
+    "blocks": 10000,
+    "headings": 10000
+  },
+  "captures": [
+    {
+      "Name": "light-100",
+      "Dpi": 96,
+      "theme": "light",
+      "file": "tests/conformance/visual/artifacts/issue-342/issue-342-markdown-accessibility-virtualization/light-100.png",
+      "sha256": "1d5bca87854ba91de6a3902a14354e808aa423a424e43e8af9616381932e2301",
+      "pixelWidth": 520,
+      "pixelHeight": 320
+    },
+    {
+      "Name": "dark-150",
+      "Dpi": 144,
+      "theme": "dark",
+      "file": "tests/conformance/visual/artifacts/issue-342/issue-342-markdown-accessibility-virtualization/dark-150.png",
+      "sha256": "134b40d4b26bdb589a29dd7a224d194ebeaa85fdc2015d490f4f09bc9a687d5a",
+      "pixelWidth": 780,
+      "pixelHeight": 480
+    },
+    {
+      "Name": "high-contrast-200",
+      "Dpi": 192,
+      "theme": "high-contrast",
+      "file": "tests/conformance/visual/artifacts/issue-342/issue-342-markdown-accessibility-virtualization/high-contrast-200.png",
+      "sha256": "f97f90e188777857768d4d9ad586a5a1c2a3730f8dc75253176945b27441acd3",
+      "pixelWidth": 1040,
+      "pixelHeight": 640
+    }
+  ]
+}

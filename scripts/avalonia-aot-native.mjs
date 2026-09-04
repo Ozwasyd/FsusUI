@@ -42,6 +42,9 @@ export const validateScenarioBindings = (source) => {
     'DismissKeyboardAsync',
     'DismissPointerOutsideAsync',
     'NativeLogErrorCount == 0',
+    'ControlAutomationPeer.CreatePeerForElement(markdownEditor)',
+    'largeMarkdownSource.Length >= 100_000',
+    'largeVisuals.Length < 64',
     'catch (Exception error)',
   ])
     if (!source.includes(evidence))
@@ -93,6 +96,28 @@ export const validateReport = (report, expected) => {
     throw new Error('smoke report runtime dependencies are missing')
   if (!Array.isArray(report.PackageDigests) || report.PackageDigests.length < 1)
     throw new Error('smoke report package digests are missing')
+  if (
+    report.MarkdownAutomationReady !== true ||
+    report.MarkdownAutomationNodeCount < 1 ||
+    report.MarkdownAutomationNodeCount > 64
+  )
+    throw new Error('smoke report Markdown automation evidence is incomplete')
+  if (
+    report.MarkdownVirtualizationReady !== true ||
+    report.MarkdownDocumentCharacters < 100_000 ||
+    report.MarkdownBlockCount < 3_000 ||
+    report.MarkdownHeadingCount < 10_000 ||
+    report.MarkdownVisualCount >= 64 ||
+    !Number.isFinite(report.MarkdownLayoutMilliseconds) ||
+    report.MarkdownLayoutMilliseconds < 0 ||
+    !Number.isSafeInteger(report.MarkdownManagedBytesDelta) ||
+    report.MarkdownManagedBytesDelta < 0 ||
+    !Number.isFinite(report.RenderScaling) ||
+    report.RenderScaling <= 0
+  )
+    throw new Error(
+      'smoke report Markdown virtualization evidence is incomplete',
+    )
   if (
     !Array.isArray(report.PartialCapabilities) ||
     !report.PartialCapabilities.includes(
