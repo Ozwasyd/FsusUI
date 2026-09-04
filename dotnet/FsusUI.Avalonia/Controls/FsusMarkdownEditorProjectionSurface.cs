@@ -227,6 +227,11 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
   private IReadOnlyList<ValueSpan<TextRunProperties>>? styleOverrides;
   private IReadOnlyList<ProseDecoration>? decorations;
   private FsusMarkdownEditorSelection selection = new(0, 0);
+  private IReadOnlyList<FsusMarkdownSearchMatch> searchMatches = [];
+  private int currentSearchIndex = -1;
+  private IReadOnlyList<FsusMarkdownSourceRange> focusActiveRanges = [];
+  private IReadOnlyList<FsusMarkdownSourceRange> focusExemptRanges = [];
+  private bool focusPresentationEnabled;
 
   public void Update(
     string displayText,
@@ -249,6 +254,21 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
       layout = null;
       InvalidateMeasure();
     }
+    InvalidateVisual();
+  }
+
+  public void UpdateAdjacent(
+    IReadOnlyList<FsusMarkdownSearchMatch> matches,
+    int currentMatchIndex,
+    IReadOnlyList<FsusMarkdownSourceRange> activeRanges,
+    IReadOnlyList<FsusMarkdownSourceRange> exemptRanges,
+    bool focusEnabled)
+  {
+    searchMatches = matches;
+    currentSearchIndex = currentMatchIndex;
+    focusActiveRanges = activeRanges;
+    focusExemptRanges = exemptRanges;
+    focusPresentationEnabled = focusEnabled;
     InvalidateVisual();
   }
 
@@ -336,6 +356,7 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
 
     var visualStart = map?.SourceToVisual(selection.Start, -1) ?? 0;
     var visualEnd = map?.SourceToVisual(selection.End, 1) ?? visualStart;
+    DrawSearchHighlights(context, layout);
     if (visualEnd > visualStart)
     {
       var selectionBrush = new SolidColorBrush(Color.FromArgb(72, 66, 133, 244));
@@ -353,14 +374,7 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
           new Rect(start.Left, start.Top, width, Math.Max(start.Height, FontSize * 1.2)));
       }
     }
-    if (decorations is not null)
-    {
-      foreach (var decoration in decorations)
-      {
-        decoration.Draw(context, layout);
-      }
-    }
-    layout.Draw(context, default);
+    DrawProjectionText(context, layout);
     if (visualStart == visualEnd)
     {
       var caret = layout.HitTestTextPosition(Math.Clamp(visualStart, 0, text.Length));
@@ -368,6 +382,88 @@ internal sealed class FsusMarkdownEditorProjectionView : global::Avalonia.Contro
         new Pen(Foreground ?? Brushes.Black, 1),
         new Point(caret.Left, caret.Top),
         new Point(caret.Left, caret.Bottom));
+    }
+  }
+
+  private void DrawSearchHighlights(DrawingContext context, TextLayout textLayout)
+  {
+    if (map is null || searchMatches.Count == 0)
+    {
+      return;
+    }
+    var accent = ResolveBrush("FsusColorActionPrimaryBrush") ?? Brushes.DodgerBlue;
+    var quiet = ResolveBrush("FsusComponentStateSurfaceEmphasisBackgroundBrush") ?? accent;
+    for (var index = 0; index < searchMatches.Count; index += 1)
+    {
+      var range = searchMatches[index].SourceRange;
+      var start = Math.Clamp(map.SourceToVisual(range.Start, -1), 0, text.Length);
+      var end = Math.Clamp(map.SourceToVisual(range.End, 1), 0, text.Length);
+      if (end <= start)
+      {
+        continue;
+      }
+      using var opacity = context.PushOpacity(index == currentSearchIndex ? 0.32 : 0.18);
+      foreach (var rectangle in textLayout.HitTestTextRange(start, end - start))
+      {
+        context.FillRectangle(
+          index == currentSearchIndex ? accent : quiet,
+          new Rect(
+            rectangle.Left,
+            rectangle.Top,
+            Math.Max(1, rectangle.Width),
+            Math.Max(rectangle.Height, FontSize * 1.2)));
+      }
+    }
+  }
+
+  private void DrawProjectionText(DrawingContext context, TextLayout textLayout)
+  {
+    if (!focusPresentationEnabled ||
+      map is null ||
+      focusActiveRanges.Count + focusExemptRanges.Count == 0)
+    {
+      DrawDecorations(context, textLayout);
+      textLayout.Draw(context, default);
+      return;
+    }
+
+    // Match the public Web Focus presentation contract without introducing an
+    // Avalonia-only opacity or changing layout metrics.
+    using (context.PushOpacity(0.72))
+    {
+      DrawDecorations(context, textLayout);
+      textLayout.Draw(context, default);
+    }
+    foreach (var range in focusActiveRanges.Concat(focusExemptRanges))
+    {
+      var start = Math.Clamp(map.SourceToVisual(range.Start, -1), 0, text.Length);
+      var end = Math.Clamp(map.SourceToVisual(range.End, 1), 0, text.Length);
+      if (end <= start)
+      {
+        continue;
+      }
+      foreach (var rectangle in textLayout.HitTestTextRange(start, end - start))
+      {
+        using var clip = context.PushClip(new Rect(
+          rectangle.Left,
+          rectangle.Top,
+          Math.Max(1, rectangle.Width),
+          Math.Max(rectangle.Height, FontSize * 1.2)));
+        DrawDecorations(context, textLayout);
+        textLayout.Draw(context, default);
+      }
+    }
+  }
+
+  private void DrawDecorations(DrawingContext context, TextLayout textLayout)
+  {
+    if (decorations is null)
+    {
+      return;
+    }
+    foreach (var decoration in decorations)
+    {
+      decoration.Draw(context, textLayout);
     }
   }
 

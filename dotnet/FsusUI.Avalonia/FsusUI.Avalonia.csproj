@@ -2,6 +2,10 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
     <PackageId>FsusUI.Avalonia</PackageId>
     <Description>Platform-neutral FsusUI Avalonia constants and shared contracts.</Description>
   </PropertyGroup>

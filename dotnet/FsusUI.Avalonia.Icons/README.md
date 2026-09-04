@@ -6,6 +6,15 @@
 For adoption setup, package references, and clean sample verification, see
 [`docs/avalonia/installation.md`](../../docs/avalonia/installation.md).
 
+## Trimming and AOT
+
+This package is an AOT-compatible library with trimming, single-file, and AOT
+analyzers enabled. The generated icon dictionary remains on the normal package
+resource path; there is no AOT-only icon path or public API. The library
+contract does not set `PublishAot` or validate a final RID-specific Native AOT
+executable. Consuming applications and third-party plugins must verify their
+own dynamic loading and reflection boundaries.
+
 ## Import
 
 ```xml

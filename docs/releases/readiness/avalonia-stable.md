@@ -28,6 +28,13 @@ final Avalonia packages.
 | Known limitations           | Complex controls remain deferred until their roadmap entries have contracts, budgets, accessibility evidence, and platform review.         |
 | Cache and sharding policy   | Unit shards consume `unit-test-artifacts`; screenshot and .NET build output artifacts are uploaded per matrix axis with short retention.   |
 
+The AOT-compatible library boundary is bound by
+`spec/avalonia/aot-library-findings.json` and
+`spec/avalonia/aot-library-boundaries.json`: the three public packages run
+warning-free analyzers, keep reviewed dynamic boundaries and normal resource
+paths, and make package-only support claims. Final RID publish/run evidence
+remains separate.
+
 CI groups:
 
 - PR fast: `verify:pr-fast` on pull requests.
