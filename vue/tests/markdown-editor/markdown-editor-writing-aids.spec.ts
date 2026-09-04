@@ -115,8 +115,10 @@ test('renders focus mode and reveals a source range on desktop and mobile', asyn
     ),
   ).toBe(true)
   for (const zoom of ['1.5', '2']) {
-    await page.evaluate((value) => {
+    await page.evaluate(async (value) => {
       document.documentElement.style.zoom = value
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+      window.dispatchEvent(new Event('resize'))
     }, zoom)
     await expect.poll(() => presentationFits(mobileEditor)).toBe(true)
   }
@@ -138,7 +140,8 @@ test('fails closed, mounts an exact virtual target, and preserves keyboard and S
     return [target.selectionStart, target.selectionEnd]
   })
 
-  await missingButton.click()
+  await missingButton.focus()
+  await missingButton.press('Enter')
   await expect(fixture.getByTestId('markdown-reveal-status')).toHaveText(
     'missing:not-found',
   )

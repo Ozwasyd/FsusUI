@@ -406,13 +406,12 @@
     box-sizing: border-box;
     margin: 0;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: hidden;
     padding: 16px;
     pointer-events: none;
     background: getCssVar('bg-color');
     color: getCssVar('text-color', 'primary');
     scrollbar-color: transparent transparent;
-    scrollbar-gutter: stable;
     font: inherit;
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',

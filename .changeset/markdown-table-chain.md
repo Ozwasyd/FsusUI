@@ -4,4 +4,4 @@
 'element-plus': minor
 ---
 
-Advance Markdown table dependency chain with table/cell structural transactions, keyboard navigation, TSV/CSV paste, explicit format, and compact contextual UI (#370, #371, #372, #373).
+Advance Markdown table dependency chain with table/cell structural transactions, keyboard navigation, TSV/CSV paste, explicit format, and compact contextual UI (#370, #371, #372, #373). Also preserve document-identity rendering and cross-browser focus/typewriter scrolling while navigating Markdown content.

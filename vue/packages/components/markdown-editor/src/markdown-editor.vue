@@ -1843,6 +1843,8 @@ const liveLayout = ref<MarkdownLiveLayoutPlan>(
 let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
 let restoringViewport = false
 let restoringTypewriter = false
+let typewriterScrollTarget: number | null = null
+let typewriterScrollSmooth = false
 let typewriterLayoutAdjustment = false
 let typewriterLayoutFrame: number | undefined
 let textareaLayoutHeight = 0
@@ -1956,6 +1958,7 @@ const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
   }, 200)
 }
 const suspendTypewriterForUserScroll = () => {
+  typewriterScrollTarget = null
   writingAidsController.handleUserScroll()
   writingAidsState.value = writingAidsController.state
 }
@@ -1997,6 +2000,13 @@ const handleLayoutScroll = () => {
   const textarea = textareaRef.value
   if (textarea) syncFocusLayerScroll(textarea.scrollTop)
   if (restoringSelection || restoringViewport || restoringTypewriter) return
+  if (textarea && typewriterScrollTarget !== null) {
+    const reachedTarget =
+      Math.abs(textarea.scrollTop - typewriterScrollTarget) <= 1
+    if (reachedTarget) typewriterScrollTarget = null
+    if (reachedTarget || typewriterScrollSmooth) return
+    typewriterScrollTarget = null
+  }
   if (
     textarea &&
     (textarea.clientHeight !== textareaLayoutHeight ||
@@ -2098,6 +2108,9 @@ const applyTypewriterScroll = (
       target.scrollTop,
       Math.max(0, textarea.scrollHeight - textarea.clientHeight),
     )
+    typewriterScrollTarget = scrollTop
+    typewriterScrollSmooth =
+      trigger !== 'async-layout' && target.smooth
     textarea.scrollTo({
       behavior:
         trigger === 'async-layout' ? 'auto' : target.smooth ? 'smooth' : 'auto',
@@ -2107,11 +2120,15 @@ const applyTypewriterScroll = (
       syncFocusLayerScroll(textarea.scrollTop)
     })
   } else {
+    typewriterScrollTarget = target.scrollTop
+    typewriterScrollSmooth = false
     textarea.scrollTop = target.scrollTop
     syncFocusLayerScroll(target.scrollTop)
   }
   requestAnimationFrame(() => {
-    restoringTypewriter = false
+    requestAnimationFrame(() => {
+      restoringTypewriter = false
+    })
   })
 }
 const refreshLiveReveal = (
@@ -4049,6 +4066,7 @@ const handleSelectionMove = () => {
 
 const handleSelectionDragStart = () => {
   if (isComposing.value) return
+  typewriterScrollTarget = null
   writingAidsController.handleSelectionDragStart()
   writingAidsState.value = writingAidsController.state
 }
