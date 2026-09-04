@@ -38,11 +38,11 @@ const validateFreshnessIdentity = (serialized, file) => {
   const baseline = JSON.parse(serialized)
   const source = baseline.source ?? {}
   assert(
-    baseline.baselineVersion === '2.1.0',
-    `${file} baselineVersion must be 2.1.0`,
+    baseline.baselineVersion === '2.2.0',
+    `${file} baselineVersion must be 2.2.0`,
   )
   assert(
-    source.toolVersion === 'FsusUI.Avalonia.ApiTool@1.5.0',
+    source.toolVersion === 'FsusUI.Avalonia.ApiTool@1.6.0',
     `${file} source.toolVersion is stale`,
   )
   for (const field of [

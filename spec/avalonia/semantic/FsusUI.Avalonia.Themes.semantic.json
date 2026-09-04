@@ -1,14 +1,14 @@
 {
   "packageId": "FsusUI.Avalonia.Themes",
-  "baselineVersion": "2.1.0",
+  "baselineVersion": "2.2.0",
   "source": {
-    "toolVersion": "FsusUI.Avalonia.ApiTool@1.5.0",
+    "toolVersion": "FsusUI.Avalonia.ApiTool@1.6.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "6c6f2105f29d6719cf37c507e91ccfa09a3d3ddc2f367f8d339a4ce605cbfbb1",
-    "compilerOptionsHash": "4cad637d64a53471d9c054a671e7b7a70cbf7b07640e1838952ba18ce227a475",
+    "inputTreeHash": "930d912d50ed01ec1509fd701682cc61dc929193aa4a9d62168066b306e2fc73",
+    "compilerOptionsHash": "b55601673826309cfdf18c9dd3bfde035372887aae11591b6fd5072b626ac188",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "b17adc5df200b16d2e3ca7e7acc56cccb657c398160de0202b352ddc855b081a"
+    "outputHash": "5a9059277222aee5ab894e4fb49450ae43a10b78853af86bc1b74a054ccd0ca3"
   },
   "semanticTypes": [
     {
@@ -167,6 +167,35 @@
         }
       ],
       "avaloniaProperties": [],
+      "stateContract": {
+        "declaredPseudoClasses": [],
+        "pseudoClassBindings": [],
+        "pseudoClassContractKnown": false,
+        "pseudoClassContractComplete": false,
+        "classBindingAuthority": "roslyn-control-instance-operation",
+        "classContractDeclared": false,
+        "classBindings": [
+          {
+            "kind": "class",
+            "action": "add",
+            "nameKnown": false,
+            "nameExpression": "className",
+            "publicDependencies": [],
+            "sourceMember": "Ensure",
+            "provider": "Classes.Add"
+          },
+          {
+            "kind": "class",
+            "action": "remove",
+            "nameKnown": false,
+            "nameExpression": "className",
+            "publicDependencies": [],
+            "sourceMember": "Ensure",
+            "provider": "Classes.Remove"
+          }
+        ],
+        "classNamesResolved": false
+      },
       "events": [
         {
           "name": "ModeChanged",

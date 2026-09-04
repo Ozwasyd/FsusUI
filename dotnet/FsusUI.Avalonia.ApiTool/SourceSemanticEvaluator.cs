@@ -11,7 +11,7 @@ namespace FsusUI.Avalonia.ApiTool;
 
 internal sealed class SourceSemanticEvaluator
 {
-  private const string EvaluatorVersion = "source-semantics-v3";
+  private const string EvaluatorVersion = "source-semantics-v4";
 
   private static readonly CSharpParseOptions ParseOptions =
     new(languageVersion: LanguageVersion.Latest, documentationMode: DocumentationMode.Parse);
@@ -110,6 +110,18 @@ internal sealed class SourceSemanticEvaluator
           };
         }
       }
+
+      foreach (var invocation in root.DescendantNodes().OfType<InvocationExpressionSyntax>())
+      {
+        if (model.GetOperation(invocation) is not IInvocationOperation operation ||
+            model.GetEnclosingSymbol(invocation.SpanStart)?.ContainingType is not { } containingType)
+        {
+          continue;
+        }
+
+        var type = GetOrCreate(types, ReflectionTypeName(containingType));
+        IndexStateMutation(compilation, model, operation, type);
+      }
     }
 
     var inputFiles = sourceFiles
@@ -127,6 +139,15 @@ internal sealed class SourceSemanticEvaluator
           AvaloniaProperties = pair.Value.AvaloniaProperties,
           GenericParameters = pair.Value.GenericParameters,
           Commands = pair.Value.Commands,
+          DeclaredPseudoClasses = pair.Value.DeclaredPseudoClasses
+            .OrderBy(name => name, StringComparer.Ordinal)
+            .ToList(),
+          PseudoClassBindings = pair.Value.PseudoClassBindings
+            .OrderBy(StateBindingSortKey, StringComparer.Ordinal)
+            .ToList(),
+          ClassBindings = pair.Value.ClassBindings
+            .OrderBy(StateBindingSortKey, StringComparer.Ordinal)
+            .ToList(),
           ContentProperties = pair.Value.ContentProperties
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToList(),
@@ -284,6 +305,22 @@ internal sealed class SourceSemanticEvaluator
     if (typeSymbol.Locations.Any(location => location.IsInSource))
     {
       var type = GetOrCreate(types, ReflectionTypeName(typeSymbol));
+      foreach (var attribute in typeSymbol.GetAttributes().Where(attribute =>
+        attribute.AttributeClass?.ToDisplayString(
+          SymbolDisplayFormat.CSharpErrorMessageFormat) ==
+        "Avalonia.Controls.Metadata.PseudoClassesAttribute"))
+      {
+        foreach (var argument in attribute.ConstructorArguments)
+        {
+          foreach (var value in argument.Values)
+          {
+            if (value.Value is string pseudoClass)
+            {
+              type.DeclaredPseudoClasses.Add(pseudoClass);
+            }
+          }
+        }
+      }
       type.GenericParameters.AddRange(
         typeSymbol.TypeParameters
           .OrderBy(parameter => parameter.Ordinal)
@@ -372,6 +409,283 @@ internal sealed class SourceSemanticEvaluator
           typeQualificationStyle:
             SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
           genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters));
+
+  private static void IndexStateMutation(
+    Compilation compilation,
+    SemanticModel model,
+    IInvocationOperation operation,
+    MutableSourceTypeSemantics type)
+  {
+    var targetType = operation.TargetMethod.ContainingType.ToDisplayString(
+      SymbolDisplayFormat.CSharpErrorMessageFormat);
+    if (targetType == "FsusUI.Avalonia.Controls.FsusComponentClasses")
+    {
+      var control = Argument(operation, "control");
+      if (!IsContainingInstance(control?.Value))
+      {
+        return;
+      }
+
+      var sourceMember = SourceMember(model, operation);
+      switch (operation.TargetMethod.Name)
+      {
+        case "SetBaseClasses":
+          AddStateBinding(
+            type.ClassBindings,
+            "class",
+            "add",
+            Argument(operation, "baseClass")?.Value,
+            condition: null,
+            sourceMember,
+            provider: operation.TargetMethod.Name);
+          foreach (var className in HelperClassNames(compilation, operation.TargetMethod))
+          {
+            AddKnownStateBinding(
+              type.ClassBindings,
+              "class",
+              "add",
+              className,
+              condition: null,
+              sourceMember,
+              operation.TargetMethod.Name);
+          }
+          return;
+        case "Ensure":
+          AddStateBinding(
+            type.ClassBindings,
+            "class",
+            "set",
+            Argument(operation, "className")?.Value,
+            Argument(operation, "enabled")?.Value,
+            sourceMember,
+            provider: operation.TargetMethod.Name);
+          return;
+        case "SyncVariant":
+        case "SyncSize":
+        case "SyncIconPlacement":
+          var controller = operation.Arguments
+            .FirstOrDefault(argument => argument.Parameter?.Name != "control")
+            ?.Value;
+          foreach (var className in HelperClassNames(compilation, operation.TargetMethod))
+          {
+            AddKnownStateBinding(
+              type.ClassBindings,
+              "class-family",
+              "select",
+              className,
+              controller,
+              sourceMember,
+              operation.TargetMethod.Name);
+          }
+          return;
+      }
+    }
+
+    var pseudoClasses = operation.Instance ??
+      operation.Arguments.FirstOrDefault(
+        argument => argument.Parameter?.Name is "classes" or "pseudoClasses")
+        ?.Value;
+    if (operation.TargetMethod.Name == "Set" &&
+        IsContainingInstanceCollection(pseudoClasses, "PseudoClasses"))
+    {
+      AddStateBinding(
+        type.PseudoClassBindings,
+        "pseudo-class",
+        "set",
+        Argument(operation, "name")?.Value ??
+          operation.Arguments.ElementAtOrDefault(1)?.Value,
+        Argument(operation, "value")?.Value ??
+          operation.Arguments.ElementAtOrDefault(2)?.Value,
+        SourceMember(model, operation),
+        provider: "PseudoClasses.Set");
+      return;
+    }
+
+    if (operation.TargetMethod.Name is "Add" or "Remove" &&
+        IsContainingInstanceCollection(operation.Instance, "Classes"))
+    {
+      AddStateBinding(
+        type.ClassBindings,
+        "class",
+        operation.TargetMethod.Name.ToLowerInvariant(),
+        operation.Arguments.ElementAtOrDefault(0)?.Value,
+        condition: null,
+        SourceMember(model, operation),
+        provider: $"Classes.{operation.TargetMethod.Name}");
+    }
+  }
+
+  private static IArgumentOperation? Argument(
+    IInvocationOperation operation,
+    string name) =>
+    operation.Arguments.FirstOrDefault(argument => argument.Parameter?.Name == name);
+
+  private static bool IsContainingInstance(IOperation? operation)
+  {
+    while (operation is IConversionOperation conversion)
+    {
+      operation = conversion.Operand;
+    }
+    return operation is IInstanceReferenceOperation
+    {
+      ReferenceKind:
+        InstanceReferenceKind.ContainingTypeInstance or
+        InstanceReferenceKind.ImplicitReceiver,
+    };
+  }
+
+  private static bool IsContainingInstanceCollection(
+    IOperation? operation,
+    string propertyName)
+  {
+    while (operation is IConversionOperation conversion)
+    {
+      operation = conversion.Operand;
+    }
+    return operation is IPropertyReferenceOperation property &&
+      property.Property.Name == propertyName &&
+      IsContainingInstance(property.Instance);
+  }
+
+  private static void AddStateBinding(
+    List<SourceStateBindingSemantics> bindings,
+    string kind,
+    string action,
+    IOperation? name,
+    IOperation? condition,
+    string sourceMember,
+    string provider)
+  {
+    var constant = name?.ConstantValue;
+    bindings.Add(new SourceStateBindingSemantics
+    {
+      Kind = kind,
+      Action = action,
+      NameKnown = constant is { HasValue: true, Value: string },
+      Name = constant is { HasValue: true, Value: string value } ? value : null,
+      NameExpression =
+        constant is { HasValue: true, Value: string }
+          ? null
+          : NormalizedExpression(name),
+      ConditionExpression = NormalizedExpression(condition),
+      PublicDependencies = PublicDependencies(condition),
+      SourceMember = sourceMember,
+      Provider = provider,
+    });
+  }
+
+  private static void AddKnownStateBinding(
+    List<SourceStateBindingSemantics> bindings,
+    string kind,
+    string action,
+    string name,
+    IOperation? condition,
+    string sourceMember,
+    string provider) =>
+    bindings.Add(new SourceStateBindingSemantics
+    {
+      Kind = kind,
+      Action = action,
+      NameKnown = true,
+      Name = name,
+      ConditionExpression = NormalizedExpression(condition),
+      PublicDependencies = PublicDependencies(condition),
+      SourceMember = sourceMember,
+      Provider = provider,
+    });
+
+  private static string? NormalizedExpression(IOperation? operation) =>
+    operation?.Syntax.NormalizeWhitespace().ToFullString();
+
+  private static List<string> PublicDependencies(IOperation? operation) =>
+    operation is null
+      ? []
+      : Walk(operation)
+        .Select(node => node switch
+        {
+          IPropertyReferenceOperation property
+            when property.Property.DeclaredAccessibility == Accessibility.Public =>
+            $"{ReflectionTypeName(property.Property.ContainingType)}.{property.Property.Name}",
+          IFieldReferenceOperation field
+            when field.Field.DeclaredAccessibility == Accessibility.Public =>
+            $"{ReflectionTypeName(field.Field.ContainingType)}.{field.Field.Name}",
+          _ => null,
+        })
+        .Where(name => name is not null)
+        .Cast<string>()
+        .Distinct(StringComparer.Ordinal)
+        .OrderBy(name => name, StringComparer.Ordinal)
+        .ToList();
+
+  private static IEnumerable<IOperation> Walk(IOperation operation)
+  {
+    yield return operation;
+    foreach (var child in operation.ChildOperations)
+    {
+      foreach (var descendant in Walk(child))
+      {
+        yield return descendant;
+      }
+    }
+  }
+
+  private static string SourceMember(
+    SemanticModel model,
+    IInvocationOperation operation) =>
+    model.GetEnclosingSymbol(operation.Syntax.SpanStart)?.Name ?? "<unknown>";
+
+  private static List<string> HelperClassNames(
+    Compilation compilation,
+    IMethodSymbol helper)
+  {
+    var names = new HashSet<string>(StringComparer.Ordinal);
+    foreach (var syntaxReference in helper.DeclaringSyntaxReferences)
+    {
+      var syntax = syntaxReference.GetSyntax();
+      var model = compilation.GetSemanticModel(syntax.SyntaxTree);
+      foreach (var expression in syntax.DescendantNodesAndSelf().OfType<ExpressionSyntax>())
+      {
+        if (model.GetConstantValue(expression) is { HasValue: true, Value: string value })
+        {
+          names.Add(value);
+        }
+      }
+      if (model.GetOperation(syntax) is not { } operation)
+      {
+        continue;
+      }
+      foreach (var field in Walk(operation)
+        .OfType<IFieldReferenceOperation>()
+        .Select(reference => reference.Field)
+        .Distinct<IFieldSymbol>(SymbolEqualityComparer.Default))
+      {
+        foreach (var fieldReference in field.DeclaringSyntaxReferences)
+        {
+          var fieldSyntax = fieldReference.GetSyntax();
+          var fieldModel = compilation.GetSemanticModel(fieldSyntax.SyntaxTree);
+          foreach (var expression in fieldSyntax.DescendantNodesAndSelf().OfType<ExpressionSyntax>())
+          {
+            if (fieldModel.GetConstantValue(expression) is
+              { HasValue: true, Value: string value })
+            {
+              names.Add(value);
+            }
+          }
+        }
+      }
+    }
+    return names.OrderBy(name => name, StringComparer.Ordinal).ToList();
+  }
+
+  private static string StateBindingSortKey(SourceStateBindingSemantics binding) =>
+    string.Join(
+      "\0",
+      binding.Kind,
+      binding.NameKnown ? binding.Name : binding.NameExpression,
+      binding.Action,
+      binding.ConditionExpression,
+      binding.SourceMember,
+      binding.Provider);
 
   private static string ReflectionTypeName(INamedTypeSymbol type)
   {
@@ -528,6 +842,13 @@ internal sealed class SourceSemanticEvaluator
     public Dictionary<string, SourceCommandSemantics> Commands { get; } =
       new(StringComparer.Ordinal);
 
+    public HashSet<string> DeclaredPseudoClasses { get; } =
+      new(StringComparer.Ordinal);
+
+    public List<SourceStateBindingSemantics> PseudoClassBindings { get; } = [];
+
+    public List<SourceStateBindingSemantics> ClassBindings { get; } = [];
+
     public HashSet<string> ContentProperties { get; } =
       new(StringComparer.Ordinal);
   }
@@ -557,6 +878,12 @@ internal sealed class SourceTypeSemantics
 
   public Dictionary<string, SourceCommandSemantics> Commands { get; init; } =
     new(StringComparer.Ordinal);
+
+  public List<string> DeclaredPseudoClasses { get; init; } = [];
+
+  public List<SourceStateBindingSemantics> PseudoClassBindings { get; init; } = [];
+
+  public List<SourceStateBindingSemantics> ClassBindings { get; init; } = [];
 
   public List<string> ContentProperties { get; init; } = [];
 }
@@ -593,6 +920,27 @@ internal sealed class SourceCommandSemantics
   public bool CanWrite { get; init; }
 
   public bool IsStatic { get; init; }
+}
+
+internal sealed class SourceStateBindingSemantics
+{
+  public string Kind { get; init; } = "";
+
+  public string Action { get; init; } = "";
+
+  public bool NameKnown { get; init; }
+
+  public string? Name { get; init; }
+
+  public string? NameExpression { get; init; }
+
+  public string? ConditionExpression { get; init; }
+
+  public List<string> PublicDependencies { get; init; } = [];
+
+  public string SourceMember { get; init; } = "";
+
+  public string Provider { get; init; } = "";
 }
 
 internal sealed class SourcePropertySemantics
