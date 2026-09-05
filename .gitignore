@@ -151,3 +151,6 @@ tmp/
 /process_theme.js
 /run_decouple.mjs
 /split-fsus-theme.mjs
+
+# Mimosa security-scanner session state and baselines
+.mimosa/
