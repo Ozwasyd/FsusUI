@@ -913,6 +913,7 @@ internal static class ConformanceV2Runner
       "scenario.v2.el-check-tag.motion",
       "scenario.v2.el-check-tag.perf",
     };
+    var automationChildren = AutomationChildNodes(editor);
     var trace = new
     {
       schema = "fsusui.conformance-evidence.v2",
@@ -956,7 +957,7 @@ internal static class ConformanceV2Runner
             checkTagNode,
             AutomationNode(editor, 4, store.Selection),
           }
-          .Concat(AutomationChildNodes(editor))
+          .Concat(automationChildren.Nodes)
           .ToArray(),
         markdown = new
         {
@@ -964,7 +965,7 @@ internal static class ConformanceV2Runner
           wholeDocumentLiveRegion = false,
           decorationDuplicate = false,
           paragraphTabStops = 0,
-          atomicActionCount = AutomationChildNodes(editor).Count,
+          atomicActionCount = automationChildren.AtomicActionCount,
         },
       },
       performance = new
@@ -1254,15 +1255,52 @@ internal static class ConformanceV2Runner
     };
   }
 
-  private static IReadOnlyList<object> AutomationChildNodes(FsusMarkdownEditor editor)
+  private sealed record AutomationChildSnapshot(
+    IReadOnlyList<object> Nodes,
+    int AtomicActionCount);
+
+  private static AutomationChildSnapshot AutomationChildNodes(FsusMarkdownEditor editor)
   {
     var parent = ControlAutomationPeer.CreatePeerForElement(editor)
       ?? throw new InvalidOperationException("No AutomationPeer for FsusMarkdownEditor.");
-    return parent.GetChildren()?.Select((peer, index) => (object)new
+    var nodes = new List<object>();
+    var actionIndex = 0;
+    foreach (var atomicPeer in parent.GetChildren() ?? [])
     {
-      control = "FsusMarkdownAtomicAction",
+      var actionPeers = atomicPeer.GetChildren() ?? [];
+      nodes.Add(AutomationPeerNode(
+        atomicPeer,
+        "FsusMarkdownAtomicNode",
+        "FsusMarkdownEditor",
+        -1 - nodes.Count,
+        actionPeers.Select(child => child.GetName()).ToArray()));
+      foreach (var actionPeer in actionPeers)
+      {
+        nodes.Add(AutomationPeerNode(
+          actionPeer,
+          "FsusMarkdownAtomicAction",
+          atomicPeer.GetName(),
+          -1 - nodes.Count,
+          []));
+        actionIndex++;
+      }
+    }
+    return new(nodes, actionIndex);
+  }
+
+  private static object AutomationPeerNode(
+    AutomationPeer peer,
+    string control,
+    string logicalParent,
+    int tabOrder,
+    IReadOnlyList<string> children)
+  {
+    var name = peer.GetName();
+    return new
+    {
+      control,
       role = peer.GetAutomationControlType().ToString().ToLowerInvariant(),
-      name = peer.GetName(),
+      name,
       description = peer.GetHelpText(),
       value = peer.GetProvider<IValueProvider>()?.Value,
       selection = (object?)null,
@@ -1276,20 +1314,20 @@ internal static class ConformanceV2Runner
         checkedState = (string?)null,
       },
       liveRegion = "off",
-      logicalParent = "FsusMarkdownEditor",
-      children = Array.Empty<string>(),
+      logicalParent,
+      children,
       focus = new
       {
         keyboardFocusable = peer.IsKeyboardFocusable(),
         focused = peer.HasKeyboardFocus(),
-        tabOrder = -1 - index,
+        tabOrder,
       },
       action = new
       {
         invokable = peer.GetProvider<IInvokeProvider>() is not null,
-        sourceEntry = peer.GetName().Contains("edit-source", StringComparison.Ordinal),
+        sourceEntry = string.Equals(name, "edit-source", StringComparison.Ordinal),
       },
-    }).ToArray() ?? [];
+    };
   }
 
   private static object MarkdownResult(FsusMarkdownEditorDispatchResult result)
