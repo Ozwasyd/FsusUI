@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "506b0e49ce93f76605c6808916335186431227dff038cee9b6aa0160c9f5432f",
+    "inputTreeHash": "a85f157ed5ded34666607de320e0b08538d2b7a0e850b29e142083bfb984fb23",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "17264eb2329265d2b8b4e0044580ee9ff9c979b92dae6f2dd2ac76265b2715dd"
+    "outputHash": "8e3271cf028ce4cd69a100da8a2476cd79d43d316aebfc436ec5205f518a937a"
   },
   "semanticTypes": [
     {
@@ -73,7 +73,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",

@@ -163,6 +163,7 @@ internal static class Program
     var properties = ExtractProperties(type, sourceTypeSemantics);
     var avaloniaProperties = ExtractAvaloniaProperties(type, sourceTypeSemantics);
     var contentRegions = ExtractContentRegions(
+      type,
       properties,
       avaloniaProperties,
       sourceTypeSemantics);
@@ -207,7 +208,9 @@ internal static class Program
             .ToList()
           : null,
       ContentProperty =
-        contentRegions.Count == 1 ? contentRegions[0].Name : null,
+        contentRegions.Count == 1
+          ? contentRegions[0].Name
+          : FindInheritedContentProperty(type),
       ContentRegions = contentRegions,
       Properties = properties,
       AvaloniaProperties = avaloniaProperties,
@@ -386,6 +389,7 @@ internal static class Program
   }
 
   private static List<SemanticContentRegion> ExtractContentRegions(
+    Type type,
     IReadOnlyList<SemanticProperty> properties,
     IReadOnlyList<SemanticAvaloniaProperty> avaloniaProperties,
     SourceTypeSemantics? sourceSemantics)
@@ -395,7 +399,7 @@ internal static class Program
     var avaloniaByName = avaloniaProperties.ToDictionary(
       property => property.Name,
       StringComparer.Ordinal);
-    return properties
+    var regions = properties
       .Where(property => contentProperties.Contains(property.Name))
       .Select(property =>
       {
@@ -411,8 +415,63 @@ internal static class Program
           PropertyKind = avaloniaProperty?.Kind ?? "clr",
         };
       })
+      .ToList();
+
+    // Content inherited from a base control (for example ContentControl)
+    // is still a real public content surface of the derived control.
+    var inheritedContent = FindInheritedContentProperty(type);
+    if (
+      inheritedContent is not null &&
+      regions.All(region => region.Name != inheritedContent)
+    )
+    {
+      var property = type
+        .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        .FirstOrDefault(candidate => candidate.Name == inheritedContent);
+      if (property is not null)
+      {
+        regions.Add(new SemanticContentRegion
+        {
+          Name = property.Name,
+          Type = TypeName(property.PropertyType),
+          Nullable = IsNullable(property.PropertyType),
+          CanRead = property.CanRead,
+          CanWrite = property.CanWrite,
+          Required = false,
+          PropertyKind = "clr",
+        });
+      }
+    }
+
+    return regions
       .OrderBy(region => region.Name, StringComparer.Ordinal)
       .ToList();
+  }
+
+  private static string? FindInheritedContentProperty(Type type)
+  {
+    foreach (var property in type.GetProperties(
+      BindingFlags.Public | BindingFlags.Instance))
+    {
+      try
+      {
+        if (property
+          .GetCustomAttributes(true)
+          .Any(attribute =>
+            attribute.GetType().FullName ==
+            "Avalonia.Metadata.ContentAttribute"))
+        {
+          return property.Name;
+        }
+      }
+      catch
+      {
+        // One attribute must not prevent extraction of the remaining public
+        // properties. A missing result remains visible in Contract V2.
+      }
+    }
+
+    return null;
   }
 
   private static List<SemanticProperty> ExtractProperties(

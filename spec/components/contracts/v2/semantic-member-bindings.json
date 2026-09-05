@@ -2,39 +2,27 @@
   "schemaVersion": 2,
   "mappings": [
     {
-      "component": "ElMarkdownEditor",
-      "semantic": "document",
-      "kind": "input",
-      "web": "modelValue",
-      "avalonia": "Document"
+      "component": "ElCheckTag",
+      "semantic": "default",
+      "kind": "contentRegion",
+      "web": "default",
+      "avalonia": "Content"
     },
     {
-      "component": "ElMarkdownEditor",
-      "semantic": "document-identity",
-      "kind": "input",
-      "web": "documentIdentity",
-      "avalonia": "DocumentIdentity"
+      "component": "ElCheckTag",
+      "semantic": "change",
+      "kind": "output",
+      "web": "change",
+      "avalonia": "CheckedChanged",
+      "avaloniaPayloadField": "NewChecked"
     },
     {
-      "component": "ElMarkdownEditor",
-      "semantic": "mode",
-      "kind": "input",
-      "web": "mode",
-      "avalonia": "Mode"
-    },
-    {
-      "component": "ElMarkdownEditor",
-      "semantic": "read-only",
-      "kind": "input",
-      "web": "readonly",
-      "avalonia": "IsReadOnly"
-    },
-    {
-      "component": "ElMarkdownEditor",
-      "semantic": "editor-profile",
-      "kind": "input",
-      "web": "editorProfile",
-      "avalonia": "Profile"
+      "component": "ElCheckTag",
+      "semantic": "update-checked",
+      "kind": "output",
+      "web": "update:checked",
+      "avalonia": "CheckedChanged",
+      "avaloniaPayloadField": "NewChecked"
     },
     {
       "component": "ElMarkdownEditor",
@@ -45,10 +33,45 @@
     },
     {
       "component": "ElMarkdownEditor",
+      "semantic": "document-identity",
+      "kind": "input",
+      "web": "documentIdentity",
+      "avalonia": "DocumentIdentity"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "editor-profile",
+      "kind": "input",
+      "web": "editorProfile",
+      "avalonia": "Profile"
+    },
+    {
+      "component": "ElMarkdownEditor",
       "semantic": "locale",
       "kind": "input",
       "web": "lang",
       "avalonia": "Locale"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "mode",
+      "kind": "input",
+      "web": "mode",
+      "avalonia": "Mode"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "document",
+      "kind": "input",
+      "web": "modelValue",
+      "avalonia": "Document"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "read-only",
+      "kind": "input",
+      "web": "readonly",
+      "avalonia": "IsReadOnly"
     },
     {
       "component": "ElMarkdownEditor",
@@ -59,38 +82,10 @@
     },
     {
       "component": "ElMarkdownEditor",
-      "semantic": "transaction",
-      "kind": "output",
-      "web": "transaction",
-      "avalonia": "Transaction"
-    },
-    {
-      "component": "ElMarkdownEditor",
-      "semantic": "selection-change",
-      "kind": "output",
-      "web": "selection-change",
-      "avalonia": "SelectionChange"
-    },
-    {
-      "component": "ElMarkdownEditor",
-      "semantic": "history-change",
-      "kind": "output",
-      "web": "history-change",
-      "avalonia": "HistoryChange"
-    },
-    {
-      "component": "ElMarkdownEditor",
       "semantic": "dispatch-transaction",
       "kind": "operation",
       "web": "dispatchTransaction",
       "avalonia": "DispatchTransaction"
-    },
-    {
-      "component": "ElMarkdownEditor",
-      "semantic": "undo",
-      "kind": "operation",
-      "web": "undo",
-      "avalonia": "Undo"
     },
     {
       "component": "ElMarkdownEditor",
@@ -119,6 +114,34 @@
       "kind": "operation",
       "web": "searchNavigate",
       "avalonia": "NavigateSearch"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "undo",
+      "kind": "operation",
+      "web": "undo",
+      "avalonia": "Undo"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "history-change",
+      "kind": "output",
+      "web": "history-change",
+      "avalonia": "HistoryChange"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "selection-change",
+      "kind": "output",
+      "web": "selection-change",
+      "avalonia": "SelectionChange"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "transaction",
+      "kind": "output",
+      "web": "transaction",
+      "avalonia": "Transaction"
     }
   ],
   "dispositions": [

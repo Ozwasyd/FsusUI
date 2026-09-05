@@ -696,6 +696,32 @@ const compareEventPayloads = (web, avalonia) => {
     }
     avaloniaShape = wrapper.shape
   }
+  if (parameter.shape?.kind !== 'object') {
+    // A primitive Vue payload value corresponds to the single value carried
+    // by the real .NET event args; compare the value categories directly.
+    const field =
+      avaloniaShape?.kind === 'object' && avaloniaShape.fields.length === 1
+        ? avaloniaShape.fields[0]
+        : null
+    if (!field) {
+      differences.push(
+        `web payload shape unavailable: ${parameter.shape?.reason ?? 'unknown type'}`,
+      )
+    } else {
+      const webCategories = categoriesFromVueProp({
+        runtimeType: parameter.type,
+        semanticType: parameter.type,
+      })
+      const avaloniaCategories = categoriesFromClrType(field.type)
+      const compatible = categoriesOverlap(webCategories, avaloniaCategories)
+      if (compatible !== true) {
+        differences.push(
+          `payload ${parameter.name} type ${compatible === false ? 'mismatch' : 'not comparable'}: web ${webCategories.join('|')} vs avalonia ${avaloniaCategories.join('|')}`,
+        )
+      }
+    }
+    return differences.length > 0 ? differences.join('; ') : null
+  }
   const fieldDifference = comparePayloadFields(parameter.shape, avaloniaShape)
   if (fieldDifference) differences.push(fieldDifference)
   return differences.length > 0 ? differences.join('; ') : null
@@ -715,7 +741,11 @@ const compareContentRegions = (web, avalonia) => {
     differences.push('web content-region payload is incomplete or spread-bound')
   }
   if (!web?.contentType) {
-    differences.push('web content value type metadata unavailable')
+    if (web?.scoped === true) {
+      differences.push('web content value type metadata unavailable')
+    }
+    // Unscoped Vue slots deliver untyped content; that is semantically
+    // compatible with an object-typed Avalonia content property (issue #285).
   } else {
     const webCategories = categoriesFromVueProp({
       runtimeType: web.contentType,
@@ -1046,14 +1076,25 @@ const avaloniaPayloadShape = (
   }
 }
 
-const avaloniaEventRef = (event, typeIndex) => {
+const avaloniaEventRef = (event, typeIndex, payloadField) => {
   const argsType =
     event.argsType?.match(/^System\.EventHandler<(.+)>$/u)?.[1] ?? null
+  const argsShape = avaloniaPayloadShape(argsType, typeIndex)
+  const projected =
+    payloadField && argsShape?.kind === 'object'
+      ? {
+          ...argsShape,
+          fields: argsShape.fields.filter(
+            (field) => field.name === payloadField,
+          ),
+        }
+      : argsShape
   return {
     member: event.name,
     categories: categoriesFromClrType(event.argsType),
     argsType: event.argsType,
-    argsShape: avaloniaPayloadShape(argsType, typeIndex),
+    ...(payloadField ? { payloadField } : {}),
+    argsShape: projected,
   }
 }
 
@@ -1302,6 +1343,26 @@ export const avaloniaPublicSurfaces = (type) => {
     surfaces.push(
       canonicalAvaloniaPropertyOnlySurface(property, contentRegions),
     )
+  }
+  const coveredPropertyNames = new Set([
+    ...clrPropertyNames,
+    ...[...(type.avaloniaProperties ?? []).map((property) => property.name)],
+  ])
+  for (const [regionName, region] of contentRegions) {
+    if (coveredPropertyNames.has(regionName)) continue
+    surfaces.push({
+      kind: 'avalonia-property',
+      member: regionName,
+      propertyKind: region.propertyKind ?? 'clr',
+      type: region.type,
+      nullable: knownBoolean(region.nullable),
+      defaultKnown: false,
+      defaultValue: null,
+      deprecated: false,
+      deprecationMessage: null,
+      isContentProperty: true,
+      contentRegion: region,
+    })
   }
   surfaces.push(
     ...(type.events ?? []).map(canonicalAvaloniaEventSurface),
@@ -1854,7 +1915,7 @@ const outputMember = ({
   } else {
     const comparison = compareMembers({
       web,
-      avalonia: avaloniaEventRef(avalonia, typeIndex),
+      avalonia: avaloniaEventRef(avalonia, typeIndex, binding?.avaloniaPayloadField),
       kind: 'output',
     })
     drift = comparison.drift
@@ -1869,7 +1930,9 @@ const outputMember = ({
     name: emit,
     kind: 'output',
     web,
-    avalonia: avalonia ? avaloniaEventRef(avalonia, typeIndex) : null,
+    avalonia: avalonia
+      ? avaloniaEventRef(avalonia, typeIndex, binding?.avaloniaPayloadField)
+      : null,
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'output', emit)],
@@ -2428,7 +2491,7 @@ const resolveAvaloniaSurfaceClaims = ({
   errors = [],
 }) => {
   const surfaces = avaloniaPublicSurfaces(avaloniaType)
-  const claims = new Set()
+  const claims = new Map()
   const sections = [
     ['inputs', new Set(['property', 'avalonia-property'])],
     ['outputs', new Set(['event'])],
@@ -2462,12 +2525,17 @@ const resolveAvaloniaSurfaceClaims = ({
         continue
       }
       const fingerprint = avaloniaSurfaceFingerprint(candidates[0])
-      if (claims.has(fingerprint)) {
+      const claimSection = claims.get(fingerprint)
+      if (claimSection != null && claimSection !== section) {
         errors.push(
           `${context} duplicates an already registered public surface`,
         )
       }
-      claims.add(fingerprint)
+      // Vue's v-model convention fans two emitted events (update:x plus the
+      // domain event) into one real .NET event; Contract V2 keeps both
+      // members bound to that same surface, which issue #285 allows as a
+      // many-to-one mapping proven per semantic member.
+      claims.set(fingerprint, section)
     }
   }
   return claims
@@ -2929,6 +2997,30 @@ export const validateSemanticMemberBindings = ({
       errors.push(
         `${context} references a missing real Avalonia member ${binding.avalonia}`,
       )
+    }
+    if (binding.avaloniaPayloadField != null) {
+      if (binding.kind !== 'output') {
+        errors.push(
+          `${context} only output bindings may declare avaloniaPayloadField`,
+        )
+      } else {
+        const event = (avaloniaType.events ?? []).find(
+          (candidate) => candidate.name === binding.avalonia,
+        )
+        const argsType =
+          event?.argsType?.match(/^System\.EventHandler<(.+)>$/u)?.[1] ?? null
+        const argsTypeSemantics = argsType
+          ? typeIndex.get(argsType)
+          : undefined
+        const fieldNames = (argsTypeSemantics?.properties ?? []).map(
+          (property) => property.name,
+        )
+        if (!fieldNames.includes(binding.avaloniaPayloadField)) {
+          errors.push(
+            `${context} references a missing real Avalonia event args field ${binding.avaloniaPayloadField}`,
+          )
+        }
+      }
     }
   }
   const seenDispositions = new Set()

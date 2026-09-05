@@ -183,8 +183,15 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
         ...region,
       })),
   )
+  const declaredContentRegions = contentRegions.filter((region) =>
+    [
+      'FsusUI.Avalonia.Controls.FsusActivityRailSection',
+      'FsusUI.Avalonia.Controls.FsusActivityRailShell',
+      'FsusUI.Avalonia.Controls.FsusSettingsCategory',
+    ].includes(region.ownerType),
+  )
   assert.deepEqual(
-    contentRegions.map((region) => [
+    declaredContentRegions.map((region) => [
       region.ownerType,
       region.name,
       region.propertyKind,
@@ -199,13 +206,33 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
       ['FsusUI.Avalonia.Controls.FsusSettingsCategory', 'Content', 'clr'],
     ],
   )
-  for (const region of contentRegions) {
+  for (const region of declaredContentRegions) {
     assert.equal(region.type, 'System.Object')
     assert.equal(region.nullable, true)
     assert.equal(region.canRead, true)
     assert.equal(region.canWrite, true)
     assert.equal(region.required, false)
   }
+  for (const region of contentRegions) {
+    assert.equal(region.canRead, true)
+    assert.equal(region.required, false)
+  }
+  const typesWithContentProperty = avaloniaBaselines.avalonia.semanticTypes.filter(
+    (type) => typeof type.contentProperty === 'string',
+  )
+  assert.equal(typesWithContentProperty.length, 158)
+  for (const type of typesWithContentProperty) {
+    assert.ok(
+      (type.contentRegions ?? []).some(
+        (region) => region.name === type.contentProperty,
+      ),
+      `${type.name} must expose its inherited content property as a region`,
+    )
+  }
+  const checkTagType = avaloniaBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusCheckTag',
+  )
+  assert.equal(checkTagType.contentProperty, 'Content')
   const semanticTypes = Object.values(avaloniaBaselines).flatMap(
     (baseline) => baseline.semanticTypes,
   )
@@ -1463,7 +1490,14 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
   )
 
   const duplicate = clone(semanticMemberBindings)
-  duplicate.mappings.push(clone(duplicate.mappings[0]))
+  duplicate.mappings.push(
+    clone(
+      duplicate.mappings.find(
+        (mapping) =>
+          mapping.component === 'ElMarkdownEditor' && mapping.web === 'modelValue',
+      ),
+    ),
+  )
   const errors = validateSemanticMemberBindings({
     registry: duplicate,
     vueBaseline,
@@ -1539,6 +1573,7 @@ test('member disposition mutations fail closed', () => {
       (registry) => {
         registry.dispositions[0] = {
           ...registry.dispositions[0],
+          component: registry.mappings[0].component,
           kind: registry.mappings[0].kind,
           web: registry.mappings[0].web,
         }
