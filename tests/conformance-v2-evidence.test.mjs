@@ -11,6 +11,7 @@ import {
   sealExecutionCoverage,
   validateCoverage,
   validateEvidence,
+  loadCurrentCheckTagVisualReview,
   validateCurrentComparison,
   validateOverride,
   validateReadiness,
@@ -47,6 +48,62 @@ const comparisonFor = (name, records = []) => {
       evidenceDigests,
       records,
     }),
+  }
+}
+
+const realManifests = () => ({
+  web: JSON.parse(
+    fs.readFileSync(
+      path.join(root, '.tmp/conformance-v2/web-a11y/manifest.json'),
+      'utf8',
+    ),
+  ),
+  avalonia: JSON.parse(
+    fs.readFileSync(
+      path.join(root, '.tmp/conformance-v2/avalonia.json'),
+      'utf8',
+    ),
+  ),
+})
+
+const realCheckTagContract = () => {
+  const registry = JSON.parse(
+    fs.readFileSync(
+      path.join(
+        root,
+        'spec/components/contracts/v2/contract-v2.json',
+      ),
+      'utf8',
+    ),
+  )
+  return registry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-check-tag',
+  )
+}
+
+const validatedRealComparison = async () => {
+  const { web, avalonia } = realManifests()
+  const visualReview = await loadCurrentCheckTagVisualReview(web, avalonia)
+  const comparison = compareEvidence(web, avalonia, visualReview)
+  validateCurrentComparison(
+    comparison,
+    web,
+    avalonia,
+    { ...comparison.identity },
+    visualReview,
+  )
+  return comparison
+}
+
+const consumerBindingsFor = (...ids) => {
+  const byContract = {}
+  for (const id of ids) {
+    byContract[id] = { releaseFamily: 'display', galleryRoute: 'display' }
+  }
+  return {
+    byContract,
+    releaseScopeFamilies: ['display'],
+    galleryRoutes: ['display'],
   }
 }
 
@@ -595,16 +652,25 @@ test('public values remain release-blocking until mapped and evidenced', () => {
   validateReadiness(alignment)
 })
 
-test('alignment preserves unbound web-only exports without creating gaps', () => {
+test('alignment preserves reviewed web-only exports without creating gaps', () => {
+  const webOnlyContract = {
+    id: 'component-v2.web-only',
+    component: { exportStatus: 'web-only' },
+    bindings: { avalonia: { status: 'unbound' } },
+    coverage: { missing: 0, partial: 0 },
+    scenarioIds: ['scenario.v2.web-only.input.value'],
+    platformException: {
+      reason: 'Browser-only capability with no native counterpart.',
+      alternative: 'The native shell consumes the platform service.',
+      owner: 'FsusUI Core',
+      testPolicy: 'contract',
+      reviewPolicy: 'pr-review',
+      reviewedAt: '2026-09-05',
+    },
+  }
   const alignment = deriveAlignment({
-    contracts: [
-      {
-        id: 'component-v2.web-only',
-        component: { exportStatus: 'web-only' },
-        bindings: { avalonia: { status: 'unbound' } },
-        coverage: { missing: 0, partial: 0 },
-      },
-    ],
+    contracts: [webOnlyContract],
+    consumerBindings: consumerBindingsFor('component-v2.web-only'),
   })
   assert.deepEqual(alignment.statuses, [
     {
@@ -615,139 +681,97 @@ test('alignment preserves unbound web-only exports without creating gaps', () =>
   ])
   assert.deepEqual(alignment.gaps, [])
   assert.deepEqual(alignment.stable, [])
+
+  const unreviewed = deriveAlignment({
+    contracts: [{ ...webOnlyContract, platformException: undefined }],
+    consumerBindings: consumerBindingsFor('component-v2.web-only'),
+  })
+  assert.equal(unreviewed.statuses[0].status, 'missing')
+  assert.equal(unreviewed.gaps.length, 1)
 })
 
-test('comparison sets align only exact statically complete contracts', () => {
-  const contracts = ['first', 'second', 'no-evidence'].map((name) => ({
-    id: `component-v2.${name}`,
-    component: { exportStatus: 'aligned-candidate' },
-    bindings: { avalonia: { status: 'bound' } },
-    inputs: [
-      {
-        name: 'value',
-        status: 'aligned-candidate',
-        scenarioIds: [scenario(name)],
-      },
-    ],
+test('receipts align only statically complete contracts with same-identity evidence', async () => {
+  const comparison = await validatedRealComparison()
+  const checkTag = realCheckTagContract()
+  const noEvidence = {
+    ...checkTag,
+    id: 'component-v2.no-evidence',
     coverage: { missing: 0, partial: 0 },
-  }))
-  const comparison = {
-    schema: 'fsusui.conformance-comparison-set.v2',
-    comparisons: ['first', 'second'].map((name) =>
-      comparisonFor(name, [
-        {
-          kind: 'input',
-          member: 'value',
-          scenarioId: scenario(name),
-          webSource: { kind: 'step', index: 0 },
-          avaloniaSource: { kind: 'step', index: 0 },
-        },
-      ]),
-    ),
   }
-  const alignment = deriveAlignment({ contracts }, comparison)
-  assert.deepEqual(alignment.stable, [
-    'component-v2.first',
-    'component-v2.second',
-  ])
+  const alignment = deriveAlignment(
+    {
+      contracts: [checkTag, noEvidence],
+      consumerBindings: consumerBindingsFor(
+        'component-v2.el-check-tag',
+        'component-v2.no-evidence',
+      ),
+    },
+    comparison,
+  )
+  assert.deepEqual(alignment.stable, ['component-v2.el-check-tag'])
   assert.equal(
     alignment.statuses.find((entry) => entry.id === 'component-v2.no-evidence')
       .status,
     'blocked',
   )
-  assert.throws(
-    () =>
-      deriveAlignment(
-        { contracts },
-        {
-          comparisons: [comparison.comparisons[0], comparison.comparisons[0]],
-        },
-      ),
-    /duplicated in comparison set/u,
+  const noEvidenceGap = alignment.gaps.find(
+    (gap) => gap.contract === 'component-v2.no-evidence',
   )
+  assert.ok(
+    noEvidenceGap.missingArtifacts.includes(
+      'same-identity-cross-platform-comparison',
+    ),
+  )
+  assert.ok(noEvidenceGap.missingArtifacts.includes('required-member-coverage'))
 })
 
-test('alignment blocks an otherwise complete contract with incomplete executed-member coverage', () => {
-  const contract = {
+test('alignment blocks an otherwise complete contract with uncovered members', async () => {
+  const comparison = await validatedRealComparison()
+  const withExtraMember = {
+    ...realCheckTagContract(),
     id: 'component-v2.coverage-required',
-    component: { exportStatus: 'aligned-candidate' },
-    bindings: { avalonia: { status: 'bound' } },
+    coverage: { missing: 0, partial: 0 },
     inputs: [
+      ...realCheckTagContract().inputs,
       {
         name: 'value',
+        kind: 'input',
         status: 'aligned-candidate',
-        scenarioIds: [scenario('coverage-required')],
+        scenarioIds: ['scenario.v2.coverage-required.input.value'],
       },
     ],
-    coverage: { missing: 0, partial: 0 },
+    scenarioIds: [
+      ...realCheckTagContract().scenarioIds,
+      'scenario.v2.coverage-required.input.value',
+    ],
   }
-  const comparison = comparisonFor('coverage-required')
-  const alignment = deriveAlignment({ contracts: [contract] }, comparison)
+  const alignment = deriveAlignment(
+    {
+      contracts: [withExtraMember],
+      consumerBindings: consumerBindingsFor('component-v2.coverage-required'),
+    },
+    comparison,
+  )
   assert.equal(alignment.statuses[0].status, 'blocked')
-  assert.deepEqual(alignment.gaps[0].missingCoverageMembers, [
-    `input:value@${scenario('coverage-required')}`,
-  ])
-  assert.deepEqual(alignment.gaps[0].missingArtifacts, [
-    'required-member-execution-coverage',
-  ])
+  assert.deepEqual(alignment.stable, [])
 })
 
-test('execution coverage rejects absent, metadata-only, forged, and mutated ledgers', () => {
-  const contract = {
-    id: 'component-v2.coverage-integrity',
-    component: { exportStatus: 'aligned-candidate' },
-    bindings: { avalonia: { status: 'bound' } },
-    inputs: [],
-    coverage: { missing: 0, partial: 0 },
-  }
-  const comparison = comparisonFor('coverage-integrity')
-  const derive = (candidate) =>
-    deriveAlignment({ contracts: [contract] }, candidate)
+test('derived alignment re-validates receipt coverage claims against the contract', async () => {
+  const comparison = await validatedRealComparison()
+  const checkTag = realCheckTagContract()
+  const bindings = consumerBindingsFor('component-v2.el-check-tag')
+  const registry = { contracts: [checkTag], consumerBindings: bindings }
+  assert.deepEqual(
+    deriveAlignment(registry, comparison).stable,
+    ['component-v2.el-check-tag'],
+  )
 
-  assert.throws(
-    () => derive({ ...comparison, executionCoverage: undefined }),
-    /executionCoverage\.schema invalid/u,
+  comparison.receipts['component-v2.el-check-tag'].coverage.requiredMembers.push(
+    'input.forged',
   )
   assert.throws(
-    () =>
-      derive({
-        ...comparison,
-        executionCoverage: sealExecutionCoverage({
-          ...comparison.executionCoverage,
-          real: false,
-        }),
-      }),
-    /metadata-only/u,
-  )
-  assert.throws(
-    () =>
-      derive({
-        ...comparison,
-        executionCoverage: sealExecutionCoverage({
-          ...comparison.executionCoverage,
-          identity: { contract: 'component-v2.forged' },
-        }),
-      }),
-    /identity mismatch/u,
-  )
-  assert.throws(
-    () =>
-      derive({
-        ...comparison,
-        executionCoverage: {
-          ...comparison.executionCoverage,
-          records: [
-            {
-              kind: 'input',
-              member: 'forged',
-              scenarioId: 'scenario.v2.forged',
-              webSource: {},
-              avaloniaSource: {},
-            },
-          ],
-        },
-      }),
-    /outputHash invalid/u,
+    () => deriveAlignment(registry, comparison),
+    /coverage\.member\.input\.forged unexpected/u,
   )
 })
 
