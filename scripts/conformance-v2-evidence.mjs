@@ -97,6 +97,17 @@ const writeJson = (file, value) => {
 const fail = (message) => {
   throw new Error(message)
 }
+const executionCoverageWithoutHash = (coverage) => {
+  const { outputHash: _outputHash, ...canonical } = coverage
+  return canonical
+}
+export const executionCoverageHash = (coverage) =>
+  digest(executionCoverageWithoutHash(coverage))
+export const sealExecutionCoverage = (coverage) => ({
+  ...executionCoverageWithoutHash(coverage),
+  outputHash: executionCoverageHash(coverage),
+})
+
 
 export async function loadCurrentCheckTagVisualReview(web, avalonia) {
   const entries = Object.entries(checkTagReviewFiles)

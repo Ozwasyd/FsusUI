@@ -74,12 +74,12 @@ const requestedCaseIds = new Set(
 const cases = [
   {
     id: 'vue-semantic-tsx-discovery-mutated',
-    file: 'scripts/vue-semantic-baseline.mjs',
+    file: 'scripts/avalonia-vue-public-api-baseline.mjs',
     inject: () =>
       mutateText(
-        'scripts/vue-semantic-baseline.mjs',
-        'else if (/\\.(ts|tsx|vue)$/u.test(entry.name)) {',
-        'else if (/\\.(ts|vue)$/u.test(entry.name)) {',
+        'scripts/avalonia-vue-public-api-baseline.mjs',
+        '(file) => /\\.(ts|tsx|vue)$/.test(file)',
+        '(file) => /\\.(ts|vue)$/.test(file)',
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'fixture TSX widget source identity was not exact',
@@ -220,7 +220,9 @@ const cases = [
     expected:
       id === 'consumer-binding-deleted'
         ? 'consumer bindings must bind every exact contract id once'
-        : 'contract-v2.json drifted from generated output',
+        : id === 'consumer-binding-release-family-mutated'
+          ? 'references unknown release family'
+          : 'contract-v2.json drifted from generated output',
   })),
   {
     id: 'stable-readiness-second-scope-authority-mutated',
@@ -436,7 +438,7 @@ const cases = [
         '          DefaultKnown = false,',
       ),
     command: ['pnpm', ['run', 'avalonia:semantic:check']],
-    expected: 'FsusUI.Avalonia.semantic.json drifted',
+    expected: 'defaultKnown',
   },
   {
     id: 'table-v2-input-binding-mutated',
@@ -1229,6 +1231,20 @@ try {
     path.join(root, 'node_modules'),
     path.join(checkout, 'node_modules'),
   )
+  const workspaceNodeModules = fs
+    .readdirSync(path.join(root, 'vue/packages'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join('vue/packages', entry.name, 'node_modules'))
+  if (fs.existsSync(path.join(root, 'vue/node_modules'))) {
+    workspaceNodeModules.unshift(path.join('vue', 'node_modules'))
+  }
+  for (const relative of workspaceNodeModules) {
+    const source = path.join(root, relative)
+    if (!fs.existsSync(source)) continue
+    const target = path.join(checkout, relative)
+    fs.mkdirSync(path.dirname(target), { recursive: true })
+    fs.symlinkSync(source, target)
+  }
   const results = []
   for (const entry of selectedCases) {
     reset()

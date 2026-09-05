@@ -11,6 +11,8 @@ import {
   validateWorkflowContracts,
 } from '../scripts/avalonia-aot-native.mjs'
 import fs from 'node:fs'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 
 const commitSha = 'a'.repeat(40)
 const candidateSha256 = 'b'.repeat(64)
