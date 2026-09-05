@@ -392,6 +392,7 @@ const CLR_TO_CATEGORY = {
   'System.Uri': 'string',
   'System.Guid': 'string',
   'System.Void': 'void',
+  'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'object',
 }
 
 export const categoriesFromClrType = (type) => {

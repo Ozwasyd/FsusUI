@@ -34,7 +34,7 @@
     },
     "semanticMemberBindings": {
       "path": "spec/components/contracts/v2/semantic-member-bindings.json",
-      "hash": "e93b5c79cb20fbc6af16bb8bd868eb3a414405e593dafdc3f16447e4303eddd8"
+      "hash": "f7179eac47e5ce52b97cdbdb1442462b434ffa1cfa65d31eddfc8e8a3595d3ac"
     }
   },
   "rules": {
@@ -122839,11 +122839,28 @@
             "deprecated": false,
             "deprecationMessage": null
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "Overscan",
+            "categories": [
+              "number"
+            ],
+            "type": "System.Int32",
+            "nullable": false,
+            "propertyKind": "styled",
+            "defaultKnown": true,
+            "defaultValue": 2,
+            "required": false,
+            "canRead": true,
+            "canWrite": true,
+            "isStatic": false,
+            "enumValuesKnown": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "status": "partial",
           "drift": {
-            "type": null,
-            "default": null,
+            "type": "web type not comparable to avalonia type",
+            "default": "web default kind missing is not comparable",
             "required": null,
             "readWrite": null,
             "nullability": null,
@@ -122856,8 +122873,10 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.cache"
           ],
+          "semantic": "cache-overload",
+          "bindingBasis": "explicit-semantic",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -123719,6 +123738,8 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.header-height"
           ],
+          "semantic": "header-height",
+          "bindingBasis": "explicit-semantic",
           "governance": {
             "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
@@ -123794,12 +123815,29 @@
             "deprecated": false,
             "deprecationMessage": null
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "ViewportHeight",
+            "categories": [
+              "number"
+            ],
+            "type": "System.Double",
+            "nullable": false,
+            "propertyKind": "clr",
+            "defaultKnown": true,
+            "defaultValue": 480,
+            "required": false,
+            "canRead": true,
+            "canWrite": true,
+            "isStatic": false,
+            "enumValuesKnown": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "status": "partial",
           "drift": {
             "type": null,
-            "default": null,
-            "required": null,
+            "default": "web default kind missing is not comparable",
+            "required": "web required=true vs avalonia required=false",
             "readWrite": null,
             "nullability": null,
             "eventPayload": null,
@@ -123811,8 +123849,10 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.height"
           ],
+          "semantic": "height",
+          "bindingBasis": "explicit-semantic",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -123980,14 +124020,31 @@
             "deprecated": false,
             "deprecationMessage": null
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "ViewportMaxHeight",
+            "categories": [
+              "number"
+            ],
+            "type": "System.Double?",
+            "nullable": true,
+            "propertyKind": "clr",
+            "defaultKnown": false,
+            "defaultValue": null,
+            "required": false,
+            "canRead": true,
+            "canWrite": true,
+            "isStatic": false,
+            "enumValuesKnown": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "status": "partial",
           "drift": {
             "type": null,
-            "default": null,
+            "default": "avalonia default metadata unavailable",
             "required": null,
             "readWrite": null,
-            "nullability": null,
+            "nullability": "web nullable=false vs avalonia nullable=true",
             "eventPayload": null,
             "operationSignature": null,
             "contentRegion": null,
@@ -123997,8 +124054,10 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.max-height"
           ],
+          "semantic": "max-height",
+          "bindingBasis": "explicit-semantic",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -124720,7 +124779,7 @@
           "avalonia": {
             "member": "SortBy",
             "categories": [
-              "FsusTableV2Sort"
+              "object"
             ],
             "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
             "nullable": true,
@@ -124737,7 +124796,7 @@
           },
           "status": "partial",
           "drift": {
-            "type": "web object vs avalonia FsusTableV2Sort",
+            "type": null,
             "default": "avalonia default metadata unavailable",
             "required": null,
             "readWrite": null,
@@ -124783,7 +124842,7 @@
           "avalonia": {
             "member": "SortState",
             "categories": [
-              "FsusTableV2Sort"
+              "object"
             ],
             "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
             "nullable": true,
@@ -124800,7 +124859,7 @@
           },
           "status": "partial",
           "drift": {
-            "type": "web object vs avalonia FsusTableV2Sort",
+            "type": null,
             "default": "avalonia default metadata unavailable",
             "required": null,
             "readWrite": null,
@@ -124981,12 +125040,29 @@
             "deprecated": false,
             "deprecationMessage": null
           },
-          "avalonia": null,
-          "status": "missing",
+          "avalonia": {
+            "member": "ViewportWidth",
+            "categories": [
+              "number"
+            ],
+            "type": "System.Double",
+            "nullable": false,
+            "propertyKind": "clr",
+            "defaultKnown": true,
+            "defaultValue": 960,
+            "required": false,
+            "canRead": true,
+            "canWrite": true,
+            "isStatic": false,
+            "enumValuesKnown": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "status": "partial",
           "drift": {
             "type": null,
-            "default": null,
-            "required": null,
+            "default": "web default kind missing is not comparable",
+            "required": "web required=true vs avalonia required=false",
             "readWrite": null,
             "nullability": null,
             "eventPayload": null,
@@ -124998,8 +125074,10 @@
           "scenarioIds": [
             "scenario.v2.el-table-v2.input.width"
           ],
+          "semantic": "width",
+          "bindingBasis": "explicit-semantic",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -125288,9 +125366,9 @@
         {
           "member": "cache",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -125475,9 +125553,9 @@
         {
           "member": "height",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -125519,9 +125597,9 @@
         {
           "member": "maxHeight",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -125717,9 +125795,9 @@
         {
           "member": "width",
           "kind": "input",
-          "status": "missing",
+          "status": "partial",
           "governance": {
-            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "reason": "Real member exists on both sides but semantic drift was detected.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -126263,21 +126341,6 @@
           ]
         },
         {
-          "member": "Overscan",
-          "kind": "avalonia-extra",
-          "surfaceKind": "property",
-          "surfaceHash": "6a7c70ac6c3913e13c6ca2c6c014c4ef6bf55069956b7ca671aef49c98623d30",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-table-v2.avalonia-extra.overscan"
-          ]
-        },
-        {
           "member": "RealizedCellCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -126578,51 +126641,6 @@
           ]
         },
         {
-          "member": "ViewportHeight",
-          "kind": "avalonia-extra",
-          "surfaceKind": "property",
-          "surfaceHash": "7271c389fb01adb339eeee093a059477c95a2dc8f452eb18b32d87c79fa87abb",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-table-v2.avalonia-extra.viewport-height"
-          ]
-        },
-        {
-          "member": "ViewportMaxHeight",
-          "kind": "avalonia-extra",
-          "surfaceKind": "property",
-          "surfaceHash": "316ac5f161da22acaaf78442f0a0442a392f7aa318c4aabcee4af566d119470f",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-table-v2.avalonia-extra.viewport-max-height"
-          ]
-        },
-        {
-          "member": "ViewportWidth",
-          "kind": "avalonia-extra",
-          "surfaceKind": "property",
-          "surfaceHash": "9131d59064c8216fca1685dc74592aa699c3f521ea513c12423848b5a3a0a8b3",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-table-v2.avalonia-extra.viewport-width"
-          ]
-        },
-        {
           "member": "VirtualizationBudget",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -126710,10 +126728,10 @@
       "coverage": {
         "total": 45,
         "alignedCandidate": 0,
-        "partial": 24,
-        "missing": 21,
+        "partial": 28,
+        "missing": 17,
         "webOnly": 0,
-        "mappedPercent": 53.3
+        "mappedPercent": 62.2
       }
     },
     {
@@ -176977,7 +176995,7 @@
           "avalonia": {
             "member": "SortBy",
             "categories": [
-              "FsusTableV2Sort"
+              "object"
             ],
             "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
             "nullable": true,
@@ -176994,7 +177012,7 @@
           },
           "status": "partial",
           "drift": {
-            "type": "web object vs avalonia FsusTableV2Sort",
+            "type": null,
             "default": "avalonia default metadata unavailable",
             "required": null,
             "readWrite": null,
@@ -177040,7 +177058,7 @@
           "avalonia": {
             "member": "SortState",
             "categories": [
-              "FsusTableV2Sort"
+              "object"
             ],
             "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
             "nullable": true,
@@ -177057,7 +177075,7 @@
           },
           "status": "partial",
           "drift": {
-            "type": "web object vs avalonia FsusTableV2Sort",
+            "type": null,
             "default": "avalonia default metadata unavailable",
             "required": null,
             "readWrite": null,
@@ -189078,10 +189096,10 @@
   },
   "coverage": {
     "aligned-candidate": 17,
-    "partial": 187,
-    "missing": 2189,
+    "partial": 191,
+    "missing": 2185,
     "web-only": 62,
     "total": 2455,
-    "mappedPercent": 8.3
+    "mappedPercent": 8.5
   }
 }

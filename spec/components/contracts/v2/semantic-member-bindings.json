@@ -142,6 +142,41 @@
       "kind": "output",
       "web": "transaction",
       "avalonia": "Transaction"
+    },
+    {
+      "component": "ElTableV2",
+      "semantic": "cache-overload",
+      "kind": "input",
+      "web": "cache",
+      "avalonia": "Overscan"
+    },
+    {
+      "component": "ElTableV2",
+      "semantic": "header-height",
+      "kind": "input",
+      "web": "headerHeight",
+      "avalonia": "HeaderHeight"
+    },
+    {
+      "component": "ElTableV2",
+      "semantic": "height",
+      "kind": "input",
+      "web": "height",
+      "avalonia": "ViewportHeight"
+    },
+    {
+      "component": "ElTableV2",
+      "semantic": "max-height",
+      "kind": "input",
+      "web": "maxHeight",
+      "avalonia": "ViewportMaxHeight"
+    },
+    {
+      "component": "ElTableV2",
+      "semantic": "width",
+      "kind": "input",
+      "web": "width",
+      "avalonia": "ViewportWidth"
     }
   ],
   "dispositions": [

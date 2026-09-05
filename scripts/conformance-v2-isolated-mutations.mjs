@@ -114,11 +114,15 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/vue-semantic-baseline.mjs',
-        'const resolvedNode = unwrapExpression(resolved?.node)',
-        'const resolvedNode = resolved?.node',
+        `        if (resolved?.node?.type === 'ObjectExpression') {
+          result.push(...this.parseBuildPropsObject(resolved.node))
+        }`,
+        `        if (resolved?.node?.type === 'MissingObjectExpression') {
+          result.push(...this.parseBuildPropsObject(resolved.node))
+        }`,
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
-    expected: 'Avalonia Vue public API baseline is stale',
+    expected: 'fixture TSX widget imported prop label was not extracted',
   },
   {
     id: 'vue-semantic-member-descriptor-mutated',
@@ -126,8 +130,8 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/vue-semantic-baseline.mjs',
-        "['MemberExpression', 'OptionalMemberExpression'].includes(valueNode.type)",
-        "['MissingMemberExpression'].includes(valueNode.type)",
+        'const sub = this.parseFromNode(resolved.node, name, resolved.relPath)',
+        'const sub = null && this.parseFromNode(resolved.node, name, resolved.relPath)',
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'Avalonia Vue public API baseline is stale',
@@ -138,11 +142,11 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/vue-semantic-baseline.mjs',
-        "if (node.type === 'Identifier') {\n      const source =",
-        "if (node.type === 'MissingIdentifier') {\n      const source =",
+        "if (unwrapped.type === 'Identifier') {",
+        "if (unwrapped.type === 'MissingIdentifier') {",
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
-    expected: 'Avalonia Vue public API baseline is stale',
+    expected: 'fixture TSX widget imported prop count was not extracted',
   },
   {
     id: 'vue-public-alias-mutated',
@@ -436,36 +440,36 @@ const cases = [
   },
   {
     id: 'table-v2-input-binding-mutated',
-    file: 'scripts/contract-v2.mjs',
+    file: 'spec/components/contracts/v2/contract-v2.json',
     inject: () =>
       mutateText(
-        'scripts/contract-v2.mjs',
-        "height: { member: 'ViewportHeight' },",
-        "height: { member: 'ViewportMissing' },",
+        'spec/components/contracts/v2/contract-v2.json',
+        '"member": "ViewportHeight"',
+        '"member": "ViewportMissing"',
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
   },
   {
     id: 'table-v2-header-height-binding-mutated',
-    file: 'scripts/contract-v2.mjs',
+    file: 'spec/components/contracts/v2/contract-v2.json',
     inject: () =>
       mutateText(
-        'scripts/contract-v2.mjs',
-        "        member: 'HeaderHeight',",
-        "        member: 'HeaderHeightMissing',",
+        'spec/components/contracts/v2/contract-v2.json',
+        '"member": "HeaderHeight"',
+        '"member": "HeaderHeightMissing"',
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
   },
   {
     id: 'table-v2-header-height-alternate-mutated',
-    file: 'scripts/contract-v2.mjs',
+    file: 'spec/components/contracts/v2/semantic-member-bindings.json',
     inject: () =>
       mutateText(
-        'scripts/contract-v2.mjs',
-        "        alternateMembers: ['HeaderHeights'],",
-        '        alternateMembers: [],',
+        'spec/components/contracts/v2/semantic-member-bindings.json',
+        '"avalonia": "HeaderHeight"',
+        '"avalonia": "HeaderHeights"',
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
@@ -476,8 +480,8 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/vue-semantic-baseline.mjs',
-        '        slot.payload = payload\n',
-        '        slot.payload = []\n',
+        '        payload.push({\n          name: property.arg.content,',
+        "        payload.push({\n          name: 'mutated-slot-field',",
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'Avalonia Vue public API baseline is stale',
@@ -883,7 +887,7 @@ const cases = [
     ],
     [
       'avalonia-unmapped-public-member',
-      'public class FsusMarkdownEditor : TemplatedControl\n{',
+      'public partial class FsusMarkdownEditor : TemplatedControl\n{',
     ],
   ].map(([id, locator]) => ({
     id,
