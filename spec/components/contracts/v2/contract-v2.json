@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "3caaa995f518dfa39cbc2d3a4e00707c21db5fac209b16810e97bcbc217d8f62",
+      "hash": "5b2db8e8669ce86c44a8264126b198c703ec159356e467775826f99647ba3068",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -21215,10 +21215,16 @@
                 "name": "value",
                 "type": "boolean",
                 "optional": false,
-                "rest": false
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "unknown",
+                  "type": "boolean",
+                  "reason": "framework or unresolved payload type"
+                }
               }
             ],
-            "payloadShapeStatus": null,
+            "payloadShapeStatus": "callable",
             "payloadShapeReason": null
           },
           "avalonia": {
@@ -21272,10 +21278,16 @@
                 "name": "value",
                 "type": "boolean",
                 "optional": false,
-                "rest": false
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "unknown",
+                  "type": "boolean",
+                  "reason": "framework or unresolved payload type"
+                }
               }
             ],
-            "payloadShapeStatus": null,
+            "payloadShapeStatus": "callable",
             "payloadShapeReason": null
           },
           "avalonia": {

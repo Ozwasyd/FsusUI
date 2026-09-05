@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "fca8406dd98a6d24f3ca9575c6577b8bbfa2c0c0",
+    "commitSha": "b3b543c27c4c0fc50b4425c773df29ed83e01015",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
@@ -10,9 +10,9 @@
     "inputTreeHash": "8f3772cc51d36040782dd8da602bba89f96d4aee7ee55757e37cfdc521096198",
     "compilerOptionsHash": "919b1f4f85e411ccb762efdc5a2d646f412fd73928c05ad302bbfdda0ab731e4",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
-    "structuredOutputSelectionHash": "7766081d12b6608e10d05140d5842841ad32fc86691fec8728a43eb16a363e86",
+    "structuredOutputSelectionHash": "89b32af9989fe158907d999ffe574d1e080dcddd71beb213eb6fb504f8220e01",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "430f16f8dc19333079661403fb571e0574ca98c6c74728f300b2420c189c58bb"
+    "outputHash": "619054319de5018d82cc78b2f5e4bbceb1e437a22681f7a32b360eaf4a868482"
   },
   "summary": {
     "componentModules": 93,
@@ -5307,9 +5307,17 @@
                 "name": "value",
                 "type": "boolean",
                 "optional": false,
-                "rest": false
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "unknown",
+                  "type": "boolean",
+                  "reason": "framework or unresolved payload type"
+                }
               }
-            ]
+            ],
+            "payloadShapeStatus": "callable",
+            "payloadShapeReason": null
           },
           {
             "name": "update:checked",
@@ -5318,9 +5326,17 @@
                 "name": "value",
                 "type": "boolean",
                 "optional": false,
-                "rest": false
+                "rest": false,
+                "nullable": false,
+                "shape": {
+                  "kind": "unknown",
+                  "type": "boolean",
+                  "reason": "framework or unresolved payload type"
+                }
               }
-            ]
+            ],
+            "payloadShapeStatus": "callable",
+            "payloadShapeReason": null
           }
         ],
         "exposed": [],
