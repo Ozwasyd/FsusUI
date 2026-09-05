@@ -91,10 +91,6 @@
       "role": "none",
       "states.invalid": null
     },
-    "dialog-confirm": {
-      "role": "group",
-      "states.expanded": null
-    },
     "tabs-main": {
       "states.selected": null
     },
@@ -107,30 +103,6 @@
     },
     "menu-stable23": {
       "states.selected": null,
-      "states.expanded": null
-    },
-    "dialog-stable24": {
-      "role": "group",
-      "states.expanded": null
-    },
-    "drawer-stable24": {
-      "role": "pane",
-      "states.expanded": null
-    },
-    "message-box-stable24": {
-      "role": "group",
-      "states.expanded": null
-    },
-    "tooltip-stable25": {
-      "role": "text",
-      "states.expanded": null
-    },
-    "popover-stable25": {
-      "role": "group",
-      "states.expanded": null
-    },
-    "popconfirm-stable25": {
-      "role": "group",
       "states.expanded": null
     },
     "dropdown-stable25": {

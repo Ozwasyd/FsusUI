@@ -400,12 +400,12 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 403)
+  assert.equal(mappings.length, 406)
   assert.deepEqual(semanticCounts, {
     role: 106,
     name: 123,
     value: 4,
-    state: 111,
+    state: 114,
     'help-text': 25,
     'accessibility-view': 22,
     'live-setting': 12,
@@ -418,7 +418,7 @@ test('Avalonia automation baseline separates source observations from declared a
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'automation-peer-owner')
       .length,
-    21,
+    24,
   )
   assert.ok(
     automationTypes.every(
@@ -515,6 +515,53 @@ test('Avalonia automation baseline separates source observations from declared a
         ),
     ),
   )
+  const modalSurface = automationTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusModalSurface',
+  )
+  assert.ok(
+    modalSurface.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'role' &&
+        mapping.provider === 'AutomationProperties.SetControlTypeOverride' &&
+        mapping.valueKnown === true &&
+        mapping.value === 'Window',
+    ),
+  )
+  assert.ok(
+    modalSurface.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'state' &&
+        mapping.provider ===
+          'Avalonia.Automation.Provider.IExpandCollapseProvider.ExpandCollapseState' &&
+        mapping.valueExpression.includes('owner.IsOpen') &&
+        mapping.publicDependencies.includes(
+          'FsusUI.Avalonia.Controls.FsusModalSurface.IsOpen',
+        ),
+    ),
+  )
+  for (const [typeName, role] of [
+    ['FsusUI.Avalonia.Controls.FsusTooltip', 'ToolTip'],
+    ['FsusUI.Avalonia.Controls.FsusPopover', 'Window'],
+  ]) {
+    const overlay = automationTypes.find((type) => type.name === typeName)
+    assert.ok(
+      overlay.automationContract.mappings.some(
+        (mapping) =>
+          mapping.semantic === 'role' &&
+          mapping.valueKnown === true &&
+          mapping.value === role,
+      ),
+    )
+    assert.ok(
+      overlay.automationContract.mappings.some(
+        (mapping) =>
+          mapping.semantic === 'state' &&
+          mapping.provider ===
+            'Avalonia.Automation.Provider.IExpandCollapseProvider.ExpandCollapseState' &&
+          mapping.valueExpression === 'owner.AutomationExpandCollapseState',
+      ),
+    )
+  }
 })
 
 test('automation mutations invalidate independent Contract V2 identities without changing derived status', () => {
@@ -539,6 +586,34 @@ test('automation mutations invalidate independent Contract V2 identities without
   assert.match(
     errors,
     /component-v2\.el-slider has stale Avalonia automation contract binding/,
+  )
+
+  const changedOverlayBaselines = clone(avaloniaBaselines)
+  const changedPopover = changedOverlayBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusPopover',
+  )
+  const currentPopoverFingerprint =
+    avaloniaAutomationContractFingerprint(changedPopover)
+  changedPopover.automationContract.mappings.find(
+    (mapping) =>
+      mapping.provider ===
+      'Avalonia.Automation.Provider.IExpandCollapseProvider.ExpandCollapseState',
+  ).valueExpression = 'ExpandCollapseState.Collapsed'
+  assert.notEqual(
+    avaloniaAutomationContractFingerprint(changedPopover),
+    currentPopoverFingerprint,
+  )
+  const overlayErrors = validateAvaloniaSurfaceRegistration({
+    registry: committedRegistry,
+    avaloniaBaselines: changedOverlayBaselines,
+  }).errors.join('\n')
+  assert.match(
+    overlayErrors,
+    /ElPopover.*has stale automation contract fingerprint/,
+  )
+  assert.match(
+    overlayErrors,
+    /component-v2\.el-popover has stale Avalonia automation contract binding/,
   )
 
   const deletedIdentity = clone(committedRegistry)

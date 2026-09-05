@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "4d15b4d2a8fb74b0bc832738c7bf7d0efcfc313d03c07fb028dbac31984411b8",
+    "inputTreeHash": "76e31f146aa78aea46274c71a74ba3354e3d31271c4ea19f913a7d7a5aff5a67",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "868d94a7455800354183e4cc14240a2b5cd872ecd20550808a2fd5433a4e3f33"
+    "outputHash": "22429de21af08de6f0d01856fde157fc4f469d06d197659e141ce39324649020"
   },
   "semanticTypes": [
     {
@@ -16617,7 +16617,7 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": true,
-            "value": "Pane",
+            "value": "Window",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusDrawer..ctor"
           },
@@ -16628,7 +16628,7 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": true,
-            "value": "Pane",
+            "value": "Window",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusDrawer.SyncState"
           }
@@ -33405,7 +33405,8 @@
       },
       "automationContract": {
         "observationAuthorities": [
-          "roslyn-automation-attached-property-write"
+          "roslyn-automation-attached-property-write",
+          "roslyn-automation-provider-interface"
         ],
         "contractDeclared": false,
         "runtimeTreeVerified": false,
@@ -33450,7 +33451,7 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": true,
-            "value": "Group",
+            "value": "Window",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusModalSurface.SyncState"
           },
@@ -33464,6 +33465,19 @@
             "valueExpression": "ModalStatus()",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusModalSurface.SyncState"
+          },
+          {
+            "semantic": "state",
+            "provider": "Avalonia.Automation.Provider.IExpandCollapseProvider.ExpandCollapseState",
+            "authority": "roslyn-automation-provider-interface",
+            "targetKind": "automation-peer-owner",
+            "targetExpression": "OnCreateAutomationPeer:this",
+            "valueKnown": false,
+            "valueExpression": "owner.IsOpen ? ExpandCollapseState.Expanded : ExpandCollapseState.Collapsed",
+            "publicDependencies": [
+              "FsusUI.Avalonia.Controls.FsusModalSurface.IsOpen"
+            ],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusModalSurface\u002BFsusModalSurfaceAutomationPeer.ExpandCollapseState"
           }
         ]
       },
@@ -38401,13 +38415,15 @@
       "avaloniaProperties": [],
       "automationContract": {
         "observationAuthorities": [
-          "roslyn-automation-attached-property-write"
+          "roslyn-automation-attached-property-write",
+          "roslyn-automation-provider-interface"
         ],
         "contractDeclared": false,
         "runtimeTreeVerified": false,
         "mappingComplete": false,
         "observedSemantics": [
-          "role"
+          "role",
+          "state"
         ],
         "mappings": [
           {
@@ -38417,7 +38433,7 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": true,
-            "value": "Group",
+            "value": "Window",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusPopover..ctor"
           },
@@ -38428,9 +38444,20 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": true,
-            "value": "Group",
+            "value": "Window",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusPopover.SyncState"
+          },
+          {
+            "semantic": "state",
+            "provider": "Avalonia.Automation.Provider.IExpandCollapseProvider.ExpandCollapseState",
+            "authority": "roslyn-automation-provider-interface",
+            "targetKind": "automation-peer-owner",
+            "targetExpression": "OnCreateAutomationPeer:this",
+            "valueKnown": false,
+            "valueExpression": "owner.AutomationExpandCollapseState",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusPopover\u002BFsusPopoverAutomationPeer.ExpandCollapseState"
           }
         ]
       },
@@ -52216,13 +52243,15 @@
       "avaloniaProperties": [],
       "automationContract": {
         "observationAuthorities": [
-          "roslyn-automation-attached-property-write"
+          "roslyn-automation-attached-property-write",
+          "roslyn-automation-provider-interface"
         ],
         "contractDeclared": false,
         "runtimeTreeVerified": false,
         "mappingComplete": false,
         "observedSemantics": [
-          "role"
+          "role",
+          "state"
         ],
         "mappings": [
           {
@@ -52232,7 +52261,7 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": true,
-            "value": "Text",
+            "value": "ToolTip",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusTooltip..ctor"
           },
@@ -52243,9 +52272,20 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": true,
-            "value": "Text",
+            "value": "ToolTip",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusTooltip.SyncState"
+          },
+          {
+            "semantic": "state",
+            "provider": "Avalonia.Automation.Provider.IExpandCollapseProvider.ExpandCollapseState",
+            "authority": "roslyn-automation-provider-interface",
+            "targetKind": "automation-peer-owner",
+            "targetExpression": "OnCreateAutomationPeer:this",
+            "valueKnown": false,
+            "valueExpression": "owner.AutomationExpandCollapseState",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTooltip\u002BFsusTooltipAutomationPeer.ExpandCollapseState"
           }
         ]
       },

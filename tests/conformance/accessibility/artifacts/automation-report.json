@@ -12,7 +12,7 @@
     },
     {
       "path": "tests/conformance/accessibility/avalonia-runtime-scenarios.json",
-      "sha256": "f94860f55577f80c4c3557a69b6c0dc039e63583f4d9ea9bd8fdb64eff827f2d"
+      "sha256": "5ab72ad318b284c447024344d6e24265529b0c9f0f40d87f00f266ab1e74056a"
     }
   ],
   "requiredContractFields": [
@@ -1247,26 +1247,7 @@
       "factory": "FsusDialog",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "dialog-confirm",
-          "field": "role",
-          "observed": "group",
-          "reason": "The current FsusDialog AutomationPeer exposes \"group\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "dialog-confirm",
-          "field": "states.expanded",
-          "observed": null,
-          "reason": "The current FsusDialog AutomationPeer does not expose states.expanded.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -1458,26 +1439,7 @@
       "factory": "FsusDialog",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "dialog-stable24",
-          "field": "role",
-          "observed": "group",
-          "reason": "The current FsusDialog AutomationPeer exposes \"group\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "dialog-stable24",
-          "field": "states.expanded",
-          "observed": null,
-          "reason": "The current FsusDialog AutomationPeer does not expose states.expanded.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -1493,26 +1455,7 @@
       "factory": "FsusDrawer",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "drawer-stable24",
-          "field": "role",
-          "observed": "pane",
-          "reason": "The current FsusDrawer AutomationPeer exposes \"pane\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "drawer-stable24",
-          "field": "states.expanded",
-          "observed": null,
-          "reason": "The current FsusDrawer AutomationPeer does not expose states.expanded.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -1528,26 +1471,7 @@
       "factory": "FsusMessageBox",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "message-box-stable24",
-          "field": "role",
-          "observed": "group",
-          "reason": "The current FsusMessageBox AutomationPeer exposes \"group\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "message-box-stable24",
-          "field": "states.expanded",
-          "observed": null,
-          "reason": "The current FsusMessageBox AutomationPeer does not expose states.expanded.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -1563,26 +1487,7 @@
       "factory": "FsusTooltip",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "tooltip-stable25",
-          "field": "role",
-          "observed": "text",
-          "reason": "The current FsusTooltip AutomationPeer exposes \"text\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "tooltip-stable25",
-          "field": "states.expanded",
-          "observed": null,
-          "reason": "The current FsusTooltip AutomationPeer does not expose states.expanded.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -1598,26 +1503,7 @@
       "factory": "FsusPopover",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "popover-stable25",
-          "field": "role",
-          "observed": "group",
-          "reason": "The current FsusPopover AutomationPeer exposes \"group\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "popover-stable25",
-          "field": "states.expanded",
-          "observed": null,
-          "reason": "The current FsusPopover AutomationPeer does not expose states.expanded.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -1633,26 +1519,7 @@
       "factory": "FsusPopconfirm",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "popconfirm-stable25",
-          "field": "role",
-          "observed": "group",
-          "reason": "The current FsusPopconfirm AutomationPeer exposes \"group\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "popconfirm-stable25",
-          "field": "states.expanded",
-          "observed": null,
-          "reason": "The current FsusPopconfirm AutomationPeer does not expose states.expanded.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,

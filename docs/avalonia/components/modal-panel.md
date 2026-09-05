@@ -20,6 +20,14 @@ presentation and suppresses the semantic template. `OpenDialog` centers the
 surface in the overlay viewport, and every modal entry renders a scrim behind
 the content.
 
+## Automation
+
+`FsusDialog`, `FsusDrawer`, and `FsusMessageBox` expose an automation window
+role while they are mounted in the overlay host. Their expand/collapse provider
+reports the live `IsOpen` state and routes collapse and reopen requests through
+the same host lifecycle, close policy, and `BeforeClose` guard as public
+application actions.
+
 ## Vue Contract Mapping
 
 Vue dialog, drawer, and message-box props map to public content, title, close
@@ -57,4 +65,5 @@ var semanticDialog = new FsusDialog
 ## Known Limitations
 
 The service requires an app-owned overlay host; it does not create an implicit
-global DOM-style overlay root.
+global DOM-style overlay root. An automation peer cannot reopen a surface after
+its lifecycle host has been collected.

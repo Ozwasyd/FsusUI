@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
@@ -34,7 +35,9 @@ public class FsusAnchoredOverlayPrimitiveTests
     Assert.True(tooltip.IsOpen);
     Assert.Contains("fsus-tooltip", tooltip.Classes);
     Assert.Equal("Publish help", AutomationProperties.GetName(tooltip));
-    Assert.Equal(AutomationControlType.Text, AutomationProperties.GetControlTypeOverride(tooltip));
+    Assert.Equal(
+      AutomationControlType.ToolTip,
+      AutomationProperties.GetControlTypeOverride(tooltip));
     Assert.Equal("open top-start", AutomationProperties.GetItemStatus(tooltip));
 
     Assert.True(await tooltip.PressAsync(Key.Escape));
@@ -51,7 +54,9 @@ public class FsusAnchoredOverlayPrimitiveTests
     popover.TriggerClick(host);
 
     Assert.True(popover.IsOpen);
-    Assert.Equal(AutomationControlType.Group, AutomationProperties.GetControlTypeOverride(popover));
+    Assert.Equal(
+      AutomationControlType.Window,
+      AutomationProperties.GetControlTypeOverride(popover));
     Assert.Equal("Popover", AutomationProperties.GetClassNameOverride(popover));
 
     Assert.True(await popover.PressAsync(Key.Escape));
@@ -74,10 +79,22 @@ public class FsusAnchoredOverlayPrimitiveTests
 
     Assert.True(popconfirm.IsOpen);
     Assert.Contains("fsus-dangerous", popconfirm.Classes);
+    var popconfirmPeer = ControlAutomationPeer.CreatePeerForElement(popconfirm);
+    var popconfirmProvider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+      popconfirmPeer?.GetProvider<IExpandCollapseProvider>());
+    Assert.Equal(
+      AutomationControlType.Window,
+      popconfirmPeer?.GetAutomationControlType());
+    Assert.Equal(
+      ExpandCollapseState.Expanded,
+      popconfirmProvider.ExpandCollapseState);
     Assert.True(await popconfirm.ConfirmAsync());
     Assert.Equal(1, confirmed);
     Assert.Equal(0, canceled);
     Assert.False(popconfirm.IsOpen);
+    Assert.Equal(
+      ExpandCollapseState.Collapsed,
+      popconfirmProvider.ExpandCollapseState);
   }
 
   [Fact]
@@ -117,6 +134,64 @@ public class FsusAnchoredOverlayPrimitiveTests
 
     Assert.False(await dropdown.PressAsync(Key.Enter, host));
     Assert.False(dropdown.IsOpen);
+  }
+
+  [Fact]
+  public void AnchoredOverlayAutomationPeersExposeRoleAndRealLifecycleState()
+  {
+    var host = new FsusOverlayHost();
+    var tooltip = new FsusTooltip
+    {
+      AccessibleName = "Publish help",
+      OverlayContent = "Publishes the draft.",
+    };
+    tooltip.Open(host);
+    var tooltipPeer = ControlAutomationPeer.CreatePeerForElement(tooltip);
+    var tooltipProvider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+      tooltipPeer?.GetProvider<IExpandCollapseProvider>());
+
+    Assert.Equal(
+      AutomationControlType.ToolTip,
+      tooltipPeer?.GetAutomationControlType());
+    Assert.Equal(
+      ExpandCollapseState.Expanded,
+      tooltipProvider.ExpandCollapseState);
+
+    tooltipProvider.Collapse();
+    Assert.False(tooltip.IsOpen);
+    Assert.Equal(
+      ExpandCollapseState.Collapsed,
+      tooltipProvider.ExpandCollapseState);
+
+    tooltipProvider.Expand();
+    Assert.True(tooltip.IsOpen);
+
+    tooltipProvider.Collapse();
+    tooltip.IsDisabled = true;
+    Assert.Throws<InvalidOperationException>(tooltipProvider.Expand);
+    Assert.False(tooltip.IsOpen);
+
+    var popover = new FsusPopover
+    {
+      AccessibleName = "Publish settings",
+      OverlayContent = "Audience and schedule",
+    };
+    popover.Open(host);
+    var popoverPeer = ControlAutomationPeer.CreatePeerForElement(popover);
+    var popoverProvider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+      popoverPeer?.GetProvider<IExpandCollapseProvider>());
+
+    Assert.Equal(
+      AutomationControlType.Window,
+      popoverPeer?.GetAutomationControlType());
+    Assert.Equal(
+      ExpandCollapseState.Expanded,
+      popoverProvider.ExpandCollapseState);
+
+    popoverProvider.Collapse();
+    Assert.False(popover.IsOpen);
+    popoverProvider.Expand();
+    Assert.True(popover.IsOpen);
   }
 
   [Fact]

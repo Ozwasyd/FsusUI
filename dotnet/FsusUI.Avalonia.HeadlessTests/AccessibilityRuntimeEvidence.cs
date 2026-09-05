@@ -14,6 +14,7 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
+using FsusUI.Avalonia.Overlay;
 using FsusUI.Avalonia.Themes;
 
 namespace FsusUI.Avalonia.HeadlessTests.Generated;
@@ -164,11 +165,12 @@ internal static class AccessibilityRuntimeEvidence
     List<string> assertionErrors)
   {
     var control = CreateControl(scenario);
+    var presentationRoot = PreparePresentationRoot(control);
     var window = new Window
     {
       Content = new Border
       {
-        Child = control,
+        Child = presentationRoot,
         Padding = new Thickness(12),
       },
       Height = 240,
@@ -381,6 +383,11 @@ internal static class AccessibilityRuntimeEvidence
     {
       alert.Content = scenario.Value ?? scenario.AccessibleName;
     }
+    if (control is FsusAnchoredOverlaySurface anchoredOverlay)
+    {
+      anchoredOverlay.AccessibleName = scenario.AccessibleName;
+      anchoredOverlay.OverlayContent = scenario.AccessibleName;
+    }
     if (control is FsusTextViewer textViewer)
     {
       textViewer.AccessibleName = scenario.AccessibleName;
@@ -406,6 +413,26 @@ internal static class AccessibilityRuntimeEvidence
     }
     control.IsEnabled = scenario.Disabled != true;
     control.TabIndex = scenario.TabOrder;
+    return control;
+  }
+
+  private static Control PreparePresentationRoot(Control control)
+  {
+    if (control is FsusModalSurface modalSurface)
+    {
+      var host = new FsusOverlayHost();
+      modalSurface.Open(host);
+      return host;
+    }
+
+    if (control is FsusAnchoredOverlaySurface anchoredOverlay)
+    {
+      var host = new FsusOverlayHost();
+      anchoredOverlay.TriggerMode = FsusAnchoredTriggerMode.Manual;
+      anchoredOverlay.Open(host, FsusAnchoredOpenReason.Manual);
+      return host;
+    }
+
     return control;
   }
 
@@ -649,6 +676,7 @@ internal static class AccessibilityRuntimeEvidence
   private static string NormalizeRole(AccessibilityNode node) =>
     (node.Role, node.ClassName, node.LiveRegion) switch
     {
+      ("window", _, _) => "dialog",
       ("text", "Alert", "assertive") => "alert",
       ("text", "Document", _) => "document",
       _ => node.Role,
