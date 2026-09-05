@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "fb4cbe20418193b2fba1dda541770a2053c7ba6609292f01346b85d397cdb389",
-  "candidateSha": "aad8470a31cf5bf14930e7d617e8961ded8080d5",
-  "candidateDigest": "e3f602910e02c53365159b7f55e82059d7bd946f72dfea8252f6e8f0f474420a",
+  "classificationReceiptDigest": "f5862b0c197ea2da712b3d162295cded7e318df3b89d86190b4e57d0cbf421d7",
+  "candidateSha": "04d3047086856dfb5c1d40ccb0000d9666c659ff",
+  "candidateDigest": "b8b8574bc9d48c11c7a208020c4262e7d1b8a3dda7ef66c884a7fb1a96714dc9",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,9 +13,9 @@
     "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
     "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
   ],
-  "activeBaselineIdentityDigest": "0020e5e19da7bfbfdc6740b3fe3cdd6b4bf4e041b87db0b93082942eb095b209",
+  "activeBaselineIdentityDigest": "82013e711eead37cce082cac021f1eaf06ef3a09638ad08f532926fe9e8c515c",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "ca9d7e0a45ac797a4b6870736e72f505c308cd4d7256d1bee41da7eb8c03b49e",
+  "independenceEvidenceDigest": "5dbf6b93027a3c572f4311e145335ee0233065a13969fbeccd5ea53ac6e53b88",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -40,7 +40,7 @@
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127"
+      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -56,12 +56,12 @@
       "id": "check-tag-avalonia-focused-unchecked",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127",
+      "digest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "c82bd35aaf359aaf37ab7fedaea9e7d74d8712d14aadde8ea67ea624ebe92302"
+  "receiptDigest": "a3fdec14c62ec117fa464a712c070a165b6e618bab8f0bed4444fb5fed5e2aa7"
 }

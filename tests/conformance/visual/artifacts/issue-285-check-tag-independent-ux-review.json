@@ -1,19 +1,19 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "aad8470a31cf5bf14930e7d617e8961ded8080d5",
+  "candidateSha": "04d3047086856dfb5c1d40ccb0000d9666c659ff",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-aad8470a31cf5bf14930e7d617e8961ded8080d5",
+    "executionId": "conformance-v2-check-tag-04d3047086856dfb5c1d40ccb0000d9666c659ff",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "997ec9dc76d3cf80ee9644d88c7ad66abcc3efd3df02f856610a7c95c1cfcea9",
-    "webBaselineHash": "cef0d3092f35b1682d195b06f695b355858c69a23763bf29d22d3defa48485e9",
-    "avaloniaBaselineHash": "f1572e7f281431ae545347ec8422d75d9a08535a26b6ba37a403b72a946352d6",
-    "runnerHash": "733c694c9bc23466090e070303ec97f092f89c11773847453411691119697ef8"
+    "contractHash": "7c34c190ddb173416879bad7627bcc51be7b71ccc439af1f32331d93f28cef2d",
+    "webBaselineHash": "487e4ae48bb4e3d6b2812451a425d904379c00ce3188bce7696138d5a2d1d07b",
+    "avaloniaBaselineHash": "e2a87507078fb78cb1da39622a8db7fd3e3b3c9874e3f2a03c6210224fe4eed8",
+    "runnerHash": "5dda002fd72dee663f307a3334c5104130ccedeb09b6482a5ff26c254bdb99e3"
   },
   "viewportStateMatrix": [
     {
@@ -54,7 +54,7 @@
         "automation-peer",
         "reduced-motion"
       ],
-      "evidenceDigest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127"
+      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -75,8 +75,8 @@
       "platform": "avalonia",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127",
-      "bytes": 9690,
+      "digest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b",
+      "bytes": 10049,
       "width": 960,
       "height": 720,
       "inspected": true,
