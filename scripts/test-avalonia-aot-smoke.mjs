@@ -123,7 +123,7 @@ const globalPackagesOutput = execute(
 const globalPackages = realpathSync(
   globalPackagesOutput.slice(globalPackagesOutput.indexOf(':') + 1).trim(),
 )
-const fsusUiCandidatePackagePattern =
+const candidatePackagePattern =
   /^fsusui\.avalonia(?:\.themes|\.icons)?\..*\.nupkg$/iu
 const seedLocalFeed = (
   directory,
@@ -137,13 +137,13 @@ const seedLocalFeed = (
       entry.isFile() &&
       entry.name.endsWith('.nupkg') &&
       (includeCandidatePackages ||
-        !fsusUiCandidatePackagePattern.test(entry.name))
+        !candidatePackagePattern.test(entry.name))
     ) {
       copyFileSync(candidate, path.join(feed, entry.name))
     }
   }
 }
-seedLocalFeed(globalPackages)
+seedLocalFeed(globalPackages, { includeCandidatePackages: false })
 
 const systemDotnet = realpathSync(
   execute('sh', ['-c', 'command -v dotnet'], {

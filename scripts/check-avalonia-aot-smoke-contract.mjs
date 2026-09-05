@@ -162,7 +162,7 @@ requireMatch(
 )
 requireMatch(
   runner,
-  /includeCandidatePackages\s*\|\|\s*!fsusUiCandidatePackagePattern\.test\(entry\.name\)/u,
+  /includeCandidatePackages\s*\|\|\s*!candidatePackagePattern\.test\(entry\.name\)/u,
   'Native AOT must exclude stale FsusUI candidates from the dependency cache',
 )
 requireMatch(
