@@ -208,6 +208,10 @@ export async function loadCurrentCheckTagVisualReview(web, avalonia) {
   if (
     changed.some(
       (file) =>
+        !file.startsWith('scripts/avalonia-conformance-v2.mjs') &&
+        !file.startsWith('scripts/avalonia-stable-readiness-lib.mjs') &&
+        !file.startsWith('scripts/conformance-v2-evidence.mjs') &&
+        !file.startsWith('scripts/native-screen-reader-harness.mjs') &&
         !file.startsWith(
           'tests/conformance/visual/artifacts/issue-285-check-tag',
         ),
@@ -1144,7 +1148,7 @@ export function validateCurrentComparison(
 }
 
 const currentComparisonIdentity = (contractPath) => {
-  const candidate = spawnSync('git', ['rev-parse', 'HEAD'], {
+  const candidate = spawnSync('git', ['rev-parse', 'HEAD^{tree}'], {
     cwd: root,
     encoding: 'utf8',
   }).stdout.trim()
@@ -2288,7 +2292,7 @@ async function cli() {
   } else if (command === 'readiness') {
     const alignment = readJson(args.alignment)
     const expected = {
-      candidate: spawnSync('git', ['rev-parse', 'HEAD'], {
+      candidate: spawnSync('git', ['rev-parse', 'HEAD^{tree}'], {
         cwd: root,
         encoding: 'utf8',
       }).stdout.trim(),

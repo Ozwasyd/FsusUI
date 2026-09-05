@@ -23,7 +23,7 @@ const output = path.resolve(
   process.env.FSUS_CONFORMANCE_V2_AVALONIA_OUTPUT ??
     '.tmp/conformance-v2/avalonia.json',
 )
-const candidate = spawnSync('git', ['rev-parse', 'HEAD'], {
+const candidate = spawnSync('git', ['rev-parse', 'HEAD^{tree}'], {
   cwd: root,
   encoding: 'utf8',
 }).stdout.trim()

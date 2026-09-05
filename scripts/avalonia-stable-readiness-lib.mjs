@@ -56,7 +56,7 @@ export const assertCleanPackageInputs = () => {
 
 export const currentIdentity = ({ requireCleanPackageInputs = false } = {}) => {
   if (requireCleanPackageInputs) assertCleanPackageInputs()
-  const gitHead = spawnSync('git', ['rev-parse', 'HEAD'], {
+  const gitHead = spawnSync('git', ['rev-parse', 'HEAD^{tree}'], {
     cwd: root,
     encoding: 'utf8',
   })
