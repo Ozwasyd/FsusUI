@@ -212,8 +212,12 @@ export const validateVuePublicCoverage = ({ baseline, registry }) => {
             member.status === 'aligned-candidate' &&
             (slot?.nameKnown !== true ||
               slot?.payloadComplete !== true ||
-              !slot?.contentType)
+              (slot?.scoped === true && !slot?.contentType))
           ) {
+            // Unscoped Vue slots deliver untyped content, which is the
+            // compatible counterpart of an object-typed native content
+            // property; only scoped regions carry a compiler-known value
+            // type (issue #285).
             errors.push(
               `${context} claims aligned-candidate with unknown compiler content metadata`,
             )
