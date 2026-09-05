@@ -8,13 +8,13 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.common-picker` | `missing` |
 | `component-v2.dynamic-size-grid` | `missing` |
 | `component-v2.dynamic-size-list` | `missing` |
-| `component-v2.el-affix` | `web-only` |
+| `component-v2.el-affix` | `partial` |
 | `component-v2.el-alert` | `partial` |
 | `component-v2.el-aside` | `partial` |
-| `component-v2.el-auto-resizer` | `blocked` |
+| `component-v2.el-auto-resizer` | `partial` |
 | `component-v2.el-autocomplete` | `partial` |
 | `component-v2.el-avatar` | `partial` |
-| `component-v2.el-backtop` | `web-only` |
+| `component-v2.el-backtop` | `partial` |
 | `component-v2.el-badge` | `partial` |
 | `component-v2.el-breadcrumb` | `partial` |
 | `component-v2.el-breadcrumb-item` | `partial` |
@@ -26,7 +26,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-carousel-item` | `partial` |
 | `component-v2.el-cascader` | `partial` |
 | `component-v2.el-cascader-panel` | `partial` |
-| `component-v2.el-check-tag` | `partial` |
+| `component-v2.el-check-tag` | `aligned` |
 | `component-v2.el-checkbox` | `partial` |
 | `component-v2.el-checkbox-button` | `partial` |
 | `component-v2.el-checkbox-group` | `partial` |
@@ -74,7 +74,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-image-viewer` | `partial` |
 | `component-v2.el-inbox-empty-state` | `partial` |
 | `component-v2.el-inbox-layout` | `partial` |
-| `component-v2.el-infinite-scroll` | `web-only` |
+| `component-v2.el-infinite-scroll` | `blocked` |
 | `component-v2.el-inline-actions` | `partial` |
 | `component-v2.el-input` | `partial` |
 | `component-v2.el-input-number` | `partial` |
@@ -142,7 +142,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-skeleton` | `partial` |
 | `component-v2.el-skeleton-item` | `missing` |
 | `component-v2.el-slider` | `partial` |
-| `component-v2.el-space` | `blocked` |
+| `component-v2.el-space` | `partial` |
 | `component-v2.el-split-pane` | `missing` |
 | `component-v2.el-statistic` | `partial` |
 | `component-v2.el-status-summary` | `partial` |
@@ -153,7 +153,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-tab-pane` | `partial` |
 | `component-v2.el-table` | `partial` |
 | `component-v2.el-table-column` | `missing` |
-| `component-v2.el-table-v2` | `blocked` |
+| `component-v2.el-table-v2` | `partial` |
 | `component-v2.el-tabs` | `partial` |
 | `component-v2.el-tag` | `partial` |
 | `component-v2.el-task-page-header` | `missing` |
@@ -163,7 +163,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.el-thread-panel` | `partial` |
 | `component-v2.el-time-picker` | `partial` |
 | `component-v2.el-time-select` | `partial` |
-| `component-v2.el-timeline` | `partial` |
+| `component-v2.el-timeline` | `blocked` |
 | `component-v2.el-timeline-item` | `partial` |
 | `component-v2.el-tooltip` | `partial` |
 | `component-v2.el-tooltip-v2` | `missing` |
@@ -226,7 +226,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `component-v2.fsus-text-task-challenge` | `partial` |
 | `component-v2.fsus-thread-panel` | `partial` |
 | `component-v2.fsus-typed-confirm-field` | `partial` |
-| `component-v2.table-v2` | `blocked` |
+| `component-v2.table-v2` | `partial` |
 | `component-v2.table-v2-alignment` | `missing` |
 | `component-v2.table-v2-fixed-dir` | `missing` |
 | `component-v2.table-v2-placeholder` | `missing` |
@@ -509,6 +509,13 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusTableV2Budget` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTableV2BudgetResult` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTableV2CellContainer` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2HeaderCellContext` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2HeaderContext` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2RowContext` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2RowExpansion` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2RowsRendered` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTableV2Sort` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTabPaneContextEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTextarea` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTextBlockKind` | `avalonia-extra` |
