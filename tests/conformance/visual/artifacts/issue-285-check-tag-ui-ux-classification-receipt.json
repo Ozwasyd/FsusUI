@@ -34,13 +34,13 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "8c868f280adca6d29b79eaf86474df1819c60426",
+    "revision": "47dea2e6cb6bd813bffd43a13ac6916d6a97ed91",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "0301f8cf9dc78a13ad971ddb9058546ef3615b23a9a84187690342dd75061ea3",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "8c868f280adca6d29b79eaf86474df1819c60426",
-  "candidateDigest": "b8ca9f6c1971c5a75e5b0ae37a1b9b7e84fd56b552bbc8f7e12382ee3e662bfe",
+  "candidateSha": "47dea2e6cb6bd813bffd43a13ac6916d6a97ed91",
+  "candidateDigest": "927f290e62ac9f41bd2b4487cca2b53861867a8b6c5099ac5dbffadd42753fbe",
   "stateEvidenceMatrix": [
     {
       "state": "focused-unchecked-after-pointer-keyboard",
@@ -68,5 +68,5 @@
   "classificationEvidenceDigest": "bf1cf46ccbef62abbf4f30a6bb0a0031a8607149ead79dab2eabe35e983ab126",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "99df1f2b142a9f004644ad71ed792e519c32b1135f5138622a0a13754e667dd4"
+  "receiptDigest": "2f801c72d9cdacb39145eb2c63b545ea2baef7d5befb41521a4de388f80a49f4"
 }
