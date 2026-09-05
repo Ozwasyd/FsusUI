@@ -12,7 +12,7 @@
     },
     {
       "path": "tests/conformance/accessibility/avalonia-runtime-scenarios.json",
-      "sha256": "dc5f0d4d3b70cdbbcdbb88db641066626a9201fac302285a386110a7be855f9d"
+      "sha256": "f94860f55577f80c4c3557a69b6c0dc039e63583f4d9ea9bd8fdb64eff827f2d"
     }
   ],
   "requiredContractFields": [
@@ -1381,26 +1381,7 @@
       "factory": "FsusAlert",
       "bindingDisposition": "exact",
       "bindingGap": null,
-      "implementationGaps": [
-        {
-          "snapshotId": "alert-live-region",
-          "field": "role",
-          "observed": "text",
-          "reason": "The current FsusAlert AutomationPeer exposes \"text\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "alert-live-region",
-          "field": "value",
-          "observed": null,
-          "reason": "The current FsusAlert AutomationPeer does not expose value.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -1980,26 +1961,7 @@
         "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
         "reviewAfter": "2026-12-05"
       },
-      "implementationGaps": [
-        {
-          "snapshotId": "text-viewer-stable36",
-          "field": "role",
-          "observed": "text",
-          "reason": "The current FsusTextViewer AutomationPeer exposes \"text\" instead of the declared value for role.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
-        {
-          "snapshotId": "text-viewer-stable36",
-          "field": "value",
-          "observed": null,
-          "reason": "The current FsusTextViewer AutomationPeer does not expose value.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        }
-      ],
+      "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
       "real": false,
@@ -2022,15 +1984,6 @@
         "reviewAfter": "2026-12-05"
       },
       "implementationGaps": [
-        {
-          "snapshotId": "text-editor-stable37",
-          "field": "value",
-          "observed": null,
-          "reason": "The current FsusTextEditor AutomationPeer does not expose value.",
-          "owner": "FsusUI Avalonia",
-          "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
-          "reviewAfter": "2026-12-05"
-        },
         {
           "snapshotId": "text-editor-stable37",
           "field": "states.selected",

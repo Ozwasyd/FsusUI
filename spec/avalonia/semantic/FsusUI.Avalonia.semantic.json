@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "855a74e099ef2becc8a76078a96ac597a8490ddbe638b588388c4e5745eb87f3",
+    "inputTreeHash": "4d15b4d2a8fb74b0bc832738c7bf7d0efcfc313d03c07fb028dbac31984411b8",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "4835f336a53474e61892d4d07c7a3e3ecd7aba764f6e4eef1c5ac0afd9532526"
+    "outputHash": "868d94a7455800354183e4cc14240a2b5cd872ecd20550808a2fd5433a4e3f33"
   },
   "semanticTypes": [
     {
@@ -1472,6 +1472,7 @@
         "mappingComplete": false,
         "observedSemantics": [
           "help-text",
+          "live-setting",
           "name",
           "role",
           "state"
@@ -1488,6 +1489,17 @@
             "publicDependencies": [
               "FsusUI.Avalonia.Controls.FsusAlert.Description"
             ],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusAlert.SyncAutomation"
+          },
+          {
+            "semantic": "live-setting",
+            "provider": "AutomationProperties.SetLiveSetting",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "public-control-this",
+            "targetExpression": "this",
+            "valueKnown": true,
+            "value": "Assertive",
+            "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusAlert.SyncAutomation"
           },
           {
@@ -49753,7 +49765,8 @@
       },
       "automationContract": {
         "observationAuthorities": [
-          "roslyn-automation-attached-property-write"
+          "roslyn-automation-attached-property-write",
+          "roslyn-automation-provider-interface"
         ],
         "contractDeclared": false,
         "runtimeTreeVerified": false,
@@ -49761,7 +49774,8 @@
         "observedSemantics": [
           "name",
           "role",
-          "state"
+          "state",
+          "value"
         ],
         "mappings": [
           {
@@ -49793,14 +49807,35 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": false,
-            "valueExpression": "$\u0022{PreviewStateName}, {text.Length.ToString(CultureInfo.InvariantCulture)} chars, selection {Selection.Start.ToString(CultureInfo.InvariantCulture)}-{Selection.End.ToString(CultureInfo.InvariantCulture)}, {PreviewStatus()}\u0022",
-            "publicDependencies": [
-              "FsusUI.Avalonia.Controls.FsusTextEditor.PreviewStateName",
-              "FsusUI.Avalonia.Controls.FsusTextEditor.Selection",
-              "FsusUI.Avalonia.Controls.FsusTextSelection.End",
-              "FsusUI.Avalonia.Controls.FsusTextSelection.Start"
-            ],
+            "valueExpression": "AutomationStatus",
+            "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusTextEditor.SyncState"
+          },
+          {
+            "semantic": "state",
+            "provider": "Avalonia.Automation.Provider.IValueProvider.IsReadOnly",
+            "authority": "roslyn-automation-provider-interface",
+            "targetKind": "automation-peer-owner",
+            "targetExpression": "OnCreateAutomationPeer:this",
+            "valueKnown": false,
+            "valueExpression": "owner.IsReadOnly",
+            "publicDependencies": [
+              "FsusUI.Avalonia.Controls.FsusTextEditor.IsReadOnly"
+            ],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTextEditor\u002BTextEditorAutomationPeer.IsReadOnly"
+          },
+          {
+            "semantic": "value",
+            "provider": "Avalonia.Automation.Provider.IValueProvider.Value",
+            "authority": "roslyn-automation-provider-interface",
+            "targetKind": "automation-peer-owner",
+            "targetExpression": "OnCreateAutomationPeer:this",
+            "valueKnown": false,
+            "valueExpression": "owner.Text",
+            "publicDependencies": [
+              "FsusUI.Avalonia.Controls.FsusTextEditor.Text"
+            ],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTextEditor\u002BTextEditorAutomationPeer.Value"
           }
         ]
       },
@@ -50666,11 +50701,8 @@
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": false,
-            "valueExpression": "$\u0022{StateName}, {renderedBlocks.Count.ToString(CultureInfo.InvariantCulture)} blocks, focus {(FocusedBlockIndex \u002B 1).ToString(CultureInfo.InvariantCulture)} of {Math.Max(1, renderedBlocks.Count).ToString(CultureInfo.InvariantCulture)}\u0022",
-            "publicDependencies": [
-              "FsusUI.Avalonia.Controls.FsusTextViewer.FocusedBlockIndex",
-              "FsusUI.Avalonia.Controls.FsusTextViewer.StateName"
-            ],
+            "valueExpression": "AutomationStatus",
+            "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusTextViewer.SyncState"
           }
         ]

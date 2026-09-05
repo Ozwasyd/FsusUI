@@ -4,8 +4,8 @@ Component ID: `display`
 
 ## Avalonia API
 
-Use `FsusProgress`, `FsusSkeleton`, `FsusEmpty`, and `FsusResult` for progress,
-loading placeholders, empty states, and result feedback.
+Use `FsusProgress`, `FsusSkeleton`, `FsusEmpty`, `FsusResult`, and `FsusAlert`
+for progress, loading placeholders, empty states, and result feedback.
 
 ## Vue Contract Mapping
 
@@ -21,6 +21,12 @@ Animation reduction and text measurement follow
 
 Display controls use text, muted text, loading, disabled, danger, surface,
 border, density, and motion tokens.
+
+## Accessibility
+
+`FsusAlert` exposes an assertive live-region alert role. Its accessible name
+comes from the current title or content, so assistive technology observes the
+same message that the control presents without an editable value pattern.
 
 ## Minimal Avalonia Example
 

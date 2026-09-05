@@ -23,6 +23,14 @@ IME, clipboard, text selection, and scroll sync follow
 Text editor uses text, muted text, surface, border, focus, danger, density, and
 motion resources.
 
+## Accessibility
+
+The production automation peer exposes the current raw document through its
+editable value pattern. Reads and writes therefore round-trip through the same
+text contract, while item status reports document length, selection, preview
+synchronization, and undo/redo availability. Its read-only state mirrors
+`IsReadOnly`.
+
 ## Minimal Avalonia Example
 
 ```csharp

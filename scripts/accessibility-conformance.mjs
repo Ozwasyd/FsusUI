@@ -978,11 +978,28 @@ const normalizeContractRole = (role) =>
     })[role] ?? role
   ).toLowerCase()
 
+const normalizeAvaloniaRole = (node) => {
+  if (
+    node.role === 'text' &&
+    node.className === 'Alert' &&
+    node.liveRegion === 'assertive'
+  ) {
+    return 'alert'
+  }
+  if (node.role === 'text' && node.className === 'Document') {
+    return 'document'
+  }
+  return node.role
+}
+
 const requiredNodeFields = [
   'role',
+  'className',
   'name',
   'description',
   'value',
+  'providerValue',
+  'valueSource',
   'selection',
   'caret',
   'states',
@@ -1176,6 +1193,30 @@ const validateRuntimeEvidence = (evidenceSet) => {
           errors.push(`${context} nodes[${index}].states.${field} missing`)
         }
       }
+      if (
+        ![
+          'accessible-name',
+          'item-status',
+          'value-provider',
+          'unavailable',
+        ].includes(node.valueSource)
+      ) {
+        errors.push(`${context} nodes[${index}] value source invalid`)
+      } else {
+        const sourceValue =
+          node.valueSource === 'accessible-name'
+            ? node.name
+            : node.valueSource === 'item-status'
+              ? node.itemStatus
+              : node.valueSource === 'value-provider'
+                ? node.providerValue
+                : null
+        if (node.value !== sourceValue) {
+          errors.push(
+            `${context} nodes[${index}] value source binding mismatch`,
+          )
+        }
+      }
       for (const childId of node.children ?? []) {
         const child = nodeById.get(childId)
         if (!child) {
@@ -1195,11 +1236,12 @@ const validateRuntimeEvidence = (evidenceSet) => {
       problemActual.set(field, actual)
     }
     const expectedRole = normalizeContractRole(contract.role)
-    if (rootNode.role !== expectedRole) {
+    const actualRole = normalizeAvaloniaRole(rootNode)
+    if (actualRole !== expectedRole) {
       mismatch(
         'role',
-        `role expected=${expectedRole} actual=${rootNode.role}`,
-        rootNode.role,
+        `role expected=${expectedRole} actual=${actualRole}`,
+        actualRole,
       )
     }
     if (rootNode.name !== snapshot.accessibleName) {
@@ -1375,11 +1417,43 @@ const verifyRuntimeEvidence = () => {
       'problem field role is undeclared',
     ],
     [
+      'alert-class-name-drift',
+      (candidate) => {
+        const alert = find(candidate, 'avalonia-alert-live-region')
+        alert.accessibility.nodes[0].className = 'Text'
+      },
+      'problem field role is undeclared',
+    ],
+    [
+      'alert-live-region-drift',
+      (candidate) => {
+        const alert = find(candidate, 'avalonia-alert-live-region')
+        alert.accessibility.nodes[0].liveRegion = 'off'
+      },
+      'problem field role is undeclared',
+    ],
+    [
       'name-drift',
       (candidate) => {
         candidate.evidence[0].accessibility.nodes[0].name = 'Fixture name'
       },
       'problem field name is undeclared',
+    ],
+    [
+      'provider-value-drift',
+      (candidate) => {
+        const viewer = find(candidate, 'avalonia-text-viewer-stable36')
+        viewer.accessibility.nodes[0].value = 'Fixture summary'
+      },
+      'problem field value is undeclared',
+    ],
+    [
+      'value-source-drift',
+      (candidate) => {
+        const editor = find(candidate, 'avalonia-text-editor-stable37')
+        editor.accessibility.nodes[0].valueSource = 'value-provider'
+      },
+      'value source binding mismatch',
     ],
     [
       'state-drift',
