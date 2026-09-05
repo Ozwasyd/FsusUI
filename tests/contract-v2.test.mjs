@@ -400,25 +400,25 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 400)
+  assert.equal(mappings.length, 403)
   assert.deepEqual(semanticCounts, {
     role: 106,
     name: 123,
-    value: 3,
-    state: 110,
+    value: 4,
+    state: 111,
     'help-text': 25,
     'accessibility-view': 22,
-    'live-setting': 11,
+    'live-setting': 12,
   })
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'public-control-this')
       .length,
-    322,
+    323,
   )
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'automation-peer-owner')
       .length,
-    19,
+    21,
   )
   assert.ok(
     automationTypes.every(
@@ -484,6 +484,34 @@ test('Avalonia automation baseline separates source observations from declared a
         mapping.valueExpression.includes('invalid=') &&
         mapping.publicDependencies.includes(
           'FsusUI.Avalonia.Controls.FsusInput.IsInvalid',
+        ),
+    ),
+  )
+  const alert = automationTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusAlert',
+  )
+  assert.ok(
+    alert.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'live-setting' &&
+        mapping.provider === 'AutomationProperties.SetLiveSetting' &&
+        mapping.valueKnown === true &&
+        mapping.value === 'Assertive',
+    ),
+  )
+  const textEditor = automationTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusTextEditor',
+  )
+  assert.ok(
+    textEditor.automationContract.mappings.some(
+      (mapping) =>
+        mapping.semantic === 'value' &&
+        mapping.provider ===
+          'Avalonia.Automation.Provider.IValueProvider.Value' &&
+        mapping.targetKind === 'automation-peer-owner' &&
+        mapping.valueExpression === 'owner.Text' &&
+        mapping.publicDependencies.includes(
+          'FsusUI.Avalonia.Controls.FsusTextEditor.Text',
         ),
     ),
   )

@@ -8,6 +8,7 @@ using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
@@ -196,6 +197,17 @@ internal static class AccessibilityRuntimeEvidence
       _ = control.Focus();
       Dispatcher.UIThread.RunJobs();
       window.UpdateLayout();
+      if (control is FsusTextViewer)
+      {
+        var moveFocus = new KeyEventArgs
+        {
+          RoutedEvent = InputElement.KeyDownEvent,
+          Source = control,
+          Key = Key.Down,
+        };
+        control.RaiseEvent(moveFocus);
+        Dispatcher.UIThread.RunJobs();
+      }
 
       var peer = ControlAutomationPeer.CreatePeerForElement(control)
         ?? throw new InvalidOperationException(
@@ -369,6 +381,29 @@ internal static class AccessibilityRuntimeEvidence
     {
       alert.Content = scenario.Value ?? scenario.AccessibleName;
     }
+    if (control is FsusTextViewer textViewer)
+    {
+      textViewer.AccessibleName = scenario.AccessibleName;
+      textViewer.Blocks.Add(
+        new FsusTextContentBlock(FsusTextBlockKind.Heading, "Release notes", 1));
+      textViewer.Blocks.Add(
+        new FsusTextContentBlock(FsusTextBlockKind.Paragraph, "发布说明", Language: "zh"));
+      textViewer.Blocks.Add(
+        new FsusTextContentBlock(FsusTextBlockKind.ListItem, "Keyboard navigation"));
+      textViewer.Blocks.Add(
+        new FsusTextContentBlock(FsusTextBlockKind.Quote, "Stable behavior"));
+      _ = textViewer.RenderAsync().AsTask().GetAwaiter().GetResult();
+    }
+    if (control is FsusTextEditor textEditor)
+    {
+      textEditor.AccessibleName = scenario.AccessibleName;
+      textEditor.PreviewDebounce = TimeSpan.Zero;
+      textEditor.SetText(new string('a', 29));
+      textEditor.TypeText("b");
+      textEditor.TypeText("c");
+      _ = textEditor.Undo();
+      _ = textEditor.SyncPreviewAsync().AsTask().GetAwaiter().GetResult();
+    }
     control.IsEnabled = scenario.Disabled != true;
     control.TabIndex = scenario.TabOrder;
     return control;
@@ -420,24 +455,40 @@ internal static class AccessibilityRuntimeEvidence
       .Select((_, index) => $"{id}.{index}")
       .ToArray();
     var status = peer.GetItemStatus();
+    var role = peer.GetAutomationControlType().ToString().ToLowerInvariant();
+    var className = NullIfEmpty(peer.GetClassName());
+    var name = NullIfEmpty(peer.GetName());
+    var liveRegion = peer.GetLiveSetting().ToString().ToLowerInvariant();
+    var valueProvider = peer.GetProvider<IValueProvider>();
+    var providerValue = valueProvider?.Value;
+    var value = ResolveAccessibilityValue(
+      role,
+      className,
+      liveRegion,
+      name,
+      status,
+      providerValue);
     var selection = ParseSelection(status);
     nodes.Add(new(
       id,
       control,
-      peer.GetAutomationControlType().ToString().ToLowerInvariant(),
-      NullIfEmpty(peer.GetName()),
+      role,
+      className,
+      name,
       NullIfEmpty(peer.GetHelpText()),
-      peer.GetProvider<IValueProvider>()?.Value,
+      value.Value,
+      providerValue,
+      value.Source,
       selection,
       ParseStatusInt(status, "caret"),
       new(
         !peer.IsEnabled(),
-        peer.GetProvider<IValueProvider>()?.IsReadOnly,
+        valueProvider?.IsReadOnly,
         ParseStatusBool(status, "invalid"),
         peer.GetProvider<ISelectionItemProvider>()?.IsSelected,
         Expanded(peer.GetProvider<IExpandCollapseProvider>()),
         Checked(peer.GetProvider<IToggleProvider>())),
-      peer.GetLiveSetting().ToString().ToLowerInvariant(),
+      liveRegion,
       logicalParent,
       childIds,
       new(peer.IsKeyboardFocusable(), peer.HasKeyboardFocus(), tabOrder),
@@ -481,7 +532,7 @@ internal static class AccessibilityRuntimeEvidence
       "textbox" => "edit",
       _ => scenario.Role,
     };
-    Compare("role", expectedRole, root.Role);
+    Compare("role", expectedRole, NormalizeRole(root));
     Compare("name", scenario.AccessibleName, root.Name);
     if (scenario.Value is not null)
     {
@@ -595,6 +646,30 @@ internal static class AccessibilityRuntimeEvidence
       _ => null,
     };
 
+  private static string NormalizeRole(AccessibilityNode node) =>
+    (node.Role, node.ClassName, node.LiveRegion) switch
+    {
+      ("text", "Alert", "assertive") => "alert",
+      ("text", "Document", _) => "document",
+      _ => node.Role,
+    };
+
+  private static AccessibilityValue ResolveAccessibilityValue(
+    string role,
+    string? className,
+    string liveRegion,
+    string? name,
+    string? itemStatus,
+    string? providerValue) =>
+    (role, className, liveRegion) switch
+    {
+      ("text", "Alert", "assertive") => new(name, "accessible-name"),
+      ("text", "Document", _) => new(itemStatus, "item-status"),
+      ("edit", "TextEditor", _) => new(itemStatus, "item-status"),
+      _ when providerValue is not null => new(providerValue, "value-provider"),
+      _ => new(null, "unavailable"),
+    };
+
   private static string? Checked(IToggleProvider? provider) =>
     provider?.ToggleState.ToString().ToLowerInvariant();
 
@@ -706,9 +781,12 @@ internal static class AccessibilityRuntimeEvidence
     string Id,
     string Control,
     string Role,
+    string? ClassName,
     string? Name,
     string? Description,
     string? Value,
+    string? ProviderValue,
+    string ValueSource,
     SelectionSnapshot? Selection,
     int? Caret,
     AccessibilityStates States,
@@ -717,6 +795,8 @@ internal static class AccessibilityRuntimeEvidence
     IReadOnlyList<string> Children,
     FocusState Focus,
     string? ItemStatus);
+
+  private sealed record AccessibilityValue(string? Value, string Source);
 
   private sealed record SelectionSnapshot(
     int Start,

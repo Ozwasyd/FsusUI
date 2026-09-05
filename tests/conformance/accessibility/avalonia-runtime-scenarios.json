@@ -102,10 +102,6 @@
       "states.selected": null,
       "states.expanded": null
     },
-    "alert-live-region": {
-      "role": "text",
-      "value": null
-    },
     "tabs-stable23": {
       "states.selected": null
     },
@@ -167,12 +163,7 @@
       "states.selected": null,
       "states.expanded": null
     },
-    "text-viewer-stable36": {
-      "role": "text",
-      "value": null
-    },
     "text-editor-stable37": {
-      "value": null,
       "states.selected": null
     },
     "public-shell-stable38": {

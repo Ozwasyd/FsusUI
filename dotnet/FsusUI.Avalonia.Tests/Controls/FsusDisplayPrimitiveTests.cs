@@ -130,6 +130,15 @@ public class FsusDisplayPrimitiveTests
     Assert.True(alert.IsDismissed);
     Assert.Contains("fsus-dismissed", alert.Classes);
     Assert.Equal("dismissed", AutomationProperties.GetItemStatus(alert));
+    Assert.Equal("Alert", AutomationProperties.GetClassNameOverride(alert));
+    Assert.Equal(
+      AutomationLiveSetting.Assertive,
+      AutomationProperties.GetLiveSetting(alert));
+    var alertPeer = Assert.IsAssignableFrom<AutomationPeer>(
+      ControlAutomationPeer.CreatePeerForElement(alert));
+    Assert.Equal("Connection lost", alertPeer.GetName());
+    Assert.Null(
+      alertPeer.GetProvider<global::Avalonia.Automation.Provider.IValueProvider>());
 
     var ignoredDismissals = 0;
     var lockedAlert = new FsusAlert { Title = "Always visible", IsDismissible = false };
