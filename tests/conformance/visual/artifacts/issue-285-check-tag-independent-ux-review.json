@@ -1,12 +1,12 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "eedd7a325b9e6d272df50831b3be6c8d5604bd0b",
+  "candidateSha": "9cfec216f0baa880e022dd43c62699a452b58810",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-eedd7a325b9e6d272df50831b3be6c8d5604bd0b",
+    "executionId": "conformance-v2-check-tag-9cfec216f0baa880e022dd43c62699a452b58810",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
