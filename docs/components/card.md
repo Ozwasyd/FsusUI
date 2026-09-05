@@ -1,26 +1,27 @@
-# Card 卡片
+# Card
 
-将信息聚合展示在卡片容器中。
+Groups information in a card container.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-Card 由 `header`、`body`、`footer` 三部分组成，后两者均可选，通过具名插槽分发内容。
+Card has `header`, `body`, and `footer` regions. The latter two are optional and
+receive content through named slots.
 
-## 简单卡片
+## Simple Card
 
-省略 `header` 插槽时，卡片只显示内容区域。
+Without the `header` slot, only the content region is rendered.
 
-## 带图片
+## With Images
 
-通过 `body-style` 属性自定义卡片主体样式，配合图片组件实现图文卡片。
+Use `body-style` to customize the body, for example alongside an image component.
 
-## 阴影效果
+## Shadow
 
-通过 `shadow` 属性控制阴影显示时机：`always`（始终显示）、`hover`（悬停时）、`never`（从不显示）。
+Use `shadow` to show the shadow `always`, on `hover`, or `never`.
 
 ---
 

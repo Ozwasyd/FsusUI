@@ -1,32 +1,30 @@
-# Table 表格
+# Table
 
-用于展示多条结构类似的数据，可对数据进行排序、筛选、对比或其他自定义操作。
+Displays structurally similar records and supports sorting, filtering, comparison, and other custom actions.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                                                                   |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| purpose                | 展示结构化数据，支持排序、筛选、选择、展开、树形数据和自定义列模板。                                                                   |
-| basic usage            | 通过 `data` 传入数组，用 `el-table-column` 声明列；大数据场景优先评估 TableV2 或虚拟列表。                                             |
-| props / events / slots | 本页 `Table API` 和 `Table-column API` 覆盖公开 props、events、slots 和 exposes。                                                      |
-| accessibility          | 为业务表格提供明确上下文标题；选择列、展开列和自定义单元格内容应保留键盘可达控件与可读文本。                                           |
-| theme token notes      | 跟随公开背景、边框、文本、主色、阴影和 motion control token；WASM 加速不改变视觉 token。                                               |
-| known limitations      | 索引加速只覆盖本地 number / ASCII string 排序；locale-aware、CJK、mixed、自定义 comparator、服务端排序和分页继续使用语义正确的原路径。 |
-| stability level        | Preview public component；WASM 加速路径属于 Experimental behavior。                                                                    |
+This is a preview public component; the optional WASM path is experimental. See
+[API stability](../api-stability.md#stability-levels) and the shared [theme and
+motion contracts](../theme/tokens.md). Give each table a contextual heading and
+keep selection, expansion, and custom-cell controls keyboard accessible. Index
+acceleration covers local `number` and ASCII-string sorting only; locale-aware,
+CJK, mixed, custom-comparator, server-side, and paginated sorting use the
+semantic JavaScript path.
 
-## WASM 加速
+## WASM Acceleration
 
-FsusUI 的大数据路径先提取最小 primitive 列数据，在 Worker 中通过持久 WASM buffer 返回稳定 `Uint32Array` 行索引。重复值按原始 index 稳定排序，完整 row object 不进入 Worker；只有最新 generation 返回后才在公共数组边界 materialize。新的排序会取消仍在执行的旧任务，旧结果或组件卸载后的结果不会写回 Table；卸载同时释放 Worker/WASM session。策略会记录初始化、复制、计算、映射和提交耗时，并动态选择 Worker/WASM 或可让出主线程的分块 JS，不使用固定 5K 阈值。
+FsusUI's large-data path extracts only primitive column data, then returns stable `Uint32Array` row indexes from a persistent WASM buffer in a Worker. Equal values are stably sorted by original index, and full row objects never enter the Worker; objects materialize at the public array boundary only after the latest generation returns. A new sort cancels the prior task, and stale or post-unmount results cannot write to Table; unmount also releases the Worker/WASM session. The strategy records initialization, copy, compute, mapping, and commit timings, then chooses Worker/WASM or yieldable chunked JS dynamically rather than using a fixed 5K threshold.
 
-WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 pointer/capacity，每次操作重新读取当前 heap view。组件/pool 释放时同时释放 input/output/index buffer。locale-aware、CJK、mixed values、`sort-method` 和 `sort-by` 保持 JS 语义，不会使用 ASCII 字节序冒充 locale 排序。
+After WASM memory growth, old TypedArray views become invalid. The implementation therefore persists only pointer/capacity and reads the current heap view for each operation. Releasing the component or pool also releases input/output/index buffers. locale-aware values, CJK, mixed values, `sort-method`, and `sort-by` retain JS semantics; ASCII byte order is never used as a substitute for locale sorting.
 
-> **注意**：开启 WASM 加速无需任何额外配置；如需从源码重新编译 WASM 模块，需要 Emscripten 5.0.4。
+> **Note:** WASM acceleration needs no extra configuration. Rebuilding the WASM module from source requires Emscripten 5.0.4.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
-## 大数据变更策略
+## Large-Data Change Strategy
 
-`data-change-strategy` 明确 Table 何时接收消费者的数据变化：
+`data-change-strategy` defines when Table receives consumer data changes:
 
 | 策略       | 刷新条件                      | 适用场景                                    |
 | ---------- | ----------------------------- | ------------------------------------------- |
@@ -35,7 +33,7 @@ WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 p
 | `manual`   | 调用 Table 实例的 `refresh()` | 批处理、外部缓存或事务式提交                |
 | `deep`     | 数组或任意嵌套行字段改变      | 兼容旧行为；仍是当前默认值                  |
 
-`deep` 保持为默认值是为了避免现有应用在升级后静默停止刷新；新建的大数据页面应显式选择 `identity`。`identity`、`version` 和 `manual` 使用 shallow/raw 边界，不订阅全部行对象。纯内容提交不会重算列结构，同一 microtask 内的重复提交只形成一次 layout batch。
+`deep` remains the default so existing applications do not silently stop refreshing after an upgrade; new large-data pages should explicitly choose `identity`. `identity`, `version`, and `manual` use shallow/raw boundaries and do not subscribe to every row object. Content-only commits do not recompute column structure, and repeated commits in one microtask form one layout batch.
 
 ```vue
 <el-table
@@ -47,74 +45,69 @@ WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 p
 />
 ```
 
-排序和筛选内部保存 `Uint32Array` row index view；selection 使用 `row-key` Map。`selection-change`、`getSelectionRows()` 等公共边界仍返回行对象数组。`getLayoutDiagnostics()` 返回最近一次 layout 的 `lastReasons`、待处理 reason 和 flush 次数，可区分 `data-*`、`sort`、`filter`、`columns` 与 `container-resize`。
+Sorting and filtering keep a `Uint32Array` row-index view; selection uses a `row-key` Map. Public boundaries such as `selection-change` and `getSelectionRows()` still return row-object arrays. `getLayoutDiagnostics()` returns the latest layout's `lastReasons`, pending reason, and flush count, distinguishing `data-*`, `sort`, `filter`, `columns`, and `container-resize`.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `data` 属性传入数据数组；`el-table-column` 的 `prop` 对应数据字段，`label` 为列名，`width` 设置列宽。
+Pass the data array through `data`; `el-table-column` uses `prop` for the field, `label` for the column name, and `width` for its width.
 
-## 带斑马纹
+## Striped Rows
 
-设置 `stripe` 为 `true` 让表格隔行换色，更易区分不同行。
+Set `stripe` to `true` to alternate row colors and distinguish rows.
 
-## 带边框
+## With Border
 
-设置 `border` 为 `true` 显示纵向边框。
+Set `border` to `true` to show vertical borders.
 
-## 固定表头
+## Fixed Header
 
-通过 `height` 属性设置表格高度，超出时表头固定，内容区域滚动。
+Set table height with `height`; the header stays fixed while the content scrolls when it overflows.
 
-## 固定列
+## Fixed Columns
 
-在 `el-table-column` 上设置 `fixed` 属性（`true` / `'left'` / `'right'`）固定列。
+Set `fixed` (`true` / `'left'` / `'right'`) on `el-table-column` to fix a column.
 
-## 排序
+## Sorting
 
-在列上设置 `sortable` 开启排序。可通过 `sort-method` / `sort-by` 自定义排序逻辑。后端排序时设置 `sortable="custom"`，监听 `sort-change` 事件自行请求接口。
+Set `sortable` on a column to enable sorting. Use `sort-method` / `sort-by` for custom logic. For server sorting, set `sortable="custom"` and fetch data in response to `sort-change`.
 
-> 是否启用 Worker/WASM 由当前设备和该会话的端到端历史决定；行数本身不是固定开关。
+> Worker/WASM activation depends on the device and this session's end-to-end history; row count alone is not a fixed switch.
 
-## 筛选
+## Filtering
 
-在 `el-table-column` 上设置 `filters` 数组和 `filter-method` 函数实现列筛选。
+Set a `filters` array and `filter-method` on `el-table-column` for column filtering.
 
-## 自定义列模板
+## Custom Column Templates
 
-通过 `default` 插槽访问 `row`、`column`、`$index` 等数据，插入自定义内容。
+Use the `default` slot's `row`, `column`, and `$index` values to render custom content.
 
-## 响应式列投影
+## Responsive Column Projection
 
-设置 `responsive="auto"` 或 `responsive="priority"` 后，组件宽度小于
-`640px` 时只在主行保留 `priority="primary"` 的列。`secondary` 与 `detail`
-列不会丢弃：每行的 40px 展开动作会将这些字段投影为平坦的 label/value
-详情列表。未声明 priority 时，第一个普通数据列为 primary，其余普通列为
-secondary；选择、索引、展开等功能列始终保留。
+With `responsive="auto"` or `responsive="priority"`, below `640px` the main row keeps only columns with `priority="primary"`. `secondary` and `detail` columns are not discarded: each row's 40px expand action projects them into a flat label/value detail list. Without an explicit priority, the first ordinary data column is primary and the rest are secondary; selection, index, expand, and other feature columns remain.
 
-设置 `responsive="scroll"` 可显式保留宽表。滚动区域可聚焦、有可访问名称，
-并在首次横向滚动前显示右边缘渐隐提示；键盘左右方向键可以浏览。
+Set `responsive="scroll"` to explicitly retain a wide table. The scroller is focusable and named, shows a right-edge fade before the first horizontal scroll, and supports the keyboard left/right keys.
 
-## 多选
+## Multiple Selection
 
-设置 `type="selection"` 列开启多选；配合 `toggleRowSelection`、`clearSelection` 等方法管理选中状态。
+Add a `type="selection"` column for multiple selection; manage state with methods such as `toggleRowSelection` and `clearSelection`.
 
-## 展开行
+## Expandable Rows
 
-设置 `type="expand"` 列实现展开行功能。
+Add a `type="expand"` column for expandable rows.
 
-## 树形数据
+## Tree Data
 
-数据中包含 `children` 字段时自动渲染为树形结构（需设置 `row-key`）。
+Data with a `children` field renders as a tree (set `row-key`).
 
-## 合计行
+## Summary Row
 
-设置 `show-summary` 为 `true` 显示合计行，可通过 `summary-method` 自定义。
+Set `show-summary` to `true` for a summary row; customize it with `summary-method`.
 
-## 合并行列
+## Merged Rows and Columns
 
-通过 `span-method` 函数返回 `[rowspan, colspan]` 实现行列合并。
+Return `[rowspan, colspan]` from `span-method` to merge cells.
 
 ---
 
@@ -243,9 +236,9 @@ secondary；选择、索引、展开等功能列始终保留。
 
 ---
 
-## 常见问题
+## Frequently Asked Questions
 
-**图片预览时如何让蒙层显示正确？**
+**How can the overlay display correctly during image preview?**
 
 ```vue
 <el-table-column width="180">
@@ -255,6 +248,6 @@ secondary；选择、索引、展开等功能列始终保留。
 </el-table-column>
 ```
 
-**使用 DOM 模板时列不渲染？**
+**Why are columns not rendered with a DOM template?**
 
-这是 HTML 规范限制（非自闭合标签问题），请改用单文件组件（`.vue` 文件）形式。
+This is an HTML specification limitation, not a self-closing-tag issue. Use a single-file component (`.vue` file) instead.

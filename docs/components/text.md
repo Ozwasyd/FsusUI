@@ -1,27 +1,27 @@
-# Text 文本
+# Text
 
-语义化文本组件。
+A semantic text component.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-使用 `type` 属性定义文本类型。
+Use `type` to define the text type.
 
-## 不同尺寸
+## Sizes
 
-使用 `size` 属性设置文本尺寸：`large`、`default`、`small`。
+Set the text size with `size`: `large`, `default`, or `small`.
 
-## 文本省略
+## Text Truncation
 
-传入 `truncated` 属性，当文本超出容器宽度或 max-width 时自动显示省略号。  
-使用 `line-clamp` 属性实现多行省略。
+Set `truncated` to show an ellipsis when text exceeds the container or `max-width`.
+Use `line-clamp` for multi-line truncation.
 
-## 自定义标签
+## Custom Tag
 
-使用 `tag` 属性覆盖渲染的 HTML 标签（默认 `span`）。
+Use `tag` to override the rendered HTML element (default `span`).
 
 ---
 

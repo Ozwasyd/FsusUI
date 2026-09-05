@@ -1,42 +1,40 @@
-# Image 图片
+# Image
 
-除了原生特性外，还支持懒加载、自定义占位符、加载失败提示、图片预览等功能。
+In addition to native image behavior, it supports lazy loading, custom placeholders, load-error content, and image preview.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                                         |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
-| purpose                | 展示单张图片，处理加载、错误、懒加载和预览入口。                                                             |
-| basic usage            | 使用 `src` 与 `fit` 渲染图片，使用 `preview-src-list` 开启大图预览。                                         |
-| props / events / slots | 本页 `Image API` 覆盖公开 props、events、slots 和 exposes；独立预览器见 [`ImageViewer`](./image-viewer.md)。 |
-| accessibility          | 必须传入有意义的 `alt`，装饰图片使用空 `alt`；预览图集应保证关闭、切换和缩放控件可键盘操作。                 |
-| theme token notes      | 跟随公开背景、边框、圆角、overlay 和 motion token。                                                          |
-| known limitations      | 懒加载依赖浏览器或滚动容器行为；远程图片鉴权、占位图策略和错误重试由调用方负责。                             |
-| stability level        | Preview public component。                                                                                   |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+for the change policy and the shared [theme token contract](../theme/tokens.md).
+Provide a meaningful `alt` (or an empty `alt` for decoration), and keep
+preview controls keyboard accessible. Lazy loading follows browser or scroll
+container behavior; consumers own remote authentication, placeholders, and
+retry policy. The standalone [`ImageViewer`](./image-viewer.md) documents the
+full-screen preview surface.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `fit` 属性控制图片填充容器的方式（同 CSS `object-fit`）。
+Use `fit` to control how the image fills its container, as with CSS `object-fit`.
 
-## 占位内容
+## Placeholder Content
 
-通过 `placeholder` 插槽自定义图片加载前的占位内容。
+Customize the pre-load placeholder with the `placeholder` slot.
 
-## 加载失败
+## Load Failure
 
-通过 `error` 插槽自定义加载失败时显示的内容。
+Customize load-error content with the `error` slot.
 
-## 懒加载
+## Lazy Loading
 
-设置 `loading="lazy"` 或 `lazy` 实现懒加载；通过 `scroll-container` 指定监听滚动的容器。
+Set `loading="lazy"` or `lazy` for lazy loading; use `scroll-container` to choose the scroll container to observe.
 
-## 图片预览
+## Image Preview
 
-设置 `preview-src-list` 属性开启大图预览，通过 `initial-index` 设置初始预览索引。
+Set `preview-src-list` to enable preview and `initial-index` for the initial image index.
 
 ---
 

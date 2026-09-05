@@ -1,23 +1,26 @@
-# 安装
+# Installation
 
-## 环境要求
+## Requirements
 
-FsusUI 要求以下最低版本的运行环境：
+The repository is maintained against these minimum tool versions:
 
-| 环境       | 版本      |
-| ---------- | --------- |
+| Tool | Version |
+| --- | --- |
 | Node.js    | `22.x`    |
 | pnpm       | `10.33.0` |
 | TypeScript | `6.0.x`   |
 | Vue        | `^3.5.0`  |
 
-FsusUI 的构建目标为 `ES2022`。对浏览器能力的保守基线按 Chromium `106+` 估算；其他现代浏览器需具备等效的 ES2022 支持能力。
+FsusUI targets `ES2022`. Consumers must provide equivalent modern browser
+support or transpile the package in their application; no older browser
+baseline is promised.
 
-### SCSS 编译器
+### SCSS compiler
 
-本项目使用 `theme-chalk` 中的 SCSS 源码，最低兼容 Sass `1.79.0`。
+The `theme-chalk` SCSS source requires Sass `1.79.0` or newer.
 
-如果终端出现 `legacy JS API Deprecation Warning`，在 `vite.config.ts` 中添加：
+If the terminal reports `legacy JS API Deprecation Warning`, set the modern
+compiler API in `vite.config.ts`:
 
 ```ts
 // vite.config.ts
@@ -30,31 +33,29 @@ export default defineConfig({
 })
 ```
 
----
+## Install from npm
 
-## 通过 npm 安装
+FsusUI public-preview packages are published to the npm public registry at
+`https://registry.npmjs.org/`.
 
-FsusUI public preview 发布在 npm public registry：`https://registry.npmjs.org/`。
-
-当前正式安装名为 `@ozwasyd/element-plus`。安装不需要项目级 `.npmrc`、scope registry 配置或 GitHub package token。
+Install `@ozwasyd/element-plus`; no project `.npmrc`, scope registry, or GitHub
+package token is required.
 
 ```bash
 pnpm install @ozwasyd/element-plus
 ```
 
-### Sass 源码依赖（可选）
+### Optional Sass source dependency
 
-若需要使用 SCSS 变量进行深度主题定制，额外安装：
+Install Sass when build-time SCSS variable overrides are needed:
 
 ```bash
 pnpm install -D sass
 ```
 
----
+## Develop in this repository
 
-## 在本仓库中进行本地开发
-
-若要在仓库内对组件或样式进行修改，直接在 monorepo 工作区中操作：
+For component or theme work, use the monorepo workspace directly:
 
 ```bash
 # 安装全部工作区依赖
@@ -70,20 +71,27 @@ pnpm build
 pnpm test:run
 ```
 
-完整的命令说明请参阅 [工程维护交接](../engineering-handoff.md)。
+See [Engineering handoff](../engineering-handoff.md) for the complete command
+reference.
 
----
+## Optional WASM acceleration
 
-## WASM 可选性能层
+FsusUI includes an optional WASM acceleration layer. These paths select it when
+their runtime and adapter support it:
 
-FsusUI 内置 WASM 加速模块，在特定场景下自动启用，无需额外配置：
+- **Table sorting:** Number and ASCII-string data can return stable row indices
+  through Worker/WASM. Runtime history selects Worker/WASM or chunked JS; it
+  does not switch on a fixed row-count threshold.
+- **SelectV2 filtering:** A persistent index is rebuilt when options, labels, or
+  filter mode changes. Queries use generation/cancellation and transferable
+  index results; JS results remain available while WASM initializes.
+- **VirtualList row-height estimation:** Lists with `>= 2000` items try the WASM
+  batch estimator; smaller lists return to the caller's fallback estimate.
+- **MarkdownRenderer:** The built-in renderer accepts Markdown and presents raw
+  HTML as text. Its artifacts include `markdown_basic.js/.wasm` and
+  `markdown_simd.js/.wasm`; the component does not include Markdown styling.
 
-- **Table 排序**：number / ASCII string 数据可通过 Worker/WASM 返回稳定行索引；运行时依据真实端到端历史动态选择加速或分块 JS 路径，不按固定行数切换。
-- **SelectV2 过滤**：选项变化时建立一次持久索引，连续 query 使用 generation/cancel 和 transferable 索引结果；WASM 未就绪时继续显示 JS 过滤结果。
-- **VirtualList 行高预估**：当列表项 ≥ 2000 时，自动启用 WASM 动态行高预估，低于阈值时自动降级。
-- **MarkdownRenderer**：内置仅接受 Markdown、将原始 HTML 作为文本呈现的渲染器，产物包含 `markdown_basic.js/.wasm` 与 `markdown_simd.js/.wasm`，组件本身不包含 Markdown 样式。
-
-若需要在项目中重新编译 WASM 模块，需要 Emscripten `5.0.4`：
+Rebuilding the WASM modules requires Emscripten `5.0.4`:
 
 ```bash
 pnpm run build:wasm
@@ -91,9 +99,8 @@ pnpm run check:markdown-wasm
 pnpm run check:markdown-wasm-runtime
 ```
 
-详见 [工程维护交接](../engineering-handoff.md#wasm)。
+See [Engineering handoff](../engineering-handoff.md#wasm) for the WASM workflow.
 
-> **Name note:** FsusUI is the recommended public-facing name. The package
-> `@ozwasyd/element-plus` is the current FsusUI public-preview compatibility
-> build based on Element Plus; Element Plus itself remains upstream provenance
-> and API-compatibility context.
+External consumers import the public wrapper `@ozwasyd/element-plus/wasm`.
+The workspace package `@element-plus/wasm` and generated modules under
+`es/wasm/*` or `lib/wasm/*` are internal build details.

@@ -1,30 +1,30 @@
-# Rate 评分
+# Rate
 
-用于评分。
+Provides a rating control.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-评分被划分为多个等级，可通过 `colors` 属性区分颜色（支持 3 元素数组或以阈值为 key 的对象）。使用 `low-threshold` / `high-threshold` 定义等级阈值。
+Ratings are divided into levels. Use `colors` to distinguish them (a three-element array or an object keyed by thresholds), and `low-threshold` / `high-threshold` to define those thresholds.
 
-## 半星
+## Half Stars
 
-设置 `allow-half` 属性允许选择半星。
+Set `allow-half` to allow half-star values.
 
-## 辅助文字
+## Auxiliary Text
 
-设置 `show-text` 在右侧显示文字；通过 `texts` 数组为不同评分配置文字。
+Set `show-text` to show text on the right; configure text for each rating in `texts`.
 
-## 可清空
+## Clearable
 
-设置 `clearable` 属性，再次点击同一值时将重置为 0。
+Set `clearable`; clicking the same value again resets the rating to 0.
 
-## 只读
+## Read-Only
 
-设置 `disabled` 为只读展示模式，可配合 `show-score` 显示当前分值，通过 `score-template` 自定义分值模板（包含 `{value}`）。
+Set `disabled` for a read-only display. Combine it with `show-score` and customize the score template with `score-template` (including `{value}`).
 
 ---
 

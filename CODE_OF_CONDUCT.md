@@ -1,11 +1,11 @@
-# Code Of Conduct
+# Code of Conduct
 
-FsusUI uses a small public-preview conduct policy.
+FsusUI’s public-preview conduct policy is short and direct.
 
 ## Expected Behavior
 
-- Be respectful and direct.
-- Keep technical critique focused on code, docs, behavior, and evidence.
+- Be respectful and direct; keep technical critique focused on code, docs,
+  behavior, and evidence.
 - Provide enough reproduction detail for maintainers to evaluate a report.
 - Respect maintainer decisions on API stability, security disclosure, and
   release timing.

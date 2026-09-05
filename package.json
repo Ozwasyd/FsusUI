@@ -110,6 +110,7 @@
     "check:design-source-drift": "node ./scripts/with-node-heap.mjs node ./scripts/check-design-source-drift.mjs",
     "check:fsusui-design-conformance": "node ./scripts/with-node-heap.mjs node ./scripts/check-fsusui-design-conformance.mjs",
     "check:documentation-architecture": "node ./scripts/with-node-heap.mjs node ./scripts/check-documentation-architecture.mjs && node ./scripts/with-node-heap.mjs node ./scripts/test-documentation-architecture.mjs",
+    "check:documentation-compression": "node ./scripts/check-documentation-compression.mjs && node ./scripts/test-documentation-compression.mjs",
     "check:foundation-style-boundary": "node ./scripts/with-node-heap.mjs node ./scripts/check-foundation-style-boundary.mjs",
     "check:focus-ring-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-focus-ring-contract.mjs",
     "check:theme-scale-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-theme-scale-contract.mjs",

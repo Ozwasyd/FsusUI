@@ -1,26 +1,26 @@
-# Popover 气泡卡片
+# Popover
 
-与 Tooltip 类似，但可展示更丰富的内容，如表格、操作按钮等。
+Similar to Tooltip, but supports richer content such as tables and action buttons.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `trigger` 设置触发方式，通过 `content` 设置内容（也可用默认插槽覆盖），通过 `reference` 插槽放置触发元素。
+Set the trigger with `trigger`, content with `content` (or replace it with the default slot), and the trigger element with the `reference` slot.
 
-## 嵌套内容
+## Nested Content
 
-用默认插槽放入任意组件（表格、表单等）。
+Put any component, such as a table or form, in the default slot.
 
-## 受控模式
+## Controlled Mode
 
-使用 `v-model:visible` 实现手动控制显示。
+Use `v-model:visible` for manual visibility control.
 
-## 虚拟触发
+## Virtual Triggering
 
-通过 `virtual-triggering` 和 `virtual-ref` 将触发元素与弹出内容解耦。
+Use `virtual-triggering` and `virtual-ref` to decouple the trigger from the popover content.
 
 ---
 

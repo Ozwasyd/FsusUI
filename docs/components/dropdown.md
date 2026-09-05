@@ -1,14 +1,14 @@
-# Dropdown 下拉菜单
+# Dropdown
 
-将动作或菜单折叠到下拉菜单中。
+Groups actions or menus inside a dropdown.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-触发元素放在默认插槽，菜单内容放在 `#dropdown` 插槽（使用 `el-dropdown-menu`）。
+Put the trigger in the default slot and menu content in `#dropdown` (using `el-dropdown-menu`).
 
 ```vue
 <el-dropdown>
@@ -23,17 +23,17 @@
 </el-dropdown>
 ```
 
-## 触发方式
+## Triggering
 
-通过 `trigger` 设置触发方式：`hover`（默认）、`click`、`contextmenu`。
+Set `trigger` to `hover` (default), `click`, or `contextmenu`.
 
-## 分裂按钮
+## Split Button
 
-设置 `split-button` 将触发元素改为左右分裂的按钮组。
+Set `split-button` to turn the trigger into a two-part button group.
 
-## 指令触发
+## Directive Triggering
 
-通过 `handleOpen` / `handleClose` 方法手动控制菜单显示。
+Use `handleOpen` / `handleClose` to control menu visibility manually.
 
 ---
 

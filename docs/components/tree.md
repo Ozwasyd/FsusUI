@@ -1,42 +1,42 @@
-# Tree 树形控件
+# Tree
 
-用清晰的层级结构展示信息，可展开或折叠。
+Displays information in a clear hierarchy that can expand or collapse.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `data` 属性传入树形数组；`node-key` 指定节点唯一标识字段；`props` 配置 label、children 等字段映射。
+Pass a tree array through `data`; use `node-key` for the unique node field and `props` to map fields such as label and children.
 
-## 可选择节点
+## Selectable Nodes
 
-设置 `show-checkbox` 启用节点多选功能；`check-strictly` 控制父子节点选中状态是否关联。
+Set `show-checkbox` for multi-select nodes; `check-strictly` controls whether parent and child selection states are linked.
 
-## 懒加载
+## Lazy Loading
 
-设置 `lazy` 与 `load` 函数，点击展开时才异步加载子节点。
+Set `lazy` with a `load` function to load child nodes asynchronously on expansion.
 
-## 默认展开与选中
+## Default Expansion and Selection
 
-使用 `default-expanded-keys` 和 `default-checked-keys` 设置初始展开/选中的节点 key 数组（需配置 `node-key`）。
+Use `default-expanded-keys` and `default-checked-keys` for initial expanded/checked node keys; `node-key` is required.
 
-## 自定义节点内容
+## Custom Node Content
 
-通过默认插槽（访问 `node`、`data`）或 `render-content` 渲染函数自定义节点显示内容。
+Customize node content with the default slot (`node`, `data`) or the `render-content` renderer.
 
-## 节点过滤
+## Node Filtering
 
-调用实例方法 `filter(keyword)` 过滤节点，配合 `filter-node-method` 自定义过滤逻辑。
+Call `filter(keyword)` on the instance to filter nodes and use `filter-node-method` for custom logic.
 
-## 手风琴模式
+## Accordion Mode
 
-设置 `accordion` 使同级节点只能同时展开一个。
+Set `accordion` so only one sibling can be expanded at a time.
 
-## 可拖拽
+## Draggable
 
-设置 `draggable` 启用节点拖放功能；`allow-drag`、`allow-drop` 函数控制拖放规则。
+Set `draggable` for node dragging; `allow-drag` and `allow-drop` control the drag rules.
 
 ---
 
@@ -73,7 +73,7 @@
 | allow-drag | 判断节点能否被拖拽的函数 | `(node) => boolean` | — |
 | allow-drop | 判断节点能否被放入的函数 | `(draggingNode, dropNode, type) => boolean` | — |
 
-### props 字段映射
+### Props Field Mapping
 
 | 属性 | 说明 | 类型 |
 |------|------|------|

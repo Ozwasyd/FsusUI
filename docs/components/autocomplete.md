@@ -1,26 +1,28 @@
-# Autocomplete 自动补全输入框
+# Autocomplete
 
-根据当前输入内容提供输入建议。
+Provides suggestions based on the current input.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-`fetch-suggestions` 属性接收一个方法，当输入内容变化时被调用，通过 `callback(data)` 返回建议列表。
+`fetch-suggestions` receives a function called when the input changes; return
+the suggestion list through `callback(data)`.
 
-## 自定义模板
+## Custom Template
 
-通过默认插槽自定义建议项的展示方式，插槽 scope 中可访问 `item`。
+Customize suggestion items with the default slot; the slot scope exposes `item`.
 
-## 远程搜索
+## Remote Search
 
-在 `fetch-suggestions` 中请求后端数据，设置 `debounce` 控制防抖延迟（默认 300ms）。
+Request remote data in `fetch-suggestions`; set `debounce` for the debounce delay
+(300ms by default).
 
-## 自定义头部和底部
+## Custom Header and Footer
 
-使用 `header` / `footer` 插槽自定义下拉框的顶部和底部内容。
+Use the `header` and `footer` slots for custom dropdown content.
 
 ---
 

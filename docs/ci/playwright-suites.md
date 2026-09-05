@@ -1,55 +1,45 @@
-# Release-critical Playwright suite registry
+# Release-Critical Playwright Suite Registry
 
-> **Authority:** `spec/ci/playwright-suites.json`  
-> **Schema:** `spec/ci/playwright-suites.schema.json`  
-> **Project cell contracts:** `spec/ci/playwright-project-contracts/*.json`  
-> **Commands:** `pnpm ci:playwright:plan`, `pnpm ci:playwright:check`
+> **Role:** Normative suite registry
+> **Authority:** `spec/ci/playwright-suites.json`,
+> `spec/ci/playwright-suites.schema.json`, and
+> `spec/ci/playwright-project-contracts/*.json`
+> **Checks:** `pnpm ci:playwright:plan` and `pnpm ci:playwright:check`
 
-## Purpose
-
-Several Playwright entry points exist outside the generic visual orchestration
-job. This registry is the **only hand-edited authority** for:
-
-- which suite ids exist
-- which package command and Playwright config each suite uses
-- the full execution cell matrix (browser × viewport × theme × …)
-- which CI profile (`pr` / `main` / `nightly` / `release`) owns each suite
-- source impact roots, artifact namespaces, and skip policy
-
-Workflow YAML and issue text must not invent a second matrix.
+This registry is the only hand-edited authority for suite IDs, package command,
+Playwright config, browser × viewport × theme × runtime cells, CI ownership,
+impact roots, artifact namespace, and skip policy. Workflow YAML and issue text
+must not define a second matrix.
 
 ## Dimension semantics
 
-| Dimension     | Meaning                                            | Not this                               |
-| ------------- | -------------------------------------------------- | -------------------------------------- |
-| `browser`     | Playwright engine: `chromium`, `firefox`, `webkit` | Never `desktop-dark`                   |
-| `viewport`    | Layout form factor: `desktop`, `mobile`, `tiny`    | Not a browser                          |
-| `theme`       | Color scheme: `light`, `dark`                      | Not a browser                          |
-| `safeArea`    | Safe-area geometry matrix cell                     | Separate from viewport label           |
-| `runtimeMode` | `ssr`, `reuse`, or `product`                       | Shard/worker counts are not dimensions |
+| Dimension | Meaning | Excludes |
+| --- | --- | --- |
+| `browser` | `chromium`, `firefox`, or `webkit` | `desktop-dark` |
+| `viewport` | `desktop`, `mobile`, or `tiny` | Browser identity |
+| `theme` | `light` or `dark` | Browser identity |
+| `safeArea` | Safe-area geometry cell | Viewport label |
+| `runtimeMode` | `ssr`, `reuse`, or `product` | Shards, workers, test count |
 
-Shard count, worker count, and test count are capacity details — they are **not**
-compatibility coverage.
+Shard, worker, and test counts are capacity details, not compatibility
+coverage.
 
-## Fixed suite ids
+## Fixed suite IDs
 
 1. `view-transitions` — three browsers
-2. `motion-ssr` — Chromium SSR cell
+2. `motion-ssr` — Chromium SSR
 3. `dom-layout` — Chromium × viewport × theme
 4. `geometry-smoke` — Chromium
 5. `markdown-editor-interaction` — three browsers
-6. `visual-boundary-audit` — viewport/theme + safe-area cells
-7. `visual-runtime-reuse` — **runtime contract only**; does **not** count toward product browser coverage
-8. `web-interaction-conformance` — Chromium, Firefox, and WebKit real-interaction cells
+6. `visual-boundary-audit` — viewport/theme plus safe-area cells
+7. `visual-runtime-reuse` — runtime contract only; not product browser coverage
+8. `web-interaction-conformance` — Chromium, Firefox, and WebKit interaction cells
 
-## Pure-data project contracts
+Each suite’s JSON project contract is authoritative for project names and
+dimensions. Registry cells must match it 1:1, and config files must declare the
+same names so renames fail validation.
 
-Each suite has a JSON contract under `spec/ci/playwright-project-contracts/`.
-That file is the authority for Playwright project names and dimensions. The
-registry cells must match it 1:1. Config files must declare the same project
-names so renames fail the check.
-
-## Commands
+## Commands and workflow binding
 
 ```bash
 pnpm ci:playwright:plan --group pr
@@ -59,13 +49,8 @@ pnpm ci:playwright:plan --group release --json
 pnpm ci:playwright:check
 ```
 
-`plan` and `check` do not install browsers, start servers, or hit the network.
-`runBinding` is always `current-workflow-run` — release never points at historical
-external evidence.
-
-## Workflow note
-
-The reusable Playwright workflow derives its execution-owner cells from this
-registry. `web-interaction-conformance` has one owner and runs each browser
-project once; the fixed local entry point is
-`pnpm test:conformance:web-interaction`.
+These commands are offline and do not install browsers or start servers.
+`runBinding` is always `current-workflow-run`; release plans never point to
+historical external evidence. The reusable workflow derives execution-owner
+cells from this registry. `web-interaction-conformance` has one owner and runs
+each browser project once through `pnpm test:conformance:web-interaction`.

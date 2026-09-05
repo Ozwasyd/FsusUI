@@ -1,16 +1,16 @@
-# InfiniteScroll 无限滚动
+# InfiniteScroll
 
-滚动到底部时自动执行加载方法。
+Automatically runs a loading method when scrolling reaches the bottom.
 
-> **警告**：该指令已被标记为废弃，将在 3.0.0 版本移除。请改用 [Scrollbar 的无限滚动功能](./scrollbar.md)。
+> **Warning:** This directive is deprecated and will be removed in 3.0.0. Use [Scrollbar's infinite-scroll feature](./scrollbar.md) instead.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-在列表元素上添加 `v-infinite-scroll` 指令，绑定加载函数，滚动到底部时自动调用。
+Add `v-infinite-scroll` to a list element and bind a loading function; it is called automatically at the bottom.
 
 ```vue
 <ul v-infinite-scroll="loadMore" :infinite-scroll-disabled="loading">

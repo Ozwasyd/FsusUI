@@ -1,9 +1,8 @@
 # Icon Registry Schema
 
 Icon specs define meaning, size, stroke, fill, and pairing behavior without
-tying the contract to a specific icon renderer. `registry.yaml` is the
-platform-neutral source consumed by Web metadata generation and Avalonia
-resource generation.
+binding the contract to a renderer. `registry.yaml` is the platform-neutral
+source for Web metadata and Avalonia resource generation.
 
 ## Required Fields
 
@@ -22,8 +21,8 @@ resource generation.
 | `aliases`             | stable compatibility or semantic alias ids                |
 
 The icon pipeline validates `path`, viewport, stroke, fill, and Vue component
-name against `source`. Registry entries drift when the source SVG or Vue
-component changes without regenerating Avalonia artifacts.
+name against `source`; entries drift when a source SVG or Vue component changes
+without regenerating Avalonia artifacts.
 
 Icons used as the only visible command label require an accessible name from
 the consuming component or pattern. Decorative icons must be explicitly marked
@@ -31,17 +30,17 @@ decorative when they would otherwise be the only visible glyph.
 
 ## Generated Artifacts
 
-Run `pnpm run icons:generate` after changing the registry. CI uses
-`pnpm run icons:check` and `pnpm run icons:lint` to ensure generated artifacts
-are current.
+After changing the registry, run `pnpm run icons:generate`. CI runs
+`pnpm run icons:check` and `pnpm run icons:lint` to ensure artifacts are current.
 
-- Web metadata: `vue/packages/icons-vue/generated/icon-metadata.json`
-- Avalonia resources:
-  `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml`
-- C# lookup keys: `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs`
-- Stable inventory: `docs/icons/generated/stable-icons.md`
-- Visual baseline: `tests/conformance/visual/icon-baselines.json`
+| Artifact | Path |
+| --- | --- |
+| Web metadata | `vue/packages/icons-vue/generated/icon-metadata.json` |
+| Avalonia resources | `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml` |
+| C# lookup keys | `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs` |
+| Stable inventory | `docs/icons/generated/stable-icons.md` |
+| Visual baseline | `tests/conformance/visual/icon-baselines.json` |
 
-Web Vue components remain generated from `vue/packages/icons-svg`, but the Web
-generation step reads this registry to add semantic aliases such as
-`ChevronRight` and to catch missing source SVG mappings.
+Web Vue components remain generated from `vue/packages/icons-svg`; the Web step
+reads this registry to add semantic aliases such as `ChevronRight` and catch
+missing source SVG mappings.

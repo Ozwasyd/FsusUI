@@ -5,6 +5,11 @@ packages. Start with [installation](installation.md), then use the component
 pages under [components](components/button.md) when mapping existing Vue/FsusUI
 contracts to Avalonia controls.
 
+Cross-cutting contracts live in [platform differences](platform-differences.md),
+[overlay host](overlay-host.md), [motion runtime](motion-runtime.md), and
+[layout primitives](layout-primitives.md). Component pages link back to these
+owners instead of repeating their shared rules.
+
 ## Package Guides
 
 - [Install the three Avalonia packages](installation.md)
@@ -80,13 +85,12 @@ IBUS_ADDRESS="$(ibus address)" GTK_IM_MODULE=ibus QT_IM_MODULE=ibus \
 This gate uses the OS input pipeline and is not replaceable by
 Avalonia.Headless or synthetic composition scripts.
 
-The packed runtime command runs the same full component scenario set first as
-a framework-dependent JIT application and then as a self-contained trimmed
-application. Both modes consume the exact candidate manifest supplied to the
-separate Native AOT command. The Native AOT command restores from the isolated
-local-only source, publishes a self-contained RID-specific native executable,
-and runs that executable directly against a real Avalonia window and
-dispatcher. These commands do not define the component scenario registry.
+The packed-runtime command runs the full component scenario set as both a
+framework-dependent JIT and self-contained trimmed application. Both consume
+the exact candidate manifest used by the separate Native AOT command, which
+restores from the isolated local-only source and runs a self-contained,
+RID-specific executable against a real Avalonia window and dispatcher. These
+commands do not define the component scenario registry.
 
 The stable component-family source in
 [`spec/ci/avalonia-stable-readiness.json`](../../spec/ci/avalonia-stable-readiness.json)

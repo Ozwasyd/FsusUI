@@ -1,12 +1,12 @@
-# ConfigProvider 全局配置
+# ConfigProvider
 
-`ElConfigProvider` 用于在应用根部提供 FsusUI 的全局上下文。当前仓库已实现的配置面以 `vue/packages/components/config-provider/src/config-provider-props.ts` 为准。
+`ElConfigProvider` provides FsusUI's global context at the application root. The implemented configuration surface is defined by `vue/packages/components/config-provider/src/config-provider-props.ts`.
 
-> 运行示例：`pnpm dev` 后访问 demo-app，可直接看到全局尺寸、主题模式等配置的联动效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <template>
@@ -30,26 +30,26 @@ const themeMode = ref<'light' | 'dark' | 'system'>('system')
 
 ---
 
-## 主题模式
+## Theme Mode
 
-`theme-mode` 会把主题状态同步到 `<html>`，用于稳定地压过系统偏好或跟随系统偏好：
+`theme-mode` synchronizes theme state to `<html>`, either overriding or following the system preference:
 
-- `system`：跟随 `prefers-color-scheme`
-- `dark`：强制暗色
-- `light`：强制亮色
+- `system`: follow `prefers-color-scheme`
+- `dark`: force dark mode
+- `light`: force light mode
 
-同步副作用包括：
+Synchronization side effects include:
 
-- `class="dark"` / `class="light"`（显式模式）
+- `class="dark"` / `class="light"` (explicit modes)
 - `data-theme-mode`
 - `data-theme-resolved`
 - `color-scheme`
 
-如果你需要在 Vue 挂载前就先应用主题，配合 [`syncThemeMode`](../guide/dark-mode.md) 使用更合适。
+To apply the theme before Vue mounts, use [`syncThemeMode`](../guide/dark-mode.md).
 
 ---
 
-## 已实现属性
+## Implemented Attributes
 
 | 属性名                | 说明                           | 类型                              | 默认值                             |
 | --------------------- | ------------------------------ | --------------------------------- | ---------------------------------- |
@@ -67,13 +67,13 @@ const themeMode = ref<'light' | 'dark' | 'system'>('system')
 
 ---
 
-## Button 配置
+## Button Configuration
 
 | 属性名          | 说明                             | 类型      | 默认值  |
 | --------------- | -------------------------------- | --------- | ------- |
 | autoInsertSpace | 两个中文字符之间是否自动插入空格 | `boolean` | `false` |
 
-## Message 配置
+## Message Configuration
 
 | 属性名 | 说明                 | 类型     | 默认值 |
 | ------ | -------------------- | -------- | ------ |
@@ -81,15 +81,15 @@ const themeMode = ref<'light' | 'dark' | 'system'>('system')
 
 ---
 
-## Render Pipeline 配置
+## Render Pipeline Configuration
 
-`render-pipeline` 为重型内容提供统一的 Worker/分块/虚拟挂载预算。组件不会按名称写死启用策略；运行时会根据内容估算的 HTML 字节数、DOM 节点数和 item 数决定走同步渲染还是分块渲染。
+`render-pipeline` provides shared Worker, chunking, and virtual-mount budgets for heavy content. Components do not hard-code a strategy by name; runtime estimates HTML bytes, DOM nodes, and item count to choose synchronous or chunked rendering.
 
-策略选择是热拔插的：组件只调用统一 resolver，不直接写死策略分支。内部可以通过 `registerFsusRenderPipelineStrategyResolver()` 注册新的策略解析器，返回 `sync`、`chunked-main`、`chunked-worker` 或 `disabled`；注销函数执行后会回到默认预算策略。
+Strategy selection is hot-swappable: components call the shared resolver instead of embedding strategy branches. Register a resolver with `registerFsusRenderPipelineStrategyResolver()`; it returns `sync`, `chunked-main`, `chunked-worker`, or `disabled`. After unregistering, the default budget strategy resumes.
 
-组件接入也是注册制：全量安装、分组安装、demo contract 和按需 `app.use(ElXxx)` 都会为已安装控件注册默认 `RenderPipelineComponentPolicy`。轻量控件统一归类为 `sync-monitored`，滚动容器归类为 `viewport-provider`，可分块内容归类为 `chunk-adapter`，已有虚拟列表/网格归类为 `virtual-list` / `virtual-grid`，TreeV2、TableV2、SelectV2 通过 `inherited` 策略继承底层虚拟化预算。后续新增控件只需要注册 policy 或 adapter，不需要在现有控件里新增策略分支。
+Component integration is registration-based: full installs, grouped installs, demo contracts, and on-demand `app.use(ElXxx)` register a default `RenderPipelineComponentPolicy` for each installed control. Lightweight controls use `sync-monitored`, scroll containers use `viewport-provider`, chunkable content uses `chunk-adapter`, and existing virtual lists/grids use `virtual-list` / `virtual-grid`. TreeV2, TableV2, and SelectV2 inherit the lower-level virtual budget through `inherited`. New controls only register a policy or adapter; they do not add strategy branches to existing controls.
 
-外部重型组件应从主包的稳定子路径 `render-pipeline` 接入 adapter registry、policy registry 和 runtime。主包根入口保留兼容导出，但新增业务代码优先使用专用入口；完整示例见 [Render Pipeline 指南](../guide/render-pipeline.md)。
+External heavy components should use the stable `render-pipeline` package subpath for the adapter registry, policy registry, and runtime. The package root keeps compatibility exports, but new application code should use the dedicated entry point; see the [Render Pipeline guide](../guide/render-pipeline.md) for a complete example.
 
 ```vue
 <el-config-provider
@@ -125,16 +125,16 @@ const themeMode = ref<'light' | 'dark' | 'system'>('system')
 | acceleration.contentVisibility | `'auto' \| 'enabled' \| 'disabled'`，控制虚拟 chunk 的 `content-visibility` | `auto`   |
 | acceleration.layerBudget       | 临时合成层预算提示                                                          | `80`     |
 
-SSR、Worker 不可用或组件无法提供可序列化分块 adapter 时会自动降级为主线程同步路径；轻量组件共享该配置但不会被强行虚拟化。
-GPU 模式仅指浏览器 DOM compositor 路径，不引入 WebGPU；CPU 模式会收紧默认预算并优先使用 Worker 分块，但不会覆盖显式 `worker: 'disabled'`。
+When SSR or Worker is unavailable, or a component cannot provide a serializable chunk adapter, the runtime falls back to synchronous main-thread rendering. Lightweight components share this configuration but are not forced into virtualization.
+GPU mode refers only to the browser DOM compositor path and does not introduce WebGPU. CPU mode tightens default budgets and prefers Worker chunking, but does not override explicit `worker: 'disabled'`.
 
-当前接入层：
+Current integrations:
 
-- 全部 demo/安装器注册控件：都有组件级 policy，并通过统一策略路径解析为 `sync`、`chunked-main`、`chunked-worker` 或 `disabled`。
-- `ElMarkdownRenderer`：小文档走同步 HTML fast path，大文档走 `chunked-worker` / `chunked-main` 与虚拟挂载。
-- `VirtualList` / `DynamicSizeList` / `FixedSizeList`：通过统一策略与 `budget.overscanPx` 推导有效 cache；未显式提供 `render-pipeline` 时保持历史 `cache` 行为。
-- `VirtualGrid` / `DynamicSizeGrid` / `FixedSizeGrid`：同样通过统一策略推导行列 cache。
-- `TreeV2`、`TableV2`、`SelectV2`：通过上面的 VirtualList/Grid 继承统一预算策略，不在组件内部重复实现。
+- All demo/installer-registered controls have a component policy, resolved through the shared strategy path as `sync`, `chunked-main`, `chunked-worker`, or `disabled`.
+- `ElMarkdownRenderer`: small documents use the synchronous HTML fast path; large documents use `chunked-worker` / `chunked-main` with virtual mounting.
+- `VirtualList` / `DynamicSizeList` / `FixedSizeList`: derive effective cache from the shared strategy and `budget.overscanPx`; without explicit `render-pipeline`, historical `cache` behavior remains.
+- `VirtualGrid` / `DynamicSizeGrid` / `FixedSizeGrid`: likewise derive row and column cache through the shared strategy.
+- `TreeV2`, `TableV2`, and `SelectV2`: inherit the shared budget strategy through VirtualList/Grid instead of reimplementing it in each component.
 
 ---
 

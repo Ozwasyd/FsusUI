@@ -14,13 +14,11 @@ Maps the Vue button contract to `Content`, `Command`, `Activated`, `Variant`,
 
 ## Supported Platform Differences
 
-Native templates, focus visuals, and accessible names follow the accepted
-overrides in `docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for native templates, focus visuals, and accessible-name boundaries.
 
 ## Theme Tokens
 
-Consume `FsusThemeResourceKeys.FocusBrush`, density resources, danger brushes,
-disabled opacity, and motion resources through `FsusUI.Avalonia.Themes`.
+Consume `FsusThemeResourceKeys.FocusBrush`, density, danger, disabled-opacity, and motion resources through [Application Setup](../installation.md#application-setup) and [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

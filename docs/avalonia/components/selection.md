@@ -33,13 +33,11 @@ items, loading state, and keyboard contracts map to `IsChecked`, `Label`,
 
 ## Supported Platform Differences
 
-Native automation peers and high-contrast focus behavior follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for native automation peers and high-contrast focus behavior.
 
 ## Theme Tokens
 
-Selection controls use focus, disabled, accent, density, text, and motion
-resources.
+Use focus, disabled, accent, density, and text resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

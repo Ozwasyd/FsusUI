@@ -16,13 +16,11 @@ properties.
 
 ## Supported Platform Differences
 
-File picker integration, drag-and-drop file access, and keyboard focus follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for file-picker, drag-and-drop, and keyboard-focus boundaries.
 
 ## Theme Tokens
 
-Upload and transfer controls use border, focus, surface, text, danger, loading,
-density, and motion resources.
+Use border, focus, surface, text, danger, loading, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

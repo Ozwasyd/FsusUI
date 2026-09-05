@@ -1,50 +1,46 @@
-# Progress 进度条
+# Progress
 
-展示操作的当前进度，让用户了解系统实时状态。
+Shows the current operation progress so users can understand the live system state.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                     |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| purpose                | 展示确定或不确定任务进度，帮助用户判断等待、完成或异常状态。                             |
-| basic usage            | 使用 `percentage` 传入 0-100 的数值，按需选择 line、circle、dashboard 或 indeterminate。 |
-| props / events / slots | 本页 `API` 覆盖公开 props 和 slots。                                                     |
-| accessibility          | 业务侧应提供进度上下文文本；隐藏百分比时，用相邻文本或 ARIA 属性说明当前任务状态。       |
-| theme token notes      | 跟随公开主色、状态色、背景、圆角和 motion control token；自定义 `color` 应满足对比度。   |
-| known limitations      | 组件只展示调用方传入的进度，不负责估算异步任务真实完成率。                               |
-| stability level        | Preview public component。                                                               |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+and the shared [theme and motion contracts](../theme/tokens.md). Provide
+progress context text; when the percentage is hidden, expose the state through
+nearby text or ARIA. The component displays the supplied progress and does not
+estimate asynchronous completion.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 线形进度条
+## Linear Progress
 
-`percentage` 属性为必填，范围 0-100。通过 `format` 自定义文字格式。
+`percentage` is required and ranges from 0 to 100. Use `format` for custom text.
 
-## 内部百分比
+## Inline Percentage
 
-设置 `text-inside` 将百分比文字放在进度条内部，配合 `stroke-width` 调整高度。
+Set `text-inside` to place the percentage inside the bar and use `stroke-width` to adjust its height.
 
-## 自定义颜色
+## Custom Colors
 
-`color` 属性支持颜色字符串、函数（根据百分比返回颜色）或颜色区间数组。
+`color` accepts a color string, a function that returns a color by percentage, or a color-range array.
 
-## 环形进度条
+## Circular Progress
 
-设置 `type="circle"` 使用环形进度条；`width` 控制直径大小。
+Set `type="circle"` for a circular bar; use `width` to control its diameter.
 
-## 仪表盘
+## Dashboard
 
-设置 `type="dashboard"` 使用仪表盘形式。
+Set `type="dashboard"` for a dashboard gauge.
 
-## 不确定进度
+## Indeterminate Progress
 
-设置 `indeterminate` 展示加载中的不确定进度；通过 `duration` 控制动画时长。
+Set `indeterminate` for an indeterminate loading state and use `duration` for the animation duration.
 
-## 条纹进度
+## Striped Progress
 
-设置 `striped` 显示条纹进度条；`striped-flow` 使条纹流动；`duration` 控制动画时长。
+Set `striped` for stripes, `striped-flow` to animate them, and `duration` for the animation duration.
 
 ---
 

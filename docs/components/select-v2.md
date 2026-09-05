@@ -1,48 +1,48 @@
-# Select V2 虚拟化选择器
+# Select V2
 
-适用于选项数量极多（数万条）的场景，通过虚拟渲染优化性能。
+Use for very large option sets (tens of thousands), with virtual rendering for performance.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-最简单的选择器，通过 `options` 属性传入选项数据。
+The basic selector; pass option data through `options`.
 
-## 多选
+## Multiple Selection
 
-支持多选，绑定值为数组，配合 `collapse-tags` / `collapse-tags-tooltip` 折叠已选项。
+Supports multiple selection with an array value. Use `collapse-tags` / `collapse-tags-tooltip` to collapse selected items.
 
-## 禁用
+## Disabled
 
-可禁用整个选择器或某个选项项。
+Disable the entire selector or an individual option.
 
-## 可清空
+## Clearable
 
-设置 `clearable` 属性显示清空按钮。
+Set `clearable` to show a clear button.
 
-## 可过滤
+## Filterable
 
-设置 `filterable` 启用前端过滤，可通过 `filter-method` 自定义过滤逻辑。
+Set `filterable` for client-side filtering and use `filter-method` for custom logic.
 
-默认过滤索引只在 options identity/version、label getter 或 case 模式变化时重建，不依赖 query。连续 ASCII 输入在 Worker 中复用持久 WASM buffer，并可从上一次候选集合继续缩小；generation/cancel 确保旧查询不会覆盖新结果，命中索引通过 transferable `Uint32Array` 返回。WASM 冷启动、Worker 不可用、CJK 或自定义过滤仍保留语义正确的 JS 结果；大数据 JS fallback 按帧预算分块，每次 query 只创建一个 `RegExp`，不会闪现空列表。
+The filter index is rebuilt only when the options identity/version, label getter, or case mode changes; it does not depend on the query. Consecutive ASCII input reuses a persistent WASM buffer in the Worker and can narrow the previous candidate set. generation/cancel prevents stale queries from overwriting new results, and matching indexes return as transferable `Uint32Array`. WASM cold start, Worker unavailability, CJK input, and custom filters retain semantically correct JS results; the large-data JS fallback chunks work within frame budgets, creates one `RegExp` per query, and does not flash an empty list.
 
-## 选项分组
+## Option Groups
 
-数据结构支持嵌套分组。
+The data structure supports nested groups.
 
-## 自定义选项渲染
+## Custom Option Rendering
 
-通过 `default` 插槽自定义选项内容。
+Customize option content with the `default` slot.
 
-## 远程搜索
+## Remote Search
 
-同时设置 `filterable` 和 `remote`，配合 `remote-method` 从服务端搜索数据。
+Set `filterable` and `remote` together, then use `remote-method` to search server-side.
 
-## 创建新条目
+## Create New Items
 
-同时设置 `filterable` 和 `allow-create` 允许用户创建不在选项中的新条目，可使用 `default-first-option` 让 Enter 键直接选中第一个匹配项。
+Set `filterable` and `allow-create` to let users create values not in the options. Use `default-first-option` to let Enter select the first match.
 
 ---
 

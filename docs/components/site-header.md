@@ -1,10 +1,10 @@
-# SiteHeader 站点头部
+# SiteHeader
 
-`ElSiteHeader` 是 slot 驱动的通用站点 chrome primitive，用于在公开站点、公开认证页、账户工作台等布局中复用同一套 header 视觉与响应式规则。
+`ElSiteHeader` is a slot-driven site chrome primitive for reusing one header visual and responsive rule set across public sites, authentication pages, and account workspaces.
 
-组件只负责结构、样式、focus ring、desktop/mobile 区域切换和 sticky/max-width 等布局能力；品牌内容、导航、账户动作、主题切换、搜索入口和移动菜单都由调用方通过 slot 提供。
+The component owns structure, styling, focus ring, desktop/mobile regions, and sticky/max-width layout behavior. Consumers provide brand content, navigation, account actions, theme switching, search, and mobile menus through slots.
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <template>

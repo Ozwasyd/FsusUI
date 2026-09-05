@@ -3,7 +3,7 @@
 > **Role:** Navigation
 > **Applies to:** FsusUI and applications that consume FsusUI
 
-FsusUI has one human-readable visual source of truth: [`docs/design.md`](../design.md). Files in this directory govern how that contract is interpreted and changed; they must not create alternative token values, component defaults, or visual styles.
+FsusUI has one human-readable visual source of truth: [`docs/design.md`](../design.md). Files in this directory govern its interpretation and change; they must not introduce alternative token values, component defaults, or visual styles.
 
 ## Core contract
 

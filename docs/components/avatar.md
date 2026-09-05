@@ -1,30 +1,31 @@
-# Avatar 头像
+# Avatar
 
-用于展示用户或事物的图像，支持图片、图标或文字形式。
+Displays a user or object as an image, icon, or text avatar.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `shape` 设置头像形状（`circle` / `square`），通过 `size` 设置大小。
+Use `shape` for `circle` or `square`, and `size` for the avatar size.
 
-## 类型
+## Types
 
-支持图片（`src`）、图标（`icon`）和字符三种展示方式。
+The avatar supports an image (`src`), icon (`icon`), or character content.
 
-## 图片加载失败
+## Image Load Failure
 
-通过 `error` 事件处理图片加载失败，或使用默认插槽自定义回退内容。
+Handle image-load failure in the `error` event, or provide fallback content in
+the default slot.
 
-## 适配容器
+## Container Fit
 
-通过 `fit` 属性控制图片如何填充容器（同 CSS `object-fit`）。
+Use `fit` to control how the image fills its container, as with CSS `object-fit`.
 
-## 头像组
+## Avatar Group
 
-使用 `el-avatar-group` 将多个头像组合展示，支持折叠和 tooltip。
+Use `el-avatar-group` to combine avatars; it supports collapsing and tooltips.
 
 ---
 

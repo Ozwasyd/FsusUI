@@ -1,29 +1,29 @@
-# Countdown 倒计时
+# Countdown
 
-**注意**：Countdown 是 Statistic 组件的一部分。完整的统计数值文档见 [Statistic](./statistic.md)。
+**Note:** Countdown is part of the Statistic component. See [Statistic](./statistic.md) for the complete numeric-display documentation.
 
-倒计时组件，展示目标时间距现在的剩余时长，支持格式化、前后缀和结束回调。
+A countdown component that shows the remaining time until a target, with formatting, prefixes, suffixes, and a completion callback.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-countdown title="距活动结束" :value="deadline" format="HH:mm:ss" />
 ```
 
-其中 `deadline` 为目标时间戳（毫秒）或 `dayjs` 对象：
+`deadline` is a target timestamp in milliseconds or a `dayjs` object:
 
 ```ts
 import dayjs from 'dayjs'
 const deadline = dayjs().add(10, 'minute').valueOf()
 ```
 
-## 自定义格式
+## Custom Format
 
-`format` 支持以下占位符：
+`format` supports these placeholders:
 
 | 格式 | 说明 |
 |------|------|
@@ -35,7 +35,7 @@ const deadline = dayjs().add(10, 'minute').valueOf()
 | `ss` | 秒 |
 | `SSS` | 毫秒 |
 
-> **提示**：建议 format 范围不超过天级别，超出部分不会显示。
+> **Tip:** Keep the `format` range at day-level or smaller; larger units are not displayed.
 
 ---
 

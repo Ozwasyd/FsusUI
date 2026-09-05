@@ -1,12 +1,12 @@
-# Watermark 水印
+# Watermark
 
-在页面或容器上添加特定文字或图案水印。
+Adds a text or image watermark to a page or container.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-watermark content="FsusUI">
@@ -14,13 +14,13 @@
 </el-watermark>
 ```
 
-## 多行水印
+## Multi-Line Watermark
 
-`content` 传入字符串数组即可实现多行文字水印。
+Pass an array of strings to `content` for a multi-line text watermark.
 
-## 图片水印
+## Image Watermark
 
-通过 `image` 设置图片水印。建议使用 2x/3x 分辨率图片，并指定 `width`/`height` 防止拉伸。
+Set an image watermark with `image`. Use a 2x/3x asset and specify `width` / `height` to prevent stretching.
 
 ---
 
@@ -40,7 +40,7 @@
 | gap | 水印间距 `[水平, 垂直]` | `[number, number]` | `[100, 100]` |
 | offset | 水印偏移量（默认为 `gap/2`） | `[number, number]` | `[gap[0]/2, gap[1]/2]` |
 
-### Font（字体配置）
+### Font (Font Options)
 
 | 属性名 | 说明 | 类型 | 默认值 |
 |--------|------|------|--------|

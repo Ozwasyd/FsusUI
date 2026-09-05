@@ -1,12 +1,12 @@
-# Timeline 时间线
+# Timeline
 
-可视化地呈现时间流信息，与 Steps 的区别在于强调时间戳。
+Visualizes a sequence of events; unlike Steps, it emphasizes timestamps.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-timeline>
@@ -16,21 +16,21 @@
 </el-timeline>
 ```
 
-## 排列模式
+## Layout Mode
 
-通过 `mode` 控制时间线与内容的相对位置：`start`（默认）、`end`、`alternate`、`alternate-reverse`。
+Use `mode` for the timeline/content relationship: `start` (default), `end`, `alternate`, or `alternate-reverse`.
 
-## 自定义节点
+## Custom Nodes
 
-通过 `type`、`color`、`size`、`icon` 属性自定义节点样式，或通过 `#dot` 插槽完全自定义节点。
+Customize node styling with `type`, `color`, `size`, and `icon`, or replace the node with the `#dot` slot.
 
-## 时间戳位置
+## Timestamp Position
 
-通过 `placement` 将时间戳放置在内容上方（`top`）或下方（`bottom`，默认）。
+Use `placement` to put timestamps above (`top`) or below (`bottom`, default) the content.
 
-## 反向排列
+## Reverse Order
 
-设置 `reverse` 使节点按倒序排列。
+Set `reverse` to order nodes in reverse.
 
 ---
 

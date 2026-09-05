@@ -1,22 +1,22 @@
-# TimeSelect 时间选择
+# TimeSelect
 
-提供固定时间段的下拉选择，与 TimePicker 的区别在于只能选择预设时间段。
+Provides a dropdown of fixed time ranges; unlike TimePicker, it allows only preset ranges.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-`v-model` 绑定字符串时间值（格式 `HH:mm`）；`start` / `end` / `step` 控制时间列表范围和步长。
+Bind a string time in `HH:mm` format with `v-model`; `start` / `end` / `step` control the list range and increment.
 
-## 禁用时间
+## Disabled Times
 
-通过 `disabled-time` 属性传入函数禁止选择特定时间。
+Pass a function through `disabled-time` to disallow particular times.
 
-## 跨日时间范围
+## Cross-Day Time Range
 
-可通过结束时间小于开始时间实现跨日效果。
+Set an end time earlier than the start time for an overnight range.
 
 ---
 

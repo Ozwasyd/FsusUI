@@ -1,32 +1,32 @@
-# Radio 单选框
+# Radio
 
-在一组备选项中进行单选。
+Select one option from a set of alternatives.
 
-> **注意**：`label` 作为 `value` 使用的方式已废弃，推荐使用 `value` 属性（需 2.6.0+）。
+> **Note:** Using `label` as `value` is deprecated. Use the `value` prop instead (requires 2.6.0+).
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-单选框的选项不宜过多。`v-model` 绑定当前选中的值。
+Keep the number of radio options reasonable. Bind the selected value with `v-model`.
 
-## 禁用状态
+## Disabled State
 
-通过 `disabled` 属性禁用单选框。
+Use `disabled` to disable a radio.
 
-## 单选框组
+## Radio Group
 
-配合 `el-radio-group` 使用，可通过 `v-model` 统一管理多个单选框，并监听 `change` 事件。
+Use `el-radio-group` to manage multiple radios through one `v-model` and listen for `change`.
 
-## 带边框
+## With Border
 
-通过 `border` 属性为单选框添加边框。
+Set `border` to add a border.
 
-## 按钮样式
+## Button Style
 
-将 `el-radio` 替换为 `el-radio-button` 实现按钮样式。可通过 `fill` 和 `text-color` 设置激活样式。
+Replace `el-radio` with `el-radio-button` for a button style. Use `fill` and `text-color` for the active style.
 
 ---
 
@@ -103,10 +103,9 @@
 | ------- | ---------- |
 | default | 自定义内容 |
 
-### 44px 触控高度
+### 44px Touch Target
 
-需要保留 `size="small"` 的紧凑字重与水平留白，同时满足移动端默认 44px
-触控高度时，可在 `el-radio-group` 上使用公开 modifier class：
+To retain the compact weight and horizontal padding of `size="small"` while meeting the mobile 44px touch height, use the public modifier class on `el-radio-group`:
 
 ```vue
 <el-radio-group class="fsus-radio-group--touch" size="small">
@@ -115,5 +114,4 @@
 </el-radio-group>
 ```
 
-该 class 使用公共 `--fsus-control-height` token 设置最小高度，并负责内容垂直、
-水平居中。消费者无需通过 `:deep()` 或 `.el-radio-button__inner` 覆盖组件内部结构。
+This class uses the shared `--fsus-control-height` token for the minimum height and centers content vertically and horizontally. Consumers do not need to override internals with `:deep()` or `.el-radio-button__inner`.

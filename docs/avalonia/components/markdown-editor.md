@@ -228,14 +228,14 @@ Markdown parser.
 
 ## Supported Platform Differences
 
-Native host, scroll, and content regions follow
-`docs/avalonia/platform-differences.md`. This control is not a WebView wrapper
-and is not an alias of `FsusTextEditor`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for native host, scroll,
+and content regions. This control is not a WebView wrapper or an alias of
+`FsusTextEditor`.
 
 ## Theme Tokens
 
-The native shell consumes the shared text-editor surface, text, border, spacing,
-control-border, and surface-radius resources from the generated Avalonia theme.
+The native shell consumes shared text-editor surface, text, border, spacing,
+control-border, and surface-radius resources from [Application Setup](../installation.md#application-setup).
 
 ## Minimal Avalonia Example
 

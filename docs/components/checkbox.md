@@ -1,40 +1,41 @@
-# Checkbox 多选框
+# Checkbox
 
-一组备选项中进行多选。
+Select multiple values from a set of alternatives.
 
-> **注意**：`label` 作为 `value` 使用的方式已废弃，推荐使用 `value` 属性（需 2.6.0+）。
+> **Deprecated:** using `label` as `value` is deprecated. Use the `value` prop
+> instead (requires 2.6.0+).
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-单独使用，通过 `v-model` 绑定 Boolean 值。
+Use a checkbox alone with a Boolean `v-model`.
 
-## 禁用状态
+## Disabled State
 
-通过 `disabled` 属性禁用多选框。
+Set `disabled` to disable a checkbox.
 
-## 多选框组
+## Checkbox Group
 
-使用 `el-checkbox-group` 组合多个多选框，`v-model` 绑定为数组。
+Group checkboxes with `el-checkbox-group` and bind an array with `v-model`.
 
-## 全选（中间状态）
+## Select All (Indeterminate State)
 
-通过 `indeterminate` 属性实现"全选"的中间态效果。
+Use `indeterminate` for a select-all intermediate state.
 
-## 最多/最少可选数量
+## Minimum/Maximum Selection
 
-使用 `el-checkbox-group` 的 `min` / `max` 属性限制可选数量。
+Use `min` and `max` on `el-checkbox-group` to limit the selection count.
 
-## 按钮样式
+## Button Style
 
-将 `el-checkbox` 替换为 `el-checkbox-button` 实现按钮样式。
+Replace `el-checkbox` with `el-checkbox-button` for a button style.
 
-## 带边框
+## With Border
 
-通过 `border` 属性为多选框添加边框。
+Set `border` to add a border.
 
 ---
 

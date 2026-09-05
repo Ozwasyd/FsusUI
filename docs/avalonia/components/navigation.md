@@ -151,8 +151,9 @@ await palette.HandleKeyAsync(Key.Enter);
 
 ## Theme Tokens
 
-Navigation controls use focus, surface, border, text, muted text, density, and
-motion resources.
+Use focus, surface, border, text, and muted-text resources from
+[Application Setup](../installation.md#application-setup); motion behavior is
+defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Settings Shell
 

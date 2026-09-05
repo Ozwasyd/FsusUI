@@ -1,8 +1,7 @@
 # Playground And Demo App
 
-The current public playground is the Vite demo app in `vue/packages/demo-app`. It
-remains a development app, but its examples must be safe for public-preview
-evaluation.
+The public playground is the Vite demo app in `vue/packages/demo-app`. It is a
+development app, but examples must remain safe for public-preview evaluation.
 
 ## Run The Demo
 
@@ -10,7 +9,7 @@ evaluation.
 pnpm -C vue/packages/demo-app dev
 ```
 
-The dev server uses port `5173` by default. Previewing a built demo uses:
+The dev server uses port `5173` by default. Preview a built demo with:
 
 ```bash
 pnpm -C vue/packages/demo-app build
@@ -25,7 +24,7 @@ pnpm run build:demo
 
 ## What The Demo Covers
 
-The default gallery is split into sections:
+The default gallery sections are:
 
 | Section          | File                                                            |
 | ---------------- | --------------------------------------------------------------- |
@@ -39,34 +38,31 @@ The default gallery is split into sections:
 | Markdown stress  | `vue/packages/demo-app/src/sections/MarkdownStressSection.vue`  |
 | Issue primitives | `vue/packages/demo-app/src/sections/IssuePrimitivesSection.vue` |
 
-The demo also has UI audit routes and metadata in
-`vue/packages/demo-app/src/ui-audit-manifest.ts`.
+UI audit routes and metadata live in `vue/packages/demo-app/src/ui-audit-manifest.ts`.
 
 ## Add A Demo
 
-1. Add the example to the closest section file.
+1. Add it to the closest section file.
 2. Use neutral fixture text and synthetic data.
-3. Keep controls reachable by keyboard.
-4. Add labels for icon-only buttons and custom interactive elements.
-5. Prefer public package imports or existing demo component registration.
-6. Update visual tests or audit metadata when the demo changes a covered state.
+3. Keep controls keyboard-reachable and label icon-only buttons/custom interactive elements.
+4. Prefer public package imports or existing demo registration.
+5. Update visual tests or audit metadata when a covered state changes.
 
 ## Visual Regression Relationship
 
 Visual snapshots under `vue/tests/visual/demo-app.spec.ts-snapshots/` are generated
-from the demo app. The normal local command is:
+from the demo app. Run locally:
 
 ```bash
 pnpm run verify:visual:affected
 ```
 
-Use `pnpm run test:visual:full` for the authoritative four-project matrix and
-`pnpm run test:visual:evidence` when successful artifacts must be retained. The
-unqualified `test:visual` command prints profile help; profile details live in
-[`visual-testing.md`](./visual-testing.md).
+Use `pnpm run test:visual:full` for the authoritative four-project matrix or
+`pnpm run test:visual:evidence` when successful artifacts must be retained. Unqualified
+`test:visual` prints profile help; details live in [`visual-testing.md`](./visual-testing.md).
 
-Focused Playwright specs live under `vue/tests/visual/`, including demo smoke,
-interactive audit, UI audit, scroll motion, and issue primitive coverage.
+Focused Playwright specs under `vue/tests/visual/` cover demo smoke, interactive
+and UI audits, scroll motion, and issue primitives.
 
 When a demo change intentionally changes screenshots, update the relevant
 snapshots in the same change and explain why in the commit or pull request.
@@ -76,7 +72,5 @@ snapshots in the same change and explain why in the commit or pull request.
 - Do not use private sample content, real user data, customer names, secrets,
   internal URLs, or private image attachments.
 - Do not present FsusBlog-only adapters as general-purpose FsusUI API.
-- Keep examples small enough that users can inspect behavior quickly.
-- Keep public docs and demo labels aligned with API stability docs.
-- Prefer component states that help users evaluate accessibility, theme, motion,
-  and responsive behavior.
+- Keep examples inspectable, keep public docs and demo labels aligned with API stability docs,
+  and prefer states that expose accessibility, theme, motion, and responsive behavior.

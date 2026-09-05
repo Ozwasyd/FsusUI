@@ -1,51 +1,56 @@
-# 与 Element Plus 不同点的接入指南（FsusUI）
+# Integrating FsusUI where Element Plus differs
 
-本指南只覆盖**本仓库代码与配置可直接证明**的差异点，以及这些差异对接入/联调的影响。不会写“完全兼容”“无需改代码”等无法从仓库自动证明的强保证。
+This guide lists only differences directly demonstrated by repository code or
+configuration and their integration impact. It does not claim complete
+compatibility or zero code changes.
 
-适用人群：
+Audience:
 
-- **业务项目接入/迁移**：从 Element Plus 切换到本仓库 npm 构建产物时的注意事项
-- **仓库内开发联调**：在本仓库里用 demo、源码 alias、源码态样式进行开发与调试
+- product teams migrating from Element Plus to the published FsusUI build; and
+- repository contributors using the demo, source aliases, and source theme.
 
-相关入口：
+Start with [Project overview](./project-overview.md), the repository document at
+`docs/project-overview.md`.
 
-- 主文档：`docs/project-overview.md`
+## A. Product integration and migration
 
-## A. 面向业务项目：从 Element Plus 接入/迁移到 FsusUI
+### A1. Runtime and compatibility boundary
 
-### A1. 环境与兼容性边界（必须先确认）
+- The build target is `es2022` (`vue/internal/build/src/build-info.ts`), so the
+  runtime needs equivalent ES2022 support.
+- Older targets require the product's own transpilation and polyfills; this
+  repository does not promise down-level output.
+- Repository development requires `node >= 22` and `pnpm >= 10` from the root
+  `package.json`; those are not product runtime requirements.
 
-- 本仓库构建目标为 `es2022`（见 `vue/internal/build/src/build-info.ts`），意味着你的运行环境至少需要具备 ES2022 支持能力。
-- 若你的目标浏览器/运行环境低于 ES2022（例如需要兼容更老浏览器），需要在业务侧自行做更强的转译与 polyfill 策略；本仓库不承诺提供向下兼容输出。
-- 根 `package.json` 对开发环境要求：`node >= 22`、`pnpm >= 10`（用于构建与仓库内联调，不等同于业务运行时要求）。
+### A2. Published and source names
 
-### A2. 安装与入口（发布名 vs 源码名）
+The npm public package is `@ozwasyd/element-plus`. Source remains under
+`vue/packages/element-plus`, whose package name is `element-plus`; do not mix
+the two surfaces.
 
-当前对外 npm public registry 主包为 `@ozwasyd/element-plus`。仓库内部源码主入口仍位于 `vue/packages/element-plus`，源码包名保持 `element-plus`，两者不要混用。
+| Product import | Use |
+| --- | --- |
+| `@ozwasyd/element-plus` | Full package |
+| `@ozwasyd/element-plus/global` | Global component types |
+| `@ozwasyd/element-plus/es/locale/lang/*` | Locale packages |
 
-- 业务项目整包安装入口：`@ozwasyd/element-plus`
-- 全局类型入口：`@ozwasyd/element-plus/global`
-- 语言包子路径：`@ozwasyd/element-plus/es/locale/lang/*`
-- 业务项目通常不需要单独安装 theme / wasm 工作区包，优先直接消费主包工件
+Products normally need no separate theme or WASM workspace package; consume
+the main package artifacts.
 
-### A3. 样式引入建议（业务侧）
+### A3. Styles
 
-业务侧优先按“发布产物”方式引入样式（而不是照搬仓库联调用的源码态 SCSS）：
+Prefer the published stylesheet, `@ozwasyd/element-plus/dist/fsus.css`.
 
-- 推荐：`@ozwasyd/element-plus/dist/fsus.css`（主包内唯一完整的 FsusUI 发布样式入口）
+Do not copy the repository source entry
+`@ozwasyd/element-plus/theme-chalk/src/fsus.scss` into a product unless its
+SCSS toolchain, path resolution, variables, and side effects are intentionally
+matched.
 
-不推荐在业务项目中直接引入：
+### A3.1. Dark mode
 
-- `@ozwasyd/element-plus/theme-chalk/src/fsus.scss`
-
-原因：这是仓库联调友好的源码态入口，业务侧是否具备一致的 SCSS 构建、变量/路径解析与副作用配置不确定。
-
-### A3.1. 暗色模式接入（业务侧）
-
-FsusUI 当前主题包已经内置明暗 token 和 `prefers-color-scheme` 自适应，所以：
-
-- 只要引入主题 CSS，就已经具备“跟随系统”的基础能力
-- 如果业务侧要持久化用户主题选择，建议在安装时显式传入 `themeMode`
+The theme CSS already follows `prefers-color-scheme`. For a persisted choice,
+pass `themeMode` at install time or set it on the root `ConfigProvider`:
 
 ```ts
 app.use(ElementPlus, {
@@ -53,21 +58,15 @@ app.use(ElementPlus, {
 })
 ```
 
-或在根部使用：
-
 ```vue
 <el-config-provider :theme-mode="themeMode">
   <App />
 </el-config-provider>
 ```
 
-接入侧需要了解的真实行为：
-
-- `themeMode: 'dark'` 会写入 `html.dark`
-- `themeMode: 'light'` 会写入 `html.light`
-- `themeMode: 'system'` 不强制写 class，而是保留系统媒体查询切换，并同步 `data-theme-resolved`
-
-如果你要写“仅暗色态”自定义 CSS，推荐命中：
+`dark` writes `html.dark`; `light` writes `html.light`; `system` leaves both
+classes off, follows the media query, and updates `data-theme-resolved`. Match
+both explicit and resolved dark roots in custom CSS:
 
 ```css
 html.dark,
@@ -76,68 +75,82 @@ html[data-theme-resolved='dark'] {
 }
 ```
 
-这样既兼容显式 dark，也兼容 system 模式下解析出的暗色态。
+See [Dark mode](./guide/dark-mode.md) for first-paint, SSR, storage, and test
+helper details.
 
-### A4. WASM 注意事项（业务侧）
+### A4. WASM acceleration
 
-`@element-plus/wasm` 是“可选性能层”，仓库代码中已有两处组件侧接入点：
+`@element-plus/wasm` is the internal workspace source package. Product code
+uses the public wrapper `@ozwasyd/element-plus/wasm`. The repository has three
+component integration points:
 
-- `vue/packages/components/table/src/composables/use-wasm-sort.ts`
-  - number / ASCII string 本地排序返回稳定行索引；动态策略根据初始化、复制、计算、映射和提交的端到端历史选择 Worker/WASM 或分块 JS，不再使用固定行数阈值
-- `vue/packages/components/select-v2/src/useSelect.ts`
-  - options / label / case 模式变化时才重建持久过滤索引；query 只提交 generation 查询，WASM 冷启动或 Worker 不可用时保留并异步更新 JS 结果
-- `vue/packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`
-  - 当 items `>= 2000` 时尝试走 WASM 批量预估，否则返回 `null` 由调用方降级
+- `vue/packages/components/table/src/composables/use-wasm-sort.ts`: number and
+  ASCII-string sorting returns stable row indexes; measured end-to-end history
+  chooses Worker/WASM or chunked JS instead of a fixed row threshold.
+- `vue/packages/components/select-v2/src/useSelect.ts`: option, label, or case
+  changes rebuild the persistent filter index; queries use generation; cold
+  WASM or unavailable Workers retain and asynchronously update JS results.
+- `vue/packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`:
+  `items >= 2000` tries the WASM batch estimator; smaller lists return `null`
+  for the caller's fallback estimate.
 
-业务接入时的现实约束：
+Built artifacts are in `vue/packages/wasm/dist/`; the bundler/deployment chain
+must handle `.wasm` resources and their loading. Zero-configuration success is
+not guaranteed: static asset copying, cross-origin/COOP/COEP settings, and a
+WASM bundler plugin depend on the product environment.
 
-- WASM 构建产物位于 `vue/packages/wasm/dist/`，并通过 `@element-plus/wasm` 对外导出；你需要确保你的打包器/部署链路能正确处理 `.wasm` 资源与其加载方式。
-- 不要假设“零配置必然可用”：是否需要额外的静态资源拷贝、跨域/COOP/COEP 配置、或 bundler 的 wasm 插件支持，取决于你的构建与部署环境。
+### A5. Observable differences
 
-### A5. 与 Element Plus 的“可见差异清单”（只列可证实项）
+These differences do not by themselves change the published component API, but
+they affect repository integration and build strategy:
 
-这些差异点大多**不影响**你在业务侧以“发布包”方式使用组件 API，但会影响仓库内联调与构建策略：
+- `vue/packages/element-plus/index.ts` re-exports `dayjs` via
+  `export { default as dayjs } from 'dayjs'`.
+- `@element-plus/icons-svg` is the repository's source SVG; generated
+  `@element-plus/icons-vue` is consumed by component code. This keeps source
+  and demo integration aligned; it does not assert a separate visual system.
+- The optional `@element-plus/wasm` workspace layer is folded into the demo's
+  `fsus-ui` chunk for full installation and split into `fsus-wasm` for on-demand
+  consumer builds.
 
-- **额外能力**：`vue/packages/element-plus/index.ts` 额外转导出 `dayjs`（`export { default as dayjs } from 'dayjs'`）。
-- **图标源码归属**：`@element-plus/icons-svg` 在本仓库内作为原始 SVG 真源维护，`@element-plus/icons-vue` 由其生成并供组件代码直接引用；当前目标是源码内收与联调一致，不代表视觉体系已分叉。
-- **可选性能层**：新增 `@element-plus/wasm`。仓库 demo 的完整插件安装会将工作区运行时收拢到 `fsus-ui` chunk；按需 consumer 构建仍将其拆到独立 `fsus-wasm` chunk。
+## B. Repository development
 
-## B. 面向仓库开发者：本地联调与贡献
-
-### B1. demo 启动与端口
+### B1. Demo and ports
 
 ```bash
 pnpm install
 pnpm -C vue/packages/demo-app dev
 ```
 
-- dev server：`5173`（见 `vue/packages/demo-app/vite.config.ts`）
-- preview：`4173`
+The dev server uses `5173` (`vue/packages/demo-app/vite.config.ts`); preview
+uses `4173`.
 
-### B2. 源码联调（Vite alias / 排除预构建）
+### B2. Source aliases and dependency optimization
 
-`vue/packages/demo-app/vite.config.ts` 通过 alias 将依赖指向工作区源码：
+`vue/packages/demo-app/vite.config.ts` aliases workspace source and uses
+`optimizeDeps.exclude` to keep it out of dependency pre-bundling:
 
-- `element-plus` -> `vue/packages/element-plus/index.ts`
-- `@element-plus/components` / `constants` / `directives` / `hooks` / `locale` / `utils` / `wasm` -> 对应 `vue/packages/*`
+- `element-plus` → `vue/packages/element-plus/index.ts`;
+- `@element-plus/components`, `constants`, `directives`, `hooks`, `locale`,
+  `utils`, and `wasm` → their corresponding `vue/packages/*` paths.
 
-同时 `optimizeDeps.exclude` 排除这些包，目的是让它们保持源码态联调，而不是被 Vite 当作普通三方依赖进行预构建。
+This keeps local source integration out of Vite's ordinary dependency
+pre-bundling.
 
-### B3. 样式联调（仅仓库内）
+### B3. Source theme
 
-demo 入口 `vue/packages/demo-app/src/main.ts` 使用源码态样式入口：
+The demo entry `vue/packages/demo-app/src/main.ts` imports
+`@element-plus/theme-chalk/src/fsus.scss`. This is a repository convenience,
+not a product recommendation.
 
-- `@element-plus/theme-chalk/src/fsus.scss`
+### B4. Build and debug WASM
 
-这对仓库内开发是便利的，但不代表业务项目应该照搬。
-
-### B4. WASM 构建与调试
-
-WASM 构建脚本为 `vue/packages/wasm/build.sh`，仓库根命令为：
+The script is `vue/packages/wasm/build.sh`; run it from the repository root:
 
 ```bash
 pnpm build:wasm
 ```
 
-- 构建依赖 Emscripten 工具链（`emsdk`）已安装并激活；脚本会在必要时尝试从环境中定位/激活。
-- demo 的完整插件构建会把 WASM 与其他工作区运行时收拢为 `fsus-ui` chunk，以避免跨组件循环；按需 consumer 构建会把 WASM 相关模块拆分为 `fsus-wasm` chunk（见 `scripts/vite-manual-chunks.mjs`）。
+It requires the Emscripten `emsdk` toolchain and may locate or activate it from
+the environment. Full demo builds fold WASM into `fsus-ui`; on-demand consumer
+builds split it into `fsus-wasm` (see `scripts/vite-manual-chunks.mjs`).

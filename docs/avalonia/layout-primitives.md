@@ -1,21 +1,20 @@
 # Avalonia Layout Primitives
 
-FsusUI Avalonia layout primitives provide the stable layout layer used by demos
-and product integrations. They intentionally map Web flex/grid behavior to
-Avalonia layout panels instead of exposing DOM-specific structure.
+FsusUI Avalonia layout primitives map the stable Web flex/grid contract to
+Avalonia layout panels without exposing DOM-specific structure.
 
 ## Web flex/grid behavior vs Avalonia layout panels
 
-Web `Space`, `Row`, and `Col` rely on flex and grid algorithms that can wrap,
-shrink, and distribute columns from CSS media queries. Avalonia uses panel
-measure and arrange passes, so `FsusSpace`, `FsusRow`, and `FsusCol` expose the
-contract as explicit gap, wrap, breakpoint, and span properties. Consumers
-should depend on those properties and not on Web class names or DOM order.
+Web `Space`, `Row`, and `Col` can wrap, shrink, and distribute columns through
+CSS media queries. Avalonia uses panel measure/arrange passes, so
+`FsusSpace`, `FsusRow`, and `FsusCol` expose explicit gap, wrap, breakpoint, and
+span properties. Consumers should depend on those properties, not Web class
+names or DOM order.
 
-`FsusRow.RefreshResponsiveColumns(viewportWidth)` resolves the active breakpoint
-and applies each `FsusCol` responsive span. The default grid remains 24 columns
-to match the Web contract, while actual pixel measurement can differ by platform
-font, density, and host window constraints.
+`FsusRow.RefreshResponsiveColumns(viewportWidth)` resolves the active
+breakpoint and applies each `FsusCol` responsive span. The default grid remains
+24 columns to match Web; pixel measurement can differ by platform font, density,
+and host-window constraints.
 
 ## Container regions
 

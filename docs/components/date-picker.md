@@ -1,31 +1,31 @@
-# DatePicker 日期选择器
+# DatePicker
 
-用于日期的选择输入，基于 Day.js 进行日期处理。
+Provides date selection input backed by Day.js.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `type` 属性设置选择粒度（默认 `date`），可通过 `shortcuts` 设置快捷选项，通过 `disabled-date` 设置禁用日期。
+Use `type` to set the selection granularity (default `date`), `shortcuts` for quick options, and `disabled-date` for disabled dates.
 
-## 其他选择粒度
+## Other Selection Granularities
 
-支持按周（`week`）、月（`month`）、年（`year`）或多日期（`dates`）选择。
+Supports selection by week (`week`), month (`month`), year (`year`), or multiple dates (`dates`).
 
-## 日期范围
+## Date Range
 
-设置 `type="daterange"` 或 `type="datetimerange"` 选择日期范围。默认左右面板联动，设置 `unlink-panels` 可解除联动。
+Set `type="daterange"` or `type="datetimerange"` to select a date range. The panels are linked by default; set `unlink-panels` to decouple them.
 
-## 日期格式
+## Date Format
 
-- `format`：输入框显示格式
-- `value-format`：绑定值格式
+- `format`: input display format
+- `value-format`: bound value format
 
-格式参考 [Day.js 文档](https://day.js.org/docs/en/display/format)。
+See the [Day.js format documentation](https://day.js.org/docs/en/display/format).
 
-> **注意**：格式字符大小写有区别，请严格遵循规范。
+> **Note:** Format tokens are case-sensitive; follow the documented spelling exactly.
 
 ---
 

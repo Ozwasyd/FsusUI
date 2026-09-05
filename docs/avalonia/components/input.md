@@ -17,8 +17,8 @@ and change events map to typed properties and events on the Avalonia controls.
 
 ## Supported Platform Differences
 
-IME, text selection, focus rings, and font metrics follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for IME, text selection,
+focus rings, and font metrics.
 
 `FsusShortcutGesture.SerializedText` is the stable persistence form. Its
 modifier semantics are platform-neutral: a primary shortcut serializes as
@@ -36,8 +36,9 @@ recording or validation state.
 
 ## Theme Tokens
 
-Inputs use border, focus, disabled, danger, text, muted text, density, and
-motion theme resources.
+Use border, focus, disabled, danger, text, and muted-text resources from
+[Application Setup](../installation.md#application-setup); motion behavior is
+defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

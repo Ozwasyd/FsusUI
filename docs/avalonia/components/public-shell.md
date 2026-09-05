@@ -15,13 +15,11 @@ theme mode events.
 
 ## Supported Platform Differences
 
-Responsive measurement, keyboard focus, and native theme behavior follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for responsive measurement, keyboard focus, and native-theme boundaries.
 
 ## Theme Tokens
 
-Public shell uses surface, raised surface, border, text, muted text, focus,
-density, and motion resources.
+Use surface, raised-surface, border, text, muted-text, focus, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

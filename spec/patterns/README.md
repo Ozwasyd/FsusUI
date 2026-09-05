@@ -1,6 +1,8 @@
 # UX Pattern Schema
 
-Patterns define reusable product layouts and flows above raw controls.
+Patterns define reusable product layouts and flows above raw controls. Product
+apps can compose them; product-specific copy, routes, and data models remain
+outside FsusUI core.
 
 ## Pattern Record
 
@@ -18,18 +20,6 @@ Patterns define reusable product layouts and flows above raw controls.
 
 ## Initial Patterns
 
-- `app-shell`
-- `sidebar`
-- `topbar`
-- `breadcrumb`
-- `settings-page`
-- `list-page`
-- `detail-page`
-- `form-page`
-- `table-toolbar`
-- `empty-state`
-- `error-state`
-- `confirm-danger-action`
-
-Product apps can compose these patterns, but product-specific copy, routes, and
-data models stay outside FsusUI core.
+`app-shell`, `sidebar`, `topbar`, `breadcrumb`, `settings-page`, `list-page`,
+`detail-page`, `form-page`, `table-toolbar`, `empty-state`, `error-state`, and
+`confirm-danger-action`.

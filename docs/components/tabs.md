@@ -1,42 +1,38 @@
-# Tabs 标签页
+# Tabs
 
-将数据内容分割成相关联的不同类别，每次只展示一类。
+Divides related content into categories and shows one category at a time.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------- |
-| purpose                | 在同一页面内切换并列内容区域，适合设置面板、信息分组和数据视图切换。                  |
-| basic usage            | 使用 `v-model` 绑定当前 pane 的 `name`，通过 `el-tab-pane` 声明每个标签页。           |
-| props / events / slots | 本页 `Tabs API` 和 `Tab-pane API` 覆盖公开 props、events、slots 和 exposes。          |
-| accessibility          | 每个 tab label 应能独立说明内容；可关闭或可新增标签需要提供明确文本或可访问图标名称。 |
-| theme token notes      | 跟随公开主色、边框、文本、背景、圆角和 motion control token。                         |
-| known limitations      | 动态增删标签时，调用方需要维护当前激活项，避免删除当前项后焦点丢失。                  |
-| stability level        | Preview public component。                                                            |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+and the shared [theme and motion contracts](../theme/tokens.md). Each tab label
+must identify its content; add/close controls need readable text or an
+accessible icon name. When tabs are added or removed dynamically, the consumer
+must maintain the active item so focus is not lost.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-`v-model` 绑定当前激活 Tab 的 `name`，默认选中第一个标签页。
+Bind the active Tab's `name` with `v-model`; the first tab is selected by default.
 
-## 卡片风格
+## Card Style
 
-设置 `type="card"` 使用卡片样式。
+Set `type="card"` for the card style.
 
-## 带边框卡片
+## Bordered Card
 
-设置 `type="border-card"` 使用带边框的卡片样式。
+Set `type="border-card"` for the bordered-card style.
 
-## 位置
+## Position
 
-通过 `tab-position` 设置标签位置：`top`（默认）、`bottom`、`left`、`right`。
+Set the tab position with `tab-position`: `top` (default), `bottom`, `left`, or `right`.
 
-## 可新增和关闭
+## Add and Close Tabs
 
-设置 `editable` 或同时设置 `addable` + `closable`（仅卡片类型支持），实现动态增删标签页。
+Set `editable`, or both `addable` and `closable` (card type only), for dynamic tab creation and removal.
 
 ---
 

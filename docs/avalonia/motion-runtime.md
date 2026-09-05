@@ -1,8 +1,7 @@
 # Avalonia Motion Runtime
 
-`FsusMotionService` is the Avalonia-native motion contract for stable controls.
-It maps shared motion tokens to platform plans without depending on DOM,
-GSAP, CSS transitions, or Web-only preset mechanics.
+`FsusMotionService` maps shared motion tokens to Avalonia-native plans without
+DOM, GSAP, CSS transitions, or Web-only preset mechanics.
 
 ## Modes
 
@@ -27,7 +26,7 @@ modes so component hosts can invalidate cached plans.
 | `ListItemAppearance` | List item enter with bounded stagger delay                                    |
 | `ActionRowSafe`      | Data-table/action-row feedback that never translates layout                   |
 
-Stable controls must request a plan from `FsusMotionService` instead of
-hard-coding durations, easing, transitions, transforms, or opacity animations.
-`check:avalonia-motion-contract` enforces that policy for Avalonia control and
-theme sources.
+Stable controls must request plans from `FsusMotionService` rather than
+hard-code durations, easing, transitions, transforms, or opacity animations.
+`check:avalonia-motion-contract` enforces this for Avalonia controls and theme
+sources.

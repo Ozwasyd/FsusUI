@@ -14,13 +14,11 @@ heading levels, copied text, search highlights, and render budgets.
 
 ## Supported Platform Differences
 
-Text measurement, wrapping, and baseline thresholds follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for text measurement, wrapping, and baseline thresholds.
 
 ## Theme Tokens
 
-Text viewer uses text, muted text, surface, border, focus, density, and motion
-resources.
+Use text, muted-text, surface, border, focus, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Accessibility
 

@@ -1,32 +1,32 @@
-# Transfer 穿梭框
+# Transfer
 
-在两个互斥数据集之间进行数据移动。
+Moves records between two mutually exclusive data sets.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-`v-model` 绑定右侧列表的 key 数组；`data` 定义所有数据；`props` 自定义数据字段名。
+Bind the right-list key array with `v-model`; `data` defines all records and `props` customizes field names.
 
-## 可搜索
+## Searchable
 
-设置 `filterable` 属性启用搜索功能，可通过 `filter-method` 自定义搜索逻辑。
+Set `filterable` to enable search and use `filter-method` for custom filtering.
 
-## 自定义渲染
+## Custom Rendering
 
-使用默认插槽自定义数据项渲染；使用 `left-footer` / `right-footer` 插槽自定义底部内容。
+Customize item rendering with the default slot and footer content with `left-footer` / `right-footer`.
 
-## 数据项属性
+## Data Item Properties
 
-通过给数据项添加 `disabled: true` 禁止该项被移动。
+Set `disabled: true` on a record to prevent it from being moved.
 
-## 响应式方向
+## Responsive Direction
 
-`direction` 默认为 `auto`。组件容器可用宽度小于 `640px` 时，两侧列表会按“可用列表 → 操作按钮 → 已选列表”的 DOM 与视觉顺序纵向排列；判断依据是组件容器而不是全局 viewport。可使用 `horizontal` 或 `vertical` 强制固定方向。
+`direction` defaults to `auto`. Below `640px` of container width, the lists stack in DOM and visual order as “available list → action buttons → selected list”; the component container, not the global viewport, determines this. Use `horizontal` or `vertical` to force a direction.
 
-纵向模式会将移动图标转为上/下方向。默认数据项在单行省略时保留完整 `title`，移动按钮的可访问名称同时包含来源与目标列表标题。
+Vertical mode uses up/down transfer icons. When a default item is truncated to one line, its full `title` remains available, and transfer-button accessible names include both source and destination list titles.
 
 ---
 

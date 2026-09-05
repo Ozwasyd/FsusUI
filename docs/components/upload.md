@@ -1,34 +1,34 @@
-# Upload 上传
+# Upload
 
-通过点击或拖拽上传文件。
+Upload files by clicking or dragging.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `slot` 自定义上传按钮类型和文字。使用 `limit` 和 `on-exceed` 限制最大上传数量，通过 `before-remove` 钩子中止删除。
+Customize the upload button type and label with a slot. Use `limit` and `on-exceed` to cap the number of uploads, and `before-remove` to cancel removal.
 
-## 覆盖前一个文件
+## Replace the Previous File
 
-设置 `limit` 和 `on-exceed` 实现选择新文件时自动替换旧文件。
+Use `limit` and `on-exceed` to replace an old file automatically when a new one is selected.
 
-## 照片墙
+## Picture Wall
 
-通过 `list-type` 设置文件列表样式（`text`、`picture`、`picture-card`）。
+Set the file-list style with `list-type`: `text`, `picture`, or `picture-card`.
 
-## 拖拽上传
+## Drag and Drop Upload
 
-设置 `drag` 为 `true` 启用拖拽上传。
+Set `drag` to `true` to enable drag-and-drop upload.
 
-## 上传目录
+## Directory Upload
 
-设置 `directory` 为 `true` 支持上传整个文件夹（文件夹内文件会被展开为扁平列表）。
+Set `directory` to `true` to upload a folder; its files are flattened into a list.
 
-## 手动上传
+## Manual Upload
 
-设置 `auto-upload` 为 `false` 禁用自动上传，通过 `submit` 方法手动触发。
+Set `auto-upload` to `false` to disable automatic upload and call `submit` manually.
 
 ---
 

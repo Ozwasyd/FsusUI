@@ -1,7 +1,7 @@
 # Accessibility Mapping Schema
 
-Accessibility specs define required user outcomes first, then map those
-outcomes to each implementation target.
+Accessibility specs define required user outcomes first, then map them to each
+implementation target.
 
 ## Required Fields
 
@@ -18,10 +18,9 @@ outcomes to each implementation target.
 
 ## Mapping Rules
 
-- Web mappings may use ARIA, native HTML semantics, and focus management, but
-  those details are implementation adapters rather than source contracts.
-- Avalonia mappings may use automation properties and control patterns, but
-  those details are implementation adapters rather than source contracts.
+- Web mappings may use ARIA, native HTML semantics, and focus management; Avalonia
+  mappings may use automation properties and control patterns. Both are
+  implementation adapters rather than source contracts.
 - Disabled, loading, readonly, selected, invalid, and busy states must be
   expressed both visually and programmatically where a platform supports it.
 - Motion must never be the only state indicator.

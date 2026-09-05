@@ -8,15 +8,8 @@ For adoption setup, package references, and clean sample verification, see
 
 This package is generated and tested as part of the cross-platform FsusUI
 workspace. It does not expose Web DOM structure, Element Plus internals, or
-product-specific FsusPanel/FsusBlog contracts.
-
-## Trimming and AOT
-
-This package is an AOT-compatible library with trimming, single-file, and AOT
-analyzers enabled. The library contract does not set `PublishAot` or validate a
-final RID-specific Native AOT executable. Consuming applications and
-third-party plugins must verify their own dynamic loading, reflection, and
-runtime code-generation boundaries.
+product-specific FsusPanel/FsusBlog contracts. Its shared trimming and Native
+AOT boundary is defined in [Avalonia installation](../../docs/avalonia/installation.md#trimming-and-aot-library-boundary).
 
 ## Button Controls
 

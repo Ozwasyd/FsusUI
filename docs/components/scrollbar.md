@@ -1,30 +1,30 @@
-# Scrollbar 滚动条
+# Scrollbar
 
-替代浏览器原生滚动条，提供符合 FsusUI 设计风格的自定义滚动条。
+Replaces the browser scrollbar with a custom scrollbar aligned to the FsusUI design.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `height` 属性设置滚动条高度；若不设置，则自适应父容器高度。
+Set scrollbar height with `height`; when omitted, it adapts to the parent height.
 
-## 横向滚动
+## Horizontal Scrolling
 
-当内容宽度超过滚动条宽度时，自动显示横向滚动条。
+When content is wider than the scrollbar, a horizontal scrollbar appears automatically.
 
-## 最大高度
+## Maximum Height
 
-通过 `max-height` 设置最大高度，内容超出时才显示滚动条。
+Use `max-height` to show the scrollbar only after content exceeds that height.
 
-## 手动滚动
+## Manual Scrolling
 
-使用 `setScrollTop` / `setScrollLeft` 方法手动控制滚动位置。
+Use `setScrollTop` / `setScrollLeft` to control the scroll position manually.
 
-## 无限滚动
+## Infinite Scroll
 
-通过 `end-reached` 事件监听滚动到底部：
+Listen for `end-reached` when scrolling reaches the bottom:
 
 ```vue
 <template>

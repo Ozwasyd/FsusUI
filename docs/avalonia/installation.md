@@ -21,6 +21,10 @@ Local workspace consumers can reference the three projects directly:
 `FsusThemeManager`. `FsusUI.Avalonia.Icons` contains generated icon resources
 and `FsusIconKeys`.
 
+The shared overlay, motion, and platform contracts are documented in
+[overlay host](overlay-host.md), [motion runtime](motion-runtime.md), and
+[platform differences](platform-differences.md).
+
 ## Trimming and AOT Library Boundary
 
 The three packages above declare an AOT-compatible library contract and run
@@ -29,7 +33,7 @@ that a final RID-specific Native AOT application has been validated. AXAML,
 theme, token, and icon resources use the same package paths shown below for
 trimmed and non-trimmed consumers. Application-owned reflection, runtime type
 or assembly loading, runtime code generation, and third-party plugins remain
-outside this library support statement and require consumer verification.
+outside this library support statement; consumers must verify those boundaries.
 
 ## Application Setup
 
@@ -69,17 +73,21 @@ manager.Apply(
   });
 ```
 
-`FsusThemeManager.Apply` keeps the variant-aware semantic brushes current on
-every call. `{DynamicResource FsusColorActionPrimaryBrush}` resolves to
-`#2A599C` under the light palette and `#4B79CC` under the dark palette; an
-explicit `AccentOverride` replaces it while one is provided. Components bound
-through `{DynamicResource ...}` update immediately when the variant switches.
-The optional `Palette` record independently accepts nullable `IBrush` overrides
-for background, surface, raised surface, text, muted text, border, and icon.
-`Surface` reaches the existing shell, editor, tree, and picker surface aliases,
-while `SurfaceRaised` reaches raised picker and read-only states. Null fields use
-the selected built-in light or dark resource; high contrast keeps its complete
-built-in palette, so callers do not need to fork the shipped dictionaries.
+`FsusThemeManager.Apply` keeps variant-aware semantic brushes current. Dynamic
+resources update immediately when the variant switches; an explicit
+`AccentOverride` wins while provided. The optional `Palette` accepts nullable `IBrush`
+overrides for background, surface, raised surface, text, muted text, border,
+and icon. Null fields retain the selected built-in palette; high contrast keeps
+its complete built-in palette, so consumers do not need to fork the shipped
+dictionaries. `FsusColorActionPrimaryBrush` resolves to `#2A599C` in light and
+`#4B79CC` in dark. `Surface` feeds shell, editor, tree, and picker aliases, while
+`SurfaceRaised` feeds raised picker and read-only states.
+
+`Apply` resolves resources in this order: built-in light/dark/high-contrast
+palette, nullable palette overrides when high contrast is off, accent override,
+density, then motion. Unknown enum values fall back to light, default density,
+and system motion; `FollowSystemTheme` sets `Application.RequestedThemeVariant`
+to `ThemeVariant.Default` while FsusUI resource fallbacks remain active.
 
 ## Clean Consumer Sample
 

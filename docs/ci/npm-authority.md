@@ -1,4 +1,4 @@
-# npm dependency authority (#405 / #406)
+# npm Dependency Authority
 
 > **Authority:** `config/dependencies/npm-authority.json`  
 > **Schema:** `config/dependencies/npm-authority.schema.json`  
@@ -41,7 +41,7 @@ only an all-documentation diff may emit a machine-readable
 `no-package-impact:documentation-only` skip plan; every unclassified, runtime,
 exports, peer, build, or package path runs the matrix.
 
-## `pnpm deps:sync` (#406)
+## `pnpm deps:sync`
 
 Projects authority into controlled manifests:
 
@@ -65,7 +65,7 @@ pnpm test:deps-sync
 pnpm deps:authority:check
 ```
 
-## `pnpm deps:check` (#408)
+## `pnpm deps:check`
 
 Read-only drift checker against `npm-authority.json`. Does **not** write files, does **not** run `deps:sync`, and does **not** contact the registry.
 
@@ -109,7 +109,7 @@ parser/scan logs, Dependency Dashboard state, and real upgrade PRs (or a
 hosted no-update result) require repository-owner and hosted-service evidence;
 local dry-runs are not substitutes.
 
-## Required checks and platform PR automerge (#407 / #409)
+## Required checks and platform PR automerge
 
 `config/dependencies/required-checks.json` is the only dependency-PR check
 authority. It maps every governed dependency group and update type to the exact
@@ -140,7 +140,7 @@ Renovate PR. Repository owners must compare the live default-branch protection
 payload with the checked-in authority before treating hosted automerge as
 accepted evidence.
 
-## Freshness blocker lifecycle (#411 / #412)
+## Freshness blocker lifecycle
 
 `pnpm deps:freshness -- --output <path>` writes the single structured result
 consumed by `.github/workflows/dependency-freshness.yml`. The workflow runs at
@@ -160,15 +160,6 @@ node scripts/test-dependency-freshness-blocker.mjs
 
 It is not evidence that a scheduled GitHub Actions run or live API mutation has
 completed successfully.
-
-## What #405 / #406 / #408 cover
-
-- **#405:** authority schema, inventory, migration baseline digests.
-- **#406:** `deps:sync` projection + mutation tests (script-local versions, registry latest, nondeterministic order, missed fixture).
-- **#408:** read-only `deps:check` + semver containment / drift negative tests.
-- **#316 repository contract:** authority-only Renovate ownership,
-  update-surface generation/checking, lock projections, and local governance
-  validation. Hosted Mend evidence remains external.
 
 ## Mutation contract
 

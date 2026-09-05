@@ -1,12 +1,11 @@
 # Stable Component Contract Catalog
 
 The complete versioned source registry is
-[`contracts/v1/vue-public-contracts.json`](./contracts/v1/vue-public-contracts.json).
-It is generated from the Vue public API baseline and validated by
-`pnpm run conformance:contracts`.
-
-The table below keeps the original first controls as a human-readable summary.
-It intentionally avoids DOM, Vue, XAML, and platform template details.
+[`contracts/v1/vue-public-contracts.json`](./contracts/v1/vue-public-contracts.json),
+generated from the Vue public API baseline and validated by
+`pnpm run conformance:contracts`. This human-readable summary covers the
+original first controls and intentionally avoids DOM, Vue, XAML, and platform
+template details.
 
 | ID             | Contract Summary                                       | Core States                                               | Required Token Groups                     |
 | -------------- | ------------------------------------------------------ | --------------------------------------------------------- | ----------------------------------------- |

@@ -1,40 +1,46 @@
-# FsusUI 工程维护交接
+# FsusUI Engineering Handoff
 
-本文面向后续接手仓库维护的工程师，目标是让接手者不依赖聊天记录即可完成本地验收、CI 排查和视觉回归维护。
+> **Role:** Maintainer handoff and operational reference
+> **Applies to:** Local quality gates, CI diagnosis, visual regression, WASM,
+> and cross-platform package lanes
+> **Authority:** Commands and contracts remain owned by `package.json`, `spec/`,
+> workflow files, and the linked domain documents.
 
-## 1. 环境基线
+This page is the shortest route for a new maintainer. It records commands and
+diagnostic boundaries; release policy lives in [`docs/releases/governance.md`](./releases/governance.md),
+and visual decisions follow [`docs/workflows/visual-change.md`](./workflows/visual-change.md).
 
-- Node.js：`22.x`
-- pnpm：`10.33.0`
-- TypeScript：`6.0.x`
-- 浏览器/视觉回归：Playwright Chromium（桌面亮色、移动端亮色、桌面暗黑、移动端暗黑）
-- WASM 构建：需要 Emscripten `5.0.4`
+## 1. Environment baseline
 
-本仓库默认以 `Node 22 + pnpm 10 + 现代浏览器` 作为质量门基线；不要在未验证的旧版本 Node 或 pnpm 上排查 CI 问题。
+- Node.js `22.x` (or newer within the repository requirement)
+- pnpm `10.33.0`
+- TypeScript `6.0.x`
+- Playwright Chromium for desktop/mobile and light/dark visual projects
+- Emscripten `5.0.4` for WASM builds
 
-## 2. 标准命令入口
+Use this Node/pnpm baseline when diagnosing CI; do not attribute a failure to
+the repository before checking an unsupported runtime.
 
-### 最小本地质量门
+## 2. Standard local gates
+
+Minimal quality loop:
 
 ```bash
 pnpm lint
 pnpm typecheck
 pnpm test:run
+pnpm test:unit
 pnpm build
 pnpm build:demo
 pnpm verify
 ```
 
-通过标准：
+Expected results are zero lint/typecheck failures, a passing Vitest run, a
+successful root build without `TS5103`, a successful production demo build,
+and a passing `verify` chain. `pnpm verify` is the safe alias for
+`verify:full`.
 
-- `lint`：零 error、零 warning
-- `typecheck`：零 TypeScript warning、零 error
-- `test:run`：全量 Vitest 通过
-- `build`：根构建通过，且类型生成链路无 `TS5103`
-- `build:demo`：`vue/packages/demo-app` 生产构建成功
-- `verify`：上述主链路按既定顺序串行通过
-
-### 覆盖率与视觉回归
+Coverage, visual, and release evidence are separate:
 
 ```bash
 pnpm test:coverage
@@ -42,21 +48,23 @@ pnpm test:visual:full
 pnpm verify:release
 ```
 
-通过标准：
+`test:coverage` must produce `coverage/lcov`; `test:visual:full` runs the
+registered visual projects (plain `test:visual` only prints profile help);
+`verify:release` adds the candidate and three-profile consumer chain. Release
+acceptance still requires explicit coverage and visual-evidence runs.
 
-- `test:coverage`：成功生成 `coverage/`，包含 `lcov`
-- `test:visual:full`：Playwright 四 project + 单次 Dev 的权威完整覆盖；普通 `test:visual` 仅打印 profile 帮助
-- `verify:release`：`verify`、`check:npm-dist-tag`、唯一 candidate 和三 profile `test:consumer-matrix` 一并通过
+<a id="wasm"></a>
 
-## WASM
+## 3. WASM and Markdown
 
-本仓库的 WASM 包位于 `vue/packages/wasm`，当前构建会生成：
+The WASM package is `vue/packages/wasm`. Its generated runtime includes:
 
-- `ep_wasm.mjs/.wasm`：表格排序、虚拟列表行高等通用加速能力。
-- `markdown_basic.js/.wasm`：Markdown 渲染器的标量 fallback。
-- `markdown_simd.js/.wasm`：Markdown 渲染器的 SIMD 版本。
+- `ep_wasm.mjs/.wasm` for general acceleration such as table sorting and
+  virtual-list row-height estimation;
+- `markdown_basic.js/.wasm` for the scalar Markdown fallback; and
+- `markdown_simd.js/.wasm` for SIMD Markdown rendering.
 
-维护 Markdown 渲染器时，优先跑下面的窄门：
+For Markdown changes, run the narrow gates first:
 
 ```bash
 pnpm run build:wasm
@@ -66,131 +74,145 @@ pnpm run check:markdown-no-js-path
 pnpm run check:markdown-extreme
 ```
 
-MarkdownRenderer 组件不携带完整文章排版主题，但会通过 public `markdown-runtime` 自动归一 heading id、hash/external link、CSP nonce、Mermaid/LaTeX 占位符和代码块高亮挂点；业务侧通过 `features-activated` 和 `placeholders-ready` 接入业务 glue。
+The renderer does not ship a complete article layout theme. Public
+`markdown-runtime` normalizes heading ids, hash/external links, CSP nonces,
+Mermaid/LaTeX placeholders, and code-highlight mount points; consumers attach
+business glue through `features-activated` and `placeholders-ready`. WASM must
+retain the JavaScript fallback and must not publish debug-only artifacts or
+source maps.
 
-## Motion 系统收口状态
+## 4. Motion ownership
 
-Motion 系统的上游实现已经收口在 FsusUI：
+Motion is implemented in FsusUI and consumed through public APIs:
 
-- 专用模块位于 [`vue/packages/motion`](../vue/packages/motion)，提供 `FsuTransition`、`v-motion`、`v-scroll-reveal`、tokens、presets、runtime、GSAP context、timeline、ScrollTrigger wrapper 和 route cleanup。
-- `ElConfigProvider.motion` 位于 [`vue/packages/components/config-provider/src/motion.ts`](../vue/packages/components/config-provider/src/motion.ts)，统一写入 `system / enabled / reduced / disabled` 状态、motion preset 和 CSS token。
-- 组件级 `motion` prop 约定位于 [`vue/packages/components/motion.ts`](../vue/packages/components/motion.ts)，已接入 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、Notification、Collapse 和 Tabs。
-- GSAP 不作为业务侧直接依赖暴露；调用端通过 `useGsapContext`、`useTimeline`、`useScrollReveal`、`useMotionRouteCleanup` 和 `refreshScrollTriggers()` 完成生命周期清理与动态内容刷新。
-- 使用说明、preset gallery、低动效策略、性能规则、反模式和 FsusBlog 集成示例统一维护在 [`docs/components/motion.md`](./components/motion.md)。
+- [`vue/packages/motion`](../vue/packages/motion) owns `FsuTransition`,
+  `v-motion`, `v-scroll-reveal`, tokens, presets, runtime, GSAP context,
+  timelines, ScrollTrigger wrappers, and route cleanup.
+- [`config-provider/src/motion.ts`](../vue/packages/components/config-provider/src/motion.ts)
+  maps `ElConfigProvider.motion` to `system`, `enabled`, `reduced`, and
+  `disabled` state, presets, and CSS tokens.
+- [`components/motion.ts`](../vue/packages/components/motion.ts) defines the
+  component `motion` prop used by Button, Card, Dialog, Drawer, Dropdown,
+  Tooltip, Message, Notification, Collapse, and Tabs.
 
-FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / directive / composable / preset，不在业务页面重复编写本地动画系统，不直接导入 `gsap` 或 `ScrollTrigger`；路由切换和动态 Markdown / 图片内容必须走 FsusUI 的 cleanup 与 refresh API。
+Consumers use `useGsapContext`, `useTimeline`, `useScrollReveal`,
+`useMotionRouteCleanup`, and `refreshScrollTriggers()`; they do not import
+`gsap` or `ScrollTrigger` directly or create a second animation system. The
+full usage and preset contract is [`docs/components/motion.md`](./components/motion.md).
 
-## 3. 质量门分工
+## 5. Quality ownership and CI
 
-### 本地入口
+Local entrypoints:
 
-- `verify:pr-fast` 是 PR 默认快速门，用于小改动迭代；它覆盖 lint、按变更路径选择的 affected typecheck/unit、token/icon/design governance 和最小包构建 smoke。
-- `verify:full` 是完整本地质量门，等价于历史 `verify` 的覆盖面。
-- `verify` 保留为 `verify:full` 的安全别名，避免旧命令降低检查覆盖。
-- `verify:release` 用于发布前完整核验，在 `verify:full` 基础上增加 npm dist-tag、唯一 package candidate、consumer matrix fixtures 与三 profile cold install。
-- `verify:release` 不替代视觉/覆盖率证据；发布前仍需显式执行 `test:coverage` 与 `test:visual:evidence`。
+- `verify:pr-fast`: affected typecheck/unit, lint, token/icon/design governance,
+  and package smoke for PR iteration.
+- `verify:full`: complete local quality and demo build.
+- `verify:release`: `verify:full` plus dist-tag, candidate, negative-fixture,
+  and `npm-latest`/`pnpm-latest`/`npm-peer-floor` consumer checks.
+- `test:coverage` and `test:visual:evidence`: required evidence that release
+  verification does not replace.
 
-### Test artifact cache
+Artifact and capacity rules are shared by local and CI runs:
 
-- `prepare:test-artifacts` 会按 source hash 检查 icon / WASM 生成工件，再决定是否调用 `ensure:icons` 与 `ensure:wasm`。
-- CI 使用 test artifact cache 恢复 `vue/packages/icons-vue/dist` 与 `vue/packages/wasm/dist`，cache key 覆盖相关源码、构建配置和生成脚本。
-- GitHub Actions 日志会输出 `icons-cache-hit` 与 `wasm-cache-hit`；本地 wrapper 会继续输出 `cache hit` / `cache miss`、source hash 和 miss reason。
-- cache hit 会跳过对应 ensure 脚本；cache miss、restore-key 命中过期工件或 fingerprint 不一致时会重新生成。
-- `pnpm run build:wasm` 保留显式 force regeneration 语义；需要强制重建所有测试工件时可使用 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`。
-- `_quality.yml` 的 `capacity` job 根据测试文件数和 runner 的 CPU/内存限制生成 Unit matrix；`unit-artifacts` job 只生成一次 `unit-test-artifacts`。Unit shard 下载、解包并执行 `pnpm run check:test-artifacts-ready` 后，以 plan 给出的 `<n>/<total>` 和 `FSUS_VITEST_WORKERS` 运行 Vitest。
-- 本地运行 `pnpm ci:capacity:plan --dry-run` 可看到同一 shard/worker 计划；`pnpm test:unit` 会在一次 artifact prepare 后按该计划有限并发执行，等价的诊断入口是 `vitest run --shard=<n>/<total>`。不要在每个 shard 前重复生成 icon/WASM 工件。
-- Typecheck 四配置由 capacity runner 分批执行；`verify:pr-fast` / `verify:full` 的 sibling tasks 也按 lane 批次运行并保留完整失败收集语义，避免外层和内层同时占满全部 CPU。
-- `pnpm ci:capacity:check` 使用 v1、v2、无 cgroup、2C/8GB、4C/16GB、高配、CPU/内存不对称和 override fixtures 验证纯调度逻辑，不依赖 Actions、网络或固定耗时。
-- `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-candidate`，其中包含唯一 npm tarball、SHA-256 sidecar 与 candidate manifest，并导出 `candidate-digest`。`consumer-install` 校验该 digest，从同一个 tarball执行三个固定 profile；receipts 与 impact plan 上传为 `consumer-matrix` artifact，不再构建第二份目录。
-- `verify:release` 可在本地从零运行 `package:candidate:build`、`package:candidate:verify`、candidate/matrix negative fixtures 与 consumer matrix。独立重建必须用 `package:candidate:compare` 比较 canonical 文件树；不得无比较地替换已测试 candidate。
+- `prepare:test-artifacts` uses source hashes to reuse or regenerate
+  `vue/packages/icons-vue/dist` and `vue/packages/wasm/dist`; cache hit/miss,
+  fingerprint, and reason are logged. Use `FORCE_REBUILD=1 pnpm run
+  prepare:test-artifacts` to force all test artifacts.
+- `_quality.yml` plans Unit shards from test-file count and effective
+  CPU/memory; `unit-artifacts` prepares once, then shards run
+  `pnpm run check:test-artifacts-ready` and Vitest with the planned
+  `--shard=<n>/<total>` and `FSUS_VITEST_WORKERS`. Inspect the plan with
+  `pnpm ci:capacity:plan --dry-run`; validate fixtures with
+  `pnpm ci:capacity:check`.
+- Replay an individual planned shard with:
 
-### CI 入口
+  ```bash
+  pnpm exec vitest run --config vue/vitest.config.ts --shard=<n>/<total>
+  ```
 
-- `.github/workflows/quality.yml` 是统一质量入口
-- `.github/workflows/_quality.yml` 是可复用质量门定义
-- `publish-npm.yml` 必须依赖 release quality 门，下载同一个 `fsusui-npm-candidate`，核对 commit/tag/package/digest，并以该 tarball 作为 `npm publish` 输入；publish job 禁止 build 或 prepare
-- main/nightly/release 共用 `spec/ci/readiness-gates.json`；用 `pnpm ci:profile:plan --group release` 查看完整 leaf 计划，用 `pnpm ci:profile:check` 静态验证 tag 与手工 Release 编排。tag publish 显式传 `group: release`，并依赖 release-readiness evidence digest，不能落入 reusable workflow 的默认 Main profile
+The workflow's executable form is the `vitest run --shard` command with the
+configuration and shard arguments supplied by the capacity plan.
+- `build-package` emits one `fsusui-npm-candidate` tarball, SHA-256 sidecar,
+  and manifest. `consumer-install` and local `verify:release` must consume that
+  same digest and the same candidate manifest—the release rule is “同一个 tarball”
+  (one immutable tarball); compare any diagnostic rebuild with
+  `pnpm package:candidate:compare <A.tgz> <B.tgz>` before use.
+- Typecheck lanes use `scripts/run-typecheck.mjs`, write `.tsbuildinfo` under
+  `.tmp/typecheck-cache`, and may use `pnpm run typecheck:no-cache` for
+  diagnosis. Cache keys include lockfile, `vue/tsconfig*.json`, config, source,
+  typings, and the typecheck runner.
 
-当前 CI job 分工：
+The typecheck cache records a cache hit or cache miss and its primary key. The
+affected path uses `typecheck:affected`; the full `typecheck` graph remains the
+four lanes (`web`, `node`, `vite-config`, and `vitest`). Use
+`typecheck:no-cache` when a diagnostic must bypass the cache.
 
-- `quality.yml` 在 `pull_request` 默认运行 `verify:pr-fast`
-- `quality.yml` 在 `push` 调用 `_quality.yml` 的 `group: main`
-- `quality.yml` 在定时任务或手工选择 nightly 时调用 `_quality.yml` 的 `group: nightly`
-- `quality.yml` 在手工选择 release 时调用 `_quality.yml` 的 `group: release`
+CI entrypoints are `.github/workflows/quality.yml` (dispatch) and
+`.github/workflows/_quality.yml` (reusable gates). `pull_request` uses
+`verify:pr-fast`; push, scheduled, and release dispatch use the explicit
+`main`, `nightly`, and `release` groups. `publish-npm.yml` downloads and
+verifies the release candidate; it must not build or prepare a second one.
+The profile registry is `spec/ci/readiness-gates.json`; inspect it with
+`pnpm ci:profile:plan --group release` and validate it with
+`pnpm ci:profile:check`.
 
-- `lint`
-- `typecheck`
-- `unit`
-- `coverage`
-- `build-package`
-- `build-demo`
-- `visual`
+## 6. Failure triage
 
-## 4. 常见失败点与排查顺序
+Run the smallest applicable gate, then broaden only as needed:
 
-建议始终按下面顺序排查，避免同时处理多条链路：
+```bash
+pnpm verify:pr-fast
+pnpm verify:full
+pnpm test:coverage
+pnpm test:visual:evidence
+pnpm verify:release
+pnpm run check:npm-dist-tag
+pnpm run build:npm-package
+```
 
-1. `pnpm verify:pr-fast`
-2. `pnpm verify:full`
-3. `pnpm test:coverage`
-4. `pnpm test:visual:evidence`
-5. `pnpm verify:release`
-6. `pnpm run check:npm-dist-tag`
-7. `pnpm run build:npm-package`
+Useful owners:
 
-高频问题与对应位置：
+- Vitest setup: `vue/vitest.setup.ts`
+- Coverage scope/config: `vue/vitest.config.ts`
+- Visual config and tests: `vue/playwright.config.ts` and `vue/tests/visual/`
+- Demo fixtures: `vue/packages/demo-app/src/AuditFixtures.vue` and the
+  section components under `vue/packages/demo-app/src/sections/`
+- npm preparation: `scripts/prepare-npm-package.mjs`
+- Type generation: `vue/internal/build/src/tasks/types-definitions.ts`
 
-- Vitest 环境噪声：看 [vitest.setup.ts](/data/projects/FsusUI/vitest.setup.ts:1)
-- 覆盖率范围或门槛：看 [vue/vitest.config.ts](/data/projects/FsusUI/vue/vitest.config.ts:1)
-- 视觉回归失败：先看 [vue/playwright.config.ts](/data/projects/FsusUI/vue/playwright.config.ts:1) 和 [vue/tests/visual/demo-app.spec.ts](/data/projects/FsusUI/vue/tests/visual/demo-app.spec.ts:1)
-- demo 夹具问题：看 [vue/packages/demo-app/src/VisualFixtures.vue](/data/projects/FsusUI/vue/packages/demo-app/src/VisualFixtures.vue:1)
-- npm package 准备问题：看 `scripts/prepare-npm-package.mjs`
-- 根构建类型生成问题：看 `vue/internal/build/src/tasks/types-definitions.ts`
+Vitest owns unit/integration tests and `test:coverage`; Playwright owns
+desktop/mobile light/dark visual coverage and is not part of the default
+`verify` chain. Prefer behavior assertions to snapshots, use `--update-snapshots`
+only for intentional output changes, and never weaken a baseline to hide a
+defect.
 
-## 5. Vitest、Coverage、Playwright 的关系
+## 7. Visual fixture rules
 
-- Vitest 负责单元测试与集成测试，是 `verify` 主链路的一部分
-- `test:coverage` 基于 Vitest 全量执行，并输出 `text + lcov`
-- Playwright 负责桌面/移动端与亮色/暗黑模式的视觉 smoke 与截图回归，不参与 `verify`
-- 视觉基线当前覆盖首批高风险组件的 `forms / data / surfaces` 三组夹具
+The stable demo entry is `vue/packages/demo-app/src/App.vue`; the capture
+registry is `vue/tests/visual/capture-all.spec.ts`. Visual routes use
+`/?visual=<group>&theme=<light|dark>&compact=<0|1>`.
 
-当前约束：
+When adding a case:
 
-- 行为断言优先于快照断言
-- 若实现修复导致旧快照失真，应更新快照，而不是保留错误行为
-- 视觉基线默认复用现有截图，不在常规验收中执行 `--update-snapshots`
+- add a focused fixture rather than assertions to a complex page;
+- capture a component region rather than a long scrolling page;
+- fix viewport, locale, timezone, color scheme, and motion;
+- reuse the Playwright project matrix; and
+- cover only the key interaction states: open, hover, focus, disabled, loading,
+  selected, and empty.
 
-## 6. Visual Fixtures 维护规则
+Inspect relevant rendered states, themes, viewports, locales, accessibility,
+zoom/overflow, touch, and reduced-motion behavior before claiming acceptance.
+Follow [`docs/workflows/visual-change.md`](./workflows/visual-change.md) for
+classification and evidence requirements.
 
-- 稳定夹具入口在 [vue/packages/demo-app/src/VisualFixtures.vue](/data/projects/FsusUI/vue/packages/demo-app/src/VisualFixtures.vue:1)
-- Playwright 用例入口在 [vue/tests/visual/demo-app.spec.ts](/data/projects/FsusUI/vue/tests/visual/demo-app.spec.ts:1)
-- 视觉模式通过 `/?visual=<group>&theme=<light|dark>&compact=<0|1>` 切换，由 [vue/packages/demo-app/src/main.ts](/data/projects/FsusUI/vue/packages/demo-app/src/main.ts:1) 挂载
+## 8. Lint and handoff checklist
 
-新增视觉用例时遵守这些规则：
+One-off migration or local helper scripts are explicit lint exclusions.
+Long-lived scripts, generators, package builds, tests, and CI assets remain in
+the lint scope; classify new scripts before adding an ignore.
 
-- 优先新增 fixture，不直接在复杂 demo 页面堆断言
-- 优先做组件区块截图，不做长页面滚动截图
-- 固定 viewport、locale、timezone、color scheme、motion
-- 首选复用 Playwright 项目矩阵，不单独复制测试文件
-- 需要交互的表面态只覆盖关键路径：打开、hover、focus、disabled、loading、selected、empty
-
-## 7. ESLint 范围治理
-
-- 根目录一次性迁移脚本属于明确排除项，不纳入质量门
-- 长期维护脚本仍纳入质量门，包括：
-  - `scripts/**`
-  - `vue/packages/icons-vue/build/**`
-  - `vue/playwright.config.ts`
-  - CI 工作流相关长期资产
-
-后续新增脚本时，先判断它是：
-
-- 一次性迁移/本地辅助脚本：加入 ignore
-- 长期维护/发布/生成/测试脚本：纳入 lint 范围
-
-## 8. 接手者的标准动作
-
-新接手时，先执行：
+For a new handoff, run:
 
 ```bash
 pnpm install
@@ -200,78 +222,51 @@ pnpm run build:npm-package
 pnpm test:consumer-install
 ```
 
-如果这些步骤都通过，说明当前仓库质量门、视觉基线和发布工件链路都处于可维护状态。
+## 9. Avalonia quality lanes
 
-## Typecheck cache policy
+Platform verification and package validation are separate:
 
-## .NET quality lanes
+- `dotnet-platform` runs restore, Release build, tests, and demo startup smoke
+  on Linux, Windows, and macOS; each runner emits its own platform manifest.
+- `dotnet-package` runs once on Ubuntu, creates the canonical NuGet candidate,
+  checks metadata/content/packed-consumer/stable contracts, and emits one
+  aggregate SHA-256.
+- `static-quality` owns icons, tokens, conformance, governance, and a11y; it is
+  not part of the OS matrix.
 
-Run `pnpm dotnet:matrix:plan --os linux,windows,macos` to inspect ownership
-without attempting cross-OS execution. The three `dotnet-platform` matrix
-entries own only restore/build/test/startup smoke and each emit a distinct
-platform manifest. `pnpm dotnet:platform:verify` runs that same lane for the
-current host.
+Inspect ownership with `pnpm dotnet:matrix:plan --os linux,windows,macos`.
+Run the current-host lanes with `pnpm dotnet:platform:verify` and
+`pnpm dotnet:package:verify`; local verification does not emulate other OSes.
+`check:dotnet-matrix` rejects package/governance commands in the OS matrix and
+checks missing/duplicate/failed platform manifests. Restore caches include OS,
+SDK, projects, solution, props/targets, and lock inputs; final package
+directories are not trusted cache evidence.
 
-`pnpm dotnet:package:verify` is the canonical Ubuntu package lane. It deletes
-the prior package output, restores/builds once, packs the three public projects,
-runs metadata/package/packed-consumer/stable checks, and emits a manifest with
-one aggregate candidate SHA-256. CI uploads that candidate separately from
-platform results. Icons, tokens, conformance, governance, and a11y remain in
-the single `static-quality` job.
-
-The `check:dotnet-matrix` governance guard includes negative fixtures that
-reject package or governance commands in the OS matrix and reject missing
-platform coverage. The final manifest check also rejects duplicate platforms,
-failed tests/smoke, commit mismatches, and candidate digest drift. A developer
-needs only the current operating system to run either local verification lane.
-
-PR-fast uses `typecheck:affected`, which selects the affected TypeScript
-lanes and runs them through `scripts/run-typecheck.mjs`. The default
-`typecheck:*` lanes write `.tsbuildinfo` files under `.tmp/typecheck-cache`;
-GitHub Actions restores that typecheck cache with a key that includes
-`pnpm-lock.yaml`, `package.json`, `vue/tsconfig*.json`, package sources, typings,
-internal TypeScript sources, and `scripts/run-typecheck.mjs`.
-
-Workflow logs print `typecheck-cache-hit`, `cache-hit`, and
-`cache-primary-key`. The wrapper also prints `cache hit` / `cache miss`,
-the lane name, the `.tsbuildinfo` path, and a source hash prefix. `verify:full`
-still runs the full four-lane `typecheck` graph, while
-`pnpm run typecheck:no-cache` keeps a diagnostic and release fallback that
-bypasses the incremental typecheck cache entirely.
-
-## Path-aware demo build
+## 10. Capacity-aware demo and coverage
 
 PR checks call `scripts/should-run-demo-build.mjs` after `verify:pr-fast`.
-The script classifies changed files into demo, component/runtime, theme,
-public API, and build-config filters. Matching changes run `pnpm run build:demo`;
-docs/metadata-only changes skip it. The workflow logs `demo-build-run` and
-`demo-build-reason` for handoff/debugging.
+This path-aware demo build runs for demo, component/runtime, theme, public-API,
+and build-config changes and invokes `pnpm run build:demo`; docs/metadata-only
+changes may skip it. The workflow logs `demo-build-run` and `demo-build-reason`.
+Main, nightly, release, and local full verification always keep the full demo gate.
 
-Full verification remains unchanged for main, master, workflow-dispatch, and
-release paths: `verify:full` and the reusable `build-demo` quality job still
-run the complete demo build.
+The reusable `static-quality` job is the short quality consolidation: it uses
+shared setup/install while retaining separate named contract, lint, token, icon,
+conformance, and governance steps, so failure output identifies the affected
+quality area.
 
-## Short Quality Consolidation
+Coverage planning is offline and resource-aware:
 
-Reusable full quality uses a `static-quality` job for short quality checks with
-shared setup/install. The job keeps contract, lint, token, icon, conformance,
-and governance as separate named steps so failure output remains easy to map
-back to the failing quality area.
+```bash
+pnpm coverage:plan --dry-run
+pnpm coverage:run
+pnpm coverage:merge <blob-dir>
+```
 
-## Coverage planning, execution, and merge
-
-Use `pnpm coverage:plan --dry-run` to inspect the local resource-aware plan,
-`pnpm coverage:run` to execute it, and `pnpm coverage:merge <blob-dir>` to merge
-artifacts produced elsewhere. Planning is offline and uses the same effective
-CPU, memory/cgroup, and lane budget as the rest of CI. Test scale and per-shard
-memory limit shard count; the product of shard count and workers per shard must
-remain inside that shared budget. Small workloads use one complete channel.
-
-Parallel shards run concurrently and each emits a blob, coverage fragment, and
-unique manifest. Merge first proves `1..N` completeness and rejects duplicate
-indexes, wrong totals, stale artifact digests, or differences in commit SHA,
-config, selection, or toolchain. Per-shard thresholds are never completion
-evidence: only the final merged result applies coverage thresholds, once. The
-default wall-clock target is a scheduling signal rather than a fixed runner
-correctness condition. Set `FSUSUI_COVERAGE_DURATION_BUDGET_SECONDS` for an
-environment-specific SLO; the same budget is enforced in both modes.
+Shards emit unique blobs, fragments, and manifests. Merge rejects missing or
+duplicate indexes, mixed totals, stale digests, or mismatched commit/config/
+selection/toolchain. Every shard and the final merged result must identify the
+same commit. Only the complete final merged result applies thresholds once;
+per-shard thresholds are not completion evidence. Set
+`FSUSUI_COVERAGE_DURATION_BUDGET_SECONDS` only for an environment-specific SLO;
+the budget applies to both single and sharded modes.

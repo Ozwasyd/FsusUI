@@ -1,26 +1,27 @@
-# Icon 图标
+# Icon
 
-FsusUI 图标系统通过 `@ozwasyd/element-plus/icons-vue` 暴露 SVG 图标组件。导入、生成和命名稳定性策略见 [图标系统](../icons.md)。
+FsusUI exposes SVG icon components through `@ozwasyd/element-plus/icons-vue`. See the [icon system](../icons.md) for import, generation, and naming stability rules.
 
-生成的 FsusUI 线性图标在 SVG 源中携带 `stroke-linejoin="round"`、
-`stroke-linecap="round"` 与 token 化描边宽度。基础样式不会修改裸 `svg`；自定义
-线性图标需要通过 `<el-icon variant="linear">` 显式启用 scoped cap/join recipe。
+Generated FsusUI linear icons carry `stroke-linejoin="round"`,
+`stroke-linecap="round"`, and a tokenized stroke width in their SVG source. Base
+styles do not modify bare `svg`; custom linear icons must explicitly opt into the
+scoped cap/join recipe with `<el-icon variant="linear">`.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看所有可用图标。
+> See the [Playground](../playground.md) for runnable icon examples.
 
 ---
 
-## 安装
+## Installation
 
-图标包已内置于 FsusUI 主包，通常无需额外安装。
+The icon package is bundled with the FsusUI main package, so no extra installation is usually needed.
 
-若在独立项目中使用：
+For use in a standalone project:
 
 ```bash
 pnpm install @ozwasyd/element-plus
 ```
 
-## 全量注册图标
+## Register All Icons
 
 ```ts
 // main.ts
@@ -32,13 +33,13 @@ for (const [key, component] of Object.entries(FsusIconsVue)) {
 }
 ```
 
-> **注意**：HTML 原生标签 `<menu>` 与图标名 `Menu` 冲突，注册后需使用别名。
+> **Note:** The native HTML `<menu>` element conflicts with the `Menu` icon name; use an alias after registration.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-使用 `<el-icon>` 包裹 SVG 图标组件，可以统一控制大小和颜色：
+Wrap an SVG icon component in `<el-icon>` to control size and color consistently:
 
 ```vue
 <template>
@@ -54,9 +55,9 @@ import { Edit } from '@ozwasyd/element-plus/icons-vue'
 </script>
 ```
 
-## 加载动画
+## Loading Animation
 
-为 `<el-icon>` 添加 `is-loading` class，图标会自动 360° 旋转：
+Add the `is-loading` class to `<el-icon>` for an automatic 360° rotation:
 
 ```vue
 <template>
