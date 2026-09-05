@@ -60,6 +60,16 @@
     <Setter Property="MinHeight" Value="44" />
   </Style>
 
+  <Style Selector="UniformGrid.fsus-metric-list, UniformGrid.fsus-kpi-group">
+    <Setter Property="ColumnSpacing" Value="8" />
+    <Setter Property="RowSpacing" Value="8" />
+  </Style>
+
+  <Style Selector="UniformGrid.fsus-kpi-group.fsus-mobile">
+    <Setter Property="Rows" Value="0" />
+    <Setter Property="Columns" Value="1" />
+  </Style>
+
   <Style Selector="fsus|FsusCopyableDetail:focus">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
     <Setter Property="BorderThickness" Value="2" />

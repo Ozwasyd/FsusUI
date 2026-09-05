@@ -20,6 +20,12 @@ collapse contracts map to page values, item collections, placement/status
 enums, content controls, `FsusAvatarShape`, and `FsusCollapse`
 `Accordion`/`ActiveNames` state.
 
+`FsusDescriptions` renders its `Items` collection as a responsive key/value
+grid. `RefreshLayout(width)` resolves the mobile one-column layout below 480px
+and otherwise uses the requested `Column` count; call it after the host layout
+changes. Item labels and values remain left-aligned and truncated to preserve
+dense document surfaces.
+
 ## Supported Platform Differences
 
 See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for text baselines and

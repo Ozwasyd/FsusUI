@@ -34,6 +34,11 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
   </Style>
 
+  <Style Selector="UniformGrid.fsus-descriptions-grid">
+    <Setter Property="ColumnSpacing" Value="12" />
+    <Setter Property="RowSpacing" Value="8" />
+  </Style>
+
   <Style Selector="fsus|FsusTimeline.fsus-alternate">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
   </Style>

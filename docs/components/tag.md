@@ -18,7 +18,7 @@ values with Checkbox, Select, or application state.
 
 Use `type` for the tag type and `color` for its background.
 
-Tag preserves the supplied text's case and letter spacing, which suits mixed-language and code-like labels such as `状态 APIv2`, `zh-CN Ready`, and `sha-1:AbC123`. For an uppercase appearance, consumers must explicitly add `.is-uppercase` or `data-fsus-tag-uppercase="true"`; default styles must not rewrite user text.
+Tag preserves the supplied text's case and letter spacing, which suits mixed-language (混合语言) and code-like labels such as `状态 APIv2`, `zh-CN Ready`, and `sha-1:AbC123`. For an uppercase appearance, consumers must explicitly add `.is-uppercase` or `data-fsus-tag-uppercase="true"`; default styles must not rewrite user text.
 
 ## Removable Tags
 

@@ -1,8 +1,13 @@
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Layout;
+using Avalonia.Media;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 
 namespace FsusUI.Avalonia.Controls;
@@ -373,10 +378,62 @@ public class FsusKpiGroup : FsusProductPrimitiveControl
   public FsusKpiGroup()
     : base("fsus-kpi-group")
   {
+    Items.CollectionChanged += OnItemsChanged;
   }
 
-  public Collection<FsusMetricItem> Items { get; } = [];
+  public ObservableCollection<FsusMetricItem> Items { get; } = [];
   protected override int ItemCount => Items.Count;
+
+  protected override void SyncState()
+  {
+    base.SyncState();
+    BuildVisualTree();
+  }
+
+  private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs eventArgs)
+  {
+    SyncState();
+  }
+
+  private void BuildVisualTree()
+  {
+    var panel = new UniformGrid
+    {
+      Columns = IsMobile ? 1 : Math.Max(1, Math.Min(4, Items.Count)),
+      Rows = IsMobile ? 0 : 1,
+      Margin = new Thickness(0),
+    };
+    panel.Classes.Add("fsus-kpi-group");
+
+    foreach (var item in Items)
+    {
+      var content = new StackPanel
+      {
+        Spacing = FsusTokens.Space1Thickness.Top,
+        VerticalAlignment = VerticalAlignment.Top,
+      };
+      var label = new FsusText
+      {
+        Text = item.Label,
+        IsTruncated = true,
+        Variant = FsusTextVariant.Muted,
+      };
+      label.Classes.Add("fsus-metric-label");
+      content.Children.Add(label);
+
+      var value = new FsusText
+      {
+        Text = item.Value,
+        IsTruncated = true,
+        Variant = FsusTextVariant.Strong,
+      };
+      value.Classes.Add("fsus-metric-value");
+      content.Children.Add(value);
+      panel.Children.Add(content);
+    }
+
+    Content = panel;
+  }
 }
 
 public class FsusKeyValueGrid : FsusProductPrimitiveControl

@@ -16,6 +16,11 @@ Vue product slots map to typed records and content controls for settings,
 danger actions, metrics, key/value data, diagnostics, conversations, and
 reply composition.
 
+`FsusKpiGroup` renders its `Items` collection as a restrained, responsive KPI
+row. Desktop rows use up to four equal columns; mobile layouts stack in source
+order. Product metrics still own their labels, values, thresholds, and domain
+semantics.
+
 ## Supported Platform Differences
 
 See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for dense layout, text

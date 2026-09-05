@@ -28,7 +28,7 @@ caps controls at `220ms`, panels at `360ms`, and uses no blur, glow, or trail.
 | `--fsus-motion-control-fast` | `140ms` | Fast control feedback. |
 | `--fsus-motion-control` | `220ms` | Default control feedback. |
 | `--fsus-motion-panel` | `360ms` | Panel and large-surface transitions. |
-| `--fsus-motion-overlay` | `300ms` | Overlay enter/leave transitions. |
+| `--fsus-motion-overlay`      | `300ms` | Overlay enter/leave transitions. |
 
 The theme layer also owns View Transition snapshot tokens:
 

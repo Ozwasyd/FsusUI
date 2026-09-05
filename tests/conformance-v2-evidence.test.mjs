@@ -8,7 +8,6 @@ import { fileURLToPath } from 'node:url'
 import {
   compareEvidence,
   deriveAlignment,
-  sealExecutionCoverage,
   validateCoverage,
   validateEvidence,
   loadCurrentCheckTagVisualReview,
@@ -32,24 +31,6 @@ import {
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const scenario = (name) => `scenario.v2.${name}.input.value`
-const comparisonFor = (name, records = []) => {
-  const identity = { contract: `component-v2.${name}` }
-  const evidenceDigests = { web: `${name}-web`, avalonia: `${name}-avalonia` }
-  return {
-    schema: 'fsusui.conformance-comparison.v2',
-    verdict: 'pass',
-    identity,
-    evidenceDigests,
-    executionCoverage: sealExecutionCoverage({
-      schema: 'fsusui.member-execution-coverage.v2',
-      identity,
-      real: true,
-      evidenceDigests,
-      records,
-    }),
-  }
-}
 
 const realManifests = () => ({
   web: JSON.parse(
