@@ -1591,14 +1591,14 @@ test('real mapped inputs use compiler-known metadata and keep unknown values par
   const mappedInputs = registry.contracts.flatMap((contract) =>
     contract.inputs.filter((input) => input.avalonia != null),
   )
-  assert.equal(mappedInputs.length, 140)
+  assert.equal(mappedInputs.length, 180)
   assert.equal(
     mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
     14,
   )
   assert.equal(
     mappedInputs.filter((input) => input.status === 'partial').length,
-    126,
+    166,
   )
   const max = registry.contracts
     .find((contract) => contract.component.name === 'ElBadge')

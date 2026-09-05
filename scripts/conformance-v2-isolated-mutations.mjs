@@ -90,8 +90,8 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/vue-semantic-baseline.mjs',
-        "node.callee.name === 'defineComponent'",
-        "node.callee.name === 'defineComponentMutation'",
+        "          if (optionName === 'emits') {",
+        "          if (optionName === 'emitsMutation') {",
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'fixture TSX widget emit submit was not extracted',
@@ -186,8 +186,8 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/contract-v2.mjs',
-        '      web.required === false &&\n',
-        '      web.required === true &&\n',
+        '    } else if (webNullable !== avaloniaNullable) {\n',
+        '    } else if (false) {\n',
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
@@ -416,20 +416,20 @@ const cases = [
     inject: () =>
       mutateText(
         'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
-        'state == NullabilityState.Nullable ||',
-        'state == NullabilityState.NotNull ||',
+        '    return type.IsValueType == false;',
+        '    return type.IsValueType == true;',
       ),
     command: ['pnpm', ['run', 'avalonia:semantic:check']],
     expected: 'FsusUI.Avalonia.semantic.json drifted',
   },
   {
     id: 'avalonia-semantic-default-mutated',
-    file: 'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+    file: 'dotnet/FsusUI.Avalonia.ApiTool/SourceSemanticEvaluator.cs',
     inject: () =>
       mutateText(
-        'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
-        '            "GetDefaultValue",',
-        '            "GetDefaultValueMutation",',
+        'dotnet/FsusUI.Avalonia.ApiTool/SourceSemanticEvaluator.cs',
+        '          DefaultKnown = defaultValue.Known,',
+        '          DefaultKnown = false,',
       ),
     command: ['pnpm', ['run', 'avalonia:semantic:check']],
     expected: 'FsusUI.Avalonia.semantic.json drifted',
