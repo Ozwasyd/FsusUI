@@ -21,6 +21,10 @@
     {
       "snapshotId": "perception-character-challenge-conformance",
       "contractId": "component-v2.el-perception-character-challenge"
+    },
+    {
+      "snapshotId": "table-v2-stable34",
+      "contractId": "component-v2.el-table-v2"
     }
   ],
   "bindingGaps": [
@@ -48,13 +52,6 @@
     {
       "snapshotId": "virtualization-stable34",
       "reason": "Contract V2 has no Avalonia type binding for FsusVirtualList.",
-      "owner": "FsusUI Contract V2",
-      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
-      "reviewAfter": "2026-12-05"
-    },
-    {
-      "snapshotId": "table-v2-stable34",
-      "reason": "The FsusTableV2 Contract V2 type binding has no declared accessibility scenario.",
       "owner": "FsusUI Contract V2",
       "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
       "reviewAfter": "2026-12-05"
