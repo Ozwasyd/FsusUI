@@ -1890,6 +1890,8 @@
       "manager": "nuget",
       "files": [
         "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.ApiTool/FsusUI.Avalonia.ApiTool.csproj",
+        "dotnet/FsusUI.Avalonia.ApiTool/packages.lock.json",
         "dotnet/FsusUI.Avalonia.FormGenerator.Tests/FsusUI.Avalonia.FormGenerator.Tests.csproj",
         "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json",
         "dotnet/FsusUI.Avalonia.FormGenerator/FsusUI.Avalonia.FormGenerator.csproj",
