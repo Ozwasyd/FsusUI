@@ -1,34 +1,34 @@
-# Slider 滑块
+# Slider
 
-通过拖动滑块在一个固定区间内进行选择。
+Select a value within a fixed range by dragging a slider.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-使用 `v-model` 绑定数值，拖动时实时显示当前值。
+Bind the value with `v-model`; the current value updates while dragging.
 
-## 离散值
+## Discrete Values
 
-通过 `step` 设置步长；开启 `show-stops` 显示刻度点。
+Set the increment with `step`; enable `show-stops` to show stop marks.
 
-## 带输入框
+## With Input
 
-开启 `show-input` 在右侧显示输入框，可通过输入框直接设置值。
+Enable `show-input` to show an input on the right and set the value directly.
 
-## 范围选择
+## Range Selection
 
-设置 `range` 为 `true` 开启范围模式，绑定值为包含起止两个数值的数组。
+Set `range` to `true` for range mode; the bound value is an array with start and end values.
 
-## 垂直模式
+## Vertical Mode
 
-设置 `vertical` 为 `true` 开启垂直模式（此时必须同时设置 `height`）。
+Set `vertical` to `true` for vertical mode; `height` is then required.
 
-## 刻度标记
+## Tick Marks
 
-通过 `marks` 属性设置刻度标记，key 为数值，value 为标签文字或自定义样式对象。
+Use `marks` for scale labels; each key is a number and its value is label text or a custom style object.
 
 ---
 

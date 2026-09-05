@@ -8,12 +8,9 @@ For adoption setup, package references, and clean sample verification, see
 
 ## Trimming and AOT
 
-This package is an AOT-compatible library with trimming, single-file, and AOT
-analyzers enabled. The generated icon dictionary remains on the normal package
-resource path; there is no AOT-only icon path or public API. The library
-contract does not set `PublishAot` or validate a final RID-specific Native AOT
-executable. Consuming applications and third-party plugins must verify their
-own dynamic loading and reflection boundaries.
+The generated dictionary stays on the normal package resource path; there is
+no AOT-only icon path or public API. For the shared analyzer boundary and
+consumer-owned Native AOT verification, see [Avalonia installation](../../docs/avalonia/installation.md#trimming-and-aot-library-boundary).
 
 ## Import
 
@@ -53,7 +50,7 @@ name. Icons inherit the host foreground color in every theme.
 
 ## Semantics
 
-Icon size, stroke, and fill names come from shared token ids:
+Icon size, stroke, and fill names come from shared token IDs:
 
 - `icon.size.md`
 - `icon.stroke.md`

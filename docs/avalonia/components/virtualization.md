@@ -53,13 +53,11 @@ and scroll-bound `Loaded` callbacks.
 
 ## Supported Platform Differences
 
-Scroll anchoring and presenter offset correction follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for scroll anchoring and presenter-offset correction.
 
 ## Theme Tokens
 
-Virtualized surfaces use surface, border, focus, text, density, and motion
-resources.
+Use surface, border, focus, text, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

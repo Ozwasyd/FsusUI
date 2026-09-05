@@ -1,14 +1,14 @@
-# TableV2 虚拟化表格（Beta）
+# TableV2 (Beta)
 
-利用虚拟滚动技术，实现大数据量表格的高性能渲染。
+Uses virtual scrolling for high-performance rendering of large tables.
 
-> **提示**：该组件仍处于测试阶段，API 可能发生变化。当数据量极大时，网络和内存才是真正的瓶颈——请配合分页、过滤等手段使用。
+> **Tip:** This component is still experimental and its API may change. For very large data sets, network and memory are the real bottlenecks; combine it with pagination and filtering.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 与 TableV1 的区别
+## Differences from Table V1
 
 | 特性            | TableV1                                                                  | TableV2                                         |
 | --------------- | ------------------------------------------------------------------------ | ----------------------------------------------- |
@@ -17,29 +17,29 @@
 | colspan/rowspan | 原生支持                                                                 | 需自定义行渲染器实现                            |
 | 功能集          | 丰富                                                                     | 轻量，按需自定义                                |
 
-不要仅按固定行数切换组件。先用 Table 的 `getLayoutDiagnostics()` 和同机基准判断成本来自数据追踪、排序还是 DOM/Layout；当可见行 DOM 与复杂单元格持续主导帧耗时时迁移到 TableV2。两者都应使用稳定 `row-key`，排序/筛选状态保存 key 或 row index，只有事件和渲染边界才 materialize 行对象，避免迁移时出现两套 selection 语义。
+Do not switch based only on a fixed row count. Use Table's `getLayoutDiagnostics()` and same-machine benchmarks to determine whether cost comes from data tracking, sorting, or DOM/layout; migrate to TableV2 when visible-row DOM and complex cells consistently dominate frame time. Both components should use a stable `row-key`; preserve sort/filter state as keys or row indexes and materialize row objects only at event and render boundaries to avoid two selection semantics during migration.
 
-## 基础用法
+## Basic Usage
 
-必须传入 `width`、`height` 和 `columns` 三个必填属性。
+The required props are `width`, `height`, and `columns`.
 
 ```vue
 <el-table-v2 :columns="columns" :data="data" :width="700" :height="400" />
 ```
 
-## 自动大小
+## Auto Size
 
-用 `AutoResizer` 组件包裹可自动跟随父容器尺寸变化。
+Wrap it in `AutoResizer` to follow parent-container size changes automatically.
 
-> **提示**：`AutoResizer` 的父容器必须有固定高度。
+> **Tip:** The `AutoResizer` parent must have a fixed height.
 
-## 固定列
+## Fixed Columns
 
-在列定义中设置 `fixed: true`（或 `FixedDir.LEFT` / `FixedDir.RIGHT`）实现列固定。
+Set `fixed: true` (or `FixedDir.LEFT` / `FixedDir.RIGHT`) in a column definition to fix a column.
 
-## 动态行高
+## Dynamic Row Height
 
-设置 `estimated-row-height` 开启动态行高，系统会在渲染时实时测量每行高度。
+Set `estimated-row-height` to enable dynamic row heights; the component measures each row while rendering.
 
 ---
 

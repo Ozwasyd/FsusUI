@@ -14,13 +14,11 @@ Vue display props map to `Value`, `Maximum`, `Title`, `Description`,
 
 ## Supported Platform Differences
 
-Animation reduction and text measurement follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for animation reduction and text-measurement boundaries.
 
 ## Theme Tokens
 
-Display controls use text, muted text, loading, disabled, danger, surface,
-border, density, and motion tokens.
+Use text, muted-text, loading, disabled, danger, surface, border, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Accessibility
 

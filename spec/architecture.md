@@ -22,9 +22,9 @@ spec/
 
 ## Dependency Direction
 
-Web and Avalonia may both depend on `spec/` and generated artifacts. They must
-not depend on each other. Product apps depend on published FsusUI packages and
-documented contracts only.
+Web and Avalonia may both depend on `spec/` and generated artifacts, but must not
+depend on each other. Product apps depend only on published FsusUI packages and
+documented contracts.
 
 Allowed:
 

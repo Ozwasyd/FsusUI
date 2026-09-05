@@ -1,14 +1,14 @@
-# Result 结果
+# Result
 
-用于对用户操作结果或异常访问给出反馈。
+Provides feedback about an operation result or an exceptional visit.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-设置 `icon` 展示不同类型的结果图标，设置 `title` 和 `sub-title` 显示标题和副标题。
+Use `icon` for the result icon and `title` / `sub-title` for the heading and subtitle.
 
 ```vue
 <el-result icon="success" title="提交成功" sub-title="请等待审核人员处理">
@@ -18,9 +18,9 @@
 </el-result>
 ```
 
-## 自定义内容
+## Custom Content
 
-通过各具名插槽自定义图标、标题、副标题和底部操作区域。
+Customize the icon, heading, subtitle, and footer actions with the named slots.
 
 ---
 

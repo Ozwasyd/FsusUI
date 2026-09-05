@@ -10,12 +10,9 @@ For adoption setup, package references, and clean sample verification, see
 
 ## Trimming and AOT
 
-This package is an AOT-compatible library with trimming, single-file, and AOT
-analyzers enabled. Generated tokens and every shipped AXAML theme dictionary
-remain on the normal package resource path; there is no AOT-only theme path.
-The library contract does not set `PublishAot` or validate a final RID-specific
-Native AOT executable. Consuming applications and third-party plugins must
-verify their own dynamic loading and reflection boundaries.
+Generated tokens and shipped AXAML dictionaries stay on the normal package
+resource path; there is no AOT-only theme path. For the shared analyzer
+boundary and consumer-owned Native AOT verification, see [Avalonia installation](../../docs/avalonia/installation.md#trimming-and-aot-library-boundary).
 
 ## Import
 
@@ -28,8 +25,9 @@ verify their own dynamic loading and reflection boundaries.
 
 ## Theme Manager
 
-Use `FsusThemeManager` for runtime changes instead of mutating demo or
-application resources directly:
+Use `FsusThemeManager` for runtime changes as shown in [Application Setup](../../docs/avalonia/installation.md#application-setup).
+That canonical contract defines palette precedence, nullable brush overrides,
+dynamic-resource updates, high-contrast behavior, and enum fallbacks.
 
 ```csharp
 var manager = new FsusThemeManager();
@@ -52,26 +50,6 @@ manager.Apply(
   });
 ```
 
-The manager applies resources in this order:
-
-1. built-in light, dark, or high-contrast palette
-2. nullable `FsusThemePaletteOptions` brush fields when high contrast is off
-3. accent override
-4. density resources
-5. motion resources
-
-`FsusThemePaletteOptions` accepts any `IBrush` for `Background`, `Surface`,
-`SurfaceRaised`, `Text`, `MutedText`, `Border`, and `Icon` independently. A
-null field keeps the selected built-in value. `Surface` also feeds the existing
-shell, editor, tree, and picker surface aliases; `SurfaceRaised` feeds raised
-picker and read-only states. High contrast retains its complete built-in palette.
-Calling `Apply` again replaces the runtime resources, so controls consuming the
-corresponding `DynamicResource` update without replacing theme dictionaries.
-
-Unknown enum values fall back to light, default density, and system motion.
-`FollowSystemTheme` sets `Application.RequestedThemeVariant` to
-`ThemeVariant.Default` while keeping FsusUI resource fallbacks active.
-
 ## Scope
 
 The package includes baseline styles for:
@@ -93,22 +71,11 @@ FsusPanel business logic.
 
 ## Motion Modes
 
-Motion resources are exposed through stable theme keys:
-
-- `FsusMotionModeCurrent`
-- `FsusMotionDurationEffective`
-- `FsusMotionEasingEffective`
-
-Controls should consume these semantic resources instead of hard-coding local
-durations or easing values.
-
-`FsusMotionService` resolves stable Avalonia motion plans from the same token
-set. It provides presets for control feedback, panel enter/leave, overlay
-transitions, list item appearance, and action-row safe motion. `Reduced` mode
-keeps terminal visual state with no travel or scale; `Disabled` mode resolves
-immediately with `0ms` duration.
-
-See `docs/avalonia/motion-runtime.md` for the runtime API and governance gate.
+Motion keys, service presets, reduced/disabled behavior, and the governance gate
+are defined in [`docs/avalonia/motion-runtime.md`](../../docs/avalonia/motion-runtime.md).
+Controls consume those semantic resources instead of hard-coding local plans.
+The stable resource keys include `FsusMotionModeCurrent`,
+`FsusMotionDurationEffective`, and `FsusMotionEasingEffective`.
 
 ## Runtime Resource Dictionaries
 

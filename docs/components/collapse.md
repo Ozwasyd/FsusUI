@@ -1,30 +1,33 @@
-# Collapse 折叠面板
+# Collapse
 
-通过折叠/展开来存放内容。
+Stores content behind collapsible panels.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-`v-model` 绑定当前展开的面板名称（非手风琴模式为数组）。
+Bind the expanded panel name with `v-model`; non-accordion mode uses an array.
 
-## 手风琴模式
+## Accordion Mode
 
-设置 `accordion` 属性，同一时间只能展开一个面板，`v-model` 绑定值为字符串。
+Set `accordion` to allow one panel at a time; its `v-model` value is a string.
 
-## 自定义标题
+## Custom Title
 
-除了 `title` 属性外，也可通过 `#title` 插槽自定义标题内容（插槽 scope 中可访问 `isActive`）。
+In addition to `title`, customize the heading through `#title`, whose slot scope
+exposes `isActive`.
 
-## 自定义图标
+## Custom Icons
 
-通过 `icon` 属性或 `#icon` 插槽自定义展开图标；通过 `expand-icon-position` 设置图标位置（`left` / `right`）。
+Customize the expand icon with `icon` or `#icon`, and place it with
+`expand-icon-position` (`left` or `right`).
 
-## 阻止折叠
+## Prevent Collapse
 
-设置 `before-collapse` 钩子，返回 `false` 或 rejected 的 `Promise` 可阻止状态切换。
+Use `before-collapse`; returning `false` or a rejected `Promise` prevents the
+state change.
 
 ---
 

@@ -1,57 +1,48 @@
-# Cross-Platform Release Governance
+# Cross-Platform Release Policy
 
 > **Role:** Normative cross-platform release policy
-> **Applies to:** Shared spec versions, Web/Avalonia release classification, evidence, and bounded platform variance
+> **Applies to:** Shared spec versions, Web/Avalonia classification, evidence, and bounded platform variance
 
-FsusUI cross-platform releases are governed by a shared spec version, Web npm
-package versions, Avalonia NuGet package versions, token schema version, and
-component contract version.
+Web/Vue and Avalonia/.NET share platform-neutral contracts but publish through
+separate npm and NuGet channels. A channel-specific patch must not redefine the
+shared spec or token semantics.
 
-## Version Sources
+## Version sources
 
-- spec version: recorded in `spec/` documents and contract files.
-- token schema version: `spec/tokens/tokens.json`.
-- Web package version: npm release workflow for `@ozwasyd/element-plus`.
-- Avalonia package version: NuGet package metadata under `dotnet/`.
-- component contract version: component contract files under `spec/components/`.
-- Contract V2 version: `spec/components/contracts/v2/contract-v2.json` maps the
-  real Web and Avalonia semantic baselines; it must be regenerated and checked
-  (`pnpm run contract-v2:check`) whenever either baseline changes.
+| Contract | Source of truth |
+| --- | --- |
+| Spec | `spec/` documents and contract files |
+| Token schema version | `spec/tokens/tokens.json` |
+| Web package | npm workflow for `@ozwasyd/element-plus` |
+| Avalonia packages | NuGet metadata under `dotnet/` |
+| Component contract | `spec/components/` |
+| Contract V2 | `spec/components/contracts/v2/contract-v2.json` |
 
-Web npm packages, Avalonia NuGet packages, and generated token/spec artifacts
-share the same platform-neutral contract but remain separate distribution
-channels. A Web-only npm patch must not silently redefine spec or token
-semantics; an Avalonia-only NuGet preview must point back to the same
-`spec/tokens`, `spec/components`, `spec/motion`, and `spec/icons` sources. When
-the shared contract changes, release notes must name the affected spec version,
-token schema version, npm package version, and NuGet package version.
+Regenerate and check Contract V2 with `pnpm run contract-v2:check` whenever the
+Web or Avalonia semantic baseline changes. An Avalonia-only preview still
+points to the same `spec/tokens`, `spec/components`, `spec/motion`, and
+`spec/icons` sources. Release notes for a shared-contract change name every
+affected spec, token-schema, npm, and NuGet version.
 
-## Release Classification
+## Release classification
 
-Every cross-platform public contract change must be classified before release:
+Classify every cross-platform public-contract change before release:
 
-- `preview-patch`: documentation, tests, or non-breaking generated metadata.
-- `preview-minor`: new token, component, pattern, mode, or public preview API.
-- `preview-breaking`: rename, removal, incompatible behavior, or token type
-  change during preview.
-- `stable-breaking`: reserved for post-stable major version changes.
+- `preview-patch`: docs, tests, or non-breaking generated metadata;
+- `preview-minor`: a new token, component, pattern, mode, or preview API;
+- `preview-breaking`: a rename, removal, incompatible behavior, or token-type
+  change during preview; and
+- `stable-breaking`: reserved for post-stable major changes.
 
-Contract files must include a release classification so CI can reject
-unclassified public-contract changes.
+Contract files must carry a classification so CI can reject an unclassified
+public-contract change.
 
-## Consistency Target
+## Consistency and evidence
 
-FsusUI targets contract-perfect consistency and visually bounded variance.
-It does not claim pixel-perfect equality across browser engines, Skia, DPI
-modes, OS accessibility settings, or Linux compositor behavior.
+FsusUI targets contract-perfect consistency with visually bounded variance; it
+does not promise pixel identity across browser engines, Skia, DPI modes, OS
+accessibility settings, or Linux compositor behavior.
 
-## Evidence Requirements
-
-Preview releases require:
-
-- token generation/check evidence
-- Web build/test evidence
-- Avalonia restore/build/test evidence when Avalonia packages are in scope
-- conformance gate output
-- platform override review when a variance is accepted
-- release notes that identify contract and token version changes
+Preview releases require token generation/check, Web build/test, Avalonia
+restore/build/test when in scope, conformance gates, platform-override review
+for accepted variance, and release notes naming contract/token version changes.

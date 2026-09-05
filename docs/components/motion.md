@@ -1,10 +1,11 @@
-# Motion 动效
+# Motion
 
-Motion 提供 FsusUI 的语义化动效层。业务页面只选择 preset，不直接编写底层 `transform`、`duration` 或 GSAP 参数。
+Motion is FsusUI's semantic motion layer. Product pages select a preset instead
+of writing low-level `transform`, `duration`, or GSAP parameters.
 
-## 基础用法
+## Basic Usage
 
-完整安装 FsusUI 后会自动注册 `v-motion` 和 `FsuTransition`。
+The full FsusUI install registers `v-motion` and `FsuTransition`.
 
 ```vue
 <template>
@@ -12,7 +13,8 @@ Motion 提供 FsusUI 的语义化动效层。业务页面只选择 preset，不�
 </template>
 ```
 
-对象写法可覆盖 duration、delay、easing，并支持 `once`。
+The object form can override `duration`, `delay`, and `easing`, and supports
+`once`.
 
 ```vue
 <template>
@@ -29,7 +31,7 @@ Motion 提供 FsusUI 的语义化动效层。业务页面只选择 preset，不�
 </template>
 ```
 
-## 卡片
+## Card
 
 ```vue
 <template>
@@ -40,7 +42,7 @@ Motion 提供 FsusUI 的语义化动效层。业务页面只选择 preset，不�
 </template>
 ```
 
-## 对话框
+## Dialog
 
 ```vue
 <template>
@@ -92,39 +94,10 @@ runOwnershipTransferSnapshotMotion(snapshotEl, {
 </template>
 ```
 
-## 下拉面板
-
-```vue
-<template>
-  <FsuTransition name="fade-down">
-    <div v-if="visible" class="menu-panel">
-      <button>编辑</button>
-      <button>归档</button>
-    </div>
-  </FsuTransition>
-</template>
-```
-
-## 列表错峰
-
-```vue
-<template>
-  <ul>
-    <li
-      v-for="(item, index) in items"
-      :key="item.id"
-      v-motion="{ name: 'list-stagger', index }"
-    >
-      {{ item.title }}
-    </li>
-  </ul>
-</template>
-```
-
 ## Timeline
 
-使用 `useTimeline` 编排多个元素。业务页面只添加 preset step，不直接拼 GSAP
-timeline 参数。
+Use `useTimeline` to coordinate multiple elements. Add preset steps rather than
+assembling GSAP timeline parameters in the product page.
 
 ```vue
 <script setup lang="ts">
@@ -146,8 +119,8 @@ onMounted(() => {
 
 ## Scroll Reveal
 
-完整安装后会自动注册 `v-scroll-reveal`。它会通过 FsusUI 管理
-ScrollTrigger 注册、实例清理和 reduced motion 终态。
+The full install registers `v-scroll-reveal`. FsusUI owns ScrollTrigger
+registration, instance cleanup, and the reduced-motion terminal state.
 
 ```vue
 <template>
@@ -157,7 +130,7 @@ ScrollTrigger 注册、实例清理和 reduced motion 终态。
 </template>
 ```
 
-组合式用法：
+Composition API form:
 
 ```ts
 import { onMounted, ref } from 'vue'
@@ -171,10 +144,39 @@ onMounted(() => {
 })
 ```
 
+## Dropdown
+
+```vue
+<template>
+  <FsuTransition name="fade-down">
+    <div v-if="visible" class="menu-panel">
+      <button>编辑</button>
+      <button>归档</button>
+    </div>
+  </FsuTransition>
+</template>
+```
+
+## List Stagger
+
+```vue
+<template>
+  <ul>
+    <li
+      v-for="(item, index) in items"
+      :key="item.id"
+      v-motion="{ name: 'list-stagger', index }"
+    >
+      {{ item.title }}
+    </li>
+  </ul>
+</template>
+```
+
 ## GSAP Context
 
-自定义编排必须包在 `useGsapContext` 中，组件卸载或路由离开时调用
-`revert()`。
+Wrap custom orchestration in `useGsapContext` and call `revert()` when the
+component unmounts or the route changes.
 
 ```ts
 import { onMounted, ref } from 'vue'
@@ -192,8 +194,8 @@ onMounted(() => {
 
 ## Route Cleanup
 
-路由页面里创建的 context、timeline 和 scroll reveal 都要加入清理桶。离开路由
-时清理动画实例，并在清理后刷新 ScrollTrigger。
+Add route-owned contexts, timelines, and scroll reveals to one cleanup bucket.
+Clean up animation instances on route leave and refresh ScrollTrigger afterward.
 
 ```ts
 import { onBeforeRouteLeave } from 'vue-router'
@@ -220,8 +222,10 @@ onBeforeRouteLeave(() => {
 
 ## Dynamic Content Refresh
 
-Markdown、图片、评论列表等内容在初次渲染后改变高度时，等待内容稳定后调用
-`refreshScrollTriggers()`。调用端不需要直接访问 `ScrollTrigger.refresh()`。
+When Markdown, images, comments, or other content changes height after the
+initial render, wait for the content to settle and call
+`refreshScrollTriggers()`. Consumers do not need to access
+`ScrollTrigger.refresh()` directly.
 
 ```ts
 import { nextTick } from 'vue'
@@ -233,9 +237,9 @@ refreshScrollTriggers()
 
 ## Component Motion Prop
 
-关键组件共享同一个 `motion` prop 约定：传 preset 名称启用语义动效，传 `false`
-关闭该组件的本地动效。全局 reduced / disabled motion 仍由 `ElConfigProvider`
-统一控制。
+Key components share the `motion` prop convention: a preset name enables
+semantic motion and `false` disables local motion. `ElConfigProvider` still
+controls global reduced or disabled motion.
 
 ```vue
 <template>
@@ -256,7 +260,7 @@ refreshScrollTriggers()
 </template>
 ```
 
-Message 和 Notification 也接受 `motion`：
+Message and Notification also accept `motion`:
 
 ```ts
 ElMessage({ message: '已保存', motion: 'slide-up' })
@@ -265,22 +269,22 @@ ElNotification({ title: '完成', message: '同步结束', motion: false })
 
 ## Presets
 
-Preset gallery：
+Preset gallery:
 
-| Preset         | 用途                         | 建议入口                                    |
-| -------------- | ---------------------------- | ------------------------------------------- |
-| `fade-in`      | 静态内容淡入                 | 低密度说明、辅助区域                        |
-| `fade-up`      | 内容区块进入                 | 文章卡片、搜索结果、设置分区                |
-| `fade-down`    | 顶部或触发器下方浮层         | Dropdown、菜单、筛选面板                    |
-| `fade-left`    | 从右向左进入的辅助内容       | 右侧摘要、详情预览                          |
-| `fade-right`   | 从左向右进入的辅助内容       | 左侧目录、侧栏说明                          |
-| `scale-fade`   | 居中浮层或确认面板           | Dialog、Popconfirm、空状态插图              |
-| `slide-left`   | 从右侧进入的面板             | 右侧 Drawer、移动端操作面板                 |
-| `slide-right`  | 从左侧进入的面板             | 左侧 Drawer、导航侧栏                       |
-| `slide-up`     | 从底部进入的反馈             | Message、Notification、底部工具面板         |
-| `list-stagger` | 小规模列表错峰               | 不超过 20 项的导航、卡片列表                |
-| `route-fade`   | 路由内容切换                 | 主内容区、文章页切换                        |
-| `card-hover`   | 可点击卡片的轻量 hover/press | Entry card、管理入口、可交互 Dashboard tile |
+| Preset         | Use | Recommended surfaces |
+| -------------- | --- | -------------------- |
+| `fade-in`      | Quietly fades static content in. | Low-density notes and secondary regions |
+| `fade-up`      | Enters a content block. | Article cards, search results, settings sections |
+| `fade-down`    | Enters a top or trigger-adjacent surface. | Dropdowns, menus, filter panels |
+| `fade-left`    | Enters supporting content from the right. | Right summaries and detail previews |
+| `fade-right`   | Enters supporting content from the left. | Side navigation and notes |
+| `scale-fade`   | Enters a centered surface. | Dialog, Popconfirm, empty-state illustration |
+| `slide-left`   | Enters a panel from the right. | Right Drawer and mobile action panels |
+| `slide-right`  | Enters a panel from the left. | Left Drawer and navigation rail |
+| `slide-up`     | Enters feedback from the bottom. | Message, Notification, bottom tool panels |
+| `list-stagger` | Staggers a bounded list. | Navigation or card lists of at most 20 items |
+| `route-fade`   | Switches route content. | Main content and article transitions |
+| `card-hover`   | Provides light hover/press feedback. | Entry cards and interactive dashboard tiles |
 
 ## Motion Recipe
 
@@ -452,13 +456,15 @@ recipes should animate only `transform`, `opacity`, and budget-controlled
 
 ## Reduced Motion
 
-当 `ElConfigProvider` 的 `motion.mode` 为 `reduced` / `disabled`，或系统 `prefers-reduced-motion: reduce` 生效时，`v-motion` 和 `FsuTransition` 会跳过位移/缩放过程并直接落到最终状态。
+When `ElConfigProvider` sets `motion.mode` to `reduced` or `disabled`, or the
+system enables `prefers-reduced-motion: reduce`, `v-motion` and `FsuTransition`
+skip translation/scale and land at the terminal state.
 
-`useTimeline`、`useScrollReveal` 和 `v-scroll-reveal` 同样遵守 reduced motion。
-业务组件不应直接创建 ScrollTrigger，也不应在 FsusBlog 页面中散落原始 GSAP
-调用；需要新增场景时先封装到 Motion wrapper。
+`useTimeline`, `useScrollReveal`, and `v-scroll-reveal` follow the same policy.
+Product components must not create ScrollTrigger directly or scatter raw GSAP
+calls through FsusBlog pages; add new scenarios through a Motion wrapper.
 
-全局关闭：
+Disable motion globally:
 
 ```vue
 <el-config-provider :motion="{ mode: 'disabled' }">
@@ -466,48 +472,50 @@ recipes should animate only `transform`, `opacity`, and budget-controlled
 </el-config-provider>
 ```
 
-组件级关闭：
+Disable motion for one component:
 
 ```vue
 <el-card :motion="false">文章目录</el-card>
 ```
 
-## 选择规则
+## Selection Rules
 
-CSS transitions 适合 hover、focus、active、tabs indicator、button press、card lift
-这类局部交互。只动 `opacity`、`transform`、`box-shadow` 或颜色 token。
+Use CSS transitions for local hover, focus, active, tab-indicator, button-press,
+and card-lift interactions. Animate only `opacity`, `transform`, `box-shadow`,
+or color tokens.
 
-Vue Transition 适合组件 enter/leave：Dialog、Drawer、Dropdown、Tooltip、Message
-和路由内容切换。组件只选择 transition/preset，不在业务页面写 class 名。
+Use Vue Transition for component enter/leave behavior such as Dialog, Drawer,
+Dropdown, Tooltip, Message, and route content. Components select a
+transition/preset; product pages do not write motion class names.
 
-GSAP timeline 只用于多元素编排或需要暂停、反向、重启的序列。业务页面使用
-`useTimeline()`，不要直接 `gsap.timeline()`。
+Use a GSAP timeline only for multi-element orchestration or sequences that need
+pause, reverse, or restart. Product pages use `useTimeline()`, not
+`gsap.timeline()`.
 
-ScrollTrigger 只用于滚动进入视口的内容 reveal。业务页面使用 `v-scroll-reveal`
-或 `useScrollReveal()`，不要直接 `ScrollTrigger.create()`。
+Use ScrollTrigger only for viewport-entry reveals. Product pages use
+`v-scroll-reveal` or `useScrollReveal()`, not `ScrollTrigger.create()`.
 
 ## Performance Policy
 
-- 优先动画 `transform` 和 `opacity`。
-- 避免在热路径动画 `height`、`width`、`top`、`left`、`margin`、`padding`。
-- 大列表不要为每一项创建 ScrollTrigger；使用 `list-stagger` 或只 reveal 分组容器。
-- 不做 scroll hijacking，不修改用户滚动惯性。
-- 阅读型页面保持克制：文章正文、代码块、目录只允许轻量 reveal 或 route fade。
-- 移动端减少 blur、shadow 和长距离位移；必要时传 `motion={false}`。
-- 动态 markdown、图片、评论或异步卡片加载后显式调用
-  `refreshScrollTriggers()`。
+- Prefer `transform` and `opacity`.
+- Avoid animating `height`, `width`, `top`, `left`, `margin`, or `padding` in hot paths.
+- Do not create one ScrollTrigger per item in a large list; use `list-stagger` or reveal the group container.
+- Do not hijack scrolling or change the user's scroll inertia.
+- Keep reading pages quiet: article bodies, code blocks, and TOCs allow only light reveal or route fade.
+- Reduce blur, shadow, and long-distance movement on mobile; pass `motion={false}` when needed.
+- Call `refreshScrollTriggers()` after dynamic Markdown, image, comment, or async-card content settles.
 
 ## Anti-Patterns
 
-- 不在 FsusBlog 页面直接导入 `gsap` 或 `ScrollTrigger`。
-- 不在业务 CSS 里复制 `transition-duration`、`cubic-bezier` 或位移常量。
-- 不把 loading、button、tag 的动效做成会改变布局占位的动画。
-- 不给大量列表项逐个绑定 `v-scroll-reveal`。
-- 不用动效隐藏可访问状态变化；disabled、loading、selected 仍要有明确静态态。
+- Do not import `gsap` or `ScrollTrigger` directly in FsusBlog pages.
+- Do not copy `transition-duration`, `cubic-bezier`, or motion distances into product CSS.
+- Do not animate loading, button, or tag states in a way that changes layout occupancy.
+- Do not bind `v-scroll-reveal` to every item in a large list.
+- Do not hide accessible state changes with motion; disabled, loading, and selected states need a clear static state.
 
 ## FsusBlog Integration
 
-文章列表：
+Article list:
 
 ```vue
 <article
@@ -519,7 +527,7 @@ ScrollTrigger 只用于滚动进入视口的内容 reveal。业务页面使用 `
 </article>
 ```
 
-文章正文和动态 markdown：
+Article body and dynamic Markdown:
 
 ```ts
 import { nextTick, watch } from 'vue'
@@ -531,7 +539,7 @@ watch(markdownHtml, async () => {
 })
 ```
 
-管理入口：
+Management entry:
 
 ```vue
 <el-card motion="card-hover">
@@ -540,7 +548,7 @@ watch(markdownHtml, async () => {
 </el-card>
 ```
 
-路由页面：
+Route page:
 
 ```ts
 import { onBeforeRouteLeave } from 'vue-router'
@@ -552,8 +560,6 @@ const reveal = useScrollReveal()
 routeMotion.add(reveal.kill)
 onBeforeRouteLeave(routeMotion.cleanup)
 ```
-
-## QA Checklist
 
 ## Semantic Settle Vocabulary
 
@@ -743,11 +749,15 @@ reduced-motion terminal state, forbidden surfaces, and a migration example.
 Apps should first add semantic mappings to FsusUI presets; if the mapping cannot
 express the interaction, open a preset request instead of adding local effects.
 
-- Route leave 后，context、timeline 和 scroll reveal 的 cleanup 都被调用。
-- 组件 unmount 后没有残留 ScrollTrigger 或未 kill 的 timeline。
-- `motion={false}` 在 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、
-  Notification、Collapse、Tabs 上都能禁用本地动效。
-- `ElConfigProvider motion.mode="reduced"` 和系统 `prefers-reduced-motion: reduce`
-  都会落到最终视觉状态。
-- 动态 markdown、图片加载、评论展开后调用了 `refreshScrollTriggers()`。
-- 桌面和移动端均无文字重叠、按钮换行挤压、固定列透底或布局跳动。
+## QA Checklist
+
+- Route leave calls cleanup for every context, timeline, and scroll reveal.
+- Component unmount leaves no ScrollTrigger or un-killed timeline.
+- `motion={false}` disables local motion on Button, Card, Dialog, Drawer, Dropdown,
+  Tooltip, Message, Notification, Collapse, and Tabs.
+- `ElConfigProvider motion.mode="reduced"` and system
+  `prefers-reduced-motion: reduce` both land at the terminal visual state.
+- Dynamic Markdown, image loads, and expanded comments call
+  `refreshScrollTriggers()`.
+- Desktop and mobile layouts have no text overlap, squeezed button wrapping,
+  fixed-column bleed-through, or layout jumps.

@@ -1,7 +1,7 @@
 # Token Schema
 
 Tokens use platform-neutral names and mechanical platform mappings. Token v2
-adds source layers and mode dimensions so Web and Avalonia can be generated from
+adds source layers and mode dimensions so Web and Avalonia are generated from
 one registry without hand-authored value drift.
 
 ```txt
@@ -68,17 +68,17 @@ Each token record includes:
 | `semanticMeaning` | no       | unique semantic meaning guard for aliases       |
 
 Traceability defaults live once in the root `traceability` registry. The
-generator expands them onto every token record so generated JSON and docs expose
-the canonical name, every runtime alias, resolved light/dark values, usage
+generator expands them onto every token record, exposing in generated JSON and
+docs the canonical name, every runtime alias, resolved light/dark values, usage
 surface, owner, consumer-use flag, generated outputs, documentation, fixture,
 status, and migration status. A token may override `owner`, `usageSurface`,
 `consumerUse`, `status`, or `migrationStatus` only when its lifecycle differs
 from the layer default.
 
 Aliases make a token consumer-usable even when its layer is internal by
-default. Consumer-owned aliases remain outside this registry: FsusBlog, for
-example, defines `--fsusblog-*` in its own stylesheet and maps those names to
-public `--fsus-*` or `--el-*` tokens.
+default. Consumer-owned aliases remain outside this registry: FsusBlog defines
+`--fsusblog-*` in its stylesheet and maps those names to public `--fsus-*` or
+`--el-*` tokens.
 
 ## Platform Mapping
 
@@ -95,9 +95,9 @@ Mappings are generated mechanically:
 Compatibility aliases such as `--el-color-primary` are allowed only when they
 point back to platform-neutral source tokens.
 
-Canonical eight-digit colors use CSS ordering, `#RRGGBBAA`. Web outputs preserve
-that representation. Avalonia outputs mechanically convert the same color to
-`#AARRGGBB`; platform files must not hand-author a second value.
+Canonical eight-digit colors use CSS ordering, `#RRGGBBAA`; Web outputs preserve
+it, while Avalonia outputs mechanically convert the same color to `#AARRGGBB`.
+Platform files must not hand-author a second value.
 
 High-contrast behavior is not a canonical theme dimension. Operating-system
 accessibility behavior is registered as a reviewed platform override under
@@ -121,10 +121,11 @@ Literal fallbacks for `var(--fsus-radius-*, <fallback>)` in
 `vue/packages/theme-chalk/src` must use the canonical radius scale:
 `4px`, `6px`, `10px`, `12px`, `24px`, or `999px`. Token-to-token and SCSS
 fallback expressions remain valid because their resolved value is governed by
-the token pipeline. The obsolete naked declaration `border-radius: 8px` is
-also rejected: component surfaces must select the matching
+the token pipeline. The obsolete naked declaration `border-radius: 8px` is also
+rejected: component surfaces must select the matching
 `--fsus-radius-*` role instead of recreating the removed intermediate radius.
-Comments are excluded from this check. `pnpm tokens:lint` enforces both rules.
+Comments are excluded from this check.
+`pnpm tokens:lint` enforces both rules.
 
 The same lint command rejects literal visual truth for stable spacing, radius,
 control-height, material, and interaction-state declarations in

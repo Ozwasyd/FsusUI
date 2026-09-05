@@ -24,10 +24,10 @@ response/error state is cleared before the replacement becomes interactive.
 
 ## Supported Platform Differences
 
-Localization rendering, focus state, and motion reduction follow
-`docs/avalonia/platform-differences.md`. Avalonia has no library-owned audio
-player: `AudioRequested` asks the consumer to play the final audio after a user
-action. This is a semantic adapter, not autoplay and not a protocol override.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for localization,
+focus, and motion reduction. Avalonia has no library-owned audio player:
+`AudioRequested` asks the consumer to play final audio after user action. This
+is a semantic adapter, not autoplay or a protocol override.
 
 ## Theme Tokens
 

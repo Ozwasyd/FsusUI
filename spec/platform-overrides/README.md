@@ -1,19 +1,12 @@
 # Platform Overrides
 
-Platform differences are allowed only when they are explicit and testable.
+Platform differences are allowed only when explicit and testable.
 
 Each override entry must include:
 
-- `id`
-- affected component
-- affected contract id
-- affected platform
-- reason
-- visual threshold
-- behavior expectation
-- conformance test expectation
-- owner
-- review date
+`id`, affected component, affected contract id, affected platform, reason,
+visual threshold, behavior expectation, conformance test expectation, owner, and
+review date.
 
 Override entries must not become a private second design system. If the same
 override is needed repeatedly, promote the behavior back into the neutral spec.
@@ -22,8 +15,7 @@ override is needed repeatedly, promote the behavior back into the neutral spec.
 
 The registry may accept bounded differences for:
 
-- font rasterization and text baseline differences between browser engines and
-  Skia
+- font rasterization and text baseline differences between browser engines and Skia
 - Skia, browser, compositor, and OS rendering differences for shadows,
   antialiasing, clipping, and DPI scaling
 - operating-system accessibility behavior, including high-contrast focus cues

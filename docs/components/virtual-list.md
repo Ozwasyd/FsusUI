@@ -1,20 +1,20 @@
-# VirtualList 虚拟列表
+# VirtualList
 
-高性能虚拟滚动列表，用于渲染超大数据集，自动按需渲染可视区域内的条目。
+A high-performance virtual list for very large data sets that renders visible items on demand.
 
-## FsusUI WASM 加速
+## FsusUI WASM Acceleration
 
-当列表条目数量 **≥ 2000** 时，FsusUI 自动启用基于 WASM 的行高预估算法（位于 `vue/packages/wasm/`），大幅减少初始布局计算时间。低于阈值时自动降级为纯 JavaScript 实现，无需任何手动配置。
+When the list has **≥ 2000** items, FsusUI automatically enables the WASM row-height estimator in `vue/packages/wasm/`, reducing initial layout work. Below the threshold it falls back to JavaScript automatically, with no manual configuration.
 
-> **注意**：如需从源码重新编译 WASM 模块，需要 Emscripten 5.0.4。
+> **Note:** Rebuilding the WASM module from source requires Emscripten 5.0.4.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-将大量数据传给 `data`，设置条目固定高度 `item-size`，组件只渲染视口内的条目。
+Pass a large data set through `data` and set the fixed item height with `item-size`; only visible items render.
 
 ```vue
 <template>
@@ -26,21 +26,21 @@
 </template>
 ```
 
-## 动态行高
+## Dynamic Row Height
 
-当条目高度不固定时，省略 `item-size`，WASM 行高预估器（条目 ≥ 2000）或 JS 估算器（条目 < 2000）会自动处理。
+When item height varies, omit `item-size`; the WASM estimator (≥ 2000 items) or JS estimator (< 2000 items) handles it automatically.
 
-## 水平滚动
+## Horizontal Scrolling
 
-设置 `direction="horizontal"` 实现水平虚拟滚动。
+Set `direction="horizontal"` for horizontal virtual scrolling.
 
-## 滚动性能模型
+## Scrolling Performance Model
 
-VirtualList 与 VirtualGrid 只提升滚动窗口、单个内部平移容器、滚动条和必要浮层，不会为每个可见行或单元格创建独立合成层。快速滚动期间会暂时关闭行级 transition、glow、阴影和非必要滤镜；`scrollend` 或最后一次滚动事件 120 ms 后恢复静止状态。
+VirtualList and VirtualGrid promote only the scroll window, one internal transform container, the scrollbar, and required overlays; they do not create a compositing layer for every visible row or cell. During rapid scrolling, row-level transitions, glow, shadows, and non-essential filters are temporarily disabled and restored after `scrollend` or 120ms after the last scroll event.
 
-样式缓存按 item size、layout、direction 与 Grid 尺寸模型分区，提供真实 `clear()` / `invalidate()` 并限制最多保留 64 个样式 map。滚动停止不会清空仍然有效的尺寸缓存；尺寸模型变化也不会复用旧 map。上述行为不改变 props、slot、键盘或 `scrollTo*` 合同。
+The style cache is partitioned by item size, layout, direction, and Grid size model. It provides real `clear()` / `invalidate()` methods and keeps at most 64 style maps. Stopping scroll does not clear still-valid size caches, and a changed size model does not reuse an old map. These rules do not change props, slots, keyboard behavior, or the `scrollTo*` contract.
 
-#186 的同机真实 Chromium 配对使用 #184 runner、100K fixed/variable list 与大 Grid、60 Hz/DPR1、1 次 warmup + 7 次样本。修改前后 frame interval p95 分别为 `16.8→16.8 ms`、`16.8→16.8 ms`、`50.0→33.4 ms`；峰值 layer 数分别为 `38→13`、`35→13`、`30→13`。原始 JSON 保留在未跟踪 `.tmp/performance/issue-186-baseline-final/` 与 `.tmp/performance/issue-186-current-final2/`，这些本机数值不是跨机器预算。
+#186's same-machine Chromium pairing used the #184 runner, 100K fixed/variable lists and a large Grid, 60Hz/DPR1, one warmup, and seven samples. Before/after frame-interval p95 was `16.8→16.8 ms`, `16.8→16.8 ms`, and `50.0→33.4 ms`; peak layer counts were `38→13`, `35→13`, and `30→13`. Raw JSON remains in the untracked `.tmp/performance/issue-186-baseline-final/` and `.tmp/performance/issue-186-current-final2/`; these local values are not cross-machine budgets.
 
 ---
 

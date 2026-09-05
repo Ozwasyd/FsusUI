@@ -35,13 +35,11 @@ policy, placement, service options, and close events.
 
 ## Supported Platform Differences
 
-Window shadows, focus containment, and overlay host behavior follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for window shadows, focus containment, and overlay-host boundaries.
 
 ## Theme Tokens
 
-Modal panels use overlay, surface, border, focus, danger, density, and motion
-resources.
+Use overlay, surface, border, focus, danger, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

@@ -18,15 +18,17 @@ reply composition.
 
 ## Supported Platform Differences
 
-Dense product layout, text metrics, and keyboard focus follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for dense layout, text
+metrics, and keyboard focus.
 
 ## Theme Tokens
 
-Product primitives use surface, border, text, muted text, danger, focus,
-density, and motion resources. Copyable detail targets are at least 40px on
-desktop and 44px on mobile; disabled styling preserves full control opacity and
-the standard 2px focus border remains visible for enabled keyboard users.
+Product primitives use surface, border, text, muted-text, danger, focus, and
+density resources from [Application Setup](../installation.md#application-setup);
+see [Avalonia Motion Runtime](../motion-runtime.md) for motion. Copyable detail
+targets are at least 40px on desktop and 44px on mobile; disabled styling keeps
+full control opacity and the standard 2px focus border remains visible for
+enabled keyboard users.
 
 ## Minimal Avalonia Example
 

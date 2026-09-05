@@ -1,14 +1,15 @@
-# 自定义命名空间
+# Custom Namespace
 
-FsusUI 的组件 CSS 类名默认以 `el` 为前缀（如 `el-button`、`el-input`）。在特殊场景下（如与其他组件库共存、需要样式隔离），可以自定义命名空间。
+FsusUI component classes use the `el` prefix by default, such as `el-button`
+and `el-input`. A custom namespace is useful when isolating styles or sharing a
+page with another component library.
 
----
+## Configure the namespace
 
-## 配置命名空间
+Update both the runtime provider and the SCSS build configuration. Updating only
+one leaves component logic and CSS out of sync.
 
-必须**同时**修改以下两处，否则 CSS 与组件逻辑会不匹配：
-
-### 第一步：配置 `ElConfigProvider`
+### 1. Configure `ElConfigProvider`
 
 ```vue
 <!-- App.vue -->
@@ -19,9 +20,9 @@ FsusUI 的组件 CSS 类名默认以 `el` 为前缀（如 `el-button`、`el-inpu
 </template>
 ```
 
-### 第二步：配置 SCSS 变量
+### 2. Configure the SCSS variable
 
-创建 `styles/element/index.scss`：
+Create `styles/element/index.scss`:
 
 ```scss
 /* styles/element/index.scss */
@@ -30,7 +31,7 @@ FsusUI 的组件 CSS 类名默认以 `el` 为前缀（如 `el-button`、`el-inpu
 );
 ```
 
-在 `vite.config.ts` 中引入：
+Load the variable file from `vite.config.ts`:
 
 ```ts
 // vite.config.ts
@@ -46,11 +47,11 @@ export default defineConfig({
 })
 ```
 
-完成后，所有组件的 CSS 类名前缀将从 `el-` 变为 `ep-`。
+All component class prefixes then change from `el-` to `ep-`.
 
----
+## Cautions
 
-## 注意事项
-
-- 修改命名空间后，如果使用了 `append-to` 属性，需要相应调整 `#el-popper-container-` 选择器。详见 [SSR 文档](./ssr.md)。
-- 命名空间配置必须在 SCSS **构建阶段**完成，不支持运行时动态修改。
+- If `append-to` is used, update the `#el-popper-container-` selector prefix as
+  well. See [SSR](./ssr.md).
+- The namespace is a SCSS **build-time** setting; runtime changes are not
+  supported.

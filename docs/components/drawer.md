@@ -1,60 +1,60 @@
-# Drawer 抽屉
+# Drawer
 
-从侧边滑出的临时面板，与 Dialog 的 API 基本一致，但提供不同的用户体验。
+A temporary panel that slides from an edge. Its API is largely shared with Dialog, but the interaction differs.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                             |
-| ---------------------- | ------------------------------------------------------------------------------------------------ |
-| purpose                | 从视口边缘打开临时上下文，适用于详情、筛选、设置和辅助编辑。                                     |
-| basic usage            | 使用 `v-model` 控制显示，`direction` 决定方向，`size` 控制宽高，`footer` slot 放置操作。         |
-| props / events / slots | 本页 `API` 覆盖公开 props、events、slots 和 exposes。                                            |
-| accessibility          | 默认保留标题区域；隐藏标题时应通过业务内容提供等价名称；可调整大小时不要让关键控件离开可视区域。 |
-| theme token notes      | 跟随公开 surface、文本、边框、阴影、圆角、backdrop blur 和 panel/overlay motion token；方向相关 safe-area 由统一 helper 写入 header/body/footer 内容内边距。 |
-| known limitations      | 内容懒渲染，依赖 DOM 的逻辑应在 `open` / `opened` 后执行；嵌套 Drawer 需要单独验证滚动锁定。     |
-| stability level        | Preview public component。                                                                       |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+for the change policy. Keep a readable heading, or provide an equivalent name
+when the title is hidden; resizable drawers must keep critical controls inside
+the viewport. Lazy content requires DOM-dependent work after `open` or
+`opened`, and nested drawers need an explicit scroll-lock check. Directional
+insets and overlay geometry follow the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract).
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `v-model` 控制显示，`direction` 设置滑出方向，`size` 设置宽度/高度（默认 30%）。
+Use `v-model` to control visibility, `direction` for the slide edge, and `size` for width or height (30% by default).
 
 ## Viewport / safe-area
 
-Drawer 背景贴齐屏幕边缘；safe-area 进入内容内边距，不离开边缘：
+Drawer background reaches the viewport edge; safe-area insets apply to content
+padding without moving that edge:
 
-- `ltr`：top / bottom / left
-- `rtl`：top / bottom / right
-- `ttb`：top / left / right
-- `btt`：bottom / left / right
+- `ltr`: top / bottom / left
+- `rtl`: top / bottom / right
+- `ttb`: top / left / right
+- `btt`: bottom / left / right
 
-绝对定位的关闭按钮不随 header padding 位移，因此额外通过 `fsus-inset-safe-area`
-消费 top（以及 `rtl` 的 right）安全区。
+The absolutely positioned close button does not move with header padding, so it
+also consumes the top (and `rtl` right) inset through `fsus-inset-safe-area`.
 
-遮罩仍由 Overlay scrim 覆盖完整 viewport。不要在 consumer 中补丁式覆盖 Drawer 内部几何。
+The overlay scrim still covers the full viewport. Do not patch Drawer geometry
+from a consumer; use the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract).
 
-自动门禁：`pnpm audit:visual-boundaries` 的 safe-area 矩阵覆盖四方向 Drawer；验证的是 viewport-safe CSS contract，不是真机 Safari 工具栏。
+The `pnpm audit:visual-boundaries` matrix covers all four Drawer directions.
+It verifies the viewport-safe CSS contract, not a physical Safari toolbar.
 
-## 无标题
+## Without a Title
 
-设置 `with-header="false"` 移除标题区域。
+Set `with-header="false"` to remove the heading region.
 
-## 可调整大小
+## Resizable
 
-设置 `resizable="true"` 开启边缘拖拽调整大小。
+Set `resizable="true"` to enable edge dragging for resize.
 
-## 嵌套抽屉
+## Nested Drawers
 
-嵌套使用时，内层抽屉必须设置 `append-to-body="true"`。
+When drawers are nested, the inner drawer must set `append-to-body="true"`.
 
-## 销毁内容
+## Destroy Content
 
-设置 `destroy-on-close` 在关闭时销毁子组件，每次打开都会触发 `mounted` 生命周期。
+Set `destroy-on-close` to destroy child content on close; each opening then runs the `mounted` lifecycle.
 
-> **提示**：Drawer 内容默认懒渲染，DOM 操作应通过 `ref` 或在 `open` 事件后进行。
+> **Tip:** Drawer content is lazy-rendered by default. Perform DOM work through a `ref` or after the `open` event.
 
 ---
 

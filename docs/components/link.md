@@ -1,8 +1,10 @@
-# Link 链接
+# Link
 
-文字超链接。
+A text hyperlink.
 
-> **安全提示**：`href` 属性会直接渲染为 `<a>` 标签的 href。使用前务必对 URL 进行校验与过滤，防止 XSS 或开放重定向漏洞。
+> Validate and filter untrusted URLs before passing `href`; it is rendered
+> directly on `<a>` and can otherwise enable XSS or open redirects. See the
+> [Security Policy](../../SECURITY.md).
 >
 > ```js
 > function sanitizeUrl(url) {
@@ -16,25 +18,25 @@
 > }
 > ```
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-基础的文字链接。
+A basic text link.
 
-## 禁用状态
+## Disabled State
 
-链接的禁用状态。
+The disabled link state.
 
-## 下划线控制
+## Underline
 
-通过 `underline` 属性控制下划线的显示时机：`'always'`（始终）、`'hover'`（悬停时，默认）、`'never'`（从不）。
+Use `underline` to show the underline `always`, on `hover` (default), or `never`.
 
-## 带图标的链接
+## Links with Icons
 
-通过 `icon` 属性或 `icon` 插槽为链接添加图标前缀。
+Add an icon prefix with the `icon` prop or slot.
 
 ---
 

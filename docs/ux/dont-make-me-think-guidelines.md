@@ -1,20 +1,33 @@
-# Don’t Make Me Think UX 指南
+# Don’t Make Me Think UX Guidelines
 
-FsusUI 的 UX 语义层用于约束组件组合，而不是替业务系统写死流程。页面、动作、空状态、加载和危险操作必须让用户扫描后立即知道自己在哪、这里有什么、下一步做什么。
+> **Role:** Normative UX composition guidance
+> **Applies to:** FsusUI task, page, action, empty-state, loading, and
+> dangerous-operation compositions
+> **Authority:** Complements the detailed [task-oriented component contract](./task-oriented-components.md); it does not define business workflows.
 
-## 扫描优先
+Every surface should let a user scan and answer: where am I, what is here, and
+what should I do next? Do not use explanatory prose to compensate for unclear
+component semantics.
 
-用户不会阅读，只会扫描。页面首屏必须用清晰标题、简短任务说明和稳定动作区回答：
+The contract keeps its searchable labels: “用户不会阅读” (users do not read),
+“我在哪” (where am I), “下一步” (next step), “按钮必须说出结果” (buttons state
+the result), “高级选项” (advanced options), “危险操作” (dangerous operation),
+“空状态” (empty state), “列表” (list), and “推荐动作” (recommended action).
 
-- 我在哪：唯一 `h1` 或等价页面标题。
-- 这里有什么：description 或 task intro 说明当前对象、范围和状态。
-- 下一步做什么：主动作说出结果，次动作降低优先级。
+## Scan-first layout
 
-不要用大段说明补救语义不清的组件。高级选项默认折叠，但入口必须可发现，并说明展开后影响什么。
+- Use one `h1` (or equivalent page title) to identify the current location.
+- Use a short description or task introduction for the object, scope, and
+  current state.
+- Use one result-oriented primary action; lower-priority actions remain visibly
+  secondary.
+- Keep advanced options collapsed by default, but make the entry discoverable
+  and explain its effect.
 
-## 按钮文案
+## Button labels
 
-按钮必须说出结果，而不是泛泛说“确定”。提交或主动作默认禁止使用：
+Labels must state the result rather than a generic confirmation. Unless a
+documented code exception supplies context, do not use:
 
 ```text
 确定
@@ -25,7 +38,7 @@ Submit
 Confirm
 ```
 
-推荐使用结果型文案：
+Prefer result-oriented labels such as:
 
 ```text
 保存草稿
@@ -39,19 +52,19 @@ Confirm
 永久删除
 ```
 
-如果确实需要泛化文案，必须在代码中声明例外和上下文证明，例如 `data-ux-allow-generic-label` 与 `data-ux-label-context`。
+If a generic label is unavoidable, declare the exception and its context in
+code, for example `data-ux-allow-generic-label` with
+`data-ux-label-context`.
 
-## 危险操作
+## Dangerous operations
 
-危险操作必须说明后果。删除、拒绝、隐藏、关闭、永久删除等动作必须声明：
+Deletion, rejection, hiding, closing, and permanent deletion must state:
 
-- 是否需要确认或是否可撤销。
-- 是否可恢复，永久性操作必须显示不可恢复。
-- 是否通知用户。
-- 是否写入审计记录。
-- 执行后影响哪些对象。
-
-示例：
+- whether confirmation is required and whether undo is available;
+- whether the result is recoverable (permanent actions must say when it is not);
+- whether users are notified;
+- whether an audit record is written; and
+- which objects are affected.
 
 ```text
 永久删除
@@ -63,24 +76,24 @@ Confirm
 关闭后用户仍可查看历史记录，但不能继续回复。
 ```
 
-## 空状态
+## Empty, filtered, and recommended states
 
-空状态必须回答为什么为空，以及用户下一步能做什么。若没有下一步动作，必须明确无动作原因。筛选结果为空时，说明当前筛选条件，避免用户误以为完整列表为空。
-
-## 列表与筛选
-
-列表或表格页如果提供搜索、状态、标签、地区、时间范围等筛选，必须显示当前筛选状态摘要：
+- An empty state must explain why it is empty and what the user can do next. If
+  there is no action, state why.
+- A filtered list or table must show the active filter summary and provide a
+  clear action unless no filter can be cleared. An empty filtered result must
+  name the active conditions so it is not mistaken for a complete empty list.
 
 ```text
 当前显示：状态=待审核，地区=中国大陆，关键词=spam，共 12 条结果
 ```
 
-摘要旁应提供清除筛选动作，除非该页面没有可清除条件。
+- A recommendation (for moderation, risk, inspection, or diagnosis) must state
+  the recommendation, its reason or evidence, confidence when available, and
+  whether the user may override it.
 
-## 推荐动作
+## Loading and asynchronous state
 
-推荐动作必须解释原因。评论审核、风控、巡检和诊断页面至少说明系统建议、置信度或证据，以及用户是否可以覆盖建议。
-
-## 加载与异步状态
-
-超过 300ms 的 loading 必须提供 skeleton 或明确状态文本。不允许长时间只显示空白。异步保存、发布、审核和迁移必须显示 pending、成功、失败状态。
+Loading longer than 300ms must show a skeleton or explicit status text; a long
+blank region is not acceptable. Asynchronous save, publish, review, and
+migration actions must expose pending, success, and failure states.

@@ -48,8 +48,8 @@ map to typed value properties and events.
 
 ## Supported Platform Differences
 
-Pointer geometry, keyboard increments, and focus cues follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for pointer geometry,
+keyboard increments, and focus cues.
 
 ## Theme Tokens
 

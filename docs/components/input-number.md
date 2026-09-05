@@ -1,38 +1,38 @@
-# InputNumber 数字输入框
+# InputNumber
 
-仅允许输入标准的数字值，可定义范围。
+Accepts standard numeric values only and supports a defined range.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-使用 `v-model` 绑定数字变量。输入非法字符串时，上层会收到 `NaN`。
+Bind a numeric value with `v-model`. The consumer receives `NaN` for an invalid string.
 
-## 禁用
+## Disabled
 
-通过 `disabled` 属性禁用；通过 `min` / `max` 限制取值范围。
+Use `disabled` to disable the control and `min` / `max` to limit its range.
 
-## 步长
+## Step
 
-通过 `step` 属性设置每次增减的步长值。`step-strictly` 设为 `true` 时，输入值只能是步长的整数倍。
+Set the increment with `step`. With `step-strictly: true`, values must be integer multiples of the step.
 
-## 精度
+## Precision
 
-通过 `precision` 设置精度（须为非负整数，且不能小于 `step` 的小数位数）。
+Set decimal precision with `precision` (a non-negative integer no smaller than the number of decimal places in `step`).
 
-## 尺寸
+## Sizes
 
-通过 `size` 设置尺寸：`large`、`default`（默认）、`small`。
+Set the size with `size`: `large`, `default` (default), or `small`.
 
-## 按钮位置
+## Button Position
 
-通过 `controls-position="right"` 将增减按钮置于右侧。
+Set `controls-position="right"` to place the increment and decrement buttons on the right.
 
-## 格式化
+## Formatting
 
-通过 `formatter` / `parser` 自定义显示格式（设置后输入框类型变为 `text`）。
+Use `formatter` / `parser` for custom display formatting; the input type becomes `text` when either is set.
 
 ---
 

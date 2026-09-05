@@ -1,33 +1,36 @@
-# Calendar 日历
+# Calendar
 
-展示日期，支持单月视图、自定义日期内容与范围限制。
+Displays dates with a single-month view, custom date content, and range limits.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `v-model` 绑定当前显示的月份；不设置时默认显示当月。
+Bind the visible month with `v-model`; the current month is shown by default.
 
-## 自定义内容
+## Custom Content
 
-通过 `#date-cell` 具名插槽自定义日历格内容，可获取日期信息（类型、是否选中、格式化日期字符串）。
+Customize date cells with the `#date-cell` slot, which exposes the date type,
+selection state, and formatted date string.
 
-## 范围限制
+## Range Limits
 
-通过 `range` 设置显示范围。开始日期必须是一周的第一天，结束日期必须是最后一天，时间跨度不超过两个月。
+Set the displayed range with `range`. The start must be the first day of a week,
+the end must be the last day, and the span cannot exceed two months.
 
-## 自定义头部
+## Custom Header
 
-通过 `#header` 插槽自定义头部区域（可获取当前显示的月份字符串）。
+Customize the header with `#header`, which exposes the displayed month string.
 
-## 移动端头部
+## Mobile Header
 
-Calendar 根据自身容器宽度布局。小于 `560px` 时，月份/年份标题位于第一行，
-上一月、今天、下一月位于第二行稳定动作组；上一月和下一月使用图标，但保留
-`aria-label` 与原生 tooltip。标题、动作组和日期网格共享 16px 左右基线，
-所有导航动作与日期格保持至少 40px 高。
+Calendar uses its own container width. Below `560px`, the month/year heading is
+on the first row and the previous/today/next actions form a stable second row.
+Previous and next use icons while retaining `aria-label` and the native tooltip.
+The heading, actions, and date grid share a roughly 16px baseline, and every
+navigation action and date cell remains at least 40px high.
 
 ---
 

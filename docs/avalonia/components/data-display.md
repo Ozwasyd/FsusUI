@@ -22,17 +22,17 @@ enums, content controls, `FsusAvatarShape`, and `FsusCollapse`
 
 ## Supported Platform Differences
 
-Text baseline and keyboard focus behavior follow
-`docs/avalonia/platform-differences.md`. `FsusCollapse`/`FsusCollapseItem`
-follow the Web authority geometry: 52px headers with the 13px caption size at
-weight 500, a 48px expanded content area with 20px inline and 25px bottom
-padding, and `color.border.subtle` separators under the expanded content and
-each collapsed header; the active header itself carries no bottom border.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for text baselines and
+keyboard focus. `FsusCollapse`/`FsusCollapseItem` retain the Web geometry: 52px
+headers with 13px/500 captions, a 48px expanded area with 20px inline and 25px
+bottom padding, and `color.border.subtle` separators under expanded content
+and each collapsed header; the active header has no bottom border.
 
 ## Theme Tokens
 
-Data display controls use text, muted text, surface, border, focus, density,
-and motion resources.
+Use text, muted-text, surface, border, focus, and density resources from
+[Application Setup](../installation.md#application-setup); motion behavior is
+defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

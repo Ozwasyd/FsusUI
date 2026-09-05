@@ -1,69 +1,67 @@
-# Input 输入框
+# Input
 
-通过鼠标或键盘输入字符。
+Accepts character input from a mouse or keyboard.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                                                             |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| purpose                | 采集单行文本、密码、搜索、数字字符串和多行 textarea 文本。                                                                       |
-| basic usage            | 使用 `v-model` 绑定值，按需启用 `clearable`、`show-password`、`formatter`、`parser`、`autosize`。                                |
-| props / events / slots | 本页 `API` 覆盖公开 props、events、slots 和 exposes。                                                                            |
-| accessibility          | 表单中应通过 `el-form-item` label、原生 `aria-label` 或 `aria-labelledby` 提供名称；清空、密码切换等图标按钮需保持可聚焦和可读。 |
-| theme token notes      | 跟随公开输入框边框、背景、文本、焦点色、圆角和 motion control token；局部覆盖建议作用在业务容器上。                              |
-| known limitations      | `formatter` / `parser` 仅适用于 text 类输入；`type="number"` 仍受浏览器原生行为影响，不适合作为严格数值校验。                    |
-| stability level        | Preview public component。                                                                                                       |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+for the change policy and the shared [theme token contract](../theme/tokens.md).
+Give each input a name through an `el-form-item` label, `aria-label`, or
+`aria-labelledby`; clear and password-toggle controls must remain focusable and
+readable. `formatter` and `parser` apply only to text-like inputs, while
+`type="number"` retains browser behavior and is not strict numeric validation.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-使用 `v-model` 绑定输入值。
+Bind the input value with `v-model`.
 
-## 禁用状态
+## Disabled State
 
-通过 `disabled` 属性禁用输入框。
+Use `disabled` to disable the input.
 
-## 可清空
+## Clearable
 
-通过 `clearable` 属性为输入框添加清空按钮（`textarea` 类型同样支持）。
+Set `clearable` to add a clear button; `textarea` inputs support it as well.
 
-## 密码框
+## Password Input
 
-通过 `show-password` 属性创建可切换显示密码的输入框。
+Set `show-password` to create an input with a password-visibility toggle.
 
-## 带图标的输入框
+## Inputs with Icons
 
-通过 `prefix-icon` 和 `suffix-icon` 属性，或使用 `prefix` / `suffix` 具名插槽添加图标。
+Add icons with `prefix-icon` / `suffix-icon` or the named `prefix` / `suffix` slots.
 
-## 文本域
+## Text Area
 
-设置 `type="textarea"` 改为原生 `textarea`，通过 `rows` 控制初始行高。使用 `autosize` 可自适应高度，可设置 `{ minRows, maxRows }` 限制行数范围。
+Set `type="textarea"` for a native `textarea`; use `rows` for its initial height. Set `autosize` for automatic height and optionally `{ minRows, maxRows }` bounds.
 
-文章、知识库等编辑任务的标题输入可使用
-`type="textarea" textarea-variant="editor-title"`。该公开 variant 由 FsusUI
-统一拥有标题字号、批准字重、移动端收缩、字数统计位置与 focus ring，consumer
-只需在组件根节点通过 `--fsus-editor-title-*` 公开变量映射产品色彩，不应使用
-`:deep()` 或 `.el-textarea__inner` 覆盖内部结构。默认值 `default` 保持常规
-textarea 外观。
+For article, knowledge-base, and similar editing tasks, use
+`type="textarea" textarea-variant="editor-title"`. This public variant gives FsusUI
+ownership of title size, approved weight, mobile reduction, count placement, and
+focus ring. Consumers only map product colors through the public
+`--fsus-editor-title-*` variables on the component root; do not override internals
+with `:deep()` or `.el-textarea__inner`. The default `default` value keeps the
+standard textarea appearance.
 
-## 复合型输入框
+## Composite Input
 
-使用 `prepend` / `append` 插槽在输入框前后追加元素（标签或按钮）。
+Use `prepend` / `append` slots to add elements such as labels or buttons before or after the input.
 
-## 尺寸
+## Sizes
 
-通过 `size` 属性设置尺寸：`large`、`default`、`small`。
+Set the size with `size`: `large`, `default`, or `small`.
 
-## 字数统计
+## Character Count
 
-设置 `maxlength` 后，再开启 `show-word-limit` 显示字数统计，可通过 `word-limit-position` 控制显示位置（`inside` / `outside`）。
+Set `maxlength`, then enable `show-word-limit` to display a character count. Use `word-limit-position` for `inside` or `outside` placement.
 
-## 格式化
+## Formatting
 
-通过 `formatter` 和 `parser` 属性实现输入值的展示格式化与解析（仅 `text` 类型有效）。
+Use `formatter` and `parser` to format and parse displayed values (only for `text` inputs).
 
 ---
 
@@ -141,11 +139,11 @@ textarea 外观。
 
 ---
 
-## 常见问题
+## Frequently Asked Questions
 
-**为什么设置 `clearable` 后输入框宽度变宽？**
+**Why does the input become wider when `clearable` is set?**
 
-`el-input` 没有默认宽度，清空图标出现时会撑宽组件。解决方法是为输入框设置明确宽度：
+`el-input` has no default width, so the clear icon can expand it. Give the input an explicit width:
 
 ```vue
 <el-input v-model="input" clearable style="width: 200px" />

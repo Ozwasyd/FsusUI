@@ -1,58 +1,57 @@
-# Dialog 对话框
+# Dialog
 
-在保留当前页面状态的情况下，告知用户并承载相关操作。
+Informs the user and hosts related actions while preserving the current page state.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                          |
-| ---------------------- | --------------------------------------------------------------------------------------------- |
-| purpose                | 承载需要用户短期聚焦处理的确认、编辑、检查或说明任务。                                        |
-| basic usage            | 使用 `v-model` 控制显示，`title` 或 `header` slot 提供标题，`footer` slot 放置主次操作。      |
-| props / events / slots | 本页 `API` 覆盖公开 props、events、slots 和 exposes。                                         |
-| accessibility          | 必须提供可读标题；自定义 `header` 时保留 `titleId`；避免在 Dialog 内打开无必要的嵌套 Dialog。 |
-| theme token notes      | 跟随公开 surface、文本、边框、阴影、圆角、backdrop blur 和 panel/overlay motion token；交互几何消费 `#260` canonical viewport/safe-area 变量与统一 SCSS helper（见 `docs/theme/tokens.md`）。 |
-| known limitations      | Teleport 内容不继承 SFC scoped 样式；嵌套 Dialog 必须显式处理 `append-to-body` 和焦点顺序。   |
-| stability level        | Preview public component。                                                                    |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+for the change policy. Provide a readable title; custom `header` content must
+preserve `titleId`. Teleported content does not inherit SFC-scoped styles, and
+nested dialogs must explicitly manage `append-to-body` and focus order. Dialog
+uses the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract);
+consumers must not override its internal geometry.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `v-model` 绑定一个布尔值控制对话框显示，`title` 设置标题，`footer` 具名插槽放置操作按钮。
+Bind a Boolean with `v-model` to control visibility, set the title with `title`, and place action buttons in the named `footer` slot.
 
-## 自定义内容
+## Custom Content
 
-对话框内容可以是任何组件，例如表格、表单等。
+Dialog content can be any component, such as a table or form.
 
-## 自定义头部
+## Custom Header
 
-使用 `header` 插槽自定义标题区域（插槽 scope 包含 `titleId`，用于无障碍访问）。
+Customize the heading region with the `header` slot; its slot scope includes `titleId` for accessible labeling.
 
-## 嵌套对话框
+## Nested Dialogs
 
-嵌套使用时，内层对话框必须设置 `append-to-body="true"`。
+When dialogs are nested, the inner dialog must set `append-to-body="true"`.
 
-## 可拖拽
+## Draggable
 
-设置 `draggable` 允许拖动对话框；`overflow` 允许超出视口范围拖动。
+Set `draggable` to allow dragging; `overflow` allows the dialog to move beyond the viewport.
 
-## 全屏
+## Fullscreen
 
-设置 `fullscreen` 为 `true` 打开全屏对话框。
+Set `fullscreen` to `true` to open a full-screen dialog.
 
 ## Viewport / safe-area
 
-- 遮罩（scrim）始终 `position: fixed; inset: 0`，不会被 safe-area 缩小。
-- `.el-overlay-dialog` 通过统一 helper 提供四方向安全间距、滚动与居中；非全屏 Dialog 的 `max-block-size` 由 `--fsus-viewport-block-size` 与上下 safe-area/基础间距共同计算。
-- 全屏表面可铺满 viewport，但 header/body/footer 交互内容避开安全区。
-- 不要在 consumer 中用 `:deep(.el-overlay-dialog)` 等方式重写几何。
-- 自动门禁：`pnpm audit:visual-boundaries` 的 safe-area 矩阵在 Chromium/WebKit 上通过覆盖 #260 CSS 变量做几何断言；真机 Safari 浏览器 UI 仍需 release evidence。
+Dialog follows the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract):
+the scrim stays `position: fixed; inset: 0`, while the panel uses four-way
+insets, scrolling, centering, and `--fsus-viewport-block-size`. Full-screen
+surfaces may fill the viewport, but header/body/footer controls remain inside
+the safe area. Do not override `.el-overlay-dialog` through `:deep()` or a
+product class. The `pnpm audit:visual-boundaries` matrix covers Chromium/WebKit
+with #260 variable overrides; real Safari UI still needs release evidence.
 
-## 销毁内容
+## Destroy Content
 
-设置 `destroy-on-close` 在关闭时销毁默认插槽内容，有助于性能优化。
+Set `destroy-on-close` to destroy default-slot content on close, which can improve performance.
 
 ---
 
@@ -110,12 +109,12 @@
 
 ---
 
-## 常见问题
+## Frequently Asked Questions
 
-**SFC 中的 scoped 样式不生效？**
+**Why do scoped styles not work in an SFC?**
 
-因为 Dialog 使用了 Teleport 挂载，建议将样式写在全局 CSS 中，而非 scoped。
+Dialog mounts through Teleport, so put these styles in global CSS rather than a scoped block.
 
-**显示/隐藏时页面元素偏移？**
+**Why do page elements shift when the dialog opens or closes?**
 
-建议将滚动区域包裹在 Vue 挂载节点（如 `<div id="app" />`）内，并为 body 设置 `overflow: hidden`。
+Wrap the scroll region in the Vue mount node (such as `<div id="app" />`) and set `overflow: hidden` on `body`.

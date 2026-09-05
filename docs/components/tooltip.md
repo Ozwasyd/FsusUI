@@ -1,36 +1,37 @@
-# Tooltip 文字提示
+# Tooltip
 
-鼠标悬停时显示提示信息。
+Shows a tooltip when the pointer hovers.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `content` 设置显示内容，`placement` 设置弹出位置（共 12 个方向）。
+Set the content with `content` and the position with `placement` (12 directions are available).
 
-## 主题
+## Themes
 
-通过 `effect` 切换主题：`dark`（默认）或 `light`；也可传入自定义主题名。
+Use `effect` to choose `dark` (default), `light`, or a custom theme name.
 
-## 更多内容
+## Additional Content
 
-使用 `content` 具名插槽覆盖 `content` 属性，支持多行富文本内容。
+Use the named `content` slot instead of the `content` prop for multi-line rich content.
 
-## HTML 内容
+## HTML Content
 
-设置 `raw-content` 为 `true` 后，`content` 将被解析为 HTML 字符串。
+Set `raw-content` to `true` to parse `content` as an HTML string.
 
-> **警告**：确保 `content` 内容可信，防止 XSS 攻击。
+> Treat HTML as trusted input only; see the [Security Policy](../../SECURITY.md)
+> for security handling and reporting.
 
-## 受控模式
+## Controlled Mode
 
-使用 `v-model:visible` 实现受控显示；受控模式下点击外部不会自动关闭。
+Use `v-model:visible` for controlled visibility; controlled mode does not close automatically on outside clicks.
 
-## 虚拟触发
+## Virtual Triggering
 
-通过 `virtual-triggering` 和 `virtual-ref` 将触发元素与内容解耦。
+Use `virtual-triggering` and `virtual-ref` to decouple the trigger from the content.
 
 ---
 
@@ -88,11 +89,11 @@
 
 ---
 
-## 常见问题
+## Frequently Asked Questions
 
-**tooltip 内嵌 input 时无法输入空格？**
+**Why can't an input nested in a tooltip receive spaces?**
 
-设置 `:trigger-keys="[]"` 防止空格键被拦截：
+Set `:trigger-keys="[]"` so the space key is not intercepted:
 
 ```vue
 <el-tooltip content="提示" placement="top" :trigger-keys="[]">

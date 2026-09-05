@@ -16,13 +16,11 @@ runtime.
 
 ## Supported Platform Differences
 
-Culture-specific text shaping and right-to-left flow follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for culture-specific text shaping and right-to-left flow.
 
 ## Theme Tokens
 
-Locale formatting uses the same text, muted text, focus, density, and motion
-resources as text controls.
+Use the text-control text, muted-text, focus, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

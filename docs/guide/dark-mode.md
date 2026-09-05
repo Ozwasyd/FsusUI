@@ -1,35 +1,33 @@
-# 暗色模式
+# Dark mode
 
-FsusUI 当前主题入口 `@ozwasyd/element-plus/theme-chalk` 已内置明暗双套 token，并默认包含基于 `prefers-color-scheme` 的系统级自适应。
+The public theme entry is `@ozwasyd/element-plus/theme-chalk`; the FsusUI
+stylesheet, `@ozwasyd/element-plus/dist/fsus.css`, includes light and dark token
+sets and follows `prefers-color-scheme` by default. Importing
+the stylesheet is enough for system-following mode. Use `themeMode` and
+`syncThemeMode` when the app needs a persisted choice, SSR first-paint
+consistency, or an explicit `light`/`dark` mode.
 
-如果你的应用只需要“跟随系统”，引入主题 CSS 就够了；如果你需要持久化用户选择、SSR 首帧一致性、或显式强制 `light`/`dark`，请使用本页的 `themeMode` / `syncThemeMode` 接入方式。
-
----
-
-## 默认行为
-
-只要引入主题样式，组件会自动跟随系统主题：
+## Default behavior
 
 ```ts
 import ElementPlus from '@ozwasyd/element-plus'
 import '@ozwasyd/element-plus/dist/fsus.css'
 ```
 
-内置规则位于 `vue/packages/theme-chalk/src/fsus-theme.scss`：
+The theme source (`vue/packages/theme-chalk/src/fsus-theme.scss`) defines:
 
-- `html.dark`：强制暗色
-- `html.light`：强制亮色
-- `@media (prefers-color-scheme: dark) { html:not(.light) { ... } }`：系统自适应
+- `html.dark` — force dark mode;
+- `html.light` — force light mode by opting out of the dark media rule; and
+- `@media (prefers-color-scheme: dark) { html:not(.light) { ... } }` — system
+  adaptation.
 
-这意味着调用端不写任何 JS，也能获得基础的 dark mode。
+No application JavaScript is needed for basic system-following behavior.
 
----
+## Recommended setup
 
-## 推荐接入方式
+### 1. Set `themeMode` when installing
 
-### 方式一：安装时声明 `themeMode`
-
-适合业务应用根入口。
+Use this at the application root:
 
 ```ts
 import { createApp } from 'vue'
@@ -46,15 +44,17 @@ app.use(ElementPlus, {
 app.mount('#app')
 ```
 
-`themeMode` 支持三种值：
+`themeMode` accepts:
 
-- `system`：跟随系统主题，不强制写入 `.dark` / `.light`
-- `dark`：强制暗色
-- `light`：强制亮色
+| Value | Effect |
+| --- | --- |
+| `system` | Follow the OS preference without forcing `.dark` or `.light`. |
+| `dark` | Force dark mode. |
+| `light` | Force light mode. |
 
-### 方式二：在根 `ConfigProvider` 中声明
+### 2. Set it on the root `ConfigProvider`
 
-适合应用运行时会切换主题模式的场景。
+Use this when the app changes modes at runtime:
 
 ```vue
 <template>
@@ -70,9 +70,10 @@ const themeMode = ref<'light' | 'dark' | 'system'>('system')
 </script>
 ```
 
-### 方式三：在挂载前直接同步
+### 3. Synchronize before mount
 
-适合你要在 Vue 启动前先应用本地持久化主题，避免首帧闪烁。
+Call `syncThemeMode` before Vue starts when a persisted choice must apply to the
+first frame:
 
 ```ts
 import { syncThemeMode } from '@ozwasyd/element-plus/theme'
@@ -85,22 +86,19 @@ syncThemeMode(
 )
 ```
 
-`syncThemeMode()` 会同步这些状态到 `<html>`：
+`syncThemeMode()` updates `<html>` with:
 
-- `class="dark"` 或 `class="light"`（仅显式模式）
-- `data-theme-mode="light|dark|system"`
-- `data-theme-resolved="light|dark"`
-- `style.colorScheme`
+- `class="dark"` or `class="light"` for explicit modes only;
+- `data-theme-mode="light|dark|system"`;
+- `data-theme-resolved="light|dark"`; and
+- `style.colorScheme`.
 
----
+## Consumer overrides
 
-## 调用端自定义暗色变量
+### CSS variables
 
-### CSS 变量覆盖
-
-如果你要覆盖“暗色态”变量，**不要只写 `html.dark`**。在 `system` 模式下，FsusUI 不会强制添加 `.dark`，而是通过媒体查询切换 token。
-
-推荐同时覆盖显式暗色与系统解析后的暗色态：
+In `system` mode, FsusUI resolves dark tokens through the media query rather
+than adding `.dark`. Match both explicit and resolved dark roots:
 
 ```css
 html.dark,
@@ -115,16 +113,15 @@ html[data-theme-resolved='dark'] {
 }
 ```
 
-入口只需要继续引入主主题样式：
-
 ```ts
 import '@ozwasyd/element-plus/dist/fsus.css'
 import './styles/dark.css'
 ```
 
-### SCSS 变量覆盖
+### SCSS variables
 
-构建期定制请继续走 `theme-chalk/src/common/var.scss`，直接覆盖 dark map：
+For build-time customization, override the dark maps in
+`theme-chalk/src/common/var.scss`:
 
 ```scss
 @forward '@ozwasyd/element-plus/theme-chalk/src/common/var.scss' with (
@@ -146,22 +143,23 @@ import './styles/dark.css'
 );
 ```
 
-然后在你的主题入口中先引入这个变量文件，再引入 FsusUI。
+Load this variable file before FsusUI's theme entry in the app's theme build.
 
----
+## SSR and first paint
 
-## SSR 与首帧一致性
+For a persisted choice:
 
-如果你的站点会持久化用户主题选择，推荐：
+1. Render `<html class="dark">` or `<html class="light">` on the server.
+2. Call `syncThemeMode(storedThemeMode)` before client mount.
+3. Keep the Vue root's `themeMode` in the same state at runtime.
 
-1. 服务端直接输出 `<html class="dark">` 或 `<html class="light">`
-2. 客户端在挂载前调用 `syncThemeMode(storedThemeMode)`
-3. Vue 根部再用 `themeMode` 保持运行时状态一致
+Storage and persistence policy belong to the consuming app; core components do
+not persist user data by default.
 
-## 测试与截图脚本
+## Tests and screenshots
 
-Playwright、人工截图或下游 AGENTS 工具需要强制主题时，不要直接改
-`document.documentElement.classList`。使用 FsusUI 提供的测试 helper：
+Playwright, screenshot scripts, and downstream AGENTS tools should use the
+FsusUI helper instead of mutating `document.documentElement.classList`:
 
 ```ts
 import { installThemeModeTestHelper } from '@ozwasyd/element-plus/theme'
@@ -172,7 +170,7 @@ installThemeModeTestHelper({
 })
 ```
 
-安装后浏览器脚本可以调用：
+The browser script can then set a mode:
 
 ```ts
 await page.evaluate(() => {
@@ -180,10 +178,10 @@ await page.evaluate(() => {
 })
 ```
 
-helper 会复用 `syncThemeMode()`，同步 `<html>` 的 class、`data-theme-mode`、
-`data-theme-resolved` 和 `color-scheme`，并按需写入指定 storage key。
-
-业务运行时需要持久化和订阅 resolved theme 时，优先使用稳定子路径：
+The helper reuses `syncThemeMode`, updates the root class, data attributes, and
+`color-scheme`, and optionally writes the requested storage key. For app
+runtime persistence or resolved-theme subscriptions, use the stable theme
+subpath:
 
 ```ts
 import {
@@ -194,16 +192,8 @@ import {
 } from '@ozwasyd/element-plus/theme'
 ```
 
-这样可以避免“用户已选亮色，但系统是暗色，首帧仍短暂闪黑”的问题。
+## Design source
 
----
-
-## 设计基线
-
-FsusUI 暗色模式仍遵循 [design.md](../design.md) 的同一套视觉语言：
-
-- 背景基线：`#121214` / `#09090B`
-- 主文本：`#F0F0F4`
-- 次文本：`#A1A1AA`
-- 强调色：学术蓝在暗色下提升为 `#4B79CC`
-- 浮层：深色半透明背景配合 `backdrop-filter: blur(40px)`
+Use [`docs/theme/tokens.md`](../theme/tokens.md) for current token names and
+values, and [`docs/design.md`](../design.md) for the visual contract. This
+guide does not duplicate palette, radius, shadow, or material values.

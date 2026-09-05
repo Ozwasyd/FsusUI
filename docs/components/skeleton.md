@@ -1,20 +1,20 @@
-# Skeleton 骨架屏
+# Skeleton
 
-在数据加载前展示骨架结构，提供更好的视觉体验。
+Shows a skeleton structure before data loads to maintain visual continuity.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-skeleton :rows="5" animated />
 ```
 
-## 加载状态控制
+## Loading State Control
 
-通过 `loading` 属性控制是否显示骨架屏。`loading` 为 `false` 时显示默认插槽中的真实内容。
+Use `loading` to control the skeleton. When `loading` is `false`, the default slot renders the real content.
 
 ```vue
 <el-skeleton :loading="isLoading" animated>
@@ -24,9 +24,9 @@
 </el-skeleton>
 ```
 
-## 自定义模板
+## Custom Template
 
-通过 `#template` 插槽自定义骨架结构，配合 `el-skeleton-item` 组件使用。
+Customize the skeleton with the `#template` slot, typically using `el-skeleton-item`.
 
 ```vue
 <el-skeleton animated>
@@ -37,9 +37,9 @@
 </el-skeleton>
 ```
 
-## 防止渲染抖动
+## Prevent Render Jitter
 
-使用 `throttle` 属性设置延迟渲染（ms），避免快速请求导致闪烁。支持传入对象控制显示/隐藏的独立延迟：`{ leading: 500, trailing: 300 }`。
+Use `throttle` to delay rendering in milliseconds and avoid flashes from fast requests. An object can set independent show/hide delays: `{ leading: 500, trailing: 300 }`.
 
 ---
 

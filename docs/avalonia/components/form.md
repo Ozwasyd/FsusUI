@@ -15,13 +15,11 @@ Slots map to `Content` inside `FsusFormItem`.
 
 ## Supported Platform Differences
 
-Focus movement, scroll targeting, and accessible error relationships follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for focus movement, scroll targeting, and accessible-error boundaries.
 
 ## Theme Tokens
 
-Forms use text, muted text, danger, focus, border, density, and disabled theme
-resources.
+Use text, muted-text, danger, focus, border, density, and disabled resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

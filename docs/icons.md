@@ -11,8 +11,7 @@ Import only the icons you use:
 import { Search, Edit, Delete } from '@ozwasyd/element-plus/icons-vue'
 ```
 
-Use icons with `ElIcon` when you need a consistent size, color, loading state,
-or inline alignment:
+Use `ElIcon` when you need consistent size, color, loading state, or inline alignment:
 
 ```vue
 <template>
@@ -22,10 +21,10 @@ or inline alignment:
 </template>
 ```
 
-FsusUI never applies stroke or fill rules to a bare `svg`. Generated line icons
-carry their stroke contract in the SVG source. For a consumer-owned line icon,
-opt into the scoped cap/join recipe on the `ElIcon` container; solid and
-third-party icons should omit the attribute.
+FsusUI never applies stroke or fill rules to a bare `svg`; generated line icons
+carry that contract in their SVG source. For a consumer-owned line icon, opt
+into the scoped cap/join recipe on its `ElIcon` container; solid and third-party
+icons should omit the attribute.
 
 ```vue
 <el-icon variant="linear">
@@ -33,10 +32,8 @@ third-party icons should omit the attribute.
 </el-icon>
 ```
 
-`variant="inherit"` is the default and leaves a slotted SVG's paint geometry
-untouched.
-
-Icon-only buttons must provide an accessible name:
+`variant="inherit"` is the default and leaves slotted SVG paint geometry
+untouched. Icon-only buttons must provide an accessible name:
 
 ```vue
 <el-button :icon="Search" aria-label="搜索" circle />
@@ -44,24 +41,20 @@ Icon-only buttons must provide an accessible name:
 
 ## Available Icon Packages
 
-| Package or path                   | Audience                                  | Stability                  |
-| --------------------------------- | ----------------------------------------- | -------------------------- |
-| `@ozwasyd/element-plus/icons-vue` | External consumers                        | Preview public API         |
-| `vue/packages/icons-svg`              | Repository maintainers                    | Internal source of truth   |
-| `vue/packages/icons-vue`              | Repository maintainers and build pipeline | Internal workspace package |
+| Package or path | Audience | Stability |
+| --- | --- | --- |
+| `@ozwasyd/element-plus/icons-vue` | External consumers | Preview public API |
+| `vue/packages/icons-svg` | Repository maintainers | Internal source of truth |
+| `vue/packages/icons-vue` | Maintainers and build pipeline | Internal workspace package |
 
-The workspace package names still include Element Plus naming for source
-compatibility. External consumers should use the `@ozwasyd/element-plus`
-package path.
+Workspace package names retain Element Plus naming for source compatibility;
+external consumers should use the `@ozwasyd/element-plus` path.
 
 ## Cross-Platform Registry
 
-The platform-neutral icon registry lives in `spec/icons/registry.yaml`.
-It defines stable semantic ids, source SVGs, Avalonia path data, tokenized
-size/stroke/fill names, aliases, and decorative-vs-semantic accessibility
-defaults.
+The platform-neutral icon registry is [`spec/icons/registry.yaml`](../spec/icons/registry.yaml). It defines semantic ids, source SVGs, Avalonia path data, tokenized size/stroke/fill names, aliases, and decorative-vs-semantic accessibility defaults.
 
-Generated registry outputs:
+Generated outputs are:
 
 - `vue/packages/icons-vue/generated/icon-metadata.json`
 - `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml`
@@ -77,23 +70,22 @@ pnpm run icons:lint
 
 ## File Type Resolution (Avalonia)
 
-`FsusUI.Avalonia.Icons` ships `FsusFileTypeIcon`, an Avalonia resolver that
-maps a file name or extension to a semantic file icon key
-(`FsusIconFileText`, `FsusIconFileMarkdown`, `FsusIconFileCode`,
-`FsusIconFileData`, `FsusIconFileImage`, `FsusIconFileArchive`,
-`FsusIconFileDocument`) with a stable `FsusIconFile` fallback for unknown
-types. Tree rows should keep the visible file name as the accessible name and
-treat the resolved icon as decorative; icons inherit the row foreground in
-light, dark, and high-contrast themes.
+`FsusUI.Avalonia.Icons` ships `FsusFileTypeIcon`, which maps a file name or
+extension to a semantic key: `FsusIconFileText`, `FsusIconFileMarkdown`,
+`FsusIconFileCode`, `FsusIconFileData`, `FsusIconFileImage`,
+`FsusIconFileArchive`, or `FsusIconFileDocument`. Unknown types use the stable
+`FsusIconFile` fallback. Tree rows should keep the visible file name as the
+accessible name and treat the resolved icon as decorative; icons inherit row
+foreground in light, dark, and high-contrast themes.
 
 ## Generation Workflow
 
-SVG source files live in `vue/packages/icons-svg/*.svg`. Vue icon components are
-generated into `vue/packages/icons-vue/src/components`; the Web generator reads the
-registry to add semantic aliases such as `ChevronRight` while preserving
-existing file-name exports.
+SVG sources live in `vue/packages/icons-svg/*.svg`; Vue components are generated
+into `vue/packages/icons-vue/src/components`. The Web generator reads the
+registry for semantic aliases such as `ChevronRight` while preserving existing
+file-name exports.
 
-Use the root guard when you only need to ensure artifacts are fresh:
+Use the root guard when you only need to ensure fresh artifacts:
 
 ```bash
 pnpm run ensure:icons
@@ -105,35 +97,32 @@ Use the icon package generator when adding or reviewing SVG changes:
 pnpm -C vue/packages/icons-vue build:generate
 ```
 
-The generator enforces the FsusUI icon contract:
+The generator enforces:
 
-- one root `<svg>` element
-- `viewBox="0 0 1024 1024"`
-- `stroke="currentColor"`
-- `fill="currentColor"`
-- `stroke-linejoin="round"`
-- `stroke-linecap="round"`
-- `stroke-width="112"` for line icons, derived from
-  `icon.stroke.md` / `icon.size.md` with `1.75 * 1024 / 16`
+- one root `<svg>` element;
+- `viewBox="0 0 1024 1024"`;
+- `stroke="currentColor"` and `fill="currentColor"`;
+- `stroke-linejoin="round"` and `stroke-linecap="round"`;
+- `stroke-width="112"` for line icons, derived from `icon.stroke.md` /
+  `icon.size.md` with `1.75 * 1024 / 16`.
 
-Solid `*-filled` icons keep `fill="currentColor"` and do not inherit line icon
+Solid `*-filled` icons keep `fill="currentColor"` and do not inherit line-icon
 stroke attributes.
 
 ## SVG Review Expectations
 
 - Keep icon names stable and kebab-case in `vue/packages/icons-svg`.
 - Review the rendered Vue component, not only the raw SVG path.
-- Do not include private logos, customer artwork, tracking pixels, or external
-  image references.
+- Do not include private logos, customer artwork, tracking pixels, or external image references.
 - Prefer currentColor-driven icons so themes can control color.
 - Run visual checks when an icon appears in public component demos.
 
 ## Icon Name Stability
 
-Icon component names generated from existing SVG filenames are preview public
-API when exported through `@ozwasyd/element-plus/icons-vue`. Renaming or
-removing an exported icon requires release notes and a migration note during
-public preview.
+Icon component names generated from existing SVG filenames are preview public API
+when exported through `@ozwasyd/element-plus/icons-vue`. Renaming or removing
+an exported icon requires release notes and a migration note during public
+preview.
 
-New icon names remain preview public after they are generated, exported, and
-referenced by docs or demos.
+New icon names become preview public after generation, export, and reference by
+docs or demos.

@@ -1,30 +1,31 @@
-# Badge 徽章
+# Badge
 
-在按钮或图标上展示数字或状态标记。
+Displays a numeric or status marker on a button or icon.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `value` 属性设置显示的数字或文字。
+Set the displayed number or text with `value`.
 
-## 最大值
+## Maximum Value
 
-通过 `max` 属性设置最大值，超出时显示 `{max}+`（仅 value 为数字时有效，默认 99）。
+Set the maximum with `max`; values above it display as `{max}+` (numeric
+`value` only, default `99`).
 
-## 自定义内容
+## Custom Content
 
-`value` 为字符串时显示自定义文字；也可通过 `content` 插槽完全自定义内容。
+String `value` supplies custom text; the `content` slot can replace the content.
 
-## 红点
+## Dot
 
-设置 `is-dot` 为 `true` 显示红点而非数字。
+Set `is-dot` to `true` to show a dot instead of a number.
 
-## 偏移量
+## Offset
 
-通过 `offset` 属性 `[left, top]` 设置徽章偏移量。
+Set the badge offset with `[left, top]` in `offset`.
 
 ---
 

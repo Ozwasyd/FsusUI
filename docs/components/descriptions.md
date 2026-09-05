@@ -1,38 +1,38 @@
-# Descriptions 描述列表
+# Descriptions
 
-以列表形式展示多个字段信息。
+Displays multiple fields as a list.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-使用 `el-descriptions` 和 `el-descriptions-item` 组合，`label` 属性设置字段名，默认插槽放置字段值。
+Compose `el-descriptions` and `el-descriptions-item`; use `label` for the field name and the default slot for its value.
 
-## 不同尺寸
+## Sizes
 
-通过 `size` 属性设置列表尺寸：`large`、`default`、`small`。
+Set the list size with `size`: `large`, `default`, or `small`.
 
-## 垂直排列
+## Vertical Layout
 
-设置 `direction="vertical"` 改为垂直方向排列。
+Set `direction="vertical"` for vertical layout.
 
-## 跨行
+## Row Spanning
 
-通过 `rowspan` 属性设置单元格跨行数。
+Use `rowspan` to set how many rows a cell spans.
 
-## 响应式投影
+## Responsive Projection
 
-`responsive="auto"`（默认）根据组件自身可用宽度选择投影：宽度小于
-`560px` 时使用语义化的 `dl/dt/dd` 纵向字段列表，桌面仍使用表格。
-`responsive="stack"` 始终使用纵向投影；`responsive="scroll"` 保留表格并
-提供可聚焦的横向滚动容器和右边缘提示。长地址、URL 和标识符会自然换行，
-不会被静默省略。滚动模式可通过 `scroll-aria-label` 提供业务语境名称。
+`responsive="auto"` (default) chooses the projection from the component's own available width: below
+`560px`, it uses a semantic `dl/dt/dd` field list while desktop retains the table.
+`responsive="stack"` always uses the vertical projection; `responsive="scroll"` retains the table and
+provides a focusable horizontal scroller with an edge cue. Long addresses, URLs, and identifiers wrap
+naturally instead of being silently truncated. Use `scroll-aria-label` to provide business context for the scroller.
 
-## 自定义样式
+## Custom Styles
 
-通过 `align`、`label-align`、`class-name`、`label-class-name` 等属性自定义样式。
+Customize styling with `align`, `label-align`, `class-name`, `label-class-name`, and related props.
 
 ---
 

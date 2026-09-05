@@ -1,14 +1,14 @@
-# MessageBox 消息弹框
+# MessageBox
 
-模拟系统的 `alert`、`confirm`、`prompt` 弹框，用于提示用户信息、确认操作或接收输入。
+Provides system-style `alert`, `confirm`, and `prompt` dialogs for messages, confirmations, and input.
 
-> **提示**：MessageBox 提供的是系统级交互。若需要展示复杂内容，请使用 Dialog 组件。
+> **Tip:** MessageBox is for system-level interactions. Use Dialog for complex content.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 消息提示（Alert）
+## Message (Alert)
 
 ```ts
 import { ElMessageBox } from '@ozwasyd/element-plus'
@@ -18,7 +18,7 @@ ElMessageBox.alert('这是提示内容', '标题', {
 })
 ```
 
-## 确认消息（Confirm）
+## Confirmation (Confirm)
 
 ```ts
 const result = await ElMessageBox.confirm('确认执行此操作吗？', '警告', {
@@ -31,7 +31,7 @@ if (result.ok) {
 }
 ```
 
-## 提交内容（Prompt）
+## Submit Content (Prompt)
 
 ```ts
 const result = await ElMessageBox.prompt('请输入邮箱', '提示', {
@@ -44,26 +44,32 @@ if (result.ok) {
 }
 ```
 
-## HTML 内容
+## HTML Content
 
-设置 `dangerouslyUseHTMLString: true` 后，`message` 将被解析为 HTML。
+Set `dangerouslyUseHTMLString: true` to parse `message` as HTML.
 
-> **警告**：确保内容可信，防止 XSS 攻击。
+> Treat HTML as trusted input only; see the [Security Policy](../../SECURITY.md)
+> for security handling and reporting.
 
-## 区分取消与关闭
+## Distinguish Cancel and Close
 
-设置 `distinguishCancelAndClose: true` 后，取消和关闭都会返回 `ok: false`，`error.message` 分别为 `'cancel'` 或 `'close'`。
+With `distinguishCancelAndClose: true`, both cancel and close return `ok: false`;
+`error.message` is `'cancel'` or `'close'`, respectively.
 
-Promise 返回值是稳定的 `FsusResult<MessageBoxData>`。业务侧需要复用判断逻辑时，从 `@ozwasyd/element-plus/result` 导入 `isFsusResult`、`isTruthyFsusOk` 或 `getFsusErrorMessage`，不要判断私有返回 shape。`center` 等 option 默认值会在组件首次渲染前完成归一化。
+Promise results use the stable `FsusResult<MessageBoxData>` shape. Reuse
+`isFsusResult`, `isTruthyFsusOk`, or `getFsusErrorMessage` from
+`@ozwasyd/element-plus/result` instead of inspecting a private shape. Options
+such as `center` are normalized before the first render.
 
-进入和退出动效使用 `--fsus-motion-panel`（默认 `360ms`），遮罩使用
-`--fsus-motion-overlay`；业务主题可覆盖 token，但不要为 MessageBox 写入独立的
-硬编码时长。
+Use the shared [motion token contract](../theme/motion.md) for panel and
+overlay timing; consumers may override tokens but must not add MessageBox
+hard-coded durations.
 
-MessageBox 交互宿主与 Dialog 共用统一 viewport-safe overlay helper：四方向安全间距、
-可滚动居中，小屏/横屏/大字号下按钮区可滚动到达。`pnpm audit:visual-boundaries`
-safe-area 矩阵在 `short-visual` 等 profile 下断言 actions 可达。不要复制 `max(gap, safe-area)`
-公式或用 product class 覆盖 `.el-overlay-message-box` 几何。
+MessageBox shares Dialog's viewport-safe overlay helper: four-direction insets,
+scrollable centering, and reachable actions on small, landscape, and large-text
+viewports. The [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract)
+owns the geometry; do not copy its inset formula or override
+`.el-overlay-message-box` with product classes.
 
 ---
 

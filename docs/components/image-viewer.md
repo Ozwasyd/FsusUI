@@ -1,31 +1,28 @@
-# ImageViewer 图片预览
+# ImageViewer
 
-以全屏浮层查看一组图片，支持上一张/下一张、缩放、旋转、关闭和键盘操作。`Image` 组件通过 `preview-src-list` 内置调用该预览器；需要完全自定义触发入口时可直接使用 `ElImageViewer`。
+Shows a group of images in a full-screen overlay with previous/next navigation, zoom, rotation, close, and keyboard controls. `Image` invokes it through `preview-src-list`; use `ElImageViewer` directly when the trigger must be fully customized.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                            |
-| ---------------------- | ----------------------------------------------------------------------------------------------- |
-| purpose                | 为图片列表提供全屏预览、缩放、旋转与键盘导航能力。                                              |
-| basic usage            | 传入 `url-list`，通过 `v-if` 或业务状态控制挂载，监听 `close` 后移除预览器。                    |
-| props / events / slots | 本页 `ImageViewer API` 覆盖公开 props 和 events；当前没有公开 slots。                           |
-| accessibility          | 保留 ESC 关闭能力，确保打开预览时背景内容不可操作；图片应在触发入口处提供上下文文本或替代说明。 |
-| theme token notes      | 跟随公开 overlay、文本、主色、阴影和 motion overlay token；wrapper/mask 全 viewport 覆盖，控件偏移消费统一 safe-area helper。 |
-| known limitations      | 预览器只负责展示已加载 URL，不处理鉴权、下载、图片安全扫描或错误重试。                          |
-| stability level        | Preview public component。                                                                      |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+for the change policy. Keep Escape-to-close and make the trigger provide
+context or alternative text. The viewer displays already-loaded URLs; it does
+not handle authentication, downloads, image scanning, or retries. Wrapper,
+mask, and control insets follow the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract).
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## Viewport / safe-area
+## Viewport / Safe Area
 
-- wrapper 与 mask 覆盖完整 viewport（scrim 语义，不被 safe-area 缩小）。
-- 自动门禁：`pnpm audit:visual-boundaries` 的 safe-area 矩阵断言 wrapper 全 viewport 覆盖与控件落在 safe rectangle 内（#260 变量覆盖；真机 evidence 另附）。
-- close / prev / next / actions 使用统一 `max(base, safe-area)` helper，不再以裸
-  `40px` / `30px` 作为相对屏幕边缘的唯一距离；横屏刘海在左或右时两侧导航仍位于安全矩形内。
+ImageViewer follows the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract):
+the wrapper and mask cover the full viewport, while close/previous/next/action
+controls use the shared `max(base, safe-area)` helper and remain inside the safe
+rectangle in landscape cutout layouts. The `pnpm audit:visual-boundaries` matrix
+asserts this with #260 variable overrides; real-device evidence is separate.
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <template>

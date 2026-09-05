@@ -1,12 +1,12 @@
-# TreeV2 虚拟化树（Beta）
+# TreeV2 (Beta)
 
-利用虚拟滚动技术，实现任意数量节点的高性能树形视图。
+Uses virtual scrolling for a high-performance tree view with any number of nodes.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-tree-v2
@@ -16,21 +16,21 @@
 />
 ```
 
-## 可选择
+## Selectable
 
-设置 `show-checkbox` 开启复选框。默认情况下点击叶子节点会选中（`check-on-click-leaf: true`）。
+Set `show-checkbox` for checkboxes. By default, clicking a leaf selects it (`check-on-click-leaf: true`).
 
-## 默认展开/选中
+## Default Expansion and Selection
 
-通过 `default-expanded-keys` 和 `default-checked-keys` 设置初始展开和选中的节点。
+Use `default-expanded-keys` and `default-checked-keys` for initially expanded and checked nodes.
 
-## 自定义节点内容
+## Custom Node Content
 
-通过默认插槽（可访问 `{ node, data }`）自定义节点内容。
+Customize node content with the default slot, which exposes `{ node, data }`.
 
-## 节点过滤
+## Node Filtering
 
-调用实例的 `filter(query)` 方法过滤节点，配合 `filter-method` 使用。
+Call the instance's `filter(query)` method to filter nodes, together with `filter-method`.
 
 ---
 
@@ -59,7 +59,7 @@
 | item-size | 节点行高（px） | `number` | `26` |
 | scrollbar-always-on | 是否始终显示滚动条 | `boolean` | `false` |
 
-### props 配置项
+### Props Options
 
 | 属性名 | 说明 | 类型 | 默认值 |
 |--------|------|------|--------|

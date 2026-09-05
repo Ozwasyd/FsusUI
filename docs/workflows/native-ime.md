@@ -91,10 +91,12 @@ and forced `GTK_IM_MODULE=ibus`/`QT_IM_MODULE=ibus`/`XMODIFIERS=@im=ibus`.
 | `FSUS_IME_ENGINE` / `FSUS_IME_REQUIRE_ENGINE` | ibus engine (default `libpinyin`) |
 | `FSUS_IME_BROWSER` | headed browser (default `chromium`) |
 | `FSUS_IME_EDITOR_SELECTOR` | Editor selector inside the fixture (default `[data-testid="markdown-editor-transaction-fixture"] .el-markdown-editor textarea`) |
-| `FSUS_IME_EXPECT_WINDOW_CLASS` | Browser window class (default `Google-chrome`) |
+| `FSUS_IME_EXPECT_WINDOW_CLASS` | Browser window class (defaults from the selected browser profile) |
 | `FSUS_IME_DELAY_MOUNT_MS` | Delay the fixture mount (negative-path testing) |
 | `FSUS_IME_MOUNT_TIMEOUT_MS` | Wait for fixture/editor interactivity (default 20000) |
 | `FSUS_IME_STEP_TIMEOUT_MS` | Per-step state wait (default 15000) |
+| `FSUS_IME_SKIP_BUILD` | Reuse the demo build, equivalent to `--skip-build` |
+| `FSUS_IME_FIREFOX_PATH` | Official Firefox executable override |
 | `FSUS_IME_EXTRA_ENV` | JSON object merged into the browser/ibus environment |
 
 ## Identity binding

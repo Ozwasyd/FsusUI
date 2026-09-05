@@ -1,48 +1,45 @@
-# Notification 通知
+# Notification
 
-在屏幕角落弹出全局通知消息。与 Message 的区别在于，Notification 更适合系统级被动推送。
+Shows a global notification in a screen corner. Unlike Message, Notification is suited to passive, system-level pushes.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                   |
-| ---------------------- | -------------------------------------------------------------------------------------- |
-| purpose                | 展示系统级、被动或跨页面的短通知，通常不阻塞当前任务。                                 |
-| basic usage            | 调用 `ElNotification({ title, message })` 或类型快捷方法创建通知。                     |
-| props / events / slots | 本页 `API` 覆盖公开 options 和 instance methods。                                      |
-| accessibility          | 通知文案应短且可独立理解；需要用户立即处理的内容应使用 Dialog、Drawer 或页面内 Alert。 |
-| theme token notes      | 跟随公开 surface、文本、边框、阴影、圆角、状态色和 overlay motion token。              |
-| known limitations      | 服务 API 依赖浏览器 DOM；`dangerouslyUseHTMLString` 只允许可信内容。                   |
-| stability level        | Preview public service。                                                               |
+This preview public service follows [API stability](../api-stability.md#stability-levels)
+and the shared [theme and motion contracts](../theme/tokens.md). Keep the
+message short and self-contained; use Dialog, Drawer, or inline Alert when the
+user must act immediately. The service requires browser DOM, and
+`dangerouslyUseHTMLString` accepts only trusted content.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-调用 `ElNotification({ title, message })` 显示通知，默认 4500ms 后自动关闭。设置 `duration` 为 `0` 则不自动关闭。
+Call `ElNotification({ title, message })` to show a notification; it closes after 4500ms by default. Set `duration` to `0` to keep it open.
 
-## 类型
+## Types
 
-通过 `type` 设置通知类型：`info`、`success`、`warning`、`error`、`primary`。可直接调用快捷方法如 `ElNotification.success({...})`。
+Set `type` to `info`, `success`, `warning`, `error`, or `primary`. Shortcut methods such as `ElNotification.success({...})` are also available.
 
-## 自定义位置
+## Custom Position
 
-通过 `position` 设置弹出角落：`top-right`（默认）、`top-left`、`bottom-right`、`bottom-left`。
+Use `position` to choose a corner: `top-right` (default), `top-left`, `bottom-right`, or `bottom-left`.
 
-## 偏移量
+## Offset
 
-通过 `offset` 设置距屏幕边缘的距离（同一批次的通知应使用相同 offset）。
+Use `offset` to set the distance from the screen edge; notifications in one batch should use the same offset.
 
-## HTML 内容
+## HTML Content
 
-设置 `dangerouslyUseHTMLString` 为 `true` 后，`message` 将被解析为 HTML 字符串。
+Set `dangerouslyUseHTMLString` to `true` to parse `message` as an HTML string.
 
-> **警告**：确保 `message` 内容可信，防止 XSS 攻击。
+> Treat HTML as trusted input only; see the [Security Policy](../../SECURITY.md)
+> for security handling and reporting.
 
-## 关闭所有
+## Close All
 
-调用 `ElNotification.closeAll()` 手动关闭所有通知实例。
+Call `ElNotification.closeAll()` to close all notification instances manually.
 
 ---
 

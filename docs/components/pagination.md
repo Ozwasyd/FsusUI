@@ -1,40 +1,39 @@
-# Pagination 分页
+# Pagination
 
-当数据量过多时，使用分页将数据分隔展示。
+Use pagination to split large data sets into separate views.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `layout` 属性组合各功能模块（逗号分隔）：`prev`（上一页）、`pager`（页码列表）、`next`（下一页）、`jumper`（跳转输入框）、`total`（总条数）、`sizes`（每页条数选择器）、`->`（右对齐分隔符）。
+Use the comma-separated `layout` prop to compose modules: `prev`, `pager`, `next`, `jumper`, `total`, `sizes`, and `->` (right-aligned separator).
 
-## 带背景色
+## Background Color
 
-设置 `background` 属性使按钮带有背景色。
+Set `background` to give the buttons a background.
 
-## 小型分页
+## Compact Pagination
 
-设置 `size="small"` 使用小型分页，适合空间有限的场景。
+Set `size="small"` for compact pagination when space is limited.
 
-## 只有一页时隐藏
+## Hide When There Is One Page
 
-设置 `hide-on-single-page` 当只有一页时自动隐藏分页组件。
+Set `hide-on-single-page` to hide pagination automatically when there is only one page.
 
-## 容器驱动的响应式优先级
+## Container-Driven Responsive Priority
 
-`responsive="auto"` 按组件自身宽度收敛，而不是读取 viewport：
+`responsive="auto"` adapts to the component's own width rather than the viewport:
 
-- `<360px` 仅保留上一页、当前页/总页数、下一页；
-- `360–559px` 使用紧凑 pager，并将总数放入独立信息区；
-- `560–767px` 显示完整导航，并在 total 与 sizes 中优先 total；
-- `>=768px` 显示 layout 声明的完整导航与设置。
+- `<360px`: keep only previous, current/total pages, and next;
+- `360–559px`: use a compact pager and put the total in a separate information region;
+- `560–767px`: show full navigation, prioritizing total over sizes;
+- `>=768px`: show the complete navigation and settings declared by `layout`.
 
-低优先级控件使用 `display:none` 离开 Tab 顺序；导航 DOM 始终先于说明和
-设置区。所有导航动作保持至少 `40×40px`。
+Low-priority controls use `display:none` and leave the Tab order. Navigation DOM always precedes the description and settings regions. Every navigation action remains at least `40×40px`.
 
-## 完整示例
+## Complete Example
 
 ```vue
 <el-pagination
@@ -75,7 +74,7 @@
 | responsive                          | 容器驱动的响应式布局                          | `'off' \| 'auto'`                                 | `off`                                  |
 | aria-label                          | responsive 导航区可访问名称                   | `string`                                          | `Pagination`                           |
 
-> **提示**：必须定义 `total` 或 `page-count` 之一；若使用 `v-model:current-page` / `v-model:page-size`，必须同时监听对应更新事件，否则分页不工作。
+> **Tip:** Define either `total` or `page-count`. When using `v-model:current-page` / `v-model:page-size`, also listen for the matching update event or pagination will not work.
 
 ### Events
 
@@ -87,7 +86,7 @@
 | prev-click     | 点击上一页按钮时触发       | `(value: number) => void`                         |
 | next-click     | 点击下一页按钮时触发       | `(value: number) => void`                         |
 
-> **提示**：推荐使用 `v-model` 双向绑定而非上述事件。
+> **Tip:** Prefer two-way `v-model` binding over the events above.
 
 ### Slots
 

@@ -35,7 +35,7 @@ pnpm run verify
 Run the demo app:
 
 ```bash
-pnpm -C packages/demo-app dev
+pnpm -C vue/packages/demo-app dev
 ```
 
 ## Contribution Workflow
@@ -56,15 +56,15 @@ Component changes should name the affected component docs under
 
 ## Component Contribution Workflow
 
-- Start from the component source under `packages/components/<name>/`.
+- Start from the component source under `vue/packages/components/<name>/`.
 - Update the matching docs page under `docs/components/`.
 - State whether props, events, slots, exposes, styling, or accessibility
   behavior changed.
 - Add or update focused unit tests under the component package.
 - Run visual tests when the rendered DOM, style, layout, icon, focus, hover,
   active, loading, disabled, or empty states change.
-- Do not rely on undocumented deep imports from `es/*`, `lib/*`, `packages/*`,
-  or `internal/*`.
+- Do not rely on undocumented deep imports from `es/*`, `lib/*`,
+  `vue/packages/*`, or `vue/internal/*`.
 
 ## Theme Token Contribution Workflow
 
@@ -80,14 +80,14 @@ Component changes should name the affected component docs under
 
 ## Icon Generation Workflow
 
-SVG sources live in `packages/icons-svg`. Generated Vue components live in
-`packages/icons-vue/src/components`.
+SVG sources live in `vue/packages/icons-svg`. Generated Vue components live in
+`vue/packages/icons-vue/src/components`.
 
 Use:
 
 ```bash
 pnpm run ensure:icons
-pnpm -C packages/icons-vue build:generate
+pnpm -C vue/packages/icons-vue build:generate
 ```
 
 Icon changes must satisfy the review rules in [`docs/icons.md`](./docs/icons.md)

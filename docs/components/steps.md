@@ -1,14 +1,14 @@
-# Steps 步骤条
+# Steps
 
-引导用户按照流程完成任务，步骤数量不能少于 2 步。
+Guides users through a process with at least two steps.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `active` 属性（从 0 开始的数字索引）设置当前激活步骤。
+Set the active step with `active`, a zero-based numeric index.
 
 ```vue
 <el-steps :active="active">
@@ -18,17 +18,17 @@
 </el-steps>
 ```
 
-## 含状态
+## Status Variants
 
-通过 `process-status` 和 `finish-status` 设置当前步骤和已完成步骤的状态。
+Use `process-status` and `finish-status` for the current and completed step states.
 
-## 垂直排列
+## Vertical Layout
 
-设置 `direction="vertical"` 使步骤条垂直排列。
+Set `direction="vertical"` for vertical steps.
 
-## 简洁样式
+## Simple Style
 
-设置 `simple` 启用简洁主题（`align-center`、`description` 等属性失效）。
+Set `simple` for the compact theme; `align-center`, `description`, and related props have no effect.
 
 ---
 

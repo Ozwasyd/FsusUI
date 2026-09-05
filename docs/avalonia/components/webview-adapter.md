@@ -47,6 +47,12 @@ The edit commands are `Cut`, `Copy`, `Paste`, `RichCopy`, `CopyHtml`,
 `UseNativeMenu`. Backend implementations keep the corresponding DOM command or
 native API inside the backend boundary.
 
+## Vue Contract Mapping
+
+Browser context-menu, spelling, developer-tools, and PDF intents map to typed
+facade requests and capability/result records. This adapter does not expose a
+Vue component alias, DOM selector, or browser-engine type.
+
 ## Spelling and developer tools
 
 `FsusWebViewCapabilities` separately advertises spelling suggestions,
@@ -85,13 +91,31 @@ observed before backend dispatch and after backend completion. `Theme` carries
 the explicit Light or Dark print variant; `PrintBackgrounds` carries the
 background choice without exposing backend print-setting types.
 
-## Supported platform differences
+## Supported Platform Differences
 
 Windows and Linux adapters may use different embedded-browser engines, but
 they expose the same `FsusWebViewPlatform`, capability, command, result, PDF,
 and outline types. An unsupported backend reports individual capability
 absence. FsusUI does not claim a feature was applied based on operating-system
 name alone.
+
+## Theme Tokens
+
+Context menus reuse the shared menu/overlay resources; PDF export carries an
+explicit `Theme` variant and `PrintBackgrounds` choice. See [Application
+Setup](../installation.md#application-setup) for resource ownership.
+
+## Minimal Avalonia Example
+
+The C# example above is the minimal integration: the application supplies the
+backend, overlay host, menu, and localized labels; the adapter owns only the
+typed request/result boundary.
+
+## Known Limitations
+
+The adapter does not ship an embedded-browser engine, print dialog, or native
+developer-tools implementation. The application must provide a supported
+backend and verify engine-specific behavior.
 
 ## Accessibility and AOT
 
