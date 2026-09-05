@@ -73,18 +73,17 @@ composition semantics; it does not claim a Vue component alias or DOM API.
 
 ## Supported Platform Differences
 
-`AccessibleName` is applied to the public Edit automation peer and the native
-input owner. The peer provides the Value pattern and reports read-only state;
-item status exposes caret line/column, line count, and match count. Native IME,
-clipboard, font fallback, text rasterization, and platform automation bridges
-follow [`docs/avalonia/platform-differences.md`](../platform-differences.md).
+`AccessibleName` applies to the public Edit automation peer and native input
+owner. The peer provides the Value pattern and read-only state; item status
+exposes caret line/column, line count, and match count. Native IME, clipboard,
+font fallback, text rasterization, and automation bridges follow [`docs/avalonia/platform-differences.md`](../platform-differences.md).
 
 ## Theme Tokens
 
-The control reuses the existing text-editor surface, text, muted text, border,
-focus, disabled surface, control radius, spacing, typography size, and
-monospace-family resources. It defines no component-specific token or theme
-variant.
+The control reuses the text-editor surface, text, muted-text, border, focus,
+disabled-surface, radius, spacing, typography, and monospace resources from
+[Application Setup](../installation.md#application-setup); it defines no
+component-specific token or theme variant.
 
 ## Minimal Avalonia Example
 

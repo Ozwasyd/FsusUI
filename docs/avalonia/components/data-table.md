@@ -15,13 +15,11 @@ state, and virtualization budgets map to typed column and row models.
 
 ## Supported Platform Differences
 
-Table layout, frozen column shadows, and virtualization thresholds follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for table layout, frozen column shadows, and virtualization thresholds.
 
 ## Theme Tokens
 
-Tables use surface, border, focus, text, muted text, density, loading, and
-motion resources.
+Use surface, border, focus, text, muted-text, density, and loading resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

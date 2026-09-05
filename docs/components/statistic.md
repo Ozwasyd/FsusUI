@@ -1,22 +1,22 @@
-# Statistic 统计数值
+# Statistic
 
-突出展示数字或关键指标，如金额、排名、统计数据等。
+Highlights a number or key metric such as an amount, rank, or statistic.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-statistic title="活跃用户" :value="98500" />
 ```
 
-可配合 [VueUse useTransition](https://vueuse.org/core/useTransition/) 实现数字动画。
+Combine with [VueUse useTransition](https://vueuse.org/core/useTransition/) for animated values.
 
-## 倒计时
+## Countdown
 
-`el-countdown` 组件用于展示倒计时，支持格式化显示。
+Use `el-countdown` for a formatted countdown.
 
 ---
 

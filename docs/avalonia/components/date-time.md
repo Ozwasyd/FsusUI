@@ -14,13 +14,11 @@ range intent, and clear behavior map to typed date and time values.
 
 ## Supported Platform Differences
 
-Native picker panels and locale formatting follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for native picker panels and locale-formatting boundaries.
 
 ## Theme Tokens
 
-Date and time controls use surface, border, focus, text, muted text, danger,
-density, and motion resources.
+Use surface, border, focus, text, muted-text, danger, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

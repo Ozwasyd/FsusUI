@@ -1,7 +1,7 @@
 # Demo Data
 
-All data in the Avalonia demo shell is static and safe for public screenshots.
-It represents design-system validation states only:
+Demo-shell data is static and safe for public screenshots. It covers design-
+system validation states only:
 
 - token checks
 - theme resources
@@ -11,4 +11,3 @@ It represents design-system validation states only:
 
 Do not add FsusPanel, FsusBlog, customer, server, credential, or telemetry data
 to this demo.
-

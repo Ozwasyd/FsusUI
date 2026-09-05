@@ -3,7 +3,7 @@
 > **Role:** Navigation
 > **Applies to:** FsusUI maintainers and platform implementers
 
-Architecture documents explain repository boundaries, dependency direction, runtime ownership, and cross-platform implementation. They do not define visual values; those remain in [`docs/design.md`](../design.md) and [`spec/`](../../spec/README.md).
+Architecture docs map repository boundaries, dependency direction, runtime ownership, and cross-platform implementation. Visual values remain in [`docs/design.md`](../design.md) and [`spec/`](../../spec/README.md).
 
 ## Repository and specification architecture
 

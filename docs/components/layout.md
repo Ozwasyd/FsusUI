@@ -1,14 +1,14 @@
-# Layout 布局
+# Layout
 
-基于 24 栅格的响应式布局系统，使用 Flex 布局实现。
+A responsive 24-column grid implemented with Flexbox.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础布局
+## Basic Layout
 
-使用 `<el-row>` 和 `<el-col>` 组合，通过 `span` 属性进行分栏。
+Compose `<el-row>` and `<el-col>` and set the column span with `span`.
 
 ```vue
 <template>
@@ -22,35 +22,35 @@
 </template>
 ```
 
-## 列间距
+## Column Gutter
 
-使用 `<el-row>` 的 `gutter` 属性指定列之间的间距（默认 0）。
+Set the space between columns with `<el-row>`'s `gutter` (default `0`).
 
-## 分栏偏移
+## Column Offset
 
-通过 `offset` 属性指定列偏移量。
+Set a column offset with `offset`.
 
-## 对齐方式
+## Alignment
 
-使用 `justify` 属性设置子元素的水平对齐：`start`、`center`、`end`、`space-between`、`space-around`、`space-evenly`。
+Use `justify` for horizontal alignment: `start`, `center`, `end`, `space-between`, `space-around`, or `space-evenly`.
 
-## 响应式布局
+## Responsive Layout
 
-预设五个断点：`xs`（< 768px）、`sm`（≥ 768px）、`md`（≥ 992px）、`lg`（≥ 1200px）、`xl`（≥ 1920px）。
+Five breakpoints are provided: `xs` (< 768px), `sm` (≥ 768px), `md` (≥ 992px), `lg` (≥ 1200px), and `xl` (≥ 1920px).
 
 ```vue
 <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">响应式列</el-col>
 ```
 
-## 元素隐藏辅助类
+## Element Visibility Helpers
 
-引入 CSS 后可使用响应式隐藏类：
+After importing the CSS, use responsive visibility helpers:
 
 ```ts
 import '@ozwasyd/element-plus/theme-chalk/display.css'
 ```
 
-可用类名：`hidden-xs-only`、`hidden-sm-only`、`hidden-sm-and-down`、`hidden-sm-and-up`、`hidden-md-only`、`hidden-md-and-down`、`hidden-md-and-up`、`hidden-lg-only`、`hidden-lg-and-down`、`hidden-lg-and-up`、`hidden-xl-only`
+Available classes: `hidden-xs-only`, `hidden-sm-only`, `hidden-sm-and-down`, `hidden-sm-and-up`, `hidden-md-only`, `hidden-md-and-down`, `hidden-md-and-up`, `hidden-lg-only`, `hidden-lg-and-down`, `hidden-lg-and-up`, `hidden-xl-only`
 
 ---
 

@@ -1,43 +1,35 @@
-# PublicShell 公共页面外壳
+# PublicShell
 
-`ElPublicShell` 提供面向公开站点的基础 shell 布局：desktop nav、显式 mobile navigation、primary row、brand/nav/actions 间距、mobile primary actions、search 宽度与 reduced-motion 基线都由 FsusUI 维护。
+`ElPublicShell` provides a base shell layout for public sites. FsusUI owns the desktop nav, explicit mobile navigation, primary row, brand/nav/action spacing, mobile primary actions, search width, and reduced-motion baseline.
 
-`active-nav-motion="indicator"` 可为 desktop nav 启用组件自有的 active indicator。默认 `none` 保持原有静态 active 颜色和下划线；启用后 indicator 通过组件内部测量写入 CSS 变量，不要求业务侧使用 `:deep()` 覆盖内部 class，并在 `prefers-reduced-motion: reduce` 下取消移动过渡。移动端由 `mobile-nav-mode` 显式选择形态；只有 `bottom` 使用 `FsuBottomTabBar` 的固定底部 active indicator。
+`active-nav-motion="indicator"` enables the component-owned active indicator for desktop nav. The default `none` preserves the existing static active color and underline; when enabled, the indicator writes CSS variables from internal measurement, so consumers need not override internal classes with `:deep()`, and movement is canceled under `prefers-reduced-motion: reduce`. Mobile shape is chosen explicitly with `mobile-nav-mode`; only `bottom` uses the fixed-bottom active indicator from `FsuBottomTabBar`.
 
-严格设置 `style-src-attr 'none'` 的 consumer 可启用 `csp-safe`。该模式不输出 inline layout variable，使用静态默认 token，并把 active indicator 降级为既有的静态 active 下划线；menu 的 enter/leave 由 Transition class 驱动，search 隐藏状态使用 CSS class，均避免 hydration 写入 `style="display:none"`。
+Consumers with strict `style-src-attr 'none'` can enable `csp-safe`. This mode emits no inline layout variables, uses static default tokens, and degrades the active indicator to the existing static underline. Menu enter/leave uses Transition classes and search visibility uses CSS classes, avoiding hydration writes of `style="display:none"`.
 
-`mobile-nav-mode="menu"` 保留原生 `<details>/<summary>` 的无 JavaScript 展开能力，并由组件内置可中断的 enter/leave motion。关闭时会先让面板完成轻量的 opacity/vertical transition，再清除 `open`；Escape 会在关闭完成后恢复 summary 焦点。`prefers-reduced-motion: reduce` 下状态立即完成且不产生位移。Consumer 不应通过 `:deep(.el-public-shell__*)` 覆写这些内部状态或复制 motion preset。
+`mobile-nav-mode="menu"` retains the no-JavaScript expand behavior of native `<details>/<summary>` and uses interruptible built-in enter/leave motion. On close, the panel completes a lightweight opacity/vertical transition before `open` is cleared; Escape restores summary focus after closing. Under `prefers-reduced-motion: reduce`, state completes immediately with no displacement. Consumers must not override these internal states through `:deep(.el-public-shell__*)` or copy the motion preset.
 
-需要测量 sticky header 的 consumer 使用稳定的 `[data-public-shell-header]` hook；
-不得把 `.el-public-shell__header` 等内部 BEM class 当成应用运行时 API。
+Consumers that measure the sticky header should use the stable `[data-public-shell-header]` hook;
+internal BEM classes such as `.el-public-shell__header` are not application runtime APIs.
 
-当同时传入 `auth-label` 与 `auth-href` 时，`ElPublicShell` 会在 desktop actions
-渲染账户入口，并保留 `data-public-nav="auth"`。默认 `menu` 模式把 mobile
-账户入口放进菜单 panel，打开 Menu 后一步可达；显式选择其他 mobile 模式时才保留
-primary row 账户入口。如果业务完全自定义移动端账户入口，可将 `auth-label` 或
-`auth-href` 置空并通过 slot 接管。
+When both `auth-label` and `auth-href` are provided, `ElPublicShell` renders an account entry in desktop actions and retains `data-public-nav="auth"`. Default `menu` mode places the mobile account entry in the menu panel, reachable in one step after opening Menu; other mobile modes keep it in the primary row. To fully customize the mobile account entry, leave `auth-label` or `auth-href` empty and take over through a slot.
 
-Desktop search 由 `desktop-search-mode` 显式选择。默认 `inline` 保留已有常驻
-input；`trigger` 输出指向 `search-action` 的原生链接，并由组件拥有相邻 panel、
-焦点转移、Escape 恢复、外部 pointer 关闭与 reduced-motion；`none` 不输出默认
-desktop search。Mobile search 继续由 `mobile-search-mode` 独立选择，两者不会互相
-打开或关闭。
+Desktop search is selected explicitly by `desktop-search-mode`. Default `inline` retains the existing persistent input; `trigger` emits a native link to `search-action` and the component owns the adjacent panel, focus transfer, Escape restoration, outside-pointer close, and reduced-motion behavior; `none` emits no default desktop search. Mobile search remains independently selected by `mobile-search-mode`; the two modes do not open or close each other.
 
 ## Critical CSS
 
-SSR、AOT 或首帧需要稳定 shell 布局时，可以单独引入 critical artifact：
+When SSR, AOT, or first paint needs a stable shell layout, import the critical artifact separately:
 
 ```ts
 import '@ozwasyd/element-plus/dist/public-shell-critical.css'
 ```
 
-完整运行时样式仍来自主 CSS：
+The full runtime styles still come from the main CSS:
 
 ```ts
 import '@ozwasyd/element-plus/dist/fsus.css'
 ```
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <template>
@@ -105,7 +97,7 @@ import '@ozwasyd/element-plus/dist/fsus.css'
 | footer                 | 页脚                                                                           |
 | footer-brand           | 页脚品牌                                                                       |
 
-## Desktop search 策略
+## Desktop Search Strategy
 
 | 模式      | 输出                                 | 适用场景                         |
 | --------- | ------------------------------------ | -------------------------------- |
@@ -113,35 +105,19 @@ import '@ozwasyd/element-plus/dist/fsus.css'
 | `trigger` | 原生搜索链接 + 相邻 disclosure panel | 低噪声公共阅读 shell             |
 | `none`    | 不输出默认 desktop search            | 页面无需搜索或 consumer 完全接管 |
 
-`desktop-search-mode="trigger"` 的链接在无 JavaScript、修饰键点击或新窗口
-激活时仍导航到 `search-action`。普通主按钮激活会阻止本次导航，展开 panel 并把
-焦点移到 input；Escape 关闭后焦点返回 trigger。点击 disclosure 外部只关闭 panel，
-不劫持 pointer 目标的焦点。`aria-expanded` 和 `aria-controls` 始终反映当前状态。
+The `desktop-search-mode="trigger"` link still navigates to `search-action` without JavaScript, on a modified click, or when activated in a new window. A normal primary-button activation prevents that navigation, opens the panel, and focuses the input; Escape closes it and returns focus to the trigger. Clicking outside the disclosure only closes the panel and does not steal focus from the pointer target. `aria-expanded` and `aria-controls` always reflect current state.
 
-`search-query`、`update:search-query`、`search` 与 `spa-search` 在 inline/trigger
-之间共享同一契约。非空 controlled query 会展开 trigger panel，保证已有查询可见。
-严格 CSP consumer 使用 `csp-safe` 时，关闭态通过 class 与 `inert` 管理，不写入
-inline style。Trigger 的 panel placement、padding、border、radius、shadow 和
-transition 都属于组件内部实现；consumer 不应依赖 `.el-public-shell__search*` 等
-BEM selector。
+`search-query`, `update:search-query`, `search`, and `spa-search` share one contract across inline and trigger modes. A non-empty controlled query opens the trigger panel so the existing query remains visible. With strict CSP, `csp-safe` manages the closed state with a class and `inert` without writing inline styles. Trigger panel placement, padding, border, radius, shadow, and transition are internal implementation details; consumers must not depend on BEM selectors such as `.el-public-shell__search*`.
 
-`desktop-search` slot 继续作为完全自定义兼容入口；一旦提供该 slot，consumer
-自行拥有其 markup/state，`desktop-search-mode` 只控制默认内容。新迁移应优先使用
-`trigger`，而不是复制 disclosure 状态机。组件没有单独的 desktop cancel label：
-trigger 文本保持稳定，展开/折叠语义由 `aria-expanded` 明确表达。
+The `desktop-search` slot remains a fully custom compatibility entry point. Once provided, the consumer owns its markup/state and `desktop-search-mode` controls only the default content. New migrations should prefer `trigger` instead of copying the disclosure state machine. The component has no separate desktop cancel label: trigger text remains stable and expand/collapse semantics are expressed by `aria-expanded`.
 
 ## Main content flow
 
-`content-flow="viewport-stable"` 是默认策略：shell 主内容继续填充可用视口并保留
-底部节奏。文章详情、空状态等由内容高度决定的短页面可显式使用
-`content-flow="content-driven"`。组件会在自己拥有的 `main` 上输出
-`data-content-flow`，并由 full/critical theme 同步处理 flex 与底部 padding。
+`content-flow="viewport-stable"` is the default: shell content fills the available viewport and retains the bottom rhythm. Short content-driven pages such as article details and empty states can explicitly use `content-flow="content-driven"`. The component writes `data-content-flow` on its own `main`, while the full/critical theme synchronizes flex and bottom padding.
 
-consumer 不应通过 `:deep()`、`:has()` 或 `.el-public-shell__main` 等内部 BEM
-selector 改写 shell 主内容布局；业务内容内部仍可使用自己的稳定 data attribute
-表达页面级最小高度等语义。
+Consumers must not rewrite shell content layout through `:deep()`, `:has()`, or internal BEM selectors such as `.el-public-shell__main`. Business content may still use its own stable data attributes for page-level minimum-height semantics.
 
-## Mobile navigation 策略
+## Mobile Navigation Strategy
 
 | 模式     | 输出                                                         | 适用场景                                              |
 | -------- | ------------------------------------------------------------ | ----------------------------------------------------- |
@@ -150,70 +126,31 @@ selector 改写 shell 主内容布局；业务内容内部仍可使用自己的�
 | `bottom` | 固定 `FsuBottomTabBar`                                       | 明确采用 app-like consumer navigation 的 3–5 项主导航 |
 | `none`   | 不输出 mobile navigation                                     | consumer 完全接管或页面无需移动导航                   |
 
-所有模式都保留 desktop navigation。`menu` 与 `inline` 为 active link 写入
-`aria-current="page"`，菜单使用原生 summary 键盘语义，并支持 Escape
-关闭后把焦点还给 summary。`bottom` 才给 shell 增加
-`--fsus-bottom-tab-height + var(--fsus-safe-area-inset-bottom)` 的底部留白；其他模式
-不会为不存在的 fixed dock 预留空间。footer 在窄屏仍保留底部 safe-area
-（`max(40px, 24px + var(--fsus-safe-area-inset-bottom))`）。safe-area 与动态
-viewport 的唯一来源见 [`docs/theme/tokens.md`](../theme/tokens.md)；consumer 负责
-文档级 `viewport-fit=cover`，不得在组件内再写 `env(safe-area-inset-*)`。
+All modes retain desktop navigation. `menu` and `inline` set `aria-current="page"` on the active link; the menu uses native summary keyboard semantics and returns focus to summary after Escape closes it. Only `bottom` adds bottom padding of `--fsus-bottom-tab-height + var(--fsus-safe-area-inset-bottom)`; other modes do not reserve space for a nonexistent fixed dock. The footer retains bottom safe-area padding on narrow screens (`max(40px, 24px + var(--fsus-safe-area-inset-bottom))`). The sole source for safe-area and dynamic viewport values is [`docs/theme/tokens.md`](../theme/tokens.md); consumers own document-level `viewport-fit=cover` and must not write `env(safe-area-inset-*)` inside the component.
 
-默认 `menu` 模式的第一行固定为可截断品牌 + Search + Menu。Search、Menu 消费
-`--fsus-public-shell-mobile-action-height: 44px`，水平 padding 为 `12px`，间距
-`8px`，文字为 `14px / 500`。账户入口、`mobile-menu-actions`，以及兼容的
-`mobile-primary-actions` 内容都进入 panel；panel action 至少 `44px` 高并使用
-`16px` 水平 padding。这样主题、语言和认证不会形成三个不等宽 bordered button，
-也不会在 320px 或高缩放下把品牌挤到下一行。
+The default `menu` mode fixes the first row as truncatable brand + Search + Menu. Search and Menu use `--fsus-public-shell-mobile-action-height: 44px`, `12px` horizontal padding, `8px` gap, and `14px / 500` text. The account entry, `mobile-menu-actions`, and compatible `mobile-primary-actions` content all move into the panel; panel actions are at least `44px` high with `16px` horizontal padding. This prevents theme, language, and authentication from becoming three unequal bordered buttons and keeps the brand on one line at 320px or high zoom.
 
-Consumer 可以覆盖公开的 `--fsus-public-shell-mobile-action-height`，但不得设为低于
-`44px`；不得覆盖 `.el-public-shell__*` 内部 BEM selector。显式 `inline` 模式仍使用
-统一高度，icon-only action 的宽度也不得低于该 token，账户入口保持 text link
-层级而非 segmented-control item。
+Consumers may override the public `--fsus-public-shell-mobile-action-height`, but not below `44px`, and must not override `.el-public-shell__*` internal BEM selectors. Explicit `inline` mode still uses the shared height; icon-only actions must be at least that token wide, and the account entry remains a text link rather than a segmented-control item.
 
-`mobile-search-mode="trigger"` 使用指向 `search-action` 的原生链接作为触发器：
-有 JavaScript 时普通点击按需展开搜索行并把焦点移入输入框，Escape/再次点击关闭并
-恢复焦点；无 JavaScript 或修饰键点击时保留原生搜索页导航。折叠状态会显式标记
-toolbar 为 `is-collapsed`，不会留下空白次级行。
+`mobile-search-mode="trigger"` uses a native link to `search-action` as its trigger. With JavaScript, a normal click expands the search row on demand and focuses the input; Escape or another click closes it and restores focus. Without JavaScript or on a modified click, native search-page navigation is preserved. The collapsed state explicitly marks the toolbar `is-collapsed` and leaves no empty secondary row.
 
-同一页面不得同时启用 `mobile-nav-mode="bottom"` 和页面级 reading dock。
-组件库不猜测 consumer 是否存在另一个 dock；consumer 必须在页面装配层把
-两者约束为互斥状态。
+The same page must not enable `mobile-nav-mode="bottom"` and a page-level reading dock together. The library does not guess whether another dock exists; the consumer must enforce mutual exclusion at page assembly.
 
-## 从旧默认行为迁移
+## Migration from the Previous Default
 
-Desktop 现有 consumer 无需修改，`desktop-search-mode` 默认仍为 `inline`。迁移
-自定义低噪声 trigger 时，删除 consumer 的 open/close state、document pointer
-listener、Escape/focus restoration、panel markup、transition class 及对内部 BEM
-selector 的 CSS，只保留 search route/name/query/label 和 SPA submit 语义。可见变化
-应限定为常驻 input 变为低噪声 trigger，以及组件自有 panel 的一致布局与 motion；
-不得借此调整 brand、navigation、auth、header height、footer 或结果页。
+Existing desktop consumers need no changes; `desktop-search-mode` remains `inline` by default. When migrating a custom low-noise trigger, remove the consumer's open/close state, document pointer listener, Escape/focus restoration, panel markup, transition class, and internal-BEM CSS. Keep only search route/name/query/label and SPA submit semantics. The visible change should be limited to a persistent input becoming a low-noise trigger and the component-owned panel's consistent layout and motion; do not use this migration to change brand, navigation, auth, header height, footer, or result pages.
 
-旧版本只要 `nav-items` 非空就会隐式渲染固定 BottomTabBar。现在默认改为
-`menu`，这是有意的视觉行为变更：公共文章站不再被默认塑造成 app shell。
+Previous versions implicitly rendered a fixed BottomTabBar whenever `nav-items` was non-empty. The default is now `menu`, an intentional visual behavior change: public article sites are no longer shaped as app shells by default.
 
-- 需要保留旧行为：显式添加 `mobile-nav-mode="bottom"`。
-- 需要编辑型移动导航：采用默认 `menu`，并按 consumer 文案传入
-  `mobile-nav-label` 与 `mobile-nav-menu-label`。
-- `menu` 关闭时，菜单面板及其中的操作会退出布局与可达控件集合；打开
-  `<details>` 后才显示。这保证窄视口和高缩放下不会由关闭态内容产生越界。
-- 已有自定义移动导航：使用 `mobile-nav-mode="none"`，避免两个全局导航并存。
-- 使用 `bottom` 的 consumer 应检查 safe-area、主内容底部留白、active key，
-  并确认页面没有 reading dock。
+- To retain the old behavior, explicitly add `mobile-nav-mode="bottom"`.
+- For an editor-style mobile navigation, use the default `menu` and pass consumer copy through `mobile-nav-label` and `mobile-nav-menu-label`.
+- When `menu` is closed, the menu panel and its actions leave the layout and reachable-control set; they appear only after `<details>` opens. This prevents closed content from overflowing at narrow widths or high zoom.
+- For an existing custom mobile navigation, use `mobile-nav-mode="none"` to avoid two global navigations.
+- Consumers using `bottom` should check safe-area, main-content bottom padding, and active key, and confirm that the page has no reading dock.
 
-该变更应进入下一个带迁移说明的组件库版本；发布前 consumer 可以通过本地
-workspace alias 验证源码，但不得假定未发布 npm 包已经包含新 prop。
+This change belongs in the next library version with migration notes. Before release, consumers may verify source through a local workspace alias, but must not assume an unpublished npm package contains the new prop.
 
 ## Verification Contract
 
-组件测试锁定 desktop `inline | trigger | none` 的 native fallback、modified click、
-controlled query、CSP-safe、outside pointer、Escape 与焦点恢复；同时锁定四种 mobile
-navigation 策略的 DOM/active state，并确认 desktop nav 在策略切换时保持不变。
-`public-shell-desktop-search.spec.ts` 覆盖 desktop Light/Dark 的 inline/trigger/none
-以及 trigger open/closed；`public-shell-mobile-nav.spec.ts` 为 `menu | inline | bottom | none` 保存独立
-mobile snapshot，同时验证原生 summary 键盘顺序、navigation landmark、
-`aria-current="page"`、BottomTabBar fixed/safe-area/content padding，以及 `none`
-模式不会留下重复导航 landmark。该套件还以真实 fixture 覆盖匿名/登录、长品牌、
-中文/英文/长语言文案、320/375/390/768px、Light/Dark、150%/200% zoom，并测量
-44px hit rectangle、panel padding、光学对齐、横向 overflow 和
-Brand → Search → Menu → panel 的键盘顺序。
+Component tests lock the desktop `inline | trigger | none` native fallback, modified clicks, controlled query, CSP-safe mode, outside pointer, Escape, and focus restoration. They also lock the DOM/active state of all four mobile navigation strategies and confirm desktop nav is unchanged when the strategy switches.
+`public-shell-desktop-search.spec.ts` covers desktop Light/Dark inline/trigger/none and trigger open/closed. `public-shell-mobile-nav.spec.ts` saves independent mobile snapshots for `menu | inline | bottom | none` and verifies native summary keyboard order, the navigation landmark, `aria-current="page"`, BottomTabBar fixed/safe-area/content padding, and that `none` leaves no duplicate navigation landmark. The suite also uses real fixtures for anonymous/authenticated states, long brands, Chinese/English/long-language copy, 320/375/390/768px, Light/Dark, and 150%/200% zoom, measuring 44px hit rectangles, panel padding, optical alignment, horizontal overflow, and the Brand → Search → Menu → panel keyboard order.

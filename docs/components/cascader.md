@@ -1,42 +1,46 @@
-# Cascader 级联选择器
+# Cascader
 
-当一个数据集合有清晰的层级结构时，可通过级联选择器逐级查看并选择。
+Use a cascader to inspect and select a clearly hierarchical data set level by level.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `options` 传入选项数组。`props.expandTrigger` 设置子选项展开触发方式（`click` / `hover`）。
+Pass options through `options`. Set `props.expandTrigger` to expand child options
+on `click` or `hover`.
 
-## 禁用选项
+## Disabled Options
 
-在选项数据中设置 `disabled: true` 禁用该选项。字段名可通过 `props.disabled` 自定义。
+Set `disabled: true` in an option to disable it; customize the field name with
+`props.disabled`.
 
-## 可清空
+## Clearable
 
-设置 `clearable` 属性显示清空按钮。
+Set `clearable` to show a clear button.
 
-## 只显示最后一级
+## Show Only the Last Level
 
-设置 `show-all-levels="false"` 输入框中只显示最后一级。
+Set `show-all-levels="false"` to show only the last level in the input.
 
-## 多选
+## Multiple Selection
 
-通过 `:props="{ multiple: true }"` 开启多选。多选时可设置 `collapse-tags` 折叠已选项。
+Set `:props="{ multiple: true }"` for multiple selection. Use `collapse-tags`
+to collapse selected items.
 
-## 选择任意等级
+## Select Any Level
 
-默认只能选叶子节点。设置 `props.checkStrictly = true` 使父子节点取消关联，可选任意层级。
+Only leaf nodes are selectable by default. Set `props.checkStrictly = true` to
+decouple parent and child state and allow any level.
 
-## 动态加载
+## Lazy Loading
 
-设置 `props.lazy = true` 并配合 `props.lazyLoad` 函数实现动态加载子节点。
+Set `props.lazy = true` with `props.lazyLoad` to load child nodes on demand.
 
-## 可搜索
+## Searchable
 
-设置 `filterable` 开启搜索，可通过 `filter-method` 自定义搜索逻辑。
+Set `filterable` to enable search and use `filter-method` for custom filtering.
 
 ---
 
@@ -66,7 +70,7 @@
 | tag-type | 多选 Tag 类型 | `'success' \| 'info' \| 'warning' \| 'danger'` | `info` |
 | virtual-scroll | 是否开启虚拟滚动（大数据量场景） | `boolean` | `false` |
 
-### CascaderProps（配置项）
+### CascaderProps (Options)
 
 | 属性名 | 说明 | 类型 | 默认值 |
 |--------|------|------|--------|

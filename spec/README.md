@@ -1,8 +1,8 @@
 # FsusUI Specification
 
-`spec/` is the platform-neutral source of truth for FsusUI behavior. It defines
-public design contracts that Web/Vue, Avalonia, and product integrations consume
-without depending on each other's implementation details.
+`spec/` is the platform-neutral source of truth for FsusUI behavior: its public
+design contracts serve Web/Vue, Avalonia, and product integrations without
+coupling to implementation details.
 
 The specification owns:
 
@@ -22,16 +22,15 @@ The specification does not own:
 - product-specific business logic from FsusBlog, FsusPanel, or downstream apps
 
 Product apps must consume public FsusUI tokens, contracts, components, and
-patterns. They must not couple to undocumented Web internals, generated WASM
+patterns; they must not couple to undocumented Web internals, generated WASM
 paths, private CSS selectors, or Avalonia template parts.
 
 ## Public Contract Model
 
-Each spec domain follows the same model:
+Each spec domain follows this model:
 
 1. Define a stable platform-neutral concept.
-2. Map the concept to Web and Avalonia in implementation packages or generated
-   adapters.
+2. Map it to Web and Avalonia in implementation packages or generated adapters.
 3. Register allowed platform differences under `platform-overrides/`.
 4. Test conformance at the token, contract, interaction, accessibility, and
    visual-boundary layers.

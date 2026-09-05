@@ -28,13 +28,13 @@ and overlay behavior map to typed options, node objects, and selection events.
 
 ## Supported Platform Differences
 
-Native focus, overlay placement, and keyboard traversal follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for native focus, overlay placement, and keyboard traversal.
 
 ## Theme Tokens
 
-Pickers use surface, border, focus, text, muted text, loading, density, and
-motion resources.
+Use picker surface, border, text, muted-text, focus-ring, control/option-height,
+radius, spacing, density, and reduced-motion resources from the active FsusUI
+theme ([Application Setup](../installation.md#application-setup)).
 
 ## Minimal Avalonia Example
 
@@ -84,11 +84,9 @@ UI Automation exposes the selector as a `ComboBox` with ExpandCollapse and
 Selection patterns. The popup option container is a list, and each enabled or
 disabled option is a list item with SelectionItem state and an accessible name.
 
-The selector resolves picker surface, border, text, muted text, focus ring,
-control-height, option-height, radius, spacing, and reduced-motion resources
-from the active FsusUI theme. `FsusThemeOptions.FollowSystemTheme` keeps the
-Avalonia requested theme at `ThemeVariant.Default`; light and dark variants use
-their corresponding picker surface resources.
+`FsusThemeOptions.FollowSystemTheme` keeps the Avalonia requested theme at
+`ThemeVariant.Default`; light and dark variants use their corresponding picker
+surface resources.
 
 ## Known Limitations
 

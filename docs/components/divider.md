@@ -1,14 +1,14 @@
-# Divider 分割线
+# Divider
 
-区隔内容的分割线。
+A divider that separates content.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-默认方向为水平，会从父容器中获取宽度。
+The default direction is horizontal and takes its width from the parent container.
 
 ```vue
 <template>
@@ -18,13 +18,13 @@
 </template>
 ```
 
-## 自定义内容
+## Custom Content
 
-在分割线上显示文字，配合 `content-position` 设置内容位置（`left`、`center`、`right`）。
+Display text on the divider and use `content-position` to place it at `left`, `center`, or `right`.
 
-## 垂直分割线
+## Vertical Divider
 
-通过 `direction="vertical"` 使用垂直分割线（适用于行内元素）。
+Set `direction="vertical"` for a vertical divider (for inline elements).
 
 ---
 

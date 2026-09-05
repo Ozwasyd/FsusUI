@@ -1,34 +1,36 @@
-# Carousel 走马灯
+# Carousel
 
-在有限的空间内循环展示图片或文字。
+Cycles through images or text in a bounded space.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-将 `el-carousel-item` 放入 `el-carousel` 中，每个条目内容完全自定义。设置 `trigger="click"` 改为点击指示器才切换。
+Place `el-carousel-item` elements inside `el-carousel`; each item is fully
+customizable. Set `trigger="click"` to switch only when an indicator is clicked.
 
-## 运动模糊
+## Motion Blur
 
-设置 `motion-blur` 为 `true` 开启切换时的模糊动效。
+Set `motion-blur` to `true` to enable blur during transitions.
 
-## 指示器位置
+## Indicator Position
 
-通过 `indicator-position` 控制指示器位置：默认内部、`outside`（外部）、`none`（隐藏）。
+Use `indicator-position` to place indicators inside (default), `outside`, or
+`none` (hidden).
 
-## 箭头显示
+## Arrow Visibility
 
-通过 `arrow` 属性控制箭头：`hover`（默认，悬停显示）、`always`、`never`。
+Use `arrow` to show arrows on `hover` (default), `always`, or `never`.
 
-## 卡片模式
+## Card Mode
 
-设置 `type="card"` 启用卡片模式，两侧缩略图可直接点击切换。
+Set `type="card"` to enable card mode; side thumbnails are clickable.
 
-## 垂直方向
+## Vertical Direction
 
-设置 `direction="vertical"` 使走马灯垂直展示。
+Set `direction="vertical"` for a vertical carousel.
 
 ---
 

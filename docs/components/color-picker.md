@@ -1,32 +1,37 @@
-# ColorPicker 颜色选择器
+# ColorPicker
 
-用于颜色的选择，支持多种颜色格式。
+Selects colors in several formats.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-`v-model` 绑定字符串类型的颜色值。
+Bind a string color value with `v-model`.
 
-## Alpha 通道
+## Alpha Channel
 
-设置 `show-alpha` 开启透明度选择。
+Set `show-alpha` to enable alpha selection.
 
-## 预定义颜色
+## Preset Colors
 
-通过 `predefine` 数组提供快捷颜色选项。
+Provide shortcut colors through the `predefine` array.
 
-## 尺寸
+## Sizes
 
-通过 `size` 设置尺寸。
+Set the size with `size`.
 
-## 主题契约
+## Theme Contract
 
-ColorPicker chrome（触发器、滑块 thumb、SV 光标、预设色选中态、遮罩与下拉面板）使用 Fsus surface、border、focus 与 shadow token。默认 active/dragging 反馈只保留静态 ring，不启用 blur 或 glow。
+ColorPicker chrome (trigger, slider thumb, SV cursor, preset selection, mask,
+and dropdown) uses Fsus surface, border, focus, and shadow tokens. Active and
+dragging feedback remains a static ring by default, without blur or glow.
 
-Hue、SV 与 Alpha 面板里的 `color-space gradients` 是颜色模型本身的坐标背景，用来表达色相、饱和度、明度与透明度，不属于主题装饰色。调整主题 token 时应保留这些功能性渐变，并把外层交互 chrome 与它们分开处理。
+The `color-space gradients` in the Hue, SV, and Alpha panels are coordinate
+backgrounds for hue, saturation, lightness, and alpha; they are not decorative
+theme colors. Preserve these functional gradients when changing theme tokens
+and keep outer interaction chrome separate from them.
 
 ---
 

@@ -1,12 +1,12 @@
-# Breadcrumb 面包屑
+# Breadcrumb
 
-显示当前页面的路径，方便用户浏览返回。
+Shows the current page path and supports back-navigation.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-breadcrumb separator="/">
@@ -17,9 +17,9 @@
 </el-breadcrumb>
 ```
 
-## 图标分隔符
+## Icon Separator
 
-通过 `separator-icon` 使用 SVG 图标作为分隔符（会覆盖 `separator`）。
+Use an SVG icon as the separator with `separator-icon`; it overrides `separator`.
 
 ---
 

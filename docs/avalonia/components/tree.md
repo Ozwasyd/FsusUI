@@ -118,16 +118,17 @@ The `node-click` contract maps to `NodeActivated`; lazy loading maps to
 
 ## Supported Platform Differences
 
-Automation tree semantics, indentation rendering, and platform differences for
-Enter/Space/arrow-key handling follow `docs/avalonia/platform-differences.md`.
-Repository acceptance uses a reproducible local AutomationPeer and
-AutomationProperties simulation for screen-reader semantics; it is explicitly
-not evidence of a physical device or an OS screen-reader session.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for automation-tree
+semantics, indentation, and Enter/Space/arrow-key handling. Repository
+acceptance uses reproducible local AutomationPeer and AutomationProperties
+simulation; it is not evidence of a physical device or OS screen-reader
+session.
 
 ## Theme Tokens
 
-Tree controls use surface, border, focus, text, muted text, density, and motion
-resources.
+Use surface, border, focus, text, and muted-text resources from
+[Application Setup](../installation.md#application-setup); motion behavior is
+defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

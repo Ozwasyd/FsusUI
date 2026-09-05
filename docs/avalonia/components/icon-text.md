@@ -19,12 +19,11 @@ contracts map to `Text`, `Content`, `NavigateUri`, `Activated`, and
 
 ## Supported Platform Differences
 
-Icon geometry and text baselines follow `docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for icon geometry and text-baseline boundaries.
 
 ## Theme Tokens
 
-Use icon size, stroke, fill, text brush, muted text brush, focus, and density
-resources from the theme package.
+Use icon size, stroke, fill, text, muted-text, focus, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

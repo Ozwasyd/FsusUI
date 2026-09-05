@@ -15,13 +15,11 @@ and debounce contracts map to explicit editor state and methods.
 
 ## Supported Platform Differences
 
-IME, clipboard, text selection, and scroll sync follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for IME, clipboard, text selection, and scroll-sync boundaries.
 
 ## Theme Tokens
 
-Text editor uses text, muted text, surface, border, focus, danger, density, and
-motion resources.
+Use text, muted-text, surface, border, focus, danger, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Accessibility
 

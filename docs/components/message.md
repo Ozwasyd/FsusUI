@@ -1,52 +1,50 @@
-# Message 消息提示
+# Message
 
-操作反馈信息，与 Notification 的区别在于后者常用于系统级被动通知。
+Provides action feedback; Notification is better suited to passive, system-level notices.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------- |
-| purpose                | 展示操作完成、失败、警告或提示的短反馈，也可作为 toast 类提示使用。                               |
-| basic usage            | 调用 `ElMessage('...')`、`ElMessage.success('...')` 或对象参数创建消息。                          |
-| props / events / slots | 本页 `API` 覆盖公开 options 和 instance methods。                                                 |
-| accessibility          | 不要把唯一错误说明放在自动消失消息中；关键错误应同时出现在页面内可回读区域。                      |
-| theme token notes      | 跟随轻量 toast surface、文本、状态色、紧凑圆角、弱阴影和 overlay motion token。                   |
-| known limitations      | 服务 API 依赖浏览器 DOM；`dangerouslyUseHTMLString` 只允许可信内容，grouping 只合并相同 message。 |
-| stability level        | Preview public service。                                                                          |
+This preview public service follows [API stability](../api-stability.md#stability-levels)
+and the shared [theme and motion contracts](../theme/tokens.md). Do not put the
+only explanation of an error in an auto-dismissed message; repeat critical
+errors in a readable page region. The service requires browser DOM,
+`dangerouslyUseHTMLString` accepts only trusted content, and grouping merges
+identical messages only.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-默认显示在顶部，3 秒后自动关闭。调用 `ElMessage(message)` 传入文字或对象。
+Messages appear at the top and close after 3 seconds by default. Call `ElMessage(message)` with text or an options object.
 
-## 类型
+## Types
 
-通过 `type` 设置消息类型：`info`（默认）、`success`、`warning`、`error`、`primary`。可直接调用快捷方法如 `ElMessage.success('...')`。
+Set `type` to `info` (default), `success`, `warning`, `error`, or `primary`. Shortcut methods such as `ElMessage.success('...')` are also available.
 
-## 朴素风格
+## Plain Style
 
-设置 `plain` 为 `true` 使用朴素背景。
+Set `plain` to `true` for a plain background.
 
-## 可手动关闭
+## Manual Close
 
-设置 `showClose` 为 `true` 显示关闭按钮；设置 `duration` 为 `0` 不自动关闭。
+Set `showClose` to `true` to show a close button; set `duration` to `0` to disable automatic dismissal.
 
-## 使用 HTML 内容
+## HTML Content
 
-设置 `dangerouslyUseHTMLString` 为 `true` 后，`message` 将被解析为 HTML 字符串。
+Set `dangerouslyUseHTMLString` to `true` to parse `message` as an HTML string.
 
-> **警告**：启用 HTML 解析时请确保内容可信，防止 XSS 注入攻击。
+> Treat HTML as trusted input only; see the [Security Policy](../../SECURITY.md)
+> for security handling and reporting.
 
-## 合并相同消息
+## Group Identical Messages
 
-设置 `grouping` 为 `true` 合并相同内容的消息。
+Set `grouping` to `true` to combine messages with identical content.
 
-## 关闭所有
+## Close All
 
-调用 `ElMessage.closeAll()` 手动关闭所有消息实例。
+Call `ElMessage.closeAll()` to close all message instances manually.
 
 ---
 

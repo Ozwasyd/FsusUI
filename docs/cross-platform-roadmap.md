@@ -1,7 +1,11 @@
 # Cross-Platform FsusUI Roadmap Status
 
-FsusUI now has a first cross-platform foundation for Web/Vue and Avalonia/.NET
-without sharing component implementation source.
+> **Role:** Current cross-platform roadmap record
+> **Applies to:** Web/Vue and Avalonia/.NET contract boundaries
+> **Authority:** Point-in-time status; `spec/` and release policies own the contracts.
+
+FsusUI has a cross-platform foundation for Web/Vue and Avalonia/.NET without
+sharing component implementation source.
 
 ## Layer Model
 
@@ -13,7 +17,7 @@ spec/
   -> product integrations
 ```
 
-Authoritative boundaries:
+Boundaries:
 
 - `spec/` defines platform-neutral tokens, component contracts, UX patterns,
   accessibility mappings, icon semantics, motion semantics, and platform

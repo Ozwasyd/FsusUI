@@ -1,38 +1,38 @@
-# Switch 开关
+# Switch
 
-表示两种相互对立的状态间的切换，多用于触发「开/关」。
+Represents a choice between two opposing states, commonly “on” and “off”.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-`v-model` 绑定布尔值。通过 CSS 变量 `--el-switch-on-color` / `--el-switch-off-color` 自定义颜色。
+Bind a Boolean with `v-model`. Customize colors with `--el-switch-on-color` / `--el-switch-off-color`.
 
-## 文字描述
+## Text Description
 
-通过 `active-text` / `inactive-text` 添加状态文字；设置 `inline-prompt` 将文字内嵌在按钮中。
+Use `active-text` / `inactive-text` for state labels; set `inline-prompt` to place them inside the control.
 
-## 自定义图标
+## Custom Icons
 
-通过 `active-icon` / `inactive-icon` 设置状态图标。
+Set state icons with `active-icon` / `inactive-icon`.
 
-## 扩展 value 类型
+## Extended Value Types
 
-通过 `active-value` / `inactive-value` 支持字符串或数字类型的值。
+Use `active-value` / `inactive-value` to support string or numeric values.
 
-## 禁用
+## Disabled
 
-设置 `disabled` 属性禁用开关。
+Set `disabled` to disable the switch.
 
-## 加载状态
+## Loading State
 
-设置 `loading` 属性显示加载中状态。
+Set `loading` to show a loading state.
 
-## 阻止切换
+## Prevent Switching
 
-设置 `before-change` 返回 `false` 或 rejected 的 Promise 可阻止切换。
+If `before-change` returns `false` or a rejected Promise, the switch does not change.
 
 ---
 

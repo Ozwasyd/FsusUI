@@ -1,146 +1,112 @@
 # Consumer Design Integration
 
 > **Role:** Normative consumer-boundary contract
-> **Applies to:** Any application or library that imports, aliases, wraps, or embeds FsusUI
-> **Authority:** Applies FsusUI public contracts to consumers. It does not define consumer business logic, replace consumer-owned layout rules, or claim shared orchestration authority.
+> **Applies to:** Applications and libraries that import, alias, wrap, or embed FsusUI
+> **Authority:** Applies FsusUI public contracts to consumers; it does not define product business logic, replace consumer layout rules, or claim shared orchestration authority.
 
-A consumer inherits FsusUI public components, tokens, interaction semantics, accessibility behavior, and documented variants. It does not inherit a complete route-level product design for every public, marketing, reading, or business workflow.
+A consumer inherits documented components, tokens, interaction semantics,
+accessibility behavior, and variants. It does not inherit a complete route-level
+design for public, marketing, reading, or business workflows.
 
 ## 1. Ownership boundary
 
-FsusUI owns:
-
-- public component API and component geometry;
-- canonical and public theme/motion tokens;
-- the unique viewport / safe-area CSS contract (`--fsus-viewport-block-size`,
-  `--fsus-safe-area-inset-{top,right,bottom,left}`) and component geometry that
-  consumes it;
-- component states and keyboard behavior;
-- shared accessibility semantics;
-- documented task-surface defaults;
-- reusable navigation, overlay, form, data-region, and feedback primitives;
-- Web/Avalonia conformance and registered platform differences.
-
-The consumer owns:
-
-- routes, information architecture, business workflows, and product copy;
-- page composition and content priority;
-- public, marketing, editorial, and product-specific reading layouts;
-- the document-level viewport meta, including `viewport-fit=cover` when
-  safe-area insets must be non-zero on notched devices;
-- selection among documented component variants;
-- consumer-specific tokens under `--{consumer-name}-*`;
-- consumer fixtures and end-to-end evidence.
+| FsusUI owns | Consumer owns |
+| --- | --- |
+| Public component API and geometry | Routes, information architecture, workflows, and copy |
+| Canonical theme/motion tokens | Page composition, content priority, and product layouts |
+| `--fsus-viewport-block-size` and `--fsus-safe-area-inset-{top,right,bottom,left}` | Document viewport meta, including `viewport-fit=cover` when needed |
+| Component states, keyboard behavior, and accessibility | Selection of documented variants and `--{consumer-name}-*` tokens |
+| Task defaults and navigation/overlay/form/data/feedback primitives | Consumer fixtures and end-to-end evidence |
+| Web/Avalonia conformance and registered platform differences | |
 
 FsusUI does not rewrite `<meta name="viewport">` at runtime. Consumers must not
-redeclare synonymous safe-area tokens, invent parallel `--fsus-safe-*` aliases,
-override component-internal selectors (including `:deep(.el-overlay)`,
-`.el-overlay-dialog`, `.el-overlay-message-box`, Drawer direction classes, or
-ImageViewer control selectors) to reimplement safe-area or viewport math, or
-ship a second viewport algorithm beside the FsusUI helpers.
+redeclare safe-area aliases, invent parallel `--fsus-safe-*` tokens, override
+private selectors (`:deep(.el-overlay)`, `.el-overlay-dialog`,
+`.el-overlay-message-box`, Drawer direction classes, or ImageViewer controls),
+or ship a second viewport algorithm.
 
-## 2. Required adoption sequence
+## 2. Adoption sequence
 
-For a visual or UX change in a consumer:
+For a consumer visual or UX change:
 
-1. Identify the imported or aliased FsusUI version/baseline.
-2. Read [`docs/design.md`](../design.md), the relevant component docs, and the consumer's own layout rules.
-3. Classify the surface and owner using [`docs/design/change-classification.md`](../design/change-classification.md).
-4. Use public components, props, slots, tokens, and documented composition patterns.
-5. Keep product-specific layout and copy in the consumer.
-6. Validate the consumer's realistic states, viewports, themes, locales, and content lengths.
-7. If a reusable FsusUI defect is exposed, fix it in FsusUI and verify the consumer against the same FsusUI revision.
+1. Record the imported/aliased FsusUI version or revision.
+2. Read [`docs/design.md`](../design.md), the relevant component contracts, and
+   the consumer’s layout rules.
+3. Classify the surface and owner with [`docs/design/change-classification.md`](../design/change-classification.md).
+4. Use public components, props, slots, tokens, and documented composition.
+5. Keep product layout and copy in the consumer.
+6. Test realistic states, viewports, themes, locales, and content lengths.
+7. If a reusable FsusUI defect is exposed, fix and verify FsusUI against that
+   same revision before accepting the consumer.
 
 ## 3. Prohibited integration patterns
 
-A consumer MUST NOT:
+A consumer MUST NOT target undocumented DOM, private CSS selectors, generated
+paths, XAML template parts, or internal imports; fabricate or redefine FsusUI
+tokens; use `:deep()` to repair geometry; hide a defect in a compatibility
+wrapper; fork a component because its documented default is inconvenient; or
+modify FsusUI defaults for one route. It must not copy `docs/design.md`, infer
+marketing/editorial layouts from task defaults, or mislabel a surface as
+expressive/glass for an effect.
 
-- target undocumented FsusUI DOM, private CSS selectors, generated file paths, XAML template parts, or internal imports;
-- create fake `--fsus-*` tokens or redefine canonical FsusUI values;
-- use `:deep()` or equivalent private styling to repair FsusUI component geometry;
-- add a compatibility wrapper that hides an FsusUI defect;
-- fork a component locally because its documented default is inconvenient;
-- modify FsusUI defaults to solve one route-level composition problem;
-- copy the contents of `docs/design.md` into the consumer and allow the copy to drift;
-- infer a marketing or editorial layout from task-surface defaults;
-- label an ordinary surface expressive or glass merely to obtain a visual effect.
+A product wrapper is allowed only when it adds product semantics or composition
+without replacing the FsusUI primitive or bypassing its public contract.
 
-A product-specific wrapper is allowed only when it adds product semantics or composition without replacing the FsusUI primitive or bypassing its public contract.
+## 4. Consumer tokens and surfaces
 
-## 4. Consumer tokens
-
-Consumer-specific visual names use the consumer namespace, for example:
+Use a consumer namespace and map it to public tokens:
 
 ```css
 :root {
   --fsusblog-content-max-width: 72rem;
   --fsusblog-reading-gap: 2rem;
 }
-```
 
-These tokens may map to public FsusUI or Element Plus compatibility tokens. They must not masquerade as new FsusUI truth:
-
-```css
-/* Allowed: consumer-owned mapping. */
 .fsusblog-shell {
   color: var(--fsus-ink);
   background: var(--fsus-page);
   border-color: var(--el-border-color-lighter);
 }
-
-/* Not allowed: fabricated FsusUI token. */
-:root {
-  --fsus-card-premium-radius: 20px;
-}
 ```
 
-## 5. Surface-specific rules
+Do not fabricate FsusUI truth such as `--fsus-card-premium-radius`.
 
-### Task surfaces
+| Surface | Consumer responsibility |
+| --- | --- |
+| Task | Use FsusUI task primitives, density, hierarchy, forms, data regions, and overlays; keep composition quiet and task-oriented. |
+| Public/reading | Define page hierarchy, content width, responsive navigation, reading rhythm, media treatment, and route composition; do not import admin density into public content. |
+| Marketing | Own hero, campaign, offer, CTA, and promotion; FsusUI prohibitions and component contracts still apply to used primitives. |
 
-Use FsusUI task primitives, density, action hierarchy, form, data-region, and overlay contracts. Consumer composition should remain quiet and task-oriented.
+## 5. Defect routing
 
-### Public and reading surfaces
+Fix the FsusUI source, tests, docs, and platform mappings when a public primitive
+is wrong across valid consumers or violates its contract. Fix the consumer when
+usage, hierarchy, or composition is product-specific. Do not repair both sides
+with a compatibility layer; keep one owning implementation and one verified
+integration.
 
-The consumer MUST maintain explicit rules for page hierarchy, content width, responsive navigation, reading rhythm, media treatment, and route-level composition. Reuse FsusUI primitives without importing admin card grids or task density into public content.
+## 6. Skill and orchestration boundary
 
-### Marketing surfaces
+The canonical `fsusui-design-conformance` Skill is under `.agents/skills/` in
+this repository. A consumer may expose that exact revision or a pinned copy,
+but must record the FsusUI revision and must not fork the domain contract or
+embed copied design values. The Skill is optional assistance; specs, design,
+and public contracts remain authoritative.
 
-FsusUI does not provide a complete marketing system. The consumer owns hero, campaign, offer, CTA, and promotional composition. FsusUI's prohibitions and public component contracts still apply where FsusUI components are used.
+The Skill supplies ownership classification, `uiDecisionClass`,
+`verificationClass`, design authority, rendered-evidence requirements, and UX
+acceptance semantics. It does not define a Root/controller, actor roster,
+model/profile/effort, route, runtime permission, lease/resource/capacity,
+stage order, checkpoint, retry/recovery, delivery, cleanup, or terminalization.
+Those belong to an external scheduler. Scheduler mappings and execution
+metadata must not become FsusUI design truth or replace missing authority.
 
-## 6. Defect routing
+## 7. Consumer evidence
 
-Treat a problem as an FsusUI defect when the public primitive is incorrect across valid consumers or violates its documented contract. Fix the owning FsusUI source, tests, documentation, and platform mappings as required.
-
-Treat a problem as a consumer defect when the primitive is used incorrectly, the page hierarchy is product-specific, or the consumer overrides public contracts.
-
-Do not fix both sides by adding a compatibility layer. Use one owning implementation and one verified integration.
-
-## 7. Reusable Skill availability and authority
-
-The canonical `fsusui-design-conformance` Skill lives in the FsusUI repository under `.agents/skills/`. It is discovered automatically when an agent workspace exposes that directory. A separate consumer repository may expose the exact canonical Skill through its workspace configuration or a revision-pinned copy, but it must not fork the domain contract or embed copied design values. The consumer must record which FsusUI revision supplies the Skill and documents.
-
-The Skill is optional assistance for direct human-led work. The documents and public contracts remain authoritative even when no agent workflow is active.
-
-When an external scheduler or orchestrator uses the Skill, the exact Skill digest and active FsusUI baseline may be bound as repository/domain evidence. The Skill supplies ownership classification, `uiDecisionClass`, `verificationClass`, design authority, rendered-evidence requirements, and UX acceptance semantics.
-
-The Skill does not supply shared orchestration authority. It must not define or select a Root/controller, permanent actor roster, model/profile/effort, execution route, runtime permission class, lease/resource/capacity policy, shared stage order, checkpoint/continuation behavior, retry/recovery policy, delivery, cleanup, or terminalization. Those decisions belong to the external scheduler.
-
-A scheduler may map FsusUI domain classifications into its own execution machinery, but that mapping is not part of the FsusUI Skill or its receipts. Missing FsusUI design authority cannot be replaced by a copied summary, and scheduler execution metadata cannot be promoted into FsusUI design truth.
-
-This requirement does not raise the Skill above `spec/`, `docs/design.md`, or domain contracts.
-
-## 8. Consumer evidence
-
-Consumer visual acceptance should cover the states relevant to the route, including:
-
-- realistic short and long content;
-- empty, loading, error, success, disabled, and permission states;
-- supported locales and text expansion;
-- light and dark themes;
-- narrow and wide viewports;
-- keyboard order, focus visibility, zoom, and overflow;
-- screen reader and touch behavior when applicable;
-- the exact FsusUI baseline used for acceptance.
-
-A passing FsusUI component fixture does not prove the consumer page composition, and a passing consumer screenshot does not authorize changing FsusUI defaults.
+Acceptance should cover the route’s relevant states: realistic short/long
+content; empty, loading, error, success, disabled, and permission states;
+supported locales and expansion; light/dark themes; narrow/wide viewports;
+keyboard order, focus, zoom, overflow, screen reader, and touch behavior; and
+the exact FsusUI baseline. A passing FsusUI fixture does not prove consumer
+composition, and a consumer screenshot does not authorize changing FsusUI
+defaults.

@@ -1,34 +1,35 @@
-# Alert 提示
+# Alert
 
-页面中的非浮层元素，不会自动消失。
+An inline page element that does not dismiss automatically.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-通过 `type` 设置主题类型，默认为 `info`。
+Set the status with `type`; the default is `info`.
 
-## 主题
+## Themes
 
-通过 `effect` 切换主题：`light`（默认）或 `dark`。
+Use `effect` to choose `light` (default) or `dark`.
 
-## 可关闭
+## Closable
 
-默认可关闭（`closable`）；通过 `close-text` 自定义关闭按钮文字；监听 `close` 事件处理关闭逻辑。
+Alerts are closable by default (`closable`). Set `close-text` for the close
+button label and handle dismissal in the `close` event.
 
-## 带图标
+## With Icons
 
-设置 `show-icon` 显示类型图标；通过 `icon` 插槽自定义图标。
+Set `show-icon` to display the status icon; use the `icon` slot to customize it.
 
-## 文字居中
+## Centered Text
 
-设置 `center` 将内容居中显示。
+Set `center` to center the content.
 
-## 带描述
+## With Description
 
-通过 `description` 属性或默认插槽添加详情描述。
+Add a detailed description with the `description` prop or the default slot.
 
 ---
 

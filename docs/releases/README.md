@@ -4,7 +4,9 @@
 > **Applies to:** FsusUI maintainers, release owners, automation, and downstream consumers reviewing published evidence
 > **Authority:** This document controls release-document placement. Release behavior remains governed by the linked policy, readiness, workflow, and machine-readable sources.
 
-All active release documentation lives under the canonical `docs/releases/` domain. Do not recreate the retired single-form `docs/release/` path or a repository-root `release-evidence/` directory.
+All active release documentation lives under the canonical `docs/releases/`
+domain. Do not recreate the retired `docs/release/` path or repository-root
+`release-evidence/` directory.
 
 ## Directory semantics
 
@@ -46,5 +48,7 @@ All active release documentation lives under the canonical `docs/releases/` doma
 3. Put required gate inputs and generated readiness references in `readiness/`.
 4. Put dated or candidate-specific output in `evidence/<channel-or-platform>/` and record the candidate baseline.
 5. Evidence may cite policy and readiness contracts. Policy and readiness contracts may point to current evidence, but evidence must not redefine their requirements.
-6. Generated readiness files must name their generator and must be regenerated rather than edited by hand.
-7. Historical evidence remains immutable except for path migration, factual correction, or an explicit supersession notice.
+6. Generated readiness files must name their generator and be regenerated rather
+   than edited by hand.
+7. Historical evidence is immutable except for path migration, factual
+   correction, or an explicit supersession notice.

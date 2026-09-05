@@ -1,8 +1,8 @@
 # Motion Semantics
 
-Motion semantics align with the Web-side implementation tracked in issue #16.
-The source contract is platform-neutral; each implementation maps it to CSS,
-Vue Transition, GSAP, Avalonia animation resources, or disabled terminal states.
+Motion semantics align with the Web implementation tracked in issue #16. The
+source contract is platform-neutral; implementations map it to CSS, Vue
+Transition, GSAP, Avalonia animation resources, or disabled terminal states.
 
 ## Modes
 
@@ -23,41 +23,24 @@ Vue Transition, GSAP, Avalonia animation resources, or disabled terminal states.
 
 ## Required Semantic Presets
 
-- `fade-up`
-- `scale-fade`
-- `slide-right`
-- `list-stagger`
-- `route-fade`
+- `fade-up`, `scale-fade`, `slide-right`, `list-stagger`, and `route-fade`.
 
-Implementations may add more presets, but they must document intent, duration,
-distance, easing, reduced-motion fallback, and applicable component or pattern
-targets.
-
-Avalonia stable controls consume these semantics through
-`FsusMotionService`. The runtime maps platform presets to shared token-backed
-plans and collapses `reduced` / `disabled` modes to terminal visual state
-without layout travel.
+Implementations may add presets, but must document intent, duration, distance,
+easing, reduced-motion fallback, and applicable component or pattern targets.
+Avalonia stable controls consume these semantics through `FsusMotionService`,
+which maps platform presets to shared token-backed plans and collapses `reduced`
+and `disabled` modes to terminal visual state without layout travel.
 
 ## Recipe Layer
 
 Recipes describe business intent above preset mechanics. Implementations must
-provide at least these recipes:
-
-- `content-enter`
-- `article-list-enter`
-- `island-enter`
-- `state-pending`
-- `state-settled`
-- `state-error`
-- `route-crossfade`
-- `reading-anchor-highlight`
-- `panel-enter`
-- `list-enter-small`
-- `card-interactive`
-
-Each recipe must declare intent, default preset, duration class, allowed
-targets, reduced fallback, disabled fallback, and performance budget. Reduced
-and disabled modes must resolve to terminal visual state without layout travel.
+provide at least `content-enter`, `article-list-enter`, `island-enter`,
+`state-pending`, `state-settled`, `state-error`, `route-crossfade`,
+`reading-anchor-highlight`, `panel-enter`, `list-enter-small`, and
+`card-interactive`. Each recipe must declare intent, default preset, duration
+class, allowed targets, reduced fallback, disabled fallback, and performance
+budget. Reduced and disabled modes must resolve to terminal visual state without
+layout travel.
 
 ## Scroll Timeline
 

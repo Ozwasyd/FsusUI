@@ -1,44 +1,40 @@
-# Loading 加载
+# Loading
 
-加载数据时显示动画，提升用户体验。
+Shows an animation while data loads to provide feedback.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                                 |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- |
-| purpose                | 覆盖局部容器或全屏区域，提示用户当前内容正在加载或提交。                                             |
-| basic usage            | 使用 `v-loading` 指令绑定布尔值，或通过 `ElLoading.service()` 创建服务实例。                         |
-| props / events / slots | 本页 `API` 覆盖公开服务 options 和指令参数。                                                         |
-| accessibility          | 需要提供可读 `text`，避免长时间无解释遮挡交互；全屏 loading 应配合业务状态防止焦点进入不可操作区域。 |
-| theme token notes      | 跟随公开 overlay、文本、主色、backdrop blur 和 motion control token；自定义背景必须保留内容可读性。  |
-| known limitations      | 全屏 Loading 是单例；服务 API 依赖浏览器 DOM，SSR 中应延迟到客户端调用。                             |
-| stability level        | Preview public directive and service。                                                               |
+This preview directive and service follows [API stability](../api-stability.md#stability-levels)
+and the shared [theme and motion contracts](../theme/tokens.md). Supply
+readable `text`; full-screen loading must keep focus out of blocked content.
+Full-screen Loading is a singleton, and the service API requires browser DOM,
+so SSR callers must defer it to the client.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 容器内加载
+## Container Loading
 
-在容器元素上使用 `v-loading` 指令，绑定布尔值控制显示。
+Use `v-loading` on a container and bind a Boolean to control visibility.
 
 ```vue
 <div v-loading="loading" style="height: 200px">数据内容</div>
 ```
 
-## 全屏加载
+## Full-Screen Loading
 
-添加 `.fullscreen` 修饰符实现全屏加载；添加 `.lock` 修饰符禁用 body 滚动。
+Add the `.fullscreen` modifier for full-screen loading and `.lock` to disable body scrolling.
 
 ```vue
 <div v-loading.fullscreen.lock="loading"></div>
 ```
 
-## 自定义内容
+## Custom Content
 
-通过 `element-loading-text`、`element-loading-background`、`element-loading-spinner`/`element-loading-svg` 等属性自定义加载样式。
+Customize loading with `element-loading-text`, `element-loading-background`, `element-loading-spinner` / `element-loading-svg`, and related attributes.
 
-## 服务方式调用
+## Service Invocation
 
 ```ts
 import { ElLoading } from '@ozwasyd/element-plus'
@@ -53,13 +49,13 @@ const loadingInstance = ElLoading.service({
 loadingInstance.close()
 ```
 
-全屏 Loading 是单例，同时调用多次返回同一实例。
+Full-screen Loading is a singleton; repeated calls return the same instance.
 
 ---
 
 ## API
 
-### Options（服务调用参数）
+### Options (Service Parameters)
 
 | 选项名      | 说明                                                     | 类型                         | 默认值          |
 | ----------- | -------------------------------------------------------- | ---------------------------- | --------------- |
@@ -76,7 +72,7 @@ loadingInstance.close()
 | beforeClose | 关闭前的钩子，返回 false 阻止关闭                        | `() => boolean`              | —               |
 | closed      | 完全关闭后的回调                                         | `() => void`                 | —               |
 
-### Directives（指令）
+### Directives (Directive Options)
 
 | 指令名                       | 说明                 | 类型                        |
 | ---------------------------- | -------------------- | --------------------------- |

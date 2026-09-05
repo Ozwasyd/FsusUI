@@ -1,29 +1,26 @@
-# 服务端渲染 (SSR)
+# Server-side rendering (SSR)
 
-在 SSR 场景下使用 FsusUI 需要进行特殊处理，以避免水合（Hydrate）错误。
+FsusUI SSR integrations must preserve the server/client identities and
+Teleport targets used during hydration.
 
----
+## Markdown first-paint result
 
-## Markdown 首屏结果
-
-`ElMarkdownRenderer` 的服务端首屏只接受 runtime 产出的
-`MarkdownSafeRenderResult`：
+`ElMarkdownRenderer` accepts only the runtime-produced
+`MarkdownSafeRenderResult` for its server-rendered first paint:
 
 ```vue
 <el-markdown-renderer :content="content" :initial-render="serverRender" />
 ```
 
-客户端会核对 runtime authority、`rendererVersion`、规范化源文和
-`sourceIdentity`。不匹配的结果不会进入 `v-html`，而是被丢弃并由当前 runtime
-重新渲染。旧的字符串首显 prop 和 HTML 清洗开关不再属于公开契约。
+The client verifies the runtime authority, `rendererVersion`, normalized source,
+and `sourceIdentity`. A mismatch is discarded rather than passed to `v-html`;
+the current runtime renders again. The old string-first prop and HTML sanitizing
+switch are not public API.
 
----
+## Inject the ID sequence
 
-## 注入唯一 ID
-
-FsusUI 内部使用自增 ID 管理无障碍属性。在 SSR 中，服务端与客户端生成的 ID 必须保持一致，否则会产生水合错误。
-
-在入口文件中注入 `ID_INJECTION_KEY`：
+Server and client must share the generated IDs used by accessibility attributes;
+provide `ID_INJECTION_KEY` at the application root:
 
 ```ts
 // main.ts
@@ -38,11 +35,9 @@ app.provide(ID_INJECTION_KEY, {
 })
 ```
 
----
+## Inject the z-index sequence
 
-## 注入 ZIndex
-
-同理，`z-index` 自增也可能导致水合错误，建议注入初始值：
+The auto-incrementing `z-index` also needs a shared initial value:
 
 ```ts
 // main.ts
@@ -54,13 +49,13 @@ const app = createApp(App)
 app.provide(ZINDEX_INJECTION_KEY, { current: 0 })
 ```
 
----
+## Handle Teleport
 
-## Teleport 处理
+`ElDialog`, `ElDrawer`, `ElTooltip`, `ElDropdown`, `ElSelect`, and `ElDatePicker`
+use Vue [Teleport](https://vuejs.org/guide/scaling-up/ssr.html#teleports). Use
+one of these approaches:
 
-FsusUI 的 `ElDialog`、`ElDrawer`、`ElTooltip`、`ElDropdown`、`ElSelect`、`ElDatePicker` 等组件内部使用了 Vue 的 [Teleport](https://vuejs.org/guide/scaling-up/ssr.html#teleports)，在 SSR 中需要特殊处理。
-
-### 方式一：在客户端挂载后再渲染
+### 1. Render after client mount
 
 ```vue
 <script setup>
@@ -77,9 +72,9 @@ onMounted(() => { isClient.value = true })
 </template>
 ```
 
-### 方式二：在 HTML 中注入 Teleport 标记
+### 2. Add Teleport markers to the HTML template
 
-将 teleport 标记注入到 `<body>` 附近：
+Place the marker near `<body>`:
 
 ```html
 <!-- index.html -->
@@ -94,7 +89,7 @@ onMounted(() => { isClient.value = true })
 </html>
 ```
 
-在 `entry-server.js` 中提取 teleport 内容：
+Extract matching Teleports in `entry-server.js`:
 
 ```js
 // entry-server.js
@@ -120,6 +115,8 @@ function renderTeleports(teleports) {
 }
 ```
 
+Insert both rendered regions in `server.js`:
+
 ```js
 // server.js
 const [appHtml, teleports] = await render(url, manifest)
@@ -128,4 +125,5 @@ const html = template
   .replace(/(\n|\r\n)\s*<!--app-teleports-->/, teleports)
 ```
 
-> **注意**：如果修改了[命名空间](./namespace.md)，需要相应调整 `#el-popper-container-` 选择器前缀。
+If the [namespace](./namespace.md) changes, update the
+`#el-popper-container-` selector prefix as well.

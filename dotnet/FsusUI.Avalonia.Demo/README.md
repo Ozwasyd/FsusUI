@@ -1,7 +1,7 @@
 # FsusUI Avalonia Demo
 
-This project is a reference shell for validating FsusUI.Avalonia consumption. It
-is not a product app and does not implement FsusPanel, FsusBlog, DataTable,
+This reference shell validates FsusUI.Avalonia consumption. It is not a
+product app and does not implement FsusPanel, FsusBlog, DataTable,
 TerminalPanel, LogViewer, FileManager, or MarkdownEditor features.
 
 ## Run
@@ -41,7 +41,7 @@ Minimum supported window size: `1024x680`.
 
 Suggested screenshot viewport: `1180x760`.
 
-Use this demo for early screenshots and visual regression baselines after the
-Avalonia test harness is added. The current shell validates theme import,
-generated token consumption, focusable controls, resizing pressure, text
-wrapping, high-DPI-safe static data, and Linux desktop build behavior.
+Use this demo for early screenshots and visual regression baselines after adding the
+Avalonia test harness. The current shell validates theme import, generated
+token consumption, focusable controls, resizing pressure, text wrapping,
+high-DPI-safe static data, and Linux desktop builds.

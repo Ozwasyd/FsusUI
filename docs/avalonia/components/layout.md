@@ -18,11 +18,11 @@ because Avalonia panels have no automatic 24-column distribution.
 
 ## Supported Platform Differences
 
-Layout measurement and scroll chrome follow `docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for layout measurement and scroll-chrome boundaries.
 
 ## Theme Tokens
 
-Layout uses gap, density, border, surface, focus, and text resources.
+Use gap, density, border, surface, focus, and text resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

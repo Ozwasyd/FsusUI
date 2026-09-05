@@ -1,22 +1,22 @@
-# Backtop 回到顶部
+# Backtop
 
-回到顶部的操作按钮。
+An action button that returns to the top.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-向下滚动页面，右下角会出现回到顶部按钮。
+Scroll down the page to reveal the return-to-top button in the lower-right corner.
 
 ```vue
 <el-backtop :right="40" :bottom="40" />
 ```
 
-## 自定义内容
+## Custom Content
 
-默认显示区域为 40×40px，通过默认插槽自定义内容。
+The default area is 40×40px; customize its content with the default slot.
 
 ```vue
 <el-backtop>

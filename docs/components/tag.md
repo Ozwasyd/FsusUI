@@ -1,52 +1,48 @@
-# Tag 标签
+# Tag
 
-用于标记和选择。
+For labeling and selection.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                       |
-| ---------------------- | -------------------------------------------------------------------------- |
-| purpose                | 标记状态、分类、筛选摘要或轻量对象标签。                                   |
-| basic usage            | 使用 `type`、`effect`、`size`、`closable` 和 `round` 表达不同标签状态。    |
-| props / events / slots | 本页 `Tag API` 和 `CheckTag API` 覆盖公开 props、events 和 slots。         |
-| accessibility          | 可关闭标签应让关闭按钮有明确上下文；可选中标签不能只依赖颜色表达选中状态。 |
-| theme token notes      | 跟随公开主色、文本色、边框色、圆角和 motion control token。                |
-| known limitations      | Tag 不是表单控件；需要提交值时应与 Checkbox、Select 或业务状态同步。       |
-| stability level        | Preview public component。                                                 |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+and the shared [theme and motion contracts](../theme/tokens.md). A closable
+tag needs a contextual close control, and a selectable tag must not communicate
+selection through color alone. Tag is not a form control; synchronize submitted
+values with Checkbox, Select, or application state.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-使用 `type` 属性定义标签类型，`color` 属性设置背景色。
+Use `type` for the tag type and `color` for its background.
 
-默认 Tag 会保留传入文本的大小写与字距，适合混合语言标签和 code-like 标签，例如 `状态 APIv2`、`zh-CN Ready`、`sha-1:AbC123`。需要全大写视觉时，让调用方显式添加 `.is-uppercase` 或 `data-fsus-tag-uppercase="true"`，不要依赖默认样式改写用户文本。
+Tag preserves the supplied text's case and letter spacing, which suits mixed-language and code-like labels such as `状态 APIv2`, `zh-CN Ready`, and `sha-1:AbC123`. For an uppercase appearance, consumers must explicitly add `.is-uppercase` or `data-fsus-tag-uppercase="true"`; default styles must not rewrite user text.
 
-## 可移除标签
+## Removable Tags
 
-设置 `closable` 为 `true`，标签右侧显示关闭图标，点击后触发 `close` 事件；设置 `disable-transitions` 禁用动画。
+Set `closable` to `true` to show a close icon and emit `close` when clicked; set `disable-transitions` to disable animation.
 
-## 动态编辑
+## Dynamic Editing
 
-通过监听 `close` 事件动态添加/删除标签。
+Listen for `close` to add or remove tags dynamically.
 
-## 不同尺寸
+## Sizes
 
-通过 `size` 属性设置标签大小：`large`、`default`、`small`。
+Set the tag size with `size`: `large`, `default`, or `small`.
 
-## 主题
+## Themes
 
-通过 `effect` 属性切换主题：`light`（默认）、`dark`、`plain`。
+Set `effect` to `light` (default), `dark`, or `plain`.
 
-## 圆角
+## Rounded Corners
 
-设置 `round` 属性使标签变为圆形。
+Set `round` for a pill-shaped tag.
 
-## 可选中标签（CheckTag）
+## Selectable Tags (CheckTag)
 
-适合需要多选标签的场景，使用 `el-check-tag`，通过 `v-model:checked` 绑定选中状态。
+For selectable tags, use `el-check-tag` and bind selection with `v-model:checked`.
 
 ---
 

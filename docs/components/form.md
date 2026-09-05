@@ -1,28 +1,28 @@
-# Form 表单
+# Form
 
-由输入框、单选框、复选框、选择器等控件组成，用于数据收集、校验和提交。
+Combines inputs, radios, checkboxes, selects, and other controls for data collection, validation, and submission.
 
-> **提示**：在只有一个单行文本输入框的表单中，浏览器会将按下 Enter 视为提交。为防止此行为，在 `<el-form>` 上添加 `@submit.prevent`。
+> **Tip:** In a form with one single-line text input, browsers treat Enter as submission. Add `@submit.prevent` to `<el-form>` to prevent this behavior.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础表单
+## Basic Form
 
-包含各种类型的表单控件，每个 `form-item` 作为容器包裹表单项。
+Use different form controls inside `form-item` containers.
 
-## 行内表单
+## Inline Form
 
-设置 `inline` 为 `true` 实现行内表单（适用于垂直空间有限的场景）。
+Set `inline` to `true` for an inline form when vertical space is limited.
 
-## 对齐方式
+## Alignment
 
-通过 `label-position` 设置标签对齐方式：`left`（左对齐）、`right`（右对齐，默认）、`top`（顶部对齐）。
+Set label alignment with `label-position`: `left`, `right` (default), or `top`.
 
-## 表单校验
+## Form Validation
 
-在 `el-form` 上通过 `rules` 属性传入校验规则，在 `el-form-item` 上设置 `prop` 属性对应规则的 key。底层使用 [async-validator](https://github.com/yiminghe/async-validator)。
+Pass validation rules through `rules` on `el-form` and set `prop` on `el-form-item` to the matching rule key. Validation uses [async-validator](https://github.com/yiminghe/async-validator).
 
 ```vue
 <template>
@@ -54,19 +54,19 @@ const submit = async () => {
 </script>
 ```
 
-`validate()` 与 `validateField()` 返回 `Promise<FsusResult<boolean>>`。校验失败时返回 `ok: false`，`error.code` 为 `validation`，原始 `ValidateFieldsError` 保存在 `error.cause`；不再用 rejected Promise 表示普通校验失败。
+`validate()` and `validateField()` return `Promise<FsusResult<boolean>>`. Validation failure returns `ok: false` with `error.code: 'validation'`; the original `ValidateFieldsError` is in `error.cause`. Ordinary validation failure is no longer represented by a rejected Promise.
 
-## 自定义校验规则
+## Custom Validation Rules
 
-使用自定义校验函数时，必须调用 `callback`。使用 `status-icon` 可显示校验结果图标。
+Custom validators must call `callback`. Set `status-icon` to show a validation-result icon.
 
-## 动态增减表单项
+## Dynamic Form Items
 
-可以动态添加/删除 `el-form-item` 并即时更新校验规则。
+Add or remove `el-form-item` dynamically and update validation rules immediately.
 
-## 尺寸控制
+## Size Control
 
-Form 的 `size` 属性会被所有直接子 FormItem 继承；FormItem 也可以单独设置 `size` 覆盖。
+Form's `size` is inherited by all direct FormItem children; a FormItem can override it with its own `size`.
 
 ---
 

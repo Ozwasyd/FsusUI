@@ -35,13 +35,11 @@ service objects, options records, handles, and content controls.
 
 ## Supported Platform Differences
 
-Overlay host lifecycle and scroll measurement follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for overlay-host lifecycle and scroll-measurement boundaries.
 
 ## Theme Tokens
 
-Service helpers use surface, border, text, danger, loading, focus, density, and
-motion resources.
+Use surface, border, text, danger, loading, focus, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

@@ -1,60 +1,58 @@
-# Select 选择器
+# Select
 
-当选项过多时，使用下拉菜单展示并选择内容。
+Uses a dropdown to display and select from many options.
 
-> **提示**：`el-select` 默认宽度为 `100%`。在行内表单中使用时需要设置明确宽度（如 `style="width: 200px"`）。
+> **Tip:** `el-select` is `100%` wide by default. Give it an explicit width in inline forms (for example, `style="width: 200px"`).
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                                                          |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| purpose                | 从有限或远程选项集合中选择单个或多个值。                                                                                      |
-| basic usage            | 使用 `v-model` 与 `el-option` / `options` 绑定值，按需启用 `multiple`、`filterable`、`remote`、`allow-create`。               |
-| props / events / slots | 本页 `Select API`、`Option Group API` 和 `Option API` 覆盖公开 props、events、slots 和 exposes。                              |
-| accessibility          | 优先放在带 label 的表单项内；远程搜索需要给 loading、empty 和 no-match 文案；多选折叠标签不能隐藏用户完成任务所需的已选摘要。 |
-| theme token notes      | 下拉面板跟随公开背景、边框、阴影、圆角、主色和 overlay motion token；不要依赖未列出的 popper 内部变量。                       |
-| known limitations      | 远程搜索的取消、防抖和错误恢复由调用方负责；`allow-create` 需要业务侧校验重复项和非法值。                                     |
-| stability level        | Preview public component。                                                                                                    |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+and the shared [theme and motion contracts](../theme/tokens.md). Prefer a
+labeled form item; remote search needs loading, empty, and no-match copy, and
+collapsed multi-select tags must not hide the selected summary required to
+finish the task. Consumers own remote cancellation, debouncing, and recovery;
+`allow-create` requires duplicate and invalid-value validation. Do not depend
+on undocumented popper variables.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-`v-model` 绑定 `el-option` 的 `value` 值。
+Bind the `el-option` `value` with `v-model`.
 
-## 禁用选项
+## Disabled Options
 
-将 `el-option` 的 `disabled` 设为 `true` 即可禁用该选项。
+Set an `el-option`'s `disabled` to `true` to disable it.
 
-## 禁用状态
+## Disabled State
 
-设置 `el-select` 的 `disabled` 属性禁用整个选择器。
+Set `el-select`'s `disabled` to disable the entire selector.
 
-## 可清空
+## Clearable
 
-设置 `clearable` 属性后会出现清空图标。
+Set `clearable` to show a clear icon.
 
-## 多选
+## Multiple Selection
 
-设置 `multiple` 属性启用多选，绑定值为数组。可使用 `collapse-tags` 折叠已选项，配合 `collapse-tags-tooltip` 悬停展开。
+Set `multiple` for multiple selection with an array value. Use `collapse-tags` to collapse selected items and `collapse-tags-tooltip` to expand them on hover.
 
-## 分组选项
+## Option Groups
 
-使用 `el-option-group` 对选项分组，`label` 为分组名称。
+Use `el-option-group` to group options; `label` supplies the group name.
 
-## 可过滤
+## Filterable
 
-添加 `filterable` 启用过滤搜索，可通过 `filter-method` 自定义过滤逻辑。
+Set `filterable` to enable filtering and search; use `filter-method` for custom logic.
 
-## 远程搜索
+## Remote Search
 
-`filterable` 和 `remote` 同时设为 `true` 启用远程搜索，配合 `remote-method` 从服务器获取数据。
+Set `filterable` and `remote` to `true` for remote search, using `remote-method` to fetch server data.
 
-## 创建新条目
+## Create New Items
 
-同时设置 `filterable` 和 `allow-create` 后，用户可直接在输入框中创建新条目。
+Set `filterable` and `allow-create` to let users create a new option directly in the input.
 
 ---
 

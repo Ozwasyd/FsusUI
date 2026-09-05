@@ -15,13 +15,11 @@ typed Avalonia control properties and overlay lifecycle.
 
 ## Supported Platform Differences
 
-Image decoding, overlay focus, and text watermark rendering follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for image decoding, overlay focus, and text-watermark boundaries.
 
 ## Theme Tokens
 
-Media controls use surface, border, text, muted text, focus, density, and
-motion resources.
+Use surface, border, text, muted-text, focus, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

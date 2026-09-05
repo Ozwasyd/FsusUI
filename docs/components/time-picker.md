@@ -1,22 +1,22 @@
-# TimePicker 时间选择器
+# TimePicker
 
-用于时间的选择输入，基于 Day.js 进行时间处理。
+Provides time selection input backed by Day.js.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 任意时间
+## Arbitrary Time
 
-默认通过滚动鼠标滚轮选择时间；设置 `arrow-control` 后改为使用箭头按钮控制。
+Time is selected by scrolling the mouse wheel by default; set `arrow-control` to use arrow buttons instead.
 
-## 限制时间范围
+## Time Limits
 
-通过 `disabled-hours`、`disabled-minutes`、`disabled-seconds` 限制可选时间范围。
+Use `disabled-hours`, `disabled-minutes`, and `disabled-seconds` to limit selectable times.
 
-## 时间范围
+## Time Range
 
-设置 `is-range` 开启时间范围选择。范围模式也支持 `arrow-control`。
+Set `is-range` for time-range selection. Range mode also supports `arrow-control`.
 
 ---
 

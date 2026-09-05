@@ -1,9 +1,9 @@
 # Component Contract Schema
 
 Component specs describe public behavior, not implementation structure. The
-stable source registry now lives under
-[`contracts/v1/vue-public-contracts.json`](./contracts/v1/vue-public-contracts.json)
-and is validated by `pnpm run conformance:contracts`.
+stable source registry is
+[`contracts/v1/vue-public-contracts.json`](./contracts/v1/vue-public-contracts.json);
+validate it with `pnpm run conformance:contracts`.
 
 ## Component Record
 
@@ -29,13 +29,13 @@ The v1 registry is generated from `spec/baselines/vue-current.json`. Every Vue
 public component, directive, and service must either have a contract record or
 an explicit web-only decision.
 
-Implementation packages may expose platform-native APIs, but those APIs must
-map back to these public concepts.
+Implementation packages may expose platform-native APIs, but those APIs must map
+back to these public concepts.
 
-The legacy `avalonia-first-subset.yaml` remains as historical preview context;
-it is no longer the conformance source of truth.
+The legacy `avalonia-first-subset.yaml` remains historical preview context; it is
+no longer the conformance source of truth.
 
-Complex Avalonia component planning is tracked separately in
-[`complex-components-roadmap.yaml`](./complex-components-roadmap.yaml). Those
-entries are deferred architecture targets, not part of the first basic control
+Complex Avalonia planning is tracked separately in
+[`complex-components-roadmap.yaml`](./complex-components-roadmap.yaml); these
+entries are deferred architecture targets, not part of the first basic-control
 subset.

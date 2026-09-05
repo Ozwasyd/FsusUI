@@ -111,19 +111,18 @@ follows [`docs/avalonia/platform-differences.md`](../platform-differences.md).
 | Linux | Extended-client-area drag and window actions depend on the active X11/Wayland compositor. The typed action/state contract remains stable even when a compositor ignores a requested decoration or animation. |
 
 Native font rasterization, high-contrast overrides, focus rendering, and
-window-manager animation may differ. No separate platform theme or private
+window-manager animation may differ; no separate platform theme or private
 platform token is created.
 
 ## Theme Tokens
 
-The controls consume generated surface, raised-surface, border, text, muted
-text, action, focus, density, radius, spacing, and motion resources. They add no
-new token source. Light and dark resources update dynamically; density changes
-the rail targets, tab/header height, close targets, and title-bar controls.
-
-The controls add no essential animation. With reduced or disabled motion,
-selection, pane visibility, resizing, overflow reveal, reorder, and window
-state still reach their final state and retain text/border/selection semantics.
+The controls consume generated surface, raised-surface, border, text, muted-text,
+action, focus, density, radius, spacing, and motion resources; they add no token
+source. Light/dark resources update dynamically, and density changes rail,
+tab/header, close-target, and title-bar dimensions. See [Avalonia Motion
+Runtime](../motion-runtime.md) for reduced/disabled behavior: selection, pane
+visibility, resizing, overflow, reorder, and window state still reach their
+final state without essential animation.
 
 ## Accessibility and keyboard behavior
 

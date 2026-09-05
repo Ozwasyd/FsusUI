@@ -1,16 +1,15 @@
-# Empty 空状态
+# Empty
 
-`ElEmpty` 用于没有数据、没有匹配结果或尚未创建内容的状态。空状态首先要回答两件事：
+`ElEmpty` represents a state with no data, no matching results, or no content created yet. An empty state should answer two questions first:
 
-1. 为什么这里没有内容；
-2. 用户接下来可以做什么。
+1. Why is there no content here?
+2. What can the user do next?
 
-默认插画是安静的单色文档结构，只作位置提示。它不承担状态含义，也不应替代明确的
-说明和下一步操作。
+The default illustration is a quiet monochrome document shape used only as a positional cue. It does not convey the state and must not replace a clear explanation or next action.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-empty description="当前筛选条件没有匹配结果，请调整筛选条件。">
@@ -18,23 +17,18 @@
 </el-empty>
 ```
 
-避免只写“暂无数据”。说明原因，并在用户能继续操作时提供一个明确动作；如果没有可执行
-动作，应在描述中解释原因，不要用大插画填补空间。
+Avoid writing only “No data”. Explain why, and provide a clear action when the user can continue. If no action is available, explain the reason in the description instead of filling the space with a large illustration.
 
-## 何时不用插画
+## When Not to Use an Illustration
 
-紧凑列表、表格、抽屉和局部筛选结果优先使用
-[`FsusEmptyState size="inline"`](./empty-state.md)，其默认不显示插画。页面标题、说明和
-周边结构已经足够明确时，也应避免额外插画。
+For compact lists, tables, drawers, and local filter results, prefer
+[`FsusEmptyState size="inline"`](./empty-state.md), which hides the illustration by default. When the page heading, description, and surrounding structure are already clear, avoid adding another illustration.
 
-`ElEmpty` 的默认图形无渐变、无动画、无品牌色发光，并设置 `aria-hidden="true"`；状态
-含义始终由文本表达。
+`ElEmpty`'s default graphic has no gradient, animation, or brand-colored glow and uses `aria-hidden="true"`; text always carries the state meaning.
 
-## 自定义图片
+## Custom Image
 
-通过 `image` 属性设置自定义图片 URL，`image-size` 控制图片宽度（px）。属性图片按装饰
-内容处理，渲染为 `alt=""` 和 `aria-hidden="true"`。需要自行控制可访问语义或使用自定义
-结构时，改用 `image` slot。
+Set a custom image URL with `image` and its width in pixels with `image-size`. Prop images are decorative and render with `alt=""` and `aria-hidden="true"`. Use the `image` slot when you need control over accessible semantics or custom structure.
 
 ```vue
 <el-empty
@@ -46,10 +40,9 @@
 </el-empty>
 ```
 
-## 自定义插槽
+## Custom Slots
 
-`image`、`description` 和默认 slot 均保持可用。自定义装饰图同样应设置
-`aria-hidden="true"`，附近的文本负责解释状态。
+The `image`, `description`, and default slots remain available. Custom decorative images should also set `aria-hidden="true"`; nearby text explains the state.
 
 ```vue
 <el-empty>
@@ -83,10 +76,9 @@
 | image | 自定义装饰或图片区域 |
 | description | 自定义说明文字 |
 
-## 视觉与回归契约
+## Visual and Regression Contract
 
-- 默认 `ElEmpty` 使用单色文档结构，不包含 orbit、node、glow、渐变或动画。
-- `FsusEmptyState` 的 inline / compact 默认无插画；page 默认仅显示小型文档标记。
-- `empty-illustration.spec.ts` 对 default / inline / compact / page 分别保存 Light 与 Dark
-  快照，并核验装饰语义。
-- 组件测试锁定自定义图片、`image-size`、`image` / `description` / default slots API。
+- Default `ElEmpty` uses a monochrome document shape without orbit, node, glow, gradients, or animation.
+- `FsusEmptyState` defaults to no illustration for inline / compact and a small document mark for page.
+- `empty-illustration.spec.ts` stores Light and Dark snapshots for default / inline / compact / page and verifies decorative semantics.
+- Component tests lock the custom image, `image-size`, `image` / `description` / default-slot APIs.

@@ -7,9 +7,9 @@ discussions, demo examples, or screenshots.
 
 | Package / branch                               | Security support                                        |
 | ---------------------------------------------- | ------------------------------------------------------- |
-| `main`                                         | Supported for public-preview security triage.           |
-| `@ozwasyd/element-plus@1.5.x`                  | Supported once published as the public-preview package. |
-| Older private commits or unpublished artifacts | Best-effort only.                                       |
+| `main` | Supported for public-preview security triage. |
+| `@ozwasyd/element-plus@1.5.x` | Supported for the public-preview package. |
+| Older private commits or unpublished artifacts | Best-effort only. |
 
 Public preview does not provide a production SLA, but security reports for the
 current package line and `main` branch are reviewed before public disclosure.
@@ -29,7 +29,7 @@ Reports may cover:
 
 - XSS, DOM injection, unsafe HTML handling, or Markdown renderer bypasses.
 - Mermaid, KaTeX, Shiki, code highlighting, or feature activation injection.
-- SVG or icon injection issues in `packages/icons-svg` or generated icon
+- SVG or icon injection issues in `vue/packages/icons-svg` or generated icon
   components.
 - WASM artifact loading, fallback, integrity, or generated runtime issues.
 - Package publishing, dependency confusion, provenance, registry, or tarball

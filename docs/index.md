@@ -1,70 +1,79 @@
-# FsusUI 文档中心
+# FsusUI Documentation
 
-FsusUI 是基于 Vue 3 与 Element Plus 兼容面的跨平台组件系统。当前 npm public-preview 主包为 `@ozwasyd/element-plus`。本文只负责导航；设计、规范、API 和验证规则以各自的权威文档为准。
+FsusUI is a cross-platform Vue 3 component system built on the Element Plus
+compatibility surface. The current npm public-preview package is
+`@ozwasyd/element-plus`. This page is navigation only; design, API, and
+verification rules remain owned by their domain documents.
 
-## 从你的任务开始
+## Start with a task
 
-| 任务 | 首要入口 | 后续文档 |
+| Task | Start here | Then read |
 | --- | --- | --- |
-| 安装和使用 Web/Vue 包 | [快速开始](./guide/quickstart.md) | [安装](./guide/installation.md)、[主题](./guide/theming.md)、[组件总览](./components/overview.md) |
-| 修改 FsusUI 视觉或交互 | [设计文档地图](./design/README.md) | [设计合同](./design.md)、[变更归类](./design/change-classification.md)、[视觉变更流程](./workflows/visual-change.md) |
-| 在 FsusBlog 或其他产品中调用 FsusUI | [调用方文档](./consumers/README.md) | [设计集成边界](./consumers/design-integration.md)、[FsusBlog 示例](./ux/fsusblog-consumption-examples.md) |
-| 修改 token、motion 或主题 | [主题 token](./theme/tokens.md) | [canonical spec](../spec/tokens/README.md)、[motion](./theme/motion.md)、[customization](./theme/customization.md) |
-| 修改 Web/Vue 组件 | [组件总览](./components/overview.md) | 对应组件文档、[API 稳定性](./api-stability.md)、[视觉测试](./visual-testing.md) |
-| 修改 Avalonia/.NET | [Avalonia 文档](./avalonia/README.md) | [平台差异](./avalonia/platform-differences.md)、[Vue 迁移](./avalonia/vue-migration.md) |
-| 理解仓库或跨平台结构 | [架构文档](./architecture/README.md) | [项目概览](./project-overview.md)、[spec 架构](../spec/architecture.md) |
-| 维护、验证或发布 | [工作流文档](./workflows/README.md) | [工程交接](./engineering-handoff.md)、[治理](./governance/README.md)、[发布文档](./releases/README.md) |
+| Install and use Web/Vue | [Quickstart](./guide/quickstart.md) | [Installation](./guide/installation.md), [Theme](./guide/theming.md), [Components](./components/overview.md) |
+| Change visual or interaction behavior | [Design map](./design/README.md) | [Design contract](./design.md), [Change classification](./design/change-classification.md), [Visual workflow](./workflows/visual-change.md) |
+| Consume FsusUI from a product | [Consumer docs](./consumers/README.md) | [Design integration](./consumers/design-integration.md), [FsusBlog examples](./ux/fsusblog-consumption-examples.md) |
+| Change tokens, motion, or theme | [Theme tokens](./theme/tokens.md) | [Token spec](../spec/tokens/README.md), [Motion](./theme/motion.md), [Customization](./theme/customization.md) |
+| Change a Web/Vue component | [Component overview](./components/overview.md) | The component page, [API stability](./api-stability.md), [Visual testing](./visual-testing.md) |
+| Change Avalonia/.NET | [Avalonia docs](./avalonia/README.md) | [Platform differences](./avalonia/platform-differences.md), [Vue migration](./avalonia/vue-migration.md) |
+| Understand repository structure | [Architecture](./architecture/README.md) | [Project overview](./project-overview.md), [Architecture spec](../spec/architecture.md) |
+| Maintain, verify, or release | [Workflows](./workflows/README.md) | [Engineering handoff](./engineering-handoff.md), [Governance](./governance/README.md), [Release docs](./releases/README.md) |
 
-## 文档权威顺序
+## Documentation authority
 
-1. [`spec/`](../spec/README.md)：平台中立、机器可验证的 canonical 合同。
-2. [`docs/design.md`](./design.md)：唯一的人类可读视觉设计合同。
-3. API、theme、UX、component、Avalonia 等领域合同。
-4. governance 与 workflow：解释如何分类、变更和验证，不重定义设计值。
-5. guide、consumer 文档和示例：说明如何采用公开合同。
-6. generated、release evidence、benchmark、audit 与 archive：派生输出或时间点记录。
+1. [`spec/`](../spec/README.md): platform-neutral, machine-validated contracts.
+2. [`docs/design.md`](./design.md): the sole human-readable visual contract.
+3. API, theme, UX, component, and Avalonia domain contracts.
+4. Governance and workflow documents: how to classify, change, and verify; they
+   do not redefine design values.
+5. Guides, consumer docs, and examples: how to adopt the public contracts.
+6. Generated output, release evidence, benchmarks, audits, and archives:
+   derived output or point-in-time records.
 
-详细的文档角色、目录和新增文件放置规则见 [Documentation Architecture](./governance/documentation-architecture.md)。
+See [Documentation Architecture](./governance/documentation-architecture.md)
+for document roles, directory ownership, and placement rules.
 
-## 文档领域
+## Domains
 
-| 领域 | 入口 | 内容 |
+| Domain | Entry | Covers |
 | --- | --- | --- |
-| 设计系统 | [docs/design/](./design/README.md) | 设计合同、解释规则、变更归类、UX 与视觉证据 |
-| 平台中立规范 | [spec/](../spec/README.md) | tokens、组件合同、interaction、a11y、motion、platform overrides |
-| 架构 | [docs/architecture/](./architecture/README.md) | monorepo、runtime、跨平台、API 边界 |
-| Web/Vue 组件 | [组件总览](./components/overview.md) | 组件 API、状态、键盘行为、tokens 与限制 |
-| Avalonia | [Avalonia adoption](./avalonia/README.md) | .NET 包、组件、平台差异和迁移 |
-| 调用方 | [docs/consumers/](./consumers/README.md) | FsusUI 与产品的所有权、集成和消费示例 |
-| 使用指南 | [docs/guide/](./guide/quickstart.md) | 安装、主题、暗色、i18n、SSR、namespace、默认值 |
-| 工作流 | [docs/workflows/](./workflows/README.md) | 维护、视觉变更、测试、Demo 与发布执行 |
-| 治理 | [docs/governance/](./governance/README.md) | 文档、设计、API、CI、兼容性和发布治理 |
-| 迁移与兼容 | [Element Plus 兼容](./element-plus-compatibility.md) | 接入、迁移、包名和支持边界 |
-| 版本与证据 | [发布文档](./releases/README.md) | release/readiness、性能、审计和发布证据 |
+| Design system | [docs/design/](./design/README.md) | Design contract, change routing, UX, and visual evidence |
+| Platform-neutral specification | [spec/](../spec/README.md) | Tokens, component, interaction, accessibility, motion, and platform overrides |
+| Architecture | [docs/architecture/](./architecture/README.md) | Monorepo, runtime, cross-platform, and API boundaries |
+| Web/Vue components | [Component overview](./components/overview.md) | API, state, keyboard behavior, tokens, and limits |
+| Avalonia | [Avalonia adoption](./avalonia/README.md) | .NET packages, controls, platform differences, and migration |
+| Consumers | [docs/consumers/](./consumers/README.md) | Ownership, integration, and product examples |
+| Guides | [docs/guide/](./guide/quickstart.md) | Installation, theme, dark mode, i18n, SSR, namespace, and defaults |
+| Workflows and governance | [Workflows](./workflows/README.md) | Maintenance, testing, demo, compatibility, and release execution |
+| Migration and compatibility | [Element Plus compatibility](./element-plus-compatibility.md) | Package, import, and support boundaries |
+| Versions and evidence | [Release docs](./releases/README.md) | Readiness, performance, audit, and release evidence |
 
-## 稳定顶层入口
+## Stable top-level entries
 
-以下路径被脚本、测试、贡献指南或外部链接直接引用，因此暂时保留在 `docs/` 根目录；它们已在上述领域入口中归类：
+The following root paths are referenced by scripts, tests, contribution docs, or
+external links and therefore remain stable:
 
-- [设计合同](./design.md)
-- [项目概览](./project-overview.md)
-- [工程维护交接](./engineering-handoff.md)
+- [Design contract](./design.md)
+- [Project overview](./project-overview.md)
+- [Engineering handoff](./engineering-handoff.md)
 - [Visual test profiles](./visual-testing.md)
-- [API 稳定性](./api-stability.md)
-- [Element Plus 接入](./element-plus-integration.md)
-- [Element Plus 兼容](./element-plus-compatibility.md)
-- [图标系统](./icons.md)
+- [API stability](./api-stability.md)
+- [Element Plus integration](./element-plus-integration.md)
+- [Element Plus compatibility](./element-plus-compatibility.md)
+- [Icon system](./icons.md)
 - [Playground / Demo](./playground.md)
 
-新文档默认不得继续堆到 `docs/` 根目录。先按 [Documentation Architecture](./governance/documentation-architecture.md) 选择领域。
+New documents should be placed in their domain rather than added to `docs/`.
 
-## 关键公共文档
+## Key public documents
 
-- [贡献指南](../CONTRIBUTING.md)
-- [安全策略](../SECURITY.md)
-- [行为准则](../CODE_OF_CONDUCT.md)
-- [许可与归属](./legal/element-plus-attribution.md)
-- [从 Element Plus 迁移](./migration/from-element-plus.md)
-- [发布文档与证据](./releases/README.md)
+- [Contribution guide](../CONTRIBUTING.md)
+- [Security policy](../SECURITY.md)
+- [Code of Conduct](../CODE_OF_CONDUCT.md)
+- [License and attribution](./legal/element-plus-attribution.md)
+- [Element Plus migration](./migration/from-element-plus.md)
+- [Release docs and evidence](./releases/README.md)
 
-> **Name note:** FsusUI is the recommended public-facing name for this fork and compatibility-focused Vue 3 component library based on Element Plus. Element Plus remains the upstream provenance and API-alignment context. The current npm public-preview package is `@ozwasyd/element-plus`, which maps to the FsusUI compatibility build rather than the upstream package.
+FsusUI is the public-facing name for this fork and compatibility-focused Vue 3
+component library. Element Plus remains the upstream provenance and
+API-alignment context; `@ozwasyd/element-plus` is the FsusUI compatibility build,
+not the upstream package.

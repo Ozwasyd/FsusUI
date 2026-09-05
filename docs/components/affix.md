@@ -1,14 +1,14 @@
-# Affix 固钉
+# Affix
 
-将元素固定在特定可见区域。
+Pins an element to a specific visible area.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-默认固定在页面顶部，通过 `offset` 设置偏移距离。
+The element is fixed to the page top by default; set the offset with `offset`.
 
 ```vue
 <el-affix :offset="20">
@@ -16,13 +16,14 @@
 </el-affix>
 ```
 
-## 目标容器
+## Target Container
 
-通过 `target` 指定 CSS 选择器，将固钉限制在容器内；超出容器范围时自动隐藏。
+Set a CSS selector with `target` to constrain the pin to a container; it hides
+automatically when it leaves that container.
 
-## 固定位置
+## Fixed Position
 
-通过 `position` 设置固定在顶部（`top`）或底部（`bottom`）。
+Use `position` to pin to the top (`top`) or bottom (`bottom`).
 
 ---
 

@@ -1,16 +1,19 @@
-# Result Mode
+# Result mode
 
-FsusUI 使用 `FsusResult<T>` 表达可恢复失败。用户输入、WASM、Worker、IO、异步运行时和可取消交互不再用 `throw`、`Promise.reject` 或 `null` 作为正常失败边界。
+FsusUI uses `FsusResult<T>` for recoverable failures. User input, WASM,
+Workers, IO, asynchronous runtimes, and cancellable interactions do not use
+`throw`, `Promise.reject`, or `null` as their normal failure boundary.
 
-推荐从专用入口导入：
+Import the dedicated entry:
 
 ```ts
 import { fsusOk, fsusErr, type FsusResult } from '@ozwasyd/element-plus/result'
 ```
 
-源码联调时仓库内部仍可通过 `element-plus/result` alias 访问同一入口。
+Repository source consumers may use the `element-plus/result` alias for the
+same entry.
 
-## 数据结构
+## Data structure
 
 ```ts
 type FsusResult<T> =
@@ -38,7 +41,7 @@ type FsusErrorDetail = {
 }
 ```
 
-## 处理方式
+## Handle a result
 
 ```ts
 const result = await formRef.value?.validate()
@@ -51,39 +54,43 @@ if (!result?.ok) {
 submit()
 ```
 
-`fsusTry()` 与 `fsusTryAsync()` 只用于把第三方或历史异常边界收敛为 Result；新代码应优先直接返回 `fsusOk()` / `fsusErr()`。
+Use `fsusTry()` and `fsusTryAsync()` only to adapt third-party or legacy
+exception boundaries. New code should return `fsusOk()` or `fsusErr()` directly.
 
-## 允许 Throw 的情况
+## When `throw` remains valid
 
-保留 invariant throw：
+Synchronous invariant throws remain for:
 
-- 编程错误。
-- 缺少必须导出。
-- 非法内部状态。
-- 同步 API 在未满足调用前置条件时失败。
+- programming errors;
+- a required export being absent;
+- an invalid internal state; or
+- a synchronous API called without its prerequisites.
 
-当前显式登记的同步 invariant 包括：`WasmDataSession` 在 `dispose()` 后
-继续使用、在 `setAsciiIndex()` 前读取 ASCII 索引，以及
-`useFsusVirtualWindow` 收到重复 key。这些状态表示调用方违反生命周期或
-身份唯一性契约，不属于可重试的 WASM/Worker 运行时失败。
+The registered cases are using `WasmDataSession` after `dispose()`, reading an
+ASCII index before `setAsciiIndex()`, and passing a duplicate key to
+`useFsusVirtualWindow`. They indicate a lifecycle or identity violation, not a
+retryable WASM/Worker failure.
 
-可恢复失败必须返回 Result：
+All recoverable failures must return a Result:
 
-- 校验失败。
-- 用户取消或关闭。
-- Worker timeout、abort、crash。
-- WASM runtime unavailable、协议错误、环境不可用。
-- 上传、网络、IO、异步业务 hook 失败。
+- validation failure;
+- user cancellation or dismissal;
+- Worker timeout, abort, or crash;
+- unavailable WASM runtime, protocol error, or unavailable environment; and
+- upload, network, IO, or asynchronous business-hook failure.
 
-## 迁移表
+## Migration table
 
-| 旧写法                                                              | 新写法                                                                             |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `try { await validate() } catch (fields) { ... }`                   | `const result = await validate(); if (!result.ok) { ... }`                         |
-| `MessageBox.confirm(...).catch(...)`                                | `const result = await MessageBox.confirm(...); if (!result.ok) { ... }`            |
+| Old form | Result form |
+| --- | --- |
+| `try { await validate() } catch (fields) { ... }` | `const result = await validate(); if (!result.ok) { ... }` |
+| `MessageBox.confirm(...).catch(...)` | `const result = await MessageBox.confirm(...); if (!result.ok) { ... }` |
 | `const html = await renderMarkdownWithRuntime(...); if (!html) ...` | `const result = await renderMarkdownWithRuntime(...); if (result.ok) result.value` |
-| `worker.run(...).catch(...)`                                        | `const result = await worker.run(...); if (!result.ok) ...`                        |
+| `worker.run(...).catch(...)` | `const result = await worker.run(...); if (!result.ok) ...` |
 
-## Release Gate
+## Release gate
 
-`pnpm run check:result-boundaries` 会扫描生产 runtime 边界，防止新增裸 `Promise.reject()` 或非 allowlist 的 `throw new Error()`。测试、构建脚本、WASM glue 和 invariant-only 同步 helper 不纳入可恢复失败改造范围。
+`pnpm run check:result-boundaries` scans production runtime boundaries and
+rejects new bare `Promise.reject()` or non-allowlisted `throw new Error()`.
+Tests, build scripts, WASM glue, and invariant-only synchronous helpers are
+outside this recoverable-failure migration.

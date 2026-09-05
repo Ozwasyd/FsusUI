@@ -1,60 +1,35 @@
 # Theme Customization
 
-FsusUI supports runtime CSS variable overrides and build-time SCSS overrides.
-Runtime CSS variables are the default recommendation for public-preview
-consumers because they are easy to scope, test, and revert.
+Use runtime CSS variables for reversible, scoped overrides; use SCSS variables
+when values must be replaced at build time. The canonical public names,
+stability levels, and current values live in [`tokens.md`](./tokens.md); this
+guide keeps only the consumer workflow.
 
-## Core Color Tokens
+## Public token roles
 
-| Token                       | Default role                   | Override guidance                                                                   |
-| --------------------------- | ------------------------------ | ----------------------------------------------------------------------------------- |
-| `--el-color-primary`        | Primary action and focus color | Keep enough contrast for text, focus rings, selected states, and icon-only buttons. |
-| `--fsus-scholarly-blue`     | FsusUI semantic accent alias   | Use as a semantic alias when product copy refers to the FsusUI accent.              |
-| `--el-bg-color`             | Main surface background        | Keep paired with text and border tokens.                                            |
-| `--el-bg-color-page`        | Page background                | Use for app shells and full-page surfaces.                                          |
-| `--el-text-color-primary`   | Main text                      | Must remain readable on `--el-bg-color`.                                            |
-| `--el-text-color-secondary` | Secondary text                 | Avoid using it for required form labels when contrast becomes weak.                 |
-| `--el-border-color`         | Default border                 | Keep visible against both page and surface backgrounds.                             |
+| Token | Role |
+| --- | --- |
+| `--el-color-primary` | Primary action and focus color; preserve contrast for text, focus rings, selected states, and icon-only buttons. |
+| `--fsus-scholarly-blue` | FsusUI accent alias for links, active states, focus rings, and selection. |
+| `--el-bg-color` / `--el-bg-color-page` | Main surface and page backgrounds. |
+| `--el-text-color-primary` / `--el-text-color-secondary` | Primary and secondary text; required labels must remain readable. |
+| `--el-border-color` | Default border; keep it visible against page and surface backgrounds. |
 
-## Radius Tokens
+The public spacing ladder is `--fsus-space-1` (`4px`),
+`--fsus-space-2` (`8px`), `--fsus-space-3` (`12px`),
+`--fsus-space-4` (`16px`), `--fsus-space-5` (`20px`),
+`--fsus-space-6` (`24px`), and `--fsus-space-8` (`32px`). Component-private
+spacing remains internal unless listed in [`tokens.md`](./tokens.md).
 
-| Token                      | Default role                                       |
-| -------------------------- | -------------------------------------------------- |
-| `--el-border-radius-small` | Compact controls and small affordances.            |
-| `--el-border-radius-base`  | Buttons, inputs, and ordinary controls.            |
-| `--el-border-radius-large` | Larger panels when documented by a component.      |
-| `--el-border-radius-round` | Circular buttons, pills, badges, and rounded tags. |
+Supported radius roles are `--el-border-radius-small`,
+`--el-border-radius-base`, `--el-border-radius-large`, and
+`--el-border-radius-round`. Supported shadow aliases include
+`--el-box-shadow`, `--el-box-shadow-light`, `--el-box-shadow-lighter`,
+`--el-box-shadow-dark`, and `--fsus-backdrop-blur`.
 
-## Spacing Tokens
+## Runtime CSS overrides
 
-FsusUI exposes a small spacing ladder for product-level layout alignment:
-
-| Token            | Value  |
-| ---------------- | ------ |
-| `--fsus-space-1` | `4px`  |
-| `--fsus-space-2` | `8px`  |
-| `--fsus-space-3` | `12px` |
-| `--fsus-space-4` | `16px` |
-| `--fsus-space-5` | `20px` |
-| `--fsus-space-6` | `24px` |
-| `--fsus-space-8` | `32px` |
-
-Treat component-private spacing variables as internal unless they are listed in
-[`tokens.md`](./tokens.md).
-
-## Shadow And Overlay Tokens
-
-| Token                     | Default role                                                           |
-| ------------------------- | ---------------------------------------------------------------------- |
-| `--el-box-shadow`         | Panel elevation.                                                       |
-| `--el-box-shadow-light`   | Low elevation and small floating surfaces.                             |
-| `--el-box-shadow-lighter` | Subtle elevation.                                                      |
-| `--el-box-shadow-dark`    | Stronger elevation.                                                    |
-| `--fsus-backdrop-blur`    | Dialog, Drawer, Select dropdown, and other supported overlay surfaces. |
-
-## CSS Variable Overrides
-
-Prefer scoping overrides to a product shell or feature root:
+Prefer a product shell or feature root; use `:root` only for app-wide changes:
 
 ```css
 .admin-workbench {
@@ -65,8 +40,6 @@ Prefer scoping overrides to a product shell or feature root:
 }
 ```
 
-Global overrides are acceptable for app-wide theming:
-
 ```css
 :root {
   --el-bg-color: #ffffff;
@@ -75,16 +48,19 @@ Global overrides are acceptable for app-wide theming:
 }
 ```
 
-## Theme-Chalk Imports
-
-Application installs should import the built CSS:
+Load the built stylesheet first:
 
 ```ts
 import '@ozwasyd/element-plus/dist/fsus.css'
 ```
 
-SCSS source imports are public preview only for documented theme-chalk paths.
-Use them when your build needs compile-time variable replacement:
+Keep focus, hover, active, disabled, and selected states testable in both light
+and dark themes after changing semantic colors.
+
+## Build-time SCSS overrides
+
+SCSS source imports are public-preview paths. Use them for compile-time variable
+replacement:
 
 ```scss
 @forward '@ozwasyd/element-plus/theme-chalk/src/common/var.scss' with (
@@ -96,28 +72,21 @@ Use them when your build needs compile-time variable replacement:
 );
 ```
 
-## Safe Override Patterns
+## Safe customization rules
 
-- Override public tokens, not component class internals.
-- Scope product-specific aliases in the product stylesheet.
-- Keep focus, hover, active, disabled, and selected states testable after each
-  token change.
-- Verify both light and dark themes when changing semantic colors.
-- Avoid rewriting component DOM or CSS selectors to create a theme variant.
+- Prefer the Element Plus-compatible `--el-*` variable when it serves the same
+  purpose; add a `--fsus-*` alias only for a durable semantic layer.
+- Scope product aliases in the product stylesheet; do not introduce new
+  FsusUI contract tokens there. Add public tokens to `spec/tokens/tokens.json`,
+  then run `pnpm run tokens:generate`.
+- Override public tokens rather than component class internals or private
+  variables; do not rewrite component DOM or selectors to create a variant.
+- Paper/document material is the default: border-first panels and `0px`
+  backdrop blur. Opt into glass with `.is-glass` or
+  `[data-fsus-material='glass']`; mark article/Markdown surfaces with
+  `[data-fsus-surface='reading']` when they must suppress blur, glow, and trails.
+- `--fsus-scholarly-blue` is functional feedback, not decoration; avoid
+  gradients and neon colors.
 
-## Element Plus Variable Compatibility
-
-Element Plus-compatible `--el-*` variables remain the safest compatibility
-surface. FsusUI-specific aliases such as `--fsus-scholarly-blue` and
-`--fsus-space-*` are public preview tokens only when documented in
-[`tokens.md`](./tokens.md).
-
-If an Element Plus variable exists and works for the same purpose, prefer the
-Element Plus variable. Add FsusUI aliases only when the product needs a semantic
-layer that can survive future visual changes.
-
-> **Material customization:** The default FsusUI material is
-> paper/document-first: no backdrop blur, lower surface radii, and border-first
-> panels. Opt into glass with `.is-glass` or `[data-fsus-material='glass']`;
-> use `[data-fsus-surface='reading']` for article and Markdown surfaces that
-> should suppress glow, blur, and trails.
+See [`tokens.md`](./tokens.md) for generated cross-platform output and
+[`../design.md`](../design.md) for the visual contract.

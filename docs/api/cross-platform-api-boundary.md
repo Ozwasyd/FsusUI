@@ -9,6 +9,7 @@ documented package APIs.
 - component contracts under `spec/components/`
 - documented Web component APIs
 - documented Markdown runtime projection consumers on `@ozwasyd/element-plus/markdown-runtime`
+- the public WASM wrapper on `@ozwasyd/element-plus/wasm`
 - documented Avalonia controls under `FsusUI.Avalonia`
 - documented theme resources under `FsusUI.Avalonia.Themes`
 
@@ -19,7 +20,8 @@ documented package APIs.
 - Avalonia template internals, private resource keys, control template parts, or
   implementation-only XAML structure
 - product integrations such as FsusBlog or FsusPanel business state
-- Web-only WASM runtime paths other than the documented `/markdown-runtime` projection consumers
+- generated WASM internals other than the documented `/wasm` and
+  `/markdown-runtime` wrappers
 
 Product integrations must consume public FsusUI packages and contracts rather
 than implementation internals. Platform-specific implementation details can be

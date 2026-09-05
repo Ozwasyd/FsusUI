@@ -1,60 +1,60 @@
-# Button 按钮
+# Button
 
-常用的操作按钮。
+A common action button.
 
-## Public Preview Notes
+## Public Preview
 
-| 字段                   | 说明                                                                                                                                                                 |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| purpose                | 触发页面内明确动作，适用于表单提交、工具栏操作、危险操作确认和链接式次要操作。                                                                                       |
-| basic usage            | 使用 `type`、`disabled`、`loading`、`icon`、`link`、`text` 等属性组合按钮状态；示例见下方基础用法。                                                                  |
-| props / events / slots | 本页 `Button API` 与 `ButtonGroup API` 覆盖公开 props、slots 和 exposes；按钮点击仍使用原生 `click` 事件。                                                           |
-| accessibility          | 图标-only 按钮必须提供 `aria-label`、`aria-labelledby` 或 `title`；危险操作应使用清晰文案，不能只依赖颜色表达风险。                                                  |
-| theme token notes      | Primary 底色/文字跟随 `--fsus-button-primary-bg` / `--fsus-button-primary-text`；通用交互色跟随 `--el-color-primary`；自定义颜色优先使用 `color` prop 或公开 token。 |
-| known limitations      | `type="text"` 已废弃；`tag` 切换为非 button 元素时，调用方需要补齐键盘语义与禁用语义。                                                                               |
-| stability level        | Preview public component。                                                                                                                                           |
+This is a preview public component. See [API stability](../api-stability.md#stability-levels)
+for the change policy. Icon-only buttons require `aria-label`,
+`aria-labelledby`, or `title`; dangerous actions need text that does not rely
+on color alone. Primary colors use `--fsus-button-primary-bg` and
+`--fsus-button-primary-text`, while general interaction color uses
+`--el-color-primary`; see the [theme token contract](../theme/tokens.md).
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+`type="text"` is deprecated. When `tag` renders a non-button element, the
+consumer must supply equivalent keyboard and disabled semantics.
+
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-使用 `type`、`plain`、`round`、`dashed`、`circle` 属性定义按钮的样式。
+Use `type`, `plain`, `round`, `dashed`, and `circle` to define the button style.
 
-## 禁用状态
+## Disabled State
 
-通过 `disabled` 属性控制按钮是否禁用，接受 Boolean 值。
+Use `disabled` to control whether the button is disabled; it accepts a Boolean.
 
-## 链接按钮
+## Link Button
 
-> **已废弃**：`type="text"` 将在 3.0.0 移除，请改用 `link` 属性（新 API）。
+> **Deprecated:** `type="text"` will be removed in 3.0.0. Use the `link` prop (new API).
 
-## 文字按钮
+## Text Button
 
-使用 `text: true` 声明文字按钮（无边框、无背景）。使用 `bg: true` 可始终显示文字按钮的背景色。
+Set `text: true` for a text button (no border or background). Set `bg: true` to keep its background visible.
 
-## 图标按钮
+## Icon Buttons
 
-通过 `icon` 属性添加图标，可以只使用图标节省空间，也可以和文字搭配使用。
+Use `icon` to add an icon; use an icon alone to save space or combine it with text.
 
-## 按钮组
+## Button Group
 
-使用 `<el-button-group>` 标签来组合一组按钮。可通过 `direction` 属性设置排列方向（`horizontal` / `vertical`）。
+Use `<el-button-group>` to combine buttons. Set `direction` to `horizontal` or `vertical`.
 
-## 加载状态
+## Loading State
 
-设置 `loading` 为 `true` 即可进入加载状态。可通过 `loading` slot 或 `loadingIcon` 自定义加载图标（slot 优先级更高）。
+Set `loading` to `true` to enter the loading state. Customize the loading icon with the `loading` slot or `loadingIcon` (the slot takes precedence).
 
-## 不同尺寸
+## Sizes
 
-按钮支持 `large`、`default`、`small` 三种尺寸。
+Buttons support `large`, `default`, and `small` sizes.
 
-## 自定义颜色
+## Custom Colors
 
-通过 `color` 属性自定义按钮颜色，FsusUI 会自动计算 hover 和 active 色。`color` 也适用于 `link` 和 `text` 按钮。
+Use `color` to customize the button color; FsusUI derives hover and active colors. `color` also applies to `link` and `text` buttons.
 
-> FsusUI 默认主色为 **Scholarly Blue `#2A599C`**，Primary 按钮 Hover 时会从 Ink Black `#0F0F11` 切换至此色。
+> FsusUI's default primary color is **Scholarly Blue `#2A599C`**. On hover, a Primary button switches from Ink Black `#0F0F11` to this color.
 
 ---
 

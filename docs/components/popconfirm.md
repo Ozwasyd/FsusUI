@@ -1,14 +1,14 @@
-# Popconfirm 气泡确认框
+# Popconfirm
 
-点击元素后弹出确认框，比 MessageBox 更轻量，适合快捷确认操作。
+Opens a lightweight confirmation after an element is clicked, suited to quick confirmations instead of MessageBox.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-仅支持 `title` 属性显示提示文字，`content` 属性无效。通过 `reference` 插槽放置触发元素。
+Only `title` displays prompt text; `content` has no effect. Put the trigger in the `reference` slot.
 
 ```vue
 <el-popconfirm title="确认删除？" @confirm="handleDelete">
@@ -18,9 +18,9 @@
 </el-popconfirm>
 ```
 
-## 自定义
+## Custom Content
 
-通过属性自定义按钮文字、类型、图标颜色等；通过 `#actions` 插槽完全自定义底部操作区。
+Customize button labels, types, icon colors, and related options through props; replace the footer actions with `#actions`.
 
 ---
 

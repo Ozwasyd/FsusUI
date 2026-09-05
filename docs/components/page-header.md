@@ -1,24 +1,24 @@
-# PageHeader 页头
+# PageHeader
 
-如果页面路径较为简单，可以使用页头代替面包屑。
+For a simple page path, use a page header instead of breadcrumbs.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
 ```vue
 <el-page-header title="返回" content="页面标题" @back="goBack" />
 ```
 
-## 自定义图标
+## Custom Icons
 
-通过 `icon` 属性自定义返回图标；传入空字符串 `""` 可隐藏图标。
+Use `icon` to customize the back icon; pass an empty string `""` to hide it.
 
-## 组合用法
+## Composed Usage
 
-通过各插槽组合使用面包屑、标题、内容、附加操作和主体内容。
+Use the slots to combine breadcrumbs, a title, content, extra actions, and the main body.
 
 ```
 第一行：breadcrumb 插槽

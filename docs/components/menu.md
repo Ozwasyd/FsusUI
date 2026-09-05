@@ -1,28 +1,28 @@
-# Menu 导航菜单
+# Menu
 
-为网站提供导航功能的菜单。
+A navigation menu for websites.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 顶部导航栏
+## Top Navigation
 
-设置 `mode="horizontal"` 切换为水平菜单，可配置 `background-color`、`text-color`、`active-text-color` 自定义颜色。
+Set `mode="horizontal"` for a horizontal menu. Customize colors with `background-color`, `text-color`, and `active-text-color`.
 
-> **提示**：若需覆盖菜单默认高度，使用 `--el-menu-horizontal-height` CSS 变量。
+> **Tip:** Override the default menu height with the `--el-menu-horizontal-height` CSS variable.
 
-## 侧边栏
+## Sidebar
 
-默认垂直方向，使用 `el-sub-menu` 创建二级菜单，使用 `el-menu-item-group` 创建分组。
+The default direction is vertical. Use `el-sub-menu` for nested menus and `el-menu-item-group` for groups.
 
-## 折叠
+## Collapse
 
-垂直模式下设置 `collapse` 属性折叠菜单。
+In vertical mode, set `collapse` to collapse the menu.
 
-## 路由模式
+## Routing Mode
 
-设置 `router` 为 `true` 激活 vue-router 模式，菜单项的 `index` 将作为路由路径。
+Set `router` to `true` to enable vue-router mode; each menu item's `index` becomes its route path.
 
 ---
 

@@ -1,33 +1,30 @@
 # FsusUI
 
-FsusUI is a fork and compatibility-focused Vue 3 component library based on
-Element Plus. FsusUI is the recommended public-facing name for documentation,
-examples, and adoption guidance; Element Plus remains the upstream provenance
-and compatibility context. The workspace provides a preview package, FsusUI
-theme and motion tokens, icon assets, WASM-capable runtime paths, Markdown
-components, and a demo app for evaluation.
+FsusUI is a Vue 3 component library derived from Element Plus. Use “FsusUI” in
+documentation and adoption guidance; Element Plus remains the upstream
+provenance and compatibility context. The workspace includes the preview
+package, theme and motion tokens, icons, WASM-capable runtime paths, Markdown
+components, and a demo app.
 
-> FsusUI is currently in public preview. Documented components and theme tokens
-> are available for evaluation, but internal package paths, undocumented
-> Element Plus compatibility layers, build internals, and WASM internals may
-> change before the first stable release.
+> FsusUI is in public preview. Documented components and theme tokens are
+> available for evaluation; internal paths, undocumented compatibility layers,
+> build internals, and WASM internals may change before the first stable release.
 
 ## Status
 
-| Area              | Status                                                         |
-| ----------------- | -------------------------------------------------------------- |
-| Release stage     | Public Preview                                                 |
-| Package stability | Preview                                                        |
-| API stability     | Experimental unless explicitly documented                      |
+| Area              | Status |
+| ---               | --- |
+| Release stage     | Public Preview |
+| Package stability | Preview |
+| API stability     | Experimental unless explicitly documented |
 | Recommended use   | Evaluation, controlled internal adoption, FsusBlog integration |
-| Production SLA    | None                                                           |
+| Production SLA    | None |
 
 ## Relationship To Element Plus
 
-FsusUI is derived from Element Plus and keeps much of the Element Plus source
-layout, component naming, and package structure. It does not claim full Element
-Plus compatibility unless behavior is covered by local tests or explicit FsusUI
-docs.
+FsusUI retains much of the Element Plus source layout, component naming, and
+package structure. Full Element Plus compatibility is claimed only where local
+tests or explicit FsusUI docs cover the behavior.
 
 Public compatibility docs:
 
@@ -37,17 +34,15 @@ Public compatibility docs:
 
 ## Relationship To FsusBlog
 
-FsusUI is a design-system foundation for FsusBlog, but the package is evaluated
-as a standalone component library. FsusBlog-specific adapters and examples are
-integration context, not public FsusUI API unless a public FsusUI document
-explicitly says so.
+FsusUI is a design-system foundation for FsusBlog but is evaluated as a
+standalone library. FsusBlog adapters and examples are integration context, not
+public FsusUI API unless an FsusUI document explicitly says so.
 
 ## Install
 
-Current public-preview distribution uses the npm public registry:
-`https://registry.npmjs.org/`. The install package is
-`@ozwasyd/element-plus`; that package name is the FsusUI public-preview
-compatibility build and should not be confused with upstream Element Plus.
+The public-preview package is `@ozwasyd/element-plus` on the npm public
+registry (`https://registry.npmjs.org/`). It is FsusUI’s compatibility build,
+not the upstream Element Plus package.
 
 Install:
 
@@ -92,7 +87,7 @@ on Element Plus for the affected surface.
 
 ## Public API Boundaries
 
-Use documented imports and docs pages:
+Use only documented imports and docs pages:
 
 - [API stability](./docs/api-stability.md)
 - [Component docs](./docs/components/overview.md)
@@ -102,9 +97,9 @@ Use documented imports and docs pages:
 - [Icons](./docs/icons.md)
 - [Playground and demo app](./docs/playground.md)
 
-Do not rely on undocumented `es/*`, `lib/*`, wildcard exports, `packages/*`,
-`internal/*`, generated WASM files, build scripts, or test fixtures as public
-API.
+Do not rely on undocumented `es/*`, `lib/*`, wildcard exports,
+`vue/packages/*`, `vue/internal/*`, generated WASM files, build scripts, or test
+fixtures as public API.
 
 ## Demo And Development
 
@@ -114,10 +109,10 @@ Repository setup:
 pnpm install
 ```
 
-Run the demo app:
+Run the demo app from its workspace path:
 
 ```bash
-pnpm -C packages/demo-app dev
+pnpm -C vue/packages/demo-app dev
 ```
 
 Common checks:
@@ -130,13 +125,13 @@ pnpm run build
 pnpm run verify
 ```
 
-Visual regression and public sample guidance are documented in
-[playground docs](./docs/playground.md) and
-[contributing docs](./CONTRIBUTING.md).
+See [playground docs](./docs/playground.md) and [contributing](./CONTRIBUTING.md)
+for visual regression and public-sample guidance.
 
 ## Release Documentation and Evidence
 
-The release-domain map is maintained in [docs/releases/](./docs/releases/README.md). Public-preview readiness evidence:
+The release-domain map is maintained in [docs/releases/](./docs/releases/README.md).
+Public-preview readiness evidence includes:
 
 - [Public preview release notes](./docs/releases/channels/public-preview.md)
 - [Secret and history scan](./docs/releases/evidence/public-preview/secret-history-scan.md)
@@ -157,13 +152,15 @@ The release-domain map is maintained in [docs/releases/](./docs/releases/README.
 - [Code of conduct](./CODE_OF_CONDUCT.md)
 - [Notice and attribution](./NOTICE)
 - [License](./LICENSE)
+
 ## Avalonia trimming and AOT library boundary
 
-The supported Avalonia library packages are maintained for trimming and AOT-compatible library consumption. This is a library contract: it does not create or validate a final Native AOT application executable, RID-specific binary, or support guarantee for third-party plugins. Resource reachability (AXAML, themes, icons, and generated resources) and package metadata are part of that library-level contract.
+The supported Avalonia packages target trimming- and AOT-compatible library
+consumption. This library contract does not create or validate a final Native
+AOT executable, RID-specific binary, or third-party plugin guarantee. Resource
+reachability (AXAML, themes, icons, and generated resources) and package
+metadata are included in the contract.
 
-The contract applies only to the documented public Avalonia packages and their
-declared metadata. It does not extend to third-party plugin discovery, runtime
-assembly or type loading, runtime code generation, or other dynamic extension
-mechanisms. Consumers that introduce those mechanisms must evaluate their own
-trimming and AOT behavior; this library documentation does not claim that they
-are supported.
+It applies only to documented public Avalonia packages and their declared
+metadata. Third-party plugin discovery, runtime assembly/type loading, runtime
+code generation, and other dynamic extensions are consumer responsibilities.

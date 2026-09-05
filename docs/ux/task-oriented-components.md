@@ -1,8 +1,14 @@
-# 任务导向组件语义
+# Task-Oriented Component Semantics
 
-本文件定义 FsusUI 的 UX 语义组件契约。实现可以是组件、组合式函数、文档化模式或业务侧封装，但消费侧必须能表达这些语义，并通过 `npm run check:ux-semantics` 阻断关键回归。
+> **Role:** Normative UX semantic contract
+> **Applies to:** FsusUI task-oriented compositions and consumer wrappers
+> **Authority:** Defines semantic requirements, not a mandated implementation.
 
-## 通用类型
+This contract covers components, composables, documented patterns, and
+consumer-side wrappers that expose these semantics. The consumer must be able
+to express them; `pnpm run check:ux-semantics` blocks critical regressions.
+
+## Shared types
 
 ```ts
 interface ActionSpec {
@@ -25,9 +31,10 @@ interface StatusSpec {
 }
 ```
 
-## TaskPageHeader
+## `TaskPageHeader`
 
-`TaskPageHeader` 必须回答：我在哪里、这里可以做什么、下一步主要动作是什么。
+The header must answer where the user is, what the page does, and what the next
+primary action is.
 
 ```ts
 interface TaskPageHeaderProps {
@@ -39,15 +46,14 @@ interface TaskPageHeaderProps {
 }
 ```
 
-语义要求：
+Requirements: one primary page heading; `description` states the task scope,
+current object, or current state; and `primaryAction` uses a result-oriented
+label, not “确定、提交、确认、OK、Submit、Confirm”.
 
-- 页面只有一个主标题。
-- `description` 描述任务范围、当前对象或当前状态。
-- `primaryAction` 使用结果型文案，不使用“确定、提交、确认、OK、Submit、Confirm”。
+## `TaskActionBar`
 
-## TaskActionBar
-
-`TaskActionBar` 放置页面级操作，主动作只能有一个。次动作按风险和频率排序，危险操作与普通次动作分组。
+The page-level action bar has at most one primary action. Order secondary
+actions by risk and frequency, and group dangerous actions separately.
 
 ```ts
 interface TaskActionBarProps {
@@ -57,17 +63,16 @@ interface TaskActionBarProps {
 }
 ```
 
-## TaskPrimaryAction
+`TaskPrimaryAction` represents the next step and must use a result-oriented
+label with pending, success, and failure states for asynchronous work.
 
-`TaskPrimaryAction` 表示用户完成当前任务的下一步。它必须有结果型文案，并为异步动作提供 pending、成功、失败状态。
+`TaskSecondaryAction` represents an optional path such as preview, save draft,
+copy link, or return to list; it must not outrank the primary action.
 
-## TaskSecondaryAction
+## `DangerAction`
 
-`TaskSecondaryAction` 表示可选路径，例如预览、保存草稿、复制链接、返回列表。它不能抢占主动作视觉优先级。
-
-## DangerAction
-
-`DangerAction` 必须声明动作名称、是否可恢复、是否通知用户、是否写入审计、确认文案和后果说明。
+Dangerous actions must declare their name, recoverability, notification and
+audit behavior, confirmation text, and consequences.
 
 ```ts
 interface DangerActionSpec extends ActionSpec {
@@ -80,16 +85,16 @@ interface DangerActionSpec extends ActionSpec {
 }
 ```
 
-语义要求：
+- Require either `confirmation` or `undo`.
+- State explicitly when a permanent action cannot be recovered.
+- Explain whether affected users are notified and whether an audit entry is
+  written.
+- Describe the affected objects and consequences.
 
-- 必须要求 confirmation 或 undo。
-- 永久性操作必须显式显示不可恢复。
-- 影响其他用户的操作必须说明是否通知用户。
-- 写审计日志的操作应说明会记录。
+## `EmptyState`
 
-## EmptyState
-
-`EmptyState` 必须回答为什么为空、用户下一步能做什么。
+An empty state must explain why it is empty and what the user can do next. If it
+has no action, `reason` (or equivalent text) must explain why.
 
 ```ts
 interface EmptyStateProps {
@@ -101,11 +106,9 @@ interface EmptyStateProps {
 }
 ```
 
-若没有动作，必须提供 `reason` 或等价文案。
+## `FilterStateSummary`
 
-## FilterStateSummary
-
-`FilterStateSummary` 说明当前列表是完整结果还是过滤结果。
+The summary distinguishes a complete list from a filtered result.
 
 ```ts
 interface FilterStateSummaryProps {
@@ -115,17 +118,17 @@ interface FilterStateSummaryProps {
 }
 ```
 
-示例：
-
 ```text
 当前显示：状态=待审核，地区=中国大陆，关键词=spam，共 12 条结果
 ```
 
-有筛选控件的 list/table page 必须有筛选摘要。筛选结果为空时，空状态必须说明筛选条件。
+Every list or table with filters must show the summary and provide a clear
+action when a condition can be cleared. An empty filtered result must name its
+active conditions.
 
-## ContextBar
+## `ContextBar`
 
-`ContextBar` 明确当前操作作用到哪个对象。
+The context bar identifies the object affected by the current operation.
 
 ```ts
 interface ContextBarProps {
@@ -137,15 +140,13 @@ interface ContextBarProps {
 }
 ```
 
-示例：
-
 ```text
 正在回复：账号误封申诉 · 用户 BinaryUser · 状态：处理中
 ```
 
-## RecommendationBanner
+## `RecommendationBanner`
 
-`RecommendationBanner` 用于评论审核、风控、诊断、巡检等页面，说明系统建议和原因。
+Use this banner for moderation, risk, diagnosis, and inspection surfaces.
 
 ```ts
 interface RecommendationBannerProps {
@@ -158,15 +159,12 @@ interface RecommendationBannerProps {
 }
 ```
 
-语义要求：
+It must state the recommendation, list its reasons, and make clear whether the
+user may override it.
 
-- 必须说明推荐动作。
-- 必须列出原因。
-- 必须让用户知道是否能覆盖建议。
+## `ActionPreviewDialog`
 
-## ActionPreviewDialog
-
-`ActionPreviewDialog` 用于批量审核、批量删除、批量恢复、批量迁移等操作执行前的结果预演。
+Use the preview dialog before batch review, delete, restore, or migration.
 
 ```ts
 interface ActionPreviewDialogProps {
@@ -180,10 +178,9 @@ interface ActionPreviewDialogProps {
 }
 ```
 
-示例：
-
 ```text
 将通过 8 条评论，拒绝 2 条评论。该操作会写入审核日志。
 ```
 
-确认按钮必须使用结果型文案，例如“通过 8 条评论”，不能只写“确定”。
+The confirmation label must state the result (for example, “通过 8 条评论”),
+not only “确定”.

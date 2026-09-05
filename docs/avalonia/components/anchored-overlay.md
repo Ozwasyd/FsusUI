@@ -22,13 +22,11 @@ trigger mode, open state, and lifecycle events.
 
 ## Supported Platform Differences
 
-Viewport placement, dismissal, and focus restoration follow
-`docs/avalonia/platform-differences.md`.
+See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for placement, dismissal, and focus-restoration boundaries.
 
 ## Theme Tokens
 
-Anchored overlays use overlay, surface raised, border, focus, text, density,
-and motion resources.
+Use overlay, raised-surface, border, focus, text, and density resources from [Application Setup](../installation.md#application-setup); motion behavior is defined in [Avalonia Motion Runtime](../motion-runtime.md).
 
 ## Minimal Avalonia Example
 

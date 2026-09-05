@@ -28,11 +28,11 @@ selectors.
 
 ## Overlay Behavior
 
-Overlay behavior is host-based. Use `FsusOverlayHost` for z-order, dismissal,
-focus restoration, and viewport-aware placement. Dialog, drawer, tooltip,
-popover, popconfirm, dropdown, message, notification, and loading surfaces
-should not create independent unmanaged windows unless the product shell owns
-that window boundary.
+Overlay behavior is host-based. Use [`FsusOverlayHost`](overlay-host.md) for
+z-order, dismissal, focus restoration, and viewport-aware placement. Dialog,
+drawer, tooltip, popover, popconfirm, dropdown, message, notification, and
+loading surfaces should not create unmanaged windows unless the product shell
+owns that window boundary.
 
 ## Locale Providers
 

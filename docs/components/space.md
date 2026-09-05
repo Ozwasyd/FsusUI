@@ -1,16 +1,16 @@
-# Space 间距
+# Space
 
-为相邻元素提供统一间距，代替手动设置 margin 的繁琐操作。
+Provides consistent spacing between adjacent elements instead of manual margins.
 
-> **注意**：不建议将 `ElSpace` 与依赖祖先宽/高的组件（如 `ElSlider`）嵌套使用，可能导致拖拽位置偏移。
+> **Note:** Avoid nesting `ElSpace` with components that depend on ancestor width/height (such as `ElSlider`), as dragging positions may shift.
 
-> 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
+> See the [Playground](../playground.md) for runnable component examples.
 
 ---
 
-## 基础用法
+## Basic Usage
 
-水平排列多个元素，提供统一间距：
+Arrange multiple elements horizontally with consistent spacing:
 
 ```vue
 <template>
@@ -22,22 +22,22 @@
 </template>
 ```
 
-## 垂直布局
+## Vertical Layout
 
-通过 `direction="vertical"` 切换为纵向布局。
+Set `direction="vertical"` for vertical layout.
 
-## 间距大小
+## Spacing
 
-内置尺寸：`small`（8px，默认）、`default`（12px）、`large`（16px）。  
-也可传入自定义数值覆盖。
+Built-in sizes are `small` (8px, default), `default` (12px), and `large` (16px).
+Pass a custom value to override them.
 
-## 自动换行
+## Auto Wrap
 
-在水平模式下，使用 `wrap` 属性控制自动换行。
+In horizontal mode, use `wrap` to control line wrapping.
 
-## 分隔符
+## Separator
 
-通过 `spacer` 属性插入文字或 VNode 分隔符：
+Use `spacer` to insert text or a VNode separator:
 
 ```vue
 <template>
@@ -48,9 +48,9 @@
 </template>
 ```
 
-## 填充容器
+## Filled Container
 
-通过 `fill` 属性让子节点自动充满容器宽度，可配合 `fill-ratio` 自定义填充比例。
+Set `fill` to make children fill the container width; use `fill-ratio` for a custom ratio.
 
 ---
 
