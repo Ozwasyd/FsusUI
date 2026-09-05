@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import crypto from 'node:crypto'
 import fs from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { spawnSync } from 'node:child_process'
@@ -12,8 +11,12 @@ const out = path.resolve(
   root,
   process.argv[2] ?? '.tmp/conformance-v2/isolated-mutations.json',
 )
-const requestedCaseIds = new Set(process.argv.slice(3))
-const checkout = fs.mkdtempSync(path.join(os.tmpdir(), 'fsusui-v2-mutations-'))
+const checkoutRoot = path.join(
+  root,
+  '.tmp/conformance-v2/isolated-worktrees',
+)
+fs.mkdirSync(checkoutRoot, { recursive: true })
+const checkout = fs.mkdtempSync(path.join(checkoutRoot, 'checkout-'))
 const sha256 = (value) =>
   crypto.createHash('sha256').update(value).digest('hex')
 const run = (command, args, cwd = checkout) =>
@@ -47,7 +50,6 @@ const reset = () => {
   for (const file of [
     'web-a11y/manifest.json',
     'avalonia.json',
-    'comparison.json',
     'alignment.json',
   ]) {
     const source = path.join(root, '.tmp/conformance-v2', file)
@@ -62,19 +64,613 @@ const gate = (subcommand, args) => [
   process.execPath,
   ['scripts/conformance-v2-evidence.mjs', subcommand, ...args],
 ]
-const prepareAvaloniaSemanticCheck = () => {
-  const result = run('dotnet', [
-    'restore',
-    'dotnet/FsusUI.Avalonia.ApiTool/FsusUI.Avalonia.ApiTool.csproj',
-    '--force-evaluate',
-  ])
-  if (result.status !== 0)
-    throw new Error(
-      `Avalonia semantic mutation restore failed: ${result.stderr || result.stdout}`,
-    )
-}
+const requestedCaseIds = new Set(
+  (process.env.FSUSUI_MUTATION_CASES ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean),
+)
 
 const cases = [
+  {
+    id: 'vue-semantic-tsx-discovery-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        'else if (/\\.(ts|tsx|vue)$/u.test(entry.name)) {',
+        'else if (/\\.(ts|vue)$/u.test(entry.name)) {',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'fixture TSX widget source identity was not exact',
+  },
+  {
+    id: 'vue-semantic-tsx-options-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        "node.callee.name === 'defineComponent'",
+        "node.callee.name === 'defineComponentMutation'",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'fixture TSX widget emit submit was not extracted',
+  },
+  {
+    id: 'vue-semantic-component-source-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        "['defineComponent', 'defineOptions'].includes(node.callee.name)",
+        "['defineOptions'].includes(node.callee.name)",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'fixture TSX widget source identity was not exact',
+  },
+  {
+    id: 'vue-semantic-nested-spread-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        'const resolvedNode = unwrapExpression(resolved?.node)',
+        'const resolvedNode = resolved?.node',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'vue-semantic-member-descriptor-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        "['MemberExpression', 'OptionalMemberExpression'].includes(valueNode.type)",
+        "['MissingMemberExpression'].includes(valueNode.type)",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'vue-semantic-imported-runtime-constant-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        "if (node.type === 'Identifier') {\n      const source =",
+        "if (node.type === 'MissingIdentifier') {\n      const source =",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'vue-public-alias-mutated',
+    file: 'vue/packages/components/collection-primitives/index.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/collection-primitives/index.ts',
+        'export const FsusCollectionSummary = ElCollectionSummary.FsusCollectionSummary',
+        'export const FsusCollectionSummaryMutation = ElCollectionSummary.FsusCollectionSummary',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'vue-public-enum-mutated',
+    file: 'vue/packages/components/table-v2/src/constants.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/table-v2/src/constants.ts',
+        "  RIGHT = 'right',",
+        "  RIGHT = 'right-mutation',",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'vue-public-sentinel-mutated',
+    file: 'vue/packages/components/table-v2/src/private.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/table-v2/src/private.ts',
+        "Symbol('placeholder')",
+        "Symbol('placeholder-mutation')",
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'contract-optional-nullability-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        '      web.required === false &&\n',
+        '      web.required === true &&\n',
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  ...[
+    [
+      'consumer-binding-deleted',
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },\n",
+      '',
+    ],
+    [
+      'consumer-binding-route-mutated',
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'button' },",
+    ],
+    [
+      'consumer-binding-release-family-mutated',
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
+      "  'component-v2.el-check-tag': { releaseFamily: 'selection-mutation', galleryRoute: 'selection' },",
+    ],
+  ].map(([id, from, to]) => ({
+    id,
+    file: 'scripts/contract-v2.mjs',
+    inject: () => mutateText('scripts/contract-v2.mjs', from, to),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected:
+      id === 'consumer-binding-deleted'
+        ? 'consumer bindings must bind every exact contract id once'
+        : 'contract-v2.json drifted from generated output',
+  })),
+  {
+    id: 'stable-readiness-second-scope-authority-mutated',
+    file: 'spec/ci/avalonia-stable-readiness.json',
+    inject: () =>
+      mutateJson('spec/ci/avalonia-stable-readiness.json', (value) => {
+        value.releaseScopeFamilies = ['selection']
+      }),
+    command: ['pnpm', ['run', 'check:avalonia-stable-readiness']],
+    expected:
+      'Avalonia stable readiness spec must not define a second release scope authority',
+  },
+  {
+    id: 'aot-manual-stable-authority-mutated',
+    file: 'scripts/test-avalonia-aot-smoke.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/test-avalonia-aot-smoke.mjs',
+        'const stableScenarios = stableFamilies()',
+        "const stableScenarios = JSON.parse(readFileSync(path.join(root, 'spec/ci/avalonia-stable-readiness.json'), 'utf8')).releaseScopeFamilies",
+      ),
+    command: ['pnpm', ['run', 'check:avalonia-aot-smoke']],
+    expected: 'the AOT runner must derive scenarios from the identity-bound alignment',
+  },
+  {
+    id: 'aot-production-authority-bypass-mutated',
+    file: 'scripts/avalonia-aot-native.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/avalonia-aot-native.mjs',
+        `export const resolveStableConsumerAuthority = (authority = {}) =>
+  readStableConsumerAuthority({
+    registryPath: authority.registryPath ?? nativeSpec.contractRegistry,
+    alignmentPath: authority.alignmentPath ?? nativeSpec.alignmentArtifact,
+    expected: authority.expected,
+  })`,
+        `export const resolveStableConsumerAuthority = (authority = {}) => ({
+  releaseScopeFamilies: readJson(authority.registryPath ?? nativeSpec.contractRegistry).consumerBindings.releaseScopeFamilies,
+})`,
+      ),
+    command: ['node', ['--test', 'tests/avalonia-aot-native.test.mjs']],
+    expected: 'Missing expected exception',
+  },
+  {
+    id: 'nuget-ordinary-package-hard-block-mutated',
+    file: 'scripts/avalonia-stable-readiness-lib.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/avalonia-stable-readiness-lib.mjs',
+        '{ stablePublication = false } = {},',
+        '{ stablePublication = true } = {},',
+      ),
+    command: ['node', ['--test', 'tests/conformance-v2-evidence.test.mjs']],
+    expected: 'NuGet stable candidate blocked by derived alignment gaps',
+  },
+  {
+    id: 'nuget-stable-publication-flag-removed-mutated',
+    file: 'package.json',
+    inject: () =>
+      mutateJson('package.json', (value) => {
+        value.scripts['dotnet:stable-package'] = value.scripts[
+          'dotnet:stable-package'
+        ].replace(' --stable-publication', '')
+      }),
+    command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
+    expected: 'dotnet:stable-package must require explicit stable publication',
+  },
+  {
+    id: 'nuget-package-alignment-producer-removed-mutated',
+    file: '.github/workflows/_quality.yml',
+    inject: () =>
+      mutateText(
+        '.github/workflows/_quality.yml',
+        '          xvfb-run -a pnpm run conformance:v2\n',
+        '',
+      ),
+    command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
+    expected:
+      'dotnet-package must produce exact Contract V2 alignment before packaging',
+  },
+  {
+    id: 'nuget-caller-alignment-producer-removed-mutated',
+    file: '.github/workflows/quality.yml',
+    inject: () =>
+      mutateText(
+        '.github/workflows/quality.yml',
+        '          xvfb-run -a pnpm run conformance:v2\n',
+        '',
+      ),
+    command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
+    expected:
+      'quality.yml package caller must produce exact Contract V2 alignment before packaging',
+  },
+  {
+    id: 'nuget-stable-evidence-doc-bypass-mutated',
+    file: 'docs/releases/evidence/avalonia-stable/package-audit.md',
+    inject: () =>
+      mutateText(
+        'docs/releases/evidence/avalonia-stable/package-audit.md',
+        'pnpm run dotnet:stable-package',
+        'node scripts/check-avalonia-nuget-stable.mjs',
+      ),
+    command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
+    expected: 'package-audit.md must use the zero-gap stable evidence gate',
+  },
+  {
+    id: 'nuget-dirty-package-input-mutated',
+    file: 'dotnet/Directory.Build.props',
+    inject: () =>
+      mutateText(
+        'dotnet/Directory.Build.props',
+        'Avalonia package candidate.',
+        'Dirty Avalonia package candidate.',
+      ),
+    command: [process.execPath, ['scripts/check-avalonia-nuget-stable.mjs']],
+    expected: 'Avalonia package inputs must match the exact committed candidate',
+  },
+  {
+    id: 'nuget-alignment-artifact-integrity-mutated',
+    file: 'scripts/avalonia-stable-readiness-lib.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/avalonia-stable-readiness-lib.mjs',
+        `artifactBytes.length !== binding.artifactBytes ||
+    digest(artifactBytes) !== binding.artifactSha256 ||`,
+        `false ||
+    false ||`,
+      ),
+    command: ['node', ['--test', 'tests/conformance-v2-evidence.test.mjs']],
+    expected: 'Missing expected exception',
+  },
+  {
+    id: 'nuget-publish-block-mutated',
+    file: 'scripts/avalonia-stable-readiness-lib.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/avalonia-stable-readiness-lib.mjs',
+        'if (!release.releaseReady || alignment.consumers?.nugetStableEligible !== true) {',
+        'if (false) {',
+      ),
+    command: ['node', ['--test', 'tests/conformance-v2-evidence.test.mjs']],
+    expected: 'Missing expected exception',
+  },
+  {
+    id: 'consumer-binding-unknown-contract-mutated',
+    file: 'spec/components/contracts/v2/contract-v2.json',
+    inject: () =>
+      mutateJson(
+        'spec/components/contracts/v2/contract-v2.json',
+        (value) => {
+          value.consumerBindings.byContract['component-v2.el-unknown'] = {
+            releaseFamily: 'selection',
+            galleryRoute: 'selection',
+          }
+        },
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  ...[
+    [
+      'gallery-aligned-contract-not-instantiated',
+      'case "component-v2.el-check-tag":',
+      'case "component-v2.el-check-tag-missing":',
+      'Stable contract component-v2.el-check-tag has no exact Gallery implementation',
+    ],
+    [
+      'gallery-aligned-contract-fallback-mutated',
+      'panel.Children.Add(new FsusCheckTag',
+      'panel.Children.Add(new FsusButton',
+      'Assert.Single() Failure',
+    ],
+  ].map(([id, from, to, expected]) => ({
+    id,
+    file:
+      'dotnet/FsusUI.Avalonia.Demo/Gallery/FsusAvaloniaGalleryRegistry.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia.Demo/Gallery/FsusAvaloniaGalleryRegistry.cs',
+        from,
+        to,
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
+        '--filter',
+        'FullyQualifiedName~StableGalleryRegistryUsesExactGeneratedContractRouteBindings',
+      ],
+    ],
+    expected,
+  })),
+  {
+    id: 'avalonia-semantic-nullability-mutated',
+    file: 'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+        'state == NullabilityState.Nullable ||',
+        'state == NullabilityState.NotNull ||',
+      ),
+    command: ['pnpm', ['run', 'avalonia:semantic:check']],
+    expected: 'FsusUI.Avalonia.semantic.json drifted',
+  },
+  {
+    id: 'avalonia-semantic-default-mutated',
+    file: 'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia.ApiTool/Program.cs',
+        '            "GetDefaultValue",',
+        '            "GetDefaultValueMutation",',
+      ),
+    command: ['pnpm', ['run', 'avalonia:semantic:check']],
+    expected: 'FsusUI.Avalonia.semantic.json drifted',
+  },
+  {
+    id: 'table-v2-input-binding-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        "height: { member: 'ViewportHeight' },",
+        "height: { member: 'ViewportMissing' },",
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
+    id: 'table-v2-header-height-binding-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        "        member: 'HeaderHeight',",
+        "        member: 'HeaderHeightMissing',",
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
+    id: 'table-v2-header-height-alternate-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        "        alternateMembers: ['HeaderHeights'],",
+        '        alternateMembers: [],',
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
+    id: 'vue-semantic-scoped-payload-mutated',
+    file: 'scripts/vue-semantic-baseline.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/vue-semantic-baseline.mjs',
+        '        slot.payload = payload\n',
+        '        slot.payload = []\n',
+      ),
+    command: ['pnpm', ['run', 'avalonia:baseline:check']],
+    expected: 'Avalonia Vue public API baseline is stale',
+  },
+  {
+    id: 'table-v2-sort-object-category-mutated',
+    file: 'scripts/contract-v2.mjs',
+    inject: () =>
+      mutateText(
+        'scripts/contract-v2.mjs',
+        "'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'object',",
+        "'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'unknown',",
+      ),
+    command: ['pnpm', ['run', 'contract-v2:check']],
+    expected: 'contract-v2.json drifted from generated output',
+  },
+  {
+    id: 'auto-resizer-web-disabled-width-mutated',
+    file: 'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
+        'if (!props.disableWidth) width$.value = width - left - right',
+        'width$.value = width - left - right',
+      ),
+    command: [
+      'pnpm',
+      [
+        'exec',
+        'vitest',
+        'run',
+        '--config',
+        'vue/vitest.config.ts',
+        'vue/packages/components/table-v2/__tests__/auto-resizer.test.tsx',
+      ],
+    ],
+    expected: "to be '0x180'",
+  },
+  ...[
+    [
+      'auto-resizer-avalonia-disabled-width-mutated',
+      'DisableWidth ? Viewport.Width : viewport.Width',
+      'viewport.Width',
+    ],
+    ['auto-resizer-avalonia-callback-mutated', '    OnResize(next);\n', ''],
+    [
+      'auto-resizer-avalonia-arrange-mutated',
+      '    Resize(finalSize);',
+      '    _ = finalSize;',
+    ],
+  ].map(([id, from, to]) => ({
+    id,
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs',
+        from,
+        to,
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
+        '--filter',
+        'FullyQualifiedName~AutoResizerObservesArrangedViewportAndHonorsDisabledAxes',
+      ],
+    ],
+    expected: 'Assert.',
+  })),
+  ...[
+    [
+      'table-v2-typed-data-mutated',
+      'dataRow is not null && column is not null',
+      'false && dataRow is not null && column is not null',
+      'TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll',
+    ],
+    [
+      'table-v2-fixed-column-mutated',
+      'entry.column.Fixed != FsusDataTableFixedColumn.None',
+      'entry.column.Fixed == FsusDataTableFixedColumn.None',
+      'TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll',
+    ],
+    [
+      'table-v2-keyboard-mutated',
+      'e.Handled = HandleKeyAsync(e.Key).GetAwaiter().GetResult();',
+      'e.Handled = false;',
+      'TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll',
+    ],
+    [
+      'table-v2-scroll-mutated',
+      'realizedColumnStartIndex = ResolveStart(scrollLeft, ColumnWidth, EffectiveColumnCount, realizedColumnCount);',
+      'realizedColumnStartIndex = 0;',
+      'TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll',
+    ],
+    [
+      'table-v2-dynamic-height-mutated',
+      'rowSizeIndex.Update(rowIndex, previousHeight, nextHeight);',
+      'rowSizeIndex.Update(rowIndex, previousHeight, previousHeight);',
+      'TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks',
+    ],
+    [
+      'table-v2-scroll-callback-mutated',
+      'OnScroll?.Invoke(position);',
+      '_ = position;',
+      'TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks',
+    ],
+    [
+      'table-v2-fixed-data-mutated',
+      'Enumerable.Range(0, FixedData.Count)',
+      'Enumerable.Empty<int>()',
+      'TableV2UsesFixedDataGetterAndExpandedRowCallbacks',
+    ],
+    [
+      'table-v2-data-getter-mutated',
+      'DataGetter?.Invoke(context) ??',
+      'null ??',
+      'TableV2UsesFixedDataGetterAndExpandedRowCallbacks',
+    ],
+    [
+      'table-v2-expanded-callback-mutated',
+      'OnExpandedRowsChange?.Invoke(ExpandedRowKeys.ToArray());',
+      '_ = ExpandedRowKeys.Count;',
+      'TableV2UsesFixedDataGetterAndExpandedRowCallbacks',
+    ],
+    [
+      'table-v2-viewport-max-height-mutated',
+      'Math.Min(ViewportHeight, ViewportMaxHeight ?? double.PositiveInfinity)',
+      'ViewportHeight',
+      'TableV2MapsViewportGeometryAndCacheToRealLayout',
+    ],
+    [
+      'table-v2-sort-direction-mutated',
+      'FsusSortDirection.Ascending => Data\n        .OrderBy(',
+      'FsusSortDirection.Ascending => Data\n        .OrderByDescending(',
+      'TableV2SortsTypedRowsAndReportsColumnSort',
+    ],
+    [
+      'table-v2-sort-callback-mutated',
+      'OnColumnSort?.Invoke(SortBy);',
+      '_ = SortBy;',
+      'TableV2SortsTypedRowsAndReportsColumnSort',
+    ],
+    [
+      'table-v2-header-region-mutated',
+      'headerCellHost.Children.Add(presenter);',
+      '_ = presenter;',
+      'TableV2RendersBoundedContentRegions',
+    ],
+    [
+      'table-v2-header-index-mutated',
+      'new FsusTableV2HeaderContext(headerCells, Columns, headerIndex)',
+      'new FsusTableV2HeaderContext(headerCells, Columns, 0)',
+      'TableV2ContentRegionsReceiveScopedPayloads',
+    ],
+    [
+      'table-v2-header-array-mutated',
+      'var headerHeights = (HeaderHeights.Count > 0 ? HeaderHeights : [HeaderHeight])',
+      'var headerHeights = new[] { HeaderHeight }',
+      'TableV2ContentRegionsReceiveScopedPayloads',
+    ],
+    [
+      'table-v2-row-region-bounds-mutated',
+      'foreach (var rowIndex in realizedRows)',
+      'foreach (var rowIndex in Enumerable.Range(0, rowCount))',
+      'TableV2RendersBoundedContentRegions',
+    ],
+    [
+      'table-v2-empty-region-mutated',
+      'emptyHost.IsVisible = rowCount == 0 && EmptyContent is not null;',
+      'emptyHost.IsVisible = false;',
+      'TableV2RendersBoundedContentRegions',
+    ],
+  ].map(([id, from, to, test]) => ({
+    id,
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs',
+        from,
+        to,
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
+        '--filter',
+        `FullyQualifiedName~${test}`,
+      ],
+    ],
+    expected: 'Assert.',
+  })),
   {
     id: 'vue-prop-removed',
     file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
@@ -86,18 +682,6 @@ const cases = [
       ),
     command: [process.execPath, ['scripts/conformance-v2-vue-public-gate.mjs']],
     expected: 'Vue public props drift',
-  },
-  {
-    id: 'root-command-vue-baseline-drift',
-    file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
-    inject: () =>
-      mutateText(
-        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
-        '  documentIdentity: {\n    type: definePropType<MarkdownEditorDocumentIdentity>(Object),\n    default: undefined,\n  },\n',
-        '',
-      ),
-    command: ['pnpm', ['run', 'conformance:v2']],
-    expected: '[conformance-v2] FAIL baseline:web exit=1',
   },
   {
     id: 'vue-event-modified',
@@ -124,17 +708,165 @@ const cases = [
     expected: 'Vue public exposed drift',
   },
   {
-    id: 'vue-slot-modified',
-    file: 'vue/packages/components/select-v2/src/select.vue',
+    id: 'check-tag-vue-role-mutated',
+    file: 'vue/packages/components/check-tag/src/check-tag.vue',
     inject: () =>
       mutateText(
-        'vue/packages/components/select-v2/src/select.vue',
-        '<slot name="empty">',
-        '<slot name="empty-mutated">',
+        'vue/packages/components/check-tag/src/check-tag.vue',
+        'role="checkbox"',
+        'role="button"',
       ),
-    command: ['pnpm', ['run', 'avalonia:baseline:check']],
-    expected: 'Avalonia Vue public API baseline is stale',
+    command: [
+      'pnpm',
+      [
+        'exec',
+        'vitest',
+        'run',
+        '--config',
+        'vue/vitest.config.ts',
+        'vue/packages/components/check-tag/__tests__/check-tag.test.tsx',
+      ],
+    ],
+    expected: 'to match object',
   },
+  {
+    id: 'check-tag-vue-keyboard-mutated',
+    file: 'vue/packages/components/check-tag/src/check-tag.vue',
+    inject: () =>
+      mutateText(
+        'vue/packages/components/check-tag/src/check-tag.vue',
+        '@keydown.space.prevent="handleChange"',
+        '',
+      ),
+    command: [
+      'pnpm',
+      [
+        'exec',
+        'vitest',
+        'run',
+        '--config',
+        'vue/vitest.config.ts',
+        'vue/packages/components/check-tag/__tests__/check-tag.test.tsx',
+      ],
+    ],
+    expected: 'to deeply equal',
+  },
+  {
+    id: 'check-tag-avalonia-name-mutated',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+        '      change.Property == ContentControl.ContentProperty)',
+        '      change.Property == CheckedProperty)',
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj',
+        '--filter',
+        'FullyQualifiedName~FsusCheckTagTests',
+      ],
+    ],
+    expected: 'Assert.Equal() Failure',
+  },
+  {
+    id: 'check-tag-avalonia-keyboard-mutated',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+        'e.Key is not (Key.Enter or Key.Space)',
+        'e.Key is not Key.Escape',
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj',
+        '--filter',
+        'FullyQualifiedName~FsusCheckTagTests',
+      ],
+    ],
+    expected: 'Assert.Equal() Failure',
+  },
+  {
+    id: 'check-tag-avalonia-event-payload-mutated',
+    file: 'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+    inject: () =>
+      mutateText(
+        'dotnet/FsusUI.Avalonia/Controls/FsusCheckTag.cs',
+        'new FsusCheckTagValueChangedEventArgs(old, next)',
+        'new FsusCheckTagValueChangedEventArgs(old, old)',
+      ),
+    command: [
+      'dotnet',
+      [
+        'test',
+        'dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj',
+        '--filter',
+        'FullyQualifiedName~FsusCheckTagTests',
+      ],
+    ],
+    expected: 'Assert.Equal() Failure',
+  },
+  ...[
+    [
+      'check-tag-avalonia-focus-ring-mutated',
+      'dotnet/FsusUI.Avalonia.Themes/Themes/Controls/CheckTag.axaml',
+      'BorderThickness" Value="2"',
+      'BorderThickness" Value="0"',
+    ],
+    [
+      'check-tag-avalonia-default-focus-adorner-mutated',
+      'dotnet/FsusUI.Avalonia.Themes/Themes/Controls/CheckTag.axaml',
+      '    <Setter Property="FocusAdorner" Value="{x:Null}" />\n',
+      '',
+    ],
+    [
+      'check-tag-web-motion-mutated',
+      'vue/packages/theme-chalk/src/check-tag.scss',
+      'transition-duration: 1ms',
+      'transition-duration: 200ms',
+    ],
+  ].map(([id, file, from, to]) => ({
+    id,
+    file,
+    inject: () => mutateText(file, from, to),
+    command:
+      id === 'check-tag-avalonia-default-focus-adorner-mutated'
+        ? ['pnpm', ['run', 'conformance:v2:avalonia']]
+        : id === 'check-tag-avalonia-focus-ring-mutated'
+          ? [
+              'dotnet',
+              [
+                'test',
+                'dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj',
+                '--filter',
+                'FullyQualifiedName~FsusCheckTagHeadlessTests',
+              ],
+            ]
+          : [
+              'pnpm',
+              [
+                'exec',
+                'vitest',
+                'run',
+                '--config',
+                'vue/vitest.config.ts',
+                'vue/packages/theme-chalk/__tests__/fsus-theme.test.ts',
+                '-t',
+                'uses Scholarly Blue state tokens',
+              ],
+            ],
+    expected:
+      id === 'check-tag-avalonia-default-focus-adorner-mutated'
+        ? 'rendered focus ring pixels did not match'
+        : id === 'check-tag-avalonia-focus-ring-mutated'
+          ? 'Assert.Equal() Failure'
+          : 'expected',
+  })),
   ...[
     ['avalonia-property-removed', 'DocumentIdentityProperty'],
     [
@@ -151,7 +883,7 @@ const cases = [
     ],
     [
       'avalonia-unmapped-public-member',
-      'public partial class FsusMarkdownEditor : TemplatedControl\n{',
+      'public class FsusMarkdownEditor : TemplatedControl\n{',
     ],
   ].map(([id, locator]) => ({
     id,
@@ -165,7 +897,6 @@ const cases = [
           : `${locator}Mutation`,
       ),
     command: ['pnpm', ['run', 'avalonia:semantic:check']],
-    prepare: prepareAvaloniaSemanticCheck,
     expected:
       id === 'avalonia-property-removed' ||
       id === 'avalonia-default-nullability-modified'
@@ -176,32 +907,6 @@ const cases = [
             ? 'CS1003'
             : 'baseline',
   })),
-  {
-    id: 'root-command-avalonia-baseline-drift',
-    file: 'dotnet/FsusUI.Avalonia/Controls/FsusMarkdownEditor.cs',
-    inject: () =>
-      mutateText(
-        'dotnet/FsusUI.Avalonia/Controls/FsusMarkdownEditor.cs',
-        'public partial class FsusMarkdownEditor : TemplatedControl\n{',
-        'public partial class FsusMarkdownEditor : TemplatedControl\n{\n  public string RootCommandMutationMember { get; set; } = string.Empty;',
-      ),
-    command: ['pnpm', ['run', 'conformance:v2']],
-    prepare: prepareAvaloniaSemanticCheck,
-    expected: '[conformance-v2] FAIL baseline:avalonia exit=1',
-  },
-  {
-    id: 'avalonia-content-property-removed',
-    file: 'dotnet/FsusUI.Avalonia/Controls/FsusActivityRailShell.cs',
-    inject: () =>
-      mutateText(
-        'dotnet/FsusUI.Avalonia/Controls/FsusActivityRailShell.cs',
-        '  [Content]\n  public object? MainContent',
-        '  public object? MainContent',
-      ),
-    command: ['pnpm', ['run', 'avalonia:semantic:check']],
-    prepare: prepareAvaloniaSemanticCheck,
-    expected: 'content property',
-  },
   ...[
     ['runner-skips-click', 'pointer'],
     ['runner-skips-keyboard', 'keyboard'],
@@ -222,57 +927,6 @@ const cases = [
       '.tmp/conformance-v2/mutated-comparison.json',
     ]),
     expected: `required-step.${action}`,
-  })),
-  {
-    id: 'execution-record-source-forged',
-    file: '.tmp/conformance-v2/web-a11y/manifest.json',
-    inject: () =>
-      mutateJson('.tmp/conformance-v2/web-a11y/manifest.json', (value) => {
-        value.executionCoverage.records[0].source.name = 'markdown.not-observed'
-      }),
-    command: gate('compare', [
-      '--web',
-      '.tmp/conformance-v2/web-a11y/manifest.json',
-      '--avalonia',
-      '.tmp/conformance-v2/avalonia.json',
-      '--out',
-      '.tmp/conformance-v2/mutated-comparison.json',
-    ]),
-    expected: 'source event not observed',
-  },
-  ...[
-    [
-      'execution-ledger-member-deleted',
-      (value) => value.executionCoverage.records.splice(0, 1),
-      'executionCoverage.outputHash invalid',
-    ],
-    [
-      'execution-ledger-identity-forged',
-      (value) => (value.executionCoverage.identity.candidate = 'forged'),
-      'executionCoverage.identity mismatch',
-    ],
-    [
-      'execution-ledger-metadata-only',
-      (value) => (value.executionCoverage.real = false),
-      'executionCoverage metadata-only',
-    ],
-  ].map(([id, mutation, expected]) => ({
-    id,
-    file: '.tmp/conformance-v2/comparison.json',
-    inject: () => mutateJson('.tmp/conformance-v2/comparison.json', mutation),
-    command: gate('derive', [
-      '--contract',
-      'spec/components/contracts/v2/contract-v2.json',
-      '--comparison',
-      '.tmp/conformance-v2/comparison.json',
-      '--candidate',
-      'git',
-      '--out',
-      '.tmp/conformance-v2/mutated-alignment.json',
-      '--gaps',
-      '.tmp/conformance-v2/mutated-gaps.json',
-    ]),
-    expected,
   })),
   ...[
     [
@@ -325,12 +979,12 @@ const cases = [
     [
       'identity-hash-mismatch',
       (value) => (value.identity.contractHash = 'stale'),
-      'executionCoverage.identity mismatch',
+      'identity.contractHash',
     ],
     [
       'checkpoint-mismatch',
       (value) => (value.identity.checkpoint = 'other'),
-      'executionCoverage.identity mismatch',
+      'identity.checkpoint',
     ],
     [
       'fixture-only-a11y',
@@ -342,6 +996,102 @@ const cases = [
     file: '.tmp/conformance-v2/web-a11y/manifest.json',
     inject: () =>
       mutateJson('.tmp/conformance-v2/web-a11y/manifest.json', mutation),
+    command: gate('compare', [
+      '--web',
+      '.tmp/conformance-v2/web-a11y/manifest.json',
+      '--avalonia',
+      '.tmp/conformance-v2/avalonia.json',
+      '--out',
+      '.tmp/conformance-v2/mutated-comparison.json',
+    ]),
+    expected,
+  })),
+  ...[
+    [
+      'check-tag-evidence-pointer-mutated',
+      (execution) => (execution.steps[2].observation.passed = false),
+      'steps[2] failed',
+    ],
+    [
+      'check-tag-evidence-keyboard-mutated',
+      (execution) => (execution.steps[6].observation.passed = false),
+      'steps[6] failed',
+    ],
+    [
+      'check-tag-evidence-event-payload-mutated',
+      (execution) => (execution.events[0].payload = false),
+      'web.events.payload mismatch',
+    ],
+    [
+      'check-tag-evidence-role-mutated',
+      (execution) => (execution.accessibility.node.role = 'button'),
+      'web.a11y.role mismatch',
+    ],
+    [
+      'check-tag-evidence-name-mutated',
+      (execution) => (execution.accessibility.node.name = 'Wrong name'),
+      'web.a11y.name mismatch',
+    ],
+    [
+      'check-tag-evidence-checked-mutated',
+      (execution) => (execution.state.checked = true),
+      'web.state.checked mismatch',
+    ],
+    [
+      'check-tag-evidence-focus-mutated',
+      (execution) => (execution.state.focus = null),
+      'web.state.focus mismatch',
+    ],
+    [
+      'check-tag-evidence-motion-mutated',
+      (execution) => (execution.state.motion.active = true),
+      'web.motion.active mismatch',
+    ],
+    [
+      'check-tag-evidence-visual-mutated',
+      (execution) =>
+        (execution.visual.observation.focusIndicatorVisible = false),
+      'visual rendered focused artifact missing',
+    ],
+    [
+      'check-tag-evidence-performance-mutated',
+      (execution) =>
+        (execution.performance.interactionMilliseconds =
+          execution.performance.budget.interactionMs + 1),
+      'performance budget failed',
+    ],
+    [
+      'check-tag-evidence-memory-mutated',
+      (execution) =>
+        (execution.performance.memoryObservation.retainedPerItemStateCount = 1),
+      'performance budget failed',
+    ],
+    [
+      'check-tag-evidence-retention-mutated',
+      (execution) =>
+        (execution.performance.memoryObservation.detachedControlCollected = false),
+      'performance budget failed',
+    ],
+    [
+      'check-tag-evidence-checkpoint-mutated',
+      (execution) => (execution.identity.checkpoint = 'wrong-checkpoint'),
+      'check-tag.visual-review.identity.checkpoint mismatch',
+    ],
+    [
+      'check-tag-evidence-coverage-mutated',
+      (execution) =>
+        (execution.coverage.executions[
+          'scenario.v2.el-check-tag.pointer'
+        ].real = false),
+      'scenario.scenario.v2.el-check-tag.pointer metadata-only',
+    ],
+  ].map(([id, mutation, expected]) => ({
+    id,
+    file: '.tmp/conformance-v2/web-a11y/manifest.json',
+    inject: () =>
+      mutateJson('.tmp/conformance-v2/web-a11y/manifest.json', (value) =>
+        mutation(value.contractExecutions['component-v2.el-check-tag']),
+      ),
     command: gate('compare', [
       '--web',
       '.tmp/conformance-v2/web-a11y/manifest.json',
@@ -452,14 +1202,14 @@ const cases = [
     expected: 'reviewPolicy',
   },
 ]
-const selectedCases =
-  requestedCaseIds.size === 0
-    ? cases
-    : cases.filter((entry) => requestedCaseIds.has(entry.id))
-for (const requestedCaseId of requestedCaseIds) {
-  if (!selectedCases.some((entry) => entry.id === requestedCaseId)) {
-    throw new Error(`unknown isolated mutation ${requestedCaseId}`)
-  }
+
+const selectedCases = requestedCaseIds.size
+  ? cases.filter((entry) => requestedCaseIds.has(entry.id))
+  : cases
+if (selectedCases.length !== (requestedCaseIds.size || cases.length)) {
+  const selectedIds = new Set(selectedCases.map((entry) => entry.id))
+  const missing = [...requestedCaseIds].filter((id) => !selectedIds.has(id))
+  throw new Error(`unknown mutation cases: ${missing.join(', ')}`)
 }
 
 try {
@@ -479,7 +1229,6 @@ try {
   for (const entry of selectedCases) {
     reset()
     entry.inject()
-    entry.prepare?.()
     const diff = run('git', ['diff', '--no-ext-diff', '--', entry.file])
     const [command, args] = entry.command
     const result = run(command, args)
@@ -499,6 +1248,7 @@ try {
   const receipt = {
     schema: 'fsusui.conformance-isolated-mutations.v2',
     checkout: { kind: 'git-shared-clone', source: root },
+    selection: requestedCaseIds.size ? [...requestedCaseIds].sort() : 'all',
     positiveCandidate: run('git', ['rev-parse', 'HEAD']).stdout.trim(),
     verdict: survivors.length === 0 ? 'pass' : 'fail',
     results,

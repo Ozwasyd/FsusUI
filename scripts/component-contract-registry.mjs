@@ -88,7 +88,6 @@ const REVIEWED_WEB_ONLY_DECISIONS = {
       {
         type: 'FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface',
         members: [
-          'Content',
           'TriggerMode',
           'TriggerClick',
           'Open',

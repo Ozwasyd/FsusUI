@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "d19b29045012b19624184af9b86e77875aace4bc65f5f11e469c145be31bc65f",
+    "hash": "fd5b21f19674378c01c4b4b238bed850338591419e93650081c9c21d655ab5a8",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c"
@@ -409,6 +409,120 @@
       "events": [],
       "contentRegions": [],
       "exposed": [],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
+      "id": "component.el-affix",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "native-adapter",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "native-adapter",
+      "source": {
+        "kind": "component",
+        "name": "ElAffix",
+        "module": "affix",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [
+        {
+          "name": "offset",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "position",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "target",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "zIndex",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [
+        {
+          "name": "[CHANGE_EVENT]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "scroll",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": false,
+          "required": false
+        }
+      ],
+      "exposed": [
+        {
+          "name": "update",
+          "signature": "vue-source"
+        },
+        {
+          "name": "updateRoot",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -1114,6 +1228,107 @@
       },
       "performanceBudget": {
         "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
+      "id": "component.el-backtop",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "native-adapter",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "native-adapter",
+      "source": {
+        "kind": "component",
+        "name": "ElBacktop",
+        "module": "backtop",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [
+        {
+          "name": "bottom",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "right",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "target",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "visibilityHeight",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [
+        {
+          "name": "click",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": false,
+          "required": false
+        }
+      ],
+      "exposed": [],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 16,
         "interactionMs": 50,
         "memory": "no retained unbounded per-item state without virtualization budget"
       }
@@ -8292,6 +8507,71 @@
       },
       "performanceBudget": {
         "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
+      "id": "component.el-infinite-scroll",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "native-adapter",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "native-adapter",
+      "source": {
+        "kind": "component",
+        "name": "ElInfiniteScroll",
+        "module": "infinite-scroll",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [],
+      "events": [],
+      "contentRegions": [],
+      "exposed": [],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 16,
         "interactionMs": 50,
         "memory": "no retained unbounded per-item state without virtualization budget"
       }
@@ -28912,32 +29192,6 @@
   ],
   "webOnlyDecisions": [
     {
-      "id": "web-only.component.el-affix",
-      "source": {
-        "kind": "component",
-        "name": "ElAffix",
-        "module": "affix",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "owner": "FsusUI Core",
-      "reviewAfter": "2026-12-31",
-      "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
-    },
-    {
-      "id": "web-only.component.el-backtop",
-      "source": {
-        "kind": "component",
-        "name": "ElBacktop",
-        "module": "backtop",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "owner": "FsusUI Core",
-      "reviewAfter": "2026-12-31",
-      "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
-    },
-    {
       "id": "web-only.component.el-collapse-transition",
       "source": {
         "kind": "component",
@@ -28947,21 +29201,23 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
-    },
-    {
-      "id": "web-only.component.el-infinite-scroll",
-      "source": {
-        "kind": "component",
-        "name": "ElInfiniteScroll",
-        "module": "infinite-scroll",
-        "baseline": "spec/baselines/vue-current.json"
-      },
-      "owner": "FsusUI Core",
-      "reviewAfter": "2026-12-31",
-      "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use the native FsusCollapse public surface; Avalonia does not expose a browser transition-wrapper component.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusCollapse",
+          "members": []
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper",
@@ -28973,8 +29229,43 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use FsusTooltip, FsusPopover, FsusPopconfirm, or FsusDropdown with FsusAnchoredOverlaySurface and FsusOverlayHost.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusTooltip",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusPopover",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusPopconfirm",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusDropdown",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+          "members": []
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-arrow",
@@ -28986,8 +29277,27 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use the native anchored-overlay template and FsusAnchoredPlacement/EffectivePlacement; no public arrow primitive is exposed.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredPlacement",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": ["EffectivePlacement"]
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-content",
@@ -28999,8 +29309,35 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use FsusAnchoredOverlaySurface.OverlayContent with FsusOverlayHost, FsusOverlayEntry, and FsusOverlayOptions.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": ["OverlayContent"]
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayEntry",
+          "members": []
+        },
+        {
+          "type": "FsusUI.Avalonia.Overlay.FsusOverlayOptions",
+          "members": []
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     },
     {
       "id": "web-only.component.el-popper-trigger",
@@ -29012,8 +29349,23 @@
       },
       "owner": "FsusUI Core",
       "reviewAfter": "2026-12-31",
+      "reviewedAt": "2026-08-31",
       "reason": "This public Vue surface depends on browser or DOM behavior and is not part of the stable Avalonia parity target.",
-      "alternative": "Document an Avalonia-native contract in a future minor registry version before implementation."
+      "alternative": "Use the native Content region with TriggerMode, TriggerClick, Open, and CloseAsync on the anchored-overlay surface.",
+      "authority": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "nativeSymbols": [
+        {
+          "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+          "members": ["TriggerMode", "TriggerClick", "Open", "CloseAsync"]
+        }
+      ],
+      "testPolicy": "Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.",
+      "reviewPolicy": "Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.",
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
     }
   ]
 }

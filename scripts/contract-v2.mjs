@@ -46,6 +46,8 @@ export const SEMANTIC_MEMBER_BINDINGS_PATH =
   'spec/components/contracts/v2/semantic-member-bindings.json'
 export const CONTRACT_V2_REGISTRY_PATH =
   'spec/components/contracts/v2/contract-v2.json'
+export const V1_CONTRACT_REGISTRY_PATH =
+  'spec/components/contracts/v1/vue-public-contracts.json'
 
 const read = (file) => fs.readFileSync(file, 'utf8')
 const exists = (file) => fs.existsSync(file)
@@ -1924,6 +1926,8 @@ const contractForComponent = ({
   gate,
   semanticBindings,
   semanticDispositions,
+  performanceBudget = null,
+  platformException = null,
 }) => {
   // Keep the full export name in the stable id so distinct public exports such
   // as ElCollectionSummary and FsusCollectionSummary never collide.
@@ -2057,6 +2061,7 @@ const contractForComponent = ({
     contentRegions,
     states,
     requirements,
+    ...(performanceBudget ? { performanceBudget } : {}),
     platformDifferences: members
       .filter(
         (member) =>
@@ -2086,6 +2091,9 @@ const contractForComponent = ({
       ...requirements.perf.map(() => `scenario.v2.${contractKebab}.perf`),
     ],
     coverage: contractCoverage(members),
+  }
+  if (classification === 'web-only') {
+    contract.platformException = platformException
   }
   if (isMarkdownEditor) {
     contract.markdownEditor = markdownEditorSection()
@@ -2301,6 +2309,7 @@ export const buildRegistry = ({
   avaloniaIconsBaseline,
   gate,
   semanticMemberBindings = { mappings: [] },
+  v1Registry = null,
 }) => {
   const baselines = {
     avalonia: avaloniaBaseline,
@@ -2310,6 +2319,43 @@ export const buildRegistry = ({
   const typeIndex = avaloniaSemanticIndex(baselines)
   const semanticBindings = semanticBindingIndex(semanticMemberBindings)
   const semanticDispositions = semanticDispositionIndex(semanticMemberBindings)
+  const performanceBudgetByComponent = new Map(
+    [
+      ...(v1Registry?.contracts ?? []),
+      ...(v1Registry?.webOnlyDecisions ?? []),
+    ]
+      .filter((entry) => entry.source?.kind === 'component')
+      .map((entry) => [entry.source.name, entry.performanceBudget ?? null]),
+  )
+  const platformExceptionByComponent = new Map(
+    (v1Registry?.webOnlyDecisions ?? [])
+      .filter((entry) => entry.source?.kind === 'component')
+      .map((entry) => [
+        entry.source.name,
+        {
+          reason: entry.reason,
+          alternative: entry.alternative,
+          owner: entry.owner,
+          testPolicy:
+            entry.testPolicy ??
+            'Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.',
+          reviewPolicy:
+            entry.reviewPolicy ??
+            'Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.',
+          reviewedAt: entry.reviewedAt ?? entry.reviewAfter,
+          reviewAfter: entry.reviewAfter,
+          authority:
+            entry.authority ??
+            AVALONIA_SEMANTIC_PATHS.avalonia,
+          nativeSymbols: entry.nativeSymbols ?? [
+            {
+              type: 'FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface',
+              members: [],
+            },
+          ],
+        },
+      ]),
+  )
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
   const contracts = []
@@ -2323,6 +2369,14 @@ export const buildRegistry = ({
         gate,
         semanticBindings,
         semanticDispositions,
+        performanceBudget:
+          performanceBudgetByComponent.get(component.name) ?? {
+            renderMs: 8,
+            interactionMs: 50,
+            memory:
+              'no retained unbounded per-item state without virtualization budget',
+          },
+        platformException: platformExceptionByComponent.get(component.name),
       }),
     )
   }
@@ -3259,6 +3313,7 @@ const main = () => {
   const registryPath = path.join(root, CONTRACT_V2_REGISTRY_PATH)
   const gatePath = path.join(root, MARKDOWN_EDITOR_GATE_PATH)
   const semanticBindingsPath = path.join(root, SEMANTIC_MEMBER_BINDINGS_PATH)
+  const v1RegistryPath = path.join(root, V1_CONTRACT_REGISTRY_PATH)
 
   for (const requiredPath of [gatePath, semanticBindingsPath]) {
     if (exists(requiredPath)) continue
@@ -3279,6 +3334,7 @@ const main = () => {
   )
   const gate = parseJson(gatePath)
   const semanticMemberBindings = parseJson(semanticBindingsPath)
+  const v1Registry = parseJson(v1RegistryPath)
   const avaloniaBaselines = {
     avalonia: avaloniaBaseline,
     avaloniaThemes: avaloniaThemesBaseline,
@@ -3302,6 +3358,7 @@ const main = () => {
     avaloniaIconsBaseline,
     gate,
     semanticMemberBindings,
+    v1Registry,
   })
   const surfaceAudit = validateAvaloniaSurfaceRegistration({
     registry,
