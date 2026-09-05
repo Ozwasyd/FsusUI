@@ -169,12 +169,12 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     properties.filter((property) => typeof property.required === 'boolean')
       .length,
-    2021,
+    2083,
   )
   assert.equal(properties.filter((property) => property.required).length, 15)
   assert.equal(
     avaloniaProperties.filter((property) => property.defaultKnown).length,
-    294,
+    296,
   )
   const contentRegions = avaloniaBaselines.avalonia.semanticTypes.flatMap(
     (type) =>
@@ -183,8 +183,15 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
         ...region,
       })),
   )
+  const declaredContentRegions = contentRegions.filter((region) =>
+    [
+      'FsusUI.Avalonia.Controls.FsusActivityRailSection',
+      'FsusUI.Avalonia.Controls.FsusActivityRailShell',
+      'FsusUI.Avalonia.Controls.FsusSettingsCategory',
+    ].includes(region.ownerType),
+  )
   assert.deepEqual(
-    contentRegions.map((region) => [
+    declaredContentRegions.map((region) => [
       region.ownerType,
       region.name,
       region.propertyKind,
@@ -199,13 +206,33 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
       ['FsusUI.Avalonia.Controls.FsusSettingsCategory', 'Content', 'clr'],
     ],
   )
-  for (const region of contentRegions) {
+  for (const region of declaredContentRegions) {
     assert.equal(region.type, 'System.Object')
     assert.equal(region.nullable, true)
     assert.equal(region.canRead, true)
     assert.equal(region.canWrite, true)
     assert.equal(region.required, false)
   }
+  for (const region of contentRegions) {
+    assert.equal(region.canRead, true)
+    assert.equal(region.required, false)
+  }
+  const typesWithContentProperty = avaloniaBaselines.avalonia.semanticTypes.filter(
+    (type) => typeof type.contentProperty === 'string',
+  )
+  assert.equal(typesWithContentProperty.length, 158)
+  for (const type of typesWithContentProperty) {
+    assert.ok(
+      (type.contentRegions ?? []).some(
+        (region) => region.name === type.contentProperty,
+      ),
+      `${type.name} must expose its inherited content property as a region`,
+    )
+  }
+  const checkTagType = avaloniaBaselines.avalonia.semanticTypes.find(
+    (type) => type.name === 'FsusUI.Avalonia.Controls.FsusCheckTag',
+  )
+  assert.equal(checkTagType.contentProperty, 'Content')
   const semanticTypes = Object.values(avaloniaBaselines).flatMap(
     (baseline) => baseline.semanticTypes,
   )
@@ -400,12 +427,12 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 406)
+  assert.equal(mappings.length, 408)
   assert.deepEqual(semanticCounts, {
-    role: 106,
+    role: 107,
     name: 123,
     value: 4,
-    state: 114,
+    state: 115,
     'help-text': 25,
     'accessibility-view': 22,
     'live-setting': 12,
@@ -413,12 +440,12 @@ test('Avalonia automation baseline separates source observations from declared a
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'public-control-this')
       .length,
-    323,
+    324,
   )
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'automation-peer-owner')
       .length,
-    24,
+    25,
   )
   assert.ok(
     automationTypes.every(
@@ -654,7 +681,7 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
   assert.equal(avalonia.definitions.length, 116)
   assert.equal(themes.definitions.length, 116)
   assert.equal(avalonia.dependencies.length, 23)
-  assert.equal(themes.dependencies.length, 990)
+  assert.equal(themes.dependencies.length, 991)
   assert.equal(
     avalonia.dependencies.filter((dependency) => dependency.resolved).length,
     23,
@@ -667,7 +694,7 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
     themes.dependencies.filter(
       (dependency) => dependency.ownership === 'resolved',
     ).length,
-    607,
+    608,
   )
   assert.ok(
     [avalonia, themes].every(
@@ -1463,7 +1490,14 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
   )
 
   const duplicate = clone(semanticMemberBindings)
-  duplicate.mappings.push(clone(duplicate.mappings[0]))
+  duplicate.mappings.push(
+    clone(
+      duplicate.mappings.find(
+        (mapping) =>
+          mapping.component === 'ElMarkdownEditor' && mapping.web === 'modelValue',
+      ),
+    ),
+  )
   const errors = validateSemanticMemberBindings({
     registry: duplicate,
     vueBaseline,
@@ -1539,6 +1573,7 @@ test('member disposition mutations fail closed', () => {
       (registry) => {
         registry.dispositions[0] = {
           ...registry.dispositions[0],
+          component: registry.mappings[0].component,
           kind: registry.mappings[0].kind,
           web: registry.mappings[0].web,
         }
@@ -1591,14 +1626,14 @@ test('real mapped inputs use compiler-known metadata and keep unknown values par
   const mappedInputs = registry.contracts.flatMap((contract) =>
     contract.inputs.filter((input) => input.avalonia != null),
   )
-  assert.equal(mappedInputs.length, 140)
+  assert.equal(mappedInputs.length, 184)
   assert.equal(
     mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
-    13,
+    14,
   )
   assert.equal(
     mappedInputs.filter((input) => input.status === 'partial').length,
-    126,
+    170,
   )
   const max = registry.contracts
     .find((contract) => contract.component.name === 'ElBadge')

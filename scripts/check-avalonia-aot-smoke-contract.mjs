@@ -162,7 +162,7 @@ requireMatch(
 )
 requireMatch(
   runner,
-  /includeCandidatePackages\s*\|\|\s*!fsusUiCandidatePackagePattern\.test\(entry\.name\)/u,
+  /includeCandidatePackages\s*\|\|\s*!candidatePackagePattern\.test\(entry\.name\)/u,
   'Native AOT must exclude stale FsusUI candidates from the dependency cache',
 )
 requireMatch(
@@ -202,6 +202,19 @@ requireMatch(
   runner,
   /readFileSync\(`\/proc\/\$\{pid\}\/stat`,\s*'utf8'\)[\s\S]*?processState !== 'Z'/u,
   'session-bus cleanup must recognize a terminated zombie in PID-namespace runs',
+)
+requireMatch(
+  runner,
+  /seedLocalFeed\(globalPackages,\s*\{\s*includeCandidatePackages:\s*false\s*\}\)/u,
+  'the global cache must not seed stale FsusUI candidate packages',
+)
+requireMatch(runner, /import \{ stableFamilies \} from '\.\/avalonia-aot-native\.mjs'/u, 'the AOT runner must import the identity-bound stable family authority')
+requireMatch(runner, /const stableScenarios = stableFamilies\(\)/u, 'the AOT runner must derive scenarios from the identity-bound alignment')
+forbidMatch(runner, /avalonia-stable-readiness\.json/u, 'the AOT runner must not read a manual readiness membership list')
+requireMatch(
+  runner,
+  /candidatePackagePattern\s*=\s*\n?\s*\/\^fsusui\\\.avalonia/u,
+  'FsusUI candidate package detection must be case-insensitive',
 )
 requireMatch(
   runner,

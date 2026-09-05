@@ -14,6 +14,9 @@ list is first realized before its final mounted width is known.
 `FsusInfiniteScroll` is a non-rendering behavior helper that observes an owned
 or ancestor `ScrollViewer` and raises `Loaded` when scrolling reaches the
 configured bottom distance.
+`FsusAutoResizer` observes its arranged viewport, exposes it through `Viewport`,
+invokes `OnResize`, and preserves an axis when `DisableWidth` or `DisableHeight`
+is set.
 
 ## Realization and recycling
 
@@ -28,6 +31,25 @@ measurement cache remains capped by `VirtualizationBudget.RetainedMeasurements`.
 union of the visible row/column window and frozen axes, so a 100K × 80 source
 does not create a source-sized visual tree. `ContainerPoolLimit`,
 `LoadedWindowLimit`, and `LoadedRowIndexLimit` are explicit hard limits.
+`Columns` and `Data` accept the typed `FsusDataTableColumn` and
+`FsusDataTableRow` model. Columns marked `Left` or `Right` remain realized while
+the horizontal window moves. `ScrollTo`, `ScrollToLeft`, `ScrollToRow`, and
+`ScrollToTop` update the owned scroll surface, and arrow-key events raised on
+the control move the focused cell through the same scrolling path. When
+`EstimatedRowHeight` is set, `SetMeasuredRowHeight` updates the variable-size
+index and the realized row offsets. `OnRowsRendered`, `OnScroll`, and
+`OnEndReached` report the actual realization and scrolling path. `FixedData`
+rows remain realized, `DataGetter` receives the typed cell context, and
+expanded-row changes update `ExpandedRowKeys` before invoking
+`OnRowExpand`/`OnExpandedRowsChange`. The Vue `cache`, `width`, `height`, and
+`maxHeight` inputs bind explicitly to `Overscan`, `ViewportWidth`,
+`ViewportHeight`, and `ViewportMaxHeight`; those values size the owned
+`ScrollViewer` and its realized window. `SortColumn` orders typed row values,
+updates `SortBy`/`SortState`, and then invokes `OnColumnSort`.
+`HeaderContent`, `HeaderCellContent`, `RowContent`, `EmptyContent`,
+`FooterContent`, and `OverlayContent` are mounted in bounded presenters around
+the owned scroll surface. Row presenters are limited to the realized window;
+`HeaderHeights` and `FooterHeight` reserve their corresponding regions.
 
 Measurement corrections before the active anchor adjust the scroll offset so
 the same logical item remains visually stable. `NotifyItemsInserted` preserves

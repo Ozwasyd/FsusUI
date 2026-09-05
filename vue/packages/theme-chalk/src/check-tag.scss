@@ -18,11 +18,21 @@
     color: var(--fsus-scholarly-blue);
   }
 
+  &:focus-visible {
+    @include a11y-focus-ring(2px, getCssVar('border-radius', 'base'));
+  }
+
   @include when(checked) {
     background-color: var(--fsus-state-selected-bg);
     color: var(--fsus-scholarly-blue);
     &:hover {
       background-color: var(--fsus-state-emphasis-bg);
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @include b(check-tag) {
+    transition-duration: 1ms !important;
   }
 }

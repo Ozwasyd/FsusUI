@@ -429,6 +429,29 @@ const validateUxAcceptanceReceipt = (
   return receipt
 }
 
+export const validateFsusUIReceiptPair = async (
+  classificationReceipt,
+  uxAcceptanceReceipt,
+  assetsInput,
+) => {
+  const assets = assetsInput ?? (await loadFsusUIDesignConformanceAssets())
+  assertSourceBindings(assets)
+  assertPolicyContract(assets.policy)
+  const compiled = compileSchemas(assets.schemas)
+  const classification = validateClassificationReceipt(
+    classificationReceipt,
+    assets,
+    compiled,
+  )
+  validateUxAcceptanceReceipt(
+    uxAcceptanceReceipt,
+    classification,
+    assets,
+    compiled,
+  )
+  return { classificationReceipt, uxAcceptanceReceipt }
+}
+
 export const validateFsusUIContractBundle = async (bundle, assetsInput) => {
   const assets = assetsInput ?? (await loadFsusUIDesignConformanceAssets())
   assertSourceBindings(assets)

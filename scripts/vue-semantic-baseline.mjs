@@ -1398,6 +1398,125 @@ export const extractComponentSemantics = ({
       emits.push(...collectEmitsFromObject(object, source, vueRel))
   }
 
+  // TS/TSX components: semantics come from defineComponent options.
+  const tsRel = vueRel && !vueRel.endsWith('.vue') ? vueRel : null
+  if (tsRel) {
+    const tsModule = resolver.parseTsModule(tsRel)
+    if (tsModule) {
+      walkNodes(tsModule.ast.program.body, (node) => {
+        if (
+          node.type !== 'CallExpression' ||
+          node.callee?.type !== 'Identifier' ||
+          node.callee.name !== 'defineComponent' ||
+          node.arguments?.[0]?.type !== 'ObjectExpression'
+        ) {
+          return
+        }
+        for (const property of node.arguments[0].properties ?? []) {
+          if (
+            property.type !== 'ObjectProperty' &&
+            property.type !== 'ObjectMethod'
+          )
+            continue
+          const optionName = keyText(property.key, tsModule.content)
+          if (optionName === 'props' && property.type === 'ObjectProperty') {
+            const resolved = resolveCallArg(property.value, tsRel)
+            if (resolved?.object) {
+              props.push(
+                ...collectPropsFromObject(
+                  resolved.object,
+                  resolved.source,
+                  resolved.sourceRel ?? tsRel,
+                ),
+              )
+            }
+          }
+          if (optionName === 'emits') {
+            const resolved = resolveCallArg(property.value, tsRel)
+            if (resolved?.object) {
+              emits.push(
+                ...collectEmitsFromObject(
+                  resolved.object,
+                  resolved.source,
+                  tsRel,
+                  resolved.sourceRel,
+                ),
+              )
+            }
+            if (resolved?.array)
+              emits.push(...collectEmitsFromArray(resolved.array))
+          }
+          if (optionName !== 'setup') continue
+          const setupNode =
+            property.type === 'ObjectMethod' ? property : property.value
+          if (
+            !setupNode ||
+            ![
+              'ObjectMethod',
+              'ArrowFunctionExpression',
+              'FunctionExpression',
+            ].includes(setupNode.type)
+          )
+            continue
+          walkNodes(setupNode.body, (node) => {
+            if (
+              node.type === 'CallExpression' &&
+              node.callee?.type === 'Identifier' &&
+              node.callee.name === 'expose' &&
+              node.arguments?.[0]?.type === 'ObjectExpression'
+            ) {
+              for (const member of node.arguments[0].properties ?? []) {
+                if (
+                  member.type !== 'ObjectProperty' &&
+                  member.type !== 'ObjectMethod'
+                )
+                  continue
+                const memberName = keyText(member.key, tsModule.content)
+                if (!memberName) continue
+                if (member.type === 'ObjectMethod') {
+                  exposed.push({
+                    name: memberName,
+                    ...signatureFromFunction(member, tsModule.content),
+                  })
+                  continue
+                }
+                const valueNode = unwrapExpression(member.value)
+                if (
+                  valueNode.type === 'ArrowFunctionExpression' ||
+                  valueNode.type === 'FunctionExpression'
+                ) {
+                  exposed.push({
+                    name: memberName,
+                    ...signatureFromFunction(valueNode, tsModule.content),
+                  })
+                } else {
+                  exposed.push({
+                    name: memberName,
+                    parameters: [],
+                    returnType: null,
+                  })
+                }
+              }
+            }
+            if (
+              (node.type === 'CallExpression' ||
+                node.type === 'OptionalCallExpression') &&
+              node.callee?.type === 'MemberExpression' &&
+              node.callee.object?.type === 'Identifier' &&
+              node.callee.object.name === 'slots' &&
+              node.callee.property?.type === 'Identifier'
+            ) {
+              slots.push({
+                name: node.callee.property.name,
+                scoped: (node.arguments ?? []).length > 0,
+              })
+            }
+          })
+        }
+      })
+    }
+  }
+
   const uniqueBy = (items) => {
     const map = new Map()
     for (const item of items) {
@@ -1458,7 +1577,7 @@ export const loadModuleSources = (root, moduleName) => {
         continue
       const full = path.join(dir, entry.name)
       if (entry.isDirectory()) walk(full)
-      else if (/\.(ts|vue)$/u.test(entry.name)) {
+      else if (/\.(ts|tsx|vue)$/u.test(entry.name)) {
         files.push({
           file: full,
           relativePath: path.relative(root, full).split(path.sep).join('/'),
@@ -1471,37 +1590,49 @@ export const loadModuleSources = (root, moduleName) => {
   return files.sort((a, b) => a.relativePath.localeCompare(b.relativePath))
 }
 
-const declaredComponentNames = (source) => {
+export const declaredComponentNames = (source) => {
   const names = new Set()
+  const collectNames = (ast) => {
+    walkNodes(ast.program.body, (node) => {
+      if (
+        node.type !== 'CallExpression' ||
+        node.callee?.type !== 'Identifier' ||
+        !['defineComponent', 'defineOptions'].includes(node.callee.name) ||
+        node.arguments?.[0]?.type !== 'ObjectExpression'
+      ) {
+        return
+      }
+      for (const property of node.arguments[0].properties ?? []) {
+        if (
+          property.type === 'ObjectProperty' &&
+          property.key?.type === 'Identifier' &&
+          property.key.name === 'name' &&
+          property.value?.type === 'StringLiteral'
+        ) {
+          names.add(property.value.value)
+        }
+      }
+    })
+  }
   try {
     const { descriptor } = parseSfc(source, { filename: 'component.vue' })
-    for (const block of [descriptor.scriptSetup, descriptor.script]) {
+    const scriptBlocks = [descriptor.scriptSetup, descriptor.script]
+    for (const block of scriptBlocks) {
       if (!block?.content) continue
       const ast = babelParse(block.content, {
         sourceType: 'module',
         plugins: ['typescript', 'jsx', 'importAttributes', 'topLevelAwait'],
         errorRecovery: true,
       })
-      walkNodes(ast.program.body, (node) => {
-        if (
-          node.type !== 'CallExpression' ||
-          node.callee?.type !== 'Identifier' ||
-          !['defineComponent', 'defineOptions'].includes(node.callee.name) ||
-          node.arguments?.[0]?.type !== 'ObjectExpression'
-        ) {
-          return
-        }
-        for (const property of node.arguments[0].properties ?? []) {
-          if (
-            property.type === 'ObjectProperty' &&
-            property.key?.type === 'Identifier' &&
-            property.key.name === 'name' &&
-            property.value?.type === 'StringLiteral'
-          ) {
-            names.add(property.value.value)
-          }
-        }
+      collectNames(ast)
+    }
+    if (!scriptBlocks.some((block) => block?.content)) {
+      const ast = babelParse(source, {
+        sourceType: 'module',
+        plugins: ['typescript', 'jsx', 'importAttributes', 'topLevelAwait'],
+        errorRecovery: true,
       })
+      collectNames(ast)
     }
   } catch {
     return names
@@ -1518,13 +1649,15 @@ export const sourceForComponent = (sources, exportName) => {
       .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
       .toLowerCase()
   const kebab = toKebab(exportName)
-  const exact = sources.find((source) =>
-    source.relativePath.endsWith(`/src/${kebab}.vue`),
+  const exact = sources.find(
+    (source) =>
+      source.relativePath.endsWith(`/src/${kebab}.vue`) ||
+      source.relativePath.endsWith(`/src/${kebab}.tsx`),
   )
   if (exact) return exact
   const declared = sources.find(
     (source) =>
-      source.relativePath.endsWith('.vue') &&
+      /\.(vue|tsx|ts)$/u.test(source.relativePath) &&
       declaredComponentNames(source.content).has(exportName),
   )
   if (declared) return declared
@@ -1542,6 +1675,7 @@ export const enrichComponentWithSemantics = ({ root, component }) => {
   })
   return {
     ...component,
+    source: vueSource?.relativePath ?? null,
     semantic: {
       props: semantics.semanticProps,
       emits: semantics.semanticEmits,

@@ -1,22 +1,34 @@
 import assert from 'node:assert/strict'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import test from 'node:test'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
+  compareEvidence,
   deriveAlignment,
   sealExecutionCoverage,
   validateCoverage,
   validateEvidence,
+  loadCurrentCheckTagVisualReview,
+  validateCurrentComparison,
   validateOverride,
   validateReadiness,
 } from '../scripts/conformance-v2-evidence.mjs'
 
 import {
   alignmentHash as stableReadinessAlignmentHash,
+  createPackageAlignmentBinding,
   currentIdentity as stableReadinessCurrentIdentity,
+  deriveReleaseScopeFamilies,
+  deriveStableConsumers,
+  evaluateStableRelease,
   readAlignment as stableReadinessReadAlignment,
+  readStableConsumerAuthority,
+  requireNugetStableRelease,
+  validatePackageAlignmentBinding,
+  validateNugetPackageAlignment,
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -38,6 +50,265 @@ const comparisonFor = (name, records = []) => {
     }),
   }
 }
+
+const realManifests = () => ({
+  web: JSON.parse(
+    fs.readFileSync(
+      path.join(root, '.tmp/conformance-v2/web-a11y/manifest.json'),
+      'utf8',
+    ),
+  ),
+  avalonia: JSON.parse(
+    fs.readFileSync(
+      path.join(root, '.tmp/conformance-v2/avalonia.json'),
+      'utf8',
+    ),
+  ),
+})
+
+const realCheckTagContract = () => {
+  const registry = JSON.parse(
+    fs.readFileSync(
+      path.join(
+        root,
+        'spec/components/contracts/v2/contract-v2.json',
+      ),
+      'utf8',
+    ),
+  )
+  return registry.contracts.find(
+    (contract) => contract.id === 'component-v2.el-check-tag',
+  )
+}
+
+const validatedRealComparison = async () => {
+  const { web, avalonia } = realManifests()
+  const visualReview = await loadCurrentCheckTagVisualReview(web, avalonia)
+  const comparison = compareEvidence(web, avalonia, visualReview)
+  validateCurrentComparison(
+    comparison,
+    web,
+    avalonia,
+    { ...comparison.identity },
+    visualReview,
+  )
+  return comparison
+}
+
+const consumerBindingsFor = (...ids) => {
+  const byContract = {}
+  for (const id of ids) {
+    byContract[id] = { releaseFamily: 'display', galleryRoute: 'display' }
+  }
+  return {
+    byContract,
+    releaseScopeFamilies: ['display'],
+    galleryRoutes: ['display'],
+  }
+}
+
+test('stable readiness hashes the exact Contract V2 bytes', () => {
+  const contractPath = path.join(
+    root,
+    'spec/components/contracts/v2/contract-v2.json',
+  )
+  const expected = crypto
+    .createHash('sha256')
+    .update(fs.readFileSync(contractPath))
+    .digest('hex')
+
+  assert.equal(stableReadinessCurrentIdentity().contractHash, expected)
+})
+
+test('stable consumers derive scope from exact contract bindings and fail closed on stale projections', () => {
+  const registry = {
+    schemaVersion: 2,
+    contracts: [{ id: 'component-v2.a' }, { id: 'component-v2.b' }],
+    consumerBindings: {
+      byContract: {
+        'component-v2.a': { releaseFamily: 'alpha', galleryRoute: 'alpha' },
+        'component-v2.b': { releaseFamily: 'beta', galleryRoute: 'beta' },
+      },
+      releaseScopeFamilies: ['alpha', 'beta'],
+    },
+  }
+  assert.deepEqual(deriveReleaseScopeFamilies(registry), ['alpha', 'beta'])
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'fsusui-authority-'))
+  const registryPath = path.join(temporary, 'registry.json')
+  const alignmentPath = path.join(temporary, 'alignment.json')
+  const expected = { candidate: 'a'.repeat(40), contractHash: 'b'.repeat(64) }
+  const alignment = {
+    schema: 'fsusui.alignment.v2',
+    identity: expected,
+    statuses: registry.contracts.map(({ id }) => ({
+      id,
+      status: 'aligned',
+      source: 'derived',
+    })),
+    stable: registry.contracts.map(({ id }) => id),
+    webOnly: [],
+    gaps: [],
+  }
+  alignment.consumers = deriveStableConsumers(registry, alignment)
+  alignment.identity.alignmentHash = stableReadinessAlignmentHash(alignment)
+  fs.writeFileSync(registryPath, `${JSON.stringify(registry, null, 2)}\n`)
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(alignment, null, 2)}\n`)
+  assert.deepEqual(
+    readStableConsumerAuthority({ registryPath, alignmentPath, expected })
+      .releaseScopeFamilies,
+    ['alpha', 'beta'],
+  )
+  const staleAlignment = structuredClone(alignment)
+  staleAlignment.consumers.releaseScopeFamilies = ['alpha']
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(staleAlignment, null, 2)}\n`)
+  assert.throws(
+    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    /integrity hash is invalid/u,
+  )
+  staleAlignment.identity.alignmentHash =
+    stableReadinessAlignmentHash(staleAlignment)
+  fs.writeFileSync(alignmentPath, `${JSON.stringify(staleAlignment, null, 2)}\n`)
+  assert.throws(
+    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    /consumers do not match exact derived authority/u,
+  )
+  const staleRegistry = structuredClone(registry)
+  staleRegistry.consumerBindings.releaseScopeFamilies = ['alpha']
+  fs.writeFileSync(registryPath, `${JSON.stringify(staleRegistry, null, 2)}\n`)
+  assert.throws(
+    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    /generated release scope projection is stale/u,
+  )
+  fs.rmSync(temporary, { recursive: true, force: true })
+})
+
+test('stable readiness accepts governed product gaps but rejects leakage and forged eligibility', () => {
+  const blocked = {
+    statuses: [
+      { id: 'component-v2.aligned', status: 'aligned', source: 'derived' },
+      { id: 'component-v2.partial', status: 'partial', source: 'derived' },
+    ],
+    stable: ['component-v2.aligned'],
+    gaps: [
+      {
+        contract: 'component-v2.partial',
+        reason: 'A required member is not implemented.',
+        owner: 'FsusUI Core',
+        requiredScenarios: ['scenario.partial'],
+        requiredEvidence: ['same-identity-comparison'],
+        evidencePolicy: {
+          realExecution: true,
+          allowSkip: false,
+          allowOverrideWithoutGovernance: false,
+        },
+      },
+    ],
+    consumers: {
+      alignmentGapCount: 1,
+      releaseFamilyGaps: [{ family: 'alpha', blockingContracts: ['component-v2.partial'] }],
+      conformanceIntegrityReady: true,
+      stableSubsetEligible: true,
+      fullSurfaceReleaseReady: false,
+      nugetStableEligible: false,
+      releaseReady: false,
+    },
+  }
+  assert.deepEqual(evaluateStableRelease(blocked), {
+    alignmentGapCount: 1,
+    missingReleaseFamilies: blocked.consumers.releaseFamilyGaps,
+    releaseReady: false,
+  })
+  assert.deepEqual(validateNugetPackageAlignment(blocked), {
+    alignmentGapCount: 1,
+    missingReleaseFamilies: blocked.consumers.releaseFamilyGaps,
+    releaseReady: false,
+  })
+  assert.throws(
+    () => requireNugetStableRelease(blocked),
+    /NuGet stable candidate blocked/u,
+  )
+  assert.throws(
+    () => validateNugetPackageAlignment(blocked, { stablePublication: true }),
+    /NuGet stable candidate blocked/u,
+  )
+  assert.throws(
+    () =>
+      evaluateStableRelease({
+        ...blocked,
+        stable: ['component-v2.aligned', 'component-v2.partial'],
+      }),
+    /leaks non-aligned/u,
+  )
+  assert.throws(
+    () =>
+      evaluateStableRelease({
+        ...blocked,
+        gaps: [{ ...blocked.gaps[0], owner: '' }],
+      }),
+    /is ungoverned/u,
+  )
+  assert.throws(
+    () => evaluateStableRelease({ ...blocked, gaps: [] }),
+    /gap diagnostic|gap structure/u,
+  )
+  assert.throws(
+    () =>
+      evaluateStableRelease({
+        ...blocked,
+        consumers: {
+          ...blocked.consumers,
+          nugetStableEligible: true,
+          releaseReady: true,
+          fullSurfaceReleaseReady: true,
+        },
+      }),
+    /do not match derived alignment/u,
+  )
+
+  const ready = {
+    statuses: [
+      { id: 'component-v2.aligned', status: 'aligned', source: 'derived' },
+    ],
+    stable: ['component-v2.aligned'],
+    gaps: [],
+    consumers: {
+      alignmentGapCount: 0,
+      releaseFamilyGaps: [],
+      conformanceIntegrityReady: true,
+      stableSubsetEligible: true,
+      fullSurfaceReleaseReady: true,
+      nugetStableEligible: true,
+      releaseReady: true,
+    },
+  }
+  assert.deepEqual(
+    validateNugetPackageAlignment(ready, { stablePublication: true }),
+    { alignmentGapCount: 0, missingReleaseFamilies: [], releaseReady: true },
+  )
+  ready.schema = 'fsusui.alignment.v2'
+  ready.identity = {
+    candidate: 'a'.repeat(40),
+    contractHash: 'b'.repeat(64),
+  }
+  ready.identity.alignmentHash = stableReadinessAlignmentHash(ready)
+  const sealedArtifact = Buffer.from(`${JSON.stringify(ready)}\n`)
+  const binding = createPackageAlignmentBinding(ready, sealedArtifact)
+  assert.deepEqual(
+    validatePackageAlignmentBinding(binding, sealedArtifact, {
+      candidate: ready.identity.candidate,
+    }),
+    ready,
+  )
+  assert.throws(
+    () =>
+      validatePackageAlignmentBinding(
+        binding,
+        Buffer.concat([sealedArtifact, Buffer.from(' ')]),
+        { candidate: ready.identity.candidate },
+      ),
+    /stale or tampered/u,
+  )
+})
 
 test('evidence rejects headless and fixture-only paths', () => {
   assert.throws(
@@ -76,34 +347,330 @@ test('platform overrides require exact governed fields', () => {
   )
 })
 
+test('derive comparison validation rejects stale identity and tampered evidence', () => {
+  const web = JSON.parse(
+    fs.readFileSync(
+      path.join(root, '.tmp/conformance-v2/web-a11y/manifest.json'),
+      'utf8',
+    ),
+  )
+  const avalonia = JSON.parse(
+    fs.readFileSync(
+      path.join(root, '.tmp/conformance-v2/avalonia.json'),
+      'utf8',
+    ),
+  )
+  const comparison = compareEvidence(web, avalonia)
+  const expected = { ...comparison.identity }
+
+  const failedMarkdownStep = structuredClone(web)
+  failedMarkdownStep.contractExecutions[
+    'component-v2.el-markdown-editor'
+  ].steps[0].observation.passed = false
+  assert.throws(
+    () => compareEvidence(failedMarkdownStep, avalonia),
+    /component-v2\.el-markdown-editor\.steps\[0\] failed/u,
+  )
+
+  const spoofedMarkdownIdentity = structuredClone(web)
+  const spoofedExecution =
+    spoofedMarkdownIdentity.contractExecutions[
+      'component-v2.el-markdown-editor'
+    ]
+  spoofedExecution.identity.documentId = 'runner-authored-document'
+  for (const step of spoofedExecution.steps) {
+    step.binding.documentId = 'runner-authored-document'
+  }
+  assert.throws(
+    () => compareEvidence(spoofedMarkdownIdentity, avalonia),
+    /identity\.documentId mismatch/u,
+  )
+
+  assert.throws(
+    () => compareEvidence(web, avalonia, {}),
+    /visual-review was not current-validated/,
+  )
+
+  validateCurrentComparison(comparison, web, avalonia, expected)
+
+  const registry = JSON.parse(
+    fs.readFileSync(
+      path.join(root, 'spec/components/contracts/v2/contract-v2.json'),
+      'utf8',
+    ),
+  )
+  const alignment = deriveAlignment(registry, comparison)
+  assert.notEqual(
+    alignment.statuses.find(
+      (entry) => entry.id === 'component-v2.el-markdown-editor',
+    )?.status,
+    'aligned',
+  )
+  assert.ok(
+    alignment.gaps.some(
+      (gap) => gap.contract === 'component-v2.el-markdown-editor',
+    ),
+  )
+
+  assert.throws(
+    () =>
+      validateCurrentComparison(
+        {
+          ...comparison,
+          identity: { ...comparison.identity, candidate: 'stale-candidate' },
+        },
+        web,
+        avalonia,
+        expected,
+      ),
+    /comparison\.identity\.candidate mismatch/,
+  )
+
+  const tamperedWeb = structuredClone(web)
+  tamperedWeb.publicState.markdown.value = 'tampered after comparison'
+  assert.throws(
+    () =>
+      validateCurrentComparison(
+        comparison,
+        tamperedWeb,
+        avalonia,
+        expected,
+      ),
+    /comparison\.evidenceDigests\.web mismatch/,
+  )
+
+  assert.throws(
+    () =>
+      validateCurrentComparison(
+        { ...comparison, compared: ['public-state'] },
+        web,
+        avalonia,
+        expected,
+      ),
+    /comparison\.requiredArtifact\.transition-order missing/,
+  )
+})
+
 test('alignment is derived and readiness excludes partial contracts', () => {
   const registry = {
     contracts: [
       {
         id: 'partial',
+        owner: 'FsusUI Core',
+        scenarioIds: ['scenario.partial.input.value', 'scenario.partial.a11y'],
         bindings: { avalonia: { status: 'bound' } },
         coverage: { missing: 1, partial: 0 },
+        inputs: [
+          {
+            kind: 'input',
+            name: 'value',
+            status: 'missing',
+            scenarioIds: ['scenario.partial.input.value'],
+            governance: {
+              reason: 'No matching real Avalonia public member.',
+              owner: 'FsusUI Core',
+              testPolicy: 'contract',
+              reviewPolicy: 'pr-review',
+            },
+          },
+        ],
+        requirements: {
+          a11y: ['The control must expose an accessible name and role.'],
+        },
       },
     ],
   }
   const alignment = deriveAlignment(registry)
   assert.equal(alignment.statuses[0].status, 'partial')
+  assert.deepEqual(alignment.gaps[0], {
+    contract: 'partial',
+    status: 'partial',
+    reason: 'No matching real Avalonia public member.',
+    owner: 'FsusUI Core',
+    requiredMembers: [
+      {
+        kind: 'input',
+        name: 'value',
+        status: 'missing',
+        reason: 'No matching real Avalonia public member.',
+        owner: 'FsusUI Core',
+        testPolicy: 'contract',
+        reviewPolicy: 'pr-review',
+        scenarioIds: ['scenario.partial.input.value'],
+      },
+    ],
+    requiredScenarios: [
+      'scenario.partial.input.value',
+      'scenario.partial.a11y',
+    ],
+    requiredEvidence: [
+      'required-member-coverage',
+      'same-identity-a11y-evidence',
+      'same-identity-cross-platform-comparison',
+    ],
+    evidencePolicy: {
+      realExecution: true,
+      allowSkip: false,
+      allowOverrideWithoutGovernance: false,
+    },
+    missingMembers: 1,
+    partialMembers: 0,
+    missingArtifacts: [
+      'required-member-coverage',
+      'same-identity-a11y-evidence',
+      'same-identity-cross-platform-comparison',
+    ],
+  })
   assert.throws(
     () => validateReadiness({ ...alignment, stable: ['partial'] }),
     /is partial/,
   )
+
+  assert.throws(
+    () =>
+      deriveAlignment(registry, {
+        verdict: 'pass',
+        identity: { contract: 'partial' },
+      }),
+    /was not current-validated/,
+  )
 })
 
-test('alignment preserves unbound web-only exports without creating gaps', () => {
+test('web-only contracts remain explicit without becoming Avalonia gaps', () => {
+  const registry = {
+    contracts: [
+      {
+        id: 'web-only-bound',
+        component: { exportStatus: 'web-only' },
+        platformException: {
+          reason: 'Browser-only primitive.',
+          alternative: 'Use the native overlay primitive.',
+          owner: 'FsusUI Core',
+          testPolicy: 'Real browser regression test.',
+          reviewPolicy: 'Review on each minor release.',
+          reviewedAt: '2026-08-30',
+        },
+        bindings: { avalonia: { status: 'bound' } },
+        coverage: { missing: 0, partial: 0, webOnly: 1 },
+      },
+      {
+        id: 'web-only-unbound',
+        component: { exportStatus: 'web-only' },
+        platformException: {
+          reason: 'Browser-only primitive.',
+          alternative: 'Use the native overlay primitive.',
+          owner: 'FsusUI Core',
+          testPolicy: 'Real browser regression test.',
+          reviewPolicy: 'Review on each minor release.',
+          reviewedAt: '2026-08-30',
+        },
+        bindings: { avalonia: { status: 'unbound' } },
+        coverage: { missing: 0, partial: 0, webOnly: 1 },
+      },
+    ],
+  }
+  const alignment = deriveAlignment(registry)
+  assert.deepEqual(
+    alignment.statuses.map(({ id, status }) => ({ id, status })),
+    [
+      { id: 'web-only-bound', status: 'web-only' },
+      { id: 'web-only-unbound', status: 'web-only' },
+    ],
+  )
+  assert.deepEqual(alignment.stable, [])
+  assert.deepEqual(alignment.webOnly, [
+    'web-only-bound',
+    'web-only-unbound',
+  ])
+  assert.deepEqual(alignment.gaps, [])
+  assert.equal(alignment.consumers.nugetStableEligible, true)
+  assert.equal(alignment.consumers.releaseReady, true)
+  validateReadiness(alignment)
+})
+
+test('unreviewed web-only labels remain release-blocking gaps', () => {
   const alignment = deriveAlignment({
     contracts: [
       {
-        id: 'component-v2.web-only',
+        id: 'unreviewed-web-only',
+        owner: 'FsusUI Core',
         component: { exportStatus: 'web-only' },
         bindings: { avalonia: { status: 'unbound' } },
-        coverage: { missing: 0, partial: 0 },
+        coverage: { missing: 0, partial: 0, webOnly: 1 },
+        scenarioIds: ['scenario.unreviewed'],
+        requirements: {},
       },
     ],
+  })
+  assert.equal(alignment.statuses[0].status, 'missing')
+  assert.equal(alignment.gaps.length, 1)
+  assert.equal(alignment.consumers.releaseReady, false)
+})
+
+test('public values remain release-blocking until mapped and evidenced', () => {
+  const governance = {
+    reason: 'Behavior evidence is still required.',
+    owner: 'FsusUI Core',
+    testPolicy: 'contract',
+    reviewPolicy: 'pr-review',
+  }
+  const alignment = deriveAlignment({
+    contracts: [],
+    publicValueBindings: [
+      {
+        id: 'public-value.partial',
+        name: 'PartialValue',
+        status: 'partial',
+        avalonia: { type: 'FsusValue' },
+        scenarioIds: ['scenario.v2.public-value.partial'],
+        governance,
+      },
+      {
+        id: 'public-value.renderer-sentinel',
+        name: 'RendererSentinel',
+        status: 'web-only',
+        avalonia: null,
+        scenarioIds: ['scenario.v2.public-value.renderer-sentinel'],
+        governance: {
+          ...governance,
+          alternative: 'Use the native renderer lifecycle.',
+          reviewedAt: '2026-08-30',
+        },
+      },
+    ],
+  })
+  assert.deepEqual(
+    alignment.statuses.map(({ id, status }) => ({ id, status })),
+    [
+      { id: 'public-value.partial', status: 'partial' },
+      { id: 'public-value.renderer-sentinel', status: 'web-only' },
+    ],
+  )
+  assert.equal(alignment.gaps.length, 1)
+  assert.equal(alignment.gaps[0].contract, 'public-value.partial')
+  assert.equal(alignment.consumers.releaseReady, false)
+  validateReadiness(alignment)
+})
+
+test('alignment preserves reviewed web-only exports without creating gaps', () => {
+  const webOnlyContract = {
+    id: 'component-v2.web-only',
+    component: { exportStatus: 'web-only' },
+    bindings: { avalonia: { status: 'unbound' } },
+    coverage: { missing: 0, partial: 0 },
+    scenarioIds: ['scenario.v2.web-only.input.value'],
+    platformException: {
+      reason: 'Browser-only capability with no native counterpart.',
+      alternative: 'The native shell consumes the platform service.',
+      owner: 'FsusUI Core',
+      testPolicy: 'contract',
+      reviewPolicy: 'pr-review',
+      reviewedAt: '2026-09-05',
+    },
+  }
+  const alignment = deriveAlignment({
+    contracts: [webOnlyContract],
+    consumerBindings: consumerBindingsFor('component-v2.web-only'),
   })
   assert.deepEqual(alignment.statuses, [
     {
@@ -114,139 +681,97 @@ test('alignment preserves unbound web-only exports without creating gaps', () =>
   ])
   assert.deepEqual(alignment.gaps, [])
   assert.deepEqual(alignment.stable, [])
+
+  const unreviewed = deriveAlignment({
+    contracts: [{ ...webOnlyContract, platformException: undefined }],
+    consumerBindings: consumerBindingsFor('component-v2.web-only'),
+  })
+  assert.equal(unreviewed.statuses[0].status, 'missing')
+  assert.equal(unreviewed.gaps.length, 1)
 })
 
-test('comparison sets align only exact statically complete contracts', () => {
-  const contracts = ['first', 'second', 'no-evidence'].map((name) => ({
-    id: `component-v2.${name}`,
-    component: { exportStatus: 'aligned-candidate' },
-    bindings: { avalonia: { status: 'bound' } },
-    inputs: [
-      {
-        name: 'value',
-        status: 'aligned-candidate',
-        scenarioIds: [scenario(name)],
-      },
-    ],
+test('receipts align only statically complete contracts with same-identity evidence', async () => {
+  const comparison = await validatedRealComparison()
+  const checkTag = realCheckTagContract()
+  const noEvidence = {
+    ...checkTag,
+    id: 'component-v2.no-evidence',
     coverage: { missing: 0, partial: 0 },
-  }))
-  const comparison = {
-    schema: 'fsusui.conformance-comparison-set.v2',
-    comparisons: ['first', 'second'].map((name) =>
-      comparisonFor(name, [
-        {
-          kind: 'input',
-          member: 'value',
-          scenarioId: scenario(name),
-          webSource: { kind: 'step', index: 0 },
-          avaloniaSource: { kind: 'step', index: 0 },
-        },
-      ]),
-    ),
   }
-  const alignment = deriveAlignment({ contracts }, comparison)
-  assert.deepEqual(alignment.stable, [
-    'component-v2.first',
-    'component-v2.second',
-  ])
+  const alignment = deriveAlignment(
+    {
+      contracts: [checkTag, noEvidence],
+      consumerBindings: consumerBindingsFor(
+        'component-v2.el-check-tag',
+        'component-v2.no-evidence',
+      ),
+    },
+    comparison,
+  )
+  assert.deepEqual(alignment.stable, ['component-v2.el-check-tag'])
   assert.equal(
     alignment.statuses.find((entry) => entry.id === 'component-v2.no-evidence')
       .status,
     'blocked',
   )
-  assert.throws(
-    () =>
-      deriveAlignment(
-        { contracts },
-        {
-          comparisons: [comparison.comparisons[0], comparison.comparisons[0]],
-        },
-      ),
-    /duplicated in comparison set/u,
+  const noEvidenceGap = alignment.gaps.find(
+    (gap) => gap.contract === 'component-v2.no-evidence',
   )
+  assert.ok(
+    noEvidenceGap.missingArtifacts.includes(
+      'same-identity-cross-platform-comparison',
+    ),
+  )
+  assert.ok(noEvidenceGap.missingArtifacts.includes('required-member-coverage'))
 })
 
-test('alignment blocks an otherwise complete contract with incomplete executed-member coverage', () => {
-  const contract = {
+test('alignment blocks an otherwise complete contract with uncovered members', async () => {
+  const comparison = await validatedRealComparison()
+  const withExtraMember = {
+    ...realCheckTagContract(),
     id: 'component-v2.coverage-required',
-    component: { exportStatus: 'aligned-candidate' },
-    bindings: { avalonia: { status: 'bound' } },
+    coverage: { missing: 0, partial: 0 },
     inputs: [
+      ...realCheckTagContract().inputs,
       {
         name: 'value',
+        kind: 'input',
         status: 'aligned-candidate',
-        scenarioIds: [scenario('coverage-required')],
+        scenarioIds: ['scenario.v2.coverage-required.input.value'],
       },
     ],
-    coverage: { missing: 0, partial: 0 },
+    scenarioIds: [
+      ...realCheckTagContract().scenarioIds,
+      'scenario.v2.coverage-required.input.value',
+    ],
   }
-  const comparison = comparisonFor('coverage-required')
-  const alignment = deriveAlignment({ contracts: [contract] }, comparison)
+  const alignment = deriveAlignment(
+    {
+      contracts: [withExtraMember],
+      consumerBindings: consumerBindingsFor('component-v2.coverage-required'),
+    },
+    comparison,
+  )
   assert.equal(alignment.statuses[0].status, 'blocked')
-  assert.deepEqual(alignment.gaps[0].missingCoverageMembers, [
-    `input:value@${scenario('coverage-required')}`,
-  ])
-  assert.deepEqual(alignment.gaps[0].missingArtifacts, [
-    'required-member-execution-coverage',
-  ])
+  assert.deepEqual(alignment.stable, [])
 })
 
-test('execution coverage rejects absent, metadata-only, forged, and mutated ledgers', () => {
-  const contract = {
-    id: 'component-v2.coverage-integrity',
-    component: { exportStatus: 'aligned-candidate' },
-    bindings: { avalonia: { status: 'bound' } },
-    inputs: [],
-    coverage: { missing: 0, partial: 0 },
-  }
-  const comparison = comparisonFor('coverage-integrity')
-  const derive = (candidate) =>
-    deriveAlignment({ contracts: [contract] }, candidate)
+test('derived alignment re-validates receipt coverage claims against the contract', async () => {
+  const comparison = await validatedRealComparison()
+  const checkTag = realCheckTagContract()
+  const bindings = consumerBindingsFor('component-v2.el-check-tag')
+  const registry = { contracts: [checkTag], consumerBindings: bindings }
+  assert.deepEqual(
+    deriveAlignment(registry, comparison).stable,
+    ['component-v2.el-check-tag'],
+  )
 
-  assert.throws(
-    () => derive({ ...comparison, executionCoverage: undefined }),
-    /executionCoverage\.schema invalid/u,
+  comparison.receipts['component-v2.el-check-tag'].coverage.requiredMembers.push(
+    'input.forged',
   )
   assert.throws(
-    () =>
-      derive({
-        ...comparison,
-        executionCoverage: sealExecutionCoverage({
-          ...comparison.executionCoverage,
-          real: false,
-        }),
-      }),
-    /metadata-only/u,
-  )
-  assert.throws(
-    () =>
-      derive({
-        ...comparison,
-        executionCoverage: sealExecutionCoverage({
-          ...comparison.executionCoverage,
-          identity: { contract: 'component-v2.forged' },
-        }),
-      }),
-    /identity mismatch/u,
-  )
-  assert.throws(
-    () =>
-      derive({
-        ...comparison,
-        executionCoverage: {
-          ...comparison.executionCoverage,
-          records: [
-            {
-              kind: 'input',
-              member: 'forged',
-              scenarioId: 'scenario.v2.forged',
-              webSource: {},
-              avaloniaSource: {},
-            },
-          ],
-        },
-      }),
-    /outputHash invalid/u,
+    () => deriveAlignment(registry, comparison),
+    /coverage\.member\.input\.forged unexpected/u,
   )
 })
 
@@ -302,7 +827,11 @@ test('T762-01 stable readiness rejects missing, stale, and tampered alignment', 
   fs.writeFileSync(tamperedPath, `${JSON.stringify(tampered, null, 2)}\n`)
   try {
     assert.throws(
-      () => stableReadinessReadAlignment(tamperedPath, currentExpected),
+      () =>
+        stableReadinessReadAlignment(tamperedPath, {
+          candidate: valid.identity.candidate,
+          contractHash: valid.identity.contractHash,
+        }),
       /integrity hash is invalid/u,
     )
   } finally {

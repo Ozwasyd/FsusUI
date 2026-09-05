@@ -23,8 +23,8 @@ const useAutoResize = (props: AutoResizerProps) => {
       const top = Number.parseInt(paddingTop) || 0
       const bottom = Number.parseInt(paddingBottom) || 0
 
-      width$.value = width - left - right
-      height$.value = height - top - bottom
+      if (!props.disableWidth) width$.value = width - left - right
+      if (!props.disableHeight) height$.value = height - top - bottom
     }).stop
   })
 

@@ -12,7 +12,7 @@
     },
     {
       "path": "tests/conformance/accessibility/avalonia-runtime-scenarios.json",
-      "sha256": "5ab72ad318b284c447024344d6e24265529b0c9f0f40d87f00f266ab1e74056a"
+      "sha256": "815391e8bd00511cbcae062febea0c3873aca39095a75b0af7c138b0b3dbe8dd"
     }
   ],
   "requiredContractFields": [
@@ -34,8 +34,8 @@
     "metadataOnlyGeneratedTests": 0,
     "metadataOnlyRuntimeCoverage": 0,
     "realRuntimeScenarioDeclarations": 41,
-    "exactContractRuntimeBindings": 33,
-    "unboundRuntimeDispositions": 8,
+    "exactContractRuntimeBindings": 34,
+    "unboundRuntimeDispositions": 7,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -1680,19 +1680,13 @@
     },
     {
       "id": "avalonia-table-v2-stable34",
-      "contractId": null,
-      "contractScenarioId": null,
+      "contractId": "component-v2.el-table-v2",
+      "contractScenarioId": "scenario.v2.el-table-v2.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "table-v2-stable34",
       "factory": "FsusTableV2",
-      "bindingDisposition": "unbound",
-      "bindingGap": {
-        "snapshotId": "table-v2-stable34",
-        "reason": "The FsusTableV2 Contract V2 type binding has no declared accessibility scenario.",
-        "owner": "FsusUI Contract V2",
-        "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
-        "reviewAfter": "2026-12-05"
-      },
+      "bindingDisposition": "exact",
+      "bindingGap": null,
       "implementationGaps": [
         {
           "snapshotId": "table-v2-stable34",

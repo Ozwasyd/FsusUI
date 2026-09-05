@@ -561,9 +561,6 @@ internal static class Program
     var upload = new FsusUpload { AccessibleName = "AOT upload" };
     var uploadItem = upload.AddItem("proof.txt", 5, "text/plain");
     if (uploadItem is not null) upload.SetProgress(uploadItem.Id, 1);
-    var locale = FsusAvaloniaLocaleProvider.CreateDefault();
-    locale.SetCulture("zh-cn");
-
     var progress = new FsusProgress { Value = 50 };
     var space = new FsusSpace { Spacing = 8 };
     var tabs = Named(new FsusTabs(), "AOT tabs");
@@ -577,7 +574,6 @@ internal static class Program
     var shell = Named(new FsusPublicShell(), "AOT public shell");
     var settingsHeader = Named(new FsusSettingsSectionHeader { Content = "Settings" }, "AOT settings");
     var challenge = Named(new FsusTextTaskChallenge(), "AOT challenge");
-    var localeText = new FsusText { Text = $"{locale.T("el.messagebox.confirm")} {locale.FormatNumber(1234.5m, "N1")}" };
     var stable = new Dictionary<string, SmokeScenario>(StringComparer.Ordinal)
     {
       ["button"] = new("button", button, () => button.IsEnabled && AutomationProperties.GetName(button) == "Native AOT smoke"),
@@ -605,7 +601,6 @@ internal static class Program
       ["public-shell"] = new("public-shell", shell, () => AutomationProperties.GetName(shell) == "AOT public shell"),
       ["product-primitives"] = new("product-primitives", settingsHeader, () => AutomationProperties.GetName(settingsHeader) == "AOT settings"),
       ["perception-challenge"] = new("perception-challenge", challenge, () => AutomationProperties.GetName(challenge) == "AOT challenge"),
-      ["locale-formatting"] = new("locale-formatting", localeText, () => locale.CurrentLocale.Name == "zh-cn" && localeText.Text?.Contains("确定", StringComparison.Ordinal) == true),
     };
     var missing = options.ExpectedScenarios.Where(id => !stable.ContainsKey(id)).ToArray();
     if (missing.Length > 0)

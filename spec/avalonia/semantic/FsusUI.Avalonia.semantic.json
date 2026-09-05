@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "76e31f146aa78aea46274c71a74ba3354e3d31271c4ea19f913a7d7a5aff5a67",
+    "inputTreeHash": "5118f88b5179a6e9e5e3fb3946f4b58e3499fa310f8490db516a902f592ebb9a",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "22429de21af08de6f0d01856fde157fc4f469d06d197659e141ce39324649020"
+    "outputHash": "6c19a22abfe219416bcaed69242ed334639dfd0c6b0aa0bd532010eed3b0edf1"
   },
   "semanticTypes": [
     {
@@ -915,7 +915,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "CurrentOffset",
@@ -1137,7 +1148,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActionContent",
@@ -1608,7 +1630,18 @@
       "isAbstract": true,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -2153,7 +2186,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -2229,11 +2273,55 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
           "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "DisableHeight",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "DisableWidth",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "OnResize",
+          "type": "System.Action\u003CAvalonia.Size\u003E",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -2361,7 +2449,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsLoading",
@@ -2646,7 +2745,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "FallbackText",
@@ -2867,7 +2977,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ScrollOffset",
@@ -3050,7 +3171,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -3352,7 +3484,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -3486,7 +3629,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Header",
@@ -3652,7 +3806,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -4314,7 +4479,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Children",
+      "contentRegions": [
+        {
+          "name": "Children",
+          "type": "Avalonia.Controls.Controls",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Size",
@@ -4573,7 +4749,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -4998,7 +5185,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActionContent",
@@ -5369,7 +5567,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -5574,7 +5783,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "stateContract": {
@@ -5662,7 +5882,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -6035,7 +6266,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActivePathValues",
@@ -6314,7 +6556,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Checked",
@@ -6394,14 +6647,17 @@
       },
       "automationContract": {
         "observationAuthorities": [
-          "roslyn-automation-attached-property-write"
+          "roslyn-automation-attached-property-write",
+          "roslyn-automation-provider-interface"
         ],
         "contractDeclared": false,
         "runtimeTreeVerified": false,
         "mappingComplete": false,
         "observedSemantics": [
           "help-text",
-          "name"
+          "name",
+          "role",
+          "state"
         ],
         "mappings": [
           {
@@ -6423,10 +6679,34 @@
             "authority": "roslyn-automation-attached-property-write",
             "targetKind": "public-control-this",
             "targetExpression": "this",
-            "valueKnown": true,
-            "value": "CheckTag",
+            "valueKnown": false,
+            "valueExpression": "FsusComponentClasses.ResolveName(null, Content ?? \u0022CheckTag\u0022)",
             "publicDependencies": [],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusCheckTag.SyncAutomation"
+          },
+          {
+            "semantic": "role",
+            "provider": "AutomationProperties.SetControlTypeOverride",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "public-control-this",
+            "targetExpression": "this",
+            "valueKnown": true,
+            "value": "CheckBox",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusCheckTag.SyncAutomation"
+          },
+          {
+            "semantic": "state",
+            "provider": "Avalonia.Automation.Provider.IToggleProvider.ToggleState",
+            "authority": "roslyn-automation-provider-interface",
+            "targetKind": "automation-peer-owner",
+            "targetExpression": "OnCreateAutomationPeer:this",
+            "valueKnown": false,
+            "valueExpression": "owner.Checked ? ToggleState.On : ToggleState.Off",
+            "publicDependencies": [
+              "FsusUI.Avalonia.Controls.FsusCheckTag.Checked"
+            ],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusCheckTag\u002BCheckTagAutomationPeer.ToggleState"
           }
         ]
       },
@@ -6484,7 +6764,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -6803,7 +7094,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Checked",
@@ -7034,7 +7336,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Children",
+      "contentRegions": [
+        {
+          "name": "Children",
+          "type": "Avalonia.Controls.Controls",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "SelectedValues",
@@ -8843,7 +9156,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "EffectiveSpan",
@@ -9068,7 +9392,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Accordion",
@@ -9171,7 +9506,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Disabled",
@@ -9393,7 +9739,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -9738,7 +10095,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -11101,7 +11469,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Children",
+      "contentRegions": [
+        {
+          "name": "Children",
+          "type": "Avalonia.Controls.Controls",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Gap",
@@ -11235,7 +11614,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -11585,7 +11975,18 @@
       "isAbstract": true,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "stateContract": {
@@ -11627,7 +12028,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Accelerator",
@@ -11969,7 +12381,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "automationContract": {
@@ -12177,7 +12600,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -12190,7 +12624,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "FocusedKey",
@@ -12361,7 +12806,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsDisabled",
@@ -12450,7 +12906,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -12632,7 +13099,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Severity",
@@ -12658,7 +13136,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "DisplayText",
@@ -14188,7 +14677,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -14630,7 +15130,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -14809,7 +15320,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "DisplayText",
@@ -14958,7 +15480,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActionLabel",
@@ -15061,7 +15594,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "FocusedKey",
@@ -15097,7 +15641,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsBodyScrollable",
@@ -15303,7 +15858,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "MaxValue",
@@ -15636,7 +16202,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "CloseAccessibleName",
@@ -16158,7 +16735,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Items",
+      "contentRegions": [
+        {
+          "name": "Items",
+          "type": "Avalonia.Controls.ItemCollection",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "CanScrollBackward",
@@ -16543,7 +17131,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Placement",
@@ -16679,7 +17278,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Accepts",
@@ -17557,7 +18167,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Menu",
@@ -17651,7 +18272,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Header",
@@ -17818,7 +18450,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "FocusedKey",
@@ -17946,7 +18589,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActionContent",
@@ -18247,7 +18901,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -18260,7 +18925,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Children",
+      "contentRegions": [
+        {
+          "name": "Children",
+          "type": "Avalonia.Controls.Controls",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Fields",
@@ -18936,7 +19612,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AsyncValidator",
@@ -19719,7 +20406,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -20040,7 +20738,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsDecorativeIcon",
@@ -20216,7 +20925,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -20772,7 +21492,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -21333,7 +22064,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21346,7 +22088,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "MobilePane",
@@ -21402,7 +22155,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21463,7 +22227,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -21476,7 +22251,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Text",
+      "contentRegions": [
+        {
+          "name": "Text",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -21940,7 +22726,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Text",
+      "contentRegions": [
+        {
+          "name": "Text",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Maximum",
@@ -22255,7 +23052,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Items",
@@ -22358,7 +23166,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Items",
@@ -22493,7 +23312,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "NavigateUri",
@@ -22933,7 +23763,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsClosed",
@@ -23158,7 +23999,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "LastSubmittedPayload",
@@ -23238,7 +24090,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -31303,7 +32166,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Items",
+      "contentRegions": [
+        {
+          "name": "Items",
+          "type": "System.Collections.Generic.IList\u003CFsusUI.Avalonia.Controls.FsusMenuNode\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -31528,7 +32402,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -31541,7 +32426,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Items",
@@ -31596,7 +32492,18 @@
       "isAbstract": true,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Header",
@@ -31803,7 +32710,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "CancelText",
@@ -32350,7 +33268,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Bubbles",
@@ -32375,7 +33304,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Duration",
@@ -32680,7 +33620,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Items",
@@ -32705,7 +33656,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsInteractionEnabled",
@@ -32944,7 +33906,18 @@
       "isAbstract": true,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "BeforeClose",
@@ -34234,7 +35207,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -34988,7 +35972,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActionCommand",
@@ -35571,7 +36566,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "GroupLabel",
@@ -35757,7 +36763,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsDisabled",
@@ -35933,7 +36950,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActionContent",
@@ -36210,7 +37238,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -36454,7 +37493,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "CurrentPage",
@@ -36603,7 +37653,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -37193,7 +38254,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActiveMode",
@@ -38262,7 +39334,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "CancelText",
@@ -38410,7 +39493,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "automationContract": {
@@ -38471,7 +39565,18 @@
       "isAbstract": true,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -39032,7 +40137,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -39587,7 +40703,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -39875,7 +41002,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Children",
+      "contentRegions": [
+        {
+          "name": "Children",
+          "type": "Avalonia.Controls.Controls",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "SelectedValue",
@@ -40103,7 +41241,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -40500,7 +41649,18 @@
       "isAbstract": true,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "stateContract": {
@@ -40659,7 +41819,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsDisabled",
@@ -40746,7 +41917,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -41139,7 +42321,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActionContent",
@@ -41477,7 +42670,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Severity",
@@ -41533,7 +42737,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Children",
+      "contentRegions": [
+        {
+          "name": "Children",
+          "type": "Avalonia.Controls.Controls",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Breakpoint",
@@ -41642,7 +42857,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -41865,7 +43091,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -42680,7 +43917,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -43167,7 +44415,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "stateContract": {
@@ -43287,7 +44546,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Items",
@@ -43374,7 +44644,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "EmptyText",
@@ -43435,7 +44716,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Items",
@@ -43460,7 +44752,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "events": [],
@@ -43473,7 +44776,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "FocusedKey",
@@ -43534,7 +44848,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -45086,7 +46411,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -45390,7 +46726,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AnimationPolicy",
@@ -45589,7 +46936,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -46157,7 +47515,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Children",
+      "contentRegions": [
+        {
+          "name": "Children",
+          "type": "Avalonia.Controls.Controls",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Align",
@@ -46310,7 +47679,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -46484,7 +47864,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Tone",
@@ -46550,7 +47941,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Description",
@@ -46806,7 +48208,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ActiveIndex",
@@ -46913,7 +48326,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsOpen",
@@ -47009,7 +48433,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -47348,7 +48783,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Key",
@@ -47530,7 +48976,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -47645,7 +49102,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -47675,6 +49143,17 @@
           "nullable": false,
           "canRead": true,
           "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "CellContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
           "isStatic": false,
           "required": false,
           "defaultKnown": false,
@@ -47737,6 +49216,17 @@
           "deprecated": false
         },
         {
+          "name": "Columns",
+          "type": "System.Collections.ObjectModel.Collection\u003CFsusUI.Avalonia.Controls.FsusDataTableColumn\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "ContainerPoolLimit",
           "type": "System.Int32",
           "nullable": false,
@@ -47760,11 +49250,121 @@
           "deprecated": false
         },
         {
+          "name": "Data",
+          "type": "System.Collections.ObjectModel.Collection\u003CFsusUI.Avalonia.Controls.FsusDataTableRow\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "DataGetter",
+          "type": "System.Func\u003CFsusUI.Avalonia.Controls.FsusDataTableCellContext, System.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "DefaultExpandedRowKeys",
+          "type": "System.Collections.ObjectModel.Collection\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "DiscardedCellCount",
           "type": "System.Int32",
           "nullable": false,
           "canRead": true,
           "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "EffectiveColumnCount",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "EffectiveRowCount",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "EmptyContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "EstimatedRowHeight",
+          "type": "System.Double?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ExpandColumnKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ExpandedRowKeys",
+          "type": "System.Collections.ObjectModel.Collection\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "FixedData",
+          "type": "System.Collections.ObjectModel.Collection\u003CFsusUI.Avalonia.Controls.FsusDataTableRow\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
           "isStatic": false,
           "required": false,
           "defaultKnown": false,
@@ -47804,6 +49404,28 @@
           "deprecated": false
         },
         {
+          "name": "FooterContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "FooterHeight",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "FrozenColumnCount",
           "type": "System.Int32",
           "nullable": false,
@@ -47820,6 +49442,50 @@
           "nullable": false,
           "canRead": true,
           "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "HeaderCellContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "HeaderContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "HeaderHeight",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "HeaderHeights",
+          "type": "System.Collections.ObjectModel.Collection\u003CSystem.Double\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
           "isStatic": false,
           "required": false,
           "defaultKnown": false,
@@ -47871,6 +49537,83 @@
           "deprecated": false
         },
         {
+          "name": "OnColumnSort",
+          "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2Sort\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "OnEndReached",
+          "type": "System.Action\u003CSystem.Double\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "OnExpandedRowsChange",
+          "type": "System.Action\u003CSystem.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "OnRowExpand",
+          "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2RowExpansion\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "OnRowsRendered",
+          "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2RowsRendered\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "OnScroll",
+          "type": "System.Action\u003CFsusUI.Avalonia.Controls.FsusTableV2ScrollPosition\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "OverlayContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "Overscan",
           "type": "System.Int32",
           "nullable": false,
@@ -47878,8 +49621,7 @@
           "canWrite": true,
           "isStatic": false,
           "required": false,
-          "defaultKnown": true,
-          "defaultValue": 2,
+          "defaultKnown": false,
           "deprecated": false
         },
         {
@@ -47971,6 +49713,40 @@
           "deprecated": false
         },
         {
+          "name": "RetainedRowMeasurementCount",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "RetainedRowMeasurementLimit",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": true,
+          "defaultValue": 2048,
+          "deprecated": false
+        },
+        {
+          "name": "RowContent",
+          "type": "Avalonia.Controls.Templates.IDataTemplate",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "RowCount",
           "type": "System.Int32",
           "nullable": false,
@@ -47994,6 +49770,18 @@
           "deprecated": false
         },
         {
+          "name": "RowKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": true,
+          "defaultValue": "id",
+          "deprecated": false
+        },
+        {
           "name": "ScrollHost",
           "type": "Avalonia.Controls.ScrollViewer",
           "nullable": true,
@@ -48002,6 +49790,63 @@
           "isStatic": false,
           "required": false,
           "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "SortBy",
+          "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "SortState",
+          "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ViewportHeight",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": true,
+          "defaultValue": 480,
+          "deprecated": false
+        },
+        {
+          "name": "ViewportMaxHeight",
+          "type": "System.Double?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ViewportWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": true,
+          "defaultValue": 960,
           "deprecated": false
         },
         {
@@ -48027,7 +49872,26 @@
           "deprecated": false
         }
       ],
-      "avaloniaProperties": [],
+      "avaloniaProperties": [
+        {
+          "name": "HeaderHeight",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false,
+          "defaultKnown": true,
+          "defaultValue": 50,
+          "deprecated": false
+        },
+        {
+          "name": "Overscan",
+          "kind": "styled",
+          "type": "System.Int32",
+          "nullable": false,
+          "defaultKnown": true,
+          "defaultValue": 2,
+          "deprecated": false
+        }
+      ],
       "stateContract": {
         "declaredPseudoClasses": [],
         "pseudoClassBindings": [],
@@ -48147,6 +50011,31 @@
           "parameters": []
         },
         {
+          "name": "ResetExpandedRows",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "ScrollTo",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "scrollLeft",
+              "type": "System.Double",
+              "optional": false
+            },
+            {
+              "name": "scrollTop",
+              "type": "System.Double",
+              "optional": false
+            }
+          ]
+        },
+        {
           "name": "ScrollToCell",
           "isStatic": false,
           "returnType": "System.Void",
@@ -48160,6 +50049,99 @@
             {
               "name": "columnIndex",
               "type": "System.Int32",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "ScrollToLeft",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "scrollLeft",
+              "type": "System.Double",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "ScrollToRow",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "rowIndex",
+              "type": "System.Int32",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "ScrollToTop",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "scrollTop",
+              "type": "System.Double",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SetMeasuredRowHeight",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "rowIndex",
+              "type": "System.Int32",
+              "optional": false
+            },
+            {
+              "name": "height",
+              "type": "System.Double",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SetRowExpanded",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "rowKey",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "expanded",
+              "type": "System.Boolean",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SortColumn",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "columnKey",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "direction",
+              "type": "FsusUI.Avalonia.Controls.FsusSortDirection",
               "optional": false
             }
           ]
@@ -48401,7 +50383,18 @@
       "isAbstract": false,
       "isSealed": true,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ColumnIndex",
@@ -48541,13 +50534,634 @@
       "methods": []
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2HeaderCellContext",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [
+        {
+          "name": "Column",
+          "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ColumnIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Columns",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusDataTableColumn\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "HeaderIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Style",
+          "type": "System.Collections.Generic.IReadOnlyDictionary\u003CSystem.String, System.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2HeaderCellContext",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "Columns",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[FsusUI.Avalonia.Controls.FsusDataTableColumn, FsusUI.Avalonia, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Column",
+              "type": "FsusUI.Avalonia.Controls.FsusDataTableColumn\u0026",
+              "optional": false
+            },
+            {
+              "name": "ColumnIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "HeaderIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "Style",
+              "type": "System.Collections.Generic.IReadOnlyDictionary\u00602[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2HeaderContext",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [
+        {
+          "name": "Cells",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Columns",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusDataTableColumn\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "HeaderIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2HeaderContext",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "Cells",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Columns",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[FsusUI.Avalonia.Controls.FsusDataTableColumn, FsusUI.Avalonia, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "HeaderIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2RowContext",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [
+        {
+          "name": "Cells",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Columns",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusDataTableColumn\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Depth",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "IsScrolling",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "RowData",
+          "type": "FsusUI.Avalonia.Controls.FsusDataTableRow",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "RowIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Style",
+          "type": "System.Collections.Generic.IReadOnlyDictionary\u003CSystem.String, System.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2RowContext",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "Cells",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Style",
+              "type": "System.Collections.Generic.IReadOnlyDictionary\u00602[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Object, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Columns",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[FsusUI.Avalonia.Controls.FsusDataTableColumn, FsusUI.Avalonia, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Depth",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "RowData",
+              "type": "FsusUI.Avalonia.Controls.FsusDataTableRow\u0026",
+              "optional": false
+            },
+            {
+              "name": "RowIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsScrolling",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2RowExpansion",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [
+        {
+          "name": "Expanded",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Row",
+          "type": "FsusUI.Avalonia.Controls.FsusDataTableRow",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2RowExpansion",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "Row",
+              "type": "FsusUI.Avalonia.Controls.FsusDataTableRow\u0026",
+              "optional": false
+            },
+            {
+              "name": "Expanded",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2RowsRendered",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [
+        {
+          "name": "StartIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "StopIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "VisibleStartIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "VisibleStopIndex",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2RowsRendered",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "StartIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "StopIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "VisibleStartIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "VisibleStopIndex",
+              "type": "System.Int32\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [
+        {
+          "name": "ScrollLeft",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ScrollTop",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "ScrollLeft",
+              "type": "System.Double\u0026",
+              "optional": false
+            },
+            {
+              "name": "ScrollTop",
+              "type": "System.Double\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Order",
+          "type": "FsusUI.Avalonia.Controls.FsusSortDirection",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "Key",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Order",
+              "type": "FsusUI.Avalonia.Controls.FsusSortDirection\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusTabs",
       "kind": "class",
       "baseType": "Avalonia.Controls.TabControl",
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Items",
+      "contentRegions": [
+        {
+          "name": "Items",
+          "type": "Avalonia.Controls.ItemCollection",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -48742,7 +51356,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IconContent",
@@ -49087,7 +51712,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Inlines",
+      "contentRegions": [
+        {
+          "name": "Inlines",
+          "type": "Avalonia.Controls.Documents.InlineCollection",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -49394,7 +52030,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -50331,7 +52978,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "LastSubmittedPayload",
@@ -50446,7 +53104,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -50929,7 +53598,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Text",
+      "contentRegions": [
+        {
+          "name": "Text",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "stateContract": {
@@ -50971,7 +53651,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Composer",
@@ -51043,7 +53734,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -51410,7 +54112,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -51842,7 +54555,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -52030,7 +54754,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Status",
@@ -52238,7 +54973,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "automationContract": {
@@ -52299,7 +55045,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -52755,7 +55512,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -54413,7 +57181,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -54720,7 +57499,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -55154,7 +57944,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsVirtualized",
@@ -55418,7 +58219,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "IsConfirmed",
@@ -55468,7 +58280,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -56047,7 +58870,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -57009,7 +59843,18 @@
       "isAbstract": false,
       "isSealed": true,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "ContainerId",
@@ -57349,7 +60194,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [],
       "avaloniaProperties": [],
       "stateContract": {
@@ -57427,7 +60283,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Content",
+      "contentRegions": [
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "AccessibleName",
@@ -61238,7 +64105,18 @@
       "isAbstract": false,
       "isSealed": false,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Inlines",
+      "contentRegions": [
+        {
+          "name": "Inlines",
+          "type": "Avalonia.Controls.Documents.InlineCollection",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "Key",
@@ -61525,7 +64403,18 @@
       "isAbstract": false,
       "isSealed": true,
       "deprecated": false,
-      "contentRegions": [],
+      "contentProperty": "Children",
+      "contentRegions": [
+        {
+          "name": "Children",
+          "type": "Avalonia.Controls.Controls",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "required": false,
+          "propertyKind": "clr"
+        }
+      ],
       "properties": [
         {
           "name": "BaseZIndex",

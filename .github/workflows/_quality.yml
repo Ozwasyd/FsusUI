@@ -154,14 +154,28 @@ jobs:
 
   dotnet-package:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: dotnet/global.json
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - name: Restore canonical .NET package cache
         uses: actions/cache@v4
         with:
@@ -174,6 +188,7 @@ jobs:
       - name: Build and verify the unique NuGet candidate
         id: candidate
         run: |
+          xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
@@ -182,6 +197,7 @@ jobs:
           path: |
             dotnet/artifacts/nuget
             dotnet/artifacts/package/manifest.json
+            dotnet/artifacts/package/contract-v2-alignment.json
           retention-days: 7
       - name: Record unique NuGet candidate leaf result
         if: always()

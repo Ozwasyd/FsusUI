@@ -1,0 +1,72 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "web-check-tag",
+    "avalonia-check-tag"
+  ],
+  "uiDecisionClass": "prescribed",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "visual-change",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "c51f456aff7c87a626ef087f6f675998c33be767",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "0899bb73568e4e0430595ecce3c1d605d51c963e27e37250b6dcc0e1a6ff77a9",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "c51f456aff7c87a626ef087f6f675998c33be767",
+  "candidateDigest": "acc92e924618f27a82e7c5471bfec58f914b20302e03a0a6fdc7808e1cfcb209",
+  "stateEvidenceMatrix": [
+    {
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "viewport": "88x25",
+      "theme": "light",
+      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
+    },
+    {
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "viewport": "960x720",
+      "theme": "light",
+      "evidenceDigest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127"
+    }
+  ],
+  "inScope": [
+    "Existing CheckTag focus-visible behavior on Web and Avalonia",
+    "Focused unchecked state after real pointer and keyboard activation",
+    "Reduced-motion accessibility and automation semantics"
+  ],
+  "outOfScope": [
+    "New CheckTag variants or design intent",
+    "Pixel equality between native renderers",
+    "Adjacent component redesign"
+  ],
+  "classificationEvidenceDigest": "bf1cf46ccbef62abbf4f30a6bb0a0031a8607149ead79dab2eabe35e983ab126",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "ed274036b50c8f3d5742406abf6f3b550998aa5f1fb0af3baafbadc2989e9ee6"
+}

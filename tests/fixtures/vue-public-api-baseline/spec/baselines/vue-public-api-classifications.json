@@ -3,6 +3,7 @@
   "componentModules": {
     "fixture-options-widget": "portable",
     "fixture-service": "platform-override",
+    "fixture-tsx-widget": "portable",
     "fixture-widget": "portable"
   },
   "directives": {

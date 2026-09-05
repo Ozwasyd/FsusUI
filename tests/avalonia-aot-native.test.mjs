@@ -4,6 +4,7 @@ import { URL } from 'node:url'
 import {
   affectedDecision,
   aggregateLeaves,
+  resolveStableConsumerAuthority,
   stableFamilies,
   validateLeaf,
   validateReport,
@@ -11,6 +12,8 @@ import {
   validateWorkflowContracts,
 } from '../scripts/avalonia-aot-native.mjs'
 import fs from 'node:fs'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 
 const commitSha = 'a'.repeat(40)
 const candidateSha256 = 'b'.repeat(64)
@@ -32,6 +35,21 @@ const leaf = (overrides = {}) => ({
     skipped: 0,
   },
   ...overrides,
+})
+
+test('stable consumer authority rejects a stale alignment identity', () => {
+  const authority = resolveStableConsumerAuthority()
+  const stale = JSON.parse(JSON.stringify(authority.alignment))
+  stale.identity.candidate = '0'.repeat(40)
+  const stalePath = path.join(
+    fs.mkdtempSync(path.join(tmpdir(), 'fsusui-aot-authority-')),
+    'stale-alignment.json',
+  )
+  fs.writeFileSync(stalePath, JSON.stringify(stale, null, 2))
+  assert.throws(
+    () => resolveStableConsumerAuthority({ alignmentPath: stalePath }),
+    /identity candidate is stale/u,
+  )
 })
 
 test('stable registry owns the native scenario set', () => {

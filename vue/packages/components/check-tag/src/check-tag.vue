@@ -1,5 +1,13 @@
 <template>
-  <span :class="containerKls" @click="handleChange">
+  <span
+    :aria-checked="props.checked"
+    :class="containerKls"
+    role="checkbox"
+    tabindex="0"
+    @click="handleChange"
+    @keydown.enter.prevent="handleChange"
+    @keydown.space.prevent="handleChange"
+  >
     <slot />
   </span>
 </template>

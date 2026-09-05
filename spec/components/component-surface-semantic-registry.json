@@ -34,19 +34,19 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "6c411943d52e2b9c39a55016348c4a5841507e48226b096efc52b7c76456efc3"
+      "digest": "25c0ec51de05d6e66147ee2d2a17522b5fdd92f521fde6bbac1197f5b0825d41"
     },
     "component-motion": {
       "path": "docs/components/motion.md",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "f4d475d4e04e4b084a7a262445dad60eb6ef63bfacf8e4d1e85a20aa0950dbc8"
+      "digest": "a0f207697bd1065303d0a35f5cc8b4c92ed4a35371a13e2186721cb597e5d87f"
     },
     "component-public-shell": {
       "path": "docs/components/public-shell.md",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "31b0f203ca102c874d55f66c935268de145077fa70cadee18089bfa6813fa2b1"
+      "digest": "6a20a7ed2d99bbb5608c60e6f7540ea0b88f1045c250906b89df3a0865ce41fe"
     },
     "implementation-01": {
       "path": "vue/packages/theme-chalk/src/select-dropdown.scss",

@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   extractDeprecatedDeclarations,
   extractComponentSemantics,
+  declaredComponentNames,
   sourceForComponent as compilerSourceForComponent,
 } from './vue-semantic-baseline.mjs'
 
@@ -473,7 +474,7 @@ const loadClassifications = (root) => {
 
 const loadModuleSources = (root, moduleName) => {
   const moduleRoot = path.join(root, 'vue/packages/components', moduleName)
-  const files = walkFiles(moduleRoot, (file) => /\.(ts|vue)$/.test(file))
+  const files = walkFiles(moduleRoot, (file) => /\.(ts|tsx|vue)$/.test(file))
   return files.map((file) => ({
     file,
     relativePath: toPosix(path.relative(root, file)),
@@ -483,10 +484,16 @@ const loadModuleSources = (root, moduleName) => {
 
 const sourceForComponent = (sources, exportName) => {
   const kebab = toKebab(exportName)
-  const exact = sources.find((source) =>
-    source.relativePath.endsWith(`/src/${kebab}.vue`),
+  const exact = sources.find(
+    (source) =>
+      source.relativePath.endsWith(`/src/${kebab}.vue`) ||
+      source.relativePath.endsWith(`/src/${kebab}.tsx`),
   )
   if (exact) return exact
+  const declared = sources.find((source) =>
+    declaredComponentNames(source.content).has(exportName),
+  )
+  if (declared) return declared
   return sources.find((source) => source.relativePath.endsWith('.vue'))
 }
 
@@ -593,6 +600,7 @@ const parseComponent = (
     name: exportName,
     module: moduleName,
     classification,
+    source: vueSource?.relativePath ?? null,
     props: uniqueSorted([...fromVue.props, ...fallback.props]),
     emits: uniqueSorted([...fromVue.emits, ...fallback.emits]),
     slots: slotSemantics.semanticSlots,
@@ -989,6 +997,36 @@ const runFixtureAssertions = () => {
     throw new Error(
       'Options API setup context was misclassified as a prop or emit',
     )
+  }
+  const tsxWidget = baseline.components.find(
+    (component) => component.name === 'ElFixtureTsxWidget',
+  )
+  if (!tsxWidget) throw new Error('fixture TSX widget missing from baseline')
+  if (
+    tsxWidget.source !==
+    'vue/packages/components/fixture-tsx-widget/src/fixture-tsx-surface.tsx'
+  ) {
+    throw new Error('fixture TSX widget source identity was not exact')
+  }
+  for (const prop of ['count', 'label']) {
+    if (!tsxWidget.semantic.props.some((item) => item.name === prop)) {
+      throw new Error(
+        `fixture TSX widget imported prop ${prop} was not extracted`,
+      )
+    }
+  }
+  if (!tsxWidget.semantic.emits.some((item) => item.name === 'submit')) {
+    throw new Error('fixture TSX widget emit submit was not extracted')
+  }
+  if (!tsxWidget.semantic.exposed.some((item) => item.name === 'focus')) {
+    throw new Error('fixture TSX widget exposed member focus was not extracted')
+  }
+  if (
+    !tsxWidget.semantic.slots.some(
+      (slot) => slot.name === 'default' && slot.scoped,
+    )
+  ) {
+    throw new Error('fixture TSX widget scoped default slot was not extracted')
   }
   for (const prop of ['label', 'legacyMode', 'modelValue']) {
     if (!widget.props.includes(prop)) {

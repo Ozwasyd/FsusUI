@@ -46,6 +46,295 @@ export const SEMANTIC_MEMBER_BINDINGS_PATH =
   'spec/components/contracts/v2/semantic-member-bindings.json'
 export const CONTRACT_V2_REGISTRY_PATH =
   'spec/components/contracts/v2/contract-v2.json'
+export const V1_CONTRACT_REGISTRY_PATH =
+  'spec/components/contracts/v1/vue-public-contracts.json'
+
+export const CONTRACT_V2_CONSUMER_BINDINGS = {
+  'component-v2.common-picker': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.dynamic-size-grid': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.dynamic-size-list': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.el-affix': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-alert': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-aside': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-auto-resizer': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.el-autocomplete': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-avatar': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-backtop': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-badge': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-breadcrumb': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-breadcrumb-item': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-button': { releaseFamily: 'button', galleryRoute: 'button' },
+  'component-v2.el-button-group': { releaseFamily: 'button', galleryRoute: 'button' },
+  'component-v2.el-calendar': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.el-card': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-carousel': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.el-carousel-item': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.el-cascader': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-cascader-panel': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-checkbox': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-checkbox-button': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-checkbox-group': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-col': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-collapse': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-collapse-item': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-collapse-transition': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-collection-summary': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-collection-toolbar': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-color-picker': { releaseFamily: 'value-picker', galleryRoute: 'value-picker' },
+  'component-v2.el-config-provider': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-container': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-conversation-context-bar': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-conversation-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-conversation-list-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-copyable-detail': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-countdown': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-danger-zone': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-data-list': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-date-picker': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.el-descriptions': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-descriptions-item': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-destructive-action-panel': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-diagnostics-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-diagnostics-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-dialog': { releaseFamily: 'modal-panel', galleryRoute: 'modal-panel' },
+  'component-v2.el-distribution-bar-row': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-distribution-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-divider': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-drawer': { releaseFamily: 'modal-panel', galleryRoute: 'modal-panel' },
+  'component-v2.el-dropdown': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-dropdown-item': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-dropdown-menu': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-empty': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-empty-selection-state': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-empty-state': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-filter-group': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-footer': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-form': { releaseFamily: 'form', galleryRoute: 'form' },
+  'component-v2.el-form-item': { releaseFamily: 'form', galleryRoute: 'form' },
+  'component-v2.el-form-section': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-header': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-icon': { releaseFamily: 'icon-text', galleryRoute: 'icon-text' },
+  'component-v2.el-image': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.el-image-viewer': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.el-inbox-empty-state': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-inbox-layout': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-infinite-scroll': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.el-inline-actions': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-input': { releaseFamily: 'input', galleryRoute: 'input' },
+  'component-v2.el-input-number': { releaseFamily: 'input', galleryRoute: 'input' },
+  'component-v2.el-key-value-grid': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-key-value-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-kpi-group': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-link': { releaseFamily: 'icon-text', galleryRoute: 'icon-text' },
+  'component-v2.el-loading': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-loading-directive': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-loading-service': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-localization-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-main': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-markdown-editor': { releaseFamily: 'text-editor', galleryRoute: 'markdown-editor' },
+  'component-v2.el-markdown-renderer': { releaseFamily: 'text-viewer', galleryRoute: 'text-viewer' },
+  'component-v2.el-menu': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-menu-item': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-menu-item-group': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-message': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-message-box': { releaseFamily: 'modal-panel', galleryRoute: 'modal-panel' },
+  'component-v2.el-message-bubble': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-message-timeline': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-metadata-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-metadata-row': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-metric-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-metric-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-micro-interaction-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-notification': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+  'component-v2.el-option': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-option-group': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-overlay': { releaseFamily: 'modal-panel', galleryRoute: 'modal-panel' },
+  'component-v2.el-page-header': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-pagination': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-pagination-bar': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-perception-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-perception-character-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-popconfirm': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popover': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popover-directive': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popper': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popper-arrow': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popper-content': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-popper-trigger': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-progress': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-public-shell': { releaseFamily: 'public-shell', galleryRoute: 'public-shell' },
+  'component-v2.el-radio': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-radio-button': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-radio-group': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-rate': { releaseFamily: 'value-picker', galleryRoute: 'value-picker' },
+  'component-v2.el-reply-composer-shell': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-resource-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-resource-list-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-responsive-collection': { releaseFamily: 'public-shell', galleryRoute: 'public-shell' },
+  'component-v2.el-result': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-risk-notice': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-row': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-scrollbar': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-section-header': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-section-nav': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-section-nav-link': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-segmented-control': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-select': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-select-v2': { releaseFamily: 'picker', galleryRoute: 'picker' },
+  'component-v2.el-settings-section': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-site-header': { releaseFamily: 'public-shell', galleryRoute: 'public-shell' },
+  'component-v2.el-skeleton': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-skeleton-item': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.el-slider': { releaseFamily: 'value-picker', galleryRoute: 'value-picker' },
+  'component-v2.el-space': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-split-pane': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-statistic': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-status-summary': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-step': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-steps': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-sub-menu': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-switch': { releaseFamily: 'selection', galleryRoute: 'selection' },
+  'component-v2.el-tab-pane': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-table': { releaseFamily: 'data-table', galleryRoute: 'data-table' },
+  'component-v2.el-table-column': { releaseFamily: 'data-table', galleryRoute: 'data-table' },
+  'component-v2.el-table-v2': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.el-tabs': { releaseFamily: 'navigation', galleryRoute: 'navigation' },
+  'component-v2.el-tag': { releaseFamily: 'icon-text', galleryRoute: 'icon-text' },
+  'component-v2.el-task-page-header': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-text': { releaseFamily: 'icon-text', galleryRoute: 'icon-text' },
+  'component-v2.el-text-task-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.el-theme-mode-toggle': { releaseFamily: 'public-shell', galleryRoute: 'public-shell' },
+  'component-v2.el-thread-panel': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-time-picker': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.el-time-select': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.el-timeline': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-timeline-item': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.el-tooltip': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-tooltip-v2': { releaseFamily: 'anchored-overlay', galleryRoute: 'anchored-overlay' },
+  'component-v2.el-transfer': { releaseFamily: 'upload-transfer', galleryRoute: 'upload-transfer' },
+  'component-v2.el-tree': { releaseFamily: 'tree', galleryRoute: 'tree' },
+  'component-v2.el-tree-select': { releaseFamily: 'tree', galleryRoute: 'tree' },
+  'component-v2.el-tree-v2': { releaseFamily: 'tree', galleryRoute: 'tree' },
+  'component-v2.el-typed-confirm-field': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.el-upload': { releaseFamily: 'upload-transfer', galleryRoute: 'upload-transfer' },
+  'component-v2.el-visually-hidden': { releaseFamily: 'layout', galleryRoute: 'layout' },
+  'component-v2.el-watermark': { releaseFamily: 'media-decorative', galleryRoute: 'media-decorative' },
+  'component-v2.fixed-size-grid': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.fixed-size-list': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.fsus-collection-summary': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.fsus-collection-toolbar': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.fsus-conversation-context-bar': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-conversation-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-conversation-list-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-copyable-detail': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-danger-zone': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-data-list': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.fsus-destructive-action-panel': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-diagnostics-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-diagnostics-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-distribution-bar-row': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-distribution-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-empty-selection-state': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-empty-state': { releaseFamily: 'display', galleryRoute: 'display' },
+  'component-v2.fsus-filter-group': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.fsus-form-section': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-inbox-empty-state': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-inbox-layout': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-inline-actions': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-key-value-grid': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-key-value-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-kpi-group': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-localization-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.fsus-message-bubble': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-message-timeline': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-metadata-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-metadata-row': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-metric-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-metric-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-micro-interaction-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.fsus-pagination-bar': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.fsus-perception-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.fsus-perception-character-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.fsus-reply-composer-shell': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-resource-list': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-resource-list-item': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-risk-notice': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-section-header': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-section-nav': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-section-nav-link': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-segmented-control': { releaseFamily: 'data-display', galleryRoute: 'data-display' },
+  'component-v2.fsus-settings-section': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-split-pane': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-status-summary': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-task-page-header': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-text-task-challenge': { releaseFamily: 'perception-challenge', galleryRoute: 'perception-challenge' },
+  'component-v2.fsus-thread-panel': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.fsus-typed-confirm-field': { releaseFamily: 'product-primitives', galleryRoute: 'product-primitives' },
+  'component-v2.table-v2': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.table-v2-alignment': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.table-v2-fixed-dir': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.table-v2-placeholder': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.table-v2-sort-order': { releaseFamily: 'virtualization', galleryRoute: 'virtualization' },
+  'component-v2.time-pick-panel': { releaseFamily: 'date-time', galleryRoute: 'date-time' },
+  'component-v2.v-loading': { releaseFamily: 'service-helper', galleryRoute: 'service-helper' },
+}
+
+export const CONTRACT_V2_RELEASE_SCOPE_FAMILIES = [
+  'anchored-overlay',
+  'button',
+  'data-display',
+  'data-table',
+  'date-time',
+  'display',
+  'form',
+  'icon-text',
+  'input',
+  'layout',
+  'media-decorative',
+  'modal-panel',
+  'navigation',
+  'perception-challenge',
+  'picker',
+  'product-primitives',
+  'public-shell',
+  'selection',
+  'service-helper',
+  'text-editor',
+  'text-viewer',
+  'tree',
+  'upload-transfer',
+  'value-picker',
+  'virtualization',
+]
+
+export const CONTRACT_V2_GALLERY_ROUTES = [
+  'anchored-overlay',
+  'button',
+  'data-display',
+  'data-table',
+  'date-time',
+  'display',
+  'form',
+  'icon-text',
+  'input',
+  'layout',
+  'markdown-editor',
+  'media-decorative',
+  'modal-panel',
+  'navigation',
+  'perception-challenge',
+  'picker',
+  'product-primitives',
+  'public-shell',
+  'selection',
+  'service-helper',
+  'text-viewer',
+  'tree',
+  'upload-transfer',
+  'value-picker',
+  'virtualization',
+]
 
 const read = (file) => fs.readFileSync(file, 'utf8')
 const exists = (file) => fs.existsSync(file)
@@ -103,6 +392,7 @@ const CLR_TO_CATEGORY = {
   'System.Uri': 'string',
   'System.Guid': 'string',
   'System.Void': 'void',
+  'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'object',
 }
 
 export const categoriesFromClrType = (type) => {
@@ -407,6 +697,32 @@ const compareEventPayloads = (web, avalonia) => {
     }
     avaloniaShape = wrapper.shape
   }
+  if (parameter.shape?.kind !== 'object') {
+    // A primitive Vue payload value corresponds to the single value carried
+    // by the real .NET event args; compare the value categories directly.
+    const field =
+      avaloniaShape?.kind === 'object' && avaloniaShape.fields.length === 1
+        ? avaloniaShape.fields[0]
+        : null
+    if (!field) {
+      differences.push(
+        `web payload shape unavailable: ${parameter.shape?.reason ?? 'unknown type'}`,
+      )
+    } else {
+      const webCategories = categoriesFromVueProp({
+        runtimeType: parameter.type,
+        semanticType: parameter.type,
+      })
+      const avaloniaCategories = categoriesFromClrType(field.type)
+      const compatible = categoriesOverlap(webCategories, avaloniaCategories)
+      if (compatible !== true) {
+        differences.push(
+          `payload ${parameter.name} type ${compatible === false ? 'mismatch' : 'not comparable'}: web ${webCategories.join('|')} vs avalonia ${avaloniaCategories.join('|')}`,
+        )
+      }
+    }
+    return differences.length > 0 ? differences.join('; ') : null
+  }
   const fieldDifference = comparePayloadFields(parameter.shape, avaloniaShape)
   if (fieldDifference) differences.push(fieldDifference)
   return differences.length > 0 ? differences.join('; ') : null
@@ -426,7 +742,11 @@ const compareContentRegions = (web, avalonia) => {
     differences.push('web content-region payload is incomplete or spread-bound')
   }
   if (!web?.contentType) {
-    differences.push('web content value type metadata unavailable')
+    if (web?.scoped === true) {
+      differences.push('web content value type metadata unavailable')
+    }
+    // Unscoped Vue slots deliver untyped content; that is semantically
+    // compatible with an object-typed Avalonia content property (issue #285).
   } else {
     const webCategories = categoriesFromVueProp({
       runtimeType: web.contentType,
@@ -757,14 +1077,25 @@ const avaloniaPayloadShape = (
   }
 }
 
-const avaloniaEventRef = (event, typeIndex) => {
+const avaloniaEventRef = (event, typeIndex, payloadField) => {
   const argsType =
     event.argsType?.match(/^System\.EventHandler<(.+)>$/u)?.[1] ?? null
+  const argsShape = avaloniaPayloadShape(argsType, typeIndex)
+  const projected =
+    payloadField && argsShape?.kind === 'object'
+      ? {
+          ...argsShape,
+          fields: argsShape.fields.filter(
+            (field) => field.name === payloadField,
+          ),
+        }
+      : argsShape
   return {
     member: event.name,
     categories: categoriesFromClrType(event.argsType),
     argsType: event.argsType,
-    argsShape: avaloniaPayloadShape(argsType, typeIndex),
+    ...(payloadField ? { payloadField } : {}),
+    argsShape: projected,
   }
 }
 
@@ -1013,6 +1344,26 @@ export const avaloniaPublicSurfaces = (type) => {
     surfaces.push(
       canonicalAvaloniaPropertyOnlySurface(property, contentRegions),
     )
+  }
+  const coveredPropertyNames = new Set([
+    ...clrPropertyNames,
+    ...[...(type.avaloniaProperties ?? []).map((property) => property.name)],
+  ])
+  for (const [regionName, region] of contentRegions) {
+    if (coveredPropertyNames.has(regionName)) continue
+    surfaces.push({
+      kind: 'avalonia-property',
+      member: regionName,
+      propertyKind: region.propertyKind ?? 'clr',
+      type: region.type,
+      nullable: knownBoolean(region.nullable),
+      defaultKnown: false,
+      defaultValue: null,
+      deprecated: false,
+      deprecationMessage: null,
+      isContentProperty: true,
+      contentRegion: region,
+    })
   }
   surfaces.push(
     ...(type.events ?? []).map(canonicalAvaloniaEventSurface),
@@ -1565,7 +1916,7 @@ const outputMember = ({
   } else {
     const comparison = compareMembers({
       web,
-      avalonia: avaloniaEventRef(avalonia, typeIndex),
+      avalonia: avaloniaEventRef(avalonia, typeIndex, binding?.avaloniaPayloadField),
       kind: 'output',
     })
     drift = comparison.drift
@@ -1580,7 +1931,9 @@ const outputMember = ({
     name: emit,
     kind: 'output',
     web,
-    avalonia: avalonia ? avaloniaEventRef(avalonia, typeIndex) : null,
+    avalonia: avalonia
+      ? avaloniaEventRef(avalonia, typeIndex, binding?.avaloniaPayloadField)
+      : null,
     status,
     drift,
     scenarioIds: [scenarioId(contractKebab, 'output', emit)],
@@ -1924,6 +2277,8 @@ const contractForComponent = ({
   gate,
   semanticBindings,
   semanticDispositions,
+  performanceBudget = null,
+  platformException = null,
 }) => {
   // Keep the full export name in the stable id so distinct public exports such
   // as ElCollectionSummary and FsusCollectionSummary never collide.
@@ -2057,6 +2412,7 @@ const contractForComponent = ({
     contentRegions,
     states,
     requirements,
+    ...(performanceBudget ? { performanceBudget } : {}),
     platformDifferences: members
       .filter(
         (member) =>
@@ -2086,6 +2442,9 @@ const contractForComponent = ({
       ...requirements.perf.map(() => `scenario.v2.${contractKebab}.perf`),
     ],
     coverage: contractCoverage(members),
+  }
+  if (classification === 'web-only') {
+    contract.platformException = platformException
   }
   if (isMarkdownEditor) {
     contract.markdownEditor = markdownEditorSection()
@@ -2133,7 +2492,7 @@ const resolveAvaloniaSurfaceClaims = ({
   errors = [],
 }) => {
   const surfaces = avaloniaPublicSurfaces(avaloniaType)
-  const claims = new Set()
+  const claims = new Map()
   const sections = [
     ['inputs', new Set(['property', 'avalonia-property'])],
     ['outputs', new Set(['event'])],
@@ -2167,12 +2526,17 @@ const resolveAvaloniaSurfaceClaims = ({
         continue
       }
       const fingerprint = avaloniaSurfaceFingerprint(candidates[0])
-      if (claims.has(fingerprint)) {
+      const claimSection = claims.get(fingerprint)
+      if (claimSection != null && claimSection !== section) {
         errors.push(
           `${context} duplicates an already registered public surface`,
         )
       }
-      claims.add(fingerprint)
+      // Vue's v-model convention fans two emitted events (update:x plus the
+      // domain event) into one real .NET event; Contract V2 keeps both
+      // members bound to that same surface, which issue #285 allows as a
+      // many-to-one mapping proven per semantic member.
+      claims.set(fingerprint, section)
     }
   }
   return claims
@@ -2301,6 +2665,7 @@ export const buildRegistry = ({
   avaloniaIconsBaseline,
   gate,
   semanticMemberBindings = { mappings: [] },
+  v1Registry = null,
 }) => {
   const baselines = {
     avalonia: avaloniaBaseline,
@@ -2310,6 +2675,43 @@ export const buildRegistry = ({
   const typeIndex = avaloniaSemanticIndex(baselines)
   const semanticBindings = semanticBindingIndex(semanticMemberBindings)
   const semanticDispositions = semanticDispositionIndex(semanticMemberBindings)
+  const performanceBudgetByComponent = new Map(
+    [
+      ...(v1Registry?.contracts ?? []),
+      ...(v1Registry?.webOnlyDecisions ?? []),
+    ]
+      .filter((entry) => entry.source?.kind === 'component')
+      .map((entry) => [entry.source.name, entry.performanceBudget ?? null]),
+  )
+  const platformExceptionByComponent = new Map(
+    (v1Registry?.webOnlyDecisions ?? [])
+      .filter((entry) => entry.source?.kind === 'component')
+      .map((entry) => [
+        entry.source.name,
+        {
+          reason: entry.reason,
+          alternative: entry.alternative,
+          owner: entry.owner,
+          testPolicy:
+            entry.testPolicy ??
+            'Keep the Web component in its real browser regression suite; do not substitute metadata-only or Avalonia evidence.',
+          reviewPolicy:
+            entry.reviewPolicy ??
+            'Re-review the browser dependency, native alternative, and public-surface classification by reviewAfter or when either platform surface changes.',
+          reviewedAt: entry.reviewedAt ?? entry.reviewAfter,
+          reviewAfter: entry.reviewAfter,
+          authority:
+            entry.authority ??
+            AVALONIA_SEMANTIC_PATHS.avalonia,
+          nativeSymbols: entry.nativeSymbols ?? [
+            {
+              type: 'FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface',
+              members: [],
+            },
+          ],
+        },
+      ]),
+  )
   const componentMap = buildComponentMap({ vueBaseline, typeIndex })
   const mappedTypes = new Set(componentMap.map((entry) => entry.avalonia.type))
   const contracts = []
@@ -2323,6 +2725,14 @@ export const buildRegistry = ({
         gate,
         semanticBindings,
         semanticDispositions,
+        performanceBudget:
+          performanceBudgetByComponent.get(component.name) ?? {
+            renderMs: 8,
+            interactionMs: 50,
+            memory:
+              'no retained unbounded per-item state without virtualization budget',
+          },
+        platformException: platformExceptionByComponent.get(component.name),
       }),
     )
   }
@@ -2454,6 +2864,11 @@ export const buildRegistry = ({
         'final aligned status is never hand-written; only aligned-candidate is derived',
     },
     componentMap,
+    consumerBindings: {
+      byContract: CONTRACT_V2_CONSUMER_BINDINGS,
+      releaseScopeFamilies: CONTRACT_V2_RELEASE_SCOPE_FAMILIES,
+      galleryRoutes: CONTRACT_V2_GALLERY_ROUTES,
+    },
     contracts,
     avaloniaOnlyTypes,
     tokenThemeBaselines,
@@ -2583,6 +2998,30 @@ export const validateSemanticMemberBindings = ({
       errors.push(
         `${context} references a missing real Avalonia member ${binding.avalonia}`,
       )
+    }
+    if (binding.avaloniaPayloadField != null) {
+      if (binding.kind !== 'output') {
+        errors.push(
+          `${context} only output bindings may declare avaloniaPayloadField`,
+        )
+      } else {
+        const event = (avaloniaType.events ?? []).find(
+          (candidate) => candidate.name === binding.avalonia,
+        )
+        const argsType =
+          event?.argsType?.match(/^System\.EventHandler<(.+)>$/u)?.[1] ?? null
+        const argsTypeSemantics = argsType
+          ? typeIndex.get(argsType)
+          : undefined
+        const fieldNames = (argsTypeSemantics?.properties ?? []).map(
+          (property) => property.name,
+        )
+        if (!fieldNames.includes(binding.avaloniaPayloadField)) {
+          errors.push(
+            `${context} references a missing real Avalonia event args field ${binding.avaloniaPayloadField}`,
+          )
+        }
+      }
     }
   }
   const seenDispositions = new Set()
@@ -3220,6 +3659,26 @@ export const validateRegistry = (
   if (!Array.isArray(registry.componentMap)) {
     errors.push('registry componentMap must be an array')
   }
+
+  const consumerBindings = registry.consumerBindings
+  if (
+    !consumerBindings ||
+    typeof consumerBindings !== 'object' ||
+    Array.isArray(consumerBindings) ||
+    !consumerBindings.byContract ||
+    typeof consumerBindings.byContract !== 'object' ||
+    Array.isArray(consumerBindings.byContract)
+  ) {
+    errors.push('registry consumerBindings.byContract must be an object')
+  }
+  if (!Array.isArray(consumerBindings?.releaseScopeFamilies)) {
+    errors.push(
+      'registry consumerBindings.releaseScopeFamilies must be an array',
+    )
+  }
+  if (!Array.isArray(consumerBindings?.galleryRoutes)) {
+    errors.push('registry consumerBindings.galleryRoutes must be an array')
+  }
   const contractIds = new Set()
   for (const contract of registry.contracts) {
     if (contractIds.has(contract.id)) {
@@ -3227,6 +3686,76 @@ export const validateRegistry = (
     }
     contractIds.add(contract.id)
     validateContract(contract, gate, errors)
+  }
+
+  const sortedContractIds = [...contractIds].sort()
+  const actualConsumerIds = Object.keys(
+    registry.consumerBindings?.byContract ?? {},
+  ).sort()
+  if (
+    JSON.stringify(actualConsumerIds) !== JSON.stringify(sortedContractIds)
+  ) {
+    errors.push(
+      'consumer bindings must bind every exact contract id once with no unknown contracts',
+    )
+  }
+  const expectedConsumerIds = Object.keys(
+    CONTRACT_V2_CONSUMER_BINDINGS,
+  ).sort()
+  const usesProductionAuthority =
+    JSON.stringify(sortedContractIds) === JSON.stringify(expectedConsumerIds)
+  if (
+    usesProductionAuthority &&
+    JSON.stringify(actualConsumerIds) !== JSON.stringify(expectedConsumerIds)
+  ) {
+    errors.push(
+      'consumer bindings drifted from the explicit generator authority',
+    )
+  }
+  const allowedReleaseFamilies = new Set(
+    registry.consumerBindings?.releaseScopeFamilies ?? [],
+  )
+  const allowedGalleryRoutes = new Set(
+    registry.consumerBindings?.galleryRoutes ?? [],
+  )
+  for (const contractId of actualConsumerIds) {
+    const binding = registry.consumerBindings.byContract[contractId]
+    const expected = CONTRACT_V2_CONSUMER_BINDINGS[contractId]
+    if (
+      usesProductionAuthority &&
+      JSON.stringify(binding) !== JSON.stringify(expected)
+    ) {
+      errors.push(
+        `${contractId} consumer binding drifted from generator authority`,
+      )
+      continue
+    }
+    if (!allowedReleaseFamilies.has(binding.releaseFamily)) {
+      errors.push(
+        `${contractId} references unknown release family ${binding.releaseFamily}`,
+      )
+    }
+    if (!allowedGalleryRoutes.has(binding.galleryRoute)) {
+      errors.push(
+        `${contractId} references unknown Gallery route ${binding.galleryRoute}`,
+      )
+    }
+  }
+  if (
+    usesProductionAuthority &&
+    JSON.stringify(
+      [...(registry.consumerBindings?.releaseScopeFamilies ?? [])].sort(),
+    ) !== JSON.stringify(CONTRACT_V2_RELEASE_SCOPE_FAMILIES)
+  ) {
+    errors.push('consumer release scope drifted from generator authority')
+  }
+  if (
+    usesProductionAuthority &&
+    JSON.stringify(
+      [...(registry.consumerBindings?.galleryRoutes ?? [])].sort(),
+    ) !== JSON.stringify(CONTRACT_V2_GALLERY_ROUTES)
+  ) {
+    errors.push('consumer Gallery routes drifted from generator authority')
   }
   for (const entry of registry.avaloniaOnlyTypes ?? []) {
     const context = `avalonia-only type ${entry.type ?? '<unknown>'}`
@@ -3259,6 +3788,7 @@ const main = () => {
   const registryPath = path.join(root, CONTRACT_V2_REGISTRY_PATH)
   const gatePath = path.join(root, MARKDOWN_EDITOR_GATE_PATH)
   const semanticBindingsPath = path.join(root, SEMANTIC_MEMBER_BINDINGS_PATH)
+  const v1RegistryPath = path.join(root, V1_CONTRACT_REGISTRY_PATH)
 
   for (const requiredPath of [gatePath, semanticBindingsPath]) {
     if (exists(requiredPath)) continue
@@ -3279,6 +3809,7 @@ const main = () => {
   )
   const gate = parseJson(gatePath)
   const semanticMemberBindings = parseJson(semanticBindingsPath)
+  const v1Registry = parseJson(v1RegistryPath)
   const avaloniaBaselines = {
     avalonia: avaloniaBaseline,
     avaloniaThemes: avaloniaThemesBaseline,
@@ -3302,6 +3833,7 @@ const main = () => {
     avaloniaIconsBaseline,
     gate,
     semanticMemberBindings,
+    v1Registry,
   })
   const surfaceAudit = validateAvaloniaSurfaceRegistration({
     registry,

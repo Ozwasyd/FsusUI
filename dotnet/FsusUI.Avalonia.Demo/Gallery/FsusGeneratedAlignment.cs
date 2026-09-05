@@ -4,8 +4,22 @@ namespace FsusUI.Avalonia.Demo.Gallery;
 
 internal static class FsusGeneratedAlignment
 {
-  public static IReadOnlySet<string> StableFamilies { get; } = new HashSet<string>(StringComparer.Ordinal)
+  public static IReadOnlySet<string> StableContractIds { get; } = new HashSet<string>(StringComparer.Ordinal)
   {
+    "component-v2.el-check-tag",
+  };
 
+  public static IReadOnlySet<string> StableRoutes { get; } = new HashSet<string>(StringComparer.Ordinal)
+  {
+    "selection",
+  };
+
+  public static IReadOnlyDictionary<string, IReadOnlySet<string>> StableContractsByRoute { get; } =
+    new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal)
+  {
+    ["selection"] = new HashSet<string>(StringComparer.Ordinal)
+    {
+      "component-v2.el-check-tag",
+    },
   };
 }

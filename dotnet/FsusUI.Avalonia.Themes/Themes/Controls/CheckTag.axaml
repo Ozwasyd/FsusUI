@@ -19,23 +19,31 @@
     <Setter Property="FontSize" Value="11" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border
-          Background="{TemplateBinding Background}"
-          BorderBrush="{TemplateBinding BorderBrush}"
-          BorderThickness="{TemplateBinding BorderThickness}"
-          CornerRadius="{TemplateBinding CornerRadius}"
-          Padding="{TemplateBinding Padding}">
-          <ContentPresenter
-            Content="{TemplateBinding Content}"
-            ContentTemplate="{TemplateBinding ContentTemplate}"
-            Foreground="{TemplateBinding Foreground}"
-            FontWeight="{TemplateBinding FontWeight}"
-            FontSize="{TemplateBinding FontSize}"
-            VerticalAlignment="Center" />
-        </Border>
+        <Grid>
+          <Border
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            Padding="{TemplateBinding Padding}">
+            <ContentPresenter
+              Content="{TemplateBinding Content}"
+              ContentTemplate="{TemplateBinding ContentTemplate}"
+              Foreground="{TemplateBinding Foreground}"
+              FontWeight="{TemplateBinding FontWeight}"
+              FontSize="{TemplateBinding FontSize}"
+              VerticalAlignment="Center" />
+          </Border>
+          <Border
+            Name="PART_FocusRing"
+            BorderBrush="{DynamicResource FsusThemeFocusBrush}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False" />
+        </Grid>
       </ControlTemplate>
     </Setter>
   </Style>
@@ -44,5 +52,9 @@
     <Setter Property="Background" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusColorSurfaceBaseBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusCheckTag:focus-visible /template/ Border#PART_FocusRing">
+    <Setter Property="BorderThickness" Value="2" />
   </Style>
 </Styles>

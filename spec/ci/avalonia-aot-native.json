@@ -1,6 +1,7 @@
 {
   "schemaVersion": "fsusui.avalonia-aot-native.v1",
-  "stableRegistry": "spec/ci/avalonia-stable-readiness.json",
+  "contractRegistry": "spec/components/contracts/v2/contract-v2.json",
+  "alignmentArtifact": ".tmp/conformance-v2/alignment.json",
   "requiredRids": ["linux-x64"],
   "optionalOffHostRids": ["win-x64", "osx-arm64"],
   "reportSchema": "fsusui.avalonia-aot-smoke-report.v1",

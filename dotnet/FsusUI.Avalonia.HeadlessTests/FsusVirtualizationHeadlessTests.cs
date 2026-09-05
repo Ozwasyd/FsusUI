@@ -1,8 +1,11 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
 using System.Runtime.CompilerServices;
 
@@ -192,6 +195,31 @@ public class FsusVirtualizationHeadlessTests
   }
 
   [AvaloniaFact]
+  public void AutoResizerObservesArrangedViewportAndHonorsDisabledAxes()
+  {
+    var observations = new List<Size>();
+    var resizer = new FsusAutoResizer
+    {
+      OnResize = observations.Add,
+    };
+
+    resizer.Measure(new Size(320, 180));
+    resizer.Arrange(new Rect(0, 0, 320, 180));
+
+    Assert.Equal(new Size(320, 180), resizer.Viewport);
+    Assert.Equal(new Size(320, 180), Assert.Single(observations));
+
+    resizer.DisableWidth = true;
+    Assert.True(resizer.Resize(new Size(640, 240)));
+    Assert.Equal(new Size(320, 240), resizer.Viewport);
+    Assert.Equal(new Size(320, 240), observations[^1]);
+
+    resizer.DisableHeight = true;
+    Assert.False(resizer.Resize(new Size(800, 500)));
+    Assert.Equal(2, observations.Count);
+  }
+
+  [AvaloniaFact]
   public void AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget()
   {
     var resizer = new FsusAutoResizer
@@ -239,6 +267,321 @@ public class FsusVirtualizationHeadlessTests
     Assert.True(table.RecycledCellCount > 0);
     Assert.Equal(initialCellIds, table.RealizedCells.Select(cell => cell.ContainerId).Order().ToArray());
     Assert.Equal(AutomationControlType.DataGrid, AutomationProperties.GetControlTypeOverride(table));
+  }
+
+  [AvaloniaFact]
+  public void TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll()
+  {
+    var table = new FsusTableV2
+    {
+      AccessibleName = "Typed table",
+      RowHeight = 32,
+      ColumnWidth = 120,
+      Overscan = 0,
+    };
+    table.Columns.Add(new FsusDataTableColumn("name", "Name")
+    {
+      Fixed = FsusDataTableFixedColumn.Left,
+    });
+    table.Columns.Add(new FsusDataTableColumn("score", "Score"));
+    table.Columns.Add(new FsusDataTableColumn("owner", "Owner")
+    {
+      Fixed = FsusDataTableFixedColumn.Right,
+    });
+    for (var row = 0; row < 100; row++)
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{row}", new Dictionary<string, object?>
+      {
+        ["name"] = $"Row {row}",
+        ["score"] = row,
+        ["owner"] = "FsusUI",
+      }));
+    }
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(240, 96) });
+    table.RefreshLayout();
+
+    Assert.Equal(100, table.EffectiveRowCount);
+    Assert.Equal(3, table.EffectiveColumnCount);
+    Assert.Contains(table.RealizedCells, cell => cell.ColumnIndex == 0);
+    Assert.Contains(table.RealizedCells, cell => cell.ColumnIndex == 2);
+
+    table.ScrollToRow(50);
+    Assert.Equal(50, table.FocusedRowIndex);
+    Assert.Contains(table.RealizedCells, cell => cell.RowIndex == 50 && Equals(cell.Content, "Row 50"));
+
+    var key = new KeyEventArgs
+    {
+      RoutedEvent = InputElement.KeyDownEvent,
+      Key = Key.Right,
+    };
+    table.RaiseEvent(key);
+
+    Assert.True(key.Handled);
+    Assert.Equal(1, table.FocusedColumnIndex);
+    table.ScrollToLeft(120);
+    Assert.Equal(1, table.RealizedColumnStartIndex);
+  }
+
+  [AvaloniaFact]
+  public void TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks()
+  {
+    FsusTableV2RowsRendered? rendered = null;
+    FsusTableV2ScrollPosition? scrolled = null;
+    var endReached = 0;
+    var table = new FsusTableV2
+    {
+      RowCount = 100,
+      ColumnCount = 2,
+      EstimatedRowHeight = 24,
+      ColumnWidth = 120,
+      Overscan = 0,
+      OnRowsRendered = value => rendered = value,
+      OnScroll = value => scrolled = value,
+      OnEndReached = _ => endReached++,
+    };
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(240, 72) });
+    table.RefreshLayout();
+
+    Assert.Equal(3, table.RealizedRowCount);
+    Assert.Equal(0, rendered?.StartIndex);
+    Assert.Equal(2, rendered?.StopIndex);
+
+    table.SetMeasuredRowHeight(0, 60);
+    var secondRow = Assert.Single(
+      table.RealizedCells,
+      cell => cell.RowIndex == 1 && cell.ColumnIndex == 0);
+    Assert.Equal(60, Canvas.GetTop(secondRow));
+    Assert.Equal(1, table.RetainedRowMeasurementCount);
+
+    table.ScrollToTop(60);
+    Assert.Equal(1, table.RealizedRowStartIndex);
+    Assert.Equal(60, scrolled?.ScrollTop);
+    table.ScrollToTop(double.MaxValue);
+    Assert.Equal(1, endReached);
+  }
+
+  [AvaloniaFact]
+  public void TableV2UsesFixedDataGetterAndExpandedRowCallbacks()
+  {
+    FsusTableV2RowExpansion? expansion = null;
+    IReadOnlyList<string>? expandedKeys = null;
+    var table = new FsusTableV2
+    {
+      RowHeight = 24,
+      ColumnWidth = 120,
+      Overscan = 0,
+      DataGetter = context => $"{context.Row.Key}:{context.Value}",
+      OnRowExpand = value => expansion = value,
+      OnExpandedRowsChange = value => expandedKeys = value,
+    };
+    table.Columns.Add(new FsusDataTableColumn("name", "Name"));
+    table.FixedData.Add(FsusDataTableRow.From("fixed", new Dictionary<string, object?>
+    {
+      ["name"] = "Pinned",
+    }));
+    for (var row = 0; row < 20; row++)
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{row}", new Dictionary<string, object?>
+      {
+        ["name"] = $"Row {row}",
+      }));
+    }
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(120, 48) });
+    table.RefreshLayout();
+    table.ScrollToRow(10);
+
+    Assert.Equal(21, table.EffectiveRowCount);
+    Assert.Contains(
+      table.RealizedCells,
+      cell => cell.RowIndex == 0 && Equals(cell.Content, "fixed:Pinned"));
+
+    Assert.True(table.SetRowExpanded("row-10", true));
+    Assert.Equal("row-10", expansion?.Row.Key);
+    Assert.True(expansion?.Expanded);
+    Assert.Equal(["row-10"], expandedKeys);
+    Assert.False(table.SetRowExpanded("row-10", true));
+
+    table.DefaultExpandedRowKeys.Add("fixed");
+    table.ResetExpandedRows();
+    Assert.Equal(["fixed"], table.ExpandedRowKeys);
+  }
+
+  [AvaloniaFact]
+  public void TableV2MapsViewportGeometryAndCacheToRealLayout()
+  {
+    var table = new FsusTableV2
+    {
+      RowCount = 100,
+      ColumnCount = 10,
+      RowHeight = 24,
+      ColumnWidth = 100,
+      ViewportWidth = 220,
+      ViewportHeight = 72,
+      ViewportMaxHeight = 48,
+      Overscan = 0,
+    };
+
+    table.RefreshLayout();
+
+    Assert.Equal(2, table.RealizedRowCount);
+    Assert.Equal(3, table.RealizedColumnCount);
+    Assert.Equal(220, table.ScrollHost.Width);
+    Assert.Equal(48, table.ScrollHost.Height);
+
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(300, 96) });
+    Assert.Equal(300, table.ViewportWidth);
+    Assert.Equal(96, table.ViewportHeight);
+  }
+
+  [AvaloniaFact]
+  public void TableV2SortsTypedRowsAndReportsColumnSort()
+  {
+    FsusTableV2Sort? sorted = null;
+    var table = new FsusTableV2
+    {
+      OnColumnSort = value => sorted = value,
+    };
+    table.Columns.Add(new FsusDataTableColumn("score", "Score")
+    {
+      Sortable = true,
+    });
+    foreach (var score in new[] { 3, 1, 2 })
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{score}", new Dictionary<string, object?>
+      {
+        ["score"] = score,
+      }));
+    }
+
+    Assert.True(table.SortColumn("score", FsusSortDirection.Ascending));
+    Assert.Equal([1, 2, 3], table.Data.Select(row => row.GetValue("score")));
+    Assert.Equal(new FsusTableV2Sort("score", FsusSortDirection.Ascending), sorted);
+    Assert.Equal(sorted, table.SortBy);
+    Assert.Equal(sorted, table.SortState);
+    Assert.False(table.SortColumn("missing", FsusSortDirection.Descending));
+  }
+
+  [AvaloniaFact]
+  public void TableV2RendersBoundedContentRegions()
+  {
+    var template = new FuncDataTemplate<object>((_, _) => new TextBlock());
+    var table = new FsusTableV2
+    {
+      RowHeight = 24,
+      ColumnWidth = 100,
+      ViewportWidth = 200,
+      ViewportHeight = 48,
+      Overscan = 0,
+      HeaderCellContent = template,
+      RowContent = template,
+      FooterContent = template,
+      FooterHeight = 24,
+      OverlayContent = template,
+    };
+    table.Columns.Add(new FsusDataTableColumn("name", "Name"));
+    table.Columns.Add(new FsusDataTableColumn("score", "Score"));
+    for (var row = 0; row < 20; row++)
+    {
+      table.Data.Add(FsusDataTableRow.From($"row-{row}", new Dictionary<string, object?>
+      {
+        ["name"] = $"Row {row}",
+        ["score"] = row,
+      }));
+    }
+
+    table.RefreshLayout();
+
+    Assert.Equal(2, table.HeaderContentPresenterCount);
+    Assert.Equal(2, table.RowContentPresenterCount);
+    Assert.True(table.IsFooterContentVisible);
+    Assert.True(table.IsOverlayContentVisible);
+    Assert.False(table.IsEmptyContentVisible);
+
+    var empty = new FsusTableV2
+    {
+      EmptyContent = template,
+    };
+    empty.RefreshLayout();
+    Assert.True(empty.IsEmptyContentVisible);
+  }
+
+  [AvaloniaFact]
+  public void TableV2ContentRegionsReceiveScopedPayloads()
+  {
+    var headerCells = new List<FsusTableV2HeaderCellContext>();
+    FsusTableV2RowContext? row = null;
+    var table = new FsusTableV2
+    {
+      ColumnWidth = 100,
+      ViewportWidth = 200,
+      ViewportHeight = 48,
+      Overscan = 0,
+      HeaderCellContent = new FuncDataTemplate<FsusTableV2HeaderCellContext>((context, _) =>
+      {
+        headerCells.Add(context);
+        return new TextBlock();
+      }),
+      RowContent = new FuncDataTemplate<FsusTableV2RowContext>((context, _) =>
+      {
+        row ??= context;
+        return new TextBlock();
+      }),
+    };
+    table.HeaderHeights.Add(24);
+    table.HeaderHeights.Add(36);
+    table.Columns.Add(new FsusDataTableColumn("name", "Name"));
+    table.Columns.Add(new FsusDataTableColumn("score", "Score"));
+    table.Data.Add(FsusDataTableRow.From("row-0", new Dictionary<string, object?>
+    {
+      ["name"] = "Contract",
+      ["score"] = 7,
+    }));
+
+    table.RefreshLayout();
+    var window = new Window { Width = 240, Height = 160, Content = table };
+    window.Show();
+    window.Measure(new Size(240, 160));
+    window.Arrange(new Rect(0, 0, 240, 160));
+    Dispatcher.UIThread.RunJobs();
+
+    var headerCell = headerCells[0];
+    Assert.Equal("name", headerCell.Column.Key);
+    Assert.Equal(0, headerCell.ColumnIndex);
+    Assert.Equal(0, headerCell.HeaderIndex);
+    Assert.Equal(2, headerCell.Columns.Count);
+    Assert.Equal(100d, headerCell.Style["width"]);
+    Assert.Equal(24d, headerCell.Style["height"]);
+    Assert.Contains(headerCells, context =>
+      context.HeaderIndex == 1 &&
+      Equals(context.Style["top"], 24d) &&
+      Equals(context.Style["height"], 36d));
+    Assert.NotNull(row);
+    Assert.Equal(["Contract", 7], row.Cells);
+    Assert.Equal("row-0", row.RowData.Key);
+    Assert.Equal(0, row.RowIndex);
+    Assert.Equal(0, row.Depth);
+    Assert.False(row.IsScrolling);
+    Assert.Equal(2, row.Columns.Count);
+    Assert.Equal(200d, row.Style["width"]);
+
+    var headers = new List<FsusTableV2HeaderContext>();
+    table.HeaderCellContent = null;
+    table.HeaderContent = new FuncDataTemplate<FsusTableV2HeaderContext>((context, _) =>
+    {
+      headers.Add(context);
+      return new TextBlock();
+    });
+    table.RefreshLayout();
+    window.Measure(new Size(240, 160));
+    window.Arrange(new Rect(0, 0, 240, 160));
+    Dispatcher.UIThread.RunJobs();
+
+    var header = headers[0];
+    Assert.Equal(["Name", "Score"], header.Cells);
+    Assert.Equal(2, header.Columns.Count);
+    Assert.Equal(0, header.HeaderIndex);
+    Assert.Contains(headers, context => context.HeaderIndex == 1);
+    window.Close();
   }
 
   [AvaloniaFact]

@@ -1718,6 +1718,10 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(checkTagCss, '.el-check-tag.is-checked:hover', [
       'background-color: var(--fsus-state-emphasis-bg);',
     ])
+    expect(checkTagCss).toContain('@media (prefers-reduced-motion: reduce)')
+    expectCssRule(checkTagCss, '.el-check-tag', [
+      'transition-duration: 1ms !important;',
+    ])
     expectCssRule(tableCss, '.el-table', [
       '--el-table-current-row-bg-color: var(--fsus-state-selected-bg);',
     ])

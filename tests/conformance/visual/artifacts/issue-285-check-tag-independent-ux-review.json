@@ -1,0 +1,119 @@
+{
+  "schema": "fsusui-independent-ux-review.v1",
+  "issue": 285,
+  "candidateSha": "c51f456aff7c87a626ef087f6f675998c33be767",
+  "reviewMode": "read-only-rendered-evidence-inspection",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "identity": {
+    "executionId": "conformance-v2-check-tag-c51f456aff7c87a626ef087f6f675998c33be767",
+    "checkpoint": "check-tag-after-pointer-keyboard",
+    "contract": "component-v2.el-check-tag",
+    "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
+    "contractHash": "7cb0f79829788ffac4e7bcf61bc1e9748023a3041f3bbb8a9636238193ecf671",
+    "webBaselineHash": "6d43c3f504bbad092869c64456a4247eb4dd8be7648ed05bfda4cfc6ff303444",
+    "avaloniaBaselineHash": "5c40db1724bf216278c7ed940a8b27eddce13a95d8a4c672b6748a73fefafef0",
+    "runnerHash": "e117b08149b2ea8559231b713b5abe6b0e80f9c43ae4193fbb768f7d244e999b"
+  },
+  "viewportStateMatrix": [
+    {
+      "platform": "web",
+      "viewport": {
+        "width": 88,
+        "height": 25
+      },
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "density": "default",
+      "locale": "zh-CN",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 960,
+        "height": 720
+      },
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "density": "default",
+      "locale": "zh-CN",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "automation-peer",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "check-tag-web-focused-unchecked",
+      "platform": "web",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
+      "digest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70",
+      "bytes": 1480,
+      "width": 88,
+      "height": 25,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "check-tag-avalonia-focused-unchecked",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
+      "digest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127",
+      "bytes": 9690,
+      "width": 960,
+      "height": 720,
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "governedCriteria": [
+    {
+      "id": "blue-focus-ring-visible",
+      "status": "accepted",
+      "observation": "The Web crop shows the tag enclosed by a continuous blue focus ring on a light fill, and the Avalonia window shows the same tag outlined by a solid blue ring; the recorded ring pixel probe matched 164 of 180 sampled pixels to Scholarly Blue #2A599C within tolerance."
+    },
+    {
+      "id": "no-black-default-adorner",
+      "status": "accepted",
+      "observation": "Neither render shows a browser or native default black outline/adorner; the Avalonia probe recorded zero unexpected dark ring pixels and I saw no dark outline in either image."
+    },
+    {
+      "id": "unchecked-label-state-match",
+      "status": "accepted",
+      "observation": "Both platforms show the full dark label \"Check tag\" on a light/white fill with no checked fill or checkmark, consistent with the observation records checked=false and focused=true on both executions."
+    },
+    {
+      "id": "focus-no-bounds-shift",
+      "status": "accepted",
+      "observation": "The ring stays inside the tag rounded-rectangle bounds with no clipping at the crop edge, no overlap with the adjacent Avalonia runner controls (\"Run action\" header, trace textbox with \"Trace start\" caret), and no visible layout shift."
+    }
+  ],
+  "observations": [
+    "Web artifact (88x25 production component crop, light theme): a single rounded-rectangle CheckTag with a continuous blue focus ring, pale background, and a dark centered label \"Check tag\" that is fully readable at this size; no clipping, no black default outline, no other elements in the crop.",
+    "Avalonia artifact (960x720 real non-headless window, light theme): the CheckTag renders with a white fill and a blue focus ring, alongside the harness \"Run action\" header and a trace textbox showing the \"Trace start\" caret; the tag carries the same focused-unchecked semantic as the Web render, with no black adorner, no overlap, and undisturbed surrounding controls.",
+    "Both platforms present the same focused-unchecked-after-pointer-keyboard semantics (label \"Check tag\", checked=false, focused=true, visible blue focus indicator); native renderer and viewport scope differ, so the agreement is semantic rather than pixel-geometric."
+  ],
+  "limitations": [
+    "This review is limited to the exact light/default/zh-CN/ltr/reduced artifacts and does not claim dark, mobile, zoom, or pixel equality coverage.",
+    "The Web artifact is a component crop and the Avalonia artifact is a full real window, so acceptance is qualitative and semantic rather than cross-platform geometry equality."
+  ],
+  "blockers": [],
+  "status": "accepted"
+}

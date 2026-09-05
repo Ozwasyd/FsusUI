@@ -3,6 +3,11 @@ import path from 'node:path'
 import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import {
+  currentIdentity,
+  readStableConsumerAuthority,
+  validateNugetPackageAlignment,
+} from './avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const dotnetRoot = path.join(root, 'dotnet')
@@ -133,9 +138,9 @@ const validateCommonMetadata = (content) => {
   )
   assert(
     xmlValue(content, 'PackageReleaseNotes')?.includes(
-      'Stable Avalonia package candidate',
+      'Avalonia package candidate',
     ),
-    'Directory.Build.props release notes must describe stable Avalonia package validation',
+    'Directory.Build.props release notes must describe Avalonia package validation',
   )
 }
 
@@ -265,7 +270,7 @@ const validateNuspec = (packageInfo, packagePath) => {
     )
   }
   assert(
-    nuspec.includes('Stable Avalonia package candidate'),
+    nuspec.includes('Avalonia package candidate'),
     `${packageInfo.id} nuspec release notes are stale`,
   )
 
@@ -471,7 +476,7 @@ const writeBaselines = () => {
   }
 }
 
-const check = () => {
+export const check = ({ stablePublication = false } = {}) => {
   const failures = []
   const record = (label, fn) => {
     try {
@@ -484,15 +489,10 @@ const check = () => {
   }
 
   record('Contract V2 alignment', () => {
-    const alignment = JSON.parse(read('.tmp/conformance-v2/alignment.json'))
-    assert(
-      alignment.schema === 'fsusui.alignment.v2',
-      'alignment artifact schema invalid',
-    )
-    assert(
-      alignment.consumers?.nugetStableEligible === true,
-      'NuGet stable candidate blocked by derived alignment gaps',
-    )
+    const { alignment } = readStableConsumerAuthority({
+      expected: currentIdentity({ requireCleanPackageInputs: true }),
+    })
+    validateNugetPackageAlignment(alignment, { stablePublication })
   })
 
   record('fixtures', runFixtureChecks)
@@ -529,14 +529,18 @@ const check = () => {
     throw new Error(failures.map((failure) => `- ${failure}`).join('\n'))
   }
 
-  console.log('Avalonia stable NuGet package gate passed.')
+  console.log(
+    stablePublication
+      ? 'Avalonia stable NuGet publication gate passed.'
+      : 'Avalonia NuGet package integrity gate passed.',
+  )
 }
 
 try {
   if (process.argv.includes('--write-baselines')) {
     writeBaselines()
   } else {
-    check()
+    check({ stablePublication: process.argv.includes('--stable-publication') })
   }
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

@@ -4,27 +4,36 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { readStableConsumerAuthority } from './avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const readJson = (file) =>
   JSON.parse(fs.readFileSync(path.resolve(root, file), 'utf8'))
 const nativeSpec = readJson('spec/ci/avalonia-aot-native.json')
-const stableSpec = readJson(nativeSpec.stableRegistry)
 const sha256 = (content) => createHash('sha256').update(content).digest('hex')
 const fullSha = /^[0-9a-f]{40}$/u
 const digest = /^[0-9a-f]{64}$/u
 
-export const stableFamilies = () => [
-  ...stableSpec.requiredStableComponentFamilies,
+export const resolveStableConsumerAuthority = (authority = {}) =>
+  readStableConsumerAuthority({
+    registryPath: authority.registryPath ?? nativeSpec.contractRegistry,
+    alignmentPath: authority.alignmentPath ?? nativeSpec.alignmentArtifact,
+    expected: authority.expected,
+  })
+
+export const stableFamilies = (authority = {}) => [
+  ...resolveStableConsumerAuthority(authority).releaseScopeFamilies,
 ]
 
-export const validateScenarioBindings = (source) => {
+export const validateScenarioBindings = (
+  source,
+  required = stableFamilies(),
+) => {
   const bound = new Set(
     [...source.matchAll(/^\s*\["([a-z0-9-]+)"\]\s*=/gmu)].map(
       (match) => match[1],
     ),
   )
-  const required = stableFamilies()
   const missing = required.filter((family) => !bound.has(family))
   const unexpected = [...bound].filter((family) => !required.includes(family))
   if (missing.length || unexpected.length) {
@@ -56,7 +65,11 @@ export const validateScenarioBindings = (source) => {
   return required
 }
 
-export const validateReport = (report, expected) => {
+export const validateReport = (
+  report,
+  expected,
+  required = stableFamilies(),
+) => {
   for (const field of nativeSpec.requiredReportFields) {
     if (
       report[field] === undefined ||
@@ -83,7 +96,6 @@ export const validateReport = (report, expected) => {
   if (report.RuntimeMode !== 'nativeaot')
     throw new Error('smoke report runtime mode must be nativeaot')
   const ids = report.Scenarios.map((item) => item.Id)
-  const required = stableFamilies()
   if (
     new Set(ids).size !== ids.length ||
     required.some((id) => !ids.includes(id))
