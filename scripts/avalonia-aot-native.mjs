@@ -51,6 +51,13 @@ export const validateScenarioBindings = (
     'DismissKeyboardAsync',
     'DismissPointerOutsideAsync',
     'NativeLogErrorCount == 0',
+    'ControlAutomationPeer.CreatePeerForElement(markdownEditor)',
+    'largeMarkdownSource.Length >= 100_000',
+    'largeVisuals.Length < 64',
+    'RenderingMode = [X11RenderingMode.Software]',
+    'UseDBusMenu = false',
+    'ViewportSize = 160',
+    '"embed"',
     'catch (Exception error)',
   ])
     if (!source.includes(evidence))
@@ -86,6 +93,8 @@ export const validateReport = (
     throw new Error('smoke report candidate mismatch')
   if (expected?.rid && report.Rid !== expected.rid)
     throw new Error('smoke report RID mismatch')
+  if (report.RuntimeMode !== 'nativeaot')
+    throw new Error('smoke report runtime mode must be nativeaot')
   const ids = report.Scenarios.map((item) => item.Id)
   if (
     new Set(ids).size !== ids.length ||
@@ -105,6 +114,28 @@ export const validateReport = (
     throw new Error('smoke report runtime dependencies are missing')
   if (!Array.isArray(report.PackageDigests) || report.PackageDigests.length < 1)
     throw new Error('smoke report package digests are missing')
+  if (
+    report.MarkdownAutomationReady !== true ||
+    report.MarkdownAutomationNodeCount < 1 ||
+    report.MarkdownAutomationNodeCount > 64
+  )
+    throw new Error('smoke report Markdown automation evidence is incomplete')
+  if (
+    report.MarkdownVirtualizationReady !== true ||
+    report.MarkdownDocumentCharacters < 100_000 ||
+    report.MarkdownBlockCount < 3_000 ||
+    report.MarkdownHeadingCount < 10_000 ||
+    report.MarkdownVisualCount >= 64 ||
+    !Number.isFinite(report.MarkdownLayoutMilliseconds) ||
+    report.MarkdownLayoutMilliseconds < 0 ||
+    !Number.isSafeInteger(report.MarkdownManagedBytesDelta) ||
+    report.MarkdownManagedBytesDelta < 0 ||
+    !Number.isFinite(report.RenderScaling) ||
+    report.RenderScaling <= 0
+  )
+    throw new Error(
+      'smoke report Markdown virtualization evidence is incomplete',
+    )
   if (
     !Array.isArray(report.PartialCapabilities) ||
     !report.PartialCapabilities.includes(
@@ -267,7 +298,9 @@ export const validateWorkflowContracts = ({
     if (!caller.includes(term)) throw new Error(`PR workflow missing ${term}`)
   if (
     !publish.includes('release-readiness-digest') ||
-    !publish.includes('needs: [quality, plan, preflight]')
+    !publish.includes(
+      'needs: [quality, plan, preflight, fsusblog-consumer]',
+    )
   )
     throw new Error('publish workflow must remain bound to release readiness')
   return true

@@ -11,7 +11,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>fsusui;avalonia;components;design-system;cross-platform</PackageTags>
-    <PackageReleaseNotes>Avalonia package candidate. Public API baselines, package metadata, symbol packages, dependency review, package content audit, and packed consumer verification guard NuGet readiness; stable publication additionally requires the zero-gap Contract V2 gate.</PackageReleaseNotes>
+    <PackageReleaseNotes>Stable Avalonia package candidate. The three public packages are AOT-compatible libraries; final RID-specific Native AOT publish and run remain consuming-application release gates. Public API baselines, package metadata, symbol packages, dependency review, package content audit, and packed consumer verification guard stable NuGet readiness.</PackageReleaseNotes>
     <Deterministic>true</Deterministic>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>

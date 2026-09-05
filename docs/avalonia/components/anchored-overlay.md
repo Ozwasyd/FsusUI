@@ -7,6 +7,14 @@ Component ID: `anchored-overlay`
 Use `FsusTooltip`, `FsusPopover`, `FsusPopconfirm`, `FsusDropdown`,
 `FsusDropdownMenu`, and `FsusDropdownItem` for anchored transient surfaces.
 
+## Automation
+
+`FsusTooltip` exposes the native automation tooltip role. `FsusPopover` and
+`FsusPopconfirm` expose an automation window role for their dialog-like
+surfaces. Their expand/collapse provider reports the live `IsOpen` state and
+uses the same overlay host lifecycle as pointer, keyboard, and public API
+actions; disabled surfaces cannot be reopened through automation.
+
 ## Vue Contract Mapping
 
 Vue reference slots and trigger props map to public target content, placement,
@@ -37,3 +45,5 @@ var tooltip = new FsusTooltip
 ## Known Limitations
 
 Browser popper modifiers are not public API; use the supported placement enum.
+An automation peer cannot reopen an anchored surface after its lifecycle host
+has been collected.

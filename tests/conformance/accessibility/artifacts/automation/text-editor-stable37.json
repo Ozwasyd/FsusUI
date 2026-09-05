@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "text-editor-stable37",
     "component": "text-editor",
     "platform": "avalonia",
     "control": "FsusTextEditor",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "textbox",
     "accessibleName": "Article editor",
     "value": "30 chars, selection 30-30, preview synced, undo redo available",

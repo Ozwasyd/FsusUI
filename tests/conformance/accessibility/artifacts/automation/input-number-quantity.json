@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "input-number-quantity",
     "component": "input-number",
     "platform": "avalonia",
     "control": "FsusInputNumber",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "spinbutton",
     "accessibleName": "Quantity",
     "value": "4",

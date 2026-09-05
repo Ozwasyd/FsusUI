@@ -1,13 +1,6 @@
-import type {
-  MotionPattern,
-  MotionTier,
-} from '../tokens'
+import type { MotionPattern, MotionTier } from '../tokens'
 
-export type {
-  MotionPattern,
-  MotionTier,
-  MotionTokens,
-} from '../tokens'
+export type { MotionPattern, MotionTier, MotionTokens } from '../tokens'
 
 // Intent-based canonical motion preset vocabulary.
 // Replaces the previous 33-name enumeration that mixed generic effect names
@@ -31,7 +24,8 @@ export const motionPresetNames = [
   // Receipt surfaces — toast / banner
   'toast-receipt',
   'banner-receipt',
-  // List surfaces — small stagger
+  // List surfaces — stable state machine and explicit stagger variant
+  'list-settle',
   'index-list-settle',
   // Reading body micro-effects
   'reading-title-settle',
@@ -123,7 +117,6 @@ export const motionRecipeNames = [
 ] as const
 
 export type MotionRecipeName = (typeof motionRecipeNames)[number]
-
 
 // Pattern-tier bundle — see tokens/index.ts for the 4×2 matrix.
 

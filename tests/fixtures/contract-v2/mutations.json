@@ -52,7 +52,14 @@
     "name": "capability-unknown-fallback",
     "operation": "replace",
     "path": "/contracts/1/markdownEditor/capabilities",
-    "value": ["supported", "ok", "runtime-unavailable", "projection-failed", "feature-degraded", "fatal"],
+    "value": [
+      "supported",
+      "ok",
+      "runtime-unavailable",
+      "projection-failed",
+      "feature-degraded",
+      "fatal"
+    ],
     "expectError": "six canonical values"
   },
   {
@@ -82,11 +89,11 @@
     "expectError": "must not hand-write final aligned: true"
   },
   {
-    "name": "gate-flip",
+    "name": "incomplete-markdown-editor-alignment",
     "operation": "replace",
     "path": "/contracts/1/component/exportStatus",
     "value": "aligned-candidate",
-    "expectError": "must stay partial while"
+    "expectError": "disagrees with derived status missing"
   },
   {
     "name": "drift-aligned",

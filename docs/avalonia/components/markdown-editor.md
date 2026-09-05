@@ -7,10 +7,26 @@ Component ID: `markdown-editor`
 Use `FsusMarkdownEditor` for the public native Source and Live surface.
 Document, identity, mode, chrome, locale, status density, transaction commands,
 and canonical projection commits share one native input and selection owner.
-Split/Preview, complete platform IME acceptance, and atomic-node automation
-actions remain partial. The editor itself exposes native Edit/Value automation
-semantics; its value is writable only while the control is enabled and not
-read-only, and the whole document is not a live region.
+Split/Preview and off-host platform IME coverage remain partial. The editor
+exposes native Edit/Value automation semantics, including its selection,
+caret, read-only, disabled, invalid, mode, and capability state. Its value is
+writable only while the control is enabled and not read-only, and the whole
+document is not a live region.
+
+Canonical atomic projection spans are represented as bounded, non-focusable
+automation groups instead of paragraph controls or duplicated decoration.
+Each group exposes its semantic name, rendered value, source range, and
+actions to enter before or after, enter Source mode, select or copy the source,
+and delete it. These actions use the editor's existing selection, native
+clipboard, and transaction owners and do not add Tab stops.
+
+Documents of at least 100,000 UTF-16 code units or 3,000 logical lines use a
+viewport-sized native `TextLayout` window with overscan. Wrapped visual-line
+height is included in the extent estimate, atomic automation nodes are limited
+to the visible source window, and an ordinary edit updates the retained line
+index incrementally. Detaching the editor releases retained layout and native
+event handlers; theme, locale, density, DPI/layout, mode, and document changes
+invalidate or rebuild the affected viewport state.
 
 ## Editor page scrolling
 
@@ -22,6 +38,69 @@ to the viewport top. Setting the position cancels the pending viewport-anchor
 restore so host-driven scrolling and the internal anchor restore cooperate.
 `ScrollViewportHeight` and `ScrollExtentHeight` expose the underlying metrics
 for hosts that persist per-document scroll state.
+
+## Editor-adjacent contracts
+
+The native editor exposes the four editor-adjacent capability families without
+introducing a second Markdown parser or a second input/scroll owner.
+
+### Search and projection highlight
+
+Call `RequestSearch` with a versioned `FsusMarkdownSearchQuery`. The
+`SearchRequested` event binds the query to the current document identity,
+revision, and raw UTF-16 source. A host bridges that request to the canonical
+Markdown search runtime and returns `FsusMarkdownSearchSnapshot` through
+`CommitSearch`; the control rejects a mismatched identity, revision, query, or
+range. `NavigateSearch` wraps next/previous, selects and reveals the current
+match, and paints current/non-current ranges through the existing projection
+map without changing source, line wrapping, reading order, or scroll-container
+identity. `ClearSearch` removes the query and presentation.
+
+FsusUI deliberately does not add an Avalonia search bar. Product command and
+toolbar composition stays with the host, while the editor owns the public
+query/result/reveal semantics and projection highlight.
+
+### Outline and reveal
+
+`FsusMarkdownOutlineSnapshot` carries canonical-runtime heading items: stable
+node identity, depth, text, source/content ranges, parent identity, and
+diagnostics. `CommitOutline` validates the snapshot against the current
+document and revision without reparsing Markdown. `RevealHeading` and
+`RevealSourceRange` preserve the one native selection/focus owner and scroll
+the mapped source line. They return `Success`, `Stale`, `NotFound`, or
+`Unsupported` instead of guessing from heading text or raw offsets. Source and
+Live are supported; the currently partial Split/Preview surfaces fail closed.
+
+### Canonical HTML export and printing
+
+Set `OutputHost` to an `IFsusMarkdownEditorOutputHost`. `ExportHtmlAsync`
+supplies the current identity, revision, source, and optional committed
+projection to the host's canonical renderer bridge. `PrintAsync` first consumes
+that renderer-owned HTML, then gives it to the host print backend. Capability
+discovery, cancellation, and post-await document/revision checks are explicit;
+unsupported or stale work never reports success. FsusUI does not ship a second
+HTML renderer, WebView, PDF engine, or operating-system print dialog through
+this contract. Tagged PDF and browser-backed outline options remain available
+through the separate [WebView adapter](webview-adapter.md).
+
+### Focus and Typewriter hooks
+
+`FocusWritingAidEnabled` and `TypewriterWritingAidEnabled` are opt-in and
+default to false. `TypewriterAnchor` defaults to `UpperThird`; `Center` requires
+an explicit host choice. `WritingAidsRequested` provides the current canonical
+projection and selection so the host can commit revision-bound active and
+exempt ranges through `CommitWritingAids`. In the `prose` profile, the control
+reduces only non-active text emphasis; committed exempt ranges remain readable
+and the presentation does not change source, selection, history, line wrap, or
+the input owner.
+
+`NotifyWritingAidsInteraction` exposes the native state hooks for input,
+explicit search/outline navigation, user scroll, selection drag, composition,
+and asynchronous layout changes. Manual scroll, drag, and composition suspend
+automatic correction. A later input or explicit navigation restores it;
+selection change/end alone does not steal the viewport. Reduced-motion policy
+is inherited from the native theme, and this contract performs positional
+correction without adding smooth or decorative motion.
 
 ## Per-document undo history
 
@@ -53,6 +132,21 @@ only text input, selection, composition, and undo-command owner. Source and Live
 present through the same native Avalonia `TextLayout` viewport; Source uses an
 identity source map, while Live uses the canonical projection map. Live
 decorations never become document authority.
+
+That same owner is the only Avalonia IME, key, and clipboard path. The native
+client decorator forwards Avalonia's preedit rendering and candidate-caret
+geometry while the shared event machine freezes smart pairs, block transforms,
+and unsafe selection restoration until composition commits or cancels. A
+commit is one separate-history source transaction; a late commit after an
+identity, epoch, revision, or selection change is rejected. Normal paste
+priority is file attachment intent, Markdown source, plain text, then safe
+HTML-to-text fallback; active HTML and data URLs never become editor source.
+
+The Linux `--ime-harness` route is headful and requires a live X display with
+ibus/libpinyin and libXtst. It rejects synthetic-only qualification by first
+composing through a stock Avalonia `TextBox`, then drives the production editor
+through OS key events and records structured commit, cancel, undo, stale,
+clipboard, Unicode, high-DPI, and scrolled candidate-caret evidence.
 
 The canonical Markdown runtime supplies a parser-neutral
 `FsusMarkdownProjectionSnapshot` through `CommitProjection`. Each snapshot is
@@ -174,9 +268,9 @@ editor.Mode = FsusMarkdownEditorMode.Live;
 
 ## Known Limitations
 
-Split/Preview presentation, complete syntax-specific input behavior, real
-native IME matrix acceptance, atomic-node AutomationPeer actions, and final AOT
-acceptance remain partial. When no current canonical snapshot exists, Live
+Split/Preview presentation, off-host native IME matrix coverage, physical
+screen-reader evidence, and final packed AOT/alignment acceptance remain
+partial. When no current canonical snapshot exists, Live
 mode intentionally presents localized/current raw source fallback and reports
 `source-fallback`.
 The shipped producer contract does not include the future native shared
@@ -184,3 +278,9 @@ library or an in-process .NET Markdown parser; hosts must provide a canonical
 runtime bridge until the native binding is packaged.
 The Vue-only paste-as-Markdown review flow does not currently map to a native
 Avalonia command.
+FsusUI does not provide search, outline, export, or print chrome on Avalonia;
+hosts compose those commands around the typed control/host contracts. Search,
+outline, and Focus facts must come from the same canonical runtime projection;
+raw-text scanning or a second C# Markdown parser is not a supported producer.
+Split/Preview reveal remains unsupported while those native surfaces are
+partial.

@@ -8,6 +8,7 @@ import {
   validateMarkdownHeavyFeatureIsolatedRenderRequest,
 } from './markdown-heavy-feature-resource'
 import type { FeatureRenderOutput } from './markdown-feature-output-gateway'
+import { toMarkdownFeatureParsingHtml } from './markdown-feature-output-gateway'
 import {
   scheduleMarkdownHeavyFeatureFrameContinue,
   type MarkdownHeavyFeatureFrameContinueScheduler,
@@ -21,6 +22,18 @@ export {
 }
 
 const abortError = () => new DOMException('Aborted', 'AbortError')
+const isolatedFrameDocument =
+  '<!doctype html><html><head><meta charset="UTF-8"></head><body></body></html>'
+
+const initializeFrameDocument = (frameDocument: Document) => {
+  frameDocument.open()
+  ;(
+    frameDocument as unknown as {
+      write: (html: string | object) => void
+    }
+  ).write(toMarkdownFeatureParsingHtml(document, isolatedFrameDocument))
+  frameDocument.close()
+}
 
 const createCapability = () => {
   const cryptoApi = globalThis.crypto
@@ -67,7 +80,13 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
   if (validatedRequest.lifecycleKey) {
     iframe.dataset.fsusMarkdownHeavyNode = validatedRequest.lifecycleKey
   }
-  iframe.style.display = 'none'
+  iframe.style.position = 'fixed'
+  iframe.style.inset = '-10000px auto auto -10000px'
+  iframe.style.width = '1024px'
+  iframe.style.height = '768px'
+  iframe.style.border = '0'
+  iframe.style.opacity = '0'
+  iframe.style.pointerEvents = 'none'
   document.body.append(iframe)
 
   let resolvePromise!: (value: T) => void
@@ -188,6 +207,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
   if (!frameDocument) {
     teardown()
   } else {
+    initializeFrameDocument(frameDocument)
     frameDocument.documentElement.dataset.fsusMarkdownFrameCapability =
       capability
     frameDocument.documentElement.dataset.fsusMarkdownParentOrigin =

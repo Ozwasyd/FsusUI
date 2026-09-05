@@ -37,7 +37,7 @@
           v-model="searchQuery"
           type="text"
           :class="ns.e('search-input')"
-          placeholder="Find"
+          :placeholder="localeText.search.find"
           :aria-label="searchUiState.aria.queryAriaLabel"
           data-testid="markdown-search-query"
           @input="handleSearchQueryInput"
@@ -53,27 +53,36 @@
         </span>
         <button
           type="button"
-          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'plain-case')]"
-          aria-label="Match Case"
-          title="Match Case"
+          :class="[
+            ns.e('search-toggle'),
+            ns.is('active', searchMode === 'plain-case'),
+          ]"
+          :aria-label="localeText.search.matchCase"
+          :title="localeText.search.matchCase"
           @click="toggleSearchMode('plain-case')"
         >
           Aa
         </button>
         <button
           type="button"
-          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'whole-word')]"
-          aria-label="Match Whole Word"
-          title="Match Whole Word"
+          :class="[
+            ns.e('search-toggle'),
+            ns.is('active', searchMode === 'whole-word'),
+          ]"
+          :aria-label="localeText.search.wholeWord"
+          :title="localeText.search.wholeWord"
           @click="toggleSearchMode('whole-word')"
         >
           &#92;b
         </button>
         <button
           type="button"
-          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'regex')]"
-          aria-label="Use Regular Expression"
-          title="Use Regular Expression"
+          :class="[
+            ns.e('search-toggle'),
+            ns.is('active', searchMode === 'regex'),
+          ]"
+          :aria-label="localeText.search.useRegex"
+          :title="localeText.search.useRegex"
           @click="toggleSearchMode('regex')"
         >
           .*
@@ -82,8 +91,8 @@
           type="button"
           :class="ns.e('search-nav')"
           :disabled="!searchMatches.length"
-          aria-label="Previous match"
-          title="Previous match"
+          :aria-label="localeText.search.previousMatch"
+          :title="localeText.search.previousMatch"
           data-testid="markdown-search-prev"
           @click="searchNavigate('previous')"
         >
@@ -93,8 +102,8 @@
           type="button"
           :class="ns.e('search-nav')"
           :disabled="!searchMatches.length"
-          aria-label="Next match"
-          title="Next match"
+          :aria-label="localeText.search.nextMatch"
+          :title="localeText.search.nextMatch"
           data-testid="markdown-search-next"
           @click="searchNavigate('next')"
         >
@@ -102,9 +111,12 @@
         </button>
         <button
           type="button"
-          :class="[ns.e('search-toggle'), ns.is('active', searchUiState.replaceOpen)]"
-          aria-label="Toggle Replace"
-          title="Toggle Replace"
+          :class="[
+            ns.e('search-toggle'),
+            ns.is('active', searchUiState.replaceOpen),
+          ]"
+          :aria-label="localeText.search.toggleReplace"
+          :title="localeText.search.toggleReplace"
           @click="toggleSearchReplace"
         >
           ⇄
@@ -112,8 +124,8 @@
         <button
           type="button"
           :class="ns.e('search-close')"
-          aria-label="Close search"
-          title="Close search"
+          :aria-label="localeText.search.close"
+          :title="localeText.search.close"
           data-testid="markdown-search-close"
           @click="closeSearch"
         >
@@ -126,7 +138,7 @@
           v-model="searchReplaceText"
           type="text"
           :class="ns.e('search-input')"
-          placeholder="Replace"
+          :placeholder="localeText.search.replace"
           :aria-label="searchUiState.aria.replaceAriaLabel"
           data-testid="markdown-search-replace"
           @keydown="handleSearchReplaceKeydown"
@@ -138,7 +150,7 @@
           data-testid="markdown-search-replace-current"
           @click="searchReplaceCurrent"
         >
-          Replace
+          {{ localeText.search.replace }}
         </button>
         <button
           type="button"
@@ -147,7 +159,7 @@
           data-testid="markdown-search-replace-all"
           @click="searchReplaceAll"
         >
-          Replace All
+          {{ localeText.search.replaceAll }}
         </button>
       </div>
     </div>
@@ -286,6 +298,7 @@
       :data-markdown-atomic-status="liveAtomic?.state || undefined"
       :data-markdown-layout-action="liveLayout.action"
       :data-markdown-layout-smooth="liveLayout.smooth ? 'true' : 'false'"
+      @scroll="handlePreviewScroll"
     >
       <pre
         v-if="writingAidsFocusState.enabled"
@@ -324,7 +337,7 @@
         :placeholder="effectivePlaceholder"
         :rows="minRows"
         :tabindex="liveSurface.inputVisible ? undefined : -1"
-        :value="editorValue"
+        :value="isComposing ? nativeCompositionValue : editorValue"
         :spellcheck="languageCapability.spellcheck"
         :lang="languageCapability.lang || undefined"
         @beforeinput="handleBeforeInput"
@@ -332,6 +345,7 @@
         @click="handlePointerReveal"
         @compositionend="handleCompositionEnd"
         @compositionstart="handleCompositionStart"
+        @contextmenu="handleTableContextMenu"
         @copy="handleCopy"
         @cut="handleCut"
         @dragover.prevent
@@ -360,7 +374,7 @@
       <ul
         v-if="attachmentPresentations.length"
         :class="ns.e('attachments')"
-        aria-label="Attachments"
+        :aria-label="localeText.attachments.region"
       >
         <li
           v-for="attachment in attachmentPresentations"
@@ -391,15 +405,15 @@
       <form
         v-if="activeImage"
         :class="ns.e('media-properties')"
-        aria-label="Image properties"
+        :aria-label="localeText.imageProperties.region"
         @submit.prevent="applyImageProperties"
       >
         <label>
-          <span>Alternative text</span>
+          <span>{{ localeText.imageProperties.alt }}</span>
           <input v-model="imageAltDraft" :disabled="editingBlocked" />
         </label>
         <label>
-          <span>Destination</span>
+          <span>{{ localeText.imageProperties.destination }}</span>
           <input
             v-model="imageDestinationDraft"
             :aria-invalid="imagePropertyError ? 'true' : undefined"
@@ -407,48 +421,50 @@
           />
         </label>
         <label>
-          <span>Title</span>
+          <span>{{ localeText.imageProperties.title }}</span>
           <input v-model="imageTitleDraft" :disabled="editingBlocked" />
         </label>
         <label>
-          <span>Caption</span>
+          <span>{{ localeText.imageProperties.caption }}</span>
           <input v-model="imageCaptionDraft" :disabled="editingBlocked" />
         </label>
         <p v-if="imagePropertyError" role="alert">
           {{ imagePropertyError }}
         </p>
         <div :class="ns.e('media-actions')">
-          <button type="submit" :disabled="editingBlocked">Apply</button>
+          <button type="submit" :disabled="editingBlocked">
+            {{ localeText.imageProperties.apply }}
+          </button>
           <button
             type="button"
             :disabled="editingBlocked"
             @click="revealActiveImageSource"
           >
-            Source
+            {{ localeText.imageProperties.source }}
           </button>
           <button
             type="button"
             :disabled="!activeImageOpenAllowed"
             @click="openActiveImage"
           >
-            Open
+            {{ localeText.imageProperties.open }}
           </button>
           <button type="button" @click="copyActiveFigure('exact')">
-            Copy source
+            {{ localeText.imageProperties.copySource }}
           </button>
           <button
             v-if="activeImage.figure"
             type="button"
             @click="copyActiveFigure('visible')"
           >
-            Copy visible
+            {{ localeText.imageProperties.copyVisible }}
           </button>
           <button
             type="button"
             :disabled="editingBlocked"
             @click="openActiveImageReplacement"
           >
-            Replace
+            {{ localeText.imageProperties.replace }}
           </button>
           <button
             v-if="activeImage.figure"
@@ -456,17 +472,59 @@
             :disabled="editingBlocked"
             @click="removeActiveCaption"
           >
-            Remove caption
+            {{ localeText.imageProperties.removeCaption }}
           </button>
           <button
             type="button"
             :disabled="editingBlocked"
             @click="removeActiveImage"
           >
-            Remove image
+            {{ localeText.imageProperties.removeImage }}
           </button>
         </div>
       </form>
+
+      <div
+        v-if="currentTableCell && !editingBlocked"
+        :class="ns.e('table-context')"
+      >
+        <button
+          ref="tableMenuTriggerRef"
+          type="button"
+          :class="ns.e('table-menu-trigger')"
+          aria-haspopup="menu"
+          :aria-controls="tableMenuId"
+          :aria-expanded="tableMenuOpen"
+          aria-label="表格操作"
+          @click="toggleTableMenu"
+        >
+          表格操作
+        </button>
+        <div
+          v-if="tableMenuOpen"
+          :id="tableMenuId"
+          ref="tableMenuRef"
+          :class="ns.e('table-menu')"
+          role="menu"
+          aria-label="表格操作"
+          @keydown="handleTableMenuKeydown"
+        >
+          <button
+            v-for="action in tableContextActions"
+            :key="action.key"
+            type="button"
+            role="menuitem"
+            :title="action.title"
+            :aria-label="action.title"
+            @click="runTableContextAction(action.key)"
+          >
+            {{ action.label }}
+          </button>
+        </div>
+      </div>
+      <span :class="ns.e('visually-hidden')" aria-live="polite">
+        {{ tableAnnouncement }}
+      </span>
 
       <div
         v-if="liveDecorations.length"
@@ -485,7 +543,7 @@
       <div
         v-if="currentMode === 'live' && embedPresentationSegments.length"
         :class="ns.e('live-embeds')"
-        aria-label="Embedded content"
+        :aria-label="localeText.embeds.region"
         role="region"
       >
         <section
@@ -500,10 +558,10 @@
               segment.plan.title
             }}</span>
             <span class="el-markdown-embed__mode-tag">{{
-              segment.plan.mode
+              localeText.embeds.modes[segment.plan.mode]
             }}</span>
             <span class="el-markdown-embed__status" role="status">{{
-              segment.plan.status
+              segment.plan.statusText
             }}</span>
           </header>
           <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
@@ -562,9 +620,15 @@
             role="region"
           >
             <header class="el-markdown-embed__header">
-              <span class="el-markdown-embed__target">{{ segment.plan.title }}</span>
-              <span class="el-markdown-embed__mode-tag">{{ segment.plan.mode }}</span>
-              <span class="el-markdown-embed__status" role="status">{{ segment.plan.status }}</span>
+              <span class="el-markdown-embed__target">{{
+                segment.plan.title
+              }}</span>
+              <span class="el-markdown-embed__mode-tag">{{
+                localeText.embeds.modes[segment.plan.mode]
+              }}</span>
+              <span class="el-markdown-embed__status" role="status">{{
+                segment.plan.statusText
+              }}</span>
             </header>
             <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
               {{ segment.plan.excerpt }}
@@ -585,43 +649,45 @@
       </div>
 
       <template v-if="atomicActionNodes.length">
-      <div
-        v-for="atomicNode in atomicActionNodes"
-        :key="atomicNode.id"
-        :class="ns.e('visually-hidden')"
-        role="group"
-        :aria-label="`${atomicNode.kind} atomic Markdown actions`"
-        v-bind="{ 'data-markdown-atomic-actions': '' }"
-      >
-        <button
-          type="button"
-          tabindex="-1"
-          :aria-label="`${atomicNode.kind} enter before`"
-          @click="invokeAtomicNodeAction(atomicNode.id, 'caret-before')"
+        <div
+          v-for="atomicNode in atomicActionNodes"
+          :key="atomicNode.id"
+          :class="ns.e('visually-hidden')"
+          role="group"
+          :aria-label="localeText.atomic.actionsRegion(atomicNode.kind)"
+          v-bind="{ 'data-markdown-atomic-actions': '' }"
         >
-          Enter before
-        </button>
-        <button
-          type="button"
-          tabindex="-1"
-          :aria-label="`${atomicNode.kind} enter after`"
-          @click="invokeAtomicNodeAction(atomicNode.id, 'caret-after')"
-        >
-          Enter after
-        </button>
-        <button
-          type="button"
-          tabindex="-1"
-          :aria-label="`${atomicNode.kind} edit source`"
-          @click="invokeAtomicNodeAction(atomicNode.id, 'enter-source')"
-        >
-          Edit source
-        </button>
-      </div>
+          <button
+            type="button"
+            tabindex="-1"
+            :aria-label="localeText.atomic.enterBefore(atomicNode.kind)"
+            @click="invokeAtomicNodeAction(atomicNode.id, 'caret-before')"
+          >
+            {{ localeText.atomic.enterBefore(atomicNode.kind) }}
+          </button>
+          <button
+            type="button"
+            tabindex="-1"
+            :aria-label="localeText.atomic.enterAfter(atomicNode.kind)"
+            @click="invokeAtomicNodeAction(atomicNode.id, 'caret-after')"
+          >
+            {{ localeText.atomic.enterAfter(atomicNode.kind) }}
+          </button>
+          <button
+            type="button"
+            tabindex="-1"
+            :aria-label="localeText.atomic.editSource(atomicNode.kind)"
+            @click="invokeAtomicNodeAction(atomicNode.id, 'enter-source')"
+          >
+            {{ localeText.atomic.editSource(atomicNode.kind) }}
+          </button>
+        </div>
       </template>
 
       <el-markdown-renderer
-        v-else-if="liveSurface.rendererVisible && embedRenderSegments.length <= 1"
+        v-else-if="
+          liveSurface.rendererVisible && embedRenderSegments.length <= 1
+        "
         ref="previewRendererRef"
         :class="ns.e('preview')"
         :base-url="previewBaseUrl"
@@ -631,7 +697,7 @@
         :loading-text="localeText.states.loading"
         mode="editor"
         @features-activated="emitRenderEvent('features-activated', $event)"
-        @render-complete="handleRendererComplete($event)"
+        @render-complete="handlePreviewRenderComplete($event)"
         @render-error="emitRenderEvent('render-error', $event)"
       />
     </div>
@@ -1070,6 +1136,7 @@ import {
   markdownEditorEmits,
   markdownEditorProps,
   createMarkdownEditorMetricsSession,
+  type MarkdownEditorMetricsChange,
   resolveMarkdownEditorCommandCopy,
   resolveMarkdownEditorLocaleText,
   resolveMarkdownEditorOverflowCommands,
@@ -1238,6 +1305,24 @@ import {
   type MarkdownLiveLayoutTrigger,
   type MarkdownLiveVirtualWindow,
 } from './markdown-editor-live-layout'
+import {
+  planMarkdownTableAlignColumn,
+  planMarkdownTableDeleteColumn,
+  planMarkdownTableDeleteRow,
+  planMarkdownTableInsertColumn,
+  planMarkdownTableInsertRow,
+  planMarkdownTableMoveColumn,
+  planMarkdownTableMoveRow,
+  resolveMarkdownTableCellAtOffset,
+  resolveMarkdownTableCellCoordinates,
+  type MarkdownTableCellIdentity,
+} from './markdown-editor-table-structure'
+import {
+  planMarkdownTableFormat,
+  planMarkdownTablePaste,
+  resolveMarkdownTableInputIntent,
+} from './markdown-editor-table-input'
+import { resolveMarkdownTableContextActions } from './markdown-editor-table-acceptance'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
 import {
@@ -1325,7 +1410,12 @@ const pasteAsMarkdownBusy = ref(false)
 const pasteAsMarkdownDescriptionId = `${useId()}-paste-as-markdown-description`
 const pasteAsMarkdownTitleId = `${useId()}-paste-as-markdown-title`
 const pasteAsMarkdownHelpId = `${useId()}-paste-as-markdown-help`
+const tableMenuId = `${useId()}-table-menu`
 const commandsExpanded = ref(false)
+const tableMenuOpen = ref(false)
+const tableMenuRef = ref<HTMLElement | null>(null)
+const tableMenuTriggerRef = ref<HTMLButtonElement | null>(null)
+const retainedPreviewScrollLeft = ref(0)
 const visualViewportHeight = ref(0)
 const visualViewportOffsetTop = ref(0)
 const toolbarRef = ref<HTMLElement | null>(null)
@@ -1381,6 +1471,14 @@ provideMarkdownHeavyFeatureDocumentContext({
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)
+const currentTableCell = ref<MarkdownTableCellIdentity | null>(null)
+const tableAnnouncement = ref('')
+const tableContextActions = computed(() =>
+  resolveMarkdownTableContextActions().filter(
+    (action) => action.key !== 'delete-row' || currentTableCell.value?.row !== 0,
+  ),
+)
+const nativeCompositionValue = ref(transactionStore.value)
 const writingAidsController: MarkdownEditorWritingAidsController =
   createWritingAidsController({
     writingAids: props.writingAids,
@@ -1519,10 +1617,11 @@ const attachmentPresentations = computed(() =>
       const item = attachmentItems.get(job.itemId ?? job.id)
       return createMarkdownAttachmentAtomicPresentation({
         itemId: job.itemId ?? job.id,
-        name: item?.name ?? 'Attachment',
+        name: item?.name ?? localeText.value.attachments.unnamed,
         kind: item?.kind,
         status: job.phase === 'idle' ? 'pending' : job.phase,
         progress: job.progress,
+        copy: localeText.value.attachments,
       })
     }),
 )
@@ -1744,6 +1843,8 @@ const liveLayout = ref<MarkdownLiveLayoutPlan>(
 let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
 let restoringViewport = false
 let restoringTypewriter = false
+let typewriterScrollTarget: number | null = null
+let typewriterScrollSmooth = false
 let typewriterLayoutAdjustment = false
 let typewriterLayoutFrame: number | undefined
 let textareaLayoutHeight = 0
@@ -1857,6 +1958,7 @@ const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
   }, 200)
 }
 const suspendTypewriterForUserScroll = () => {
+  typewriterScrollTarget = null
   writingAidsController.handleUserScroll()
   writingAidsState.value = writingAidsController.state
 }
@@ -1898,6 +2000,13 @@ const handleLayoutScroll = () => {
   const textarea = textareaRef.value
   if (textarea) syncFocusLayerScroll(textarea.scrollTop)
   if (restoringSelection || restoringViewport || restoringTypewriter) return
+  if (textarea && typewriterScrollTarget !== null) {
+    const reachedTarget =
+      Math.abs(textarea.scrollTop - typewriterScrollTarget) <= 1
+    if (reachedTarget) typewriterScrollTarget = null
+    if (reachedTarget || typewriterScrollSmooth) return
+    typewriterScrollTarget = null
+  }
   if (
     textarea &&
     (textarea.clientHeight !== textareaLayoutHeight ||
@@ -1911,6 +2020,20 @@ const handleLayoutScroll = () => {
   if (typewriterLayoutAdjustment) return
   suspendTypewriterForUserScroll()
   markLayoutGesture('scrollbar')
+}
+const previewElement = () => {
+  const current = previewRendererRef.value
+  if (!current) return null
+  return current instanceof HTMLElement ? current : (current.$el ?? null)
+}
+const handlePreviewScroll = () => {
+  retainedPreviewScrollLeft.value = previewElement()?.scrollLeft ?? 0
+}
+const restorePreviewScroll = () => {
+  void nextTick(() => {
+    const preview = previewElement()
+    if (preview) preview.scrollLeft = retainedPreviewScrollLeft.value
+  })
 }
 const cssLength = (element: HTMLElement, property: string) => {
   const value = Number.parseFloat(
@@ -1985,6 +2108,9 @@ const applyTypewriterScroll = (
       target.scrollTop,
       Math.max(0, textarea.scrollHeight - textarea.clientHeight),
     )
+    typewriterScrollTarget = scrollTop
+    typewriterScrollSmooth =
+      trigger !== 'async-layout' && target.smooth
     textarea.scrollTo({
       behavior:
         trigger === 'async-layout' ? 'auto' : target.smooth ? 'smooth' : 'auto',
@@ -1994,11 +2120,15 @@ const applyTypewriterScroll = (
       syncFocusLayerScroll(textarea.scrollTop)
     })
   } else {
+    typewriterScrollTarget = target.scrollTop
+    typewriterScrollSmooth = false
     textarea.scrollTop = target.scrollTop
     syncFocusLayerScroll(target.scrollTop)
   }
   requestAnimationFrame(() => {
-    restoringTypewriter = false
+    requestAnimationFrame(() => {
+      restoringTypewriter = false
+    })
   })
 }
 const refreshLiveReveal = (
@@ -2199,6 +2329,8 @@ const restoreTextareaSelection = async (
   })
 }
 
+let pendingMetricsChange: MarkdownEditorMetricsChange | undefined
+
 const dispatchEditorOperation = (
   operation: EditorOperation,
 ): MarkdownEditorDispatchResult => {
@@ -2241,6 +2373,14 @@ const dispatchEditorOperation = (
       : operation.kind === 'undo'
         ? transactionStore.undo()
         : transactionStore.redo()
+
+  if (result.accepted && result.value !== previousValue) {
+    pendingMetricsChange =
+      operation.kind === 'transaction' &&
+      operation.transaction.changes.length === 1
+        ? operation.transaction.changes[0]
+        : deriveMarkdownEditorChange(previousValue, result.value)
+  }
 
   if (result.accepted && result.value !== previousValue) {
     const change = deriveMarkdownEditorChange(previousValue, result.value)
@@ -2383,6 +2523,45 @@ const captureSelection = (breakMerge = true) => {
   return selection
 }
 
+const refreshCurrentTableCell = (offset = transactionStore.selection.start) => {
+  const previousCellId = currentTableCell.value?.cellId
+  const nextCell = resolveMarkdownTableCellAtOffset(
+    transactionStore.value,
+    documentIdentity,
+    offset,
+  )
+  currentTableCell.value = nextCell
+  if (!nextCell || (previousCellId && nextCell.cellId !== previousCellId)) {
+    tableMenuOpen.value = false
+  }
+  return nextCell
+}
+
+const selectTableCell = async (cell: MarkdownTableCellIdentity) => {
+  const resolved = resolveMarkdownTableCellCoordinates(
+    transactionStore.value,
+    documentIdentity,
+    cell.tableId,
+    cell.row,
+    cell.column,
+    cell.cellId,
+  )
+  if (!resolved?.anchor) {
+    currentTableCell.value = null
+    return
+  }
+  currentTableCell.value = resolved
+  transactionStore.setSelection(
+    {
+      direction: 'none',
+      end: resolved.anchor.end,
+      start: resolved.anchor.start,
+    },
+    true,
+  )
+  await restoreTextareaSelection(transactionStore.selection)
+}
+
 const captureAttachmentFiles = (
   sourceKind: MarkdownAttachmentSourceKind,
   files: readonly File[],
@@ -2416,6 +2595,7 @@ const captureAttachmentFiles = (
     transactionStore.value,
     captured.batch.anchor,
     captured.batch,
+    localeText.value.attachments.uploading,
   )
   const dispatched = dispatchTransaction(planned.transaction)
   if (!dispatched.accepted) return captured
@@ -2525,7 +2705,7 @@ watch(
     beforeInputSnapshot = undefined
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
-    dispatchEditorOperation({
+    const result = dispatchEditorOperation({
       allowBlocked: true,
       emitValue: false,
       internalPropReset: true,
@@ -2550,6 +2730,10 @@ watch(
         },
       },
     })
+    if (result.accepted) {
+      currentTableCell.value = null
+      tableMenuOpen.value = false
+    }
   },
 )
 
@@ -2582,11 +2766,14 @@ watch(
     () => props.statusDensity,
   ],
   ([value, selection, options, density]) => {
-    const change = deriveMarkdownEditorChange(metricsSource, value) ?? {
-      from: 0,
-      insert: '',
-      to: 0,
-    }
+    const change =
+      pendingMetricsChange ??
+      deriveMarkdownEditorChange(metricsSource, value) ?? {
+        from: 0,
+        insert: '',
+        to: 0,
+      }
+    pendingMetricsChange = undefined
     metricsSource = value
     editorMetrics.value = metricsSession.calculate(value, {
       ...options,
@@ -3508,6 +3695,9 @@ const handleInput = (event: Event) => {
   const target = event.target
   if (!(target instanceof HTMLTextAreaElement)) return
   const inputEvent = event instanceof InputEvent ? event : undefined
+  if (nativeMachine.composing || inputEvent?.isComposing) {
+    nativeCompositionValue.value = target.value
+  }
   const snapshot =
     beforeInputSnapshot?.value === transactionStore.value
       ? beforeInputSnapshot
@@ -3568,7 +3758,10 @@ const handleInput = (event: Event) => {
   pendingInputOrigin = undefined
 }
 
-const handleCompositionStart = () => {
+const handleCompositionStart = (event: CompositionEvent) => {
+  const target = event.target
+  nativeCompositionValue.value =
+    target instanceof HTMLTextAreaElement ? target.value : transactionStore.value
   nativeMachine.apply({
     disabled: editingBlocked.value,
     documentIdentity,
@@ -3707,6 +3900,68 @@ const applyClipboardTransfer = (
 }
 
 const handlePaste = (event: ClipboardEvent) => {
+  const cell = refreshCurrentTableCell(captureSelection(false).start)
+  const clipboard = event.clipboardData
+  if (
+    cell &&
+    clipboard &&
+    clipboard.files.length === 0 &&
+    !isComposing.value &&
+    !editingBlocked.value
+  ) {
+    const tsv = clipboard.getData('text/tab-separated-values')
+    const csv = clipboard.getData('text/csv')
+    const plain = clipboard.getData('text/plain')
+    const carriesHtml = Array.from(clipboard.types).includes('text/html')
+    const payload = tsv || csv || (carriesHtml ? '' : plain)
+    const mime = tsv
+      ? 'text/tab-separated-values'
+      : csv
+        ? 'text/csv'
+        : undefined
+    if (payload.includes('\t') || mime === 'text/csv') {
+      const transfer = markdownClipboardItemsFromDataTransfer(clipboard)
+      const clipboardPlan = resolveMarkdownClipboardPaste({
+        composing: isComposing.value,
+        disabled: editingBlocked.value,
+        documentIdentity,
+        files: transfer.files,
+        items: transfer.items,
+        mode: currentMode.value,
+        origin: 'paste',
+        revision: transactionStore.revision,
+        selection: transactionStore.selection,
+        source: transactionStore.value,
+      })
+      const plan = planMarkdownTablePaste(
+        transactionStore.value,
+        documentIdentity,
+        cell.tableId,
+        cell,
+        payload,
+        mime,
+        transactionStore.revision,
+      )
+      if ('changes' in plan) {
+        event.preventDefault()
+        pendingClipboardIdentity = clipboardPlan.identity
+        pendingInputOrigin = 'paste'
+        nativeMachine.apply({
+          clipboardIdentity: clipboardPlan.identity,
+          documentIdentity,
+          kind: 'paste',
+          origin: 'paste',
+          revision: transactionStore.revision,
+        })
+        const result = dispatchTransaction(plan)
+        if (result.accepted) {
+          tableAnnouncement.value = 'Pasted table data'
+          void selectTableCell(cell)
+        }
+        return
+      }
+    }
+  }
   applyClipboardTransfer(event, 'paste', event.clipboardData)
 }
 
@@ -3790,6 +4045,7 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshCurrentTableCell()
   refreshWritingAidsDocument()
   writingAidsController.handleSelectionChange()
   writingAidsState.value = writingAidsController.state
@@ -3810,6 +4066,7 @@ const handleSelectionMove = () => {
 
 const handleSelectionDragStart = () => {
   if (isComposing.value) return
+  typewriterScrollTarget = null
   writingAidsController.handleSelectionDragStart()
   writingAidsState.value = writingAidsController.state
 }
@@ -3822,6 +4079,7 @@ const handleSelectionDragEnd = () => {
 const handlePointerReveal = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshCurrentTableCell()
   refreshWritingAidsDocument()
   if (currentMode.value === 'live') {
     applyLiveSelectionMotion('pointer-click', {
@@ -3832,6 +4090,225 @@ const handlePointerReveal = () => {
     intent: 'pointer',
     pointerOffset: transactionStore.selection.start,
   })
+}
+
+const handleTableContextMenu = (event: MouseEvent) => {
+  const cell = refreshCurrentTableCell(captureSelection(false).start)
+  if (!cell || editingBlocked.value) return
+  event.preventDefault()
+  tableAnnouncement.value = `Table row ${cell.row + 1}, column ${cell.column + 1}`
+  tableMenuOpen.value = true
+  void nextTick(() =>
+    tableMenuRef.value?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus(),
+  )
+}
+
+const focusTableMenuItem = (index: number) => {
+  const items = Array.from(
+    tableMenuRef.value?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? [],
+  )
+  if (!items.length) return
+  items[(index + items.length) % items.length]?.focus()
+}
+
+const closeTableMenu = (restoreTrigger = false) => {
+  tableMenuOpen.value = false
+  if (restoreTrigger) {
+    void nextTick(() => tableMenuTriggerRef.value?.focus())
+  }
+}
+
+const toggleTableMenu = () => {
+  tableMenuOpen.value = !tableMenuOpen.value
+  if (tableMenuOpen.value) {
+    void nextTick(() => focusTableMenuItem(0))
+  }
+}
+
+const handleTableMenuKeydown = (event: KeyboardEvent) => {
+  const items = Array.from(
+    tableMenuRef.value?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? [],
+  )
+  const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement)
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeTableMenu(true)
+    return
+  }
+  if (event.key === 'Tab') {
+    tableMenuOpen.value = false
+    return
+  }
+  const targetIndex =
+    event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? items.length - 1
+        : event.key === 'ArrowDown'
+          ? currentIndex + 1
+          : event.key === 'ArrowUp'
+            ? currentIndex - 1
+            : null
+  if (targetIndex === null) return
+  event.preventDefault()
+  focusTableMenuItem(targetIndex)
+}
+
+const runTableContextAction = (key: string) => {
+  const cell = currentTableCell.value
+  if (!cell || editingBlocked.value || isComposing.value) return
+  const source = transactionStore.value
+  const revision = transactionStore.revision
+  let plan: MarkdownEditorTransaction | { readonly rejected: string }
+  switch (key) {
+    case 'insert-row-above':
+      plan = planMarkdownTableInsertRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        'above',
+        revision,
+        cell.column,
+      )
+      break
+    case 'insert-row-below':
+      plan = planMarkdownTableInsertRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        'below',
+        revision,
+        cell.column,
+      )
+      break
+    case 'move-row-up':
+    case 'move-row-down':
+      plan = planMarkdownTableMoveRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        key === 'move-row-up' ? 'up' : 'down',
+        revision,
+        cell.column,
+      )
+      break
+    case 'delete-row':
+      plan = planMarkdownTableDeleteRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        revision,
+        cell.column,
+      )
+      break
+    case 'insert-col-left':
+      plan = planMarkdownTableInsertColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        'left',
+        revision,
+        cell.row,
+      )
+      break
+    case 'insert-col-right':
+      plan = planMarkdownTableInsertColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        'right',
+        revision,
+        cell.row,
+      )
+      break
+    case 'move-col-left':
+    case 'move-col-right':
+      plan = planMarkdownTableMoveColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        key === 'move-col-left' ? 'left' : 'right',
+        revision,
+        cell.row,
+      )
+      break
+    case 'delete-col':
+      plan = planMarkdownTableDeleteColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        revision,
+        cell.row,
+      )
+      break
+    case 'align-left':
+    case 'align-center':
+    case 'align-right':
+      plan = planMarkdownTableAlignColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        key.slice('align-'.length) as 'left' | 'center' | 'right',
+        revision,
+        cell.row,
+      )
+      break
+    case 'format-table':
+      plan = planMarkdownTableFormat(
+        source,
+        documentIdentity,
+        cell.tableId,
+        revision,
+        cell,
+      )
+      break
+    default:
+      return
+  }
+  if (!('changes' in plan)) return
+  const targetCell = (
+    plan.metadata?.markdownTable as
+      | {
+          readonly targetCell?: Readonly<{ row: number; column: number }>
+        }
+      | undefined
+  )?.targetCell
+  const result = dispatchTransaction(plan)
+  if (!result.accepted) return
+  tableAnnouncement.value = tableContextActions.value.find(
+    (action) => action.key === key,
+  )?.title ?? 'Table updated'
+  closeTableMenu()
+  const nextCell = targetCell
+    ? resolveMarkdownTableCellCoordinates(
+        transactionStore.value,
+        documentIdentity,
+        cell.tableId,
+        targetCell.row,
+        targetCell.column,
+      )
+    : resolveMarkdownTableCellAtOffset(
+        transactionStore.value,
+        documentIdentity,
+        result.selection.start,
+      )
+  currentTableCell.value = nextCell
+    ? Object.freeze({
+        ...nextCell,
+        ...(!key.startsWith('delete-') && cell.cellId
+          ? { cellId: cell.cellId }
+          : {}),
+      })
+    : null
 }
 
 const handleBlur = () => {
@@ -4197,6 +4674,8 @@ const toggleCommands = async () => {
 const setMode = (mode: MarkdownEditorMode) => {
   if (editingBlocked.value || isComposing.value) return
 
+  const preview = previewElement()
+  if (preview) retainedPreviewScrollLeft.value = preview.scrollLeft
   transactionStore.breakMergeGroup()
   const nextMode = normalizeModeForLayout(mode)
   const retained = retainMarkdownLiveSelection({
@@ -4213,6 +4692,7 @@ const setMode = (mode: MarkdownEditorMode) => {
   applyLiveLayout('mode-switch')
   refreshLiveWindow('mode-switch')
   refreshLiveReveal()
+  restorePreviewScroll()
 }
 
 const modeLabel = (mode: MarkdownEditorMode) => localeText.value.modes[mode]
@@ -4327,6 +4807,12 @@ const emitRenderEvent = (
     return
   }
   emit('render-error', payload)
+}
+
+const handlePreviewRenderComplete = (payload: unknown) => {
+  emitRenderEvent('render-complete', payload)
+  restorePreviewScroll()
+  void nextTick(syncRenderedSearchHighlights)
 }
 
 const handleRendererComplete = (payload: unknown) => {
@@ -4523,35 +5009,43 @@ const refreshEmbedPresentations = () => {
   for (const node of embedNodes.value) void resolveEmbedNode(node, generation)
 }
 
-const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(() => {
-  const segments: MarkdownEmbedRenderSegment[] = []
-  let offset = 0
-  for (const node of embedNodes.value) {
+const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(
+  () => {
+    const segments: MarkdownEmbedRenderSegment[] = []
+    let offset = 0
+    for (const node of embedNodes.value) {
+      segments.push({
+        content: editorValue.value.slice(offset, node.ranges.full.start),
+        key: `markdown:${offset}`,
+        kind: 'markdown',
+      })
+      const result = embedResults.value.get(embedNodeId(node))
+      segments.push({
+        key: embedNodeId(node),
+        kind: 'embed',
+        node,
+        plan: planMarkdownEmbedPresentation(
+          node,
+          result,
+          localeText.value.embeds,
+        ),
+        result,
+      })
+      offset = node.ranges.full.end
+    }
+    if (!segments.length) {
+      return [
+        { content: editorValue.value, key: 'markdown:all', kind: 'markdown' },
+      ]
+    }
     segments.push({
-      content: editorValue.value.slice(offset, node.ranges.full.start),
+      content: editorValue.value.slice(offset),
       key: `markdown:${offset}`,
       kind: 'markdown',
     })
-    const result = embedResults.value.get(embedNodeId(node))
-    segments.push({
-      key: embedNodeId(node),
-      kind: 'embed',
-      node,
-      plan: planMarkdownEmbedPresentation(node, result),
-      result,
-    })
-    offset = node.ranges.full.end
-  }
-  if (!segments.length) {
-    return [{ content: editorValue.value, key: 'markdown:all', kind: 'markdown' }]
-  }
-  segments.push({
-    content: editorValue.value.slice(offset),
-    key: `markdown:${offset}`,
-    kind: 'markdown',
-  })
-  return Object.freeze(segments)
-})
+    return Object.freeze(segments)
+  },
+)
 const embedPresentationSegments = computed(() =>
   embedRenderSegments.value.filter(
     (
@@ -4564,10 +5058,7 @@ const embedPresentationSegments = computed(() =>
 )
 
 const embedActionLabel = (action: MarkdownEmbedActionKind) =>
-  action
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
+  localeText.value.embeds.actions[action]
 
 const markdownCommandContext = () => ({
   dispatch: { dispatch: dispatchTransaction },
@@ -4627,6 +5118,7 @@ const updateSearchState = () => {
       mode: searchMode.value,
       replaceOpen: searchUiState.value.replaceOpen,
       replaceText: searchReplaceText.value,
+      copy: localeText.value.search,
     },
   )
 }
@@ -4663,6 +5155,7 @@ const openSearch = (replace = false) => {
       mode: searchMode.value,
       replaceOpen: replace,
       replaceText: searchReplaceText.value,
+      copy: localeText.value.search,
     },
   )
   if (searchQuery.value) {
@@ -4687,6 +5180,7 @@ const closeSearch = () => {
       mode: searchMode.value,
       replaceOpen: false,
       replaceText: searchReplaceText.value,
+      copy: localeText.value.search,
     },
   )
   if (currentMode.value === 'preview') {
@@ -4711,6 +5205,7 @@ const toggleSearchReplace = () => {
       mode: searchMode.value,
       replaceOpen: !searchUiState.value.replaceOpen,
       replaceText: searchReplaceText.value,
+      copy: localeText.value.search,
     },
   )
 }
@@ -4882,7 +5377,12 @@ const handleKeydown = (event: KeyboardEvent) => {
     openSearch(searchAction === 'open-replace')
     return
   }
-  if (event.key === 'PageUp' || event.key === 'PageDown') {
+  if (
+    event.key === 'PageUp' ||
+    event.key === 'PageDown' ||
+    ((event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End'))
+  ) {
     suspendTypewriterForUserScroll()
   }
 
@@ -4905,6 +5405,48 @@ const handleKeydown = (event: KeyboardEvent) => {
         executeSlashCommand(command)
       }
       return
+    }
+  }
+
+  if (!event.altKey && !event.ctrlKey && !event.metaKey) {
+    const selection = captureSelection(false)
+    const cell = refreshCurrentTableCell(selection.start)
+    const tableKey =
+      event.key === 'Tab' && event.shiftKey
+        ? 'Shift+Tab'
+        : event.key === 'Enter' && event.shiftKey
+          ? 'Shift+Enter'
+          : event.key
+    if (cell?.anchor) {
+      const plan = resolveMarkdownTableInputIntent({
+        cell,
+        cellOffset: Math.max(0, selection.start - cell.anchor.start),
+        cellText: transactionStore.value.slice(cell.anchor.start, cell.anchor.end),
+        compositionActive: isComposing.value,
+        documentIdentity,
+        expectedRevision: transactionStore.revision,
+        key: tableKey,
+        selection,
+        source: transactionStore.value,
+      })
+      const moved =
+        plan.nextCell.row !== cell.row ||
+        plan.nextCell.column !== cell.column ||
+        plan.nextCell.status !== cell.status
+      if (plan.transaction || moved || tableKey === 'Tab' || tableKey === 'Shift+Tab') {
+        event.preventDefault()
+        if (plan.transaction) {
+          const result = dispatchTransaction(plan.transaction)
+          if (!result.accepted) return
+        }
+        tableAnnouncement.value = plan.screenReaderText
+        if (plan.nextCell.status === 'current') {
+          void selectTableCell(plan.nextCell)
+        } else {
+          currentTableCell.value = null
+        }
+        return
+      }
     }
   }
 
@@ -5133,7 +5675,10 @@ const applyImageProperties = () => {
     },
   )
   if (!destinationValidation.open.allowed) {
-    imagePropertyError.value = `Destination rejected: ${destinationValidation.state}`
+    imagePropertyError.value =
+      localeText.value.imageProperties.destinationRejected(
+        destinationValidation.state,
+      )
     return
   }
 
@@ -5194,7 +5739,9 @@ const applyImageProperties = () => {
   })
   imagePropertyError.value = result.accepted
     ? ''
-    : `Image properties rejected: ${result.reason ?? 'invalid-change'}`
+    : localeText.value.imageProperties.updateRejected(
+        result.reason ?? 'invalid-change',
+      )
 }
 
 const revealActiveImageSource = () => {

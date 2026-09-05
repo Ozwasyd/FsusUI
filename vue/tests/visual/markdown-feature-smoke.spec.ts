@@ -19,9 +19,11 @@ type MarkdownActivationSnapshot = {
     classes: string[]
     eventAttributeCount: number
     foreignObjectCount: number
+    height: number
     id: string | null
     scriptCount: number
     text: string
+    width: number
   } | null
   lifecycle: {
     active: number
@@ -48,6 +50,7 @@ const readActivationSnapshot = (page: Page) =>
     const mermaid = renderer?.querySelector<SVGSVGElement>(
       'svg[id^="fsus-markdown-mermaid-"]',
     )
+    const mermaidBox = mermaid?.getBoundingClientRect()
     const activated = renderer
       ? [
           ...renderer.querySelectorAll<HTMLElement>(
@@ -109,9 +112,11 @@ const readActivationSnapshot = (page: Page) =>
             ),
             foreignObjectCount:
               mermaid.querySelectorAll('foreignObject').length,
+            height: mermaidBox?.height ?? 0,
             id: mermaid.id || null,
             scriptCount: mermaid.querySelectorAll('script').length,
             text: mermaid.textContent ?? '',
+            width: mermaidBox?.width ?? 0,
           }
         : null,
       forbiddenHostClassTokens,
@@ -169,6 +174,8 @@ test(SMOKE_MARKDOWN_FEATURE_TEST_TITLE, async ({ page }, testInfo) => {
   expect(activated.katex?.classes).toEqual(['katex'])
   expect(activated.katex?.mathmlCount).toBeGreaterThan(0)
   expect(activated.mermaid?.text).toContain('revision 1')
+  expect(activated.mermaid?.width).toBeGreaterThan(0)
+  expect(activated.mermaid?.height).toBeGreaterThan(0)
   expect(activated.mermaid?.id).toMatch(
     /^fsus-markdown-mermaid-[A-Za-z0-9_-]+$/u,
   )

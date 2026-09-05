@@ -15,14 +15,25 @@ public class MarkdownEditorInteractionTraceTests
     var value = Assert.IsAssignableFrom<IValueProvider>(peer);
 
     Assert.Equal(AutomationControlType.Edit, peer.GetAutomationControlType());
+    Assert.Equal("Markdown editor", peer.GetName());
     Assert.Equal(AutomationLiveSetting.Off, AutomationProperties.GetLiveSetting(editor));
     Assert.False(value.IsReadOnly);
     Assert.Equal("Trace start", value.Value);
+    Assert.Contains("multiline=true", peer.GetItemStatus());
+    Assert.Contains("selection=11:11", peer.GetItemStatus());
     value.SetValue("Changed");
     Assert.Equal("Changed", editor.Document);
+    Assert.Contains("caret=7", peer.GetItemStatus());
 
     editor.IsReadOnly = true;
     Assert.True(value.IsReadOnly);
+    Assert.Contains("readonly=true", peer.GetItemStatus());
+    Assert.Throws<InvalidOperationException>(() => value.SetValue("Rejected"));
+
+    editor.IsReadOnly = false;
+    editor.IsEnabled = false;
+    Assert.True(value.IsReadOnly);
+    Assert.Contains("disabled=true", peer.GetItemStatus());
     Assert.Throws<InvalidOperationException>(() => value.SetValue("Rejected"));
   }
 
@@ -50,18 +61,19 @@ public class MarkdownEditorInteractionTraceTests
 
     Assert.True(result.Accepted);
     var peer = ControlAutomationPeer.CreatePeerForElement(editor);
-    var actions = peer.GetChildren();
-    Assert.NotNull(actions);
-    Assert.Collection(
-      actions,
-      before => Assert.Contains("enter-before", before.GetName()),
-      after => Assert.Contains("enter-after", after.GetName()),
-      source => Assert.Contains("edit-source", source.GetName()));
+    var atomic = Assert.Single(peer.GetChildren()!);
+    Assert.Equal(AutomationControlType.Group, atomic.GetAutomationControlType());
+    Assert.Equal("inline-code", atomic.GetName());
+    Assert.Equal("code", atomic.GetProvider<IValueProvider>()?.Value);
+    Assert.Contains("source=0:6", atomic.GetItemStatus());
+    var actions = atomic.GetChildren()!;
+    Assert.Equal(
+      ["enter-before", "enter-after", "edit-source", "select-source", "copy", "delete"],
+      actions.Select(action => action.GetName()).ToArray());
     Assert.All(actions, action =>
     {
       Assert.Equal(AutomationControlType.Button, action.GetAutomationControlType());
       Assert.False(action.IsKeyboardFocusable());
-      Assert.False(string.IsNullOrWhiteSpace(action.GetProvider<IValueProvider>()?.Value));
       Assert.NotNull(action.GetProvider<IInvokeProvider>());
     });
 
@@ -71,6 +83,19 @@ public class MarkdownEditorInteractionTraceTests
     Assert.Equal(
       new FsusMarkdownEditorSelection(editor.Document.Length, editor.Document.Length),
       editor.TransactionStore.Selection);
+    actions[3].GetProvider<IInvokeProvider>()!.Invoke();
+    Assert.Equal(
+      new FsusMarkdownEditorSelection(0, editor.Document.Length),
+      editor.TransactionStore.Selection);
+    actions[2].GetProvider<IInvokeProvider>()!.Invoke();
+    Assert.Equal(FsusMarkdownEditorMode.Source, editor.Mode);
+    editor.Mode = FsusMarkdownEditorMode.Live;
+    actions[4].GetProvider<IInvokeProvider>()!.Invoke();
+    Assert.Equal(
+      new FsusMarkdownEditorSelection(0, editor.Document.Length),
+      editor.TransactionStore.Selection);
+    actions[5].GetProvider<IInvokeProvider>()!.Invoke();
+    Assert.Equal(string.Empty, editor.Document);
   }
 
   [Fact]

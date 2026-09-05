@@ -181,6 +181,7 @@
   @include e((command, command-more)) {
     min-inline-size: 2rem;
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   @media (max-width: 767px) {
@@ -405,13 +406,12 @@
     box-sizing: border-box;
     margin: 0;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: hidden;
     padding: 16px;
     pointer-events: none;
     background: getCssVar('bg-color');
     color: getCssVar('text-color', 'primary');
     scrollbar-color: transparent transparent;
-    scrollbar-gutter: stable;
     font: inherit;
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
@@ -493,6 +493,12 @@
     overflow: auto;
     border-left: 1px solid getCssVar('border-color-lighter');
     padding: 16px;
+
+    table {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: collapse;
+    }
   }
 
   @include m(preview) {
@@ -977,6 +983,112 @@
       grid-template-columns: minmax(0, 1fr);
       width: 100%;
       padding: var(--fsus-space-4, 16px);
+    }
+  }
+
+
+  @include e(table-context) {
+    position: absolute;
+    z-index: 4;
+    inset-block-start: var(--fsus-space-2, 8px);
+    inset-block-end: var(--fsus-space-2, 8px);
+    inset-inline-end: var(--fsus-space-2, 8px);
+    pointer-events: none;
+  }
+
+  @include e(table-menu-trigger) {
+    min-height: var(--fsus-control-height-compact, 40px);
+    padding-inline: var(--fsus-space-3, 12px);
+    color: getCssVar('text-color-regular');
+    background: getCssVar('bg-color');
+    border: 1px solid getCssVar('border-color');
+    border-radius: var(
+      --fsus-radius-control,
+      var(--el-border-radius-base)
+    );
+    cursor: pointer;
+    pointer-events: auto;
+
+    &:hover {
+      color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      background: getCssVar('fill-color-light');
+    }
+
+    &:focus-visible {
+      outline: 2px solid
+        var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      outline-offset: 2px;
+    }
+  }
+
+  @include e(table-menu) {
+    position: absolute;
+    display: grid;
+    gap: var(--fsus-space-1, 4px);
+    inset-inline-end: 0;
+    width: max-content;
+    min-width: 12rem;
+    max-width: min(18rem, calc(100vw - var(--fsus-space-4, 16px)));
+    inset-block-start: calc(
+      var(--fsus-control-height-compact, 40px) + var(--fsus-space-1, 4px)
+    );
+    max-height: min(
+      24rem,
+      calc(
+        100% - var(--fsus-control-height-compact, 40px) -
+          var(--fsus-space-1, 4px)
+      )
+    );
+    padding: var(--fsus-space-2, 8px);
+    overflow: auto;
+    background: getCssVar('bg-color');
+    border: 1px solid getCssVar('border-color-light');
+    border-radius: var(--fsus-radius-popover, 10px);
+    box-shadow: var(--fsus-shadow-panel, getCssVar('box-shadow-light'));
+    pointer-events: auto;
+
+    button {
+      width: 100%;
+      min-height: var(--fsus-control-height-compact, 40px);
+      padding-inline: var(--fsus-space-3, 12px);
+      text-align: start;
+      color: getCssVar('text-color-regular');
+      background: transparent;
+      border: 0;
+      border-radius: var(
+        --fsus-radius-control-small,
+        var(--el-border-radius-small)
+      );
+      cursor: pointer;
+
+      &:hover {
+        color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        background: getCssVar('fill-color-light');
+      }
+
+      &:focus-visible {
+        outline: 2px solid
+          var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        outline-offset: 0;
+      }
+    }
+
+    @media (pointer: coarse), (max-width: 768px) {
+      inset-block-start: calc(44px + var(--fsus-space-1, 4px));
+      max-height: min(
+        24rem,
+        calc(100% - 44px - var(--fsus-space-1, 4px))
+      );
+
+      button {
+        min-height: 44px;
+      }
+    }
+  }
+
+  @media (pointer: coarse), (max-width: 768px) {
+    @include e(table-menu-trigger) {
+      min-height: 44px;
     }
   }
 

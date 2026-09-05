@@ -216,6 +216,9 @@ public static class FsusAvaloniaGalleryRegistry
           Mode = FsusMarkdownEditorMode.Live,
           Chrome = FsusMarkdownEditorChrome.Framed,
           StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
+          Profile = "prose",
+          FocusWritingAidEnabled = true,
+          TypewriterWritingAidEnabled = true,
         };
         _ = markdownEditor.CommitProjection(new(
           markdownEditor.DocumentIdentity,
@@ -231,6 +234,23 @@ public static class FsusAvaloniaGalleryRegistry
               "\n\n中文 markdown editor",
               "paragraph"),
           ]));
+        var gallerySearch = new FsusMarkdownSearchQuery("markdown", 1);
+        var galleryMatch = galleryMarkdown.IndexOf("markdown", StringComparison.Ordinal);
+        markdownEditor.RequestSearch(gallerySearch);
+        _ = markdownEditor.CommitSearch(new(
+          markdownEditor.DocumentIdentity,
+          0,
+          gallerySearch,
+          [new(new(galleryMatch, galleryMatch + "markdown".Length), 1, "gallery-paragraph")]));
+        _ = markdownEditor.CommitOutline(new(
+          markdownEditor.DocumentIdentity,
+          0,
+          [new("gallery-heading", 1, "Gallery", new(0, 9), new(2, 9))]));
+        _ = markdownEditor.CommitWritingAids(new(
+          markdownEditor.DocumentIdentity,
+          0,
+          [new(9, galleryMarkdown.Length)],
+          [new(galleryMatch, galleryMatch + "markdown".Length)]));
         panel.Children.Add(markdownEditor);
         break;
       case "public-shell":

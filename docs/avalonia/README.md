@@ -52,18 +52,41 @@ node scripts/check-avalonia-docs.mjs
 dotnet run --project dotnet/FsusUI.Avalonia.ConsumerSample/FsusUI.Avalonia.ConsumerSample.csproj -- --smoke
 ```
 
-Maintainers can verify the separate packed-package Native AOT consumer on the
-current Linux host with:
+After `pnpm run dotnet:package:verify` produces the one candidate manifest,
+maintainers can verify its packed JIT, self-contained trimmed, and separate
+Native AOT consumers on the current Linux host with:
 
 ```bash
+FSUSUI_AOT_CANDIDATE_ROOT=dotnet/artifacts/nuget \
+FSUSUI_AOT_CANDIDATE_MANIFEST=dotnet/artifacts/package/manifest.json \
+  pnpm run test:avalonia-packed-runtime-smoke
 pnpm run test:avalonia-aot-smoke-contract
-pnpm run test:avalonia-aot-smoke
+FSUSUI_AOT_CANDIDATE_ROOT=dotnet/artifacts/nuget \
+FSUSUI_AOT_CANDIDATE_MANIFEST=dotnet/artifacts/package/manifest.json \
+  pnpm run test:avalonia-aot-smoke
 ```
 
-The second command packs the three FsusUI packages, restores the consumer from
-an isolated local-only source, publishes a self-contained RID-specific native
-executable, and runs that executable directly against a real Avalonia window
-and dispatcher. It does not define the component scenario registry.
+The Markdown editor's current-host Linux IME acceptance is a separate headful
+gate. With a live X/XWayland desktop and ibus/libpinyin running, execute:
+
+```bash
+IBUS_ADDRESS="$(ibus address)" GTK_IM_MODULE=ibus QT_IM_MODULE=ibus \
+  XMODIFIERS=@im=ibus dotnet run \
+  --project dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj -- \
+  --ime-harness --candidate "$(git rev-parse HEAD)" \
+  --output tests/conformance/visual/artifacts/issue-341-linux-ime-evidence.json
+```
+
+This gate uses the OS input pipeline and is not replaceable by
+Avalonia.Headless or synthetic composition scripts.
+
+The packed runtime command runs the same full component scenario set first as
+a framework-dependent JIT application and then as a self-contained trimmed
+application. Both modes consume the exact candidate manifest supplied to the
+separate Native AOT command. The Native AOT command restores from the isolated
+local-only source, publishes a self-contained RID-specific native executable,
+and runs that executable directly against a real Avalonia window and
+dispatcher. These commands do not define the component scenario registry.
 
 The stable component-family source in
 [`spec/ci/avalonia-stable-readiness.json`](../../spec/ci/avalonia-stable-readiness.json)

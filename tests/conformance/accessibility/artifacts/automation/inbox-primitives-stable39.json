@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "inbox-primitives-stable39",
     "component": "inbox-primitives",
     "platform": "avalonia",
     "control": "FsusInboxLayout",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "group",
     "accessibleName": "Inbox",
     "value": "mobile split pane, conversation list, thread timeline, disabled composer, empty state",

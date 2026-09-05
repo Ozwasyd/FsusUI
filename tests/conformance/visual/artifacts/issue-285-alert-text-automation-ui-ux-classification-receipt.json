@@ -1,0 +1,94 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "Avalonia FsusAlert programmatic alert and live-region semantics",
+    "Avalonia FsusTextViewer document status and keyboard focus semantics",
+    "Avalonia FsusTextEditor value provider and status semantics"
+  ],
+  "uiDecisionClass": "prescribed",
+  "verificationClass": "ux-local",
+  "requiredAuthorities": [
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84"
+    },
+    {
+      "id": "visual-workflow",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+    },
+    {
+      "id": "avalonia-index",
+      "path": "docs/avalonia/README.md",
+      "digest": "98e43870a8f1068244a2f00ce5de39ca8f39eb534590b9beabb7c7ac4cede0b2"
+    },
+    {
+      "id": "avalonia-display",
+      "path": "docs/avalonia/components/display.md",
+      "digest": "a66403cf6a444e7d0e0c3f96769a58819663275ea433d1862301d3a3b53fa567"
+    },
+    {
+      "id": "avalonia-text-viewer",
+      "path": "docs/avalonia/components/text-viewer.md",
+      "digest": "7e25bb65f66d593a6986dd9aaf551eb18821561e1a9ac11535634d34ae443901"
+    },
+    {
+      "id": "avalonia-text-editor",
+      "path": "docs/avalonia/components/text-editor.md",
+      "digest": "40621250df44eecf31952b0351adf3b3bf18d5d5a676d8a8def2e81707e7b0c8"
+    },
+    {
+      "id": "accessibility",
+      "path": "spec/accessibility/README.md",
+      "digest": "f149631813fbfb060d49412329638555e0f0c371fb441cf89ab46cd64a3e3de6"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "f541cccca931bed9788438fba94b83bad0292cd3",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "1bcb588ac62cbbec6202592da2e35cf6632e01c6b50b8c01e8eea93e43c106fd",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "2c80a769dd8340196140ec46afe2d15a47f38a3b",
+  "candidateDigest": "ac4519a4001991c07d7ad78e3d084466838734be977a0da860f9b16b51d82780",
+  "stateEvidenceMatrix": [
+    {
+      "state": "alert-live-region-document-focus-and-editor-value-status",
+      "viewport": "avalonia-headless-control",
+      "theme": "not-applicable",
+      "evidenceDigest": "e39fc85f6d1057d4ab1dae07babd32881e52405713d0fd1176d614dafcb38133"
+    }
+  ],
+  "inScope": [
+    "FsusAlert assertive live-region role and accessible message semantics",
+    "FsusTextViewer structured document status and keyboard block focus",
+    "FsusTextEditor round-trippable raw document value and separate item status",
+    "headless programmatic AutomationPeer and evidence-source verification"
+  ],
+  "outOfScope": [
+    "visual styling, geometry, token, theme, or motion changes",
+    "browser accessibility behavior",
+    "cross-platform rendered or screen-reader acceptance",
+    "unrelated Avalonia control behavior and remaining accessibility gaps"
+  ],
+  "classificationEvidenceDigest": "8a833101c837d8f365e2acf0e7bf963a29f4661a9cefa3cc00c8576735177f2f",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "653bd0e8b16f2428981bbb1e755430c5d800dd48c834ce81426ddb01c5eddfd0"
+}

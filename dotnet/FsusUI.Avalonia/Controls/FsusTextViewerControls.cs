@@ -132,6 +132,15 @@ public class FsusTextViewer : ContentControl
     return ValueTask.FromResult(false);
   }
 
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (!e.Handled && HandleKeyAsync(e.Key).Result)
+    {
+      e.Handled = true;
+    }
+  }
+
   private void EnsureFocusedVisible()
   {
     if (FocusedBlockIndex < VisibleBlockStartIndex)
@@ -162,8 +171,13 @@ public class FsusTextViewer : ContentControl
     FsusComponentClasses.Ensure(this, "fsus-canceled", StateName == "canceled");
     AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(AccessibleName, renderedBlocks.Count));
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Text);
-    AutomationProperties.SetItemStatus(
-      this,
-      $"{StateName}, {renderedBlocks.Count.ToString(CultureInfo.InvariantCulture)} blocks, focus {(FocusedBlockIndex + 1).ToString(CultureInfo.InvariantCulture)} of {Math.Max(1, renderedBlocks.Count).ToString(CultureInfo.InvariantCulture)}");
+    AutomationProperties.SetClassNameOverride(this, "Document");
+    AutomationProperties.SetItemStatus(this, AutomationStatus);
   }
+
+  private string AutomationStatus =>
+    $"{renderedBlocks.Count.ToString(CultureInfo.InvariantCulture)} structured blocks, " +
+    $"{(HasMixedLanguage ? "mixed language" : "single language")}, " +
+    $"focus {(FocusedBlockIndex + 1).ToString(CultureInfo.InvariantCulture)} of " +
+    $"{Math.Max(1, renderedBlocks.Count).ToString(CultureInfo.InvariantCulture)}";
 }

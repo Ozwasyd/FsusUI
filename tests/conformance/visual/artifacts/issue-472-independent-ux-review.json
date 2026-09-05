@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "issue": 472,
+  "parentIssue": 308,
+  "childIssues": [469, 470, 471, 472],
+  "evidenceClass": "independent-rendered-evidence-review",
+  "candidateSha": "8fe4b5b935190372e3e14c1b5cee22810251fd67",
+  "candidateDigest": "6b27eee2bfc0434543dd4648ad882e3b80157fb05ed50c06b9e07b95980415ec",
+  "classificationReceiptDigest": "d52defbc32b96fbbdeeb6b2a06e6126477bf7f489648149336e888b9e254eb77",
+  "productionFixture": true,
+  "implementationModifiedPaths": [],
+  "exactHead": {
+    "base": "c2ac6caa35cb63ae1e4f85ea46c74ffb45afbcea",
+    "requiredBaseAncestor": "918aa27c1f2850cc7cc65fbac690067ee3b0eef7",
+    "candidate": "8fe4b5b935190372e3e14c1b5cee22810251fd67"
+  },
+  "focusedTests": [
+    {
+      "command": "pnpm run governance:motion",
+      "passed": 46,
+      "failed": 0,
+      "notes": "Four adoption mappings passed; the legacy semantic registry passed; all 11 independent mutations were killed."
+    },
+    {
+      "command": "FSUS_VISUAL_EVIDENCE=1 FSUS_MOTION_EVIDENCE_ROOT=tests/conformance/visual/artifacts/issue-472 pnpm run test:motion:ssr",
+      "passed": 4,
+      "failed": 0,
+      "notes": "Real Chromium SSR/hydration, all-mode runtime trace, terminal render, and local cadence/throttle evidence."
+    },
+    {
+      "command": "pnpm exec vitest run --config vue/vitest.config.ts <13 affected component and theme test files>",
+      "passed": 204,
+      "failed": 0,
+      "notes": "Badge, ConfigProvider, Dropdown, Menu, Tag, Upload, and compiled theme coverage."
+    },
+    {
+      "command": "pnpm run typecheck:web && pnpm run typecheck:node",
+      "passed": 2,
+      "failed": 0,
+      "notes": "Both repository typecheck authorities passed at the candidate source hash."
+    },
+    {
+      "command": "pnpm run check:documentation-architecture && pnpm run tokens:check",
+      "passed": 2,
+      "failed": 0,
+      "notes": "Documentation architecture and generated token artifacts remained current."
+    }
+  ],
+  "broaderGate": {
+    "command": "pnpm run verify:pr-fast",
+    "status": "failed-current-main-drift",
+    "motionOwnedRemediation": "The changed Upload and transition source digests in spec/components/component-surface-semantic-registry.json were synchronized.",
+    "remainingFailures": [
+      "origin/main package.json hashes to bad90c96c94d819e482bdefcd3bc22131d8b49dbc81da8ac3001c965dda6a43b while origin/main config/dependencies/migration-baseline.json still expects 075bd07790ecb6cebe4f985c83711c8a213f63b8bfc2daa42360e564e2e69c0d",
+      "origin/main generated dark tokens use uppercase hexadecimal while origin/main scripts/check-package-build-smoke.mjs compares lowercase text without case normalization",
+      "origin/main component semantic registry carries a stale digest for vue/packages/theme-chalk/src/inbox-primitives.scss"
+    ]
+  },
+  "runtimeMatrix": [
+    {
+      "mode": "enabled",
+      "traceEntries": 277,
+      "activePhaseEntries": 169,
+      "maxDurationMs": 300,
+      "maxDelayMs": 0
+    },
+    {
+      "mode": "reduced",
+      "traceEntries": 282,
+      "activePhaseEntries": 165,
+      "maxDurationMs": 1,
+      "maxDelayMs": 0
+    },
+    {
+      "mode": "disabled",
+      "traceEntries": 282,
+      "activePhaseEntries": 165,
+      "maxDurationMs": 1,
+      "maxDelayMs": 0
+    }
+  ],
+  "finalReview": {
+    "status": "accepted",
+    "blockers": [],
+    "observations": [
+      "The inspected terminal render is coherent and contains the expected hydrated Tag and Badge state with Upload, Menu, Dropdown and Popover transient DOM removed.",
+      "The retained trace records real computed styles for Tag, Badge, Upload list, Menu, Dropdown and Popover across enabled, reduced and disabled modes, including complete Vue enter and leave phase class sequences.",
+      "The requested top Popover flips to the observed bottom placement near the viewport edge; individual translate and scale motion preserve Popper's layout transform.",
+      "Rapid Tag and Dropdown changes, nested Dropdown and Menu paths, Upload add/reorder/remove, focus return, inert cleanup and permanent-DOM cleanup all reach the asserted terminal state.",
+      "Reduced and disabled active phases are bounded to exactly 1ms with zero delay and no motion-owned translate or scale."
+    ]
+  },
+  "inspectedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-472/legacy-motion-runtime-trace.json",
+      "digest": "1d34f85ca5faba85acc5af52372a946e71f357d08ab64e9f4bd81023f829d39f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-472/legacy-motion-terminal-render.png",
+      "digest": "a5446c2868c4cbda5b7fc420ca39b0b6513b24b23e692573660caef3677f53a5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-472/local-motion-cadence-simulation.json",
+      "digest": "7a5e4db41eb65ea4ac8711c629af1a89130568152ee67d9c6ab886fa1292d680"
+    }
+  ],
+  "limitations": [
+    "Cadence evidence uses timer-based 60Hz and 120Hz sampling in Chromium with four-times CDP CPU throttling; it does not claim a physical 60Hz or 120Hz display or physical low-end hardware.",
+    "The motion contract is theme-neutral; this run inspects the light production SSR fixture and does not claim a separate dark-theme visual comparison.",
+    "No native assistive-technology session is claimed; browser assertions cover focus return, inert cleanup and DOM removal."
+  ]
+}

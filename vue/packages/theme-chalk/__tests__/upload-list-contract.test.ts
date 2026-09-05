@@ -228,8 +228,8 @@ const uploadMutations = [
   },
   {
     id: 'reintroduce-500ms-30px-motion',
-    from: `&-enter-active,
-  &-leave-active {
+    from: `&-enter-active[class*='#{$namespace}-upload-list__item'],
+  &-leave-active[class*='#{$namespace}-upload-list__item'] {
     transition:
       opacity var(--fsus-motion-control, 220ms)
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
@@ -242,8 +242,8 @@ const uploadMutations = [
     opacity: 0;
     transform: translateY(-8px);
   }`,
-    to: `&-enter-active,
-  &-leave-active {
+    to: `&-enter-active[class*='#{$namespace}-upload-list__item'],
+  &-leave-active[class*='#{$namespace}-upload-list__item'] {
     transition:
       opacity 0.5s cubic-bezier(0.55, 0, 0.1, 1),
       transform 0.5s cubic-bezier(0.55, 0, 0.1, 1);

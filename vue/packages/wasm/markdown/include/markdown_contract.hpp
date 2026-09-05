@@ -59,6 +59,13 @@ enum class syntax_status : std::uint8_t {
   malformed = 1
 };
 
+enum class syntax_table_alignment : std::uint8_t {
+  none = 0,
+  left = 1,
+  center = 2,
+  right = 3
+};
+
 struct syntax_range final {
   std::size_t start_offset{0};
   std::size_t end_offset{0};
@@ -73,6 +80,10 @@ struct syntax_node final {
   std::vector<syntax_range> marker_ranges;
   syntax_status status{syntax_status::valid};
   std::string diagnostic_code;
+  std::vector<syntax_range> table_row_ranges;
+  std::vector<std::vector<syntax_range>> table_cell_ranges;
+  std::vector<syntax_table_alignment> table_alignments;
+  std::size_t table_separator_row{static_cast<std::size_t>(-1)};
 };
 
 struct placeholder final {

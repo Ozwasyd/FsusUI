@@ -321,6 +321,8 @@ public class FsusAlert : ContentControl
   private void SyncAutomation()
   {
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Text);
+    AutomationProperties.SetClassNameOverride(this, "Alert");
+    AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Assertive);
     AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(Title, Content));
     AutomationProperties.SetHelpText(this, Description ?? string.Empty);
     AutomationProperties.SetItemStatus(

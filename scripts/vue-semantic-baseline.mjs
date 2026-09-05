@@ -3,6 +3,8 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import babelParser from '@babel/parser'
 import { parse as parseSfc } from 'vue/compiler-sfc'
+import { extractStructuredEmitPayloads } from './vue-structured-emit-payload.mjs'
+import { extractStructuredExposedSignatures } from './vue-structured-exposed-signature.mjs'
 
 const { parse: babelParse } = babelParser
 
@@ -44,50 +46,103 @@ const walkNodes = (node, visit) => {
 const sha256 = (value) =>
   crypto.createHash('sha256').update(value).digest('hex')
 
-const parseSlotTags = (templateSource) => {
-  const slots = []
-  for (const match of templateSource.matchAll(/<slot\b([^>]*)>/g)) {
-    const attrs = match[1]
-    const nameMatch = attrs.match(/\bname\s*=\s*["']([^"']+)["']/)
-    slots.push({
-      name: nameMatch ? nameMatch[1] : 'default',
-      scoped: /\s(:|v-bind:)[\w-]+/.test(attrs),
-    })
+const normalizeJsDocLine = (line) =>
+  line
+    .trim()
+    .replace(/^\*+\s?/u, '')
+    .trim()
+
+export const deprecatedMetadataForNode = (node) => {
+  const comment = [...(node?.leadingComments ?? [])]
+    .reverse()
+    .find((candidate) => /@deprecated\b/u.test(candidate.value))
+  if (!comment) return { deprecated: false, deprecationMessage: null }
+
+  const lines = comment.value.split(/\r?\n/u).map(normalizeJsDocLine)
+  const marker = lines.findIndex((line) => /^@deprecated\b/u.test(line))
+  const message = [
+    lines[marker]?.replace(/^@deprecated\b\s*/u, '') ?? '',
+    ...lines.slice(marker + 1).filter((line) => !line.startsWith('@')),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .trim()
+  return {
+    deprecated: true,
+    deprecationMessage: message || null,
   }
-  const byName = new Map()
-  for (const slot of slots) {
-    const current = byName.get(slot.name)
-    byName.set(slot.name, {
-      name: slot.name,
-      scoped: Boolean(current?.scoped || slot.scoped),
-    })
-  }
-  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name))
 }
 
-const declaredComponentNames = (source) => {
-  const scripts = []
-  if (source.relativePath.endsWith('.vue')) {
-    try {
-      const { descriptor } = parseSfc(source.content, {
-        filename: path.basename(source.relativePath),
-      })
-      if (descriptor.script?.content) scripts.push(descriptor.script.content)
-      if (descriptor.scriptSetup?.content) {
-        scripts.push(descriptor.scriptSetup.content)
-      }
-    } catch {
-      return []
-    }
+const declarationNames = (node) => {
+  if (!node) return []
+  if (node.type === 'ExportNamedDeclaration')
+    return declarationNames(node.declaration)
+  if (node.type === 'VariableDeclaration') {
+    return (node.declarations ?? [])
+      .map((declaration) =>
+        declaration.id?.type === 'Identifier' ? declaration.id.name : null,
+      )
+      .filter(Boolean)
+  }
+  if (
+    node.type === 'TSTypeAliasDeclaration' ||
+    node.type === 'TSInterfaceDeclaration' ||
+    node.type === 'ClassDeclaration' ||
+    node.type === 'FunctionDeclaration'
+  ) {
+    return node.id?.name ? [node.id.name] : []
+  }
+  if (
+    node.type === 'ObjectProperty' ||
+    node.type === 'ObjectMethod' ||
+    node.type === 'TSPropertySignature' ||
+    node.type === 'TSMethodSignature'
+  ) {
+    if (node.key?.type === 'Identifier') return [node.key.name]
+    if (node.key?.type === 'StringLiteral') return [node.key.value]
+  }
+  if (
+    node.type === 'StringLiteral' ||
+    node.type === 'NumericLiteral' ||
+    node.type === 'BooleanLiteral'
+  ) {
+    return [String(node.value)]
+  }
+  return []
+}
+
+const declarationKind = (node) => {
+  const target =
+    node?.type === 'ExportNamedDeclaration' ? node.declaration : node
+  if (target?.type === 'ObjectProperty' || target?.type === 'ObjectMethod')
+    return 'property'
+  if (
+    target?.type === 'StringLiteral' ||
+    target?.type === 'NumericLiteral' ||
+    target?.type === 'BooleanLiteral'
+  )
+    return 'literal-value'
+  if (node?.type === 'ExportNamedDeclaration') return 'export'
+  return 'declaration'
+}
+
+export const extractDeprecatedDeclarations = ({ source, filename }) => {
+  const scriptSources = []
+  if (filename.endsWith('.vue')) {
+    const { descriptor } = parseSfc(source, { filename })
+    if (descriptor.script?.content)
+      scriptSources.push(descriptor.script.content)
+    if (descriptor.scriptSetup?.content)
+      scriptSources.push(descriptor.scriptSetup.content)
   } else {
-    scripts.push(source.content)
+    scriptSources.push(source)
   }
 
-  const names = new Set()
-  for (const script of scripts) {
-    let ast
+  const declarations = []
+  for (const scriptSource of scriptSources) {
+    let parsed
     try {
-      ast = babelParse(script, {
+      parsed = babelParse(scriptSource, {
         sourceType: 'module',
         plugins: [
           'typescript',
@@ -97,52 +152,126 @@ const declaredComponentNames = (source) => {
           'topLevelAwait',
         ],
         errorRecovery: true,
+        allowReturnOutsideFunction: true,
       })
     } catch {
       continue
     }
-    const stringConstants = new Map()
-    for (const statement of ast.program.body) {
-      if (statement.type !== 'VariableDeclaration') continue
-      for (const declaration of statement.declarations || []) {
-        if (
-          declaration.id?.type === 'Identifier' &&
-          declaration.init?.type === 'StringLiteral'
-        ) {
-          stringConstants.set(declaration.id.name, declaration.init.value)
-        }
-      }
-    }
-    const nameFromOptions = (options) => {
-      if (options?.type !== 'ObjectExpression') return
-      const property = options.properties.find(
-        (candidate) =>
-          candidate.type === 'ObjectProperty' &&
-          !candidate.computed &&
-          candidate.key?.type === 'Identifier' &&
-          candidate.key.name === 'name',
-      )
-      if (property?.value?.type === 'StringLiteral') {
-        names.add(property.value.value)
-      } else if (property?.value?.type === 'Identifier') {
-        const value = stringConstants.get(property.value.name)
-        if (value) names.add(value)
-      }
-    }
-    walkNodes(ast.program.body, (node) => {
-      if (
-        node.type === 'CallExpression' &&
-        node.callee?.type === 'Identifier' &&
-        ['defineComponent', 'defineOptions'].includes(node.callee.name)
-      ) {
-        nameFromOptions(unwrapExpression(node.arguments?.[0]))
-      }
-      if (node.type === 'ExportDefaultDeclaration') {
-        nameFromOptions(unwrapExpression(node.declaration))
+    walkNodes(parsed.program.body, (node) => {
+      const metadata = deprecatedMetadataForNode(node)
+      if (!metadata.deprecated) return
+      for (const target of declarationNames(node)) {
+        declarations.push({
+          kind: declarationKind(node),
+          target,
+          message: metadata.deprecationMessage,
+        })
       }
     })
   }
-  return [...names].sort()
+  const unique = new Map()
+  for (const declaration of declarations) {
+    unique.set(
+      `${declaration.kind}\u0000${declaration.target}\u0000${declaration.message ?? ''}`,
+      declaration,
+    )
+  }
+  return [...unique.values()].sort(
+    (first, second) =>
+      first.target.localeCompare(second.target) ||
+      first.kind.localeCompare(second.kind),
+  )
+}
+
+const staticStringExpression = (expression) => {
+  if (expression?.type !== 4) return null
+  const value = expression.content.trim()
+  const match = value.match(/^(['"])(.*)\1$/su)
+  return match ? match[2] : null
+}
+
+const slotIdentity = ({ name, nameKnown, nameExpression }) =>
+  nameKnown ? name : `$dynamic:${nameExpression?.trim() || 'unknown'}`
+
+export const extractTemplateSlots = (templateAst) => {
+  const slots = []
+  walkNodes(templateAst, (node) => {
+    if (node.type !== 1 || node.tag !== 'slot') return
+    let name = 'default'
+    let nameKnown = true
+    let nameExpression = null
+    let payloadComplete = true
+    const payload = []
+
+    for (const property of node.props ?? []) {
+      if (property.type === 6 && property.name === 'name') {
+        if (property.value?.content) {
+          name = property.value.content
+        } else {
+          nameKnown = false
+          nameExpression = null
+        }
+        continue
+      }
+      if (property.type !== 7 || property.name !== 'bind') continue
+
+      if (property.arg?.type === 4 && property.arg.isStatic) {
+        if (property.arg.content === 'name') {
+          const literalName = staticStringExpression(property.exp)
+          if (literalName == null) {
+            nameKnown = false
+            nameExpression = property.exp?.content ?? null
+          } else {
+            name = literalName
+          }
+          continue
+        }
+        payload.push({
+          name: property.arg.content,
+          expression: property.exp?.content ?? null,
+          type: null,
+        })
+        continue
+      }
+
+      payloadComplete = false
+    }
+
+    const slot = {
+      name: slotIdentity({ name, nameKnown, nameExpression }),
+      nameKnown,
+      scoped: payload.length > 0 || !payloadComplete,
+      payload: payload.sort((first, second) =>
+        first.name.localeCompare(second.name),
+      ),
+      payloadComplete,
+    }
+    if (!nameKnown) slot.nameExpression = nameExpression
+    slots.push(slot)
+  })
+
+  const byName = new Map()
+  for (const slot of slots) {
+    const current = byName.get(slot.name)
+    if (!current) {
+      byName.set(slot.name, slot)
+      continue
+    }
+    const payload = new Map(
+      [...current.payload, ...slot.payload].map((field) => [field.name, field]),
+    )
+    byName.set(slot.name, {
+      ...current,
+      scoped: current.scoped || slot.scoped,
+      payload: [...payload.values()].sort((first, second) =>
+        first.name.localeCompare(second.name),
+      ),
+      payloadComplete: current.payloadComplete && slot.payloadComplete,
+    })
+  }
+  return [...byName.values()].sort((first, second) =>
+    first.name.localeCompare(second.name),
+  )
 }
 
 class SemanticResolver {
@@ -358,6 +487,7 @@ class SemanticResolver {
         macroCalls,
         setup,
         scriptAst,
+        templateAst: descriptor.template?.ast ?? null,
       }
     } catch {
       result = null
@@ -371,11 +501,9 @@ class SemanticResolver {
     if (spec.startsWith('.')) {
       const candidates = [
         `${spec}.ts`,
-        `${spec}.tsx`,
         `${spec}.vue`,
         `${spec}.js`,
         `${spec}/index.ts`,
-        `${spec}/index.tsx`,
         `${spec}/index.js`,
       ]
       for (const candidate of candidates) {
@@ -390,7 +518,6 @@ class SemanticResolver {
       const candidates = [
         `vue/packages/components/${name}/index.ts`,
         `vue/packages/components/${name}.ts`,
-        `vue/packages/components/${name}.tsx`,
         `vue/packages/components/${name}/src/index.ts`,
       ]
       for (const candidate of candidates) {
@@ -452,7 +579,7 @@ class SemanticResolver {
       const files = []
       const walk = (dir, isFile = false) => {
         if (isFile) {
-          if (/\.tsx?$/u.test(dir) && !dir.endsWith('.d.ts')) files.push(dir)
+          if (dir.endsWith('.ts') && !dir.endsWith('.d.ts')) files.push(dir)
           return
         }
         for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -466,7 +593,7 @@ class SemanticResolver {
           const full = path.join(dir, entry.name)
           if (entry.isDirectory()) walk(full)
           else if (
-            /\.tsx?$/u.test(entry.name) &&
+            entry.name.endsWith('.ts') &&
             !entry.name.endsWith('.d.ts') &&
             !entry.name.endsWith('.test.ts')
           )
@@ -583,29 +710,76 @@ const literalToJson = (node, source) => {
   }
 }
 
-const arrayLiteralValues = (node, source) => {
+const literalTypeValues = (node) => {
+  if (!node) return { values: null, valuesKnown: false }
+  if (
+    node.type === 'TSParenthesizedType' ||
+    node.type === 'TSOptionalType' ||
+    node.type === 'TSRestType'
+  ) {
+    return literalTypeValues(node.typeAnnotation)
+  }
+  if (node.type === 'TSTypeReference' && node.typeParameters?.params?.length) {
+    const name =
+      node.typeName?.type === 'Identifier' ? node.typeName.name : null
+    if (name === 'PropType' || name === 'Readonly') {
+      return literalTypeValues(node.typeParameters.params[0])
+    }
+  }
+  if (node.type === 'TSLiteralType') {
+    if (node.literal?.type === 'StringLiteral')
+      return { values: [node.literal.value], valuesKnown: true }
+    if (node.literal?.type === 'NumericLiteral')
+      return { values: [node.literal.value], valuesKnown: true }
+    if (node.literal?.type === 'BooleanLiteral')
+      return { values: [node.literal.value], valuesKnown: true }
+    return { values: null, valuesKnown: false }
+  }
+  if (
+    node.type === 'TSNullKeyword' ||
+    node.type === 'TSUndefinedKeyword' ||
+    node.type === 'TSVoidKeyword'
+  ) {
+    return { values: [], valuesKnown: true }
+  }
+  if (node.type !== 'TSUnionType') return { values: null, valuesKnown: false }
+
+  const values = []
+  for (const member of node.types ?? []) {
+    const extracted = literalTypeValues(member)
+    if (!extracted.valuesKnown) return { values: null, valuesKnown: false }
+    values.push(...extracted.values)
+  }
+  return { values: [...new Set(values)], valuesKnown: true }
+}
+
+const arrayLiteralValues = (node) => {
   if (!node) return null
   if (node.type === 'ArrayExpression') {
     const values = []
+    let valuesKnown = true
     for (const element of node.elements || []) {
       if (!element) continue
       if (element.type === 'StringLiteral') values.push(element.value)
       else if (element.type === 'NumericLiteral') values.push(element.value)
       else if (element.type === 'BooleanLiteral') values.push(element.value)
       else if (element.type === 'NullLiteral') values.push(null)
-      else
-        values.push(
-          `<expr:${sha256(source.slice(element.start, element.end)).slice(0, 12)}>`,
-        )
+      else valuesKnown = false
     }
-    return values
+    return { values, valuesKnown }
   }
   return null
 }
 
 const extractTypeExpression = (typeNode, source) => {
   if (!typeNode)
-    return { runtimeType: null, semanticType: null, nullable: false }
+    return {
+      runtimeType: null,
+      semanticType: null,
+      nullable: false,
+      values: null,
+      valuesKnown: false,
+    }
   if (typeNode.type === 'Identifier') {
     return {
       runtimeType: RUNTIME_TYPE_NAMES.has(typeNode.name) ? typeNode.name : null,
@@ -613,15 +787,20 @@ const extractTypeExpression = (typeNode, source) => {
         ? null
         : typeNode.name,
       nullable: false,
+      values: null,
+      valuesKnown: false,
     }
   }
   if (typeNode.type === 'TSAsExpression') {
     const inner = extractTypeExpression(typeNode.expression, source)
     const semantic = typeText(typeNode.typeAnnotation, source)
+    const literalValues = literalTypeValues(typeNode.typeAnnotation)
     return {
       runtimeType: inner.runtimeType || null,
       semanticType: semantic,
       nullable: /\bnull\b|\bundefined\b/u.test(semantic || ''),
+      values: literalValues.valuesKnown ? literalValues.values : inner.values,
+      valuesKnown: literalValues.valuesKnown || inner.valuesKnown,
     }
   }
   if (typeNode.type === 'TSTypeAssertion') {
@@ -644,9 +823,16 @@ const extractTypeExpression = (typeNode, source) => {
         runtimeType,
         semanticType: semantic,
         nullable: /\bnull\b|\bundefined\b/u.test(semantic || ''),
+        ...literalTypeValues(typeParam),
       }
     }
-    return { runtimeType: null, semanticType: null, nullable: false }
+    return {
+      runtimeType: null,
+      semanticType: null,
+      nullable: false,
+      values: null,
+      valuesKnown: false,
+    }
   }
   if (typeNode.type === 'ArrayExpression') {
     const names = (typeNode.elements || []).map((el) =>
@@ -656,6 +842,8 @@ const extractTypeExpression = (typeNode, source) => {
       runtimeType: 'Array',
       semanticType: names.filter(Boolean).join(' | '),
       nullable: false,
+      values: null,
+      valuesKnown: false,
     }
   }
   if (
@@ -668,9 +856,16 @@ const extractTypeExpression = (typeNode, source) => {
       runtimeType: null,
       semanticType: semantic,
       nullable: /\bnull\b|\bundefined\b/u.test(semantic || ''),
+      ...literalTypeValues(typeNode),
     }
   }
-  return { runtimeType: null, semanticType: null, nullable: false }
+  return {
+    runtimeType: null,
+    semanticType: null,
+    nullable: false,
+    values: null,
+    valuesKnown: false,
+  }
 }
 
 class PropDescriptorParser {
@@ -688,16 +883,8 @@ class PropDescriptorParser {
           property.argument?.name,
           this.fromRelPath,
         )
-        const resolvedNode = unwrapExpression(resolved?.node)
-        if (resolvedNode?.type === 'ObjectExpression') {
-          const source = this.resolver.readSource(resolved.relPath) || ''
-          result.push(
-            ...new PropDescriptorParser(
-              this.resolver,
-              source,
-              resolved.relPath,
-            ).parseBuildPropsObject(resolvedNode),
-          )
+        if (resolved?.node?.type === 'ObjectExpression') {
+          result.push(...this.parseBuildPropsObject(resolved.node))
         }
         continue
       }
@@ -708,7 +895,7 @@ class PropDescriptorParser {
         continue
       const name = this.propertyName(property)
       if (!name) continue
-      const descriptor = this.parsePropValue(property.value, name)
+      const descriptor = this.parsePropValue(property.value, name, property)
       if (descriptor) result.push(descriptor)
     }
     return result
@@ -720,8 +907,9 @@ class PropDescriptorParser {
     return null
   }
 
-  parsePropValue(valueNode, name) {
+  parsePropValue(valueNode, name, declarationNode = null) {
     if (!valueNode) return null
+    const deprecated = deprecatedMetadataForNode(declarationNode)
     valueNode = unwrapExpression(valueNode)
     if (valueNode.type === 'Identifier') {
       if (RUNTIME_TYPE_NAMES.has(valueNode.name)) {
@@ -731,9 +919,11 @@ class PropDescriptorParser {
           semanticType: null,
           nullable: false,
           values: null,
+          valuesKnown: false,
           default: { kind: 'missing' },
           required: false,
           readonly: false,
+          ...deprecated,
         }
       }
       const resolved = this.resolver.resolveIdentifier(
@@ -747,60 +937,32 @@ class PropDescriptorParser {
           semanticType: valueNode.name,
           nullable: false,
           values: null,
+          valuesKnown: false,
           default: { kind: 'missing' },
           required: false,
           readonly: false,
+          ...deprecated,
         }
       }
       const sub = this.parseFromNode(resolved.node, name, resolved.relPath)
-      if (sub) return sub
+      if (sub) return { ...sub, ...deprecated }
       return {
         name,
         runtimeType: null,
         semanticType: valueNode.name,
         nullable: false,
         values: null,
+        valuesKnown: false,
         default: { kind: 'missing' },
         required: false,
         readonly: false,
+        ...deprecated,
       }
     }
     if (valueNode.type === 'ObjectExpression') {
-      return this.parseDescriptorObject(valueNode, name)
-    }
-    if (
-      ['MemberExpression', 'OptionalMemberExpression'].includes(valueNode.type)
-    ) {
-      const memberName = valueNode.computed
-        ? valueNode.property?.type === 'StringLiteral'
-          ? valueNode.property.value
-          : null
-        : valueNode.property?.type === 'Identifier'
-          ? valueNode.property.name
-          : null
-      if (valueNode.object?.type === 'Identifier' && memberName) {
-        const resolved = this.resolver.resolveIdentifier(
-          valueNode.object.name,
-          this.fromRelPath,
-        )
-        const resolvedNode = unwrapExpression(resolved?.node)
-        const propsNode =
-          resolvedNode?.type === 'CallExpression' &&
-          resolvedNode.callee?.type === 'Identifier' &&
-          resolvedNode.callee.name === 'buildProps'
-            ? unwrapExpression(resolvedNode.arguments?.[0])
-            : resolvedNode
-        if (propsNode?.type === 'ObjectExpression') {
-          const source = this.resolver.readSource(resolved.relPath) || ''
-          const descriptor = new PropDescriptorParser(
-            this.resolver,
-            source,
-            resolved.relPath,
-          )
-            .parseBuildPropsObject(propsNode)
-            .find((candidate) => candidate.name === memberName)
-          if (descriptor) return { ...descriptor, name }
-        }
+      return {
+        ...this.parseDescriptorObject(valueNode, name),
+        ...deprecated,
       }
     }
     if (
@@ -810,7 +972,10 @@ class PropDescriptorParser {
     ) {
       const arg = unwrapExpression(valueNode.arguments?.[0])
       if (arg?.type === 'ObjectExpression')
-        return this.parseDescriptorObject(arg, name)
+        return {
+          ...this.parseDescriptorObject(arg, name),
+          ...deprecated,
+        }
     }
     const typeInfo = extractTypeExpression(valueNode, this.source)
     return {
@@ -818,26 +983,17 @@ class PropDescriptorParser {
       runtimeType: typeInfo.runtimeType,
       semanticType: typeInfo.semanticType,
       nullable: typeInfo.nullable,
-      values: null,
+      values: typeInfo.values,
+      valuesKnown: typeInfo.valuesKnown,
       default: { kind: 'missing' },
       required: false,
       readonly: false,
+      ...deprecated,
     }
   }
 
   parseFromNode(node, name, relPath) {
     node = unwrapExpression(node)
-    if (node.type === 'Identifier') {
-      const source =
-        relPath === this.fromRelPath
-          ? this.source
-          : this.resolver.readSource(relPath) || ''
-      return new PropDescriptorParser(
-        this.resolver,
-        source,
-        relPath,
-      ).parsePropValue(node, name)
-    }
     if (node.type === 'ObjectExpression') {
       const source =
         relPath === this.fromRelPath
@@ -872,20 +1028,19 @@ class PropDescriptorParser {
       node.callee?.type === 'Identifier' &&
       node.callee.name === 'definePropType'
     ) {
-      const source =
-        relPath === this.fromRelPath
-          ? this.source
-          : this.resolver.readSource(relPath) || ''
-      const typeInfo = extractTypeExpression(node, source)
+      const typeInfo = extractTypeExpression(node, this.source)
       return {
         name,
         runtimeType: typeInfo.runtimeType,
         semanticType: typeInfo.semanticType,
         nullable: typeInfo.nullable,
-        values: null,
+        values: typeInfo.values,
+        valuesKnown: typeInfo.valuesKnown,
         default: { kind: 'missing' },
         required: false,
         readonly: false,
+        deprecated: false,
+        deprecationMessage: null,
       }
     }
     return null
@@ -896,20 +1051,28 @@ class PropDescriptorParser {
     let semanticType = null
     let nullable = false
     let values = null
+    let valuesKnown = false
     let defaultValue = { kind: 'missing' }
     let required = false
     let readonly = false
     for (const property of objectNode.properties || []) {
       if (property.type === 'SpreadElement') {
-        const merged = this.parsePropValue(property.argument, name)
-        if (merged) {
-          runtimeType = merged.runtimeType
-          semanticType = merged.semanticType
-          nullable = merged.nullable
-          values = merged.values
-          defaultValue = merged.default
-          required = merged.required
-          readonly = merged.readonly
+        const resolved = this.resolver.resolveIdentifier(
+          property.argument?.name,
+          this.fromRelPath,
+        )
+        if (resolved?.node?.type === 'ObjectExpression') {
+          const merged = this.parseDescriptorObject(resolved.node, name)
+          if (merged) {
+            runtimeType = merged.runtimeType
+            semanticType = merged.semanticType
+            nullable = merged.nullable
+            values = merged.values
+            valuesKnown = merged.valuesKnown
+            defaultValue = merged.default
+            required = merged.required
+            readonly = merged.readonly
+          }
         }
         continue
       }
@@ -920,20 +1083,24 @@ class PropDescriptorParser {
         runtimeType = info.runtimeType
         semanticType = info.semanticType
         nullable = info.nullable
+        if (info.valuesKnown) {
+          values = info.values
+          valuesKnown = true
+        }
       } else if (key === 'values') {
-        if (property.value.type === 'ArrayExpression')
-          values = arrayLiteralValues(property.value, this.source)
-        else if (property.value.type === 'Identifier') {
+        let extracted = null
+        if (property.value.type === 'ArrayExpression') {
+          extracted = arrayLiteralValues(property.value)
+        } else if (property.value.type === 'Identifier') {
           const resolved = this.resolver.resolveIdentifier(
             property.value.name,
             this.fromRelPath,
           )
           if (resolved?.node?.type === 'ArrayExpression')
-            values = arrayLiteralValues(
-              resolved.node,
-              this.resolver.readSource(resolved.relPath) || this.source,
-            )
+            extracted = arrayLiteralValues(resolved.node)
         }
+        values = extracted?.values ?? null
+        valuesKnown = extracted?.valuesKnown ?? false
       } else if (key === 'default') {
         defaultValue = literalToJson(property.value, this.source)
       } else if (key === 'required') {
@@ -955,9 +1122,12 @@ class PropDescriptorParser {
       semanticType,
       nullable,
       values,
+      valuesKnown,
       default: defaultValue,
       required,
       readonly,
+      deprecated: false,
+      deprecationMessage: null,
     }
   }
 }
@@ -1016,48 +1186,49 @@ export const extractComponentSemantics = ({
   root,
   moduleSources,
   vueSource,
+  structuredEmitNames = [],
+  structuredExposedNames = [],
 }) => {
   const resolver = new SemanticResolver(root, moduleSources)
-  const componentRel = vueSource ? vueSource.relativePath : null
-  const vueModule = componentRel?.endsWith('.vue')
-    ? resolver.parseVueModule(componentRel)
-    : null
-  const tsModule =
-    componentRel && !componentRel.endsWith('.vue')
-      ? resolver.parseTsModule(componentRel)
-      : null
+  const vueRel = vueSource ? vueSource.relativePath : null
+  const vueModule = vueRel ? resolver.parseVueModule(vueRel) : null
 
   const props = []
   const emits = []
   const exposed = []
-  const slots = vueModule ? parseSlotTags(vueSource.content) : []
+  const slots = extractTemplateSlots(vueModule?.templateAst)
 
   const resolveCallArg = (argNode, fromRel) => {
     if (!argNode) return null
     const unwrapped = unwrapExpression(argNode)
     if (unwrapped.type === 'ObjectExpression')
-      return { object: unwrapped, source: resolver.readSource(fromRel) || '' }
+      return {
+        object: unwrapped,
+        source: resolver.readSource(fromRel) || '',
+        sourceRel: fromRel,
+      }
     if (unwrapped.type === 'ArrayExpression')
-      return { array: unwrapped, source: resolver.readSource(fromRel) || '' }
+      return {
+        array: unwrapped,
+        source: resolver.readSource(fromRel) || '',
+        sourceRel: fromRel,
+      }
     if (unwrapped.type === 'Identifier') {
       const resolved = resolver.resolveIdentifier(unwrapped.name, fromRel)
       if (!resolved?.node) return null
       const source = resolver.readSource(resolved.relPath) || ''
-      if (resolved.node.type === 'ObjectExpression') {
-        return { object: resolved.node, source, relPath: resolved.relPath }
-      }
-      if (resolved.node.type === 'ArrayExpression') {
-        return { array: resolved.node, source, relPath: resolved.relPath }
-      }
+      if (resolved.node.type === 'ObjectExpression')
+        return { object: resolved.node, source, sourceRel: resolved.relPath }
+      if (resolved.node.type === 'ArrayExpression')
+        return { array: resolved.node, source, sourceRel: resolved.relPath }
       if (
         resolved.node.type === 'CallExpression' &&
         resolved.node.callee?.type === 'Identifier' &&
         resolved.node.callee.name === 'buildProps'
       ) {
         const arg = unwrapExpression(resolved.node.arguments?.[0])
-        if (arg?.type === 'ObjectExpression') {
-          return { object: arg, source, relPath: resolved.relPath }
-        }
+        if (arg?.type === 'ObjectExpression')
+          return { object: arg, source, sourceRel: resolved.relPath }
       }
     }
     return null
@@ -1068,7 +1239,12 @@ export const extractComponentSemantics = ({
     return parser.parseBuildPropsObject(objectNode)
   }
 
-  const collectEmitsFromObject = (objectNode, source, fromRel) => {
+  const collectEmitsFromObject = (
+    objectNode,
+    source,
+    fromRel,
+    sourceRel = fromRel,
+  ) => {
     const result = []
     for (const property of objectNode.properties || []) {
       if (property.type !== 'ObjectProperty') continue
@@ -1084,6 +1260,20 @@ export const extractComponentSemantics = ({
       const payload = payloadFromFunction(property.value, source)
       result.push({ name, payload })
     }
+    const structured = extractStructuredEmitPayloads({
+      root,
+      sourceRelativePath: sourceRel,
+      objectStart: objectNode.start,
+      objectEnd: objectNode.end,
+      eventNames: structuredEmitNames,
+    })
+    for (const emit of result) {
+      const resolved = structured.get(emit.name)
+      if (!resolved) continue
+      emit.payloadShapeStatus = resolved.kind
+      emit.payloadShapeReason = resolved.reason ?? null
+      if (resolved.kind === 'callable') emit.payload = resolved.parameters
+    }
     return result
   }
 
@@ -1092,210 +1282,90 @@ export const extractComponentSemantics = ({
       .filter((el) => el?.type === 'StringLiteral')
       .map((el) => ({ name: el.value, payload: [] }))
 
-  const collectExposeFromObject = (objectNode, source, fromRel) => {
-    if (!objectNode) return
-    for (const property of objectNode.properties || []) {
-      if (
-        property.type !== 'ObjectProperty' &&
-        property.type !== 'ObjectMethod'
-      )
-        continue
-      const name = keyText(property.key, source)
-      if (!name) continue
-      if (property.type === 'ObjectMethod') {
-        exposed.push({ name, ...signatureFromFunction(property, source) })
-        continue
-      }
-      const valueNode = property.value
-      if (valueNode.type === 'Identifier') {
-        const resolved = resolver.resolveIdentifier(valueNode.name, fromRel)
-        if (resolved?.functionNode) {
-          const resolvedSource =
-            resolved.source || resolver.readSource(resolved.relPath) || ''
-          exposed.push({
-            name,
-            ...signatureFromFunction(resolved.node, resolvedSource),
-          })
-        } else if (resolved?.node) {
-          const resolvedSource =
-            resolved.source || resolver.readSource(resolved.relPath) || ''
-          const fn = [
-            'ArrowFunctionExpression',
-            'FunctionExpression',
-            'FunctionDeclaration',
-          ].includes(resolved.node.type)
-            ? resolved.node
-            : null
-          exposed.push(
-            fn
-              ? { name, ...signatureFromFunction(fn, resolvedSource) }
-              : { name, parameters: [], returnType: null },
-          )
-        } else {
-          exposed.push({ name, parameters: [], returnType: null })
-        }
-      } else if (
-        valueNode.type === 'ArrowFunctionExpression' ||
-        valueNode.type === 'FunctionExpression'
-      ) {
-        exposed.push({ name, ...signatureFromFunction(valueNode, source) })
-      } else {
-        exposed.push({ name, parameters: [], returnType: null })
-      }
-    }
-  }
-
-  const slotMemberName = (node) => {
-    if (
-      !node ||
-      !['MemberExpression', 'OptionalMemberExpression'].includes(node.type)
-    )
-      return null
-    if (node.object?.type !== 'Identifier' || node.object.name !== 'slots')
-      return null
-    if (!node.computed && node.property?.type === 'Identifier')
-      return node.property.name
-    if (node.computed && node.property?.type === 'StringLiteral')
-      return node.property.value
-    return null
-  }
-
-  const collectSetupSlots = (setupNode) => {
-    const found = new Map()
-    walkNodes(setupNode, (node) => {
-      const direct = slotMemberName(node)
-      if (direct && !found.has(direct)) found.set(direct, false)
-      if (
-        node.type === 'CallExpression' ||
-        node.type === 'OptionalCallExpression'
-      ) {
-        const called = slotMemberName(node.callee)
-        if (called) found.set(called, true)
-      }
-    })
-    for (const [name, scoped] of found) {
-      const current = slots.find((slot) => slot.name === name)
-      if (current) current.scoped ||= scoped
-      else slots.push({ name, scoped })
-    }
-  }
-
-  const collectOptionsObject = (optionsNode, source, fromRel) => {
-    for (const property of optionsNode.properties || []) {
-      if (
-        property.type !== 'ObjectProperty' &&
-        property.type !== 'ObjectMethod'
-      )
-        continue
-      const name = keyText(property.key, source)
-      if (name === 'props' && property.type === 'ObjectProperty') {
-        const resolved = resolveCallArg(property.value, fromRel)
-        if (resolved?.object) {
-          props.push(
-            ...collectPropsFromObject(
-              resolved.object,
-              resolved.source,
-              resolved.relPath || fromRel,
-            ),
-          )
-        }
-      }
-      if (name === 'emits' && property.type === 'ObjectProperty') {
-        const resolved = resolveCallArg(property.value, fromRel)
-        if (resolved?.object) {
-          emits.push(
-            ...collectEmitsFromObject(
-              resolved.object,
-              resolved.source,
-              resolved.relPath || fromRel,
-            ),
-          )
-        }
-        if (resolved?.array)
-          emits.push(...collectEmitsFromArray(resolved.array))
-      }
-      if (name !== 'setup') continue
-      const setupNode =
-        property.type === 'ObjectMethod' ? property : property.value
-      if (
-        !setupNode ||
-        ![
-          'ObjectMethod',
-          'ArrowFunctionExpression',
-          'FunctionExpression',
-        ].includes(setupNode.type)
-      )
-        continue
-      collectSetupSlots(setupNode)
-      walkNodes(setupNode.body, (node) => {
-        if (
-          (node.type === 'CallExpression' ||
-            node.type === 'OptionalCallExpression') &&
-          node.callee?.type === 'Identifier' &&
-          node.callee.name === 'expose'
-        ) {
-          const resolved = resolveCallArg(node.arguments?.[0], fromRel)
-          if (resolved?.object) {
-            collectExposeFromObject(
-              resolved.object,
-              resolved.source,
-              resolved.relPath || fromRel,
-            )
-          }
-        }
-      })
-    }
-  }
-
-  const collectDefineComponentOptions = (ast, source, fromRel) => {
-    const defineComponentCalls = []
-    walkNodes(ast.program.body, (node) => {
-      if (
-        node.type === 'CallExpression' &&
-        node.callee?.type === 'Identifier' &&
-        node.callee.name === 'defineComponent'
-      ) {
-        const optionsNode = unwrapExpression(node.arguments?.[0])
-        if (optionsNode?.type === 'ObjectExpression')
-          defineComponentCalls.push(optionsNode)
-      }
-    })
-    for (const optionsNode of defineComponentCalls) {
-      collectOptionsObject(optionsNode, source, fromRel)
-    }
-  }
-
   if (vueModule) {
     for (const call of vueModule.macroCalls || []) {
       const macro = call.callee.name
       const arg = call.arguments?.[0]
-      const fromRel = componentRel
+      const fromRel = vueRel
       if (macro === 'defineProps') {
         const resolved = resolveCallArg(arg, fromRel)
-        if (resolved?.object) {
+        if (resolved?.object)
           props.push(
             ...collectPropsFromObject(
               resolved.object,
               resolved.source,
-              resolved.relPath || fromRel,
+              fromRel,
             ),
           )
-        }
       } else if (macro === 'defineEmits') {
         const resolved = resolveCallArg(arg, fromRel)
-        if (resolved?.object) {
+        if (resolved?.object)
           emits.push(
             ...collectEmitsFromObject(
               resolved.object,
               resolved.source,
-              resolved.relPath || fromRel,
+              fromRel,
+              resolved.sourceRel,
             ),
           )
-        }
         if (resolved?.array)
           emits.push(...collectEmitsFromArray(resolved.array))
       } else if (macro === 'defineExpose' && arg?.type === 'ObjectExpression') {
-        collectExposeFromObject(arg, vueModule.content, componentRel)
+        for (const property of arg.properties || []) {
+          if (
+            property.type !== 'ObjectProperty' &&
+            property.type !== 'ObjectMethod'
+          )
+            continue
+          const name = keyText(property.key, vueModule.content)
+          if (!name) continue
+          if (property.type === 'ObjectMethod') {
+            exposed.push({
+              name,
+              ...signatureFromFunction(property, vueModule.content),
+            })
+            continue
+          }
+          const valueNode = property.value
+          if (valueNode.type === 'Identifier') {
+            const resolved = resolver.resolveIdentifier(valueNode.name, vueRel)
+            if (resolved?.functionNode) {
+              const source =
+                resolved.source || resolver.readSource(resolved.relPath) || ''
+              exposed.push({
+                name,
+                ...signatureFromFunction(resolved.node, source),
+              })
+            } else if (resolved?.node) {
+              const source =
+                resolved.source || resolver.readSource(resolved.relPath) || ''
+              const fn =
+                resolved.node.type === 'ArrowFunctionExpression' ||
+                resolved.node.type === 'FunctionExpression' ||
+                resolved.node.type === 'FunctionDeclaration'
+                  ? resolved.node
+                  : null
+              if (fn)
+                exposed.push({ name, ...signatureFromFunction(fn, source) })
+              else exposed.push({ name, parameters: [], returnType: null })
+            } else {
+              exposed.push({ name, parameters: [], returnType: null })
+            }
+          } else if (
+            valueNode.type === 'ArrowFunctionExpression' ||
+            valueNode.type === 'FunctionExpression'
+          ) {
+            exposed.push({
+              name,
+              ...signatureFromFunction(
+                valueNode,
+                vueModule.setup || vueModule.scriptAst || vueModule.content,
+              ),
+            })
+          } else {
+            exposed.push({ name, parameters: [], returnType: null })
+          }
+        }
       }
     }
   }
@@ -1323,160 +1393,9 @@ export const extractComponentSemantics = ({
       }
     })
     for (const object of propsObjects)
-      props.push(...collectPropsFromObject(object, source, componentRel))
+      props.push(...collectPropsFromObject(object, source, vueRel))
     for (const object of emitsObjects)
-      emits.push(...collectEmitsFromObject(object, source, componentRel))
-    collectDefineComponentOptions(parsed, source, componentRel)
-  }
-
-  if (tsModule) {
-    collectDefineComponentOptions(tsModule.ast, tsModule.content, componentRel)
-  }
-
-  // A public TSX component can forward a slot into a renderer that invokes it
-  // with the real scoped payload. Follow those calls across the component
-  // module instead of treating a root-level `slots.row` reference as unscoped.
-  const slotByName = new Map(slots.map((slot) => [slot.name, slot]))
-  const typePayloadByName = new Map()
-  for (const moduleSource of moduleSources.filter((source) =>
-    /\.tsx?$/u.test(source.relativePath),
-  )) {
-    let parsed
-    try {
-      parsed = babelParse(moduleSource.content, {
-        sourceType: 'module',
-        plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes'],
-        errorRecovery: true,
-      })
-    } catch {
-      continue
-    }
-    for (const statement of parsed.program.body) {
-      const declaration =
-        statement.type === 'ExportNamedDeclaration'
-          ? statement.declaration
-          : statement
-      if (
-        declaration?.type !== 'TSTypeAliasDeclaration' ||
-        declaration.typeAnnotation?.type !== 'TSTypeLiteral'
-      )
-        continue
-      const payload = declaration.typeAnnotation.members
-        .map((member) => keyText(member.key, moduleSource.content))
-        .filter(Boolean)
-        .sort()
-      typePayloadByName.set(declaration.id.name, payload)
-    }
-  }
-  for (const moduleSource of moduleSources) {
-    const content = moduleSource.relativePath.endsWith('.vue')
-      ? resolver.parseVueModule(moduleSource.relativePath)?.scriptContent
-      : moduleSource.content
-    if (!content) continue
-    let parsed
-    try {
-      parsed = babelParse(content, {
-        sourceType: 'module',
-        plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes'],
-        errorRecovery: true,
-      })
-    } catch {
-      continue
-    }
-    walkNodes(parsed.program.body, (node) => {
-      if (
-        node.type !== 'CallExpression' &&
-        node.type !== 'OptionalCallExpression'
-      )
-        return
-      const callee = node.callee
-      if (
-        !callee ||
-        !['MemberExpression', 'OptionalMemberExpression'].includes(
-          callee.type,
-        ) ||
-        callee.object?.type !== 'Identifier' ||
-        callee.object.name !== 'slots'
-      )
-        return
-      const name =
-        !callee.computed && callee.property?.type === 'Identifier'
-          ? callee.property.name
-          : callee.computed && callee.property?.type === 'StringLiteral'
-            ? callee.property.value
-            : null
-      const slot = name ? slotByName.get(name) : null
-      if (!slot) return
-      slot.scoped = true
-      const argument = unwrapExpression(node.arguments?.[0])
-      if (argument?.type !== 'ObjectExpression') return
-      const payload = new Set(slot.payload ?? [])
-      for (const property of argument.properties ?? []) {
-        if (
-          property.type !== 'ObjectProperty' &&
-          property.type !== 'ObjectMethod'
-        )
-          continue
-        const payloadName = keyText(property.key, content)
-        if (payloadName) payload.add(payloadName)
-      }
-      slot.payload = [...payload].sort()
-    })
-    walkNodes(parsed.program.body, (node) => {
-      if (
-        ![
-          'ArrowFunctionExpression',
-          'FunctionExpression',
-          'FunctionDeclaration',
-          'ObjectMethod',
-        ].includes(node.type)
-      )
-        return
-      const typedParameters = new Map()
-      for (const parameter of node.params ?? []) {
-        if (parameter.type !== 'Identifier' || !parameter.typeAnnotation)
-          continue
-        typedParameters.set(
-          parameter.name,
-          typeText(parameter.typeAnnotation, content),
-        )
-      }
-      if (typedParameters.size === 0) return
-      walkNodes(node.body, (candidate) => {
-        if (
-          candidate.type !== 'CallExpression' &&
-          candidate.type !== 'OptionalCallExpression'
-        )
-          return
-        const callee = candidate.callee
-        if (
-          !callee ||
-          !['MemberExpression', 'OptionalMemberExpression'].includes(
-            callee.type,
-          ) ||
-          callee.object?.type !== 'Identifier' ||
-          callee.object.name !== 'slots'
-        )
-          return
-        const name =
-          !callee.computed && callee.property?.type === 'Identifier'
-            ? callee.property.name
-            : callee.computed && callee.property?.type === 'StringLiteral'
-              ? callee.property.value
-              : null
-        const argument = unwrapExpression(candidate.arguments?.[0])
-        const typeName =
-          argument?.type === 'Identifier'
-            ? typedParameters.get(argument.name)
-            : null
-        const payload = typeName ? typePayloadByName.get(typeName) : null
-        const slot = name ? slotByName.get(name) : null
-        if (!slot || !payload) return
-        slot.scoped = true
-        slot.payloadType = typeName
-        slot.payload = payload
-      })
-    })
+      emits.push(...collectEmitsFromObject(object, source, vueRel))
   }
 
   const uniqueBy = (items) => {
@@ -1490,23 +1409,38 @@ export const extractComponentSemantics = ({
   const propsSorted = uniqueBy(props)
   const emitsSorted = uniqueBy(emits)
   const exposedSorted = uniqueBy(exposed)
-  const slotsSorted = uniqueBy(slots)
+  const requestedExposedNames = [...structuredExposedNames]
+  if (vueModule?.setup && requestedExposedNames.length > 0) {
+    const structured = extractStructuredExposedSignatures({
+      root,
+      sourceRelativePath: vueRel,
+      scriptContent: vueModule.setup,
+      memberNames: requestedExposedNames,
+    })
+    for (const member of exposedSorted) {
+      const resolved = structured.get(member.name)
+      if (!resolved) continue
+      member.signatureStatus = resolved.kind
+      member.signatureReason = resolved.reason ?? null
+      if (resolved.kind === 'callable') {
+        member.parameters = resolved.parameters
+        member.returnType = resolved.returnType
+      } else {
+        member.parameters = []
+        member.returnType = null
+      }
+    }
+  }
 
   return {
     semanticProps: propsSorted,
     semanticEmits: emitsSorted,
     semanticExposed: exposedSorted,
-    semanticSlots: slotsSorted,
+    semanticSlots: slots,
     legacyProps: propsSorted.map((p) => p.name),
     legacyEmits: emitsSorted.map((e) => e.name),
     legacyExposed: exposedSorted.map((e) => e.name),
-    legacySlots: slotsSorted,
-    componentSource: vueSource
-      ? {
-          path: vueSource.relativePath,
-          hash: sha256(vueSource.content),
-        }
-      : null,
+    legacySlots: slots,
   }
 }
 
@@ -1524,7 +1458,7 @@ export const loadModuleSources = (root, moduleName) => {
         continue
       const full = path.join(dir, entry.name)
       if (entry.isDirectory()) walk(full)
-      else if (/\.(ts|tsx|vue)$/u.test(entry.name)) {
+      else if (/\.(ts|vue)$/u.test(entry.name)) {
         files.push({
           file: full,
           relativePath: path.relative(root, full).split(path.sep).join('/'),
@@ -1537,136 +1471,45 @@ export const loadModuleSources = (root, moduleName) => {
   return files.sort((a, b) => a.relativePath.localeCompare(b.relativePath))
 }
 
-export const extractPublicValueExports = ({
-  root,
-  moduleSources,
-  moduleName,
-}) => {
-  const resolver = new SemanticResolver(root, moduleSources)
-  const indexRel = `vue/packages/components/${moduleName}/index.ts`
-  const indexModule = resolver.parseTsModule(indexRel)
-  if (!indexModule) return []
-  const values = []
-  for (const statement of indexModule.ast.program.body) {
-    if (
-      statement.type !== 'ExportNamedDeclaration' ||
-      !statement.source?.value
-    ) {
-      continue
-    }
-    const targetRel = resolver.resolveSpecFile(statement.source.value, indexRel)
-    const targetModule = targetRel ? resolver.parseTsModule(targetRel) : null
-    if (!targetModule) continue
-    for (const specifier of statement.specifiers || []) {
-      if (specifier.type !== 'ExportSpecifier') continue
-      const localName =
-        specifier.local.type === 'Identifier'
-          ? specifier.local.name
-          : specifier.local.value
-      const exportName =
-        specifier.exported.type === 'Identifier'
-          ? specifier.exported.name
-          : specifier.exported.value
-      const enumNode = targetModule.ast.program.body
-        .map((candidate) =>
-          candidate.type === 'ExportNamedDeclaration'
-            ? candidate.declaration
-            : candidate,
-        )
-        .find(
-          (candidate) =>
-            candidate?.type === 'TSEnumDeclaration' &&
-            candidate.id.name === localName,
-        )
-      if (enumNode) {
-        values.push({
-          name: exportName,
-          module: moduleName,
-          kind: 'enum',
-          source: {
-            path: targetRel,
-            hash: sha256(targetModule.content),
-            symbol: localName,
-          },
-          values: enumNode.members.map((member) => ({
-            name:
-              member.id.type === 'Identifier'
-                ? member.id.name
-                : member.id.value,
-            value:
-              member.initializer?.type === 'StringLiteral' ||
-              member.initializer?.type === 'NumericLiteral'
-                ? member.initializer.value
-                : null,
-          })),
-        })
-        continue
-      }
-      const constant = targetModule.consts.get(localName)
-      if (
-        constant?.type === 'CallExpression' &&
-        constant.callee?.type === 'Identifier' &&
-        constant.callee.name === 'Symbol'
-      ) {
-        values.push({
-          name: exportName,
-          module: moduleName,
-          kind: 'sentinel',
-          source: {
-            path: targetRel,
-            hash: sha256(targetModule.content),
-            symbol: localName,
-          },
-          values: [],
-        })
-      }
-    }
-  }
-  return values.sort((first, second) => first.name.localeCompare(second.name))
-}
-
-const exportedAliasTarget = (sources, exportName) => {
-  const indexSource = sources.find((source) =>
-    source.relativePath.endsWith('/index.ts'),
-  )
-  if (!indexSource) return null
-  let ast
+const declaredComponentNames = (source) => {
+  const names = new Set()
   try {
-    ast = babelParse(indexSource.content, {
-      sourceType: 'module',
-      plugins: ['typescript', 'jsx', 'importAttributes'],
-      errorRecovery: true,
-    })
+    const { descriptor } = parseSfc(source, { filename: 'component.vue' })
+    for (const block of [descriptor.scriptSetup, descriptor.script]) {
+      if (!block?.content) continue
+      const ast = babelParse(block.content, {
+        sourceType: 'module',
+        plugins: ['typescript', 'jsx', 'importAttributes', 'topLevelAwait'],
+        errorRecovery: true,
+      })
+      walkNodes(ast.program.body, (node) => {
+        if (
+          node.type !== 'CallExpression' ||
+          node.callee?.type !== 'Identifier' ||
+          !['defineComponent', 'defineOptions'].includes(node.callee.name) ||
+          node.arguments?.[0]?.type !== 'ObjectExpression'
+        ) {
+          return
+        }
+        for (const property of node.arguments[0].properties ?? []) {
+          if (
+            property.type === 'ObjectProperty' &&
+            property.key?.type === 'Identifier' &&
+            property.key.name === 'name' &&
+            property.value?.type === 'StringLiteral'
+          ) {
+            names.add(property.value.value)
+          }
+        }
+      })
+    }
   } catch {
-    return null
+    return names
   }
-  for (const statement of ast.program.body) {
-    if (
-      statement.type !== 'ExportNamedDeclaration' ||
-      statement.declaration?.type !== 'VariableDeclaration'
-    ) {
-      continue
-    }
-    const declaration = statement.declaration.declarations.find(
-      (candidate) =>
-        candidate.id?.type === 'Identifier' && candidate.id.name === exportName,
-    )
-    let value = unwrapExpression(declaration?.init)
-    if (value?.type === 'Identifier') return value.name
-    while (
-      value &&
-      ['MemberExpression', 'OptionalMemberExpression'].includes(value.type)
-    ) {
-      value = unwrapExpression(value.object)
-    }
-    if (value?.type === 'Identifier') return value.name
-  }
-  return null
+  return names
 }
 
-export const sourceForComponent = (sources, exportName, seen = new Set()) => {
-  if (seen.has(exportName)) return null
-  seen.add(exportName)
+export const sourceForComponent = (sources, exportName) => {
   const toKebab = (value) =>
     value
       .replace(/^El/, '')
@@ -1675,29 +1518,17 @@ export const sourceForComponent = (sources, exportName, seen = new Set()) => {
       .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
       .toLowerCase()
   const kebab = toKebab(exportName)
-  const suffixes = [
-    `/src/${kebab}.vue`,
-    `/src/${kebab}.tsx`,
-    `/src/components/${kebab}.tsx`,
-    `/src/${kebab}.ts`,
-  ]
-  for (const suffix of suffixes) {
-    const exact = sources.find((source) => source.relativePath.endsWith(suffix))
-    if (
-      exact &&
-      (exact.relativePath.endsWith('.vue') ||
-        /\bdefineComponent\s*\(/u.test(exact.content))
-    ) {
-      return exact
-    }
-  }
-  const declared = sources.filter((source) =>
-    declaredComponentNames(source).includes(exportName),
+  const exact = sources.find((source) =>
+    source.relativePath.endsWith(`/src/${kebab}.vue`),
   )
-  if (declared.length === 1) return declared[0]
-  const aliasTarget = exportedAliasTarget(sources, exportName)
-  if (aliasTarget) return sourceForComponent(sources, aliasTarget, seen)
-  return null
+  if (exact) return exact
+  const declared = sources.find(
+    (source) =>
+      source.relativePath.endsWith('.vue') &&
+      declaredComponentNames(source.content).has(exportName),
+  )
+  if (declared) return declared
+  return sources.find((source) => source.relativePath.endsWith('.vue'))
 }
 
 export const enrichComponentWithSemantics = ({ root, component }) => {

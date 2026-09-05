@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "menu-stable23",
     "component": "menu",
     "platform": "avalonia",
     "control": "FsusMenu",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "menu",
     "accessibleName": "Stable navigation menu",
     "value": null,

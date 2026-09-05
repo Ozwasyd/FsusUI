@@ -22,6 +22,13 @@ Text measurement, wrapping, and baseline thresholds follow
 Text viewer uses text, muted text, surface, border, focus, density, and motion
 resources.
 
+## Accessibility
+
+The production document automation metadata exposes an item-status summary of
+the current rendered block count, mixed-language state, and keyboard focus
+position without claiming an editable value pattern. Up and Down keys move the
+block focus used by that summary.
+
 ## Minimal Avalonia Example
 
 ```csharp

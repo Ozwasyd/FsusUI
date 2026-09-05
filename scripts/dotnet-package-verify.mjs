@@ -45,6 +45,7 @@ run('dotnet', [
   'dotnet/artifacts/nuget',
 ])
 run(process.execPath, ['scripts/check-nuget-metadata.mjs'])
+run(process.execPath, ['scripts/check-avalonia-aot-remediation-contract.mjs'])
 run(process.execPath, ['scripts/check-nuget-package-smoke.mjs'])
 run(process.execPath, ['scripts/check-avalonia-nuget-stable.mjs'])
 

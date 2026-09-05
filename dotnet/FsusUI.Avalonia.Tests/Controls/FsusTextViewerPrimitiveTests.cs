@@ -28,11 +28,20 @@ public class FsusTextViewerPrimitiveTests
     Assert.Equal("bash", viewer.RenderedBlocks[3].Language);
     Assert.Equal(AutomationControlType.Text, AutomationProperties.GetControlTypeOverride(viewer));
     Assert.Equal("Release notes", AutomationProperties.GetName(viewer));
-    Assert.Equal("ready, 4 blocks, focus 1 of 4", AutomationProperties.GetItemStatus(viewer));
+    Assert.Equal(
+      "4 structured blocks, mixed language, focus 1 of 4",
+      AutomationProperties.GetItemStatus(viewer));
 
     Assert.True(await viewer.PressAsync(Key.Down));
     Assert.Equal(1, viewer.FocusedBlockIndex);
-    Assert.Equal("ready, 4 blocks, focus 2 of 4", AutomationProperties.GetItemStatus(viewer));
+    Assert.Equal(
+      "4 structured blocks, mixed language, focus 2 of 4",
+      AutomationProperties.GetItemStatus(viewer));
+    Assert.Equal("Document", AutomationProperties.GetClassNameOverride(viewer));
+    var peer = Assert.IsAssignableFrom<AutomationPeer>(
+      ControlAutomationPeer.CreatePeerForElement(viewer));
+    Assert.Null(
+      peer.GetProvider<global::Avalonia.Automation.Provider.IValueProvider>());
   }
 
   [Fact]

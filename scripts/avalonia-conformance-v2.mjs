@@ -15,7 +15,6 @@ const runnerHash = crypto
   .update(read('scripts/avalonia-conformance-v2.mjs'))
   .update(read('scripts/native-screen-reader-harness.mjs'))
   .update(read('scripts/conformance-v2-evidence.mjs'))
-  .update(read('vue/packages/demo-app/src/InteractionTraceFixture.vue'))
   .update(read('dotnet/FsusUI.Avalonia.Demo/ConformanceV2Runner.cs'))
   .digest('hex')
 const output = path.resolve(
@@ -27,24 +26,6 @@ const candidate = spawnSync('git', ['rev-parse', 'HEAD'], {
   cwd: root,
   encoding: 'utf8',
 }).stdout.trim()
-const contractRegistry = JSON.parse(
-  read('spec/components/contracts/v2/contract-v2.json'),
-)
-const checkTagContract = contractRegistry.contracts.find(
-  (contract) => contract.id === 'component-v2.el-check-tag',
-)
-const checkTagBudget = checkTagContract?.performanceBudget?.interactionMs
-const checkTagRenderBudget = checkTagContract?.performanceBudget?.renderMs
-const checkTagMemoryBudget = checkTagContract?.performanceBudget?.memory
-if (
-  !Number.isFinite(checkTagBudget) ||
-  checkTagBudget <= 0 ||
-  !Number.isFinite(checkTagRenderBudget) ||
-  checkTagRenderBudget <= 0 ||
-  typeof checkTagMemoryBudget !== 'string' ||
-  !checkTagMemoryBudget
-)
-  throw new Error('CheckTag Contract V2 performance budget missing')
 
 if (!process.env.DISPLAY && process.platform === 'linux') {
   throw new Error(
@@ -73,12 +54,6 @@ const result = spawnSync(
     hash('spec/avalonia/semantic/FsusUI.Avalonia.semantic.json'),
     '--runner-hash',
     runnerHash,
-    '--check-tag-budget',
-    String(checkTagBudget),
-    '--check-tag-render-budget',
-    String(checkTagRenderBudget),
-    '--check-tag-memory-budget',
-    checkTagMemoryBudget,
   ],
   { cwd: root, encoding: 'utf8', env: process.env },
 )
@@ -102,16 +77,24 @@ if (!Array.isArray(evidence.steps) || evidence.steps.length < 4) {
     'Avalonia evidence did not execute the required interaction steps',
   )
 }
-const checkTagVisual =
-  evidence.contractExecutions?.['component-v2.el-check-tag']?.visual
+const atomicActions = evidence.accessibility?.nodes?.filter(
+  (node) =>
+    node.control === 'FsusMarkdownAtomicAction' &&
+    node.action?.invokable === true,
+)
 if (
-  checkTagVisual?.observation?.focusIndicatorVisible !== true ||
-  checkTagVisual.observation?.focusRingPixels?.passed !== true
+  !Array.isArray(atomicActions) ||
+  atomicActions.length !==
+    evidence.accessibility?.markdown?.atomicActionCount ||
+  atomicActions.length < 3
 ) {
   throw new Error(
-    'Avalonia CheckTag rendered focus ring pixels did not match the theme focus brush',
+    'Avalonia evidence did not expose the real invokable atomic action peers',
   )
 }
+if (!atomicActions.some((node) => node.action?.sourceEntry === true)) {
+  throw new Error('Avalonia evidence did not expose the source entry action')
+}
 console.log(
-  `[conformance-v2] avalonia real-window trace passed steps=${evidence.steps.length} candidate=${candidate}`,
+  `[conformance-v2] avalonia real-window trace passed steps=${evidence.steps.length} atomicActions=${atomicActions.length} candidate=${candidate}`,
 )

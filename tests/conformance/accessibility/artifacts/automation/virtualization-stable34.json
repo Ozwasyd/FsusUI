@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "virtualization-stable34",
     "component": "virtual-list",
     "platform": "avalonia",
     "control": "FsusVirtualList",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "list",
     "accessibleName": "Activity stream",
     "value": "100000 items, fixed and variable size, focus retained during recycle",

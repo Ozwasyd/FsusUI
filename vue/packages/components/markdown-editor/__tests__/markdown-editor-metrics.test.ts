@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
 
 import { createMarkdownSourceCoordinateMap } from '../../../wasm/markdown-runtime'
 import {
@@ -62,8 +63,126 @@ describe('markdown editor locale-aware source metrics', () => {
       change: { from: large.length, to: large.length, insert: '!' },
       selection: { start: next.length, end: next.length },
     })
-    expect(incremental.scannedCodeUnits).toBeLessThan(next.length)
+    expect(incremental.scannedCodeUnits).toBeLessThan(64)
     expect(incremental.codeUnitLength).toBe(next.length)
+  })
+
+  it('bounds a middle edit in a 100k no-space CJK source', () => {
+    const source = '你'.repeat(100_000)
+    const session = createMarkdownEditorMetricsSession({ locale: 'zh-CN' })
+    session.calculate(source)
+    const next = `${source.slice(0, 50_000)}好${source.slice(50_000)}`
+    const incremental = session.calculate(next, {
+      change: { from: 50_000, insert: '好', to: 50_000 },
+    })
+    const full = calculateMarkdownEditorMetrics(next, { locale: 'zh-CN' })
+
+    expect(incremental.scannedCodeUnits).toBeLessThan(4_096)
+    expect({ ...incremental, scannedCodeUnits: 0 }).toEqual({
+      ...full,
+      scannedCodeUnits: 0,
+    })
+  })
+
+  it('expands bounded context until locale word segmentation converges', () => {
+    let seed = 0x272434
+    const random = () => {
+      seed = (seed * 1_664_525 + 1_013_904_223) >>> 0
+      return seed / 0x1_0000_0000
+    }
+    const inserts = [
+      '你',
+      '好',
+      '😀',
+      '👨‍👩‍👧‍👦',
+      'e\u0301',
+      '\r\n',
+      ' ',
+      'مرحبا',
+      '',
+      'ไทย',
+    ]
+    let source = `${'你'.repeat(100_000)}\r\nمرحبا 😀 e\u0301`
+    let target = { from: 0, insert: '', to: 0 }
+    for (let index = 0; index <= 879; index += 1) {
+      const from = Math.floor(random() * (source.length + 1))
+      const to =
+        from +
+        Math.min(source.length - from, Math.floor(random() * 4))
+      const insert = inserts[Math.floor(random() * inserts.length)]!
+      random()
+      target = { from, insert, to }
+      if (index === 879) break
+      source = `${source.slice(0, from)}${insert}${source.slice(to)}`
+    }
+    const session = createMarkdownEditorMetricsSession({ locale: 'zh-CN' })
+    session.calculate(source)
+    const next = `${source.slice(0, target.from)}${target.insert}${source.slice(target.to)}`
+    const incremental = session.calculate(next, { change: target })
+    const full = calculateMarkdownEditorMetrics(next, { locale: 'zh-CN' })
+
+    expect(incremental.scannedCodeUnits).toBeLessThan(4_096)
+    expect({ ...incremental, scannedCodeUnits: 0 }).toEqual({
+      ...full,
+      scannedCodeUnits: 0,
+    })
+  })
+
+  it('matches a full calculation across word, Unicode, newline, byte, and selection boundaries', () => {
+    const options = { includeBytes: true, locale: 'en' }
+    const session = createMarkdownEditorMetricsSession(options)
+    let source = 'alpha beta\r\nemoji 👨‍👩‍👧‍👦\nlast'
+    session.calculate(source, options)
+    const changes = [
+      { from: 5, to: 6, insert: '' },
+      { from: 5, to: 5, insert: ' ' },
+      { from: 10, to: 12, insert: '\n' },
+      { from: 0, to: 0, insert: '😀 ' },
+    ]
+    for (const change of changes) {
+      const next = `${source.slice(0, change.from)}${change.insert}${source.slice(change.to)}`
+      const selection = {
+        start: Math.min(2, next.length),
+        end: next.length,
+        direction: 'backward' as const,
+      }
+      const incremental = session.calculate(next, { ...options, change, selection })
+      const full = calculateMarkdownEditorMetrics(next, { ...options, selection })
+      expect({ ...incremental, scannedCodeUnits: 0 }).toEqual({
+        ...full,
+        scannedCodeUnits: 0,
+      })
+      source = next
+    }
+
+    const unchanged = session.calculate(source, {
+      ...options,
+      change: { from: 0, to: 0, insert: '' },
+      selection: { start: 0, end: 0 },
+    })
+    expect(unchanged.scannedCodeUnits).toBe(0)
+    expect(unchanged.caretLine).toBe(1)
+  })
+
+  it('keeps the incremental branch free of whole-source reconstruction or line rescans', () => {
+    const implementation = readFileSync(
+      'vue/packages/components/markdown-editor/src/markdown-editor-metrics.ts',
+      'utf8',
+    )
+    const incrementalStart = implementation.indexOf(
+      'const mode = segmenterMode(merged)',
+    )
+    const incrementalBranch = implementation.slice(
+      incrementalStart,
+      implementation.indexOf(
+        'return metrics\n  }\n\n  return {',
+        incrementalStart,
+      ),
+    )
+    expect(incrementalBranch).not.toContain('lineStartsInRaw(next)')
+    expect(incrementalBranch).not.toContain('source.slice(0, change.from)')
+    expect(incrementalBranch).not.toContain('source.slice(change.to)')
+    expect(incrementalBranch).toContain('updateLineStarts')
   })
 
   it('kills whitespace-only words, normalized offsets, code-unit characters, and full rescan', () => {

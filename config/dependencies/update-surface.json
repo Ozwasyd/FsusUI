@@ -64,11 +64,25 @@
       "manager": "github-actions",
       "files": [
         ".github/workflows/_avalonia-aot-leaf.yml",
+        ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
+      ],
+      "versioning": "docker",
+      "group": "github-actions",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-action-actions-create-github-app-token",
+      "datasource": "github-tags",
+      "packageName": "actions/create-github-app-token",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_fsusblog-consumer-gate.yml"
       ],
       "versioning": "docker",
       "group": "github-actions",
@@ -81,6 +95,7 @@
       "manager": "github-actions",
       "files": [
         ".github/workflows/_avalonia-aot-leaf.yml",
+        ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml"
@@ -109,8 +124,10 @@
       "packageName": "actions/setup-node",
       "manager": "github-actions",
       "files": [
+        ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
@@ -127,8 +144,10 @@
       "files": [
         ".github/actions/readiness-manifest/action.yml",
         ".github/workflows/_avalonia-aot-leaf.yml",
+        ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml"
       ],
       "versioning": "docker",
@@ -155,8 +174,10 @@
       "packageName": "pnpm/action-setup",
       "manager": "github-actions",
       "files": [
+        ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"
@@ -171,8 +192,10 @@
       "packageName": "actions/node-versions",
       "manager": "github-actions",
       "files": [
+        ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
+        ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml"

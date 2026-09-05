@@ -1,0 +1,3620 @@
+{
+  "schema": "fsusui.markdown-editor-input-vectors.v1",
+  "contract": "markdown-editor-input@2026-08-15",
+  "blockInput": [
+    {
+      "id": "paragraph-enter-middle",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 5,
+        "start": 5
+      },
+      "source": "hello world",
+      "projection": {
+        "nodes": [
+          {
+            "end": 11,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "middle",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 5,
+              "to": 5,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 6,
+            "end": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "paragraph-enter-end",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 5,
+        "start": 5
+      },
+      "source": "hello",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "document-end",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 5,
+              "to": 5,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 6,
+            "end": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "paragraph-shift-enter-middle",
+      "key": "shift-enter",
+      "selection": {
+        "direction": "none",
+        "end": 5,
+        "start": 5
+      },
+      "source": "hello world",
+      "projection": {
+        "nodes": [
+          {
+            "end": 11,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "shift-enter",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "middle",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 5,
+              "to": 5,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 6,
+            "end": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "paragraph-backspace-middle",
+      "key": "backspace",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "hello",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "backspace",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "middle",
+          "action": "delete-backward"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 1,
+              "to": 2,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 1,
+            "end": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "paragraph-delete-middle",
+      "key": "delete",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "hello",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "delete",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "middle",
+          "action": "delete-forward"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 3,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 2,
+            "end": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "paragraph-tab",
+      "key": "tab",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "hello",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "tab",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "middle",
+          "action": "passthrough-tab"
+        },
+        "transaction": null
+      }
+    },
+    {
+      "id": "paragraph-document-start-backspace",
+      "key": "backspace",
+      "selection": {
+        "direction": "none",
+        "end": 0,
+        "start": 0
+      },
+      "source": "abc",
+      "projection": {
+        "nodes": [
+          {
+            "end": 3,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "backspace",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "document-start",
+          "action": "merge-previous"
+        },
+        "transaction": null
+      }
+    },
+    {
+      "id": "paragraph-document-end-delete",
+      "key": "delete",
+      "selection": {
+        "direction": "none",
+        "end": 3,
+        "start": 3
+      },
+      "source": "abc",
+      "projection": {
+        "nodes": [
+          {
+            "end": 3,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "delete",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "document-end",
+          "action": "merge-next"
+        },
+        "transaction": null
+      }
+    },
+    {
+      "id": "paragraph-selection-enter",
+      "key": "enter",
+      "selection": {
+        "direction": "forward",
+        "end": 5,
+        "start": 0
+      },
+      "source": "hello world",
+      "projection": {
+        "nodes": [
+          {
+            "end": 11,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "document-start",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 5,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 1,
+            "end": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "heading-enter-end",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 7,
+        "start": 7
+      },
+      "source": "# Title",
+      "projection": {
+        "nodes": [
+          {
+            "end": 7,
+            "id": "syn:editor:0:heading:0",
+            "kind": "heading",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "heading",
+          "nodeId": "syn:editor:0:heading:0",
+          "position": "document-end",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 7,
+              "to": 7,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 8,
+            "end": 8
+          }
+        }
+      }
+    },
+    {
+      "id": "heading-backspace-after-marker",
+      "key": "backspace",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "# Title",
+      "projection": {
+        "nodes": [
+          {
+            "end": 7,
+            "id": "syn:editor:0:heading:0",
+            "kind": "heading",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "backspace",
+          "context": "heading",
+          "nodeId": "syn:editor:0:heading:0",
+          "position": "start",
+          "action": "merge-previous"
+        },
+        "transaction": null
+      }
+    },
+    {
+      "id": "list-enter-content",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 6,
+        "start": 6
+      },
+      "source": "- item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "list",
+          "nodeId": "syn:editor:0:list:0",
+          "position": "document-end",
+          "action": "continue-list"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 6,
+              "to": 6,
+              "insert": "\n- "
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 9,
+            "end": 9
+          }
+        }
+      }
+    },
+    {
+      "id": "list-enter-empty",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "- ",
+      "projection": {
+        "nodes": [
+          {
+            "end": 2,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "list",
+          "nodeId": "syn:editor:0:list:0",
+          "position": "empty",
+          "action": "exit-list"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 2,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 0,
+            "end": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "list-tab-indent",
+      "key": "tab",
+      "selection": {
+        "direction": "none",
+        "end": 6,
+        "start": 6
+      },
+      "source": "- item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "tab",
+          "context": "list",
+          "nodeId": "syn:editor:0:list:0",
+          "position": "document-end",
+          "action": "indent-list"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 6,
+              "insert": "  - item"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 8,
+            "end": 8
+          }
+        }
+      }
+    },
+    {
+      "id": "list-shift-tab-outdent",
+      "key": "shift-tab",
+      "selection": {
+        "direction": "none",
+        "end": 8,
+        "start": 8
+      },
+      "source": "  - item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 8,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "shift-tab",
+          "context": "list",
+          "nodeId": "syn:editor:0:list:0",
+          "position": "document-end",
+          "action": "outdent-list"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 8,
+              "insert": "- item"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 6,
+            "end": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "list-backspace-strip-marker",
+      "key": "backspace",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "- item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "backspace",
+          "context": "list",
+          "nodeId": "syn:editor:0:list:0",
+          "position": "start",
+          "action": "strip-marker"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 2,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 0,
+            "end": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "task-enter-content",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 10,
+        "start": 10
+      },
+      "source": "- [ ] todo",
+      "projection": {
+        "nodes": [
+          {
+            "end": 10,
+            "id": "syn:editor:0:task:0",
+            "kind": "task",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "task",
+          "nodeId": "syn:editor:0:task:0",
+          "position": "document-end",
+          "action": "continue-list"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 10,
+              "to": 10,
+              "insert": "\n- [ ] "
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 17,
+            "end": 17
+          }
+        }
+      }
+    },
+    {
+      "id": "task-enter-empty",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 6,
+        "start": 6
+      },
+      "source": "- [ ] ",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:task:0",
+            "kind": "task",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "task",
+          "nodeId": "syn:editor:0:task:0",
+          "position": "empty",
+          "action": "exit-list"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 6,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 0,
+            "end": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "quote-enter-content",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 8,
+        "start": 8
+      },
+      "source": "> quoted",
+      "projection": {
+        "nodes": [
+          {
+            "end": 8,
+            "id": "syn:editor:0:quote:0",
+            "kind": "quote",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "quote",
+          "nodeId": "syn:editor:0:quote:0",
+          "position": "document-end",
+          "action": "continue-quote"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 8,
+              "to": 8,
+              "insert": "\n> "
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 11,
+            "end": 11
+          }
+        }
+      }
+    },
+    {
+      "id": "quote-enter-empty",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "> ",
+      "projection": {
+        "nodes": [
+          {
+            "end": 2,
+            "id": "syn:editor:0:quote:0",
+            "kind": "quote",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "quote",
+          "nodeId": "syn:editor:0:quote:0",
+          "position": "empty",
+          "action": "exit-quote"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 2,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 0,
+            "end": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "quote-backspace-strip-marker",
+      "key": "backspace",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "> quoted",
+      "projection": {
+        "nodes": [
+          {
+            "end": 8,
+            "id": "syn:editor:0:quote:0",
+            "kind": "quote",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "backspace",
+          "context": "quote",
+          "nodeId": "syn:editor:0:quote:0",
+          "position": "start",
+          "action": "strip-marker"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 2,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 0,
+            "end": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "code-enter",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 15,
+        "start": 15
+      },
+      "source": "```js\nconst a = 1\n```",
+      "projection": {
+        "nodes": [
+          {
+            "end": 21,
+            "id": "syn:editor:0:code:0",
+            "kind": "code",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "code",
+          "nodeId": "syn:editor:0:code:0",
+          "position": "middle",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 15,
+              "to": 15,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 16,
+            "end": 16
+          }
+        }
+      }
+    },
+    {
+      "id": "code-tab-insert-spaces",
+      "key": "tab",
+      "selection": {
+        "direction": "none",
+        "end": 15,
+        "start": 15
+      },
+      "source": "```js\nconst a = 1\n```",
+      "projection": {
+        "nodes": [
+          {
+            "end": 21,
+            "id": "syn:editor:0:code:0",
+            "kind": "code",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "tab",
+          "context": "code",
+          "nodeId": "syn:editor:0:code:0",
+          "position": "middle",
+          "action": "insert-spaces"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 15,
+              "to": 15,
+              "insert": "  "
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 17,
+            "end": 17
+          }
+        }
+      }
+    },
+    {
+      "id": "table-enter-cell",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 12,
+        "start": 12
+      },
+      "source": "| a | b |\n| - | - |\n| 1 | 2 |",
+      "projection": {
+        "nodes": [
+          {
+            "end": 29,
+            "id": "syn:editor:0:table:0",
+            "kind": "table",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "table",
+          "nodeId": "syn:editor:0:table:0",
+          "position": "middle",
+          "action": "table-hook"
+        },
+        "transaction": null
+      }
+    },
+    {
+      "id": "atomic-enter-image",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 11,
+        "start": 11
+      },
+      "source": "text ![alt](u) more",
+      "projection": {
+        "nodes": [
+          {
+            "end": 19,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          },
+          {
+            "end": 14,
+            "id": "syn:editor:0:image:0",
+            "kind": "image",
+            "start": 5
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "atomic",
+          "nodeId": "syn:editor:0:image:0",
+          "position": "middle",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 11,
+              "to": 11,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 12,
+            "end": 12
+          }
+        }
+      }
+    },
+    {
+      "id": "list-enter-composing",
+      "composing": true,
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 6,
+        "start": 6
+      },
+      "source": "- item",
+      "projection": {
+        "nodes": [
+          {
+            "end": 6,
+            "id": "syn:editor:0:list:0",
+            "kind": "list",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "list",
+          "nodeId": "syn:editor:0:list:0",
+          "position": "document-end",
+          "action": "noop"
+        },
+        "transaction": null,
+        "rejected": "composition-active"
+      }
+    },
+    {
+      "id": "multiline-tab-indent-selection",
+      "key": "tab",
+      "selection": {
+        "direction": "forward",
+        "end": 5,
+        "start": 0
+      },
+      "source": "a\nb\nc",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "tab",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "document-start",
+          "action": "indent-selection"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 5,
+              "insert": "  a\n  b\n  c"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "forward",
+            "start": 0,
+            "end": 11
+          }
+        }
+      }
+    },
+    {
+      "id": "multiline-shift-tab-outdent-selection",
+      "key": "shift-tab",
+      "selection": {
+        "direction": "forward",
+        "end": 11,
+        "start": 0
+      },
+      "source": "  a\n  b\n  c",
+      "projection": {
+        "nodes": [
+          {
+            "end": 11,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "shift-tab",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "document-start",
+          "action": "outdent-selection"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 11,
+              "insert": "a\nb\nc"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "forward",
+            "start": 0,
+            "end": 5
+          }
+        }
+      }
+    },
+    {
+      "id": "cjk-enter-middle",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "你好世界",
+      "projection": {
+        "nodes": [
+          {
+            "end": 4,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "middle",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "emoji-zwj-backspace-end",
+      "key": "backspace",
+      "selection": {
+        "direction": "none",
+        "end": 8,
+        "start": 8
+      },
+      "source": "👨‍👩‍👧",
+      "projection": {
+        "nodes": [
+          {
+            "end": 8,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "backspace",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "document-end",
+          "action": "delete-backward"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 8,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 0,
+            "end": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "combining-delete",
+      "key": "delete",
+      "selection": {
+        "direction": "none",
+        "end": 1,
+        "start": 1
+      },
+      "source": "éx",
+      "projection": {
+        "nodes": [
+          {
+            "end": 3,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "delete",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "middle",
+          "action": "delete-forward"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 1,
+              "to": 2,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 1,
+            "end": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "rtl-enter-middle",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 5,
+        "start": 5
+      },
+      "source": "שלום עולם",
+      "projection": {
+        "nodes": [
+          {
+            "end": 9,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "middle",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 5,
+              "to": 5,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 6,
+            "end": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "bom-crlf-enter",
+      "key": "enter",
+      "selection": {
+        "direction": "none",
+        "end": 5,
+        "start": 5
+      },
+      "source": "﻿a\r\nb",
+      "projection": {
+        "nodes": [
+          {
+            "end": 5,
+            "id": "syn:editor:0:paragraph:0",
+            "kind": "paragraph",
+            "start": 0
+          }
+        ]
+      },
+      "expected": {
+        "intent": {
+          "key": "enter",
+          "context": "paragraph",
+          "nodeId": "syn:editor:0:paragraph:0",
+          "position": "document-end",
+          "action": "insert-break"
+        },
+        "transaction": {
+          "changes": [
+            {
+              "from": 5,
+              "to": 5,
+              "insert": "\n"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 6,
+            "end": 6
+          }
+        }
+      }
+    }
+  ],
+  "pairInput": [
+    {
+      "id": "pair-star-collapsed",
+      "inserted": "*",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "**"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-backtick-collapsed",
+      "inserted": "`",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "``"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-paren-collapsed",
+      "inserted": "(",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "()"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-bracket-collapsed",
+      "inserted": "[",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "[]"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-brace-collapsed",
+      "inserted": "{",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "{}"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-double-quote-collapsed",
+      "inserted": "\"",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "\"\""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-skip-close-star",
+      "inserted": "*",
+      "selection": {
+        "direction": "none",
+        "end": 1,
+        "start": 1
+      },
+      "source": "a*b",
+      "expected": {
+        "action": "skip-close",
+        "transaction": {
+          "changes": [
+            {
+              "from": 1,
+              "to": 1,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 2,
+            "end": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-skip-close-paren",
+      "inserted": ")",
+      "selection": {
+        "direction": "none",
+        "end": 3,
+        "start": 3
+      },
+      "source": "a(b)",
+      "expected": {
+        "action": "skip-close",
+        "transaction": {
+          "changes": [
+            {
+              "from": 3,
+              "to": 3,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 4,
+            "end": 4
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-fence-trigger",
+      "inserted": "`",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "``",
+      "expected": {
+        "action": "insert-fence",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "`\n\n```"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 4,
+            "end": 4
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-apostrophe-after-word",
+      "inserted": "'",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "passthrough",
+        "transaction": null
+      }
+    },
+    {
+      "id": "pair-link-destination-disabled",
+      "inserted": "(",
+      "selection": {
+        "direction": "none",
+        "end": 5,
+        "start": 5
+      },
+      "source": "[a](url)",
+      "expected": {
+        "action": "passthrough",
+        "transaction": null,
+        "rejected": "disabled-context"
+      }
+    },
+    {
+      "id": "pair-backspace-inside-star",
+      "key": "backspace",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "a**b",
+      "expected": {
+        "action": "delete-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 1,
+              "to": 3,
+              "insert": ""
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 1,
+            "end": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-wrap-selection-star",
+      "inserted": "*",
+      "selection": {
+        "direction": "forward",
+        "end": 5,
+        "start": 0
+      },
+      "source": "hello",
+      "expected": {
+        "action": "wrap",
+        "transaction": {
+          "changes": [
+            {
+              "from": 0,
+              "to": 5,
+              "insert": "*hello*"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "forward",
+            "start": 1,
+            "end": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-composing",
+      "composing": true,
+      "inserted": "*",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "passthrough",
+        "transaction": null,
+        "rejected": "composition-active"
+      }
+    },
+    {
+      "id": "pair-readonly",
+      "inserted": "*",
+      "readonly": true,
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "passthrough",
+        "transaction": null,
+        "rejected": "readonly"
+      }
+    },
+    {
+      "id": "pair-preview-mode",
+      "inserted": "*",
+      "mode": "preview",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "passthrough",
+        "transaction": null,
+        "rejected": "preview"
+      }
+    },
+    {
+      "id": "pair-cjk-adjacent",
+      "inserted": "(",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "你好",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "()"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-emoji-adjacent",
+      "inserted": "*",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "👍",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "to": 2,
+              "insert": "**"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 3,
+            "end": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-inside-code-span",
+      "inserted": "*",
+      "selection": {
+        "direction": "none",
+        "end": 4,
+        "start": 4
+      },
+      "source": "`code`",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 4,
+              "to": 4,
+              "insert": "**"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 5,
+            "end": 5
+          }
+        }
+      }
+    },
+    {
+      "id": "pair-word-boundary-strong",
+      "inserted": "*",
+      "selection": {
+        "direction": "none",
+        "end": 3,
+        "start": 3
+      },
+      "source": "abc",
+      "expected": {
+        "action": "insert-pair",
+        "transaction": {
+          "changes": [
+            {
+              "from": 3,
+              "to": 3,
+              "insert": "**"
+            }
+          ],
+          "history": "separate",
+          "origin": "input",
+          "selection": {
+            "direction": "none",
+            "start": 4,
+            "end": 4
+          }
+        }
+      }
+    }
+  ],
+  "clipboard": [
+    {
+      "id": "clipboard-markdown-mime-wins",
+      "items": [
+        {
+          "text": "**md**",
+          "type": "text/markdown"
+        },
+        {
+          "text": "plain",
+          "type": "text/plain"
+        }
+      ],
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "markdown-source",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:markdown-source:text/markdown:2:2:0:x37sw",
+        "insert": "**md**",
+        "mime": "text/markdown",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "insert": "**md**",
+              "to": 2
+            }
+          ],
+          "history": "separate",
+          "metadata": {
+            "clipboard": "paste",
+            "identity": "clipboard:paste:markdown-source:text/markdown:2:2:0:x37sw",
+            "mime": "text/markdown"
+          },
+          "origin": "paste",
+          "selection": {
+            "direction": "none",
+            "end": 8,
+            "start": 8
+          }
+        }
+      }
+    },
+    {
+      "id": "clipboard-html-with-plain",
+      "items": [
+        {
+          "text": "<b>x</b>",
+          "type": "text/html"
+        },
+        {
+          "text": "x",
+          "type": "text/plain"
+        }
+      ],
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "plain-text",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:plain-text:text/plain:2:2:0:1y7mkjr",
+        "insert": "x",
+        "mime": "text/plain",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "insert": "x",
+              "to": 2
+            }
+          ],
+          "history": "separate",
+          "metadata": {
+            "clipboard": "paste",
+            "identity": "clipboard:paste:plain-text:text/plain:2:2:0:1y7mkjr",
+            "mime": "text/plain"
+          },
+          "origin": "paste",
+          "selection": {
+            "direction": "none",
+            "end": 3,
+            "start": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "clipboard-plain-only",
+      "items": [
+        {
+          "text": "plain",
+          "type": "text/plain"
+        }
+      ],
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "plain-text",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:plain-text:text/plain:2:2:0:1mr1k6f",
+        "insert": "plain",
+        "mime": "text/plain",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "insert": "plain",
+              "to": 2
+            }
+          ],
+          "history": "separate",
+          "metadata": {
+            "clipboard": "paste",
+            "identity": "clipboard:paste:plain-text:text/plain:2:2:0:1mr1k6f",
+            "mime": "text/plain"
+          },
+          "origin": "paste",
+          "selection": {
+            "direction": "none",
+            "end": 7,
+            "start": 7
+          }
+        }
+      }
+    },
+    {
+      "id": "clipboard-file-attachment-intent",
+      "files": [
+        {
+          "name": "a.png",
+          "size": 10,
+          "type": "image/png"
+        }
+      ],
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "attachment-intent",
+        "attachmentIntent": {
+          "files": [
+            {
+              "name": "a.png",
+              "size": 10,
+              "type": "image/png"
+            }
+          ],
+          "kind": "attachment",
+          "origin": "paste",
+          "selection": {
+            "direction": "none",
+            "end": 2,
+            "start": 2
+          }
+        },
+        "identity": "clipboard:paste:attachment-intent:files:2:2:0:1ufcp1n",
+        "insert": "",
+        "mime": "files",
+        "transaction": null
+      }
+    },
+    {
+      "id": "clipboard-composing",
+      "composing": true,
+      "items": [
+        {
+          "text": "x",
+          "type": "text/plain"
+        }
+      ],
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "noop",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:reject:none:2:2:0:izqfqm",
+        "insert": "",
+        "mime": null,
+        "rejected": "composition-active",
+        "transaction": null
+      }
+    },
+    {
+      "id": "clipboard-stale-revision",
+      "expectedRevision": 0,
+      "items": [
+        {
+          "text": "x",
+          "type": "text/plain"
+        }
+      ],
+      "revision": 3,
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "noop",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:reject:none:2:2:3:1y0tbao",
+        "insert": "",
+        "mime": null,
+        "rejected": "stale-document",
+        "transaction": null
+      }
+    },
+    {
+      "id": "clipboard-readonly",
+      "items": [
+        {
+          "text": "x",
+          "type": "text/plain"
+        }
+      ],
+      "readonly": true,
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "noop",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:reject:none:2:2:0:1l654hj",
+        "insert": "",
+        "mime": null,
+        "rejected": "readonly",
+        "transaction": null
+      }
+    },
+    {
+      "id": "clipboard-disabled",
+      "disabled": true,
+      "items": [
+        {
+          "text": "x",
+          "type": "text/plain"
+        }
+      ],
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "noop",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:reject:none:2:2:0:eex8g5",
+        "insert": "",
+        "mime": null,
+        "rejected": "disabled",
+        "transaction": null
+      }
+    },
+    {
+      "id": "clipboard-drop-origin",
+      "items": [
+        {
+          "text": "x",
+          "type": "text/plain"
+        }
+      ],
+      "origin": "drop",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "plain-text",
+        "attachmentIntent": null,
+        "identity": "clipboard:drop:plain-text:text/plain:2:2:0:1y7mkjr",
+        "insert": "x",
+        "mime": "text/plain",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "insert": "x",
+              "to": 2
+            }
+          ],
+          "history": "separate",
+          "metadata": {
+            "clipboard": "drop",
+            "identity": "clipboard:drop:plain-text:text/plain:2:2:0:1y7mkjr",
+            "mime": "text/plain"
+          },
+          "origin": "drop",
+          "selection": {
+            "direction": "none",
+            "end": 3,
+            "start": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "clipboard-cjk-emoji-rtl-bom",
+      "items": [
+        {
+          "text": "你好👨‍👩‍👧שלום﻿\r\n",
+          "type": "text/markdown"
+        }
+      ],
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "markdown-source",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:markdown-source:text/markdown:2:2:0:1yeoc0m",
+        "insert": "你好👨‍👩‍👧שלום﻿\r\n",
+        "mime": "text/markdown",
+        "transaction": {
+          "changes": [
+            {
+              "from": 2,
+              "insert": "你好👨‍👩‍👧שלום﻿\r\n",
+              "to": 2
+            }
+          ],
+          "history": "separate",
+          "metadata": {
+            "clipboard": "paste",
+            "identity": "clipboard:paste:markdown-source:text/markdown:2:2:0:1yeoc0m",
+            "mime": "text/markdown"
+          },
+          "origin": "paste",
+          "selection": {
+            "direction": "none",
+            "end": 19,
+            "start": 19
+          }
+        }
+      }
+    },
+    {
+      "id": "clipboard-max-units-exceeded",
+      "items": [
+        {
+          "text": "abcdef",
+          "type": "text/plain"
+        }
+      ],
+      "maxPasteUnits": 3,
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "noop",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:reject:none:2:2:0:10vvmc2",
+        "insert": "",
+        "mime": null,
+        "rejected": "budget-exceeded",
+        "transaction": null
+      }
+    },
+    {
+      "id": "clipboard-empty-noop",
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "noop",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:noop:none:2:2:0:ztntfp",
+        "insert": "",
+        "mime": null,
+        "rejected": "empty",
+        "transaction": null
+      }
+    },
+    {
+      "id": "clipboard-document-switch-rejects-old-identity",
+      "currentIdentity": {
+        "epoch": 2,
+        "id": "doc-b"
+      },
+      "documentIdentity": {
+        "epoch": 1,
+        "id": "doc-a"
+      },
+      "items": [
+        {
+          "text": "x",
+          "type": "text/plain"
+        }
+      ],
+      "selection": {
+        "direction": "none",
+        "end": 2,
+        "start": 2
+      },
+      "source": "ab",
+      "expected": {
+        "action": "noop",
+        "attachmentIntent": null,
+        "identity": "clipboard:paste:reject:none:2:2:0:1y0tbao",
+        "insert": "",
+        "mime": null,
+        "rejected": "stale-document",
+        "transaction": null
+      }
+    }
+  ],
+  "composition": [
+    {
+      "id": "composition-cjk-commit",
+      "identity": {
+        "epoch": 1,
+        "id": "doc"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "n",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "ni",
+          "kind": "compositionupdate",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "nih",
+          "kind": "compositionupdate",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "你好",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "你好",
+          "inputType": "insertCompositionText",
+          "isComposing": false,
+          "kind": "input",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "你好"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1r3nbqt",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:jk6j5b",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1r1ztdp",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:rsk86j",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "dedup",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:rsk86j",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": true,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:1r3nbqt",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "ignore",
+              "identity": "native:jk6j5b",
+              "kind": "compositionupdate",
+              "phase": "composing"
+            },
+            {
+              "action": "ignore",
+              "identity": "native:1r1ztdp",
+              "kind": "compositionupdate",
+              "phase": "composing"
+            },
+            {
+              "action": "commit",
+              "identity": "native:rsk86j",
+              "kind": "compositionend",
+              "phase": "idle"
+            },
+            {
+              "action": "dedup",
+              "identity": "native:rsk86j",
+              "inputType": "insertCompositionText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-cancel",
+      "identity": {
+        "epoch": 1,
+        "id": "doc"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "n",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "ni",
+          "kind": "compositionupdate",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "x",
+          "inputType": "insertText",
+          "kind": "beforeinput",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "x",
+          "inputType": "insertText",
+          "kind": "input",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 1,
+            "start": 1
+          },
+          "value": "x"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1r3nbqt",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:jk6j5b",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1dgj554",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "committing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "snapshot",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:f7j1zy",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "committing",
+            "preventDefault": false,
+            "restoreDisplay": false,
+            "snapshot": {
+              "data": "x",
+              "inputType": "insertText",
+              "selection": {
+                "direction": "none",
+                "end": 0,
+                "start": 0
+              },
+              "value": ""
+            }
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:1abmdvj",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:1r3nbqt",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "ignore",
+              "identity": "native:jk6j5b",
+              "kind": "compositionupdate",
+              "phase": "composing"
+            },
+            {
+              "action": "ignore",
+              "identity": "native:1dgj554",
+              "kind": "compositionend",
+              "phase": "committing"
+            },
+            {
+              "action": "snapshot",
+              "identity": "native:f7j1zy",
+              "inputType": "insertText",
+              "kind": "beforeinput",
+              "phase": "committing"
+            },
+            {
+              "action": "commit",
+              "identity": "native:1abmdvj",
+              "inputType": "insertText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-stale-commit-after-document-switch",
+      "identity": {
+        "epoch": 1,
+        "id": "doc-a"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "n",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "currentIdentity": {
+            "epoch": 2,
+            "id": "doc-b"
+          },
+          "kind": "document-switch",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "other"
+        },
+        {
+          "data": "你",
+          "documentIdentity": {
+            "epoch": 1,
+            "id": "doc-a"
+          },
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1r3nbqt",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "abort",
+            "composition": false,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:1m8esb5",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "aborted",
+            "preventDefault": false,
+            "restoreDisplay": true
+          },
+          {
+            "action": "prevent",
+            "composition": false,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:945yh8",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "draining",
+            "preventDefault": true,
+            "rejected": "orphaned-composition",
+            "restoreDisplay": true
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "draining",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:1r3nbqt",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "abort",
+              "identity": "native:1m8esb5",
+              "kind": "document-switch",
+              "phase": "aborted"
+            },
+            {
+              "action": "prevent",
+              "identity": "native:945yh8",
+              "kind": "compositionend",
+              "phase": "draining",
+              "rejected": "orphaned-composition"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-emoji-zwj-commit",
+      "identity": {
+        "epoch": 1,
+        "id": "doc"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "👨",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "👨‍👩‍👧",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "👨‍👩‍👧",
+          "inputType": "insertCompositionText",
+          "kind": "input",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "👨‍👩‍👧"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:7jkduc",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:1m4dant",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "dedup",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:1m4dant",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": true,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:7jkduc",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "commit",
+              "identity": "native:1m4dant",
+              "kind": "compositionend",
+              "phase": "idle"
+            },
+            {
+              "action": "dedup",
+              "identity": "native:1m4dant",
+              "inputType": "insertCompositionText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-combining-commit",
+      "identity": {
+        "epoch": 1,
+        "id": "doc"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "e",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "é",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "é",
+          "inputType": "insertCompositionText",
+          "kind": "input",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "é"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:mcq4f4",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:ewsq06",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "dedup",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:ewsq06",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": true,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:mcq4f4",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "commit",
+              "identity": "native:ewsq06",
+              "kind": "compositionend",
+              "phase": "idle"
+            },
+            {
+              "action": "dedup",
+              "identity": "native:ewsq06",
+              "inputType": "insertCompositionText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-rtl-commit",
+      "identity": {
+        "epoch": 1,
+        "id": "doc"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "ש",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "שלום",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "שלום",
+          "inputType": "insertCompositionText",
+          "kind": "input",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "שלום"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:t8so24",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:3seygb",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "dedup",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:3seygb",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": true,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:t8so24",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "commit",
+              "identity": "native:3seygb",
+              "kind": "compositionend",
+              "phase": "idle"
+            },
+            {
+              "action": "dedup",
+              "identity": "native:3seygb",
+              "inputType": "insertCompositionText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-crlf-commit",
+      "identity": {
+        "epoch": 1,
+        "id": "doc"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "a",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "a\r\nb",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "a\r\nb",
+          "inputType": "insertCompositionText",
+          "kind": "input",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "a\r\nb"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:pl1j4k",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:fsdep6",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "dedup",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:fsdep6",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": true,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:pl1j4k",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "commit",
+              "identity": "native:fsdep6",
+              "kind": "compositionend",
+              "phase": "idle"
+            },
+            {
+              "action": "dedup",
+              "identity": "native:fsdep6",
+              "inputType": "insertCompositionText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-paste-rejected-while-composing",
+      "identity": {
+        "epoch": 1,
+        "id": "doc"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "n",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "clipboardIdentity": "native:clip1",
+          "data": "x",
+          "kind": "paste",
+          "origin": "paste",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "你",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "你",
+          "inputType": "insertCompositionText",
+          "kind": "input",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "你"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1r3nbqt",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "prevent",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1msjcmq",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": true,
+            "rejected": "composition-active",
+            "restoreDisplay": true
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:945yh8",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "dedup",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:945yh8",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": true,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:1r3nbqt",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "prevent",
+              "identity": "native:1msjcmq",
+              "kind": "paste",
+              "phase": "composing",
+              "rejected": "composition-active",
+              "revision": 0
+            },
+            {
+              "action": "commit",
+              "identity": "native:945yh8",
+              "kind": "compositionend",
+              "phase": "idle"
+            },
+            {
+              "action": "dedup",
+              "identity": "native:945yh8",
+              "inputType": "insertCompositionText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-undo-after-commit",
+      "identity": {
+        "epoch": 1,
+        "id": "doc"
+      },
+      "revision": 0,
+      "events": [
+        {
+          "data": "n",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "你好",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "你好",
+          "inputType": "insertCompositionText",
+          "kind": "input",
+          "revision": 0,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "你好"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1r3nbqt",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:rsk86j",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "dedup",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:rsk86j",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": true,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:1r3nbqt",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "commit",
+              "identity": "native:rsk86j",
+              "kind": "compositionend",
+              "phase": "idle"
+            },
+            {
+              "action": "dedup",
+              "identity": "native:rsk86j",
+              "inputType": "insertCompositionText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "composition-same-source-different-document",
+      "identity": {
+        "epoch": 7,
+        "id": "doc-b"
+      },
+      "revision": 2,
+      "events": [
+        {
+          "data": "n",
+          "kind": "compositionstart",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "你",
+          "kind": "compositionend",
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": ""
+        },
+        {
+          "data": "你",
+          "inputType": "insertCompositionText",
+          "kind": "input",
+          "revision": 2,
+          "selection": {
+            "direction": "none",
+            "end": 0,
+            "start": 0
+          },
+          "value": "你"
+        }
+      ],
+      "expected": {
+        "plans": [
+          {
+            "action": "ignore",
+            "composition": false,
+            "freezeSmartInput": true,
+            "history": "merge",
+            "identity": "native:1r3nbqt",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "composing",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "commit",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "separate",
+            "identity": "native:945yh8",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": false,
+            "restoreDisplay": false
+          },
+          {
+            "action": "dedup",
+            "composition": true,
+            "freezeSmartInput": false,
+            "history": "merge",
+            "identity": "native:945yh8",
+            "mergeDirection": "none",
+            "origin": "input",
+            "phase": "idle",
+            "preventDefault": true,
+            "restoreDisplay": false
+          }
+        ],
+        "final": {
+          "composing": false,
+          "freezeSmartInput": false,
+          "phase": "idle",
+          "trace": [
+            {
+              "action": "ignore",
+              "identity": "native:1r3nbqt",
+              "kind": "compositionstart",
+              "phase": "composing"
+            },
+            {
+              "action": "commit",
+              "identity": "native:945yh8",
+              "kind": "compositionend",
+              "phase": "idle"
+            },
+            {
+              "action": "dedup",
+              "identity": "native:945yh8",
+              "inputType": "insertCompositionText",
+              "kind": "input",
+              "phase": "idle",
+              "revision": 2
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

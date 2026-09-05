@@ -1317,6 +1317,9 @@ watch(
     props.cspNonce,
     props.features,
     heavyThemeRevision.value,
+    heavyDocumentContext?.documentKey(),
+    heavyDocumentContext?.documentEpoch(),
+    heavyDocumentContext?.revision(),
   ],
   () => {
     if (debounceTimer) {

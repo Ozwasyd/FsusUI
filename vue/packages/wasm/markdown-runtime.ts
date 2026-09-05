@@ -229,6 +229,9 @@ export {
   type MarkdownEditorSourceRange,
   type MarkdownEditorSyntaxCoverage,
   type MarkdownEditorSyntaxNode,
+  type MarkdownEditorTableAlignment,
+  type MarkdownEditorTableSyntaxProjection,
+  type MarkdownEditorTableSyntaxRow,
 } from './markdown-editor-projection'
 export {
   MARKDOWN_PROJECTION_ACCEPTANCE_SCALE,

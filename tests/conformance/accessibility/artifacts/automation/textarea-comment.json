@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "textarea-comment",
     "component": "textarea",
     "platform": "avalonia",
     "control": "FsusTextarea",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "text-input",
     "accessibleName": "Comment body",
     "value": "First line\nSecond line",

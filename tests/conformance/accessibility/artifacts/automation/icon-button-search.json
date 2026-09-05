@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "icon-button-search",
     "component": "icon-button",
     "platform": "avalonia",
     "control": "FsusIconButton",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "overrideId": "accessibility-automation-name-001",
     "role": "button",
     "accessibleName": "Search",

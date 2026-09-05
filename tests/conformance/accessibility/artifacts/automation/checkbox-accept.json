@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "checkbox-accept",
     "component": "checkbox",
     "platform": "avalonia",
     "control": "FsusCheckbox",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "checkbox",
     "accessibleName": "Accept terms",
     "value": null,

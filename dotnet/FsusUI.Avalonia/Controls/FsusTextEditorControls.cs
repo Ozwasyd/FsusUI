@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Input;
 using System.Globalization;
@@ -395,6 +396,9 @@ public class FsusTextEditor : ContentControl
       Preview.EstimatedRetainedBlockCount,
       Budget);
 
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new TextEditorAutomationPeer(this);
+
   protected ValueTask<bool> HandleKeyAsync(
     Key key,
     KeyModifiers modifiers = KeyModifiers.None)
@@ -584,9 +588,8 @@ public class FsusTextEditor : ContentControl
     FsusComponentClasses.Ensure(this, "fsus-preview-canceled", LastPreviewCanceled);
     AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(accessibleName, "Text editor"));
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Edit);
-    AutomationProperties.SetItemStatus(
-      this,
-      $"{PreviewStateName}, {text.Length.ToString(CultureInfo.InvariantCulture)} chars, selection {Selection.Start.ToString(CultureInfo.InvariantCulture)}-{Selection.End.ToString(CultureInfo.InvariantCulture)}, {PreviewStatus()}");
+    AutomationProperties.SetClassNameOverride(this, "TextEditor");
+    AutomationProperties.SetItemStatus(this, AutomationStatus);
   }
 
   private string PreviewStatus()
@@ -598,6 +601,16 @@ public class FsusTextEditor : ContentControl
 
     return "preview synced";
   }
+
+  private string AutomationStatus =>
+    $"{text.Length.ToString(CultureInfo.InvariantCulture)} chars, " +
+    $"selection {Selection.Start.ToString(CultureInfo.InvariantCulture)}-" +
+    $"{Selection.End.ToString(CultureInfo.InvariantCulture)}, " +
+    $"{PreviewStatus()}, " +
+    (CanUndo && CanRedo
+      ? "undo redo available"
+      : $"undo {(CanUndo ? "available" : "unavailable")}, " +
+        $"redo {(CanRedo ? "available" : "unavailable")}");
 
   private static List<FsusTextContentBlock> ParseBlocks(
     string source,
@@ -693,6 +706,23 @@ public class FsusTextEditor : ContentControl
     while (stack.Count > depth)
     {
       stack.RemoveAt(0);
+    }
+  }
+
+  private sealed class TextEditorAutomationPeer(FsusTextEditor owner)
+    : ControlAutomationPeer(owner), IValueProvider
+  {
+    public bool IsReadOnly => owner.IsReadOnly;
+
+    public string Value => owner.Text;
+
+    public void SetValue(string? value)
+    {
+      if (owner.IsReadOnly || !owner.IsEnabled)
+      {
+        throw new InvalidOperationException("Text editor is read-only.");
+      }
+      owner.SetText(value);
     }
   }
 

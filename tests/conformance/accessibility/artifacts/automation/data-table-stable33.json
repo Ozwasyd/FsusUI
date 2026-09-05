@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "data-table-stable33",
     "component": "data-table",
     "platform": "avalonia",
     "control": "FsusDataTable",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "grid",
     "accessibleName": "Release table",
     "value": "2 rows, 3 columns, score sorted descending, row 1 column 2",

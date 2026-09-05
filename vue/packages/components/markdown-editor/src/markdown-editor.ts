@@ -27,6 +27,7 @@ import type {
   MarkdownNativeWritingToolsMode,
   MarkdownSpellcheckMode,
 } from './markdown-editor-language-tools'
+import { createMarkdownTableCommands } from './markdown-editor-table-acceptance'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { buildProps, definePropType } from '@element-plus/utils'
 
@@ -686,6 +687,90 @@ export interface MarkdownEditorLocaleText {
     searchPlaceholder: string
     title: string
   }>
+  readonly search: Readonly<{
+    close: string
+    find: string
+    findAndReplaceAria: string
+    findAria: string
+    matchCase: string
+    nextMatch: string
+    noMatches: string
+    previousMatch: string
+    replace: string
+    replaceAll: string
+    replaceWithAria: string
+    results: (current: number, total: number) => string
+    toggleReplace: string
+    truncatedResults: (count: number) => string
+    useRegex: string
+    wholeWord: string
+  }>
+  readonly attachments: Readonly<{
+    actions: Readonly<Record<'cancel' | 'remove' | 'retry', string>>
+    region: string
+    unnamed: string
+    uploading: (name: string) => string
+    status: (name: string, status: string, percent: number) => string
+  }>
+  readonly imageProperties: Readonly<{
+    alt: string
+    apply: string
+    caption: string
+    copySource: string
+    copyVisible: string
+    destination: string
+    destinationRejected: (code: string) => string
+    open: string
+    region: string
+    removeCaption: string
+    removeImage: string
+    replace: string
+    source: string
+    title: string
+    updateRejected: (code: string) => string
+  }>
+  readonly embeds: Readonly<{
+    actions: Readonly<
+      Record<
+        | 'source-reveal'
+        | 'open-source'
+        | 'retry'
+        | 'copy'
+        | 'caret-before'
+        | 'caret-after'
+        | 'select-node'
+        | 'delete',
+        string
+      >
+    >
+    modes: Readonly<Record<'article' | 'heading' | 'block', string>>
+    name: (target: string, mode: string) => string
+    region: string
+    statuses: Readonly<
+      Record<
+        | 'idle'
+        | 'pending'
+        | 'resolved'
+        | 'rejected'
+        | 'error'
+        | 'missing'
+        | 'forbidden'
+        | 'cycle'
+        | 'depth-exceeded'
+        | 'size-exceeded'
+        | 'time-exceeded'
+        | 'mode-mismatch'
+        | 'stale',
+        string
+      >
+    >
+  }>
+  readonly atomic: Readonly<{
+    actionsRegion: (kind: string) => string
+    editSource: (kind: string) => string
+    enterAfter: (kind: string) => string
+    enterBefore: (kind: string) => string
+  }>
   readonly contextual: Readonly<{
     anchorId: string
     apply: string
@@ -824,6 +909,96 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       searchPlaceholder: '搜索命令',
       title: '命令面板',
     }),
+    search: Object.freeze({
+      close: '关闭搜索',
+      find: '查找',
+      findAndReplaceAria: '在文档中查找和替换',
+      findAria: '在文档中查找',
+      matchCase: '区分大小写',
+      nextMatch: '下一个匹配项',
+      noMatches: '无匹配项',
+      previousMatch: '上一个匹配项',
+      replace: '替换',
+      replaceAll: '全部替换',
+      replaceWithAria: '替换为',
+      results: (current: number, total: number) => `${current} / ${total}`,
+      toggleReplace: '切换替换',
+      truncatedResults: (count: number) =>
+        `${count.toLocaleString()}+ 个匹配项`,
+      useRegex: '使用正则表达式',
+      wholeWord: '全字匹配',
+    }),
+    attachments: Object.freeze({
+      actions: Object.freeze({ cancel: '取消', remove: '移除', retry: '重试' }),
+      region: '附件',
+      unnamed: '附件',
+      uploading: (name: string) => `正在上传 ${name}…`,
+      status: (name: string, status: string, percent: number) =>
+        status === 'resolved'
+          ? `${name} 上传完成`
+          : status === 'rejected'
+            ? `${name} 上传失败`
+            : status === 'cancelled'
+              ? `${name} 上传已取消`
+              : `${name}：已上传 ${percent}%`,
+    }),
+    imageProperties: Object.freeze({
+      alt: '替代文本',
+      apply: '应用',
+      caption: '题注',
+      copySource: '复制源码',
+      copyVisible: '复制可见内容',
+      destination: '目标地址',
+      destinationRejected: (code: string) => `目标地址被拒绝：${code}`,
+      open: '打开',
+      region: '图像属性',
+      removeCaption: '移除题注',
+      removeImage: '移除图像',
+      replace: '替换',
+      source: '源码',
+      title: '标题',
+      updateRejected: (code: string) => `图像属性变更被拒绝：${code}`,
+    }),
+    embeds: Object.freeze({
+      actions: Object.freeze({
+        'source-reveal': '显示源码',
+        'open-source': '打开来源',
+        retry: '重试',
+        copy: '复制',
+        'caret-before': '将光标置于之前',
+        'caret-after': '将光标置于之后',
+        'select-node': '选择嵌入内容',
+        delete: '删除',
+      }),
+      modes: Object.freeze({
+        article: '文章',
+        heading: '标题',
+        block: '内容块',
+      }),
+      name: (target: string, mode: string) => `嵌入内容 ${target}（${mode}）`,
+      region: '嵌入内容',
+      statuses: Object.freeze({
+        idle: '空闲',
+        pending: '加载中',
+        resolved: '已加载',
+        rejected: '已拒绝',
+        error: '加载失败',
+        missing: '内容缺失',
+        forbidden: '无权访问',
+        cycle: '检测到循环引用',
+        'depth-exceeded': '超出嵌套深度',
+        'size-exceeded': '超出大小限制',
+        'time-exceeded': '超出时间限制',
+        'mode-mismatch': '模式不匹配',
+        stale: '内容已过期',
+      }),
+    }),
+    atomic: Object.freeze({
+      actionsRegion: (kind: string) => `${kind} 原子 Markdown 操作`,
+      editSource: (kind: string) => `编辑 ${kind} 源码`,
+      enterAfter: (kind: string) => `在 ${kind} 之后输入`,
+      enterBefore: (kind: string) => `在 ${kind} 之前输入`,
+    }),
     contextual: Object.freeze({
       anchorId: '锚点 ID',
       apply: '应用',
@@ -934,6 +1109,36 @@ export const resolveMarkdownEditorLocaleText = (
     ...defaultMarkdownEditorLocaleText.commandPalette,
     ...localeText?.commandPalette,
   },
+  search: { ...defaultMarkdownEditorLocaleText.search, ...localeText?.search },
+  attachments: {
+    ...defaultMarkdownEditorLocaleText.attachments,
+    ...localeText?.attachments,
+    actions: {
+      ...defaultMarkdownEditorLocaleText.attachments.actions,
+      ...localeText?.attachments?.actions,
+    },
+  },
+  imageProperties: {
+    ...defaultMarkdownEditorLocaleText.imageProperties,
+    ...localeText?.imageProperties,
+  },
+  embeds: {
+    ...defaultMarkdownEditorLocaleText.embeds,
+    ...localeText?.embeds,
+    actions: {
+      ...defaultMarkdownEditorLocaleText.embeds.actions,
+      ...localeText?.embeds?.actions,
+    },
+    modes: {
+      ...defaultMarkdownEditorLocaleText.embeds.modes,
+      ...localeText?.embeds?.modes,
+    },
+    statuses: {
+      ...defaultMarkdownEditorLocaleText.embeds.statuses,
+      ...localeText?.embeds?.statuses,
+    },
+  },
+  atomic: { ...defaultMarkdownEditorLocaleText.atomic, ...localeText?.atomic },
   commandGroups: {
     ...defaultMarkdownEditorLocaleText.commandGroups,
     ...localeText?.commandGroups,
@@ -1005,9 +1210,12 @@ export const resolveMarkdownEditorCapabilityText = (
 
 export const evaluateMarkdownEditorLocaleMutations = () => {
   const override = resolveMarkdownEditorLocaleText({
+    atomic: { editSource: (kind) => `EDIT-${kind}-L10N` },
+    attachments: { region: 'ATTACHMENTS-L10N' },
     commands: { bold: 'BOLD-L10N' },
     contextual: { editLink: 'EDIT-LINK-L10N' },
     modes: { source: 'SOURCE-L10N' },
+    search: { find: 'FIND-L10N' },
     results: {
       aborted: 'ABORTED-L10N',
       rejected: 'REJECTED-L10N',
@@ -1038,7 +1246,13 @@ export const evaluateMarkdownEditorLocaleMutations = () => {
           override.surfaces.slashMenu ===
             defaultMarkdownEditorLocaleText.surfaces.slashMenu ||
           override.contextual.editLink ===
-            defaultMarkdownEditorLocaleText.contextual.editLink,
+            defaultMarkdownEditorLocaleText.contextual.editLink ||
+          override.search.find ===
+            defaultMarkdownEditorLocaleText.search.find ||
+          override.attachments.region ===
+            defaultMarkdownEditorLocaleText.attachments.region ||
+          override.atomic.editSource('image') ===
+            defaultMarkdownEditorLocaleText.atomic.editSource('image'),
         accepted: false,
       }),
       Object.freeze({
@@ -1387,6 +1601,7 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     enabled: (context) => context.syntax?.status !== 'malformed',
     run: () => ({ focus: 'surface', surface: 'anchor-properties' }),
   },
+  ...createMarkdownTableCommands(),
 ]
 
 export const isMarkdownEditorCommandVisible = (

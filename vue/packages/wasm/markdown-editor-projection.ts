@@ -77,6 +77,25 @@ export interface MarkdownEditorSourceRange {
   readonly end: number
 }
 
+export type MarkdownEditorTableAlignment =
+  | 'none'
+  | 'left'
+  | 'center'
+  | 'right'
+
+export interface MarkdownEditorTableSyntaxRow {
+  readonly rawRange: MarkdownEditorSourceRange
+  readonly normalizedRange: MarkdownEditorSourceRange
+  readonly rawCellRanges: readonly MarkdownEditorSourceRange[]
+  readonly normalizedCellRanges: readonly MarkdownEditorSourceRange[]
+}
+
+export interface MarkdownEditorTableSyntaxProjection {
+  readonly rows: readonly MarkdownEditorTableSyntaxRow[]
+  readonly separatorRow: number
+  readonly alignments: readonly MarkdownEditorTableAlignment[]
+}
+
 export interface MarkdownEditorSyntaxNode {
   readonly blockIdentity: string
   readonly kind: string
@@ -93,6 +112,7 @@ export interface MarkdownEditorSyntaxNode {
   readonly parentNormalizedRange: MarkdownEditorSourceRange | null
   readonly childRawRanges: readonly MarkdownEditorSourceRange[]
   readonly childNormalizedRanges: readonly MarkdownEditorSourceRange[]
+  readonly table?: MarkdownEditorTableSyntaxProjection
 }
 
 export interface MarkdownEditorProjectionDiagnostic {
@@ -293,6 +313,25 @@ export const createMarkdownEditorProjection = (
     const childRawRanges = Object.freeze(
       (node.children ?? []).map((child) => toRawRange(child.start, child.end)),
     )
+    const table =
+      node.tableRows !== undefined &&
+      node.tableSeparatorRow !== undefined &&
+      node.tableAlignments !== undefined
+        ? Object.freeze({
+            rows: Object.freeze(
+              node.tableRows.map((row) =>
+                Object.freeze({
+                  normalizedRange: toNormalizedRange(row.start, row.end),
+                  rawRange: toRawRange(row.start, row.end),
+                  normalizedCellRanges: mapNormalizedRanges(row.cells),
+                  rawCellRanges: mapRawRanges(row.cells),
+                }),
+              ),
+            ),
+            separatorRow: node.tableSeparatorRow,
+            alignments: Object.freeze([...node.tableAlignments]),
+          })
+        : undefined
     nodes.push(
       Object.freeze({
         blockIdentity,
@@ -317,6 +356,7 @@ export const createMarkdownEditorProjection = (
           : null,
         childNormalizedRanges,
         childRawRanges,
+        ...(table ? { table } : {}),
       }),
     )
     if (node.status === 'malformed') {
@@ -424,6 +464,31 @@ const diagnosticsEquivalent = (
     )
   })
 
+const tableProjectionsEquivalent = (
+  left: MarkdownEditorTableSyntaxProjection | undefined,
+  right: MarkdownEditorTableSyntaxProjection | undefined,
+): boolean => {
+  if (!left || !right) return left === right
+  return (
+    left.separatorRow === right.separatorRow &&
+    left.alignments.length === right.alignments.length &&
+    left.alignments.every(
+      (alignment, index) => alignment === right.alignments[index],
+    ) &&
+    left.rows.length === right.rows.length &&
+    left.rows.every((row, index) => {
+      const other = right.rows[index]
+      return (
+        other !== undefined &&
+        sameRange(row.rawRange, other.rawRange) &&
+        sameRange(row.normalizedRange, other.normalizedRange) &&
+        sameRangeList(row.rawCellRanges, other.rawCellRanges) &&
+        sameRangeList(row.normalizedCellRanges, other.normalizedCellRanges)
+      )
+    })
+  )
+}
+
 export const transferMarkdownEditorProjection = (
   projection: MarkdownEditorProjectionResult,
 ): MarkdownEditorProjectionResult =>
@@ -471,7 +536,8 @@ export const markdownEditorProjectionsEquivalent = (
       sameRange(node.parentRawRange, other.parentRawRange) &&
       sameRange(node.parentNormalizedRange, other.parentNormalizedRange) &&
       sameRangeList(node.childRawRanges, other.childRawRanges) &&
-      sameRangeList(node.childNormalizedRanges, other.childNormalizedRanges)
+      sameRangeList(node.childNormalizedRanges, other.childNormalizedRanges) &&
+      tableProjectionsEquivalent(node.table, other.table)
     )
   })
 }

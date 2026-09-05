@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "text-viewer-stable36",
     "component": "text-viewer",
     "platform": "avalonia",
     "control": "FsusTextViewer",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "document",
     "accessibleName": "Release notes",
     "value": "4 structured blocks, mixed language, focus 2 of 4",

@@ -1,8 +1,7 @@
 {
   "schemaVersion": 1,
   "component": "ElMarkdownEditor",
-  "blocked": true,
-  "blockedBy": [340, 341, 342, 343],
-  "requiredStatus": "partial",
-  "reason": "FsusMarkdownEditor transaction, native Source/Live projection, selection, history, and position mapping are implemented; Split/Preview, complete native IME acceptance, and AutomationPeer remain partial/blocked."
+  "blocked": false,
+  "blockedBy": [],
+  "reason": "Issues #338-#343 and #288 are closed. Contract V2 now derives MarkdownEditor status only from its real static mappings and execution evidence."
 }

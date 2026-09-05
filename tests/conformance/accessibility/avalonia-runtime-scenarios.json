@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 2,
+  "coverage": "all-declared-snapshots",
+  "contractBindings": [
+    {
+      "snapshotId": "settings-primitives-stable39",
+      "contractId": "component-v2.el-settings-section"
+    },
+    {
+      "snapshotId": "metric-primitives-stable39",
+      "contractId": "component-v2.el-metric-list"
+    },
+    {
+      "snapshotId": "inbox-primitives-stable39",
+      "contractId": "component-v2.el-inbox-layout"
+    },
+    {
+      "snapshotId": "perception-challenge-stable40",
+      "contractId": "component-v2.el-perception-challenge"
+    },
+    {
+      "snapshotId": "perception-character-challenge-conformance",
+      "contractId": "component-v2.el-perception-character-challenge"
+    }
+  ],
+  "bindingGaps": [
+    {
+      "snapshotId": "textarea-comment",
+      "reason": "Contract V2 has no Avalonia type binding for FsusTextarea.",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    },
+    {
+      "snapshotId": "icon-button-search",
+      "reason": "Contract V2 has no Avalonia type binding for FsusIconButton.",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    },
+    {
+      "snapshotId": "data-table-stable33",
+      "reason": "Contract V2 has no Avalonia type binding for FsusDataTable.",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    },
+    {
+      "snapshotId": "virtualization-stable34",
+      "reason": "Contract V2 has no Avalonia type binding for FsusVirtualList.",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    },
+    {
+      "snapshotId": "table-v2-stable34",
+      "reason": "The FsusTableV2 Contract V2 type binding has no declared accessibility scenario.",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    },
+    {
+      "snapshotId": "tree-table-stable35",
+      "reason": "Contract V2 has no Avalonia type binding for FsusTreeTable.",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    },
+    {
+      "snapshotId": "text-viewer-stable36",
+      "reason": "Contract V2 has no Avalonia type binding for FsusTextViewer.",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    },
+    {
+      "snapshotId": "text-editor-stable37",
+      "reason": "Contract V2 has no Avalonia type binding for FsusTextEditor.",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    }
+  ],
+  "implementationGapPolicy": {
+    "owner": "FsusUI Avalonia",
+    "testPolicy": "Construct the named production control and require this exact observed field disposition; fail if the field disappears, changes, or begins matching while the gap remains declared.",
+    "reviewAfter": "2026-12-05"
+  },
+  "implementationGapObservations": {
+    "form-display-name": {
+      "role": "none",
+      "states.invalid": null
+    },
+    "tabs-main": {
+      "states.selected": null
+    },
+    "menu-main": {
+      "states.selected": null,
+      "states.expanded": null
+    },
+    "tabs-stable23": {
+      "states.selected": null
+    },
+    "menu-stable23": {
+      "states.selected": null,
+      "states.expanded": null
+    },
+    "dropdown-stable25": {
+      "states.selected": null,
+      "states.expanded": null
+    },
+    "media-decorative-stable32": {
+      "value": null,
+      "states.expanded": null
+    },
+    "data-table-stable33": {
+      "value": null,
+      "states.selected": null,
+      "states.expanded": null
+    },
+    "virtualization-stable34": {
+      "value": null
+    },
+    "table-v2-stable34": {
+      "value": null
+    },
+    "tree-stable35": {
+      "value": null,
+      "states.selected": null,
+      "states.expanded": null,
+      "states.checkedState": null
+    },
+    "tree-table-stable35": {
+      "value": null,
+      "states.selected": null,
+      "states.expanded": null
+    },
+    "text-editor-stable37": {
+      "states.selected": null
+    },
+    "public-shell-stable38": {
+      "value": null
+    },
+    "site-header-stable38": {
+      "value": null
+    },
+    "theme-mode-toggle-stable38": {
+      "value": null
+    },
+    "responsive-collection-stable38": {
+      "value": null
+    },
+    "settings-primitives-stable39": {
+      "value": null
+    },
+    "metric-primitives-stable39": {
+      "value": null
+    },
+    "inbox-primitives-stable39": {
+      "value": null
+    },
+    "perception-challenge-stable40": {
+      "value": null
+    },
+    "perception-character-challenge-conformance": {
+      "value": null,
+      "states.invalid": null
+    }
+  }
+}

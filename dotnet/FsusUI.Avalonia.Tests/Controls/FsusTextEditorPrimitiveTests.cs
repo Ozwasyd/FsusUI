@@ -1,5 +1,6 @@
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using System.Runtime.CompilerServices;
@@ -8,6 +9,37 @@ namespace FsusUI.Avalonia.Tests.Controls;
 
 public class FsusTextEditorPrimitiveTests
 {
+  [Fact]
+  public async Task TextEditorAutomationValueRoundTripsDocumentAndStatusUsesLiveState()
+  {
+    var editor = new FsusTextEditor
+    {
+      AccessibleName = "Article editor",
+      PreviewDebounce = TimeSpan.Zero,
+    };
+    editor.SetText(new string('a', 29));
+    editor.TypeText("b");
+    editor.TypeText("c");
+
+    Assert.True(editor.Undo());
+    Assert.True(await editor.SyncPreviewAsync());
+
+    var peer = Assert.IsAssignableFrom<AutomationPeer>(
+      ControlAutomationPeer.CreatePeerForElement(editor));
+    var valueProvider = Assert.IsAssignableFrom<IValueProvider>(
+      peer.GetProvider<IValueProvider>());
+    Assert.False(valueProvider.IsReadOnly);
+    Assert.Equal(new string('a', 29) + "b", valueProvider.Value);
+    Assert.Equal(
+      "30 chars, selection 30-30, preview synced, undo redo available",
+      peer.GetItemStatus());
+    Assert.Equal("TextEditor", peer.GetClassName());
+
+    valueProvider.SetValue("replacement");
+
+    Assert.Equal("replacement", editor.Text);
+  }
+
   [Fact]
   public async Task TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync()
   {

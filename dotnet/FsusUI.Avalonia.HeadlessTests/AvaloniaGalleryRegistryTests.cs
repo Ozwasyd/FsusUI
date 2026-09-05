@@ -93,6 +93,10 @@ public class AvaloniaGalleryRegistryTests
     Assert.Equal(FsusMarkdownEditorMode.Live, editors[0].Mode);
     Assert.Equal("aligned", editors[0].CapabilityState);
     Assert.NotNull(editors[0].ProjectionMap);
+    Assert.Single(editors[0].SearchMatches);
+    Assert.Single(editors[0].Outline);
+    Assert.True(editors[0].FocusWritingAidEnabled);
+    Assert.True(editors[0].TypewriterWritingAidEnabled);
     Assert.Equal(typeof(FsusMarkdownEditor), editors[0].GetType());
   }
 

@@ -3,37 +3,17 @@
   "registryVersion": "2.0.0",
   "releaseClassification": "preview",
   "owner": "FsusUI Core",
-  "consumerBindings": {
-    "byContract": {
-      "component-v2.el-fixture": {
-        "releaseFamily": "display",
-        "galleryRoute": "display"
-      },
-      "component-v2.el-markdown-editor": {
-        "releaseFamily": "text-editor",
-        "galleryRoute": "markdown-editor"
-      }
-    },
-    "releaseScopeFamilies": ["display", "text-editor"],
-    "galleryRoutes": ["display", "markdown-editor"]
-  },
   "contracts": [
     {
       "id": "component-v2.el-fixture",
       "version": "2.0.0",
       "releaseClassification": "preview",
       "owner": "FsusUI Core",
-      "performanceBudget": {
-        "renderMs": 8,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      },
       "component": {
         "name": "ElFixture",
         "module": "fixture",
         "classification": "portable",
-        "exportStatus": "partial",
-        "exports": ["ElFixture"]
+        "exportStatus": "partial"
       },
       "bindings": {
         "web": {
@@ -42,8 +22,7 @@
           "memberRef": {
             "baseline": "spec/baselines/vue-current.json",
             "kind": "component"
-          },
-          "exports": ["ElFixture"]
+          }
         },
         "avalonia": {
           "status": "bound",
@@ -76,6 +55,8 @@
           "drift": {
             "type": null,
             "default": null,
+            "required": null,
+            "readWrite": null,
             "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
@@ -108,6 +89,8 @@
           "drift": {
             "type": null,
             "default": null,
+            "required": null,
+            "readWrite": null,
             "nullability": "web nullable=false vs avalonia nullable=true",
             "eventPayload": null,
             "operationSignature": null,
@@ -153,30 +136,6 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
-      "requirementApplicability": {
-        "keyboard": { "status": "required" },
-        "pointer": {
-          "status": "not-applicable",
-          "governance": {
-            "reason": "The shared contract exposes no pointer behavior requiring cross-platform execution.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        "focus": { "status": "required" },
-        "a11y": {
-          "status": "not-applicable",
-          "governance": {
-            "reason": "The shared contract exposes no a11y behavior requiring cross-platform execution.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        "motion": { "status": "required" },
-        "perf": { "status": "required" }
-      },
       "platformDifferences": [
         {
           "member": "label",
@@ -194,6 +153,8 @@
         {
           "member": "AccessibleName",
           "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
@@ -229,17 +190,11 @@
       "version": "2.0.0",
       "releaseClassification": "preview",
       "owner": "FsusUI Core",
-      "performanceBudget": {
-        "renderMs": 16,
-        "interactionMs": 50,
-        "memory": "no retained unbounded per-item state without virtualization budget"
-      },
       "component": {
         "name": "ElMarkdownEditor",
         "module": "markdown-editor",
         "classification": "native-adapter",
-        "exportStatus": "partial",
-        "exports": ["ElMarkdownEditor"]
+        "exportStatus": "missing"
       },
       "bindings": {
         "web": {
@@ -248,8 +203,7 @@
           "memberRef": {
             "baseline": "spec/baselines/vue-current.json",
             "kind": "component"
-          },
-          "exports": ["ElMarkdownEditor"]
+          }
         },
         "avalonia": {
           "status": "unbound",
@@ -277,6 +231,8 @@
           "drift": {
             "type": null,
             "default": null,
+            "required": null,
+            "readWrite": null,
             "nullability": null,
             "eventPayload": null,
             "operationSignature": null,
@@ -319,30 +275,6 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
-      "requirementApplicability": {
-        "keyboard": { "status": "required" },
-        "pointer": {
-          "status": "not-applicable",
-          "governance": {
-            "reason": "The shared contract exposes no pointer behavior requiring cross-platform execution.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        "focus": { "status": "required" },
-        "a11y": {
-          "status": "not-applicable",
-          "governance": {
-            "reason": "The shared contract exposes no a11y behavior requiring cross-platform execution.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
-        },
-        "motion": { "status": "required" },
-        "perf": { "status": "required" }
-      },
       "platformDifferences": [
         {
           "member": "mode",
@@ -371,9 +303,8 @@
         "canonical": true
       },
       "markdownEditorGate": {
-        "blocked": true,
-        "blockedBy": [338, 339, 340, 341, 342, 343],
-        "requiredStatus": "partial"
+        "blocked": false,
+        "blockedBy": []
       },
       "scenarioIds": [
         "scenario.v2.el-markdown-editor.input.mode",
@@ -404,26 +335,9 @@
         "type": "FsusUI.Avalonia.Controls.FsusFixture",
         "packageId": "avalonia"
       },
-      "basis": "canonical-export-name-equality"
+      "basis": "name-equality"
     }
   ],
-  "publicExportMap": [
-    {
-      "name": "ElFixture",
-      "module": "fixture",
-      "role": "canonical",
-      "canonical": "ElFixture",
-      "contractId": "component-v2.el-fixture"
-    },
-    {
-      "name": "ElMarkdownEditor",
-      "module": "markdown-editor",
-      "role": "canonical",
-      "canonical": "ElMarkdownEditor",
-      "contractId": "component-v2.el-markdown-editor"
-    }
-  ],
-  "publicValueBindings": [],
   "avaloniaOnlyTypes": [
     {
       "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",

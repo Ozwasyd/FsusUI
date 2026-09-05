@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 2,
+  "mappings": [
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "document",
+      "kind": "input",
+      "web": "modelValue",
+      "avalonia": "Document"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "document-identity",
+      "kind": "input",
+      "web": "documentIdentity",
+      "avalonia": "DocumentIdentity"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "mode",
+      "kind": "input",
+      "web": "mode",
+      "avalonia": "Mode"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "read-only",
+      "kind": "input",
+      "web": "readonly",
+      "avalonia": "IsReadOnly"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "editor-profile",
+      "kind": "input",
+      "web": "editorProfile",
+      "avalonia": "Profile"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "chrome",
+      "kind": "input",
+      "web": "chrome",
+      "avalonia": "Chrome"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "locale",
+      "kind": "input",
+      "web": "lang",
+      "avalonia": "Locale"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "status-density",
+      "kind": "input",
+      "web": "statusDensity",
+      "avalonia": "StatusDensity"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "transaction",
+      "kind": "output",
+      "web": "transaction",
+      "avalonia": "Transaction"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "selection-change",
+      "kind": "output",
+      "web": "selection-change",
+      "avalonia": "SelectionChange"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "history-change",
+      "kind": "output",
+      "web": "history-change",
+      "avalonia": "HistoryChange"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "dispatch-transaction",
+      "kind": "operation",
+      "web": "dispatchTransaction",
+      "avalonia": "DispatchTransaction"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "undo",
+      "kind": "operation",
+      "web": "undo",
+      "avalonia": "Undo"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "redo",
+      "kind": "operation",
+      "web": "redo",
+      "avalonia": "Redo"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "reveal-heading",
+      "kind": "operation",
+      "web": "revealHeading",
+      "avalonia": "RevealHeading"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "reveal-source-range",
+      "kind": "operation",
+      "web": "revealSourceRange",
+      "avalonia": "RevealSourceRange"
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "semantic": "search-navigate",
+      "kind": "operation",
+      "web": "searchNavigate",
+      "avalonia": "NavigateSearch"
+    }
+  ],
+  "dispositions": [
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "input",
+      "web": "defaultMode",
+      "status": "web-only",
+      "reason": "Vue needs a separate uncontrolled initial-mode prop; Avalonia property assignment has no controlled/uncontrolled split.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Set FsusMarkdownEditor.Mode; its compiler-known default is Source."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "input",
+      "web": "textareaId",
+      "status": "web-only",
+      "reason": "This prop forwards an HTML id to the Web textarea and has no native-control semantic.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Use the Avalonia control Name or AutomationProperties.AutomationId at the native host."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "input",
+      "web": "textareaName",
+      "status": "web-only",
+      "reason": "This prop forwards an HTML form field name and Avalonia controls do not submit HTML forms.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Bind FsusMarkdownEditor.Document through the native view model."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "input",
+      "web": "previewCspNonce",
+      "status": "web-only",
+      "reason": "CSP nonces authorize browser style/script nodes and do not apply to native Avalonia rendering.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "The native IFsusMarkdownEditorOutputHost owns renderer and print security policy."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "input",
+      "web": "nativeWritingTools",
+      "status": "web-only",
+      "reason": "This prop controls browser textarea writing-tool attributes rather than editor document semantics.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Configure the native OS text-input service at the Avalonia host boundary."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "input",
+      "web": "spellcheck",
+      "status": "web-only",
+      "reason": "This prop controls the HTML textarea spellcheck attribute rather than the shared document contract.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Provide native language tooling through the host-owned writing-aids boundary."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "output",
+      "web": "change",
+      "status": "web-only",
+      "reason": "The computed change emit is Vue component-model plumbing rather than a platform-neutral editor event.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Observe FsusMarkdownEditor.Transaction and Document changes."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "output",
+      "web": "update:modelValue",
+      "status": "web-only",
+      "reason": "The computed update emit implements Vue v-model and has no native event-name counterpart.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Bind FsusMarkdownEditor.Document through Avalonia property binding."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "operation",
+      "web": "closeCommandPalette",
+      "status": "web-only",
+      "reason": "The operation closes Web-owned command-palette chrome; native command composition belongs to the host.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Close the host-composed native command palette."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "operation",
+      "web": "openCommandPalette",
+      "status": "web-only",
+      "reason": "The operation opens Web-owned command-palette chrome; native command composition belongs to the host.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Open the host-composed native command palette."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "operation",
+      "web": "closeSearch",
+      "status": "web-only",
+      "reason": "The operation closes the Web search bar; the Avalonia editor deliberately exposes search data without built-in search chrome.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Close host search chrome and call FsusMarkdownEditor.ClearSearch."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "operation",
+      "web": "openSearch",
+      "status": "web-only",
+      "reason": "The operation opens the Web search bar; the Avalonia editor deliberately exposes search data without built-in search chrome.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Open host search chrome and call FsusMarkdownEditor.RequestSearch."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "operation",
+      "web": "searchReplaceAll",
+      "status": "web-only",
+      "reason": "This operation dispatches the Web search-and-replace chrome action rather than a distinct document primitive.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "The native host computes replacements and submits one FsusMarkdownEditor.DispatchTransaction."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "operation",
+      "web": "searchReplaceCurrent",
+      "status": "web-only",
+      "reason": "This operation dispatches the Web search-and-replace chrome action rather than a distinct document primitive.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "The native host computes the current replacement and submits FsusMarkdownEditor.DispatchTransaction."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "operation",
+      "web": "searchUi",
+      "status": "web-only",
+      "reason": "The exposed value is the Web search-chrome view state, not a callable platform-neutral operation.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "The native host owns search-chrome state and uses RequestSearch, CommitSearch, NavigateSearch, and ClearSearch."
+    },
+    {
+      "component": "ElMarkdownEditor",
+      "kind": "contentRegion",
+      "web": "status",
+      "status": "web-only",
+      "reason": "The scoped slot replaces Web footer markup; Avalonia status presentation is host composition rather than a control ContentProperty.",
+      "owner": "FsusUI Core",
+      "testPolicy": "contract-v2-member-disposition",
+      "reviewPolicy": "pr-review",
+      "alternative": "Compose native status UI around CapabilityState, StatusDensity, and host metrics."
+    }
+  ]
+}

@@ -351,7 +351,7 @@ export default defineComponent({
               pure: true,
               offset: props.popperOffset,
               showArrow: false,
-              persistent: true,
+              persistent: false,
               popperClass: props.popperClass,
               placement: currentPlacement.value,
               teleported: appendToBody.value,

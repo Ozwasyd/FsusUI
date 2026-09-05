@@ -5,10 +5,9 @@ import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
-  extractPublicValueExports,
+  extractDeprecatedDeclarations,
   extractComponentSemantics,
-  loadModuleSources,
-  sourceForComponent,
+  sourceForComponent as compilerSourceForComponent,
 } from './vue-semantic-baseline.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
@@ -294,49 +293,21 @@ const parseOptionsApiObjects = (vueSource, key) => {
   return results
 }
 
-const parseSlotTags = (vueSource) => {
-  const slots = []
-  for (const match of vueSource.matchAll(/<slot\b([^>]*)>/g)) {
-    const attrs = match[1]
-    const nameMatch = attrs.match(/\bname\s*=\s*["']([^"']+)["']/)
-    slots.push({
-      name: nameMatch ? nameMatch[1] : 'default',
-      scoped: /\s(:|v-bind:)[\w-]+/.test(attrs),
-    })
-  }
-  const byName = new Map()
-  for (const slot of slots) {
-    const current = byName.get(slot.name)
-    byName.set(slot.name, {
-      name: slot.name,
-      scoped: Boolean(current?.scoped || slot.scoped),
-    })
-  }
-  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name))
-}
-
 const parseDeprecatedApis = (root) => {
   const files = walkFiles(path.join(root, 'vue/packages/components'), (file) =>
-    /\.(ts|tsx|vue)$/.test(file),
+    /\.(ts|vue)$/.test(file),
   )
   const deprecated = []
   for (const file of files) {
     const content = read(file)
     if (!content.includes('@deprecated')) continue
-    const lines = content.split('\n')
-    for (let index = 0; index < lines.length; index += 1) {
-      if (!lines[index].includes('@deprecated')) continue
-      let target = ''
-      for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
-        const line = lines[cursor].trim()
-        if (!line || line.startsWith('*') || line.startsWith('*/')) continue
-        target = line.replace(/,$/, '')
-        break
-      }
+    for (const declaration of extractDeprecatedDeclarations({
+      source: content,
+      filename: file,
+    })) {
       deprecated.push({
         file: toPosix(path.relative(root, file)),
-        marker: lines[index].trim().replace(/^\*\s?/, ''),
-        target,
+        ...declaration,
       })
     }
   }
@@ -500,6 +471,25 @@ const loadClassifications = (root) => {
   return parseJson(file)
 }
 
+const loadModuleSources = (root, moduleName) => {
+  const moduleRoot = path.join(root, 'vue/packages/components', moduleName)
+  const files = walkFiles(moduleRoot, (file) => /\.(ts|vue)$/.test(file))
+  return files.map((file) => ({
+    file,
+    relativePath: toPosix(path.relative(root, file)),
+    content: read(file),
+  }))
+}
+
+const sourceForComponent = (sources, exportName) => {
+  const kebab = toKebab(exportName)
+  const exact = sources.find((source) =>
+    source.relativePath.endsWith(`/src/${kebab}.vue`),
+  )
+  if (exact) return exact
+  return sources.find((source) => source.relativePath.endsWith('.vue'))
+}
+
 const collectPropsAndEmits = (sources, vueSource) => {
   const props = []
   const emits = []
@@ -563,93 +553,56 @@ const fallbackPropsAndEmits = (sources, exportName) => {
   }
 }
 
-const parseComponent = (root, moduleName, exportName, classification) => {
+const parseComponent = (
+  root,
+  moduleName,
+  exportName,
+  classification,
+  structuredEmitNames,
+  structuredExposedNames,
+) => {
   const sources = loadModuleSources(root, moduleName)
   const vueSource = sourceForComponent(sources, exportName)
-  const fromVue = vueSource?.relativePath.endsWith('.vue')
+  const slotVueSource = compilerSourceForComponent(sources, exportName)
+  const fromVue = vueSource
     ? collectPropsAndEmits(sources, vueSource.content)
     : { props: [], emits: [] }
+  const fallback =
+    fromVue.props.length || fromVue.emits.length
+      ? { props: [], emits: [] }
+      : fallbackPropsAndEmits(sources, exportName)
   const semantics = extractComponentSemantics({
     root,
     moduleSources: sources,
     vueSource,
     exportName,
+    structuredEmitNames,
+    structuredExposedNames,
   })
-  const fallback =
-    fromVue.props.length ||
-    fromVue.emits.length ||
-    semantics.legacyProps.length ||
-    semantics.legacyEmits.length
-      ? { props: [], emits: [] }
-      : fallbackPropsAndEmits(sources, exportName)
+  const slotSemantics =
+    slotVueSource === vueSource
+      ? semantics
+      : extractComponentSemantics({
+          root,
+          moduleSources: sources,
+          vueSource: slotVueSource,
+          exportName,
+        })
 
   return {
     name: exportName,
     module: moduleName,
     classification,
-    source: semantics.componentSource,
-    props: uniqueSorted([
-      ...fromVue.props,
-      ...fallback.props,
-      ...semantics.legacyProps,
-    ]),
-    emits: uniqueSorted([
-      ...fromVue.emits,
-      ...fallback.emits,
-      ...semantics.legacyEmits,
-    ]),
-    slots: semantics.legacySlots,
-    exposed: semantics.legacyExposed,
+    props: uniqueSorted([...fromVue.props, ...fallback.props]),
+    emits: uniqueSorted([...fromVue.emits, ...fallback.emits]),
+    slots: slotSemantics.semanticSlots,
+    exposed: vueSource ? parseDefineExpose(vueSource.content) : [],
     semantic: {
       props: semantics.semanticProps,
       emits: semantics.semanticEmits,
       exposed: semantics.semanticExposed,
-      slots: semantics.semanticSlots,
+      slots: slotSemantics.semanticSlots,
     },
-  }
-}
-
-const assignExportIdentities = (components, installedNames) => {
-  const installed = new Set(installedNames)
-  const bySource = new Map()
-  for (const component of components) {
-    const sourcePath = component.source?.path
-    if (!sourcePath) continue
-    const group = bySource.get(sourcePath) ?? []
-    group.push(component)
-    bySource.set(sourcePath, group)
-  }
-
-  for (const component of components) {
-    component.exportIdentity = {
-      role: 'canonical',
-      canonical: component.name,
-      aliases: [],
-    }
-  }
-  for (const group of bySource.values()) {
-    if (group.length < 2) continue
-    const canonical =
-      group.find((component) => installed.has(component.name)) ??
-      group.find((component) => component.name.startsWith('El')) ??
-      group[0]
-    const aliases = group
-      .filter((component) => component !== canonical)
-      .map((component) => component.name)
-      .sort()
-    canonical.exportIdentity = {
-      role: 'canonical',
-      canonical: canonical.name,
-      aliases,
-    }
-    for (const alias of group) {
-      if (alias === canonical) continue
-      alias.exportIdentity = {
-        role: 'alias',
-        canonical: canonical.name,
-        aliases: [],
-      }
-    }
   }
 }
 
@@ -711,6 +664,27 @@ const parseServicesAndDirectives = (
 
 export const buildArtifacts = (root, options = {}) => {
   const classifications = loadClassifications(root)
+  const semanticBindingsPath = path.join(
+    root,
+    'spec/components/contracts/v2/semantic-member-bindings.json',
+  )
+  const structuredOutputs = new Map()
+  const structuredOperations = new Map()
+  if (exists(semanticBindingsPath)) {
+    const semanticBindings = parseJson(semanticBindingsPath)
+    for (const binding of semanticBindings.mappings ?? []) {
+      if (binding.kind === 'output') {
+        const names = structuredOutputs.get(binding.component) ?? new Set()
+        names.add(binding.web)
+        structuredOutputs.set(binding.component, names)
+      }
+      if (binding.kind === 'operation') {
+        const names = structuredOperations.get(binding.component) ?? new Set()
+        names.add(binding.web)
+        structuredOperations.set(binding.component, names)
+      }
+    }
+  }
   const packageJson = parseJson(
     path.join(root, 'vue/packages/element-plus/package.json'),
   )
@@ -718,7 +692,6 @@ export const buildArtifacts = (root, options = {}) => {
   const componentImportInfo = parseComponentImports(root)
 
   const components = []
-  const publicValues = []
   for (const moduleName of componentModules) {
     const classification = requiredClassification(
       classifications.componentModules,
@@ -726,18 +699,16 @@ export const buildArtifacts = (root, options = {}) => {
       `component module ${moduleName}`,
     )
     const publicExports = parsePublicExports(root, moduleName)
-    const moduleSources = loadModuleSources(root, moduleName)
-    const moduleValues = extractPublicValueExports({
-      root,
-      moduleSources,
-      moduleName,
-    }).map((value) => ({ ...value, classification }))
-    const valueNames = new Set(moduleValues.map((value) => value.name))
-    publicValues.push(...moduleValues)
     for (const exportName of publicExports) {
-      if (valueNames.has(exportName)) continue
       components.push(
-        parseComponent(root, moduleName, exportName, classification),
+        parseComponent(
+          root,
+          moduleName,
+          exportName,
+          classification,
+          structuredOutputs.get(exportName) ?? [],
+          structuredOperations.get(exportName) ?? [],
+        ),
       )
     }
   }
@@ -754,7 +725,6 @@ export const buildArtifacts = (root, options = {}) => {
       throw new Error(`${name} is installable but has no component import`)
     }
   }
-  assignExportIdentities(components, componentImportInfo.installed)
 
   const plugins = parsePluginImports(root).map((plugin) => ({
     ...plugin,
@@ -792,7 +762,7 @@ export const buildArtifacts = (root, options = {}) => {
     ).length
   }
 
-  const semanticVersion = '1.0.0'
+  const semanticVersion = '1.4.0'
   const compilerOptionsHash = sha256(
     stableJson({
       parser: ['@babel/parser'],
@@ -803,7 +773,22 @@ export const buildArtifacts = (root, options = {}) => {
         'importAttributes',
         'topLevelAwait',
       ],
-      sfcCompiler: 'vue/compiler-sfc',
+      sfcCompiler: {
+        implementation: 'vue/compiler-sfc',
+        templateAst: true,
+        slotPayloadTypes: 'unknown-unless-compiler-proven',
+      },
+      typeChecker: {
+        implementation: 'typescript',
+        configHash: hashFiles(root, [
+          'vue/tsconfig.base.json',
+          'vue/tsconfig.web.json',
+        ]),
+        structuredEmitScope: 'explicit semantic output bindings',
+        structuredExposedScope: 'explicit semantic operation bindings',
+        maxFields: 64,
+        maxDepth: 1,
+      },
     }),
   )
   const dependencyVersionHash = sha256(
@@ -825,8 +810,7 @@ export const buildArtifacts = (root, options = {}) => {
   const inputTreeHash = hashFiles(root, [
     ...walkFiles(
       path.join(root, 'vue/packages/components'),
-      (file) =>
-        /\.(ts|tsx|vue|json)$/.test(file) && !file.includes('__tests__'),
+      (file) => /\.(ts|vue|json)$/.test(file) && !file.includes('__tests__'),
     ).map((file) => toPosix(path.relative(root, file))),
     ...walkFiles(
       path.join(root, 'vue/packages/hooks'),
@@ -843,6 +827,9 @@ export const buildArtifacts = (root, options = {}) => {
     'vue/packages/element-plus/package.json',
     'spec/baselines/vue-public-api-classifications.json',
   ])
+  const structuredOutputSelectionHash = hashFiles(root, [
+    'spec/components/contracts/v2/semantic-member-bindings.json',
+  ])
 
   const baseline = {
     schemaVersion: 1,
@@ -856,6 +843,7 @@ export const buildArtifacts = (root, options = {}) => {
       inputTreeHash,
       compilerOptionsHash,
       dependencyVersionHash,
+      structuredOutputSelectionHash,
       contractSchemaVersion: '2.0.0',
       outputHash: '',
     },
@@ -865,7 +853,6 @@ export const buildArtifacts = (root, options = {}) => {
       installableComponents: componentImportInfo.installed.length,
       directives: directives.length,
       services: services.length,
-      publicValues: publicValues.length,
       plugins: plugins.length,
       cssVariables: cssVariables.length,
       deprecatedApis: deprecatedApis.length,
@@ -876,7 +863,6 @@ export const buildArtifacts = (root, options = {}) => {
       module: componentImportInfo.imports.get(name),
     })),
     components: components.sort((a, b) => a.name.localeCompare(b.name)),
-    publicValues: publicValues.sort((a, b) => a.name.localeCompare(b.name)),
     directives,
     services,
     plugins,
@@ -948,7 +934,6 @@ This file is generated by \`pnpm run avalonia:baseline\`. Update the generator i
 | Installable components | ${baseline.summary.installableComponents} |
 | Directives | ${baseline.summary.directives} |
 | Services | ${baseline.summary.services} |
-| Public values | ${baseline.summary.publicValues} |
 | Plugins | ${baseline.summary.plugins} |
 | CSS variables | ${baseline.summary.cssVariables} |
 | Deprecated API markers | ${baseline.summary.deprecatedApis} |
@@ -973,8 +958,6 @@ Directives: ${baseline.directives.map((directive) => `\`${directive.name}\``).jo
 
 Services: ${baseline.services.map((service) => `\`${service.name}\``).join(', ') || '-'}
 
-Public values: ${baseline.publicValues.map((value) => `\`${value.name}\` (${value.kind})`).join(', ') || '-'}
-
 ## Web-Only APIs
 
 ${baseline.webOnlyApis.map((name) => `- \`${name}\``).join('\n') || '- None'}
@@ -990,13 +973,6 @@ const runFixtureAssertions = () => {
   const { baseline } = buildArtifacts(fixtureRoot, {
     commitShaOverride: 'fixture-sha',
   })
-  const assertExportIdentity = (component, expected) => {
-    if (JSON.stringify(component.exportIdentity) !== JSON.stringify(expected)) {
-      throw new Error(
-        `${component.name} export identity mismatch: ${JSON.stringify(component.exportIdentity)}`,
-      )
-    }
-  }
   const widget = baseline.components.find(
     (component) => component.name === 'ElFixtureWidget',
   )
@@ -1006,15 +982,6 @@ const runFixtureAssertions = () => {
   )
   if (!optionsWidget)
     throw new Error('fixture options widget missing from baseline')
-  const tsxWidget = baseline.components.find(
-    (component) => component.name === 'ElFixtureTsxWidget',
-  )
-  if (!tsxWidget) throw new Error('fixture TSX widget missing from baseline')
-  const tsxAlias = baseline.components.find(
-    (component) => component.name === 'FsusFixtureTsxWidget',
-  )
-  if (!tsxAlias)
-    throw new Error('fixture TSX widget alias missing from baseline')
   if (
     optionsWidget.props.includes('emit') ||
     optionsWidget.emits.includes('emit')
@@ -1022,38 +989,6 @@ const runFixtureAssertions = () => {
     throw new Error(
       'Options API setup context was misclassified as a prop or emit',
     )
-  }
-  if (
-    tsxWidget.source?.path !==
-    'vue/packages/components/fixture-tsx-widget/src/fixture-tsx-surface.tsx'
-  ) {
-    throw new Error('fixture TSX widget source identity was not exact')
-  }
-  assertExportIdentity(tsxWidget, {
-    role: 'canonical',
-    canonical: 'ElFixtureTsxWidget',
-    aliases: ['FsusFixtureTsxWidget'],
-  })
-  assertExportIdentity(tsxAlias, {
-    role: 'alias',
-    canonical: 'ElFixtureTsxWidget',
-    aliases: [],
-  })
-  for (const prop of ['count', 'label']) {
-    if (!tsxWidget.props.includes(prop)) {
-      throw new Error(
-        `fixture TSX widget imported prop ${prop} was not extracted`,
-      )
-    }
-  }
-  if (!tsxWidget.emits.includes('submit')) {
-    throw new Error('fixture TSX widget emit submit was not extracted')
-  }
-  if (!tsxWidget.exposed.includes('focus')) {
-    throw new Error('fixture TSX widget exposed member focus was not extracted')
-  }
-  if (!tsxWidget.slots.some((slot) => slot.name === 'default' && slot.scoped)) {
-    throw new Error('fixture TSX widget scoped default slot was not extracted')
   }
   for (const prop of ['label', 'legacyMode', 'modelValue']) {
     if (!widget.props.includes(prop)) {

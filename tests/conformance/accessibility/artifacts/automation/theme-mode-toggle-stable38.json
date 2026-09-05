@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "theme-mode-toggle-stable38",
     "component": "theme-mode-toggle",
     "platform": "avalonia",
     "control": "FsusThemeModeToggle",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "group",
     "accessibleName": "Theme mode",
     "value": "manager-backed light dark system selection",

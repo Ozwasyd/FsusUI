@@ -6,9 +6,12 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
+using Avalonia.Input.TextInput;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -36,8 +39,10 @@ public enum FsusMarkdownEditorStatusDensity
 
 public sealed record FsusMarkdownDocumentIdentity(string Id, int Epoch);
 
-public class FsusMarkdownEditor : TemplatedControl
+public partial class FsusMarkdownEditor : TemplatedControl
 {
+  private const int AutomationAtomicNodeBudget = 64;
+
   public static readonly StyledProperty<string> DocumentProperty =
     AvaloniaProperty.Register<FsusMarkdownEditor, string>(nameof(Document), string.Empty);
 
@@ -103,7 +108,7 @@ public class FsusMarkdownEditor : TemplatedControl
   private ContentPresenter? contentPresenter;
   private ScrollViewer? scrollViewer;
   private Grid? nativeSurface;
-  private TextBox? inputOwner;
+  internal TextBox? inputOwner;
   private FsusMarkdownEditorProjectionView? projectionView;
   private bool synchronizingDocument;
   private bool synchronizingInput;
@@ -111,6 +116,15 @@ public class FsusMarkdownEditor : TemplatedControl
   private string? lastProjectionRequestKey;
   private int? livePointerAnchor;
   private long scrollRestoreGeneration;
+  private FsusMarkdownNativeEventMachine nativeMachine = new();
+  private FsusMarkdownEditorTextInputMethodClient? imeClient;
+  private bool pendingCompositionEnd;
+
+  private sealed record FsusMarkdownPasteSnapshot(
+    string Source,
+    FsusMarkdownEditorSelection Selection,
+    int Revision,
+    FsusMarkdownDocumentIdentity DocumentIdentity);
 
   public FsusMarkdownEditor()
   {
@@ -120,6 +134,8 @@ public class FsusMarkdownEditor : TemplatedControl
     AutomationProperties.SetAccessibilityView(this, AccessibilityView.Control);
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Edit);
     AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Off);
+    AutomationProperties.SetName(this, "Markdown editor");
+    SyncAutomationState();
   }
 
   protected override AutomationPeer OnCreateAutomationPeer() =>
@@ -155,6 +171,8 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       lastProjectionRequestKey = null;
       UpdateNativeSurface();
+      RequestWritingAidsSnapshot();
+      InvalidateAutomationChildren();
     }
     return result;
   }
@@ -214,16 +232,36 @@ public class FsusMarkdownEditor : TemplatedControl
     if (previousScrollViewer is not null && previousScrollViewer != scrollViewer)
     {
       previousScrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
+      previousScrollViewer.ScrollChanged -= OnScrollChanged;
     }
     if (scrollViewer is not null)
     {
       scrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
       scrollViewer.LayoutUpdated += OnScrollLayoutUpdated;
+      scrollViewer.ScrollChanged -= OnScrollChanged;
+      scrollViewer.ScrollChanged += OnScrollChanged;
     }
     lastAppliedContentFloor = double.NaN;
     BuildNativeSurface();
     UpdateScrollContentFloor();
     UpdateNativeSurface();
+    SyncAutomationState();
+  }
+
+  protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToVisualTree(e);
+    if (contentPresenter is not null && nativeSurface is null)
+    {
+      BuildNativeSurface();
+      UpdateNativeSurface();
+    }
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    ReleaseNativeSurface();
+    base.OnDetachedFromVisualTree(e);
   }
 
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -237,6 +275,7 @@ public class FsusMarkdownEditor : TemplatedControl
       sourceProjectionMap = new(Document, []);
       projection.Reset();
       lastProjectionRequestKey = null;
+      ResetAdjacentState(preserveSearchQuery: false);
       UpdateNativeSurface();
     }
     else if (change.Property == DocumentProperty && !synchronizingDocument && store.Value != Document)
@@ -254,11 +293,13 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       store.BreakMergeGroup();
       UpdateNativeSurface();
+      RequestWritingAidsSnapshot();
     }
     else if (change.Property == ProjectionFeatureRevisionProperty)
     {
       projection.Reset();
       lastProjectionRequestKey = null;
+      writingAidsSnapshot = null;
       UpdateNativeSurface();
     }
     else if (change.Property == ScrollContentFloorProperty)
@@ -266,7 +307,16 @@ public class FsusMarkdownEditor : TemplatedControl
       lastAppliedContentFloor = double.NaN;
       UpdateScrollContentFloor();
     }
+    else if (change.Property == FocusWritingAidEnabledProperty ||
+      change.Property == TypewriterWritingAidEnabledProperty ||
+      change.Property == TypewriterAnchorProperty ||
+      change.Property == ProfileProperty)
+    {
+      UpdateAdjacentPresentation();
+      RequestWritingAidsSnapshot();
+    }
     else if (change.Property == IsReadOnlyProperty ||
+      change.Property == IsEnabledProperty ||
       change.Property == ForegroundProperty ||
       change.Property == FontFamilyProperty ||
       change.Property == FontSizeProperty ||
@@ -276,6 +326,7 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       UpdateNativeSurface();
     }
+    SyncAutomationState();
   }
 
   private void EnsureStore()
@@ -327,6 +378,16 @@ public class FsusMarkdownEditor : TemplatedControl
       archivedHistoryOrder.Remove(identity);
     }
     store = next;
+    nativeMachine.Apply(new FsusMarkdownNativeEventInput
+    {
+      Kind = FsusMarkdownNativeEventKind.DocumentSwitch,
+      DocumentIdentity = identity,
+      CurrentIdentity = identity,
+      Revision = store.Revision,
+      Value = store.Value,
+      Selection = store.Selection,
+    });
+    imeClient?.RequestImeReset();
   }
 
   private FsusMarkdownEditorDispatchResult Execute(
@@ -369,6 +430,7 @@ public class FsusMarkdownEditor : TemplatedControl
       {
         projection.Advance(previousValue, result.Value, result.Revision, result.PositionMap);
       }
+      RefreshAdjacentStateAfterTransaction();
     }
     if (result.Accepted && result.Value != Document)
     {
@@ -395,6 +457,8 @@ public class FsusMarkdownEditor : TemplatedControl
     if (result.Accepted)
     {
       UpdateNativeSurface();
+      SyncAutomationState();
+      InvalidateAutomationChildren();
     }
     return result;
   }
@@ -444,6 +508,24 @@ public class FsusMarkdownEditor : TemplatedControl
     inputOwner.PointerPressed += OnInputPointerPressed;
     inputOwner.PointerMoved += OnInputPointerMoved;
     inputOwner.PointerReleased += OnInputPointerReleased;
+    this.AddHandler(
+      InputElement.GotFocusEvent,
+      OnSelfGotFocus,
+      RoutingStrategies.Bubble);
+    AddHandler(
+      TextInputMethodClientRequestedEvent,
+      OnInputMethodClientRequested,
+      RoutingStrategies.Bubble,
+      handledEventsToo: true);
+    inputOwner.AddHandler(
+      InputElement.KeyDownEvent,
+      OnInputPreviewKeyDown,
+      RoutingStrategies.Tunnel);
+    inputOwner.AddHandler(
+      InputElement.TextInputEvent,
+      OnInputPreviewTextInput,
+      RoutingStrategies.Tunnel);
+    inputOwner.PointerWheelChanged += OnInputPointerWheelChanged;
 
     nativeSurface = new Grid();
     nativeSurface.Children.Add(inputOwner);
@@ -452,6 +534,82 @@ public class FsusMarkdownEditor : TemplatedControl
       nativeSurface.Children,
       projection);
     contentPresenter.Content = nativeSurface;
+    UpdateInputOwnerViewport();
+  }
+
+  private void UpdateInputOwnerViewport()
+  {
+    if (inputOwner is null || projectionView is null)
+    {
+      return;
+    }
+    var diagnostics = projectionView.ViewportDiagnostics;
+    if (!diagnostics.IsVirtualized)
+    {
+      inputOwner.Height = double.NaN;
+      return;
+    }
+    var viewport = scrollViewer?.Viewport.Height ?? Bounds.Height;
+    inputOwner.Height = Math.Max(FontSize * 1.5, viewport);
+    inputOwner.VerticalAlignment =
+      global::Avalonia.Layout.VerticalAlignment.Top;
+  }
+
+  private void ReleaseNativeSurface()
+  {
+    if (scrollViewer is not null)
+    {
+      scrollViewer.LayoutUpdated -= OnScrollLayoutUpdated;
+      scrollViewer.ScrollChanged -= OnScrollChanged;
+    }
+    if (inputOwner is not null)
+    {
+      inputOwner.TextChanged -= OnInputTextChanged;
+      inputOwner.KeyDown -= OnInputKeyDown;
+      inputOwner.KeyUp -= OnInputSelectionChanged;
+      inputOwner.PointerPressed -= OnInputPointerPressed;
+      inputOwner.PointerMoved -= OnInputPointerMoved;
+      inputOwner.PointerReleased -= OnInputPointerReleased;
+      inputOwner.PointerWheelChanged -= OnInputPointerWheelChanged;
+    }
+    projectionView?.ReleaseRetainedState();
+    if (contentPresenter is not null &&
+      ReferenceEquals(contentPresenter.Content, nativeSurface))
+    {
+      contentPresenter.Content = null;
+    }
+    inputOwner = null;
+    projectionView = null;
+    nativeSurface = null;
+  }
+
+  private void SyncAutomationState()
+  {
+    var selection = store.Selection;
+    var state = string.Join(
+      "; ",
+      $"mode={Mode.ToString().ToLowerInvariant()}",
+      $"capability={CapabilityState}",
+      $"selection={selection.Start}:{selection.End}",
+      $"caret={selection.End}",
+      IsReadOnly ? "readonly=true" : "readonly=false",
+      IsEnabled ? "disabled=false" : "disabled=true",
+      DataValidationErrors.GetHasErrors(this) ? "invalid=true" : "invalid=false",
+      "multiline=true");
+    AutomationProperties.SetItemStatus(this, state);
+    AutomationProperties.SetHelpText(
+      this,
+      IsReadOnly
+        ? "Read-only multi-line Markdown text."
+        : "Editable multi-line Markdown text.");
+  }
+
+  private void InvalidateAutomationChildren()
+  {
+    if (ControlAutomationPeer.FromElement(this) is MarkdownEditorAutomationPeer peer)
+    {
+      peer.RefreshChildren();
+    }
   }
 
   private void UpdateNativeSurface()
@@ -469,12 +627,13 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       SetCurrentValue(CapabilityStateProperty, capability);
     }
-    if (Mode == FsusMarkdownEditorMode.Live && projection.RequiresRefresh)
+    if (Mode != FsusMarkdownEditorMode.Preview && projection.RequiresRefresh)
     {
       var requestKey =
         $"{store.Identity.Id}\u001F{store.Identity.Epoch}\u001F{store.Revision}" +
         $"\u001F{ProjectionFeatureRevision}\u001F{store.Value}";
-      if (!string.Equals(lastProjectionRequestKey, requestKey, StringComparison.Ordinal))
+      if (!string.Equals(lastProjectionRequestKey, requestKey, StringComparison.Ordinal) &&
+        !nativeMachine.FreezeSmartInput)
       {
         lastProjectionRequestKey = requestKey;
         ProjectionRequested?.Invoke(
@@ -493,16 +652,19 @@ public class FsusMarkdownEditor : TemplatedControl
       return;
     }
 
-    synchronizingInput = true;
-    try
+    if (!nativeMachine.FreezeSmartInput)
     {
-      inputOwner.Text = store.Value;
-      inputOwner.SelectionStart = store.Selection.Start;
-      inputOwner.SelectionEnd = store.Selection.End;
-    }
-    finally
-    {
-      synchronizingInput = false;
+      synchronizingInput = true;
+      try
+      {
+        inputOwner.Text = store.Value;
+        inputOwner.SelectionStart = store.Selection.Start;
+        inputOwner.SelectionEnd = store.Selection.End;
+      }
+      finally
+      {
+        synchronizingInput = false;
+      }
     }
 
     inputOwner.IsReadOnly = IsReadOnly;
@@ -540,13 +702,27 @@ public class FsusMarkdownEditor : TemplatedControl
       presentationMap,
       store.Selection,
       live ? projection.Snapshot?.Spans : null);
+    projectionView.UpdateViewport(
+      scrollViewer?.Offset.Y ?? 0,
+      scrollViewer?.Viewport.Height ?? Bounds.Height);
+    UpdateInputOwnerViewport();
+    UpdateAdjacentPresentation();
     RestoreViewportSourceAnchor(sourceAnchor, preservedHorizontalOffset);
+    SyncAutomationState();
   }
 
   private void OnScrollLayoutUpdated(object? sender, EventArgs args)
   {
     UpdateScrollContentFloor();
+    projectionView?.UpdateViewport(
+      scrollViewer?.Offset.Y ?? 0,
+      scrollViewer?.Viewport.Height ?? Bounds.Height);
+    UpdateInputOwnerViewport();
+    InvalidateAutomationChildren();
   }
+
+  private void OnScrollChanged(object? sender, ScrollChangedEventArgs args) =>
+    OnScrollLayoutUpdated(sender, args);
 
   private void UpdateScrollContentFloor()
   {
@@ -643,6 +819,7 @@ public class FsusMarkdownEditor : TemplatedControl
 
     var expectedProjection = projectionView;
     var expectedScroll = scrollViewer;
+    var boundedAnchor = Math.Clamp(anchor, 0, store.Value.Length);
     var generation = ++scrollRestoreGeneration;
     void Restore()
     {
@@ -654,11 +831,22 @@ public class FsusMarkdownEditor : TemplatedControl
       }
       expectedScroll.Offset = new Vector(
         horizontalOffset,
-        expectedProjection.GetVisualLineTopForSource(anchor));
+        expectedProjection.GetVisualLineTopForSource(boundedAnchor));
     }
 
     Restore();
     Dispatcher.UIThread.Post(Restore);
+  }
+
+  private void OnSelfGotFocus(object? sender, FocusChangedEventArgs args)
+  {
+    if (inputOwner is null || !ReferenceEquals(args.Source, this))
+    {
+      return;
+    }
+    // Shell focus (programmatic Focus, tab navigation, chrome clicks) must
+    // land in the native input owner or the text pipeline never runs.
+    inputOwner.Focus();
   }
 
   private void OnInputTextChanged(object? sender, TextChangedEventArgs args)
@@ -672,18 +860,19 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       return;
     }
+    var previous = store.Value;
     var prefix = 0;
-    while (prefix < store.Value.Length &&
+    while (prefix < previous.Length &&
       prefix < next.Length &&
-      store.Value[prefix] == next[prefix])
+      previous[prefix] == next[prefix])
     {
       prefix += 1;
     }
-    var oldSuffix = store.Value.Length;
+    var oldSuffix = previous.Length;
     var newSuffix = next.Length;
     while (oldSuffix > prefix &&
       newSuffix > prefix &&
-      store.Value[oldSuffix - 1] == next[newSuffix - 1])
+      previous[oldSuffix - 1] == next[newSuffix - 1])
     {
       oldSuffix -= 1;
       newSuffix -= 1;
@@ -691,13 +880,33 @@ public class FsusMarkdownEditor : TemplatedControl
     var selection = new FsusMarkdownEditorSelection(
       inputOwner.SelectionStart,
       inputOwner.SelectionEnd);
+    var inserted = next[prefix..newSuffix];
+    var plan = nativeMachine.Apply(new FsusMarkdownNativeEventInput
+    {
+      Kind = FsusMarkdownNativeEventKind.Input,
+      InputType = "insertText",
+      Data = inserted,
+      Value = next,
+      PreviousValue = previous,
+      Revision = store.Revision,
+      Selection = selection,
+      DocumentIdentity = store.Identity,
+      CurrentIdentity = store.Identity,
+    });
+    if (plan.Action is not (FsusMarkdownNativeAction.Dispatch or FsusMarkdownNativeAction.Commit))
+    {
+      // Dedup, freeze, and rejections never dispatch: one pipeline, one
+      // transaction per commit, stale commits rejected above the store.
+      return;
+    }
     var transaction = new FsusMarkdownEditorTransaction(
-      [new(prefix, oldSuffix, next[prefix..newSuffix])],
-      History: "merge",
-      Origin: "input",
+      [new(prefix, oldSuffix, inserted)],
+      History: plan.History,
+      Origin: plan.Origin,
       Selection: selection,
       DocumentIdentity: store.Identity);
     _ = Execute(transaction, () => store.Dispatch(transaction));
+    NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.Input);
   }
 
   private void OnInputSelectionChanged(object? sender, RoutedEventArgs args)
@@ -714,6 +923,9 @@ public class FsusMarkdownEditor : TemplatedControl
     {
       SelectionChange?.Invoke(this, new(store.Revision, store.Selection));
       UpdateProjectionSelection();
+      RequestWritingAidsSnapshot();
+      SyncAutomationState();
+      InvalidateAutomationChildren();
     }
   }
 
@@ -735,8 +947,498 @@ public class FsusMarkdownEditor : TemplatedControl
     }
   }
 
+  private void OnInputMethodClientRequested(object? sender, TextInputMethodClientRequestedEventArgs args)
+  {
+    if (args.Client is null || args.Client is FsusMarkdownEditorTextInputMethodClient)
+    {
+      return;
+    }
+    imeClient = new FsusMarkdownEditorTextInputMethodClient(args.Client);
+    imeClient.PreeditTextChanged += OnPreeditTextChanged;
+    args.Client = imeClient;
+  }
+
+  private void OnPreeditTextChanged(string? text, int? cursorPos)
+  {
+    if (string.IsNullOrEmpty(text))
+    {
+      // Preedit cleared: the committed text arrives in the same input turn.
+      // The end event is applied when that commit lands
+      // (OnInputPreviewTextInput), or flushed as a cancel on the next
+      // observed input event. No timers: the contract forbids timeout dedup.
+      // A composition that was aborted by a document switch also keeps the
+      // pending end so its late commit is rejected as orphaned.
+      if (nativeMachine.Composing)
+      {
+        ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd, null);
+        pendingCompositionEnd = true;
+      }
+      else if (nativeMachine.Phase is FsusMarkdownNativePhase.Aborted or FsusMarkdownNativePhase.Draining)
+      {
+        pendingCompositionEnd = true;
+      }
+      return;
+    }
+    if (!nativeMachine.Composing)
+    {
+      ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionStart, text);
+    }
+    ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionUpdate, text);
+  }
+
+  private void ApplyNativeEvent(FsusMarkdownNativeEventKind kind, string? data)
+  {
+    nativeMachine.Apply(new FsusMarkdownNativeEventInput
+    {
+      Kind = kind,
+      Data = data,
+      Value = store.Value,
+      PreviousValue = store.Value,
+      Revision = store.Revision,
+      Selection = store.Selection,
+      DocumentIdentity = store.Identity,
+      CurrentIdentity = store.Identity,
+    });
+  }
+
+  private void FlushPendingCompositionEnd()
+  {
+    if (!pendingCompositionEnd)
+    {
+      return;
+    }
+    pendingCompositionEnd = false;
+    if (nativeMachine.Composing)
+    {
+      ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd, null);
+    }
+    if (nativeMachine.Phase == FsusMarkdownNativePhase.Committing)
+    {
+      _ = nativeMachine.Apply(new FsusMarkdownNativeEventInput
+      {
+        Kind = FsusMarkdownNativeEventKind.Input,
+        InputType = "insertCompositionText",
+        Value = store.Value,
+        PreviousValue = store.Value,
+        Revision = store.Revision,
+        Selection = store.Selection,
+        DocumentIdentity = store.Identity,
+        CurrentIdentity = store.Identity,
+      });
+    }
+  }
+
+  private void OnInputPreviewKeyDown(object? sender, KeyEventArgs args)
+  {
+    if (inputOwner is null)
+    {
+      return;
+    }
+    FlushPendingCompositionEnd();
+    if ((args.Key == Key.V || args.Key == Key.Insert) &&
+      args.KeyModifiers.HasFlag(KeyModifiers.Control))
+    {
+      args.Handled = true;
+      _ = HandlePasteAsync("paste");
+      return;
+    }
+    if (nativeMachine.FreezeSmartInput)
+    {
+      // Composition active: freeze editor structural transforms while leaving
+      // every key unhandled for the platform IME's candidate/preedit logic.
+      return;
+    }
+    var key = MapBlockInputKey(args.Key, args.KeyModifiers);
+    if (key is null || Mode == FsusMarkdownEditorMode.Preview || IsReadOnly)
+    {
+      return;
+    }
+    var plan = FsusMarkdownEditorBlockInput.Resolve(new FsusMarkdownBlockInputContext(
+      key,
+      store.Selection,
+      store.Value,
+      false,
+      CurrentBlockInputNodes()));
+    if (plan.Rejected is not null)
+    {
+      args.Handled = true;
+      return;
+    }
+    if (plan.Transaction is not null)
+    {
+      var transaction = plan.Transaction;
+      _ = Execute(transaction, () => store.Dispatch(transaction));
+      args.Handled = true;
+    }
+    // Null-transaction plans (passthrough-tab, table-hook, document-boundary
+    // merges) fall through to the native text box, whose text-changed
+    // pipeline produces the same raw source transaction.
+  }
+
+  private void OnInputPreviewTextInput(object? sender, TextInputEventArgs args)
+  {
+    if (inputOwner is null || args.Text is not { Length: > 0 } inserted)
+    {
+      return;
+    }
+    if (pendingCompositionEnd ||
+      nativeMachine.Phase is FsusMarkdownNativePhase.Composing or
+        FsusMarkdownNativePhase.Committing or FsusMarkdownNativePhase.Aborted or
+        FsusMarkdownNativePhase.Draining)
+    {
+      // The IME cleared the preedit and the commit text follows in the same
+      // turn — unless the composition was aborted by a document switch, in
+      // which case the late commit is orphaned and must be dropped.
+      pendingCompositionEnd = false;
+      if (nativeMachine.Phase is FsusMarkdownNativePhase.Aborted or FsusMarkdownNativePhase.Draining)
+      {
+        nativeMachine.Apply(new FsusMarkdownNativeEventInput
+        {
+          Kind = FsusMarkdownNativeEventKind.CompositionEnd,
+          Data = inserted,
+          Value = store.Value,
+          PreviousValue = store.Value,
+          Revision = store.Revision,
+          Selection = store.Selection,
+          DocumentIdentity = store.Identity,
+          CurrentIdentity = store.Identity,
+        });
+        _ = nativeMachine.Apply(new FsusMarkdownNativeEventInput
+        {
+          Kind = FsusMarkdownNativeEventKind.Input,
+          InputType = "insertCompositionText",
+          Value = store.Value,
+          PreviousValue = store.Value,
+          Revision = store.Revision,
+          Selection = store.Selection,
+          DocumentIdentity = store.Identity,
+          CurrentIdentity = store.Identity,
+        });
+        args.Handled = true;
+        return;
+      }
+      var endPlan = nativeMachine.Apply(new FsusMarkdownNativeEventInput
+      {
+        Kind = FsusMarkdownNativeEventKind.CompositionEnd,
+        Data = inserted,
+        Value = store.Value,
+        PreviousValue = store.Value,
+        Revision = store.Revision,
+        Selection = store.Selection,
+        DocumentIdentity = store.Identity,
+        CurrentIdentity = store.Identity,
+      });
+      // Avalonia's TextBox selection can temporarily include the native
+      // preedit span even though that span is not part of the source document.
+      // The transaction must use the frozen source selection captured by the
+      // store, otherwise a multi-code-unit preedit can index past store.Value.
+      var caretStart = Math.Min(store.Selection.Start, store.Selection.End);
+      var caretEnd = Math.Max(store.Selection.Start, store.Selection.End);
+      var postValue = store.Value[..caretStart] + inserted + store.Value[caretEnd..];
+      var postSelection = new FsusMarkdownEditorSelection(
+        caretStart + inserted.Length,
+        caretStart + inserted.Length);
+      _ = nativeMachine.Apply(new FsusMarkdownNativeEventInput
+      {
+        Kind = FsusMarkdownNativeEventKind.Input,
+        InputType = "insertCompositionText",
+        Data = inserted,
+        Value = postValue,
+        PreviousValue = store.Value,
+        Revision = store.Revision,
+        Selection = postSelection,
+        DocumentIdentity = store.Identity,
+        CurrentIdentity = store.Identity,
+      });
+      if (endPlan.Action is FsusMarkdownNativeAction.Commit or FsusMarkdownNativeAction.Ignore &&
+        !IsReadOnly &&
+        Mode != FsusMarkdownEditorMode.Preview)
+      {
+        var transaction = new FsusMarkdownEditorTransaction(
+          [new(caretStart, caretEnd, inserted)],
+          History: "separate",
+          Origin: "input",
+          Selection: postSelection,
+          DocumentIdentity: store.Identity);
+        _ = Execute(transaction, () => store.Dispatch(transaction));
+      }
+      args.Handled = true;
+      return;
+    }
+    if (nativeMachine.FreezeSmartInput || Mode == FsusMarkdownEditorMode.Preview || IsReadOnly)
+    {
+      return;
+    }
+    var pairPlan = FsusMarkdownEditorPairInput.Resolve(new FsusMarkdownPairInputContext(
+      Source: store.Value,
+      Selection: store.Selection,
+      Inserted: inserted,
+      Composing: false,
+      Readonly: IsReadOnly,
+      Mode: ModeString()));
+    if (pairPlan.Rejected is not null)
+    {
+      args.Handled = true;
+      return;
+    }
+    if (pairPlan.Transaction is not null)
+    {
+      var transaction = pairPlan.Transaction;
+      _ = Execute(transaction, () => store.Dispatch(transaction));
+      args.Handled = true;
+    }
+    // Null-transaction plans pass through to the native insertion, whose
+    // text-changed pipeline dispatches the raw source transaction.
+  }
+
+  private async Task HandlePasteAsync(string origin) =>
+    await HandlePasteCoreAsync(origin);
+
+  internal async Task HandlePasteCoreAsync(string origin)
+  {
+    var topLevel = TopLevel.GetTopLevel(this);
+    if (topLevel?.Clipboard is null)
+    {
+      return;
+    }
+    await HandlePasteCoreAsync(
+      origin,
+      async () => await topLevel.Clipboard.TryGetDataAsync());
+  }
+
+  internal async Task HandlePasteCoreAsync(
+    string origin,
+    Func<Task<IAsyncDataTransfer?>> readClipboardAsync)
+  {
+    var snapshot = new FsusMarkdownPasteSnapshot(
+      store.Value,
+      store.Selection,
+      store.Revision,
+      store.Identity);
+    var dataTransfer = await readClipboardAsync();
+    if (dataTransfer is null)
+    {
+      return;
+    }
+    using (dataTransfer)
+    {
+      await ReadPastePayloadAsync(dataTransfer, origin, snapshot);
+    }
+  }
+
+  private async Task ReadPastePayloadAsync(
+    IAsyncDataTransfer dataTransfer,
+    string origin,
+    FsusMarkdownPasteSnapshot snapshot)
+  {
+    var markdownFormat = DataFormat.CreateStringPlatformFormat("text/markdown");
+    var htmlFormat = DataFormat.CreateStringPlatformFormat("text/html");
+    FsusMarkdownClipboardItem? markdownItem = null;
+    FsusMarkdownClipboardItem? htmlItem = null;
+    FsusMarkdownClipboardItem? plainItem = null;
+    var files = new List<FsusMarkdownClipboardFileRef>();
+    foreach (var item in dataTransfer.Items)
+    {
+      if (item.Contains(DataFormat.File))
+      {
+        var file = await item.TryGetFileAsync();
+        if (file is not null)
+        {
+          files.Add(new FsusMarkdownClipboardFileRef(
+            file.Name,
+            0,
+            Path.GetExtension(file.Name).TrimStart('.')));
+        }
+      }
+      if (markdownItem is null && item.Contains(markdownFormat))
+      {
+        markdownItem = new FsusMarkdownClipboardItem(
+          "text/markdown",
+          await item.TryGetValueAsync(markdownFormat));
+      }
+      if (htmlItem is null && item.Contains(htmlFormat))
+      {
+        htmlItem = new FsusMarkdownClipboardItem(
+          "text/html",
+          await item.TryGetValueAsync(htmlFormat));
+      }
+      if (plainItem is null && item.Contains(DataFormat.Text))
+      {
+        plainItem = new FsusMarkdownClipboardItem(
+          "text/plain",
+          await item.TryGetTextAsync());
+      }
+    }
+    var items = new List<FsusMarkdownClipboardItem>(3);
+    if (markdownItem is not null)
+    {
+      items.Add(markdownItem);
+    }
+    if (htmlItem is not null)
+    {
+      items.Add(htmlItem);
+    }
+    if (plainItem is not null)
+    {
+      items.Add(plainItem);
+    }
+    if (items.Count == 0 && files.Count == 0)
+    {
+      return;
+    }
+    if (snapshot.Selection != store.Selection)
+    {
+      return;
+    }
+    var plan = FsusMarkdownEditorClipboardInput.Resolve(new FsusMarkdownClipboardPasteContext(
+      Source: snapshot.Source,
+      Selection: snapshot.Selection,
+      Items: items,
+      Files: files,
+      Origin: origin,
+      Composing: nativeMachine.FreezeSmartInput,
+      Readonly: IsReadOnly,
+      Disabled: !IsEnabled,
+      Mode: Mode,
+      Revision: store.Revision,
+      ExpectedRevision: snapshot.Revision,
+      CurrentIdentity: store.Identity,
+      DocumentIdentity: snapshot.DocumentIdentity));
+    nativeMachine.Apply(new FsusMarkdownNativeEventInput
+    {
+      Kind = origin == "drop" ? FsusMarkdownNativeEventKind.Drop : FsusMarkdownNativeEventKind.Paste,
+      ClipboardIdentity = plan.Identity,
+      Origin = origin,
+      Value = store.Value,
+      PreviousValue = store.Value,
+      Revision = store.Revision,
+      Selection = store.Selection,
+      DocumentIdentity = store.Identity,
+      CurrentIdentity = store.Identity,
+    });
+    if (plan.Rejected is not null || plan.Transaction is null)
+    {
+      return;
+    }
+    var transaction = plan.Transaction;
+    var previousValue = store.Value;
+    var result = Execute(transaction, () => store.Dispatch(transaction));
+    if (result.Accepted)
+    {
+      nativeMachine.Apply(new FsusMarkdownNativeEventInput
+      {
+        Kind = FsusMarkdownNativeEventKind.Input,
+        InputType = origin == "drop" ? "insertFromDrop" : "insertFromPaste",
+        Data = plan.Insert,
+        Value = result.Value,
+        PreviousValue = previousValue,
+        Revision = result.Revision,
+        Selection = result.Selection,
+        Origin = origin,
+        DocumentIdentity = store.Identity,
+        CurrentIdentity = store.Identity,
+      });
+    }
+  }
+
+  private static string? MapBlockInputKey(Key key, KeyModifiers modifiers) => key switch
+  {
+    Key.Enter => modifiers.HasFlag(KeyModifiers.Shift) ? "shift-enter" : "enter",
+    Key.Back => "backspace",
+    Key.Delete => "delete",
+    Key.Tab => modifiers.HasFlag(KeyModifiers.Shift) ? "shift-tab" : "tab",
+    _ => null,
+  };
+
+  private IReadOnlyList<FsusMarkdownBlockInputNode> CurrentBlockInputNodes()
+  {
+    var snapshot = projection.Snapshot;
+    if (snapshot is null)
+    {
+      return [];
+    }
+    var nodes = new List<FsusMarkdownBlockInputNode>(snapshot.Spans.Count);
+    foreach (var span in snapshot.Spans)
+    {
+      if (span.SemanticKind is not null)
+      {
+        nodes.Add(new FsusMarkdownBlockInputNode(
+          span.NodeId,
+          span.SemanticKind,
+          span.SourceRange.Start,
+          span.SourceRange.End));
+      }
+    }
+    return nodes;
+  }
+
+  private string ModeString() => Mode switch
+  {
+    FsusMarkdownEditorMode.Source => "source",
+    FsusMarkdownEditorMode.Live => "live",
+    FsusMarkdownEditorMode.Split => "split",
+    _ => "preview",
+  };
+
+  /// <summary>
+  /// Structured trace of the shared native input event machine for the Linux
+  /// IME evidence harness. The trace entries and plans are byte-identical to
+  /// the Web machine's output for identical event sequences.
+  /// </summary>
+  public IReadOnlyList<FsusMarkdownNativeTraceEntry> NativeTrace => nativeMachine.Trace;
+
+  public string NativePhase => FsusMarkdownNativeEventMachine.PhaseToken(nativeMachine.Phase);
+
+  /// <summary>
+  /// Candidate-window anchor reported by the native text-input owner, in the
+  /// coordinate space of <see cref="NativeCandidateCaretVisual"/>. Avalonia's
+  /// platform IME transforms this rectangle through the current window scale
+  /// and viewport offset; FsusUI never computes a parallel caret position.
+  /// </summary>
+  internal Rect NativeCandidateCaretRect => imeClient?.CursorRectangle ?? default;
+
+  /// <summary>
+  /// Visual that owns <see cref="NativeCandidateCaretRect"/>. Harnesses use
+  /// this with Avalonia's visual transform to verify DPI and scrolled viewport
+  /// placement without replacing the platform text-input client.
+  /// </summary>
+  internal Visual? NativeCandidateCaretVisual => imeClient?.TextViewVisual;
+
+  internal Task<Exception?> PendingAtomicCopy { get; private set; } =
+    Task.FromResult<Exception?>(null);
+
+  internal static async Task<Exception?> TrySetAtomicClipboardTextAsync(
+    Func<string, Task>? writeTextAsync,
+    string text)
+  {
+    if (writeTextAsync is null)
+    {
+      return null;
+    }
+    try
+    {
+      await writeTextAsync(text);
+      return null;
+    }
+    catch (Exception exception)
+    {
+      return exception;
+    }
+  }
+
+  /// <summary>
+  /// Provenance of the captured native input evidence. The default marks
+  /// headless runs as synthetic; only the real Linux IME harness (X11/ibus or
+  /// Wayland text-input) may overwrite it, and alignment evidence produced
+  /// from synthetic runs must never be presented as real IME evidence.
+  /// </summary>
+  public string NativeInputProvenance { get; set; } = "headless-synthetic";
+
+  internal FsusMarkdownEditorTransactionStore Store => store;
+
   private void OnInputPointerPressed(object? sender, PointerPressedEventArgs args)
   {
+    NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.SelectionDragStart);
     if (Mode != FsusMarkdownEditorMode.Live ||
       projectionView is null ||
       inputOwner is null)
@@ -775,9 +1477,16 @@ public class FsusMarkdownEditor : TemplatedControl
       livePointerAnchor = null;
       args.Pointer.Capture(null);
       args.Handled = true;
+      NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.SelectionDragEnd);
       return;
     }
     OnInputSelectionChanged(sender, args);
+    NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.SelectionDragEnd);
+  }
+
+  private void OnInputPointerWheelChanged(object? sender, PointerWheelEventArgs args)
+  {
+    NotifyWritingAidsInteraction(FsusMarkdownWritingAidsInteraction.UserScroll);
   }
 
   private void SetNativeSelection(FsusMarkdownEditorSelection selection)
@@ -800,6 +1509,7 @@ public class FsusMarkdownEditor : TemplatedControl
     if (store.SetSelection(selection) && store.Selection != previous)
     {
       SelectionChange?.Invoke(this, new(store.Revision, store.Selection));
+      RequestWritingAidsSnapshot();
     }
     UpdateProjectionSelection();
   }
@@ -820,6 +1530,7 @@ public class FsusMarkdownEditor : TemplatedControl
         : sourceProjectionMap,
       store.Selection,
       live ? projection.Snapshot?.Spans : null);
+    UpdateAdjacentPresentation();
   }
 
   private FsusMarkdownEditorTransaction OperationTransaction(string operation) =>
@@ -906,9 +1617,11 @@ public class FsusMarkdownEditor : TemplatedControl
   {
     private FsusMarkdownEditor Editor => (FsusMarkdownEditor)Owner;
 
-    public bool IsReadOnly => Editor.IsReadOnly;
+    public bool IsReadOnly => Editor.IsReadOnly || !Editor.IsEnabled;
 
     public string Value => Editor.Document;
+
+    public void RefreshChildren() => InvalidateChildren();
 
     public void SetValue(string? value)
     {
@@ -929,65 +1642,156 @@ public class FsusMarkdownEditor : TemplatedControl
         return null;
       }
 
-      var peers = new List<AutomationPeer>(atomicSpans.Length * 3);
-      foreach (var span in atomicSpans)
+      if (Editor.projectionView is { } view)
       {
-        peers.Add(AtomicActionPeer(span, "enter-before", span.SourceRange.Start));
-        peers.Add(AtomicActionPeer(span, "enter-after", span.SourceRange.End));
-        peers.Add(AtomicActionPeer(span, "edit-source", span.SourceRange.Start));
+        var visible = view.VisibleSourceRange;
+        atomicSpans = atomicSpans
+          .Where(span =>
+            span.SourceRange.End >= visible.Start &&
+            span.SourceRange.Start <= visible.End)
+          .ToArray();
       }
-      return peers;
+      return atomicSpans
+        .Take(AutomationAtomicNodeBudget)
+        .Select(span => (AutomationPeer)new AtomicNodeAutomationPeer(
+          new AtomicNodeControl(Editor, span)))
+        .ToArray();
+    }
+  }
+
+  private sealed class AtomicNodeControl(
+    FsusMarkdownEditor owner,
+    FsusMarkdownProjectionSpan span) : Control
+  {
+    public FsusMarkdownEditor Editor { get; } = owner;
+
+    public FsusMarkdownProjectionSpan Span { get; } = span;
+
+    public void MoveTo(int sourceOffset, bool sourceMode)
+    {
+      SetSelection(new(sourceOffset, sourceOffset));
+      if (sourceMode)
+      {
+        Editor.Mode = FsusMarkdownEditorMode.Source;
+      }
+      _ = Editor.Focus();
+      Editor.SyncAutomationState();
     }
 
-    private AutomationPeer AtomicActionPeer(
-      FsusMarkdownProjectionSpan span,
-      string action,
-      int sourceOffset)
+    public void SelectSource()
     {
-      var control = new AtomicActionControl(Editor, sourceOffset)
+      SetSelection(new(
+        Span.SourceRange.Start,
+        Span.SourceRange.End));
+      _ = Editor.Focus();
+      Editor.SyncAutomationState();
+    }
+
+    public void CopySource()
+    {
+      SelectSource();
+      var clipboard = TopLevel.GetTopLevel(Editor)?.Clipboard;
+      Editor.PendingAtomicCopy = TrySetAtomicClipboardTextAsync(
+        clipboard is null ? null : clipboard.SetTextAsync,
+        Editor.store.Value[Span.SourceRange.Start..Span.SourceRange.End]);
+    }
+
+    private void SetSelection(FsusMarkdownEditorSelection selection)
+    {
+      if (Editor.inputOwner is not null)
+      {
+        Editor.SetNativeSelection(selection);
+        return;
+      }
+      var previous = Editor.store.Selection;
+      if (Editor.store.SetSelection(selection) && Editor.store.Selection != previous)
+      {
+        Editor.SelectionChange?.Invoke(Editor, new(Editor.store.Revision, Editor.store.Selection));
+        Editor.UpdateProjectionSelection();
+      }
+    }
+
+    public void Delete()
+    {
+      if (Editor.IsReadOnly || !Editor.IsEnabled)
+      {
+        return;
+      }
+      _ = Editor.DispatchTransaction(new FsusMarkdownEditorTransaction(
+        [new FsusMarkdownEditorChange(
+          Span.SourceRange.Start,
+          Span.SourceRange.End,
+          string.Empty)],
+        Selection: new FsusMarkdownEditorSelection(
+          Span.SourceRange.Start,
+          Span.SourceRange.Start),
+        Origin: "command",
+        DocumentIdentity: Editor.store.Identity));
+      _ = Editor.Focus();
+    }
+  }
+
+  private sealed class AtomicNodeAutomationPeer
+    : ControlAutomationPeer, IValueProvider
+  {
+    public AtomicNodeAutomationPeer(AtomicNodeControl owner) : base(owner)
+    {
+      AutomationProperties.SetAccessibilityView(owner, AccessibilityView.Content);
+      AutomationProperties.SetControlTypeOverride(owner, AutomationControlType.Group);
+      AutomationProperties.SetName(
+        owner,
+        owner.Span.SemanticKind ?? "Markdown atomic node");
+      AutomationProperties.SetHelpText(owner, owner.Span.DisplayText);
+      AutomationProperties.SetItemStatus(
+        owner,
+        $"atomic; source={owner.Span.SourceRange.Start}:{owner.Span.SourceRange.End}");
+      owner.Focusable = false;
+      owner.IsHitTestVisible = false;
+    }
+
+    private AtomicNodeControl Node => (AtomicNodeControl)Owner;
+
+    public bool IsReadOnly => true;
+
+    public string Value => Node.Span.DisplayText;
+
+    public void SetValue(string? value) =>
+      throw new InvalidOperationException("Atomic Markdown nodes are read-only.");
+
+    protected override IReadOnlyList<AutomationPeer> GetChildrenCore() =>
+    [
+      Action("enter-before", () => Node.MoveTo(Node.Span.SourceRange.Start, false)),
+      Action("enter-after", () => Node.MoveTo(Node.Span.SourceRange.End, false)),
+      Action("edit-source", () => Node.MoveTo(Node.Span.SourceRange.Start, true)),
+      Action("select-source", Node.SelectSource),
+      Action("copy", Node.CopySource),
+      Action("delete", Node.Delete),
+    ];
+
+    private AutomationPeer Action(string action, Action invoke)
+    {
+      var control = new AtomicActionControl(invoke)
       {
         Focusable = false,
         IsHitTestVisible = false,
       };
       AutomationProperties.SetAccessibilityView(control, AccessibilityView.Control);
       AutomationProperties.SetControlTypeOverride(control, AutomationControlType.Button);
-      AutomationProperties.SetName(
-        control,
-        $"{span.SemanticKind ?? "atomic"} {action}");
-      AutomationProperties.SetHelpText(control, span.DisplayText);
+      AutomationProperties.SetName(control, action);
+      AutomationProperties.SetHelpText(control, Node.Span.DisplayText);
       AutomationProperties.SetItemStatus(control, action);
-      return new AtomicActionAutomationPeer(control, span.DisplayText);
+      return new AtomicActionAutomationPeer(control);
     }
   }
 
-  private sealed class AtomicActionControl(
-    FsusMarkdownEditor editor,
-    int sourceOffset) : Control
+  private sealed class AtomicActionControl(Action invoke) : Control
   {
-    public void Invoke()
-    {
-      var previous = editor.store.Selection;
-      var next = new FsusMarkdownEditorSelection(sourceOffset, sourceOffset);
-      if (editor.store.SetSelection(next) && editor.store.Selection != previous)
-      {
-        editor.SelectionChange?.Invoke(editor, new(editor.store.Revision, editor.store.Selection));
-        editor.UpdateProjectionSelection();
-      }
-      _ = editor.Focus();
-    }
+    public void Invoke() => invoke();
   }
 
   private sealed class AtomicActionAutomationPeer(
-    AtomicActionControl owner,
-    string value) : ControlAutomationPeer(owner), IInvokeProvider, IValueProvider
+    AtomicActionControl owner) : ControlAutomationPeer(owner), IInvokeProvider
   {
-    public bool IsReadOnly => true;
-
-    public string Value => value;
-
     public void Invoke() => owner.Invoke();
-
-    public void SetValue(string? value) =>
-      throw new InvalidOperationException("Atomic Markdown actions are read-only.");
   }
 }

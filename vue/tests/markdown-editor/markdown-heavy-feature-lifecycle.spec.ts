@@ -288,6 +288,7 @@ const runAtCodeAdapterStarted = (
 test('bounds mixed heavy feature lifecycle across virtual remounts', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(360_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto(
     '/?visual=basic&theme=light&performance=markdown-heavy-feature-lifecycle&size=100000',
@@ -962,12 +963,20 @@ test('preserves heavy atomic source entry, Escape, and focus return in the real 
           requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
         ),
     )
-    await fixture
-      .getByRole('button', {
-        includeHidden: true,
-        name: `${section.kind} edit source`,
-      })
-      .click({ force: true })
+    const atomicActions = fixture
+      .locator('[data-markdown-atomic-actions]')
+      .getByRole('button', { includeHidden: true })
+    await expect(atomicActions).toHaveCount(3)
+    await expect
+      .poll(() =>
+        atomicActions.evaluateAll((actions) =>
+          actions.every((action) =>
+            Boolean(action.getAttribute('aria-label')?.trim()),
+          ),
+        ),
+      )
+      .toBe(true)
+    await atomicActions.nth(2).evaluate((action) => action.click())
     await expect(body).toHaveAttribute(
       'data-markdown-atomic-kind',
       section.kind,

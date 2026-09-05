@@ -341,10 +341,10 @@ describe('MarkdownEditor', () => {
     })
     expect(wrapper.emitted('upload-image')).toHaveLength(1)
     expect(wrapper.emitted('save')?.[0]).toEqual([
-      '# Preview![Uploading preview.png...]()',
+      '# Preview![正在上传 preview.png…]()',
     ])
     expect(wrapper.emitted('submit')?.[0]).toEqual([
-      '# Preview![Uploading preview.png...]()',
+      '# Preview![正在上传 preview.png…]()',
     ])
   })
 
@@ -385,7 +385,7 @@ describe('MarkdownEditor', () => {
     ).toBe(true)
     await nextTick()
     expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
-      'report.pdf: 50% uploaded',
+      'report.pdf：已上传 50%',
     )
 
     expect(
@@ -408,7 +408,7 @@ describe('MarkdownEditor', () => {
       'Draft: [report.pdf](https://cdn.example/report.pdf)',
     )
     expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
-      'report.pdf upload complete',
+      'report.pdf 上传完成',
     )
   })
 
@@ -435,17 +435,17 @@ describe('MarkdownEditor', () => {
       return owner.find('input')
     }
 
-    await field('Destination').setValue(
+    await field('目标地址').setValue(
       getMarkdownXssSourceUrl('mxss-url-javascript-link'),
     )
     await properties.find('button[type="submit"]').trigger('submit')
     expect(properties.find('[role="alert"]').text()).toContain('blocked-scheme')
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
 
-    await field('Alternative text').setValue('可访问 alt 😀')
-    await field('Destination').setValue('/safe/new.png')
-    await field('Title').setValue('updated title')
-    await field('Caption').setValue('更新说明 😀 RTL אב')
+    await field('替代文本').setValue('可访问 alt 😀')
+    await field('目标地址').setValue('/safe/new.png')
+    await field('标题').setValue('updated title')
+    await field('题注').setValue('更新说明 😀 RTL אב')
     await properties.find('button[type="submit"]').trigger('submit')
     await nextTick()
     const edited =
@@ -454,7 +454,7 @@ describe('MarkdownEditor', () => {
 
     const removeImage = properties
       .findAll('button')
-      .find((button) => button.text() === 'Remove image')
+      .find((button) => button.text() === '移除图像')
     if (!removeImage) throw new Error('missing remove image action')
     await removeImage.trigger('click')
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('')
@@ -886,6 +886,10 @@ describe('MarkdownEditor', () => {
       )
       await nextTick()
       expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+      expect(element.value).toBe(composed)
+
+      await wrapper.setProps({ placeholder: 'Composition remains native' })
+      expect(element.value).toBe(composed)
 
       element.dispatchEvent(
         new CompositionEvent('compositionend', {
@@ -1043,7 +1047,7 @@ describe('MarkdownEditor', () => {
 
     expect(drop.defaultPrevented).toBe(true)
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(
-      'ab![Uploading drop.png...]()cd',
+      'ab![正在上传 drop.png…]()cd',
     )
     Reflect.deleteProperty(document, 'caretPositionFromPoint')
   })

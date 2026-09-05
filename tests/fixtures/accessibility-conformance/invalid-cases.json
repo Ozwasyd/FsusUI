@@ -53,6 +53,15 @@
         "path": "overrideId",
         "value": "missing-a11y-override"
       }
+    },
+    {
+      "name": "false runtime provenance label",
+      "expectedError": "static snapshot must be labeled declared-expectation",
+      "mutation": {
+        "snapshotId": "button-primary",
+        "path": "evidenceSource",
+        "value": "avalonia-headless"
+      }
     }
   ]
 }

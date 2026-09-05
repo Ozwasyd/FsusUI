@@ -17,7 +17,7 @@
         "type": "Direct",
         "requested": "[10.0.8, )",
         "resolved": "10.0.8",
-        "contentHash": "8xjelvAJif6q6j58ksrhAG0cstEih4hNxiUgFLOh3v6ZUgxW4CC6dYsvFwyCFv+WjARtSgi7yrDJd16Ig5M7DQ=="
+        "contentHash": "dVbSXGIFNR5nZcv2tOLoWI+a9T4jtFd77IYjuND+QVe360qWgAF7H0WtoopYhRw/+SgpGUTyrkrh+65+ClNnfw=="
       },
       "Avalonia.BuildServices": {
         "type": "Transitive",

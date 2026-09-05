@@ -1,6 +1,4 @@
 import assert from 'node:assert/strict'
-import os from 'node:os'
-import path from 'node:path'
 import test from 'node:test'
 import { URL } from 'node:url'
 import {
@@ -12,42 +10,10 @@ import {
   validateScenarioBindings,
   validateWorkflowContracts,
 } from '../scripts/avalonia-aot-native.mjs'
-import {
-  alignmentHash,
-  deriveStableConsumers,
-  readContractRegistry,
-} from '../scripts/avalonia-stable-readiness-lib.mjs'
 import fs from 'node:fs'
 
 const commitSha = 'a'.repeat(40)
 const candidateSha256 = 'b'.repeat(64)
-const authorityRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fsusui-aot-authority-'))
-const registryPath = path.join(authorityRoot, 'contract-v2.json')
-const alignmentPath = path.join(authorityRoot, 'alignment.json')
-const registrySource = fs.readFileSync(
-  new URL('../spec/components/contracts/v2/contract-v2.json', import.meta.url),
-)
-fs.writeFileSync(registryPath, registrySource)
-const { registry, releaseScopeFamilies } = readContractRegistry(registryPath)
-const expected = { candidate: 'c'.repeat(40), contractHash: 'd'.repeat(64) }
-const alignment = {
-  schema: 'fsusui.alignment.v2',
-  identity: expected,
-  statuses: registry.contracts.map(({ id }) => ({
-    id,
-    status: 'aligned',
-    source: 'derived',
-  })),
-  stable: registry.contracts.map(({ id }) => id),
-  webOnly: [],
-  gaps: [],
-}
-alignment.consumers = deriveStableConsumers(registry, alignment)
-alignment.identity.alignmentHash = alignmentHash(alignment)
-fs.writeFileSync(alignmentPath, `${JSON.stringify(alignment, null, 2)}\n`)
-const authority = { registryPath, alignmentPath, expected }
-const expectedStableFamilies = () => stableFamilies(authority)
-test.after(() => fs.rmSync(authorityRoot, { recursive: true, force: true }))
 const leaf = (overrides = {}) => ({
   schemaVersion: 'fsusui.avalonia-aot-leaf-manifest.v1',
   status: 'success',
@@ -61,7 +27,7 @@ const leaf = (overrides = {}) => ({
   nativeBinary: { runtimeIndependent: true, sha256: 'c'.repeat(64) },
   report: {
     sha256: 'd'.repeat(64),
-    passed: expectedStableFamilies().length,
+    passed: stableFamilies().length,
     failed: 0,
     skipped: 0,
   },
@@ -73,37 +39,26 @@ test('stable registry owns the native scenario set', () => {
     new URL('../tests/fixtures/avalonia-aot-smoke/Program.cs', import.meta.url),
     'utf8',
   )
-  assert.deepEqual(
-    validateScenarioBindings(source, expectedStableFamilies()),
-    expectedStableFamilies(),
-  )
+  assert.deepEqual(validateScenarioBindings(source), stableFamilies())
   assert.throws(
     () =>
       validateScenarioBindings(
         source.replace('["tree"] =', '["tree-missing"] ='),
-        expectedStableFamilies(),
       ),
     /binding mismatch/u,
   )
-  const stale = JSON.parse(fs.readFileSync(alignmentPath, 'utf8'))
-  stale.identity.candidate = 'e'.repeat(40)
-  fs.writeFileSync(alignmentPath, `${JSON.stringify(stale, null, 2)}\n`)
-  assert.throws(() => stableFamilies(authority), /identity candidate is stale/u)
-  const duplicate = structuredClone(alignment)
-  duplicate.statuses.push({ ...duplicate.statuses[0] })
-  duplicate.identity.alignmentHash = alignmentHash(duplicate)
-  fs.writeFileSync(alignmentPath, `${JSON.stringify(duplicate, null, 2)}\n`)
-  assert.throws(() => stableFamilies(authority), /not uniquely derived/u)
-  const ungoverned = structuredClone(alignment)
-  const partialId = ungoverned.statuses[0].id
-  ungoverned.statuses[0].status = 'partial'
-  ungoverned.stable = ungoverned.stable.filter((id) => id !== partialId)
-  ungoverned.gaps = [{ contract: partialId }]
-  ungoverned.consumers = deriveStableConsumers(registry, ungoverned)
-  ungoverned.identity.alignmentHash = alignmentHash(ungoverned)
-  fs.writeFileSync(alignmentPath, `${JSON.stringify(ungoverned, null, 2)}\n`)
-  assert.throws(() => stableFamilies(authority), /is ungoverned/u)
-  fs.writeFileSync(alignmentPath, `${JSON.stringify(alignment, null, 2)}\n`)
+  for (const mutation of [
+    source.replace(
+      'RenderingMode = [X11RenderingMode.Software]',
+      'RenderingMode = [X11RenderingMode.Glx]',
+    ),
+    source.replace('ViewportSize = 160', 'ViewportSize = 3_200'),
+    source.replace('"embed"', '"embedded-widget"'),
+  ])
+    assert.throws(
+      () => validateScenarioBindings(mutation),
+      /behavior evidence missing/u,
+    )
 })
 
 test('report rejects stale identity, skipped behavior and incomplete registry coverage', () => {
@@ -113,6 +68,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     PackageVersion: '1.0.0',
     CandidateSha256: candidateSha256,
     Rid: 'linux-x64',
+    RuntimeMode: 'nativeaot',
     OperatingSystem: 'Linux',
     ProcessArchitecture: 'X64',
     DotnetVersion: '10.0.0',
@@ -125,10 +81,20 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     NativeDependencies: ['libc.so.6'],
     PackageDigests: [`FsusUI.Avalonia.nupkg:${'d'.repeat(64)}`],
     PartialCapabilities: ['FsusMarkdownEditor:required-after-issue-343'],
+    MarkdownAutomationReady: true,
+    MarkdownVirtualizationReady: true,
+    MarkdownDocumentCharacters: 240_000,
+    MarkdownBlockCount: 10_000,
+    MarkdownHeadingCount: 10_000,
+    MarkdownAutomationNodeCount: 1,
+    MarkdownVisualCount: 12,
+    MarkdownLayoutMilliseconds: 21.5,
+    MarkdownManagedBytesDelta: 8192,
+    RenderScaling: 1.5,
     RuntimeIndependent: true,
     StartedAtUtc: '2026-01-01T00:00:00Z',
     EndedAtUtc: '2026-01-01T00:00:01Z',
-    Scenarios: expectedStableFamilies().map((Id) => ({
+    Scenarios: stableFamilies().map((Id) => ({
       Id,
       Component: `Fsus.${Id}`,
       Resource: 'packaged-template',
@@ -137,8 +103,8 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
       Error: null,
       Exception: null,
     })),
-    ScenarioCount: expectedStableFamilies().length,
-    ScenarioPassed: expectedStableFamilies().length,
+    ScenarioCount: stableFamilies().length,
+    ScenarioPassed: stableFamilies().length,
     ScenarioFailed: 0,
     ScenarioSkipped: 0,
     NativeLogErrorCount: 0,
@@ -148,11 +114,7 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
     ExitCode: 0,
   }
   assert.equal(
-    validateReport(
-      report,
-      { commitSha, candidateSha256, rid: 'linux-x64' },
-      expectedStableFamilies(),
-    ),
+    validateReport(report, { commitSha, candidateSha256, rid: 'linux-x64' }),
     true,
   )
   assert.throws(
@@ -160,50 +122,46 @@ test('report rejects stale identity, skipped behavior and incomplete registry co
       validateReport(
         { ...report, CandidateSha256: 'e'.repeat(64) },
         { candidateSha256 },
-        expectedStableFamilies(),
       ),
     /candidate mismatch/u,
   )
   assert.throws(
-    () =>
-      validateReport(
-        { ...report, Scenarios: report.Scenarios.slice(1) },
-        undefined,
-        expectedStableFamilies(),
-      ),
+    () => validateReport({ ...report, Scenarios: report.Scenarios.slice(1) }),
     /coverage/u,
   )
   assert.throws(
     () =>
-      validateReport(
-        {
-          ...report,
-          Scenarios: report.Scenarios.map((item, index) =>
-            index ? item : { ...item, Passed: false },
-          ),
-        },
-        undefined,
-        expectedStableFamilies(),
-      ),
+      validateReport({
+        ...report,
+        Scenarios: report.Scenarios.map((item, index) =>
+          index ? item : { ...item, Passed: false },
+        ),
+      }),
     /failed/u,
   )
   assert.throws(
-    () =>
-      validateReport(
-        { ...report, NativeLogErrorCount: 1 },
-        undefined,
-        expectedStableFamilies(),
-      ),
+    () => validateReport({ ...report, NativeLogErrorCount: 1 }),
     /native log/u,
   )
   assert.throws(
-    () =>
-      validateReport(
-        { ...report, PartialCapabilities: [] },
-        undefined,
-        expectedStableFamilies(),
-      ),
+    () => validateReport({ ...report, RuntimeMode: 'jit' }),
+    /runtime mode/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, PartialCapabilities: [] }),
     /MarkdownEditor as partial/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownAutomationReady: false }),
+    /automation evidence/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownVisualCount: 64 }),
+    /virtualization evidence/u,
+  )
+  assert.throws(
+    () => validateReport({ ...report, MarkdownHeadingCount: 9_999 }),
+    /virtualization evidence/u,
   )
 })
 
@@ -301,5 +259,16 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
         caller: files.caller.replace('rid: linux-x64', 'rid: win-x64'),
       }),
     /PR workflow missing/u,
+  )
+  assert.throws(
+    () =>
+      validateWorkflowContracts({
+        ...files,
+        publish: files.publish.replace(
+          'needs: [quality, plan, preflight, fsusblog-consumer]',
+          'needs: [plan, preflight, fsusblog-consumer]',
+        ),
+      }),
+    /release readiness/u,
   )
 })

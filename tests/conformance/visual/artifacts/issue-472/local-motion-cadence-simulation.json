@@ -1,0 +1,1047 @@
+{
+  "candidate": "8fe4b5b935190372e3e14c1b5cee22810251fd67",
+  "cpuThrottleRate": 4,
+  "environment": "Chromium CDP CPU throttling with timer-based 60/120Hz sampling cadence; not physical 60/120Hz or low-end hardware.",
+  "samples": [
+    {
+      "duration": "0s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 1.599999999627471,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 17.799999999813735,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 34.09999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 50.299999999813735,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.985999",
+      "phase": "leave",
+      "sampleAt": 66.3999999994412,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.932326",
+      "phase": "leave",
+      "sampleAt": 82.5,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.814909",
+      "phase": "leave",
+      "sampleAt": 98.59999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.624588",
+      "phase": "leave",
+      "sampleAt": 114.79999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.431526",
+      "phase": "leave",
+      "sampleAt": 131.09999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.288137",
+      "phase": "leave",
+      "sampleAt": 147.3999999994412,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.18892",
+      "phase": "leave",
+      "sampleAt": 163.69999999925494,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.11962",
+      "phase": "leave",
+      "sampleAt": 179.8999999994412,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0710314",
+      "phase": "leave",
+      "sampleAt": 196.69999999925494,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0379309",
+      "phase": "leave",
+      "sampleAt": 212.8999999994412,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0166221",
+      "phase": "leave",
+      "sampleAt": 229.29999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.00460485",
+      "phase": "leave",
+      "sampleAt": 245.3999999994412,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 261.5,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "none",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 277.69999999925494,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "none",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "1",
+      "phase": "enter",
+      "sampleAt": 0.09999999962747097,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "none",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 16.399999999441206,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 32.89999999944121,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 49,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0140225",
+      "phase": "enter",
+      "sampleAt": 65.29999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0672469",
+      "phase": "enter",
+      "sampleAt": 81.70000000018626,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.185205",
+      "phase": "enter",
+      "sampleAt": 97.70000000018626,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.375561",
+      "phase": "enter",
+      "sampleAt": 114.70000000018626,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.567579",
+      "phase": "enter",
+      "sampleAt": 131.29999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.711949",
+      "phase": "enter",
+      "sampleAt": 147.3999999994412,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.711949",
+      "phase": "enter",
+      "sampleAt": 163.5,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.811139",
+      "phase": "enter",
+      "sampleAt": 179.79999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.880422",
+      "phase": "enter",
+      "sampleAt": 196.09999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.928997",
+      "phase": "enter",
+      "sampleAt": 212.20000000018626,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.962088",
+      "phase": "enter",
+      "sampleAt": 228.29999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.98339",
+      "phase": "enter",
+      "sampleAt": 244.3999999994412,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "0.995353",
+      "phase": "enter",
+      "sampleAt": 260.5,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "0.999879",
+      "phase": "enter",
+      "sampleAt": 277.29999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 60,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 0.09999999962747097,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 8.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 16.899999999441206,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 25.09999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 33.299999999813735,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 41.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 49.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 57.69999999925494,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.985834",
+      "phase": "leave",
+      "sampleAt": 66,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.985834",
+      "phase": "leave",
+      "sampleAt": 74.19999999925494,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.932209",
+      "phase": "leave",
+      "sampleAt": 82.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.932209",
+      "phase": "leave",
+      "sampleAt": 90.59999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.814681",
+      "phase": "leave",
+      "sampleAt": 98.59999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.814681",
+      "phase": "leave",
+      "sampleAt": 106.79999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.625532",
+      "phase": "leave",
+      "sampleAt": 115,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.625532",
+      "phase": "leave",
+      "sampleAt": 123.79999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.432299",
+      "phase": "leave",
+      "sampleAt": 132.09999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.432299",
+      "phase": "leave",
+      "sampleAt": 140.19999999925494,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.288679",
+      "phase": "leave",
+      "sampleAt": 148.79999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.288679",
+      "phase": "leave",
+      "sampleAt": 156.79999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.188801",
+      "phase": "leave",
+      "sampleAt": 165,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.188801",
+      "phase": "leave",
+      "sampleAt": 173,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.11919",
+      "phase": "leave",
+      "sampleAt": 181.59999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.11919",
+      "phase": "leave",
+      "sampleAt": 190,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0709738",
+      "phase": "leave",
+      "sampleAt": 198.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0709738",
+      "phase": "leave",
+      "sampleAt": 206.59999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0380525",
+      "phase": "leave",
+      "sampleAt": 214.69999999925494,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0380525",
+      "phase": "leave",
+      "sampleAt": 222.8999999994412,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0165987",
+      "phase": "leave",
+      "sampleAt": 231,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0165987",
+      "phase": "leave",
+      "sampleAt": 239.59999999962747,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.00464136",
+      "phase": "leave",
+      "sampleAt": 248,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.00464136",
+      "phase": "leave",
+      "sampleAt": 256.29999999981374,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 264.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "none",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "1",
+      "phase": "leave",
+      "sampleAt": 272.69999999925494,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "none",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "1",
+      "phase": "enter",
+      "sampleAt": 0.10000000055879354,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "none",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 8.800000000745058,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 16.90000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 25.40000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 33.700000000186265,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 41.90000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 50,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0",
+      "phase": "enter",
+      "sampleAt": 58.30000000074506,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0140043",
+      "phase": "enter",
+      "sampleAt": 66.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0140043",
+      "phase": "enter",
+      "sampleAt": 74.80000000074506,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0671985",
+      "phase": "enter",
+      "sampleAt": 83.1000000005588,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.0671985",
+      "phase": "enter",
+      "sampleAt": 91.40000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.18511",
+      "phase": "enter",
+      "sampleAt": 99.90000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.18511",
+      "phase": "enter",
+      "sampleAt": 108.40000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.375437",
+      "phase": "enter",
+      "sampleAt": 116.40000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.375437",
+      "phase": "enter",
+      "sampleAt": 124.6000000005588,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.568495",
+      "phase": "enter",
+      "sampleAt": 133,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.568495",
+      "phase": "enter",
+      "sampleAt": 141.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.711164",
+      "phase": "enter",
+      "sampleAt": 149.90000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.711164",
+      "phase": "enter",
+      "sampleAt": 158.1000000005588,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.811089",
+      "phase": "enter",
+      "sampleAt": 166.5,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.811089",
+      "phase": "enter",
+      "sampleAt": 174.90000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.880387",
+      "phase": "enter",
+      "sampleAt": 183,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.880387",
+      "phase": "enter",
+      "sampleAt": 191.1000000005588,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.929213",
+      "phase": "enter",
+      "sampleAt": 199.6000000005588,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.929213",
+      "phase": "enter",
+      "sampleAt": 207.90000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.962072",
+      "phase": "enter",
+      "sampleAt": 216.1000000005588,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.962072",
+      "phase": "enter",
+      "sampleAt": 224.20000000018626,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.98338",
+      "phase": "enter",
+      "sampleAt": 233,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.98338",
+      "phase": "enter",
+      "sampleAt": 241.20000000018626,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.995348",
+      "phase": "enter",
+      "sampleAt": 249.40000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0.22s",
+      "opacity": "0.995348",
+      "phase": "enter",
+      "sampleAt": 257.40000000037253,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "0.999878",
+      "phase": "enter",
+      "sampleAt": 266,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    },
+    {
+      "duration": "0s",
+      "opacity": "0.999878",
+      "phase": "enter",
+      "sampleAt": 274.20000000018626,
+      "scale": "none",
+      "simulatedCadenceHz": 120,
+      "transform": "matrix(1, 0, 0, 1, 21, -10)",
+      "translate": "none"
+    }
+  ]
+}

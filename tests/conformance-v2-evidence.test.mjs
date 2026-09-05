@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url'
 import {
   compareEvidence,
   deriveAlignment,
+  sealExecutionCoverage,
   validateCoverage,
   validateEvidence,
   validateCurrentComparison,
@@ -30,6 +31,24 @@ import {
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const scenario = (name) => `scenario.v2.${name}.input.value`
+const comparisonFor = (name, records = []) => {
+  const identity = { contract: `component-v2.${name}` }
+  const evidenceDigests = { web: `${name}-web`, avalonia: `${name}-avalonia` }
+  return {
+    schema: 'fsusui.conformance-comparison.v2',
+    verdict: 'pass',
+    identity,
+    evidenceDigests,
+    executionCoverage: sealExecutionCoverage({
+      schema: 'fsusui.member-execution-coverage.v2',
+      identity,
+      real: true,
+      evidenceDigests,
+      records,
+    }),
+  }
+}
 
 test('stable readiness hashes the exact Contract V2 bytes', () => {
   const contractPath = path.join(
@@ -574,6 +593,162 @@ test('public values remain release-blocking until mapped and evidenced', () => {
   assert.equal(alignment.gaps[0].contract, 'public-value.partial')
   assert.equal(alignment.consumers.releaseReady, false)
   validateReadiness(alignment)
+})
+
+test('alignment preserves unbound web-only exports without creating gaps', () => {
+  const alignment = deriveAlignment({
+    contracts: [
+      {
+        id: 'component-v2.web-only',
+        component: { exportStatus: 'web-only' },
+        bindings: { avalonia: { status: 'unbound' } },
+        coverage: { missing: 0, partial: 0 },
+      },
+    ],
+  })
+  assert.deepEqual(alignment.statuses, [
+    {
+      id: 'component-v2.web-only',
+      status: 'web-only',
+      source: 'derived',
+    },
+  ])
+  assert.deepEqual(alignment.gaps, [])
+  assert.deepEqual(alignment.stable, [])
+})
+
+test('comparison sets align only exact statically complete contracts', () => {
+  const contracts = ['first', 'second', 'no-evidence'].map((name) => ({
+    id: `component-v2.${name}`,
+    component: { exportStatus: 'aligned-candidate' },
+    bindings: { avalonia: { status: 'bound' } },
+    inputs: [
+      {
+        name: 'value',
+        status: 'aligned-candidate',
+        scenarioIds: [scenario(name)],
+      },
+    ],
+    coverage: { missing: 0, partial: 0 },
+  }))
+  const comparison = {
+    schema: 'fsusui.conformance-comparison-set.v2',
+    comparisons: ['first', 'second'].map((name) =>
+      comparisonFor(name, [
+        {
+          kind: 'input',
+          member: 'value',
+          scenarioId: scenario(name),
+          webSource: { kind: 'step', index: 0 },
+          avaloniaSource: { kind: 'step', index: 0 },
+        },
+      ]),
+    ),
+  }
+  const alignment = deriveAlignment({ contracts }, comparison)
+  assert.deepEqual(alignment.stable, [
+    'component-v2.first',
+    'component-v2.second',
+  ])
+  assert.equal(
+    alignment.statuses.find((entry) => entry.id === 'component-v2.no-evidence')
+      .status,
+    'blocked',
+  )
+  assert.throws(
+    () =>
+      deriveAlignment(
+        { contracts },
+        {
+          comparisons: [comparison.comparisons[0], comparison.comparisons[0]],
+        },
+      ),
+    /duplicated in comparison set/u,
+  )
+})
+
+test('alignment blocks an otherwise complete contract with incomplete executed-member coverage', () => {
+  const contract = {
+    id: 'component-v2.coverage-required',
+    component: { exportStatus: 'aligned-candidate' },
+    bindings: { avalonia: { status: 'bound' } },
+    inputs: [
+      {
+        name: 'value',
+        status: 'aligned-candidate',
+        scenarioIds: [scenario('coverage-required')],
+      },
+    ],
+    coverage: { missing: 0, partial: 0 },
+  }
+  const comparison = comparisonFor('coverage-required')
+  const alignment = deriveAlignment({ contracts: [contract] }, comparison)
+  assert.equal(alignment.statuses[0].status, 'blocked')
+  assert.deepEqual(alignment.gaps[0].missingCoverageMembers, [
+    `input:value@${scenario('coverage-required')}`,
+  ])
+  assert.deepEqual(alignment.gaps[0].missingArtifacts, [
+    'required-member-execution-coverage',
+  ])
+})
+
+test('execution coverage rejects absent, metadata-only, forged, and mutated ledgers', () => {
+  const contract = {
+    id: 'component-v2.coverage-integrity',
+    component: { exportStatus: 'aligned-candidate' },
+    bindings: { avalonia: { status: 'bound' } },
+    inputs: [],
+    coverage: { missing: 0, partial: 0 },
+  }
+  const comparison = comparisonFor('coverage-integrity')
+  const derive = (candidate) =>
+    deriveAlignment({ contracts: [contract] }, candidate)
+
+  assert.throws(
+    () => derive({ ...comparison, executionCoverage: undefined }),
+    /executionCoverage\.schema invalid/u,
+  )
+  assert.throws(
+    () =>
+      derive({
+        ...comparison,
+        executionCoverage: sealExecutionCoverage({
+          ...comparison.executionCoverage,
+          real: false,
+        }),
+      }),
+    /metadata-only/u,
+  )
+  assert.throws(
+    () =>
+      derive({
+        ...comparison,
+        executionCoverage: sealExecutionCoverage({
+          ...comparison.executionCoverage,
+          identity: { contract: 'component-v2.forged' },
+        }),
+      }),
+    /identity mismatch/u,
+  )
+  assert.throws(
+    () =>
+      derive({
+        ...comparison,
+        executionCoverage: {
+          ...comparison.executionCoverage,
+          records: [
+            {
+              kind: 'input',
+              member: 'forged',
+              scenarioId: 'scenario.v2.forged',
+              webSource: {},
+              avaloniaSource: {},
+            },
+          ],
+        },
+      }),
+    /outputHash invalid/u,
+  )
 })
 
 test('T762-01 stable readiness rejects missing, stale, and tampered alignment', () => {

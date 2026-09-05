@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
+  "snapshot": {
+    "id": "markdown-editor-atomic",
+    "component": "markdown-editor",
+    "platform": "avalonia",
+    "control": "FsusMarkdownEditor",
+    "evidenceSource": "declared-expectation",
+    "role": "edit",
+    "accessibleName": "Markdown editor",
+    "value": "`code`",
+    "states": {
+      "disabled": false,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": false
+    },
+    "keyboard": ["Tab"],
+    "keyboardOperable": true,
+    "tabOrder": 41,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/markdown-editor-atomic.json"
+  }
+}

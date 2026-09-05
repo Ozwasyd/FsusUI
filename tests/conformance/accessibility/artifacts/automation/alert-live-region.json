@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
+  "evidenceKind": "declared-expectation",
+  "real": false,
+  "countsAsRuntimeCoverage": false,
   "snapshot": {
     "id": "alert-live-region",
     "component": "live-region",
     "platform": "avalonia",
     "control": "FsusAlert",
-    "evidenceSource": "avalonia-headless",
+    "evidenceSource": "declared-expectation",
     "role": "alert",
     "accessibleName": "Upload complete",
     "value": "Upload complete",
