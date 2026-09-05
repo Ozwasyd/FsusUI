@@ -264,7 +264,7 @@ const cases = [
 })`,
       ),
     command: ['node', ['--test', 'tests/avalonia-aot-native.test.mjs']],
-    expected: 'Missing expected exception',
+    expected: 'is not valid JSON',
   },
   {
     id: 'nuget-ordinary-package-hard-block-mutated',
@@ -1244,6 +1244,16 @@ try {
     const target = path.join(checkout, relative)
     fs.mkdirSync(path.dirname(target), { recursive: true })
     fs.symlinkSync(source, target)
+  }
+  const prepared = spawnSync('pnpm', ['run', 'prepare:test-artifacts'], {
+    cwd: checkout,
+    encoding: 'utf8',
+    env: { ...process.env, CI: '1' },
+  })
+  if (prepared.status !== 0) {
+    throw new Error(
+      `clone test artifacts failed: ${prepared.stderr || prepared.stdout}`,
+    )
   }
   const results = []
   for (const entry of selectedCases) {
