@@ -10,17 +10,17 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "3a7e0a317e402225970b123f48d887b2056266b832454e3493b89726b14ec014",
+      "hash": "487e4ae48bb4e3d6b2812451a425d904379c00ce3188bce7696138d5a2d1d07b",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "45fafe3eedb24b270da853e6fca8e8cba17ed80f32376e8f8e3dad564350c658",
+      "hash": "e2a87507078fb78cb1da39622a8db7fd3e3b3c9874e3f2a03c6210224fe4eed8",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "7612822a1f097ae24d449917b612ae188bc7ba2e99cf1e5c5aaaae2fe229c8a1",
+      "hash": "fd8bb637c179ef819c58fa6511f7cfab1bbe8ea9673073d0efa792b7938e2d7a",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
@@ -122,7 +122,7 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusAutoResizer",
         "packageId": "avalonia",
-        "surfaceHash": "4c8f6c32ebb3659587fca5236bbb31f012e549fdb4eb994642714129db0cd062",
+        "surfaceHash": "75d7f3cb35326c44e727a80bb8d22f6927c8dc10e4e0e355c6cf9f7286eec7f7",
         "stateContractFingerprint": "7bca728b027700e7c3d7ce2225380a67e1091693fa3e8c6c4998e78580d4515a",
         "automationContractFingerprint": "0c8edf36f6bdca74c056c6cdfea216d2b82017d2d736e505a6f43c4b443f4d1d"
       },
@@ -372,8 +372,8 @@
         "packageId": "avalonia",
         "surfaceHash": "81d2a02709e351eb6ae79d6edfddec27902f066ccb9e843712c84fbe88f2f59c",
         "stateContractFingerprint": "f05951e0b489f0987343a8ab780771210df9cf8bdce6dfe8ed1c5b31efb3878d",
-        "automationContractFingerprint": "c3ac3ea0f1a6f5e0530a603466c9efc996456348fdc8d838b2c3a92b366e770f",
-        "tokenThemeContractFingerprint": "a8cb421c6f342ff346424335de347004eb4284278d4df6623d701034697e3f2e"
+        "automationContractFingerprint": "51e45dc862ca25115fb02a47d0eda1841721d5f0691cb72a9a35638847830a7e",
+        "tokenThemeContractFingerprint": "a96deb136b33415eff849df57ad9a5dd722940858f931ae0d7db002755ae89b7"
       },
       "basis": "name-equality"
     },
@@ -1554,7 +1554,7 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTableV2",
         "packageId": "avalonia",
-        "surfaceHash": "9cd488c2df560a7547a6ae264a9151142a95eb0ec7b87fcab146a9c7754a9502",
+        "surfaceHash": "3acc15d84336bf231cc365646e3d5aa548d57e5d0aa62de2f97d6810f1281286",
         "stateContractFingerprint": "390d5b0d733123ef93f8f0c8288f7294b5f2c7037c7d83be057a8454d6fe3427",
         "automationContractFingerprint": "ce587f69cba6654d742893f008d163c7ea21577b73b2b90796d9791f281aecaa"
       },
@@ -2162,7 +2162,7 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusTableV2",
         "packageId": "avalonia",
-        "surfaceHash": "9cd488c2df560a7547a6ae264a9151142a95eb0ec7b87fcab146a9c7754a9502",
+        "surfaceHash": "3acc15d84336bf231cc365646e3d5aa548d57e5d0aa62de2f97d6810f1281286",
         "stateContractFingerprint": "390d5b0d733123ef93f8f0c8288f7294b5f2c7037c7d83be057a8454d6fe3427",
         "automationContractFingerprint": "ce587f69cba6654d742893f008d163c7ea21577b73b2b90796d9791f281aecaa"
       },
@@ -5149,8 +5149,8 @@
       "component": {
         "name": "ElAffix",
         "module": "affix",
-        "classification": "web-only",
-        "exportStatus": "web-only"
+        "classification": "native-adapter",
+        "exportStatus": "missing"
       },
       "bindings": {
         "web": {
@@ -5238,7 +5238,7 @@
             "deprecated": false,
             "deprecationMessage": null
           },
-          "status": "web-only",
+          "status": "aligned-candidate",
           "drift": {
             "type": null,
             "default": null,
@@ -5254,12 +5254,7 @@
           "scenarioIds": [
             "scenario.v2.el-affix.input.offset"
           ],
-          "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          }
+          "governance": null
         },
         {
           "name": "position",
@@ -5288,7 +5283,7 @@
             "deprecationMessage": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -5305,7 +5300,7 @@
             "scenario.v2.el-affix.input.position"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5335,7 +5330,7 @@
             "deprecationMessage": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -5352,7 +5347,7 @@
             "scenario.v2.el-affix.input.target"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5382,7 +5377,7 @@
             "deprecationMessage": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -5399,7 +5394,7 @@
             "scenario.v2.el-affix.input.z-index"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5418,7 +5413,7 @@
             "payloadShapeReason": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -5435,7 +5430,7 @@
             "scenario.v2.el-affix.output.change"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5452,7 +5447,7 @@
             "payloadShapeReason": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -5469,7 +5464,7 @@
             "scenario.v2.el-affix.output.scroll"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5491,7 +5486,7 @@
             }
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -5508,7 +5503,7 @@
             "scenario.v2.el-affix.operation.update"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5528,7 +5523,7 @@
             }
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -5545,7 +5540,7 @@
             "scenario.v2.el-affix.operation.update-root"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5568,7 +5563,7 @@
             "contentType": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -5585,7 +5580,7 @@
             "scenario.v2.el-affix.content-region.default"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -5623,7 +5618,96 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
-      "platformDifferences": [],
+      "platformDifferences": [
+        {
+          "member": "position",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "target",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "zIndex",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "change",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "scroll",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "update",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "updateRoot",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "default",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
       "avaloniaExtras": [
         {
           "member": "AffixedChanged",
@@ -5737,11 +5821,11 @@
       ],
       "coverage": {
         "total": 9,
-        "alignedCandidate": 0,
+        "alignedCandidate": 1,
         "partial": 0,
-        "missing": 0,
-        "webOnly": 9,
-        "mappedPercent": 0
+        "missing": 8,
+        "webOnly": 0,
+        "mappedPercent": 11.1
       }
     },
     {
@@ -6850,6 +6934,51 @@
           },
           "scenarioIds": [
             "scenario.v2.el-auto-resizer.avalonia-extra.accessible-name"
+          ]
+        },
+        {
+          "member": "DisableHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "0f17bf0132096a068b364214ee9c92e0f1f52a7892b4c166555ff7fd2fcd57c3",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-auto-resizer.avalonia-extra.disable-height"
+          ]
+        },
+        {
+          "member": "DisableWidth",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "150e8d6850782647bc1dcc51b1b40d8428ddc27d44c456b662d8e9988135c225",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-auto-resizer.avalonia-extra.disable-width"
+          ]
+        },
+        {
+          "member": "OnResize",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "4d82c1e1f381c4ca5bcf3b881f9e41ebd15065d3f9cfba08c37271bcf53f1eb0",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-auto-resizer.avalonia-extra.on-resize"
           ]
         },
         {
@@ -10142,8 +10271,8 @@
       "component": {
         "name": "ElBacktop",
         "module": "backtop",
-        "classification": "web-only",
-        "exportStatus": "web-only"
+        "classification": "native-adapter",
+        "exportStatus": "missing"
       },
       "bindings": {
         "web": {
@@ -10203,7 +10332,7 @@
             "payloadShapeReason": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -10220,7 +10349,7 @@
             "scenario.v2.el-backtop.output.click"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -10244,7 +10373,7 @@
             "contentType": null
           },
           "avalonia": null,
-          "status": "web-only",
+          "status": "missing",
           "drift": {
             "type": null,
             "default": null,
@@ -10261,7 +10390,7 @@
             "scenario.v2.el-backtop.content-region.default"
           ],
           "governance": {
-            "reason": "Web-only export registered as a platform-specific surface; no Avalonia counterpart is claimed.",
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -10299,7 +10428,30 @@
           "Render and interaction budgets must match the component performance contract."
         ]
       },
-      "platformDifferences": [],
+      "platformDifferences": [
+        {
+          "member": "click",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "default",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
       "avaloniaExtras": [
         {
           "member": "Activate",
@@ -10408,8 +10560,8 @@
         "total": 2,
         "alignedCandidate": 0,
         "partial": 0,
-        "missing": 0,
-        "webOnly": 2,
+        "missing": 2,
+        "webOnly": 0,
         "mappedPercent": 0
       }
     },
@@ -19384,18 +19536,20 @@
           },
           "automationContract": {
             "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-            "fingerprint": "c3ac3ea0f1a6f5e0530a603466c9efc996456348fdc8d838b2c3a92b366e770f",
+            "fingerprint": "51e45dc862ca25115fb02a47d0eda1841721d5f0691cb72a9a35638847830a7e",
             "contractDeclared": false,
             "runtimeTreeVerified": false,
             "mappingComplete": false,
             "observedSemantics": [
               "help-text",
-              "name"
+              "name",
+              "role",
+              "state"
             ]
           },
           "tokenThemeContract": {
-            "fingerprint": "a8cb421c6f342ff346424335de347004eb4284278d4df6623d701034697e3f2e",
-            "dependencyCount": 7,
+            "fingerprint": "a96deb136b33415eff849df57ad9a5dd722940858f931ae0d7db002755ae89b7",
+            "dependencyCount": 8,
             "resolvedCount": 6,
             "contractDeclared": false,
             "renderedEvidenceVerified": false,
@@ -50695,8 +50849,8 @@
       "component": {
         "name": "ElInfiniteScroll",
         "module": "infinite-scroll",
-        "classification": "web-only",
-        "exportStatus": "web-only"
+        "classification": "native-adapter",
+        "exportStatus": "aligned-candidate"
       },
       "bindings": {
         "web": {
@@ -115088,6 +115242,21 @@
           ]
         },
         {
+          "member": "CellContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "f6e0ffa6f4e66fcdbfe63cef6c98d9a9e217a9f5dc5288fc85014028f242ce47",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.cell-content"
+          ]
+        },
+        {
           "member": "CellPoolCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -115148,6 +115317,21 @@
           ]
         },
         {
+          "member": "Columns",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "7058f39372dbf2b06ff3c14f3b65408f64cd58a9d7e3683dff5a6a7084fb5248",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.columns"
+          ]
+        },
+        {
           "member": "ColumnWidth",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -115193,6 +115377,51 @@
           ]
         },
         {
+          "member": "Data",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "47fa2f9efde01849690729bec996a5c42c6cb6a04a16837d8bea8c334b9ca17a",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.data"
+          ]
+        },
+        {
+          "member": "DataGetter",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "2d94076cc982090676deea18e4a97f7ff4736cfa2da70318176937f9b3611fca",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.data-getter"
+          ]
+        },
+        {
+          "member": "DefaultExpandedRowKeys",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "4615b06a95b06df1caee490c1398ded4cb98913d54557a19a81da8e1df844d6e",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.default-expanded-row-keys"
+          ]
+        },
+        {
           "member": "DiscardedCellCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -115208,6 +115437,66 @@
           ]
         },
         {
+          "member": "EffectiveColumnCount",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "cc57cf923950a3683d599673f249fc6ff11a92582495b4c517183965b257dd38",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.effective-column-count"
+          ]
+        },
+        {
+          "member": "EffectiveRowCount",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "343acae1f09d1ec05341bc16e6d70046c1adeeb868566940d2b3dfe629aa4e21",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.effective-row-count"
+          ]
+        },
+        {
+          "member": "EmptyContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "9159b94db9aa4ad4d2fbba5bd11a07e25ec8f49359314afc288e0372d189f123",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.empty-content"
+          ]
+        },
+        {
+          "member": "EstimatedRowHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "412d59bf5a5fe953d089a802b070e76642453781bc55ee422338a1ff78418161",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.estimated-row-height"
+          ]
+        },
+        {
           "member": "EvaluateBudget",
           "kind": "avalonia-extra",
           "surfaceKind": "method",
@@ -115220,6 +115509,51 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.evaluate-budget"
+          ]
+        },
+        {
+          "member": "ExpandColumnKey",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "77f4d1e769de704a101f45391d03f3a47007a914bf8af9938288d21613e94ef2",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.expand-column-key"
+          ]
+        },
+        {
+          "member": "ExpandedRowKeys",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "2d85873a6cc2877b151e9d57163104a9b4d9e798bb90cb5e83a4274800ac69ef",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.expanded-row-keys"
+          ]
+        },
+        {
+          "member": "FixedData",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "169042529aa817794bc54ad49bd0afafe0bbf68d744a54a76ab9af0c78c0243b",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.fixed-data"
           ]
         },
         {
@@ -115268,6 +115602,36 @@
           ]
         },
         {
+          "member": "FooterContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "bb8316f74a2261a9891861f019c206cb7339e28354dc986937f9aac08b27ed8a",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.footer-content"
+          ]
+        },
+        {
+          "member": "FooterHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "124e6c23bd64e0e64c5b81c6bf565dcb75cbb9ea820125a50f97c087e5a14206",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.footer-height"
+          ]
+        },
+        {
           "member": "FrozenColumnCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -115295,6 +115659,66 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.frozen-row-count"
+          ]
+        },
+        {
+          "member": "HeaderCellContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "2135ed30e25748611e514bf76182908409a1cba6c731f68b9e477c577eae05cb",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.header-cell-content"
+          ]
+        },
+        {
+          "member": "HeaderContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "9647eb613f84400f63ea6fdfe839f83bb80bc7388e483877709d53b707c4015f",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.header-content"
+          ]
+        },
+        {
+          "member": "HeaderHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "92e47edcd43500d059f04a16c8efaade696caeb0fe45c0de3677f8206e73539f",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.header-height"
+          ]
+        },
+        {
+          "member": "HeaderHeights",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "31e07c698f9961c273bc511e0e15c77cc0584fb2feeb08cb418f196249df2d17",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.header-heights"
           ]
         },
         {
@@ -115358,10 +115782,115 @@
           ]
         },
         {
+          "member": "OnColumnSort",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "1856d5723eb55c1bcf8a9455494d27aeeb6d85b157116ebeab6b394fb04e5f56",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.on-column-sort"
+          ]
+        },
+        {
+          "member": "OnEndReached",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "aa9292b5fdc287ed4d077e7fcc85ef0ce608b8ad7d7fd537b4d2fb793f1da947",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.on-end-reached"
+          ]
+        },
+        {
+          "member": "OnExpandedRowsChange",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "fc03d34c234fc398cc1d0eebf9935705338c9e0b2823c7f82436f56247b1e96d",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.on-expanded-rows-change"
+          ]
+        },
+        {
+          "member": "OnRowExpand",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "afc8608f961ef12a9f65d2e03ed04f45090490cb4d364fa0c7cd3f0c637b7bab",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.on-row-expand"
+          ]
+        },
+        {
+          "member": "OnRowsRendered",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "b27e032a77917f5ca5916c06c7fb6636d8be00fb3d08f35d89930049722d81d4",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.on-rows-rendered"
+          ]
+        },
+        {
+          "member": "OnScroll",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "e060c0781807e486c3b9c9fc7f348307def4adf569594f0cd2281170d91c46c1",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.on-scroll"
+          ]
+        },
+        {
+          "member": "OverlayContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "8a4875e403f3f31a57c0862cf9678355e5b8c94c241182aa667c4165e5ff9535",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.overlay-content"
+          ]
+        },
+        {
           "member": "Overscan",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
-          "surfaceHash": "e1c8e51a09fa3ecfbdac618618808955f5a9d71c321e1182500a644f51279a2b",
+          "surfaceHash": "6a7c70ac6c3913e13c6ca2c6c014c4ef6bf55069956b7ca671aef49c98623d30",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
@@ -115508,6 +116037,66 @@
           ]
         },
         {
+          "member": "ResetExpandedRows",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "c13c2b36eafa18ec3228a5bc5ab7789dab3d533c3e008a8dd288b65d5156006a",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.reset-expanded-rows"
+          ]
+        },
+        {
+          "member": "RetainedRowMeasurementCount",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "2d8b043fabeb0ef48d6ae2d56cc2c7cf61e4e7a732a3e0acbf1261f3ecd9f26f",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.retained-row-measurement-count"
+          ]
+        },
+        {
+          "member": "RetainedRowMeasurementLimit",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "72583e66836de51b4b6a40a46b1aa9e6bf0ad3e467cf7448c6a3002a655ea47c",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.retained-row-measurement-limit"
+          ]
+        },
+        {
+          "member": "RowContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "edff7b97e299ed4a532d056b06202b90ea2db677259a4140c713489328b571e4",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.row-content"
+          ]
+        },
+        {
           "member": "RowCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -115538,6 +116127,21 @@
           ]
         },
         {
+          "member": "RowKey",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "dc92f8fc2136cfe4239d50741cf98c04548e2e9da08074e728955c824594f453",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.row-key"
+          ]
+        },
+        {
           "member": "ScrollHost",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -115550,6 +116154,21 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.scroll-host"
+          ]
+        },
+        {
+          "member": "ScrollTo",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "cefe1105fa7066e34d1439257f3d2db8f6969aca1f50e7bfd1ebb07dfc84f379",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.scroll-to"
           ]
         },
         {
@@ -115568,6 +116187,126 @@
           ]
         },
         {
+          "member": "ScrollToLeft",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "a4ab0f46988d79a055d7d810889224f62db5f6841f469edb146af5b01fbc5a29",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.scroll-to-left"
+          ]
+        },
+        {
+          "member": "ScrollToRow",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "aca6db15b399f18f04f077eb386ba4e2ef24cba52bed260213d000f2f47d6187",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.scroll-to-row"
+          ]
+        },
+        {
+          "member": "ScrollToTop",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "9c00542792e4a7d046d3d98270c57dbbc2e8e53a59c9f7c99a45b98fc81a862b",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.scroll-to-top"
+          ]
+        },
+        {
+          "member": "SetMeasuredRowHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "c442709b191b64eb9440ac48aee93fb4b85dbfb1019ace7481ab931a86b05f34",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.set-measured-row-height"
+          ]
+        },
+        {
+          "member": "SetRowExpanded",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "02563bee97166252d33c7afabb65058afb706242b3fd0b66078d8bbe55929a60",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.set-row-expanded"
+          ]
+        },
+        {
+          "member": "SortBy",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "a11b12de50159a4877e62d53816ee7b4ce32155c21442dc2eab55f27151cf9c6",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.sort-by"
+          ]
+        },
+        {
+          "member": "SortColumn",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "776314dea63fff450b6122e666c8c0c699e326daa0da72a0ac3869294d321d7a",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.sort-column"
+          ]
+        },
+        {
+          "member": "SortState",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "f8a92baf73091092ae4496e1402c6944ee34ecaee67ac6b725a16ac24b030410",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.sort-state"
+          ]
+        },
+        {
           "member": "UpdateRowIndexAsync",
           "kind": "avalonia-extra",
           "surfaceKind": "method",
@@ -115580,6 +116319,51 @@
           },
           "scenarioIds": [
             "scenario.v2.el-table-v2.avalonia-extra.update-row-index-async"
+          ]
+        },
+        {
+          "member": "ViewportHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "7271c389fb01adb339eeee093a059477c95a2dc8f452eb18b32d87c79fa87abb",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.viewport-height"
+          ]
+        },
+        {
+          "member": "ViewportMaxHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "316ac5f161da22acaaf78442f0a0442a392f7aa318c4aabcee4af566d119470f",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.viewport-max-height"
+          ]
+        },
+        {
+          "member": "ViewportWidth",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "9131d59064c8216fca1685dc74592aa699c3f521ea513c12423848b5a3a0a8b3",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-table-v2.avalonia-extra.viewport-width"
           ]
         },
         {
@@ -163837,6 +164621,21 @@
           ]
         },
         {
+          "member": "CellContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "f6e0ffa6f4e66fcdbfe63cef6c98d9a9e217a9f5dc5288fc85014028f242ce47",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.cell-content"
+          ]
+        },
+        {
           "member": "CellPoolCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -163897,6 +164696,21 @@
           ]
         },
         {
+          "member": "Columns",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "7058f39372dbf2b06ff3c14f3b65408f64cd58a9d7e3683dff5a6a7084fb5248",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.columns"
+          ]
+        },
+        {
           "member": "ColumnWidth",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -163942,6 +164756,51 @@
           ]
         },
         {
+          "member": "Data",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "47fa2f9efde01849690729bec996a5c42c6cb6a04a16837d8bea8c334b9ca17a",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.data"
+          ]
+        },
+        {
+          "member": "DataGetter",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "2d94076cc982090676deea18e4a97f7ff4736cfa2da70318176937f9b3611fca",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.data-getter"
+          ]
+        },
+        {
+          "member": "DefaultExpandedRowKeys",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "4615b06a95b06df1caee490c1398ded4cb98913d54557a19a81da8e1df844d6e",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.default-expanded-row-keys"
+          ]
+        },
+        {
           "member": "DiscardedCellCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -163957,6 +164816,66 @@
           ]
         },
         {
+          "member": "EffectiveColumnCount",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "cc57cf923950a3683d599673f249fc6ff11a92582495b4c517183965b257dd38",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.effective-column-count"
+          ]
+        },
+        {
+          "member": "EffectiveRowCount",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "343acae1f09d1ec05341bc16e6d70046c1adeeb868566940d2b3dfe629aa4e21",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.effective-row-count"
+          ]
+        },
+        {
+          "member": "EmptyContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "9159b94db9aa4ad4d2fbba5bd11a07e25ec8f49359314afc288e0372d189f123",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.empty-content"
+          ]
+        },
+        {
+          "member": "EstimatedRowHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "412d59bf5a5fe953d089a802b070e76642453781bc55ee422338a1ff78418161",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.estimated-row-height"
+          ]
+        },
+        {
           "member": "EvaluateBudget",
           "kind": "avalonia-extra",
           "surfaceKind": "method",
@@ -163969,6 +164888,51 @@
           },
           "scenarioIds": [
             "scenario.v2.table-v2.avalonia-extra.evaluate-budget"
+          ]
+        },
+        {
+          "member": "ExpandColumnKey",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "77f4d1e769de704a101f45391d03f3a47007a914bf8af9938288d21613e94ef2",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.expand-column-key"
+          ]
+        },
+        {
+          "member": "ExpandedRowKeys",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "2d85873a6cc2877b151e9d57163104a9b4d9e798bb90cb5e83a4274800ac69ef",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.expanded-row-keys"
+          ]
+        },
+        {
+          "member": "FixedData",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "169042529aa817794bc54ad49bd0afafe0bbf68d744a54a76ab9af0c78c0243b",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.fixed-data"
           ]
         },
         {
@@ -164017,6 +164981,36 @@
           ]
         },
         {
+          "member": "FooterContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "bb8316f74a2261a9891861f019c206cb7339e28354dc986937f9aac08b27ed8a",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.footer-content"
+          ]
+        },
+        {
+          "member": "FooterHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "124e6c23bd64e0e64c5b81c6bf565dcb75cbb9ea820125a50f97c087e5a14206",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.footer-height"
+          ]
+        },
+        {
           "member": "FrozenColumnCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -164044,6 +165038,66 @@
           },
           "scenarioIds": [
             "scenario.v2.table-v2.avalonia-extra.frozen-row-count"
+          ]
+        },
+        {
+          "member": "HeaderCellContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "2135ed30e25748611e514bf76182908409a1cba6c731f68b9e477c577eae05cb",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.header-cell-content"
+          ]
+        },
+        {
+          "member": "HeaderContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "9647eb613f84400f63ea6fdfe839f83bb80bc7388e483877709d53b707c4015f",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.header-content"
+          ]
+        },
+        {
+          "member": "HeaderHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "92e47edcd43500d059f04a16c8efaade696caeb0fe45c0de3677f8206e73539f",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.header-height"
+          ]
+        },
+        {
+          "member": "HeaderHeights",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "31e07c698f9961c273bc511e0e15c77cc0584fb2feeb08cb418f196249df2d17",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.header-heights"
           ]
         },
         {
@@ -164107,10 +165161,115 @@
           ]
         },
         {
+          "member": "OnColumnSort",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "1856d5723eb55c1bcf8a9455494d27aeeb6d85b157116ebeab6b394fb04e5f56",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.on-column-sort"
+          ]
+        },
+        {
+          "member": "OnEndReached",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "aa9292b5fdc287ed4d077e7fcc85ef0ce608b8ad7d7fd537b4d2fb793f1da947",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.on-end-reached"
+          ]
+        },
+        {
+          "member": "OnExpandedRowsChange",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "fc03d34c234fc398cc1d0eebf9935705338c9e0b2823c7f82436f56247b1e96d",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.on-expanded-rows-change"
+          ]
+        },
+        {
+          "member": "OnRowExpand",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "afc8608f961ef12a9f65d2e03ed04f45090490cb4d364fa0c7cd3f0c637b7bab",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.on-row-expand"
+          ]
+        },
+        {
+          "member": "OnRowsRendered",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "b27e032a77917f5ca5916c06c7fb6636d8be00fb3d08f35d89930049722d81d4",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.on-rows-rendered"
+          ]
+        },
+        {
+          "member": "OnScroll",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "e060c0781807e486c3b9c9fc7f348307def4adf569594f0cd2281170d91c46c1",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.on-scroll"
+          ]
+        },
+        {
+          "member": "OverlayContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "8a4875e403f3f31a57c0862cf9678355e5b8c94c241182aa667c4165e5ff9535",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.overlay-content"
+          ]
+        },
+        {
           "member": "Overscan",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
-          "surfaceHash": "e1c8e51a09fa3ecfbdac618618808955f5a9d71c321e1182500a644f51279a2b",
+          "surfaceHash": "6a7c70ac6c3913e13c6ca2c6c014c4ef6bf55069956b7ca671aef49c98623d30",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
@@ -164257,6 +165416,66 @@
           ]
         },
         {
+          "member": "ResetExpandedRows",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "c13c2b36eafa18ec3228a5bc5ab7789dab3d533c3e008a8dd288b65d5156006a",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.reset-expanded-rows"
+          ]
+        },
+        {
+          "member": "RetainedRowMeasurementCount",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "2d8b043fabeb0ef48d6ae2d56cc2c7cf61e4e7a732a3e0acbf1261f3ecd9f26f",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.retained-row-measurement-count"
+          ]
+        },
+        {
+          "member": "RetainedRowMeasurementLimit",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "72583e66836de51b4b6a40a46b1aa9e6bf0ad3e467cf7448c6a3002a655ea47c",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.retained-row-measurement-limit"
+          ]
+        },
+        {
+          "member": "RowContent",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "edff7b97e299ed4a532d056b06202b90ea2db677259a4140c713489328b571e4",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.row-content"
+          ]
+        },
+        {
           "member": "RowCount",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -164287,6 +165506,21 @@
           ]
         },
         {
+          "member": "RowKey",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "dc92f8fc2136cfe4239d50741cf98c04548e2e9da08074e728955c824594f453",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.row-key"
+          ]
+        },
+        {
           "member": "ScrollHost",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
@@ -164299,6 +165533,21 @@
           },
           "scenarioIds": [
             "scenario.v2.table-v2.avalonia-extra.scroll-host"
+          ]
+        },
+        {
+          "member": "ScrollTo",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "cefe1105fa7066e34d1439257f3d2db8f6969aca1f50e7bfd1ebb07dfc84f379",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.scroll-to"
           ]
         },
         {
@@ -164317,6 +165566,126 @@
           ]
         },
         {
+          "member": "ScrollToLeft",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "a4ab0f46988d79a055d7d810889224f62db5f6841f469edb146af5b01fbc5a29",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.scroll-to-left"
+          ]
+        },
+        {
+          "member": "ScrollToRow",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "aca6db15b399f18f04f077eb386ba4e2ef24cba52bed260213d000f2f47d6187",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.scroll-to-row"
+          ]
+        },
+        {
+          "member": "ScrollToTop",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "9c00542792e4a7d046d3d98270c57dbbc2e8e53a59c9f7c99a45b98fc81a862b",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.scroll-to-top"
+          ]
+        },
+        {
+          "member": "SetMeasuredRowHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "c442709b191b64eb9440ac48aee93fb4b85dbfb1019ace7481ab931a86b05f34",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.set-measured-row-height"
+          ]
+        },
+        {
+          "member": "SetRowExpanded",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "02563bee97166252d33c7afabb65058afb706242b3fd0b66078d8bbe55929a60",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.set-row-expanded"
+          ]
+        },
+        {
+          "member": "SortBy",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "a11b12de50159a4877e62d53816ee7b4ce32155c21442dc2eab55f27151cf9c6",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.sort-by"
+          ]
+        },
+        {
+          "member": "SortColumn",
+          "kind": "avalonia-extra",
+          "surfaceKind": "method",
+          "surfaceHash": "776314dea63fff450b6122e666c8c0c699e326daa0da72a0ac3869294d321d7a",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.sort-column"
+          ]
+        },
+        {
+          "member": "SortState",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "f8a92baf73091092ae4496e1402c6944ee34ecaee67ac6b725a16ac24b030410",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.sort-state"
+          ]
+        },
+        {
           "member": "UpdateRowIndexAsync",
           "kind": "avalonia-extra",
           "surfaceKind": "method",
@@ -164329,6 +165698,51 @@
           },
           "scenarioIds": [
             "scenario.v2.table-v2.avalonia-extra.update-row-index-async"
+          ]
+        },
+        {
+          "member": "ViewportHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "7271c389fb01adb339eeee093a059477c95a2dc8f452eb18b32d87c79fa87abb",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.viewport-height"
+          ]
+        },
+        {
+          "member": "ViewportMaxHeight",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "316ac5f161da22acaaf78442f0a0442a392f7aa318c4aabcee4af566d119470f",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.viewport-max-height"
+          ]
+        },
+        {
+          "member": "ViewportWidth",
+          "kind": "avalonia-extra",
+          "surfaceKind": "property",
+          "surfaceHash": "9131d59064c8216fca1685dc74592aa699c3f521ea513c12423848b5a3a0a8b3",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.table-v2.avalonia-extra.viewport-width"
           ]
         },
         {
@@ -172334,6 +173748,125 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2HeaderCellContext",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 7,
+      "surfaceHash": "843318bd27f02bb9946a0529e469c31b5ec4d4e66daaf79dbd0d8ecc54c89e80",
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-header-cell-context"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2HeaderContext",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 5,
+      "surfaceHash": "ce4bbd6eb6197ce2b12ea971923878b410abcc2a31cefd9ae5931904a2e81574",
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-header-context"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2RowContext",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 9,
+      "surfaceHash": "8a5d3d9f4e6ea1bd676f3e028e138ab820f1ed6ba9cf3a3ef834446e1b4dac60",
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-row-context"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2RowExpansion",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 4,
+      "surfaceHash": "248c5b9b46159758a4a7a45669695289eb412a113c9c5503d280e9286b086049",
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-row-expansion"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2RowsRendered",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 6,
+      "surfaceHash": "286d4c4df00a5f72eecc8d415236e1e9c44f3d8e1765e7f91fab1392af30c29b",
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-rows-rendered"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2ScrollPosition",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 4,
+      "surfaceHash": "87fe764299c910d190555554691883f66669fa03241f2f107cc9e1475a8b2e0f",
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-scroll-position"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusTableV2Sort",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 4,
+      "surfaceHash": "45a0064e5eefdeec9a1992b16586345eacaf92f606a6f3a344432157f9fe430f",
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-table-v2-sort"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusTabPaneContextEventArgs",
       "kind": "class",
       "packageId": "avalonia",
@@ -174323,21 +175856,21 @@
     },
     "avaloniaThemes": {
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "fingerprint": "c2a85654993463c8874c15a89652cd9adb8d5aaf84a5d7f547f1c0ae15b5b021",
+      "fingerprint": "6fea6f3222d37af218f66b5081a393d8e6f798d9270cbfd47ce87f88bdc48e03",
       "definitionCount": 116,
-      "dependencyCount": 990,
+      "dependencyCount": 991,
       "resolvedCount": 491,
-      "ownerBoundCount": 607,
+      "ownerBoundCount": 608,
       "contractDeclared": false,
       "renderedEvidenceVerified": false
     }
   },
   "coverage": {
-    "aligned-candidate": 13,
+    "aligned-candidate": 14,
     "partial": 139,
-    "missing": 2102,
-    "web-only": 38,
+    "missing": 2112,
+    "web-only": 27,
     "total": 2292,
-    "mappedPercent": 6.6
+    "mappedPercent": 6.7
   }
 }

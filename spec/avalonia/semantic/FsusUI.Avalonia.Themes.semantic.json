@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "20cd00f43f55e4679be7f970688e01f59dc4024a7df8d8fa859264617bb9ed0f",
+    "inputTreeHash": "506b0e49ce93f76605c6808916335186431227dff038cee9b6aa0160c9f5432f",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "25f281da95794d7a5282a4a83e1a1406ef389c5ff536bf8e81da4e322b15a9a4"
+    "outputHash": "17264eb2329265d2b8b4e0044580ee9ff9c979b92dae6f2dd2ac76265b2715dd"
   },
   "semanticTypes": [
     {
@@ -5710,6 +5710,17 @@
         "ownerType": "FsusUI.Avalonia.Controls.FsusCheckTag",
         "ownership": "resolved",
         "ownerExpression": "fsus|FsusCheckTag.fsus-checked"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/CheckTag.axaml",
+        "sourceMember": "fsus|FsusCheckTag::Border.BorderBrush",
+        "dependency": "FsusThemeFocusBrush",
+        "resolved": false,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCheckTag",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusCheckTag"
       },
       {
         "kind": "xaml-resource-reference",

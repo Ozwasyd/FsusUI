@@ -169,12 +169,12 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     properties.filter((property) => typeof property.required === 'boolean')
       .length,
-    2021,
+    2083,
   )
   assert.equal(properties.filter((property) => property.required).length, 15)
   assert.equal(
     avaloniaProperties.filter((property) => property.defaultKnown).length,
-    294,
+    296,
   )
   const contentRegions = avaloniaBaselines.avalonia.semanticTypes.flatMap(
     (type) =>
@@ -400,12 +400,12 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 406)
+  assert.equal(mappings.length, 408)
   assert.deepEqual(semanticCounts, {
-    role: 106,
+    role: 107,
     name: 123,
     value: 4,
-    state: 114,
+    state: 115,
     'help-text': 25,
     'accessibility-view': 22,
     'live-setting': 12,
@@ -413,12 +413,12 @@ test('Avalonia automation baseline separates source observations from declared a
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'public-control-this')
       .length,
-    323,
+    324,
   )
   assert.equal(
     mappings.filter((mapping) => mapping.targetKind === 'automation-peer-owner')
       .length,
-    24,
+    25,
   )
   assert.ok(
     automationTypes.every(
@@ -654,7 +654,7 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
   assert.equal(avalonia.definitions.length, 116)
   assert.equal(themes.definitions.length, 116)
   assert.equal(avalonia.dependencies.length, 23)
-  assert.equal(themes.dependencies.length, 990)
+  assert.equal(themes.dependencies.length, 991)
   assert.equal(
     avalonia.dependencies.filter((dependency) => dependency.resolved).length,
     23,
@@ -667,7 +667,7 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
     themes.dependencies.filter(
       (dependency) => dependency.ownership === 'resolved',
     ).length,
-    607,
+    608,
   )
   assert.ok(
     [avalonia, themes].every(
@@ -1594,7 +1594,7 @@ test('real mapped inputs use compiler-known metadata and keep unknown values par
   assert.equal(mappedInputs.length, 140)
   assert.equal(
     mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
-    13,
+    14,
   )
   assert.equal(
     mappedInputs.filter((input) => input.status === 'partial').length,

@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "0fb4348ff674653f20fee11091e7692a77efd218",
+    "commitSha": "2fed127f65ff9d820d449efe16a4e6ee61fd1a59",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
-    "inputTreeHash": "5b2e329102953647d0703c7c815093f6dcf2dc67bfc7546a0ae529afcebe5199",
+    "inputTreeHash": "8f3772cc51d36040782dd8da602bba89f96d4aee7ee55757e37cfdc521096198",
     "compilerOptionsHash": "919b1f4f85e411ccb762efdc5a2d646f412fd73928c05ad302bbfdda0ab731e4",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "7766081d12b6608e10d05140d5842841ad32fc86691fec8728a43eb16a363e86",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "561090fc404a52c19f4cfdae9f7e244a13fb8369d87bcfaca5ed55474a98e53f"
+    "outputHash": "5b69a71201c0dcf9fcc589e549830f169d2f095a2f540cbb9a88c7ae1e9baa4c"
   },
   "summary": {
     "componentModules": 93,
@@ -25,9 +25,9 @@
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
-      "native-adapter": 73,
+      "native-adapter": 76,
       "platform-override": 21,
-      "web-only": 8
+      "web-only": 5
     }
   },
   "installableComponents": [
@@ -1455,7 +1455,7 @@
     {
       "name": "ElAffix",
       "module": "affix",
-      "classification": "web-only",
+      "classification": "native-adapter",
       "props": ["offset", "position", "target", "zIndex"],
       "emits": ["[CHANGE_EVENT]", "scroll"],
       "slots": [
@@ -2522,7 +2522,7 @@
     {
       "name": "ElBacktop",
       "module": "backtop",
-      "classification": "web-only",
+      "classification": "native-adapter",
       "props": ["bottom", "right", "target", "visibilityHeight"],
       "emits": ["click"],
       "slots": [
@@ -11704,7 +11704,7 @@
     {
       "name": "ElInfiniteScroll",
       "module": "infinite-scroll",
-      "classification": "web-only",
+      "classification": "native-adapter",
       "props": [],
       "emits": [],
       "slots": [],
@@ -39301,7 +39301,7 @@
     {
       "name": "ElInfiniteScroll",
       "source": "@element-plus/components/infinite-scroll",
-      "classification": "web-only"
+      "classification": "native-adapter"
     },
     {
       "name": "ElLoading",
@@ -43708,10 +43708,7 @@
     }
   ],
   "webOnlyApis": [
-    "ElAffix",
-    "ElBacktop",
     "ElCollapseTransition",
-    "ElInfiniteScroll",
     "ElPopper",
     "ElPopperArrow",
     "ElPopperContent",
