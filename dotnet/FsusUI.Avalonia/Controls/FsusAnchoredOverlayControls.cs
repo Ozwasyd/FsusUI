@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Input;
 using FsusUI.Avalonia.Overlay;
@@ -82,6 +83,7 @@ public abstract class FsusAnchoredOverlaySurface : ContentControl, IFsusOverlayL
       new Rect(0, 0, 1920, 1080));
 
   private FsusOverlayHost? overlayHost;
+  private WeakReference<FsusOverlayHost>? lifecycleHost;
 
   protected FsusAnchoredOverlaySurface(string baseClass)
   {
@@ -202,6 +204,10 @@ public abstract class FsusAnchoredOverlaySurface : ContentControl, IFsusOverlayL
   {
     OverlayEntry = entry;
     overlayHost = entry.Content.Parent as FsusOverlayHost;
+    if (overlayHost is not null)
+    {
+      lifecycleHost = new WeakReference<FsusOverlayHost>(overlayHost);
+    }
     IsOpen = true;
     EffectivePlacement = FromOverlayPlacement(entry.Placement);
     SyncState();
@@ -270,6 +276,59 @@ public abstract class FsusAnchoredOverlaySurface : ContentControl, IFsusOverlayL
     FsusComponentClasses.Ensure(this, $"fsus-placement-{PlacementName(EffectivePlacement)}", true);
     AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(AccessibleName ?? Title, OverlayContent));
     AutomationProperties.SetItemStatus(this, $"{(IsOpen ? "open" : "closed")} {PlacementName(EffectivePlacement)}");
+  }
+
+  private bool TryGetLifecycleHost(out FsusOverlayHost host)
+  {
+    if (overlayHost is not null)
+    {
+      host = overlayHost;
+      return true;
+    }
+
+    if (
+      lifecycleHost is not null &&
+      lifecycleHost.TryGetTarget(out var retainedHost))
+    {
+      host = retainedHost;
+      return true;
+    }
+
+    host = null!;
+    return false;
+  }
+
+  internal ExpandCollapseState AutomationExpandCollapseState => IsOpen
+    ? ExpandCollapseState.Expanded
+    : ExpandCollapseState.Collapsed;
+
+  internal void ExpandFromAutomation()
+  {
+    if (IsOpen)
+    {
+      return;
+    }
+
+    if (
+      !IsEnabled ||
+      IsDisabled ||
+      !TryGetLifecycleHost(out var host))
+    {
+      throw new InvalidOperationException(
+        "The anchored overlay cannot reopen without an enabled lifecycle host.");
+    }
+
+    Open(host, FsusAnchoredOpenReason.Manual);
+  }
+
+  internal void CollapseFromAutomation()
+  {
+    if (!IsOpen)
+    {
+      return;
+    }
+
+    _ = CloseAsync().AsTask().GetAwaiter().GetResult();
   }
 
   private FsusOverlayOptions CreateOverlayOptions() =>
@@ -352,14 +411,30 @@ public class FsusTooltip : FsusAnchoredOverlaySurface
   public FsusTooltip() : base("fsus-tooltip")
   {
     TriggerMode = FsusAnchoredTriggerMode.Hover;
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Text);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.ToolTip);
   }
+
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new FsusTooltipAutomationPeer(this);
 
   protected override void SyncState()
   {
     base.SyncState();
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Text);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.ToolTip);
     AutomationProperties.SetClassNameOverride(this, "Tooltip");
+  }
+
+  private sealed class FsusTooltipAutomationPeer(FsusTooltip owner)
+    : ControlAutomationPeer(owner), IExpandCollapseProvider
+  {
+    public ExpandCollapseState ExpandCollapseState =>
+      owner.AutomationExpandCollapseState;
+
+    public bool ShowsMenu => false;
+
+    public void Expand() => owner.ExpandFromAutomation();
+
+    public void Collapse() => owner.CollapseFromAutomation();
   }
 }
 
@@ -368,14 +443,30 @@ public class FsusPopover : FsusAnchoredOverlaySurface
   public FsusPopover() : base("fsus-popover")
   {
     TriggerMode = FsusAnchoredTriggerMode.Click;
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Group);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Window);
   }
+
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new FsusPopoverAutomationPeer(this);
 
   protected override void SyncState()
   {
     base.SyncState();
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Group);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Window);
     AutomationProperties.SetClassNameOverride(this, "Popover");
+  }
+
+  private sealed class FsusPopoverAutomationPeer(FsusPopover owner)
+    : ControlAutomationPeer(owner), IExpandCollapseProvider
+  {
+    public ExpandCollapseState ExpandCollapseState =>
+      owner.AutomationExpandCollapseState;
+
+    public bool ShowsMenu => false;
+
+    public void Expand() => owner.ExpandFromAutomation();
+
+    public void Collapse() => owner.CollapseFromAutomation();
   }
 }
 

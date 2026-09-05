@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "1b256c6d9fe7e7676adfe5d9315cbb746822e10b0d024816bf4aefa2610dccc4",
+      "hash": "45fafe3eedb24b270da853e6fca8e8cba17ed80f32376e8f8e3dad564350c658",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -633,7 +633,7 @@
         "packageId": "avalonia",
         "surfaceHash": "d07d9f5e0a9ee5f91ef66a986669e5a84bbcba013a74d1736e281efbe3153425",
         "stateContractFingerprint": "33c1adf97df6e834bb01275b83b3af9a99da5f1e8a56ba18faf5c50ce830ae47",
-        "automationContractFingerprint": "d19ec68edbb2b9fd6f269e973eae740fb615bd8fa92eda4372c86b55127b8f76",
+        "automationContractFingerprint": "571e89f027121f068d2ee587c075ed1282f3d5a6163b7fcc684f3538d130c133",
         "tokenThemeContractFingerprint": "2dff890c9a0c25f3abfdcb721f6ab959c9be07543a26188488df13f38d9b4836"
       },
       "basis": "name-equality"
@@ -1192,7 +1192,7 @@
         "type": "FsusUI.Avalonia.Controls.FsusPopover",
         "packageId": "avalonia",
         "surfaceHash": "1a6b4cb679cb413cc0da10d712e13935c887257838551804b46b69433ad4d029",
-        "automationContractFingerprint": "9932c6dc8fc1fa2d81161d0a99a95bb81a7a3b0f20f204762d237f6b93655a31"
+        "automationContractFingerprint": "b706af93b835b33b731756d7d84812c866a1ba7bd8af95954a62f09e3c5d0277"
       },
       "basis": "name-equality"
     },
@@ -1725,7 +1725,7 @@
         "type": "FsusUI.Avalonia.Controls.FsusTooltip",
         "packageId": "avalonia",
         "surfaceHash": "61d9beb0ebdb5a85e3148185e09f5d666aac39993ae84827732432bbe51f62d9",
-        "automationContractFingerprint": "52727f834f0f4636f832530155561aeedd04227ed15701b45a83bc095b8b1646",
+        "automationContractFingerprint": "2fc06a69692793d1bf56783438a1336c5f338e14b723bd627a7cc9ee9047bc19",
         "tokenThemeContractFingerprint": "bf29cc8480ff8d240df0358f8fd07d60c444309f5ea27eae3c6800aa6ccd1577"
       },
       "basis": "name-equality"
@@ -39254,7 +39254,7 @@
           },
           "automationContract": {
             "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-            "fingerprint": "d19ec68edbb2b9fd6f269e973eae740fb615bd8fa92eda4372c86b55127b8f76",
+            "fingerprint": "571e89f027121f068d2ee587c075ed1282f3d5a6163b7fcc684f3538d130c133",
             "contractDeclared": false,
             "runtimeTreeVerified": false,
             "mappingComplete": false,
@@ -80090,12 +80090,13 @@
           "type": "FsusUI.Avalonia.Controls.FsusPopover",
           "automationContract": {
             "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-            "fingerprint": "9932c6dc8fc1fa2d81161d0a99a95bb81a7a3b0f20f204762d237f6b93655a31",
+            "fingerprint": "b706af93b835b33b731756d7d84812c866a1ba7bd8af95954a62f09e3c5d0277",
             "contractDeclared": false,
             "runtimeTreeVerified": false,
             "mappingComplete": false,
             "observedSemantics": [
-              "role"
+              "role",
+              "state"
             ]
           }
         }
@@ -126163,12 +126164,13 @@
           "type": "FsusUI.Avalonia.Controls.FsusTooltip",
           "automationContract": {
             "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-            "fingerprint": "52727f834f0f4636f832530155561aeedd04227ed15701b45a83bc095b8b1646",
+            "fingerprint": "2fc06a69692793d1bf56783438a1336c5f338e14b723bd627a7cc9ee9047bc19",
             "contractDeclared": false,
             "runtimeTreeVerified": false,
             "mappingComplete": false,
             "observedSemantics": [
-              "role"
+              "role",
+              "state"
             ]
           },
           "tokenThemeContract": {
@@ -171128,7 +171130,7 @@
       "memberCount": 27,
       "surfaceHash": "deec3513b4826588a289f93de5a5d37da2953fefe3667c15d343c6bf6f4fd92a",
       "stateContractFingerprint": "cfebd367b53b9cceed240f67aff8fc47da88e33ddf1197916598dd224aa64f2f",
-      "automationContractFingerprint": "9ddee48319d2a95037b78fb4ae03bac71899a7ffaa30c1a7cffd95bd23f5e5fc",
+      "automationContractFingerprint": "8b7f5ea86a18e4351c84d4b5f929725694238ca2549cc321c3104175fcc52773",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-modal-surface"
       ],

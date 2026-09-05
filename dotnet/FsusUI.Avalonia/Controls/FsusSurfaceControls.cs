@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -244,6 +245,7 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
 
   private readonly List<Control> focusScope = [];
   private FsusOverlayHost? overlayHost;
+  private WeakReference<FsusOverlayHost>? lifecycleHost;
   private FsusModalCloseReason? pendingCloseReason;
 
   protected FsusModalSurface(string baseClass)
@@ -435,6 +437,10 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
   {
     OverlayEntry = entry;
     overlayHost = entry.Content.Parent as FsusOverlayHost;
+    if (overlayHost is not null)
+    {
+      lifecycleHost = new WeakReference<FsusOverlayHost>(overlayHost);
+    }
     IsOpen = true;
     MotionState = FsusPanelMotionState.Open;
     SyncState();
@@ -483,13 +489,72 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
     FsusComponentClasses.Ensure(this, "fsus-has-cancel", CancelContent is not null);
     AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(Title, Content));
     AutomationProperties.SetHelpText(this, BodyContent?.ToString() ?? string.Empty);
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Group);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Window);
     AutomationProperties.SetClassNameOverride(this, "Dialog");
     AutomationProperties.SetItemStatus(this, ModalStatus());
   }
 
   protected void AddClass(string className) =>
     FsusComponentClasses.Ensure(this, className, true);
+
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new FsusModalSurfaceAutomationPeer(this);
+
+  private bool TryGetLifecycleHost(out FsusOverlayHost host)
+  {
+    if (overlayHost is not null)
+    {
+      host = overlayHost;
+      return true;
+    }
+
+    if (
+      lifecycleHost is not null &&
+      lifecycleHost.TryGetTarget(out var retainedHost))
+    {
+      host = retainedHost;
+      return true;
+    }
+
+    host = null!;
+    return false;
+  }
+
+  private sealed class FsusModalSurfaceAutomationPeer(FsusModalSurface owner)
+    : ControlAutomationPeer(owner), IExpandCollapseProvider
+  {
+    public ExpandCollapseState ExpandCollapseState => owner.IsOpen
+      ? ExpandCollapseState.Expanded
+      : ExpandCollapseState.Collapsed;
+
+    public bool ShowsMenu => false;
+
+    public void Expand()
+    {
+      if (owner.IsOpen)
+      {
+        return;
+      }
+
+      if (!owner.IsEnabled || !owner.TryGetLifecycleHost(out var host))
+      {
+        throw new InvalidOperationException(
+          "The modal surface cannot reopen without an enabled lifecycle host.");
+      }
+
+      owner.Open(host);
+    }
+
+    public void Collapse()
+    {
+      if (!owner.IsOpen)
+      {
+        return;
+      }
+
+      _ = owner.RequestCloseAsync().AsTask().GetAwaiter().GetResult();
+    }
+  }
 
   private async ValueTask<bool> CanCloseAsync(
     FsusModalCloseReason reason,
@@ -825,7 +890,7 @@ public class FsusDrawer : FsusModalSurface
 
   public FsusDrawer() : base("fsus-drawer")
   {
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Pane);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Window);
     SyncState();
   }
 
@@ -860,7 +925,7 @@ public class FsusDrawer : FsusModalSurface
     }
 
     FsusComponentClasses.Ensure(this, $"fsus-drawer-{PlacementName(Placement)}", true);
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Pane);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Window);
     AutomationProperties.SetClassNameOverride(this, "Drawer");
   }
 

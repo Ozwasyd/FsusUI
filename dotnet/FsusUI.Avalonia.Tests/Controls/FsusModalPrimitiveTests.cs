@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
@@ -52,7 +53,9 @@ public class FsusModalPrimitiveTests
     Assert.Contains("fsus-dangerous", dialog.Classes);
     Assert.Contains("fsus-loading", dialog.Classes);
     Assert.Equal("Delete article", AutomationProperties.GetName(dialog));
-    Assert.Equal(AutomationControlType.Group, AutomationProperties.GetControlTypeOverride(dialog));
+    Assert.Equal(
+      AutomationControlType.Window,
+      AutomationProperties.GetControlTypeOverride(dialog));
     Assert.Equal("Dialog", AutomationProperties.GetClassNameOverride(dialog));
     Assert.Equal("modal open dangerous loading", AutomationProperties.GetItemStatus(dialog));
 
@@ -98,7 +101,15 @@ public class FsusModalPrimitiveTests
     Assert.False(entry.Options.CloseOnPointerOutside);
     Assert.Contains("fsus-drawer-right", drawer.Classes);
     Assert.Equal("Filters", AutomationProperties.GetName(drawer));
-    Assert.Equal(AutomationControlType.Pane, AutomationProperties.GetControlTypeOverride(drawer));
+    Assert.Equal(
+      AutomationControlType.Window,
+      AutomationProperties.GetControlTypeOverride(drawer));
+    var drawerPeer = ControlAutomationPeer.CreatePeerForElement(drawer);
+    var drawerProvider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+      drawerPeer?.GetProvider<IExpandCollapseProvider>());
+    Assert.Equal(
+      ExpandCollapseState.Expanded,
+      drawerProvider.ExpandCollapseState);
 
     Assert.False(await host.DismissPointerOutsideAsync(new Point(-1, -1)));
     Assert.True(drawer.IsOpen);
@@ -129,12 +140,24 @@ public class FsusModalPrimitiveTests
     Assert.Same(dangerous, host.Topmost?.Content);
     Assert.True(dangerous.IsOpen);
     Assert.Contains("fsus-dangerous", dangerous.Classes);
+    var dangerousPeer = ControlAutomationPeer.CreatePeerForElement(dangerous);
+    var dangerousProvider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+      dangerousPeer?.GetProvider<IExpandCollapseProvider>());
+    Assert.Equal(
+      AutomationControlType.Window,
+      dangerousPeer?.GetAutomationControlType());
+    Assert.Equal(
+      ExpandCollapseState.Expanded,
+      dangerousProvider.ExpandCollapseState);
     Assert.Equal(FsusMessageBoxResult.None, await dangerous.ConfirmAsync(canceledSource.Token));
     Assert.True(dangerous.IsOpen);
 
     Assert.Equal(FsusMessageBoxResult.Confirm, await dangerous.ConfirmAsync());
     Assert.False(dangerous.IsOpen);
     Assert.Equal(FsusMessageBoxResult.Confirm, dangerous.Result);
+    Assert.Equal(
+      ExpandCollapseState.Collapsed,
+      dangerousProvider.ExpandCollapseState);
     Assert.Empty(host.OpenOverlays);
 
     var cancel = service.Show(new FsusMessageBoxOptions { Title = "Cancel publish?", Message = "Discard changes." });
@@ -147,6 +170,46 @@ public class FsusModalPrimitiveTests
     Assert.True(await host.DismissKeyboardAsync());
     Assert.Equal(FsusMessageBoxResult.Closed, keyboard.Result);
     Assert.False(keyboard.IsOpen);
+  }
+
+  [Fact]
+  public async Task ModalAutomationPeerUsesWindowRoleAndRealLifecycleState()
+  {
+    var host = new FsusOverlayHost();
+    var dialog = new FsusDialog { Title = "Confirm publish" };
+    dialog.Open(host);
+    var peer = ControlAutomationPeer.CreatePeerForElement(dialog);
+    var provider = Assert.IsAssignableFrom<IExpandCollapseProvider>(
+      peer?.GetProvider<IExpandCollapseProvider>());
+
+    Assert.Equal(AutomationControlType.Window, peer?.GetAutomationControlType());
+    Assert.Equal(ExpandCollapseState.Expanded, provider.ExpandCollapseState);
+
+    provider.Collapse();
+
+    Assert.False(dialog.IsOpen);
+    Assert.Equal(ExpandCollapseState.Collapsed, provider.ExpandCollapseState);
+
+    provider.Expand();
+
+    Assert.True(dialog.IsOpen);
+    Assert.Equal(ExpandCollapseState.Expanded, provider.ExpandCollapseState);
+
+    dialog.ClosePolicy = FsusModalClosePolicy.Blocked;
+    provider.Collapse();
+    Assert.True(dialog.IsOpen);
+
+    dialog.ClosePolicy = FsusModalClosePolicy.Any;
+    dialog.BeforeClose = _ => ValueTask.FromResult(false);
+    provider.Collapse();
+    Assert.True(dialog.IsOpen);
+
+    dialog.BeforeClose = null;
+    Assert.True(await dialog.RequestCloseAsync());
+
+    dialog.IsEnabled = false;
+    Assert.Throws<InvalidOperationException>(provider.Expand);
+    Assert.False(dialog.IsOpen);
   }
 
   [Fact]

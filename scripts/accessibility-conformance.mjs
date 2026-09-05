@@ -979,6 +979,9 @@ const normalizeContractRole = (role) =>
   ).toLowerCase()
 
 const normalizeAvaloniaRole = (node) => {
+  if (node.role === 'window') {
+    return 'dialog'
+  }
   if (
     node.role === 'text' &&
     node.className === 'Alert' &&
@@ -1433,6 +1436,22 @@ const verifyRuntimeEvidence = () => {
       'problem field role is undeclared',
     ],
     [
+      'dialog-window-role-drift',
+      (candidate) => {
+        const dialog = find(candidate, 'avalonia-dialog-confirm')
+        dialog.accessibility.nodes[0].role = 'group'
+      },
+      'problem field role is undeclared',
+    ],
+    [
+      'tooltip-role-drift',
+      (candidate) => {
+        const tooltip = find(candidate, 'avalonia-tooltip-stable25')
+        tooltip.accessibility.nodes[0].role = 'text'
+      },
+      'problem field role is undeclared',
+    ],
+    [
       'name-drift',
       (candidate) => {
         candidate.evidence[0].accessibility.nodes[0].name = 'Fixture name'
@@ -1461,6 +1480,22 @@ const verifyRuntimeEvidence = () => {
         candidate.evidence[0].accessibility.nodes[0].states.disabled = true
       },
       'problem field states.disabled is undeclared',
+    ],
+    [
+      'overlay-expanded-drift',
+      (candidate) => {
+        const popover = find(candidate, 'avalonia-popover-stable25')
+        popover.accessibility.nodes[0].states.expanded = false
+      },
+      'problem field states.expanded is undeclared',
+    ],
+    [
+      'overlay-provider-omission',
+      (candidate) => {
+        const messageBox = find(candidate, 'avalonia-message-box-stable24')
+        messageBox.accessibility.nodes[0].states.expanded = null
+      },
+      'problem field states.expanded is undeclared',
     ],
     [
       'tab-order-drift',
