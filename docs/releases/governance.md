@@ -74,6 +74,9 @@ failure set and still exit non-zero. The policy does not weaken any gate.
 - `prepare:test-artifacts` reuses icon/WASM outputs only after source-fingerprint
   validation. CI cache hits are logged; publish and forced regeneration use
   `pnpm run build:wasm` or `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`.
+- The test artifact cache reports a cache hit or cache miss and delegates
+  regeneration to `prepare:test-artifacts` or `build:wasm` when fingerprints
+  do not match.
 - Unit shards come from the capacity plan rather than a fixed count. A shared
   `unit-test-artifacts` upload is prepared once; shards verify it with
   `pnpm run check:test-artifacts-ready` and use the planned

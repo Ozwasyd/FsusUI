@@ -492,7 +492,7 @@ const collectLinks = (content) => {
 
     const labelEnd = findClosingBracket(source, index, '[', ']')
     if (labelEnd === -1) continue
-    let cursor = labelEnd + 1
+    const cursor = labelEnd + 1
 
     if (source[cursor] === '(') {
       const targetEnd = findClosingBracket(source, cursor, '(', ')')
@@ -551,7 +551,7 @@ const trimLinkTarget = (rawTarget) => {
     const title = value.search(/\s+["'][^"']*["']\s*$/u)
     if (title !== -1) value = value.slice(0, title)
   }
-  return value.replace(/\\([()\[\]<>])/gu, '$1')
+  return value.replace(/\\([()[\]<>])/gu, '$1')
 }
 
 const decodeSafe = (value) => {
@@ -575,7 +575,7 @@ const splitLinkTarget = (rawTarget) => {
   return { target, targetPath, anchor }
 }
 
-const resolveLinkPath = (file, targetPath, root) => {
+const resolveLinkPath = (file, targetPath) => {
   if (targetPath === '') return file
   if (targetPath.startsWith('/')) {
     return normalizeRelative(targetPath.slice(1))
@@ -618,7 +618,7 @@ const analyseLinks = ({
       if (EXTERNAL_LINK.test(target)) continue
       total += 1
 
-      const targetFile = resolveLinkPath(file, targetPath, root)
+      const targetFile = resolveLinkPath(file, targetPath)
       const exists = linkExists(targetFile, root, knownFiles)
       const brokenPath = !exists
       const brokenAnchor =
@@ -705,13 +705,13 @@ const checkAvaloniaHeadings = ({ root, files, contents }) => {
   return { failures, checked: targets.length }
 }
 
-const extractComponentLinks = (content, file, root) =>
+const extractComponentLinks = (content, file) =>
   collectLinks(content)
     .map(({ rawTarget }) => splitLinkTarget(rawTarget))
     .filter(({ target }) => !EXTERNAL_LINK.test(target))
-    .map(({ targetPath }) => resolveLinkPath(file, targetPath, root))
+    .map(({ targetPath }) => resolveLinkPath(file, targetPath))
 
-const checkComponentOverview = ({ root, files, contents }) => {
+const checkComponentOverview = ({ files, contents }) => {
   const componentFiles = files.filter(
     (file) => /^docs\/components\/[^/]+\.md$/u.test(file) && file !== 'docs/components/overview.md',
   )
@@ -720,7 +720,7 @@ const checkComponentOverview = ({ root, files, contents }) => {
   const overview = 'docs/components/overview.md'
   if (!contents.has(overview)) return { failures: [`${overview} missing`], checked: componentFiles.length, links: 0 }
 
-  const links = new Set(extractComponentLinks(contents.get(overview), overview, root))
+  const links = new Set(extractComponentLinks(contents.get(overview), overview))
   const missing = componentFiles
     .filter((file) => !links.has(file))
     .map((file) => `${overview} missing link to ${file}`)
