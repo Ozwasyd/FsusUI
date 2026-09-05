@@ -45,7 +45,14 @@ const mutateJson = (file, mutation) => {
 const reset = () => {
   const result = run('git', ['reset', '--hard', 'HEAD'])
   if (result.status !== 0) throw new Error(result.stderr || result.stdout)
-  run('git', ['clean', '-fd'])
+  run('git', [
+    'clean',
+    '-fd',
+    '-e',
+    'vue/packages/icons-vue/dist',
+    '-e',
+    'vue/packages/wasm/dist',
+  ])
   fs.mkdirSync(path.join(checkout, '.tmp/conformance-v2'), { recursive: true })
   for (const file of [
     'web-a11y/manifest.json',
