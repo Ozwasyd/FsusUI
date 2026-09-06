@@ -15,6 +15,10 @@ export const captureDeterministicLocatorPng = async (
     await new Promise((resolveFrame) =>
       requestAnimationFrame(() => requestAnimationFrame(resolveFrame)),
     )
+    if (document.activeElement !== element)
+      await new Promise((resolveFrame) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolveFrame)),
+      )
   })
   let accepted = null
   for (let index = 0; index < samples; index += 1) {
