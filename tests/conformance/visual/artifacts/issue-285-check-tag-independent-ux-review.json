@@ -12,7 +12,7 @@
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
     "contractHash": "957b2a6b4123425d724ebc7acfb3c963691e8c56d018d292c56bc1b2efec0528",
     "webBaselineHash": "6d43c3f504bbad092869c64456a4247eb4dd8be7648ed05bfda4cfc6ff303444",
-    "avaloniaBaselineHash": "355d8bdb7f42b5fef2e4a3bbdff0c1e51d557599a6bb4dcf96ee424bcd709b11",
+    "avaloniaBaselineHash": "24bbac3f49808e77cddd5613fc760d8ea26701a74b5949c35e61a68d3292a7f4",
     "runnerHash": "d6561b070afc3d632835e779066970a4f669291add0efda428b855fd26332607"
   },
   "viewportStateMatrix": [
