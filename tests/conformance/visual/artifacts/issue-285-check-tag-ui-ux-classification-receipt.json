@@ -34,12 +34,12 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "1c324998572545a2585d521eb008b8911ec39f44",
+    "revision": "6e6b8a873427ed8efd25c64af6dc9d02c7da9b5a",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "0899bb73568e4e0430595ecce3c1d605d51c963e27e37250b6dcc0e1a6ff77a9",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "1c324998572545a2585d521eb008b8911ec39f44",
+  "candidateSha": "6e6b8a873427ed8efd25c64af6dc9d02c7da9b5a",
   "candidateDigest": "2b662d5177e6d577910b8877704b269759a05c581727442edc0caa621969aeb7",
   "stateEvidenceMatrix": [
     {
@@ -68,5 +68,5 @@
   "classificationEvidenceDigest": "bf1cf46ccbef62abbf4f30a6bb0a0031a8607149ead79dab2eabe35e983ab126",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "f9afef26381c5cf4832759ede3daee1ca365bb17e9db8f598b61e83bcd423442"
+  "receiptDigest": "34e0969fec7213e5a48fb0202c05a399502ba432dcd001e0b8e945bc1be7bf40"
 }
