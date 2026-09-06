@@ -99,6 +99,7 @@ const fail = (message) => {
 }
 const executionCoverageWithoutHash = (coverage) => {
   const { outputHash: _outputHash, ...canonical } = coverage
+  void _outputHash
   return canonical
 }
 export const executionCoverageHash = (coverage) =>

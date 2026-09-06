@@ -1,0 +1,38 @@
+{
+  "id": "progress-vue-parity-web-avalonia",
+  "component": "data",
+  "state": "line-50pct-200x15",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "color.action.primary",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/progress-vue-parity.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/progress-vue-parity-web-avalonia.json",
+  "deltas": {
+    "geometry": 0,
+    "colorDelta": 0,
+    "radius": 0,
+    "spacing": 0,
+    "textBaseline": 0,
+    "screenshotDiffPercent": 0.052,
+    "perceptualDelta": 0.042
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [
+    {
+      "metric": "screenshotDiffPercent",
+      "delta": 0.052,
+      "threshold": 0.015,
+      "overrideId": "visual-vue-parity-batch3-text-003"
+    }
+  ],
+  "passed": true,
+  "failures": []
+}

@@ -23,7 +23,14 @@ positioning part `PART_SwitchKnob`). Without such a template, opening any
 native window that lays out a switch throws
 `KeyNotFoundException: Could not find control 'PART_MovingKnobs'`. The
 template covers plain `ToggleSwitch` controls as well as `FsusSwitch`, with
-density sizing for `fsus-size-sm`, `fsus-size-md`, and `fsus-size-lg`.
+density sizing for `fsus-size-sm`, `fsus-size-md`, and `fsus-size-lg`. The
+checked track resolves the scholarly primary action color with a knob at the
+leading edge of the track, matching the Web `el-switch` core; Web renders the
+active/inactive label pair around the core, and Avalonia composes those labels
+from the host (see `FsusSwitch` `AccessibleName` for the accessible name).
+Cross-platform element-crop evidence is registered in
+`tests/conformance/visual/fixtures/visual-comparisons.json`
+(`switch-vue-parity-web-avalonia`).
 
 ## Vue Contract Mapping
 

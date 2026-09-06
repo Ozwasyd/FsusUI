@@ -3,28 +3,24 @@
   xmlns:fsus="using:FsusUI.Avalonia.Controls"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Style Selector="fsus|FsusProgress">
-    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
-    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="Height" Value="4" />
+    <Setter Property="MinHeight" Value="4" />
+    <Setter Property="Background" Value="{DynamicResource FsusColorFillBaseBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
-    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
-    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="2" />
     <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid MinHeight="{TemplateBinding MinHeight}">
+        <Grid MinHeight="4">
           <Border
             Background="{TemplateBinding Background}"
-            BorderBrush="{TemplateBinding BorderBrush}"
-            BorderThickness="{TemplateBinding BorderThickness}"
             CornerRadius="{TemplateBinding CornerRadius}" />
           <Border
             x:Name="PART_Indicator"
             HorizontalAlignment="Left"
             Background="{TemplateBinding Foreground}"
-            BorderBrush="{TemplateBinding Foreground}"
-            BorderThickness="{DynamicResource FsusBorderControlWidth}"
             CornerRadius="{TemplateBinding CornerRadius}"
             Width="{TemplateBinding Value}" />
           <TextBlock
@@ -41,26 +37,23 @@
   </Style>
 
   <Style Selector="fsus|FsusProgress.fsus-success">
-    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="Foreground" Value="#16A34A" />
   </Style>
 
   <Style Selector="fsus|FsusProgress.fsus-danger">
-    <Setter Property="Foreground" Value="{DynamicResource FsusThemeDangerBrush}" />
+    <Setter Property="Foreground" Value="#DC2626" />
   </Style>
 
   <Style Selector="fsus|FsusSkeleton">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
-    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
-    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
-    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+    <Setter Property="Background" Value="{DynamicResource FsusColorFillBaseBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="2" />
     <Setter Property="Template">
       <ControlTemplate>
         <Border
           MinHeight="{TemplateBinding MinHeight}"
           Background="{TemplateBinding Background}"
-          BorderBrush="{TemplateBinding BorderBrush}"
-          BorderThickness="{TemplateBinding BorderThickness}"
           CornerRadius="{TemplateBinding CornerRadius}" />
       </ControlTemplate>
     </Setter>

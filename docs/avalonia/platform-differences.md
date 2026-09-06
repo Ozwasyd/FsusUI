@@ -28,6 +28,7 @@ Every accepted override below is backed by `spec/platform-overrides/`.
 | visual-token-color-001                  | button            | Tokenized color variance must not change state meaning, contrast intent, or token role semantics.                        |
 | visual-text-baseline-001                | text              | Text baselines may vary within the shared visual threshold.                                                              |
 | visual-markdown-source-surface-002      | markdown-editor   | Dense CJK source text may rasterize with sub-pixel glyph placement differences; structure, wrapping, and token colors must match.                                                        |
+| visual-vue-parity-batch3-text-003       | all               | Element-level alert, tag, progress, badge, breadcrumb, and switch crops concentrate glyph anti-aliasing and sub-pixel offsets; bounds, stripe/dot/fill geometry, and token colors must match. |
 
 ## Native Adapter Classifications
 

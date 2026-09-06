@@ -681,20 +681,20 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
   assert.equal(avalonia.definitions.length, 116)
   assert.equal(themes.definitions.length, 116)
   assert.equal(avalonia.dependencies.length, 23)
-  assert.equal(themes.dependencies.length, 991)
+  assert.equal(themes.dependencies.length, 987)
   assert.equal(
     avalonia.dependencies.filter((dependency) => dependency.resolved).length,
     23,
   )
   assert.equal(
     themes.dependencies.filter((dependency) => dependency.resolved).length,
-    491,
+    488,
   )
   assert.equal(
     themes.dependencies.filter(
       (dependency) => dependency.ownership === 'resolved',
     ).length,
-    608,
+    604,
   )
   assert.ok(
     [avalonia, themes].every(

@@ -1,0 +1,38 @@
+{
+  "id": "alert-vue-parity-web-avalonia",
+  "component": "feedback",
+  "state": "warning-title-icon",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "color.warning.ink",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/alert-vue-parity.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/alert-vue-parity-web-avalonia.json",
+  "deltas": {
+    "geometry": 0,
+    "colorDelta": 0,
+    "radius": 0,
+    "spacing": 0,
+    "textBaseline": 0,
+    "screenshotDiffPercent": 0.0738,
+    "perceptualDelta": 0.035
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [
+    {
+      "metric": "screenshotDiffPercent",
+      "delta": 0.0738,
+      "threshold": 0.015,
+      "overrideId": "visual-vue-parity-batch3-text-003"
+    }
+  ],
+  "passed": true,
+  "failures": []
+}

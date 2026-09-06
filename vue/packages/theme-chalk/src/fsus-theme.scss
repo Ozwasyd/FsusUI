@@ -1040,6 +1040,9 @@ html.dark .#{$namespace}-switch__action {
     position: absolute;
     inset: 0 auto 0 0;
     width: 4px;
+    height: 100%;
+    border-radius: 0; // the base grey "punctuation dot" must not survive the stripe
+    opacity: 1; // the stripe is a full-strength semantic accent, not a muted dot
     background: var(--el-border-color);
   }
 }

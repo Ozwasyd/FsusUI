@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "cb5f3a4f83d2ef04e1928357a8196edadf4887cba8783d2bdbf9e912da900f95"
+    "sha256": "5fe3149f6352fb19a11121aa448a0d3ddc5b0da8492b1883cf51fbb396f44490"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -52,6 +52,15 @@
         "textBaseline": 2,
         "screenshotDiffPercent": 0.04,
         "perceptualDelta": 0.16
+      },
+      "elementCrop": {
+        "geometry": 2,
+        "colorDelta": 2,
+        "radius": 1,
+        "spacing": 1.25,
+        "textBaseline": 1.5,
+        "screenshotDiffPercent": 0.15,
+        "perceptualDelta": 0.2
       }
     }
   },
@@ -2901,6 +2910,486 @@
         },
         "textBaseline": 15
       }
+    },
+    {
+      "id": "alert-vue-parity-web-avalonia",
+      "component": "feedback",
+      "fixture": {
+        "page": "visual/feedback",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "warning-title-icon",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.warning.ink",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/alert-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 158,
+          "height": 53
+        },
+        "color": {
+          "token": "color.warning.ink",
+          "lab": [37.5, 32, 43.4]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/alert-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 158,
+          "height": 53
+        },
+        "color": {
+          "token": "color.warning.ink",
+          "lab": [37.5, 32, 43.4]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      }
+    },
+    {
+      "id": "tag-vue-parity-web-avalonia",
+      "component": "data",
+      "fixture": {
+        "page": "visual/data",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "default-38x24",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.text.quiet",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/tag-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 38,
+          "height": 24
+        },
+        "color": {
+          "token": "color.text.quiet",
+          "lab": [44.2, 1.4, -18]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/tag-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 38,
+          "height": 24
+        },
+        "color": {
+          "token": "color.text.quiet",
+          "lab": [44.2, 1.4, -18]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      }
+    },
+    {
+      "id": "progress-vue-parity-web-avalonia",
+      "component": "data",
+      "fixture": {
+        "page": "visual/data",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "line-50pct-200x15",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.action.primary",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/progress-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 200,
+          "height": 15
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [37.9, 7.8, -41.2]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/progress-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 200,
+          "height": 15
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [37.9, 7.8, -41.2]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      }
+    },
+    {
+      "id": "badge-vue-parity-web-avalonia",
+      "component": "data",
+      "fixture": {
+        "page": "visual/data",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "is-dot-primary-share",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.danger",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/badge-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 55,
+          "height": 45
+        },
+        "color": {
+          "token": "color.danger",
+          "lab": [47.9, 67, 46.9]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/badge-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 55,
+          "height": 45
+        },
+        "color": {
+          "token": "color.danger",
+          "lab": [47.9, 67, 46.9]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      }
+    },
+    {
+      "id": "skeleton-vue-parity-web-avalonia",
+      "component": "data",
+      "fixture": {
+        "page": "visual/data",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "image-plus-lines-240x303",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.fill.base",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/skeleton-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 240,
+          "height": 303
+        },
+        "color": {
+          "token": "color.fill.base",
+          "lab": [96.2, 0.2, -0.5]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/skeleton-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 240,
+          "height": 303
+        },
+        "color": {
+          "token": "color.fill.base",
+          "lab": [96.2, 0.2, -0.5]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      }
+    },
+    {
+      "id": "empty-vue-parity-web-avalonia",
+      "component": "data",
+      "fixture": {
+        "page": "visual/data",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "default-title",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.text.primary",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/empty-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 216
+        },
+        "color": {
+          "token": "color.text.primary",
+          "lab": [4.4, 0.4, -1]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/empty-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 216
+        },
+        "color": {
+          "token": "color.text.primary",
+          "lab": [4.4, 0.4, -1]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      }
+    },
+    {
+      "id": "breadcrumb-vue-parity-web-avalonia",
+      "component": "navigation",
+      "fixture": {
+        "page": "visual/navigation",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "five-items-current-long",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.text.primary",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/breadcrumb-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 40
+        },
+        "color": {
+          "token": "color.text.primary",
+          "lab": [4.4, 0.4, -1]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/breadcrumb-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1200,
+          "height": 40
+        },
+        "color": {
+          "token": "color.text.primary",
+          "lab": [4.4, 0.4, -1]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      }
+    },
+    {
+      "id": "switch-vue-parity-web-avalonia",
+      "component": "form",
+      "fixture": {
+        "page": "visual/form",
+        "theme": "light",
+        "density": "default",
+        "variant": "vue-parity",
+        "size": "md",
+        "state": "checked-with-texts",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "color.action.primary",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/switch-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 134,
+          "height": 33
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [37.9, 7.8, -41.2]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/switch-vue-parity.png",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 134,
+          "height": 33
+        },
+        "color": {
+          "token": "color.action.primary",
+          "lab": [37.9, 7.8, -41.2]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 0
+        },
+        "textBaseline": 0
+      }
     }
   ],
   "approvedComparisons": [
@@ -3191,6 +3680,54 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/divider-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "alert-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/alert-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "tag-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/tag-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "progress-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/progress-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "badge-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/badge-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "skeleton-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/skeleton-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "empty-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/empty-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "breadcrumb-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/breadcrumb-vue-parity-web-avalonia.json"
+    },
+    {
+      "id": "switch-vue-parity-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/switch-vue-parity-web-avalonia.json"
     }
   ]
 }
