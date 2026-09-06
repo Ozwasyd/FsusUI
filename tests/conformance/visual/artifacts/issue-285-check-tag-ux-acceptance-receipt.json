@@ -15,7 +15,7 @@
   ],
   "activeBaselineIdentityDigest": "324335bfe9c09761bd0941d231a707698530bf0e687d4b0161e199425bc01771",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "fca2b7b619bea717dee150eb1272da231f46f942233e3cdbcf2352bacaf08fe2",
+  "independenceEvidenceDigest": "419e6080c3e4d92b0595ad5f9fbae74610a460f81b92143868d85b08f6bb1191",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -63,5 +63,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "5c6bccf5370e60805bceb1d8eca8f4c07a6f96dffd534429e5290f8c91b37760"
+  "receiptDigest": "28f2bb00afc74a8046ac5fd1abe4d71d5f713d7cf1911cad2a185d3114a5ffb3"
 }
