@@ -32,6 +32,11 @@ export const captureDeterministicLocatorPng = async (
       )
     }
     accepted = current
+    if (index < samples - 1) {
+      await locator.evaluate(async () => {
+        await new Promise((resolveFrame) => requestAnimationFrame(resolveFrame))
+      })
+    }
   }
   return accepted
 }
