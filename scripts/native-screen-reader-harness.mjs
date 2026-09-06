@@ -209,7 +209,7 @@ const main = async () => {
     if (build.status !== 0) throw new Error('build:demo failed')
   }
 
-  const candidateSha = spawnSync('git', ['rev-parse', 'HEAD^{tree}'], {
+  const candidateSha = spawnSync('git', ['rev-parse', 'HEAD'], {
     cwd: repositoryRoot,
     encoding: 'utf8',
   }).stdout.trim()
