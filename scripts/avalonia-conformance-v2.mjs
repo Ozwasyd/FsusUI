@@ -15,6 +15,7 @@ const runnerHash = crypto
   .update(read('scripts/avalonia-conformance-v2.mjs'))
   .update(read('scripts/native-screen-reader-harness.mjs'))
   .update(read('scripts/conformance-v2-evidence.mjs'))
+  .update(read('scripts/deterministic-render-evidence.mjs'))
   .update(read('vue/packages/demo-app/src/InteractionTraceFixture.vue'))
   .update(read('dotnet/FsusUI.Avalonia.Demo/ConformanceV2Runner.cs'))
   .digest('hex')
