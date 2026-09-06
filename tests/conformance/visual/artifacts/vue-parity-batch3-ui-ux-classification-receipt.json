@@ -1,0 +1,208 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "Avalonia FsusAlert is-light surface, full-height semantic stripe, and fsus-has-description reveal",
+    "Avalonia FsusTag Web color-mix label authority",
+    "Avalonia FsusBadge is-dot geometry (10px dot + 2px ring, corner overhang)",
+    "Avalonia FsusBreadcrumb/FsusBreadcrumbItem content-presenter templates",
+    "Avalonia FsusProgress 4px thin-bar contract and FsusSkeleton fill.base surface",
+    "Web fsus-theme.scss alert stripe cascade fix (height/radius/opacity pinned)",
+    "eight-family cross-platform element-crop comparison evidence"
+  ],
+  "uiDecisionClass": "prescribed",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "governance",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "visual-change",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "README",
+      "path": "docs/avalonia/README.md",
+      "digest": "49a65565a1322edad16d9e2c95df67f8f403f7b874e170de7ce3f892159b0d27"
+    },
+    {
+      "id": "icon-text",
+      "path": "docs/avalonia/components/icon-text.md",
+      "digest": "c62ce65cf1c3fcbf77c8fc271c52c5471ebab7ad37d57c75c6551816d448e5a7"
+    },
+    {
+      "id": "layout",
+      "path": "docs/avalonia/components/layout.md",
+      "digest": "100482023fc3ff6334dba6250dbca1f1b9aa4b47e45ccd1ce60d341f8c733780"
+    },
+    {
+      "id": "display",
+      "path": "docs/avalonia/components/display.md",
+      "digest": "e25b023d4fbb4fb6a234b7b76655d1e5e980078403f55e202ef42e2ec6d4058d"
+    },
+    {
+      "id": "markdown-editor",
+      "path": "docs/avalonia/components/markdown-editor.md",
+      "digest": "0ba00d78b81a5111ac99e7f17ebf80adbaef2b9c1f38c032b32804af2d3234f7"
+    },
+    {
+      "id": "platform-differences",
+      "path": "docs/avalonia/platform-differences.md",
+      "digest": "53a86d45ea16ab2d47e7634f79ac1785e2544f49c43c10568d574887d7d2ad5e"
+    },
+    {
+      "id": "data-display",
+      "path": "docs/avalonia/components/data-display.md",
+      "digest": "6eae095499f8e17665287d4099e608db711841c0dd600eb71a29a9f048fa6410"
+    },
+    {
+      "id": "navigation",
+      "path": "docs/avalonia/components/navigation.md",
+      "digest": "3123e887e541ba180b43dc5779f24fdd95e7bd1d25b1fea7a1efbc34ca984c2f"
+    },
+    {
+      "id": "selection",
+      "path": "docs/avalonia/components/selection.md",
+      "digest": "2e55ed31d740bf967f5ef0f318f0d2baba2819ee354f68fc615df39a44cef4ed"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "39b51fe496",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "bfd8484a2428309587f87e5e03e81795fd37b5318bbdc1a83a37b6a84d049e88",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "39b51fe4969745482595afd62403f244503dcce0",
+  "candidateDigest": "71ae39a28aaa668ff5ce35c79471073dec3074db56b35d87625a0a7d60ad1aa5",
+  "stateEvidenceMatrix": [
+    {
+      "state": "alert-avalonia-rendered-light",
+      "viewport": "headless-96dpi",
+      "theme": "light",
+      "evidenceDigest": "5d21c6adfd37b39f80951c910410b1cf2d3da96b8694b5c32d9e7c6f7256434b"
+    },
+    {
+      "state": "alert-web-captured-light",
+      "viewport": "chrome-element",
+      "theme": "light",
+      "evidenceDigest": "448d4c7728da027cea554a483de6dc362792f8cffaf830f342a5b015db7c190b"
+    },
+    {
+      "state": "tag-avalonia-rendered-light",
+      "viewport": "headless-96dpi",
+      "theme": "light",
+      "evidenceDigest": "3715bee7adfd790654a1412ad0569ecd8a5ec401109cd8b62a79dc000c268d65"
+    },
+    {
+      "state": "tag-web-captured-light",
+      "viewport": "chrome-element",
+      "theme": "light",
+      "evidenceDigest": "1522de87ad04a440298ed7c02104aa333d51a2a58b32bc750114f7aa0624591d"
+    },
+    {
+      "state": "progress-avalonia-rendered-light",
+      "viewport": "headless-96dpi",
+      "theme": "light",
+      "evidenceDigest": "b6b85273d119a6a9725289d5aa6938eaa84752f66903ab448c27ac75246ce1eb"
+    },
+    {
+      "state": "progress-web-captured-light",
+      "viewport": "chrome-element",
+      "theme": "light",
+      "evidenceDigest": "b14be8743bb311b7fbec4d3186db051f737a1b0a8be0d8d8679e323f362a35fb"
+    },
+    {
+      "state": "badge-avalonia-rendered-light",
+      "viewport": "headless-96dpi",
+      "theme": "light",
+      "evidenceDigest": "54288890f16cf3597611e5fe78f307d7a134fea16afe7aac4e455c9ce27a801b"
+    },
+    {
+      "state": "badge-web-captured-light",
+      "viewport": "chrome-element",
+      "theme": "light",
+      "evidenceDigest": "1fc9d5e5a6df18f6c3bd72f3ba6247de42c7d9f0450f4b7b7343bb0143493421"
+    },
+    {
+      "state": "skeleton-avalonia-rendered-light",
+      "viewport": "headless-96dpi",
+      "theme": "light",
+      "evidenceDigest": "de32f054337195a6f554049e125fd026e37f43603ccd3c4627270ff2fd8c78f5"
+    },
+    {
+      "state": "skeleton-web-captured-light",
+      "viewport": "chrome-element",
+      "theme": "light",
+      "evidenceDigest": "a3ec24f4a633c241d60355ee28f60011d789c288dc046914fe24c33eb3c4197e"
+    },
+    {
+      "state": "empty-avalonia-rendered-light",
+      "viewport": "headless-96dpi",
+      "theme": "light",
+      "evidenceDigest": "f0d43fc858367248d25afb9ec37e7fbf6f4a7419cd9172e46a49372272115233"
+    },
+    {
+      "state": "empty-web-captured-light",
+      "viewport": "chrome-element",
+      "theme": "light",
+      "evidenceDigest": "dab48fda62f1672df3791b704dddc98934f845c2b5329992f4987cf3ba048222"
+    },
+    {
+      "state": "breadcrumb-avalonia-rendered-light",
+      "viewport": "headless-96dpi",
+      "theme": "light",
+      "evidenceDigest": "28ca0776a0e794a0cca4c04567594986e4e99909e90a5263610f3e121bfb094c"
+    },
+    {
+      "state": "breadcrumb-web-captured-light",
+      "viewport": "chrome-element",
+      "theme": "light",
+      "evidenceDigest": "462d8fd9a7756c3a905db21fdf9d4c5b6d0f525ab628f908404017916e329f27"
+    },
+    {
+      "state": "switch-avalonia-rendered-light",
+      "viewport": "headless-96dpi",
+      "theme": "light",
+      "evidenceDigest": "7b0efab2e3181c118843f5aadd0ac5b481e69f2ba13f240839877b7366f44e33"
+    },
+    {
+      "state": "switch-web-captured-light",
+      "viewport": "chrome-element",
+      "theme": "light",
+      "evidenceDigest": "f0b5a0007e7436428480659c8c5e0a813532249243591f546c0c096cdc0bf3a1"
+    }
+  ],
+  "inScope": [
+    "alert is-light authority surface + stripe cascade fix on the Web side",
+    "tag/badge/breadcrumb/progress/skeleton templates matching the Web contract",
+    "real dual-platform element captures with measured pixelmatch+LAB metrics",
+    "elementCrop override level bounding glyph rasterization variance"
+  ],
+  "outOfScope": [
+    "token file changes (spec/tokens/tokens.json untouched)",
+    "excluded colleague issues #285 #641 #652 #672 #699 #708",
+    "palette Text #111827→#0F0F11 alignment (owned by issue #708 evidence chain)",
+    "embedded web font loading in headless tests (open platform gap, bounded by the override)"
+  ],
+  "classificationEvidenceDigest": "4ad6cbca9992780606c17f1e120a84595628b6a0507fca3eb986bde908197b7a",
+  "domainPolicyDigest": "f3b9797debb20a8104c747014a39067b4b2a973cf2216deec1473c18c582909e",
+  "status": "accepted",
+  "receiptDigest": "d180a4f9a7e949eb3c78b728bf37ede150edba947b4c3cf8486a881e97283bb1"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "d180a4f9a7e949eb3c78b728bf37ede150edba947b4c3cf8486a881e97283bb1",
+  "candidateSha": "39b51fe4969745482595afd62403f244503dcce0",
+  "candidateDigest": "71ae39a28aaa668ff5ce35c79471073dec3074db56b35d87625a0a7d60ad1aa5",
+  "verificationClass": "ux-path",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104",
+    "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
+    "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042",
+    "49a65565a1322edad16d9e2c95df67f8f403f7b874e170de7ce3f892159b0d27",
+    "c62ce65cf1c3fcbf77c8fc271c52c5471ebab7ad37d57c75c6551816d448e5a7",
+    "100482023fc3ff6334dba6250dbca1f1b9aa4b47e45ccd1ce60d341f8c733780",
+    "e25b023d4fbb4fb6a234b7b76655d1e5e980078403f55e202ef42e2ec6d4058d",
+    "0ba00d78b81a5111ac99e7f17ebf80adbaef2b9c1f38c032b32804af2d3234f7",
+    "53a86d45ea16ab2d47e7634f79ac1785e2544f49c43c10568d574887d7d2ad5e",
+    "6eae095499f8e17665287d4099e608db711841c0dd600eb71a29a9f048fa6410",
+    "3123e887e541ba180b43dc5779f24fdd95e7bd1d25b1fea7a1efbc34ca984c2f",
+    "2e55ed31d740bf967f5ef0f318f0d2baba2819ee354f68fc615df39a44cef4ed"
+  ],
+  "activeBaselineIdentityDigest": "bfd8484a2428309587f87e5e03e81795fd37b5318bbdc1a83a37b6a84d049e88",
+  "domainPolicyDigest": "f3b9797debb20a8104c747014a39067b4b2a973cf2216deec1473c18c582909e",
+  "independenceEvidenceDigest": "e87fb06c4100314c2ad7dff35000e98e4a52189f027156180d90e894df80f760",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "headless-96dpi",
+      "state": "batch3-eight-families-avalonia-rendered",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "5d21c6adfd37b39f80951c910410b1cf2d3da96b8694b5c32d9e7c6f7256434b"
+    },
+    {
+      "viewport": "chrome-element",
+      "state": "batch3-eight-families-web-captured",
+      "theme": "light",
+      "inputModes": [
+        "pointer"
+      ],
+      "evidenceDigest": "448d4c7728da027cea554a483de6dc362792f8cffaf830f342a5b015db7c190b"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/alert-vue-parity.png",
+      "digest": "448d4c7728da027cea554a483de6dc362792f8cffaf830f342a5b015db7c190b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/alert-vue-parity.png",
+      "digest": "5d21c6adfd37b39f80951c910410b1cf2d3da96b8694b5c32d9e7c6f7256434b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/switch-vue-parity.png",
+      "digest": "f0b5a0007e7436428480659c8c5e0a813532249243591f546c0c096cdc0bf3a1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/switch-vue-parity.png",
+      "digest": "7b0efab2e3181c118843f5aadd0ac5b481e69f2ba13f240839877b7366f44e33"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/breadcrumb-vue-parity.png",
+      "digest": "462d8fd9a7756c3a905db21fdf9d4c5b6d0f525ab628f908404017916e329f27"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/avalonia/breadcrumb-vue-parity.png",
+      "digest": "28ca0776a0e794a0cca4c04567594986e4e99909e90a5263610f3e121bfb094c"
+    },
+    {
+      "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
+      "digest": "5fe3149f6352fb19a11121aa448a0d3ddc5b0da8492b1883cf51fbb396f44490"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "d29ff13cba4f4393b5ba1de656d55d1a78335044215ba9676ad659b53949a7a4"
+}
