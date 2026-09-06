@@ -23,7 +23,13 @@ enums, content controls, `FsusAvatarShape`, and `FsusCollapse`
 ## Supported Platform Differences
 
 See [`docs/avalonia/platform-differences.md`](../platform-differences.md) for text baselines and
-keyboard focus. `FsusCollapse`/`FsusCollapseItem` retain the Web geometry: 52px
+keyboard focus. `FsusTag` and `FsusBadge` follow the Web authority: the tag
+renders an 11px/700 label in the quiet primary mix (`#596986`) on the
+near-paper fill with a 1px light outline, and the `is-dot` badge paints a 10px
+danger dot with a 2px surface ring overhanging the host's top-right corner.
+Cross-platform element-crop evidence is registered in
+`tests/conformance/visual/fixtures/visual-comparisons.json`
+(`tag-vue-parity-web-avalonia`, `badge-vue-parity-web-avalonia`). `FsusCollapse`/`FsusCollapseItem` retain the Web geometry: 52px
 headers with 13px/500 captions, a 48px expanded area with 20px inline and 25px
 bottom padding, and `color.border.subtle` separators under expanded content
 and each collapsed header; the active header has no bottom border.

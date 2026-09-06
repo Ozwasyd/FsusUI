@@ -1,0 +1,31 @@
+{
+  "id": "skeleton-vue-parity-web-avalonia",
+  "component": "data",
+  "state": "image-plus-lines-240x303",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "color.fill.base",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/skeleton-vue-parity.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/skeleton-vue-parity-web-avalonia.json",
+  "deltas": {
+    "geometry": 0,
+    "colorDelta": 0,
+    "radius": 0,
+    "spacing": 0,
+    "textBaseline": 0,
+    "screenshotDiffPercent": 0,
+    "perceptualDelta": 0.025
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

@@ -25,6 +25,26 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
   </Style>
 
+  <Style Selector="fsus|FsusBreadcrumb">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter
+          Content="{TemplateBinding Content}"
+          ContentTemplate="{TemplateBinding ContentTemplate}" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusBreadcrumbItem">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter
+          Content="{TemplateBinding Header}"
+          ContentTemplate="{TemplateBinding ContentTemplate}" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
   <Style Selector="fsus|FsusPageHeader">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="{DynamicResource FsusComponentDialogPadding}" />

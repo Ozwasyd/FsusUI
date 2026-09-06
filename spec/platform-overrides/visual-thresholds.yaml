@@ -41,3 +41,17 @@ thresholds:
     owner: fsusui-core
     reviewAfter: 2026-10-01
     linkedIssues: [719]
+  - id: visual-vue-parity-batch3-text-003
+    area: typography
+    component: all
+    platform: all
+    status: accepted
+    reason: Element-level Web/Avalonia captures of alert, tag, progress, badge, breadcrumb, and switch contain glyph anti-aliasing and cross-rasterizer sub-pixel offsets (Chromium vs headless Skia; Noto Sans SC vs the locally licensable CJK face); layout bounds and token colors match within the low geometry and color budgets. On tiny element crops a single glyph row shift dominates the diff percentage, so the crop-level budget is registered explicitly instead of the medium level used for page-scale captures.
+    affectedContracts: [component.el-alert, component.el-tag, component.el-progress, component.el-badge, component.el-breadcrumb, component.el-switch, component.el-skeleton, component.el-empty]
+    visualThreshold: medium
+    behaviorExpectation: Element bounds, stripe/dot/fill geometry, semantic colors, text content, and reading order must remain equivalent; glyph rasterization variance is bounded by the elementCrop level.
+    allowedDeviation: elementCrop
+    testPolicy: pixelmatch-plus-lab
+    owner: fsusui-core
+    reviewAfter: 2026-11-01
+    linkedIssues: [717]

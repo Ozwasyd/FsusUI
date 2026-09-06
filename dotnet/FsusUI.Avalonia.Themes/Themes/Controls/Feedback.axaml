@@ -39,72 +39,96 @@
     </Setter>
   </Style>
 
+  <Style Selector="fsus|FsusBadge.fsus-dot /template/ Border#PART_BadgeMark">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
   <Style Selector="fsus|FsusBadge">
     <Setter Property="Template">
       <ControlTemplate>
-        <Border
-          MinHeight="{TemplateBinding MinHeight}"
-          Padding="{TemplateBinding Padding}"
-          Background="{TemplateBinding Background}"
-          BorderBrush="{TemplateBinding BorderBrush}"
-          BorderThickness="{TemplateBinding BorderThickness}"
-          CornerRadius="{TemplateBinding CornerRadius}">
-          <Grid ColumnDefinitions="Auto,*">
-            <ContentPresenter
-              Grid.Column="0"
-              Content="{TemplateBinding IconContent}" />
-            <ContentPresenter
-              Grid.Column="1"
-              Content="{TemplateBinding Content}"
-              ContentTemplate="{TemplateBinding ContentTemplate}" />
-          </Grid>
-        </Border>
+        <Panel>
+          <ContentPresenter
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Border
+            Name="PART_BadgeMark"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            CornerRadius="999"
+            Background="{DynamicResource FsusThemeDangerBrush}"
+            BorderBrush="{DynamicResource FsusThemeSurfaceBrush}"
+            BorderThickness="2"
+            Width="14"
+            Height="14"
+            Margin="0,-7,-9,0"
+            IsVisible="False" />
+        </Panel>
       </ControlTemplate>
     </Setter>
   </Style>
 
   <Style Selector="fsus|FsusAlert">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="Padding" Value="16,9,8,9" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+  </Style>
+
+  <Style Selector="fsus|FsusAlert">
     <Setter Property="Template">
       <ControlTemplate>
-        <Border
-          MinHeight="{TemplateBinding MinHeight}"
-          Padding="{TemplateBinding Padding}"
-          Background="{TemplateBinding Background}"
-          BorderBrush="{TemplateBinding BorderBrush}"
-          BorderThickness="{TemplateBinding BorderThickness}"
-          CornerRadius="{TemplateBinding CornerRadius}">
-          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto">
+        <Grid ColumnDefinitions="4,*">
+          <Border
+            Grid.Column="0"
+            Name="PART_Stripe"
+            Background="{DynamicResource FsusThemeBorderBrush}"
+            Margin="0,2" />
+          <StackPanel Grid.Column="1" Margin="12,0,0,0">
+            <TextBlock
+              FontFamily="{DynamicResource FsusTypographyFamilyBody}"
+              FontSize="{DynamicResource FsusTypographyBodyMdSize}"
+              FontWeight="Medium"
+              Foreground="{TemplateBinding Foreground}"
+              Text="{TemplateBinding Title}" />
+            <TextBlock
+              Name="PART_AlertDescription"
+              FontFamily="{DynamicResource FsusTypographyFamilyBody}"
+              FontSize="{DynamicResource FsusTypographyBodyMdSize}"
+              Foreground="{TemplateBinding Foreground}"
+              Text="{TemplateBinding Description}"
+              IsVisible="False"
+              TextWrapping="Wrap" />
             <ContentPresenter
-              Grid.Row="0"
-              Grid.Column="0"
-              Content="{TemplateBinding IconContent}" />
-            <StackPanel Grid.Row="0" Grid.Column="1">
-              <TextBlock
-                FontFamily="{DynamicResource FsusTypographyFamilyBody}"
-                FontSize="{DynamicResource FsusTypographyBodyMdSize}"
-                FontWeight="{DynamicResource FsusTypographyBodyMdWeight}"
-                Foreground="{TemplateBinding Foreground}"
-                Text="{TemplateBinding Title}" />
-              <TextBlock
-                FontFamily="{DynamicResource FsusTypographyFamilyBody}"
-                FontSize="{DynamicResource FsusTypographyBodyMdSize}"
-                Foreground="{TemplateBinding Foreground}"
-                Text="{TemplateBinding Description}"
-                TextWrapping="Wrap" />
-            </StackPanel>
-            <ContentPresenter
-              Grid.Row="1"
-              Grid.ColumnSpan="2"
               Content="{TemplateBinding Content}"
               ContentTemplate="{TemplateBinding ContentTemplate}" />
-            <ContentPresenter
-              Grid.Row="2"
-              Grid.ColumnSpan="2"
-              Content="{TemplateBinding ActionContent}" />
-          </Grid>
-        </Border>
+            <ContentPresenter Content="{TemplateBinding ActionContent}" />
+          </StackPanel>
+        </Grid>
       </ControlTemplate>
     </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusAlert.fsus-success /template/ Border#PART_Stripe">
+    <Setter Property="Background" Value="#166534" />
+  </Style>
+
+  <Style Selector="fsus|FsusAlert.fsus-info /template/ Border#PART_Stripe">
+    <Setter Property="Background" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusAlert.fsus-warning /template/ Border#PART_Stripe">
+    <Setter Property="Background" Value="#92400E" />
+  </Style>
+
+  <Style Selector="fsus|FsusAlert.fsus-danger /template/ Border#PART_Stripe">
+    <Setter Property="Background" Value="#991B1B" />
+  </Style>
+
+  <Style Selector="fsus|FsusAlert.fsus-has-description /template/ TextBlock#PART_AlertDescription">
+    <Setter Property="IsVisible" Value="True" />
   </Style>
 
   <Style Selector="fsus|FsusTag.fsus-primary, fsus|FsusBadge.fsus-primary, fsus|FsusAlert.fsus-primary">
@@ -119,6 +143,18 @@
 
   <Style Selector="fsus|FsusTag.fsus-selected, fsus|FsusBadge.fsus-selected, fsus|FsusAlert.fsus-warning">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusTag.fsus-success">
+    <Setter Property="Foreground" Value="#16A34A" />
+  </Style>
+
+  <Style Selector="fsus|FsusTag.fsus-warning">
+    <Setter Property="Foreground" Value="#D97706" />
+  </Style>
+
+  <Style Selector="fsus|FsusTag.fsus-danger">
+    <Setter Property="Foreground" Value="#DC2626" />
   </Style>
 
   <Style Selector="fsus|FsusTag.fsus-removed, fsus|FsusAlert.fsus-dismissed">

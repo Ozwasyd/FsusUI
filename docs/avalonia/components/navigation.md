@@ -44,6 +44,15 @@ and activation events.
 
 Keyboard navigation and focus rings follow `docs/avalonia/platform-differences.md`.
 
+`FsusBreadcrumb` and `FsusBreadcrumbItem` ship content-presenter templates in
+`Themes/Controls/Navigation.axaml`; the breadcrumb hosts its visible item row
+through `Content`, and each item presents `Header`. The current item
+(`fsus-current`) renders in `color.action.primary`; separators are host
+composed, matching the Web `/` separator in `color.text.quiet`. Cross-platform
+element-crop evidence is registered in
+`tests/conformance/visual/fixtures/visual-comparisons.json`
+(`breadcrumb-vue-parity-web-avalonia`).
+
 `FsusPlatformCommand` is the neutral command source for
 `FsusNativeMenuBuilder` and `FsusCommandPaletteModel`. A builder owns its
 subscriptions: dispose it or rebuild through the same instance so obsolete

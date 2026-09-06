@@ -2555,10 +2555,11 @@ const avaloniaExtraForSurface = (
     'Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.',
   ),
   scenarioIds: [
-    `scenario.v2.${contractKebab}.avalonia-extra.${toKebab(surface.member)}` +
-      (disambiguateMember
+    `scenario.v2.${contractKebab}.avalonia-extra.${toKebab(surface.member)}${
+      disambiguateMember
         ? `.${toKebab(surface.kind)}.${avaloniaSurfaceFingerprint(surface).slice(0, 12)}`
-        : ''),
+        : ''
+    }`,
   ],
 })
 
