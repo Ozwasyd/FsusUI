@@ -22,7 +22,10 @@ export const captureDeterministicLocatorPng = async (
   })
   let accepted = null
   for (let index = 0; index < samples; index += 1) {
-    const current = await locator.screenshot({ animations: 'disabled' })
+    const current = await locator.screenshot({
+      animations: 'disabled',
+      caret: 'hide',
+    })
     if (!Buffer.isBuffer(current)) {
       throw new Error('deterministic screenshot did not return PNG bytes')
     }
