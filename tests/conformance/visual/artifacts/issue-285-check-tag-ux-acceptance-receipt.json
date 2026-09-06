@@ -1,6 +1,6 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "c05c45304a135e168f2e8a4c6177e32c86d1fcd499e4bec56b9f97d26d05d70a",
+  "classificationReceiptDigest": "ff35d21f7dcbb4021eaf184554f1c093476dfd3d60cef1af661abb1e4e36355e",
   "candidateSha": "b1fda1b69a3adf0c89a2df8c1eea0563671195b5",
   "candidateDigest": "9c8db1007442f8b72e6af60ce8044022180d4bd971e2061c4c0482eedc145942",
   "verificationClass": "ux-path",
@@ -63,5 +63,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "c31be522f14b28d4195bf9ebcee4168de8cd34862103d1a82f8d2ba3ddc05c67"
+  "receiptDigest": "148e09e031c0c82721b0dd0b09085dbfd889f1f78dcea60f7453ec046af32a3b"
 }
