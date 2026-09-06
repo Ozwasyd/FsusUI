@@ -10,7 +10,7 @@
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "ff27165acab23044aaf78029f369ff99c94d6c54eea7dff010715325539b793f",
+    "contractHash": "957b2a6b4123425d724ebc7acfb3c963691e8c56d018d292c56bc1b2efec0528",
     "webBaselineHash": "6d43c3f504bbad092869c64456a4247eb4dd8be7648ed05bfda4cfc6ff303444",
     "avaloniaBaselineHash": "24bbac3f49808e77cddd5613fc760d8ea26701a74b5949c35e61a68d3292a7f4",
     "runnerHash": "d6561b070afc3d632835e779066970a4f669291add0efda428b855fd26332607"
