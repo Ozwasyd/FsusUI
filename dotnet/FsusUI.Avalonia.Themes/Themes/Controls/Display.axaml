@@ -3,17 +3,17 @@
   xmlns:fsus="using:FsusUI.Avalonia.Controls"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Style Selector="fsus|FsusProgress">
-    <Setter Property="Height" Value="4" />
-    <Setter Property="MinHeight" Value="4" />
+    <Setter Property="Height" Value="{DynamicResource FsusComponentProgressHeight}" />
+    <Setter Property="MinHeight" Value="{DynamicResource FsusComponentProgressHeight}" />
     <Setter Property="Background" Value="{DynamicResource FsusColorFillBaseBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusComponentProgressRadius}" />
     <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid MinHeight="4">
+        <Grid MinHeight="{TemplateBinding MinHeight}">
           <Border
             Background="{TemplateBinding Background}"
             CornerRadius="{TemplateBinding CornerRadius}" />
@@ -37,18 +37,18 @@
   </Style>
 
   <Style Selector="fsus|FsusProgress.fsus-success">
-    <Setter Property="Foreground" Value="#16A34A" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentProgressSuccessColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusProgress.fsus-danger">
-    <Setter Property="Foreground" Value="#DC2626" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentProgressDangerColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusSkeleton">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Background" Value="{DynamicResource FsusColorFillBaseBrush}" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusComponentSkeletonRadius}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Border

@@ -156,6 +156,14 @@
   --fsus-state-hover-bg: var(--fsus-component-state-surface-hover-background);
   --fsus-component-state-surface-selected-background: #2A599C0D;
   --fsus-state-selected-bg: var(--fsus-component-state-surface-selected-background);
+  --fsus-component-alert-success-stripe-color: #166534;
+  --fsus-component-alert-warning-stripe-color: #92400E;
+  --fsus-component-alert-danger-stripe-color: #991B1B;
+  --fsus-component-progress-success-color: #16A34A;
+  --fsus-component-progress-danger-color: #DC2626;
+  --fsus-component-progress-height: 4px;
+  --fsus-component-progress-radius: 2px;
+  --fsus-component-skeleton-radius: 2px;
   --fsus-component-state-surface-emphasis-background: #2A599C14;
   --fsus-state-emphasis-bg: var(--fsus-component-state-surface-emphasis-background);
   --fsus-component-state-surface-focus-border: #2A599C47;

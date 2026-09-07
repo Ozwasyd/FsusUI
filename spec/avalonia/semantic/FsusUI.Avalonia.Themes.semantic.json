@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "84991f7f13cec2719d87597863009f6e2297b3d04224061c68b69b4079eba9dc",
+    "inputTreeHash": "57445c6e68bb2cc39333069190348918b3afe284ada833d76b0c9932d3bdcaaa",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "d9fdd703f997e8d919edba6749ac2031b266edccd5b5208a04f0eb61e9d248f9"
+    "outputHash": "3b85caf495c3ee68acf8b8870f0b289140195cc869784b27826aa54b2e74833a"
   },
   "semanticTypes": [
     {
@@ -2377,6 +2377,69 @@
         "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
       },
       {
+        "canonicalName": "component.alert.danger.stripe.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentAlertDangerStripeColor",
+          "FsusComponentAlertDangerStripeColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentAlertDangerStripeColorBrush",
+          "ComponentAlertDangerStripeColorBrushResourceKey",
+          "ComponentAlertDangerStripeColorColor",
+          "ComponentAlertDangerStripeColorName",
+          "ComponentAlertDangerStripeColorResourceKey",
+          "ComponentAlertDangerStripeColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.alert.success.stripe.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentAlertSuccessStripeColor",
+          "FsusComponentAlertSuccessStripeColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentAlertSuccessStripeColorBrush",
+          "ComponentAlertSuccessStripeColorBrushResourceKey",
+          "ComponentAlertSuccessStripeColorColor",
+          "ComponentAlertSuccessStripeColorName",
+          "ComponentAlertSuccessStripeColorResourceKey",
+          "ComponentAlertSuccessStripeColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.alert.warning.stripe.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentAlertWarningStripeColor",
+          "FsusComponentAlertWarningStripeColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentAlertWarningStripeColorBrush",
+          "ComponentAlertWarningStripeColorBrushResourceKey",
+          "ComponentAlertWarningStripeColorColor",
+          "ComponentAlertWarningStripeColorName",
+          "ComponentAlertWarningStripeColorResourceKey",
+          "ComponentAlertWarningStripeColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
         "canonicalName": "component.button.padding.x",
         "owner": "FsusUI component maintainers",
         "generatedOutputs": [
@@ -2673,6 +2736,102 @@
           "ComponentOverlayScrimName",
           "ComponentOverlayScrimResourceKey",
           "ComponentOverlayScrimValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.progress.danger.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentProgressDangerColor",
+          "FsusComponentProgressDangerColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentProgressDangerColorBrush",
+          "ComponentProgressDangerColorBrushResourceKey",
+          "ComponentProgressDangerColorColor",
+          "ComponentProgressDangerColorName",
+          "ComponentProgressDangerColorResourceKey",
+          "ComponentProgressDangerColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.progress.height",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentProgressHeight"
+        ],
+        "csharpMembers": [
+          "ComponentProgressHeightDouble",
+          "ComponentProgressHeightName",
+          "ComponentProgressHeightResourceKey",
+          "ComponentProgressHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.progress.radius",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentProgressRadius"
+        ],
+        "csharpMembers": [
+          "ComponentProgressRadiusCornerRadius",
+          "ComponentProgressRadiusName",
+          "ComponentProgressRadiusResourceKey",
+          "ComponentProgressRadiusValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.progress.success.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentProgressSuccessColor",
+          "FsusComponentProgressSuccessColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentProgressSuccessColorBrush",
+          "ComponentProgressSuccessColorBrushResourceKey",
+          "ComponentProgressSuccessColorColor",
+          "ComponentProgressSuccessColorName",
+          "ComponentProgressSuccessColorResourceKey",
+          "ComponentProgressSuccessColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.skeleton.radius",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentSkeletonRadius"
+        ],
+        "csharpMembers": [
+          "ComponentSkeletonRadiusCornerRadius",
+          "ComponentSkeletonRadiusName",
+          "ComponentSkeletonRadiusResourceKey",
+          "ComponentSkeletonRadiusValue"
         ],
         "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
       },
@@ -8497,9 +8656,45 @@
         "kind": "xaml-resource-reference",
         "authority": "xml-xaml-resource-reference",
         "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml",
+        "sourceMember": "fsus|FsusProgress.fsus-danger::Setter.Foreground",
+        "dependency": "FsusComponentProgressDangerColorBrush",
+        "canonicalName": "component.progress.danger.color",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusProgress",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusProgress.fsus-danger"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml",
+        "sourceMember": "fsus|FsusProgress.fsus-success::Setter.Foreground",
+        "dependency": "FsusComponentProgressSuccessColorBrush",
+        "canonicalName": "component.progress.success.color",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusProgress",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusProgress.fsus-success"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml",
         "sourceMember": "fsus|FsusProgress::Setter.Background",
         "dependency": "FsusColorFillBaseBrush",
         "canonicalName": "color.fill.base",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusProgress",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusProgress"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml",
+        "sourceMember": "fsus|FsusProgress::Setter.CornerRadius",
+        "dependency": "FsusComponentProgressRadius",
+        "canonicalName": "component.progress.radius",
         "resolved": true,
         "ownerType": "FsusUI.Avalonia.Controls.FsusProgress",
         "ownership": "resolved",
@@ -8536,6 +8731,30 @@
         "sourceMember": "fsus|FsusProgress::Setter.Foreground",
         "dependency": "FsusColorActionPrimaryBrush",
         "canonicalName": "color.action.primary",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusProgress",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusProgress"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml",
+        "sourceMember": "fsus|FsusProgress::Setter.Height",
+        "dependency": "FsusComponentProgressHeight",
+        "canonicalName": "component.progress.height",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusProgress",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusProgress"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml",
+        "sourceMember": "fsus|FsusProgress::Setter.MinHeight",
+        "dependency": "FsusComponentProgressHeight",
+        "canonicalName": "component.progress.height",
         "resolved": true,
         "ownerType": "FsusUI.Avalonia.Controls.FsusProgress",
         "ownership": "resolved",
@@ -8732,6 +8951,18 @@
         "kind": "xaml-resource-reference",
         "authority": "xml-xaml-resource-reference",
         "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml",
+        "sourceMember": "fsus|FsusSkeleton::Setter.CornerRadius",
+        "dependency": "FsusComponentSkeletonRadius",
+        "canonicalName": "component.skeleton.radius",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusSkeleton",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusSkeleton"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml",
         "sourceMember": "fsus|FsusSkeleton::Setter.MinHeight",
         "dependency": "FsusDensityControlDefaultY",
         "canonicalName": "density.control.default.y",
@@ -8744,6 +8975,18 @@
         "kind": "xaml-resource-reference",
         "authority": "xml-xaml-resource-reference",
         "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
+        "sourceMember": "fsus|FsusAlert.fsus-danger /template/ Border#PART_Stripe::Setter.Background",
+        "dependency": "FsusComponentAlertDangerStripeColorBrush",
+        "canonicalName": "component.alert.danger.stripe.color",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusAlert",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusAlert.fsus-danger /template/ Border#PART_Stripe"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
         "sourceMember": "fsus|FsusAlert.fsus-info /template/ Border#PART_Stripe::Setter.Background",
         "dependency": "FsusColorActionPrimaryBrush",
         "canonicalName": "color.action.primary",
@@ -8751,6 +8994,30 @@
         "ownerType": "FsusUI.Avalonia.Controls.FsusAlert",
         "ownership": "resolved",
         "ownerExpression": "fsus|FsusAlert.fsus-info /template/ Border#PART_Stripe"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
+        "sourceMember": "fsus|FsusAlert.fsus-success /template/ Border#PART_Stripe::Setter.Background",
+        "dependency": "FsusComponentAlertSuccessStripeColorBrush",
+        "canonicalName": "component.alert.success.stripe.color",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusAlert",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusAlert.fsus-success /template/ Border#PART_Stripe"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
+        "sourceMember": "fsus|FsusAlert.fsus-warning /template/ Border#PART_Stripe::Setter.Background",
+        "dependency": "FsusComponentAlertWarningStripeColorBrush",
+        "canonicalName": "component.alert.warning.stripe.color",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusAlert",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusAlert.fsus-warning /template/ Border#PART_Stripe"
       },
       {
         "kind": "xaml-resource-reference",
@@ -8864,6 +9131,18 @@
         "sourceMember": "fsus|FsusBadge::Border.BorderBrush",
         "dependency": "FsusThemeSurfaceBrush",
         "resolved": false,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusBadge",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusBadge"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
+        "sourceMember": "fsus|FsusBadge::Border.CornerRadius",
+        "dependency": "FsusRadiusPill",
+        "canonicalName": "radius.pill",
+        "resolved": true,
         "ownerType": "FsusUI.Avalonia.Controls.FsusBadge",
         "ownership": "resolved",
         "ownerExpression": "fsus|FsusBadge"
@@ -9012,6 +9291,18 @@
         "kind": "xaml-resource-reference",
         "authority": "xml-xaml-resource-reference",
         "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
+        "sourceMember": "fsus|FsusTag.fsus-danger::Setter.Foreground",
+        "dependency": "FsusComponentProgressDangerColorBrush",
+        "canonicalName": "component.progress.danger.color",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTag",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusTag.fsus-danger"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
         "sourceMember": "fsus|FsusTag.fsus-primary, fsus|FsusBadge.fsus-primary, fsus|FsusAlert.fsus-primary::Setter.Background",
         "dependency": "FsusColorActionPrimaryBrush",
         "canonicalName": "color.action.primary",
@@ -9051,6 +9342,30 @@
         "resolved": true,
         "ownership": "partial",
         "ownerExpression": "fsus|FsusTag.fsus-selected, fsus|FsusBadge.fsus-selected, fsus|FsusAlert.fsus-warning"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
+        "sourceMember": "fsus|FsusTag.fsus-success::Setter.Foreground",
+        "dependency": "FsusComponentProgressSuccessColorBrush",
+        "canonicalName": "component.progress.success.color",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTag",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusTag.fsus-success"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml",
+        "sourceMember": "fsus|FsusTag.fsus-warning::Setter.Foreground",
+        "dependency": "FsusComponentLinkWarningColorBrush",
+        "canonicalName": "component.link.warning.color",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTag",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusTag.fsus-warning"
       },
       {
         "kind": "xaml-resource-reference",

@@ -54,7 +54,7 @@
             Name="PART_BadgeMark"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            CornerRadius="999"
+            CornerRadius="{DynamicResource FsusRadiusPill}"
             Background="{DynamicResource FsusThemeDangerBrush}"
             BorderBrush="{DynamicResource FsusThemeSurfaceBrush}"
             BorderThickness="2"
@@ -112,7 +112,7 @@
   </Style>
 
   <Style Selector="fsus|FsusAlert.fsus-success /template/ Border#PART_Stripe">
-    <Setter Property="Background" Value="#166534" />
+    <Setter Property="Background" Value="{DynamicResource FsusComponentAlertSuccessStripeColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusAlert.fsus-info /template/ Border#PART_Stripe">
@@ -120,11 +120,11 @@
   </Style>
 
   <Style Selector="fsus|FsusAlert.fsus-warning /template/ Border#PART_Stripe">
-    <Setter Property="Background" Value="#92400E" />
+    <Setter Property="Background" Value="{DynamicResource FsusComponentAlertWarningStripeColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusAlert.fsus-danger /template/ Border#PART_Stripe">
-    <Setter Property="Background" Value="#991B1B" />
+    <Setter Property="Background" Value="{DynamicResource FsusComponentAlertDangerStripeColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusAlert.fsus-has-description /template/ TextBlock#PART_AlertDescription">
@@ -146,15 +146,15 @@
   </Style>
 
   <Style Selector="fsus|FsusTag.fsus-success">
-    <Setter Property="Foreground" Value="#16A34A" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentProgressSuccessColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusTag.fsus-warning">
-    <Setter Property="Foreground" Value="#D97706" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentLinkWarningColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusTag.fsus-danger">
-    <Setter Property="Foreground" Value="#DC2626" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusComponentProgressDangerColorBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusTag.fsus-removed, fsus|FsusAlert.fsus-dismissed">
