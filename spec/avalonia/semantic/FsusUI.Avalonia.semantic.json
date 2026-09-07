@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "1a1f016b22fedb83c431886d3db260bd5e6e16bcfba4e46b6f95b0b13f7cb495",
+    "inputTreeHash": "cf13df0887e8b4838b2370db36ed679e52e999d8bbb7570dde7ba4a93c1ada72",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "6191bb4cb9abc9fbaa554140a7b1b3ae2d5bcd866b85c3fe9ccb9046b93bca3c"
+    "outputHash": "32c1d4798415cde6a5651793ff300855e368d95f518f2bc4fee1f97ab5ca9345"
   },
   "semanticTypes": [
     {
@@ -10197,6 +10197,17 @@
           "deprecated": false
         },
         {
+          "name": "InitialSelection",
+          "type": "FsusUI.Avalonia.Controls.FsusCommandPaletteInitialSelection",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "IsBusy",
           "type": "System.Boolean",
           "nullable": false,
@@ -10268,6 +10279,17 @@
           "nullable": true,
           "canRead": true,
           "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ResultsAccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
           "isStatic": false,
           "required": false,
           "defaultKnown": false,
@@ -10420,6 +10442,15 @@
           "deprecated": false
         },
         {
+          "name": "InitialSelection",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusCommandPaletteInitialSelection",
+          "nullable": false,
+          "defaultKnown": true,
+          "defaultValue": "FirstEnabled",
+          "deprecated": false
+        },
+        {
           "name": "Providers",
           "kind": "styled",
           "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusCommandPaletteProvider\u003E",
@@ -10433,6 +10464,15 @@
           "type": "System.String",
           "nullable": true,
           "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ResultsAccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true,
+          "defaultKnown": true,
+          "defaultValue": "Command results",
           "deprecated": false
         },
         {
@@ -10968,6 +11008,31 @@
         },
         {
           "name": "Execution",
+          "value": 1,
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteInitialSelection",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "FirstEnabled",
+          "value": 0,
+          "deprecated": false
+        },
+        {
+          "name": "None",
           "value": 1,
           "deprecated": false
         }

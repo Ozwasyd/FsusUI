@@ -336,6 +336,244 @@ public class FsusCommandPaletteHeadlessTests
     Assert.True(new FileInfo(manifestPath).Length > 1_000);
   }
 
+  [AvaloniaFact]
+  public async Task RealHeadlessSkiaRenderProducesIssue815SelectionEvidenceMatrix()
+  {
+    var outputRoot = Path.Combine(
+      FindRepositoryRoot(),
+      "tests",
+      "conformance",
+      "visual",
+      "artifacts",
+      "issue-815-command-palette");
+    Directory.CreateDirectory(outputRoot);
+    var scenarios = new[]
+    {
+      new Issue815RenderScenario(
+        "default-first-enabled-selection",
+        FsusCommandPaletteInitialSelection.FirstEnabled,
+        "Command results",
+        ExerciseKeyboardPath: false),
+      new Issue815RenderScenario(
+        "none-initial-selection-localized-name",
+        FsusCommandPaletteInitialSelection.None,
+        "Available commands",
+        ExerciseKeyboardPath: false),
+      new Issue815RenderScenario(
+        "none-selection-keyboard-path",
+        FsusCommandPaletteInitialSelection.None,
+        "Available commands",
+        ExerciseKeyboardPath: true),
+    };
+
+    var captures = new List<Issue815CommandPaletteCapture>();
+    foreach (var scenario in scenarios)
+    {
+      captures.Add(await RenderIssue815(outputRoot, scenario));
+    }
+
+    Assert.Equal(3, captures.Count);
+    Assert.All(captures, capture =>
+    {
+      Assert.Equal(64, capture.Sha256.Length);
+      Assert.Equal(64, capture.AutomationSha256.Length);
+      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
+      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.AutomationFile)));
+    });
+
+    var manifestPath = Path.Combine(outputRoot, "command-palette-render-manifest.json");
+    File.WriteAllText(
+      manifestPath,
+      JsonSerializer.Serialize(
+        new
+        {
+          schemaVersion = 1,
+          issue = 815,
+          generatedBy =
+            "FsusCommandPaletteHeadlessTests.RealHeadlessSkiaRenderProducesIssue815SelectionEvidenceMatrix",
+          fixtureClass = "production",
+          renderer = new
+          {
+            platform = "avalonia",
+            runner = "headless-skia",
+            drawingBackend = "Skia",
+            avaloniaVersion = typeof(Application).Assembly.GetName().Version?.ToString(),
+          },
+          simulation =
+            "Local deterministic Headless Skia simulation; no external hardware, screen reader, or CI service is represented.",
+          captures,
+        },
+        new JsonSerializerOptions
+        {
+          WriteIndented = true,
+          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        }) + "\n");
+
+    Assert.True(new FileInfo(manifestPath).Length > 1_000);
+  }
+
+  private static async Task<Issue815CommandPaletteCapture> RenderIssue815(
+    string outputRoot,
+    Issue815RenderScenario scenario)
+  {
+    var executions = 0;
+    var disabled = new FsusPlatformCommand("workspace.archive", "Archive workspace")
+    {
+      Category = "Workspace",
+      Description = "Requires owner permission",
+      IsEnabled = false,
+    };
+    var open = new FsusPlatformCommand("file.open", "Open recent document")
+    {
+      Category = "File",
+      Description = "Choose a document from the recent workspace history",
+      IconKey = "FsusIconFileDocument",
+      Gesture = new FsusShortcutGesture(Key.O, KeyModifiers.Control),
+      ExecuteAction = _ => executions++,
+    };
+    var host = new FsusOverlayHost();
+    var invoker = new Button { Content = "Open commands", Focusable = true };
+    var window = CreateStyledWindow(900, 620, host, FsusThemeVariant.Light, false, invoker);
+    var palette = new FsusCommandPalette
+    {
+      AccessibleName = "Workspace commands",
+      SearchAccessibleName = "Search workspace commands",
+      SearchPlaceholder = "Search commands by name, category, or description",
+      CommandTree =
+      [
+        FsusNativeMenuItemModel.Action(disabled),
+        FsusNativeMenuItemModel.Action(open),
+      ],
+      InitialSelection = scenario.InitialSelection,
+      ResultsAccessibleName = scenario.ResultsAccessibleName,
+      OverlaySize = new Size(640, 480),
+      ViewportBounds = new Rect(0, 0, 900, 620),
+      ShortcutPlatform = FsusShortcutPlatform.Windows,
+    };
+
+    palette.Open(host);
+    Layout(window);
+    var expectedSelectedIndex = scenario.InitialSelection ==
+      FsusCommandPaletteInitialSelection.FirstEnabled
+      ? 1
+      : -1;
+    Assert.Equal(expectedSelectedIndex, palette.SelectedIndex);
+    Assert.Equal(
+      expectedSelectedIndex >= 0 ? "file.open" : string.Empty,
+      palette.SelectedCommandId);
+
+    var keyObservations = new List<object>();
+    if (scenario.ExerciseKeyboardPath)
+    {
+      keyObservations.Add(new
+      {
+        key = "Enter",
+        beforeSelectedIndex = palette.SelectedIndex,
+        handled = await palette.HandleKeyAsync(Key.Enter),
+        afterSelectedIndex = palette.SelectedIndex,
+        remainsOpen = palette.IsOpen,
+      });
+
+      Assert.True(await palette.HandleKeyAsync(Key.Down));
+      Assert.Equal(1, palette.SelectedIndex);
+      Assert.Equal("file.open", palette.SelectedCommandId);
+      Layout(window);
+    }
+
+    using var bitmap = new RenderTargetBitmap(
+      new PixelSize(900, 620),
+      new Vector(96, 96));
+    bitmap.Render(host);
+    var fileName = $"command-palette-{scenario.Name}.png";
+    var outputPath = Path.Combine(outputRoot, fileName);
+    using (var stream = File.Create(outputPath))
+    {
+      bitmap.Save(stream);
+    }
+
+    var listControl = Assert.Single(palette.GetVisualDescendants().OfType<FsusVirtualList>());
+    var searchControl = Assert.Single(palette.GetVisualDescendants().OfType<FsusInput>());
+    var resultCount = palette.Results.Count;
+    var selectedIndex = palette.SelectedIndex;
+    var selectedCommandId = palette.SelectedCommandId;
+    var resultsAccessibleName = listControl.AccessibleName ?? string.Empty;
+    var realizedItems = listControl.RealizedContainers
+      .OrderBy(container => container.Index)
+      .Select(container => new
+      {
+        container.Index,
+        role = AutomationProperties.GetControlTypeOverride(container).ToString(),
+        name = AutomationProperties.GetName(container),
+        help = AutomationProperties.GetHelpText(container),
+        status = AutomationProperties.GetItemStatus(container),
+        positionInSet = AutomationProperties.GetPositionInSet(container),
+        sizeOfSet = AutomationProperties.GetSizeOfSet(container),
+      })
+      .ToArray();
+
+    if (scenario.ExerciseKeyboardPath)
+    {
+      var enterHandled = await palette.HandleKeyAsync(Key.Enter);
+      Assert.True(enterHandled);
+      Assert.False(palette.IsOpen);
+      Assert.Equal(1, executions);
+      keyObservations.Add(new
+      {
+        key = "Enter",
+        beforeSelectedIndex = selectedIndex,
+        handled = enterHandled,
+        afterSelectedIndex = selectedIndex,
+        closesPalette = !palette.IsOpen,
+        executions,
+      });
+    }
+
+    var automationPath = Path.Combine(
+      outputRoot,
+      $"command-palette-{scenario.Name}-automation.json");
+    File.WriteAllText(
+      automationPath,
+      JsonSerializer.Serialize(
+        new
+        {
+          name = AutomationProperties.GetName(palette),
+          status = AutomationProperties.GetItemStatus(palette),
+          listRole = AutomationProperties.GetControlTypeOverride(listControl).ToString(),
+          resultsAccessibleName,
+          itemCount = resultCount,
+          selectedIndex,
+          selectedCommandId,
+          searchBounds = searchControl.Bounds.ToString(),
+          searchPlaceholder = searchControl.PlaceholderText,
+          realizedItemCount = listControl.RealizedContainerCount,
+          isVirtualized = listControl.IsVirtualized,
+          keyObservations,
+          items = realizedItems,
+        },
+        new JsonSerializerOptions
+        {
+          WriteIndented = true,
+          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        }) + "\n");
+
+    window.Close();
+    return new Issue815CommandPaletteCapture(
+      Path.GetRelativePath(FindRepositoryRoot(), outputPath).Replace('\\', '/'),
+      Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
+      Path.GetRelativePath(FindRepositoryRoot(), automationPath).Replace('\\', '/'),
+      Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(automationPath))),
+      new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
+      scenario.Name,
+      "light",
+      900,
+      620,
+      scenario.InitialSelection.ToString(),
+      resultsAccessibleName,
+      resultCount,
+      selectedIndex,
+      selectedCommandId);
+  }
+
   private static CommandPaletteCapture Render(string outputRoot, RenderScenario scenario)
   {
     var host = new FsusOverlayHost();
@@ -681,6 +919,12 @@ public class FsusCommandPaletteHeadlessTests
     double Height,
     string State);
 
+  private sealed record Issue815RenderScenario(
+    string Name,
+    FsusCommandPaletteInitialSelection InitialSelection,
+    string ResultsAccessibleName,
+    bool ExerciseKeyboardPath);
+
   private sealed record PixelDimension(int Width, int Height);
 
   private sealed record CommandPaletteCapture(
@@ -697,4 +941,20 @@ public class FsusCommandPaletteHeadlessTests
     string? ZoomSimulation,
     string State,
     int ResultCount);
+
+  private sealed record Issue815CommandPaletteCapture(
+    string File,
+    string Sha256,
+    string AutomationFile,
+    string AutomationSha256,
+    PixelDimension PixelSize,
+    string Scenario,
+    string Theme,
+    double WidthDip,
+    double HeightDip,
+    string InitialSelection,
+    string ResultsAccessibleName,
+    int ResultCount,
+    int SelectedIndex,
+    string SelectedCommandId);
 }

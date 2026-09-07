@@ -1,0 +1,105 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "Avalonia command palette initial selection",
+    "Avalonia command palette results accessibility label"
+  ],
+  "uiDecisionClass": "interaction-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "index",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "visual-change",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "consumer",
+      "path": "docs/consumers/design-integration.md",
+      "digest": "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b"
+    },
+    {
+      "id": "avalonia",
+      "path": "docs/avalonia/README.md",
+      "digest": "49a65565a1322edad16d9e2c95df67f8f403f7b874e170de7ce3f892159b0d27"
+    },
+    {
+      "id": "avalonia-navigation",
+      "path": "docs/avalonia/components/navigation.md",
+      "digest": "f924534e614f17f2f9b1252ebd855517070d3e616a783ceeda73af03285d28db"
+    },
+    {
+      "id": "accessibility",
+      "path": "spec/accessibility/README.md",
+      "digest": "8e2d22844842afd676d2d625c2d10b903ce3969aec27e014c3c85bef455c0c7e"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "d5581107db5ba6524ba50f060ba951ce5be86b7a",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "7c676586b124b0bebec055694e24b836dd82f58b756d3e709d86a88e4cb9c9b8",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "45f0a7f797004aa574a4a91683de4f298624a715",
+  "candidateDigest": "d0d609be76ce980da6b79d99ec1e1025a3f5de0174938c8022da039608a90603",
+  "stateEvidenceMatrix": [
+    {
+      "state": "default-first-enabled-selection",
+      "viewport": "desktop 900x620",
+      "theme": "light",
+      "evidenceDigest": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc"
+    },
+    {
+      "state": "consumer-no-selection-localized-name",
+      "viewport": "desktop 900x620",
+      "theme": "light",
+      "evidenceDigest": "76dd302c51c7791aefa2b83297858e3dda0df2266f4330e306d0ca1aa4536eec"
+    },
+    {
+      "state": "consumer-no-selection-keyboard-path",
+      "viewport": "desktop 900x620",
+      "theme": "light",
+      "evidenceDigest": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc"
+    }
+  ],
+  "inScope": [
+    "configure initial selection as first-enabled or none",
+    "keep Up, Down, Enter, Escape, pointer activation, nested navigation, and focus restoration deterministic",
+    "configure the results-list accessible name",
+    "retain the existing default source-compatible behavior"
+  ],
+  "outOfScope": [
+    "redesigning command palette layout, typography, motion, or visual hierarchy",
+    "consumer command models, routing, localization storage, or business workflows",
+    "private visual-tree access or application key-event workarounds",
+    "physical screen-reader or native-platform accessibility certification"
+  ],
+  "classificationEvidenceDigest": "cb347d18e06cc458078bc1e3fed4ca2131a46a40b010db3ba32651fd394570cd",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "6ed4a70d9128fe0bebd9e0ee3dcc1ca3fd051a5ed7fb34b48f289e51c7613067"
+}

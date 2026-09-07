@@ -1,0 +1,174 @@
+{
+  "schema": "fsusui-independent-ux-review.v1",
+  "issue": 815,
+  "candidateSha": "45f0a7f797004aa574a4a91683de4f298624a715",
+  "candidateDigest": "d0d609be76ce980da6b79d99ec1e1025a3f5de0174938c8022da039608a90603",
+  "reviewMode": "read-only-rendered-evidence-inspection",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "identity": {
+    "executionId": "issue-815-command-palette-798961cebb51b3fddc6ebb96b449f91ab3d6d816",
+    "generatedBy": "FsusCommandPaletteHeadlessTests.RealHeadlessSkiaRenderProducesIssue815SelectionEvidenceMatrix",
+    "contract": "Avalonia FsusCommandPalette public selection and results accessibility labels",
+    "renderer": "Avalonia Headless Skia 12.0.4"
+  },
+  "viewportStateMatrix": [
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 900,
+        "height": 620
+      },
+      "state": "default-first-enabled-selection",
+      "theme": "light",
+      "density": "default",
+      "locale": "en-US",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "keyboard",
+        "screen-reader",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 900,
+        "height": 620
+      },
+      "state": "consumer-no-selection-localized-name",
+      "theme": "light",
+      "density": "default",
+      "locale": "en-US",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "keyboard",
+        "screen-reader",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "76dd302c51c7791aefa2b83297858e3dda0df2266f4330e306d0ca1aa4536eec"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 900,
+        "height": 620
+      },
+      "state": "consumer-no-selection-keyboard-path",
+      "theme": "light",
+      "density": "default",
+      "locale": "en-US",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "keyboard",
+        "screen-reader",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "command-palette-default-first-enabled-selection",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-default-first-enabled-selection.png",
+      "digest": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc",
+      "bytes": 28381,
+      "width": 900,
+      "height": 620,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "command-palette-none-initial-selection-localized-name",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-initial-selection-localized-name.png",
+      "digest": "76dd302c51c7791aefa2b83297858e3dda0df2266f4330e306d0ca1aa4536eec",
+      "bytes": 27800,
+      "width": 900,
+      "height": 620,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "command-palette-none-selection-keyboard-path",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-selection-keyboard-path.png",
+      "digest": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc",
+      "bytes": 28381,
+      "width": 900,
+      "height": 620,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "command-palette-default-first-enabled-selection-automation",
+      "platform": "avalonia",
+      "kind": "accessibility-tree",
+      "path": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-default-first-enabled-selection-automation.json",
+      "digest": "36f850aa83c68531e0c84d4442dc68197f8fa2b4415e514960b9cdff1c2da875",
+      "bytes": 896,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "command-palette-none-initial-selection-localized-name-automation",
+      "platform": "avalonia",
+      "kind": "accessibility-tree",
+      "path": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-initial-selection-localized-name-automation.json",
+      "digest": "df3124191bef32d806022f882ac3fcb1a2f1c8a76001f5b0656429b464a00ca2",
+      "bytes": 892,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "command-palette-none-selection-keyboard-path-automation",
+      "platform": "avalonia",
+      "kind": "accessibility-tree",
+      "path": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-selection-keyboard-path-automation.json",
+      "digest": "62c7a239c503c91a8d1aea4467d6aa6bead954e803906bcc70ad2ee9214b2f07",
+      "bytes": 1212,
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "governedCriteria": [
+    {
+      "id": "default-source-compatible-selection",
+      "status": "accepted",
+      "observation": "With FirstEnabled, the production automation records selectedIndex=1 and selectedCommandId=file.open after a disabled first result; the corresponding render has a solid selection fill only on the first enabled result."
+    },
+    {
+      "id": "consumer-no-selection",
+      "status": "accepted",
+      "observation": "With None, the automation records selectedIndex=-1 and selectedCommandId empty; the render removes the result-row selection fill while retaining both list rows and labels."
+    },
+    {
+      "id": "localized-results-accessible-name",
+      "status": "accepted",
+      "observation": "The same None scenario sets the list automation name to Available commands, while the default scenario keeps Command results, proving the public property reaches the results list without private visual-tree access."
+    },
+    {
+      "id": "deterministic-keyboard-path",
+      "status": "accepted",
+      "observation": "The keyboard automation records Enter with no selection as handled=false and palette still open, then Down selecting index 1/file.open, then Enter handled=true, palette closed, and exactly one execution."
+    }
+  ],
+  "observations": [
+    "The 900x620 light renders show the same centered production command palette surface, search field, and two result rows; the only pixel difference between default and None is the selection fill on the first enabled result. Row label identity is bound by the inspected accessibility automation artifacts.",
+    "The accessibility automation tree records list role, item roles, positions, disabled/available/selected status, and the configurable results name for every scenario.",
+    "The local Headless Skia simulation is deterministic and uses reduced-motion styling; it does not claim physical hardware, an external screen reader, dark theme, or a native-platform certification."
+  ],
+  "limitations": [
+    "Coverage is the exact requested desktop 900x620 light production path; dark, mobile, and physical assistive technology are out of scope for this interaction-only API change."
+  ],
+  "blockers": [],
+  "status": "accepted"
+}

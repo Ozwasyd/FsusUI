@@ -169,12 +169,12 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     properties.filter((property) => typeof property.required === 'boolean')
       .length,
-    2083,
+    2085,
   )
   assert.equal(properties.filter((property) => property.required).length, 15)
   assert.equal(
     avaloniaProperties.filter((property) => property.defaultKnown).length,
-    296,
+    298,
   )
   const contentRegions = avaloniaBaselines.avalonia.semanticTypes.flatMap(
     (type) =>
@@ -238,8 +238,8 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   )
   const enumTypes = semanticTypes.filter((type) => type.kind === 'enum')
   const enumMembers = enumTypes.flatMap((type) => type.enumMembers)
-  assert.equal(enumTypes.length, 98)
-  assert.equal(enumMembers.length, 430)
+  assert.equal(enumTypes.length, 99)
+  assert.equal(enumMembers.length, 432)
   assert.ok(semanticTypes.every((type) => typeof type.deprecated === 'boolean'))
   assert.ok(
     semanticTypes

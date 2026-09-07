@@ -267,6 +267,7 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusCommandPaletteExecutedEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusCommandPaletteFailedEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusCommandPaletteFailureStage` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusCommandPaletteInitialSelection` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusCommandPaletteItem` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusCommandPaletteModel` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusCommandPaletteProvider` | `avalonia-extra` |

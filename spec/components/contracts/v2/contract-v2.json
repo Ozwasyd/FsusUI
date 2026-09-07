@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "355d8bdb7f42b5fef2e4a3bbdff0c1e51d557599a6bb4dcf96ee424bcd709b11",
+      "hash": "6fe4938dda08ce1be90429e8ccc7b6ee62c5997ee582876d552d1d0d357d70cd",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -182776,8 +182776,8 @@
       "kind": "class",
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 40,
-      "surfaceHash": "3ebbfc37e389fed5efe2f136c4efd26650c4a2b4027f9193343d257a3426407a",
+      "memberCount": 42,
+      "surfaceHash": "7c537a65639a1610f75c1e05e269568f9802d02dfd1c3285de21dfcf70d15164",
       "stateContractFingerprint": "b015156f8ccd1a9448c2816ef174464dfbe25d33a5d9f2ede4036469b5305cba",
       "automationContractFingerprint": "169e775f50465aa91b699e0d28f4da0128bed6885b664380629162050c2f2b5c",
       "tokenThemeContractFingerprint": "707d9105104b38d178bad19be3f9f835a1517dcc60f9d04a58b4f3ff0702d864",
@@ -182834,6 +182834,23 @@
       "surfaceHash": "ee9524c0f85201daa044df77a1741f2ddceee1bec605fec0b9b2a2dbd1a32ad2",
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-command-palette-failure-stage"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusCommandPaletteInitialSelection",
+      "kind": "enum",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "surfaceHash": "61af42639eb0472fd1734f90acc8ef5db4e97a8b06c31af3fe60fc6ed4e7a85b",
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-command-palette-initial-selection"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",

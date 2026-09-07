@@ -1,0 +1,34 @@
+{
+  "name": "Workspace commands",
+  "status": "ready, 2 commands",
+  "listRole": "List",
+  "resultsAccessibleName": "Command results",
+  "itemCount": 2,
+  "selectedIndex": 1,
+  "selectedCommandId": "file.open",
+  "searchBounds": "2, 2, 610, 44",
+  "searchPlaceholder": "Search commands by name, category, or description",
+  "realizedItemCount": 2,
+  "isVirtualized": false,
+  "keyObservations": [],
+  "items": [
+    {
+      "index": 0,
+      "role": "ListItem",
+      "name": "Archive workspace",
+      "help": "Workspace, Requires owner permission",
+      "status": "disabled",
+      "positionInSet": 1,
+      "sizeOfSet": 2
+    },
+    {
+      "index": 1,
+      "role": "ListItem",
+      "name": "Open recent document",
+      "help": "File, Choose a document from the recent workspace history, Ctrl\u002BO",
+      "status": "selected",
+      "positionInSet": 2,
+      "sizeOfSet": 2
+    }
+  ]
+}

@@ -32,6 +32,12 @@ public enum FsusCommandPaletteFailureStage
   Execution,
 }
 
+public enum FsusCommandPaletteInitialSelection
+{
+  FirstEnabled,
+  None,
+}
+
 public sealed record FsusCommandPaletteResult(
   string CommandId,
   string Label,
@@ -82,6 +88,16 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
     AvaloniaProperty.Register<FsusCommandPalette, string>(
       nameof(SearchAccessibleName),
       "Search commands");
+
+  public static readonly StyledProperty<string> ResultsAccessibleNameProperty =
+    AvaloniaProperty.Register<FsusCommandPalette, string>(
+      nameof(ResultsAccessibleName),
+      "Command results");
+
+  public static readonly StyledProperty<FsusCommandPaletteInitialSelection> InitialSelectionProperty =
+    AvaloniaProperty.Register<FsusCommandPalette, FsusCommandPaletteInitialSelection>(
+      nameof(InitialSelection),
+      FsusCommandPaletteInitialSelection.FirstEnabled);
 
   public static readonly StyledProperty<string> SearchPlaceholderProperty =
     AvaloniaProperty.Register<FsusCommandPalette, string>(
@@ -171,6 +187,18 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
   {
     get => GetValue(SearchAccessibleNameProperty);
     set => SetValue(SearchAccessibleNameProperty, value);
+  }
+
+  public string ResultsAccessibleName
+  {
+    get => GetValue(ResultsAccessibleNameProperty);
+    set => SetValue(ResultsAccessibleNameProperty, value);
+  }
+
+  public FsusCommandPaletteInitialSelection InitialSelection
+  {
+    get => GetValue(InitialSelectionProperty);
+    set => SetValue(InitialSelectionProperty, value);
   }
 
   public string SearchPlaceholder
@@ -627,6 +655,7 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
     else if (
       change.Property == AccessibleNameProperty ||
       change.Property == SearchAccessibleNameProperty ||
+      change.Property == ResultsAccessibleNameProperty ||
       change.Property == SearchPlaceholderProperty ||
       change.Property == BackLabelProperty ||
       change.Property == EmptyTextProperty ||
@@ -679,7 +708,7 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
       FsusTokens.DensityMenuItemYDouble,
       OverlaySize.Height - 140);
     resultsList.Overscan = 2;
-    resultsList.AccessibleName = "Command results";
+    resultsList.AccessibleName = ResultsAccessibleName;
     resultsList.ContainerPrepared = SyncResultContainer;
 
     statusText.Classes.Add("fsus-command-palette-status");
@@ -853,14 +882,15 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
     resolvedEntries.Clear();
     resolvedEntries.AddRange(entries);
 
-    SelectedIndex = string.IsNullOrWhiteSpace(selectedId)
+    var preservedIndex = string.IsNullOrWhiteSpace(selectedId)
       ? -1
       : resolvedEntries.FindIndex((entry) =>
         entry.Result.IsEnabled && entry.Result.CommandId == selectedId);
-    if (SelectedIndex < 0)
-    {
-      SelectedIndex = resolvedEntries.FindIndex((entry) => entry.Result.IsEnabled);
-    }
+    SelectedIndex = preservedIndex >= 0
+      ? preservedIndex
+      : InitialSelection == FsusCommandPaletteInitialSelection.FirstEnabled
+        ? resolvedEntries.FindIndex((entry) => entry.Result.IsEnabled)
+        : -1;
 
     resultsList.ItemCount = resolvedEntries.Count;
     resultsList.ItemKeyProvider = (index) => resolvedEntries[index].Result.CommandId;
@@ -1090,6 +1120,7 @@ public class FsusCommandPalette : ContentControl, IFsusOverlayLifecycle
     backButton.Content = BackLabel;
     AutomationProperties.SetName(backButton, BackLabel);
     resultsList.EmptyText = EmptyText;
+    resultsList.AccessibleName = ResultsAccessibleName;
   }
 
   private void SyncState()
