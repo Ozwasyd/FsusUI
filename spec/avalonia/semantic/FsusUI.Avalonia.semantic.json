@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "5118f88b5179a6e9e5e3fb3946f4b58e3499fa310f8490db516a902f592ebb9a",
+    "inputTreeHash": "1a1f016b22fedb83c431886d3db260bd5e6e16bcfba4e46b6f95b0b13f7cb495",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "6c19a22abfe219416bcaed69242ed334639dfd0c6b0aa0bd532010eed3b0edf1"
+    "outputHash": "6191bb4cb9abc9fbaa554140a7b1b3ae2d5bcd866b85c3fe9ccb9046b93bca3c"
   },
   "semanticTypes": [
     {
@@ -15179,7 +15179,7 @@
         },
         {
           "name": "Items",
-          "type": "System.Collections.ObjectModel.Collection\u003CFsusUI.Avalonia.Controls.FsusDescriptionsItem\u003E",
+          "type": "System.Collections.ObjectModel.ObservableCollection\u003CFsusUI.Avalonia.Controls.FsusDescriptionsItem\u003E",
           "nullable": true,
           "canRead": true,
           "canWrite": false,
@@ -23181,7 +23181,7 @@
       "properties": [
         {
           "name": "Items",
-          "type": "System.Collections.ObjectModel.Collection\u003CFsusUI.Avalonia.Controls.FsusMetricItem\u003E",
+          "type": "System.Collections.ObjectModel.ObservableCollection\u003CFsusUI.Avalonia.Controls.FsusMetricItem\u003E",
           "nullable": true,
           "canRead": true,
           "canWrite": false,
@@ -67438,6 +67438,18 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusDataDisplayControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusDescriptions.BuildVisualTree",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusDescriptions",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusDescriptions"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
         "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusLayoutControls.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusLayoutMetrics.ResolveGap",
         "dependency": "Space1Thickness",
@@ -67502,6 +67514,18 @@
         "ownerType": "FsusUI.Avalonia.Controls.FsusScrollbar",
         "ownership": "resolved",
         "ownerExpression": "FsusUI.Avalonia.Controls.FsusScrollbar"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusProductPrimitiveControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusKpiGroup.BuildVisualTree",
+        "dependency": "Space1Thickness",
+        "canonicalName": "space.1",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusKpiGroup",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusKpiGroup"
       },
       {
         "kind": "csharp-token-member-reference",

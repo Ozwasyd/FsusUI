@@ -208,6 +208,7 @@ export async function loadCurrentCheckTagVisualReview(web, avalonia) {
   if (
     changed.some(
       (file) =>
+        !file.startsWith('scripts/deterministic-render-evidence.mjs') &&
         !file.startsWith(
           'tests/conformance/visual/artifacts/issue-285-check-tag',
         ),
@@ -1170,6 +1171,11 @@ const currentComparisonIdentity = (contractPath) => {
       .update(
         fs.readFileSync(
           path.resolve(root, 'scripts/conformance-v2-evidence.mjs'),
+        ),
+      )
+      .update(
+        fs.readFileSync(
+          path.resolve(root, 'scripts/deterministic-render-evidence.mjs'),
         ),
       )
       .update(

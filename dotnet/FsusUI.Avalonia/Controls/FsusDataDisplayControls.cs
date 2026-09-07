@@ -1,7 +1,9 @@
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Layout;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -214,6 +216,7 @@ public class FsusDescriptions : ContentControl
   public FsusDescriptions()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-descriptions");
+    Items.CollectionChanged += (_, _) => SyncState();
     SyncState();
   }
 
@@ -221,11 +224,16 @@ public class FsusDescriptions : ContentControl
   public int Column { get; set; } = 3;
   public bool Border { get; set; }
   public int ResolvedColumnCount { get; private set; } = 3;
-  public Collection<FsusDescriptionsItem> Items { get; } = [];
+  public ObservableCollection<FsusDescriptionsItem> Items { get; } = [];
 
   public void RefreshLayout(double availableWidth)
   {
     ResolvedColumnCount = availableWidth < 480d ? 1 : Math.Max(1, Column);
+    if (IsMeasureValid)
+    {
+      ResolvedColumnCount = Math.Min(ResolvedColumnCount, Math.Max(1, (int)Math.Floor(availableWidth / 160d)));
+    }
+
     foreach (var item in Items)
     {
       item.SyncState();
@@ -240,6 +248,45 @@ public class FsusDescriptions : ContentControl
     AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(AccessibleName, Items.Count));
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Group);
     AutomationProperties.SetItemStatus(this, $"{Items.Count.ToString(CultureInfo.InvariantCulture)} descriptions");
+    BuildVisualTree();
+  }
+
+  private void BuildVisualTree()
+  {
+    var panel = new UniformGrid
+    {
+      Columns = ResolvedColumnCount,
+      Rows = 0,
+    };
+    panel.Classes.Add("fsus-descriptions-grid");
+    foreach (var item in Items)
+    {
+      var row = new Grid { ColumnSpacing = FsusTokens.Space2Thickness.Left };
+      row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+      row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+
+      var label = new FsusText
+      {
+        Text = item.Label,
+        IsTruncated = true,
+        Variant = FsusTextVariant.Muted,
+      };
+      label.Classes.Add("fsus-description-label");
+      var value = new FsusText
+      {
+        Text = item.Value?.ToString() ?? string.Empty,
+        IsTruncated = true,
+        Variant = FsusTextVariant.Body,
+      };
+      value.Classes.Add("fsus-description-value");
+      Grid.SetColumn(label, 0);
+      Grid.SetColumn(value, 1);
+      row.Children.Add(label);
+      row.Children.Add(value);
+      panel.Children.Add(row);
+    }
+
+    Content = panel;
   }
 }
 

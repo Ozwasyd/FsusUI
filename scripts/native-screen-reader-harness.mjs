@@ -75,6 +75,11 @@ const runnerHash = crypto
   )
   .update(
     readFileSync(
+      resolve(repositoryRoot, 'scripts/deterministic-render-evidence.mjs'),
+    ),
+  )
+  .update(
+    readFileSync(
       resolve(
         repositoryRoot,
         'vue/packages/demo-app/src/InteractionTraceFixture.vue',

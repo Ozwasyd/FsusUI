@@ -210,6 +210,20 @@ export default [
 
   {
     files: [
+      'scripts/deterministic-render-evidence.mjs',
+      'tests/conformance-v2-evidence.test.mjs',
+      'tests/deterministic-render-evidence.test.mjs',
+    ],
+    languageOptions: {
+      globals: {
+        Buffer: 'readonly',
+        requestAnimationFrame: 'readonly',
+      },
+    },
+  },
+
+  {
+    files: [
       'scripts/native-ime-harness.mjs',
       'scripts/native-ime-marionette.mjs',
       'scripts/native-live-local-acceptance.mjs',
@@ -222,6 +236,9 @@ export default [
         Event: 'readonly',
         HTMLTextAreaElement: 'readonly',
         getComputedStyle: 'readonly',
+        matchMedia: 'readonly',
+        MutationObserver: 'readonly',
+        requestAnimationFrame: 'readonly',
         setTimeout: 'readonly',
       },
     },
