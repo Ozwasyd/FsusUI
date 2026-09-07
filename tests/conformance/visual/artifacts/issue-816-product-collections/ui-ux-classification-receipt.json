@@ -1,0 +1,128 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "avalonia-product-primitives",
+    "avalonia-data-display"
+  ],
+  "uiDecisionClass": "layout-judgment",
+  "verificationClass": "ux-local",
+  "requiredAuthorities": [
+    {
+      "id": "index",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "visual-change",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "consumer",
+      "path": "docs/consumers/design-integration.md",
+      "digest": "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b"
+    },
+    {
+      "id": "metric-primitives",
+      "path": "docs/components/metric-primitives.md",
+      "digest": "a259a52a313449613bfca0ac40588dc29ca590316569e5ded60cd7161a6eb3f7"
+    },
+    {
+      "id": "avalonia-data-display",
+      "path": "docs/avalonia/components/data-display.md",
+      "digest": "11df8490f908fafb975082c196f11907cdad65c3bfdede8c2e380cbd5b6454ef"
+    },
+    {
+      "id": "avalonia-product-primitives",
+      "path": "docs/avalonia/components/product-primitives.md",
+      "digest": "9f3449f2d5e384b3d4f58b3f5c5284d98f0b6a9aafd74e6876b3cf402e0522b6"
+    },
+    {
+      "id": "avalonia",
+      "path": "docs/avalonia/README.md",
+      "digest": "49a65565a1322edad16d9e2c95df67f8f403f7b874e170de7ce3f892159b0d27"
+    },
+    {
+      "id": "avalonia-platform-differences",
+      "path": "docs/avalonia/platform-differences.md",
+      "digest": "dd8692775e7e02c3a25d40dc8e3c837e6c970563792ceff8e344869d2aec63e5"
+    },
+    {
+      "id": "accessibility",
+      "path": "spec/accessibility/README.md",
+      "digest": "8e2d22844842afd676d2d625c2d10b903ce3969aec27e014c3c85bef455c0c7e"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "e9a57de035a5b5e1a7eb67a9ae7bd8d5491c676b",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "c1f38f0c29122cdf39d19d3341d054852b157da632c930f5d88735b5d195b34c",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "e9a57de035a5b5e1a7eb67a9ae7bd8d5491c676b",
+  "candidateDigest": "18da7ff49e3b25344b84e37f74f9507b9f2383991dd5dbc55f47b80a7312a5e4",
+  "stateEvidenceMatrix": [
+    {
+      "state": "kpi-default-light",
+      "viewport": "desktop-640x320",
+      "theme": "light",
+      "evidenceDigest": "5a0977fa58638ce3e88b4bf20fbf1b38e525869538a56275cc6bab12f7f708f3"
+    },
+    {
+      "state": "kpi-responsive-dark",
+      "viewport": "mobile-360x320",
+      "theme": "dark",
+      "evidenceDigest": "6cbe23b467e48ce4edf6484eef54cd4c1f06ee8e005c760f6f6cb83197bfb7f3"
+    },
+    {
+      "state": "descriptions-default-light",
+      "viewport": "desktop-640x320",
+      "theme": "light",
+      "evidenceDigest": "9e8422c3e521bbdaef023f2f8a9909020c89f30d2281accabeaf68df5ce9852a"
+    },
+    {
+      "state": "descriptions-responsive-dark",
+      "viewport": "mobile-360x320",
+      "theme": "dark",
+      "evidenceDigest": "74a3b1ebe6a09ec0d714b6ed8ebd0906586d02d6f2ab7f9c87c4201d766c720f"
+    }
+  ],
+  "inScope": [
+    "render public FsusKpiGroup Items",
+    "render public FsusDescriptions Items",
+    "responsive default and mobile layouts",
+    "readable labels and values",
+    "existing automation metadata and public collection APIs"
+  ],
+  "outOfScope": [
+    "consumer document statistics workflow and product copy",
+    "new dashboard or product-specific metric templates",
+    "Web/Vue API changes",
+    "new theme tokens or platform overrides",
+    "changing FsusMetricList or FsusKeyValueGrid beyond shared KPI presentation semantics"
+  ],
+  "classificationEvidenceDigest": "0980aeabc7b0aaa08e241877d8b3f0dd6a20a1e638958e9da847a339e0ca73db",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "9f041c3f9125a82945d1597752aa2cfc22382561b704299b0a56a663357948e0"
+}

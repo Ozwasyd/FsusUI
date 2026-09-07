@@ -15,10 +15,17 @@ export const captureDeterministicLocatorPng = async (
     await new Promise((resolveFrame) =>
       requestAnimationFrame(() => requestAnimationFrame(resolveFrame)),
     )
+    if (document.activeElement !== element)
+      await new Promise((resolveFrame) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolveFrame)),
+      )
   })
   let accepted = null
   for (let index = 0; index < samples; index += 1) {
-    const current = await locator.screenshot()
+    const current = await locator.screenshot({
+      animations: 'disabled',
+      caret: 'hide',
+    })
     if (!Buffer.isBuffer(current)) {
       throw new Error('deterministic screenshot did not return PNG bytes')
     }
@@ -28,6 +35,11 @@ export const captureDeterministicLocatorPng = async (
       )
     }
     accepted = current
+    if (index < samples - 1) {
+      await locator.evaluate(async () => {
+        await new Promise((resolveFrame) => requestAnimationFrame(resolveFrame))
+      })
+    }
   }
   return accepted
 }

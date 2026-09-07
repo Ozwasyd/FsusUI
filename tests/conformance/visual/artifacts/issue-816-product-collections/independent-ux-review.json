@@ -1,0 +1,86 @@
+{
+  "schema": "fsusui-independent-ux-review.v1",
+  "issue": 816,
+  "candidateSha": "e9a57de035a5b5e1a7eb67a9ae7bd8d5491c676b",
+  "candidateDigest": "18da7ff49e3b25344b84e37f74f9507b9f2383991dd5dbc55f47b80a7312a5e4",
+  "reviewMode": "read-only-rendered-evidence-inspection",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 640,
+        "height": 320
+      },
+      "state": "desktop-four-kpi-two-column-descriptions",
+      "theme": "light",
+      "motion": "enabled",
+      "evidenceDigest": "aafcdcb2c21710ebc7fa44d5b47a1c00756a4cec98fa1e664dc2e85008433ca5"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 640,
+        "height": 320
+      },
+      "state": "desktop-four-kpi-two-column-descriptions",
+      "theme": "dark",
+      "motion": "enabled",
+      "evidenceDigest": "36c935c38bbf03ed53c7c60158e9782a53569fa41833a111b18fcd38d9e21e93"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "product-collections-light",
+      "path": "tests/conformance/visual/artifacts/issue-816-product-collections/product-collections-light.png",
+      "digest": "aafcdcb2c21710ebc7fa44d5b47a1c00756a4cec98fa1e664dc2e85008433ca5",
+      "bytes": 14869,
+      "width": 640,
+      "height": 320,
+      "inspected": true
+    },
+    {
+      "id": "product-collections-dark",
+      "path": "tests/conformance/visual/artifacts/issue-816-product-collections/product-collections-dark.png",
+      "digest": "36c935c38bbf03ed53c7c60158e9782a53569fa41833a111b18fcd38d9e21e93",
+      "bytes": 15230,
+      "width": 640,
+      "height": 320,
+      "inspected": true
+    }
+  ],
+  "governedCriteria": [
+    {
+      "id": "kpi-label-value-readability",
+      "status": "accepted",
+      "observation": "The four desktop KPI entries show muted labels above strong values in a stable four-column arrangement; Words, Characters, Reading time, and Paragraphs are visible in both themes."
+    },
+    {
+      "id": "descriptions-label-value-readability",
+      "status": "accepted",
+      "observation": "The four description entries show muted labels left of body values in a two-column arrangement; Document, Status, Owner, and Updated are visible in both themes."
+    },
+    {
+      "id": "theme-contrast-and-restraint",
+      "status": "accepted",
+      "observation": "Light text is dark on a white surface and dark text is bright on the dark surface. The composition uses only text, spacing, and one bordered description surface without cards, icons, decoration, or new visual hierarchy."
+    },
+    {
+      "id": "responsive-structure",
+      "status": "accepted",
+      "observation": "The same rendered fixture passes the test's 360px single-column assertions for both collections after ApplyViewport and RefreshLayout, while the captured desktop evidence proves the shared 640px two-block structure."
+    }
+  ],
+  "observations": [
+    "The light and dark artifacts both show the KPI block in the upper half and the bordered descriptions block in the lower half without overlap.",
+    "No text clipping or collision is visible in the two captured desktop artifacts.",
+    "The candidate digest binds the exact product controls, rendered evidence test, semantic baseline, and Contract V2 files used for the reviewed implementation."
+  ],
+  "limitations": [
+    "The captured artifacts prove light and dark 640x320 desktop presentation and the test asserts the 360px responsive transition; zoom, touch, screen-reader speech, and cross-platform pixel equality are not claimed.",
+    "Any change to the candidate sources or PNG bytes requires new candidate binding and rendered reinspection."
+  ],
+  "blockers": [],
+  "status": "accepted"
+}

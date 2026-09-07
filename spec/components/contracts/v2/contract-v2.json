@@ -15,17 +15,17 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "5c40db1724bf216278c7ed940a8b27eddce13a95d8a4c672b6748a73fefafef0",
+      "hash": "355d8bdb7f42b5fef2e4a3bbdff0c1e51d557599a6bb4dcf96ee424bcd709b11",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "b45ca96f0103704f2cf8a555a0ad4e8e9ce2872848e1c3f1626714e1db6acf6f",
+      "hash": "367d53efc436611936552b81b71ea748dc3f3d31bd9ae46dcbc10c72e1e9bc78",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json",
-      "hash": "9679c29b966283227e7b3a834ceda5c6346052e3b40f97f04a78ca7737754844",
+      "hash": "b6c8b6f2d9c0d160d6811771f173ebff66a7ce7f36c1ff14a7a83dd809a30dac",
       "packageId": "FsusUI.Avalonia.Icons"
     },
     "markdownEditorGate": {
@@ -538,10 +538,10 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusDescriptions",
         "packageId": "avalonia",
-        "surfaceHash": "beb5a9a46349e6df34b51e4e5578ced69e712f467066de5676f4a6af1f2b0ce8",
+        "surfaceHash": "d9604e4da5686e61e846012a3277e3b7efc4426085687529cea6771175720218",
         "stateContractFingerprint": "582442e4afb438d4421254e81ada0f1de2cb8ece8f1befb7bb4ff7f79b3db36d",
         "automationContractFingerprint": "e0ca2816b068a0fe6df55ad01455fbc5b30e0228120f10522f55fd88df2cb7bc",
-        "tokenThemeContractFingerprint": "d94e298092739f8d877c882a9b3736f1739aa2f5f0eab40d7b2d31b696c3d735"
+        "tokenThemeContractFingerprint": "7e150d1f640cb57190aad5665d6af3d4d6e1da0087c70d89d8c39c1d84ac1653"
       },
       "basis": "name-equality"
     },
@@ -891,7 +891,8 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusKpiGroup",
         "packageId": "avalonia",
-        "surfaceHash": "a7332203786ce6e80d61a17e8d46702206637fdf835ba5cf97654867a633395e"
+        "surfaceHash": "608701d896c968e8238ca107505759aa9eb2742d7be2c59091f5e17caff4837a",
+        "tokenThemeContractFingerprint": "3d34e1a4d3cf239a3b7950c34bd2e43af7e0d51752d960e97025dfc55d947d0e"
       },
       "basis": "name-equality"
     },
@@ -1972,7 +1973,8 @@
       "avalonia": {
         "type": "FsusUI.Avalonia.Controls.FsusKpiGroup",
         "packageId": "avalonia",
-        "surfaceHash": "a7332203786ce6e80d61a17e8d46702206637fdf835ba5cf97654867a633395e"
+        "surfaceHash": "608701d896c968e8238ca107505759aa9eb2742d7be2c59091f5e17caff4837a",
+        "tokenThemeContractFingerprint": "3d34e1a4d3cf239a3b7950c34bd2e43af7e0d51752d960e97025dfc55d947d0e"
       },
       "basis": "name-equality"
     },
@@ -35760,13 +35762,14 @@
             ]
           },
           "tokenThemeContract": {
-            "fingerprint": "d94e298092739f8d877c882a9b3736f1739aa2f5f0eab40d7b2d31b696c3d735",
-            "dependencyCount": 1,
-            "resolvedCount": 0,
+            "fingerprint": "7e150d1f640cb57190aad5665d6af3d4d6e1da0087c70d89d8c39c1d84ac1653",
+            "dependencyCount": 2,
+            "resolvedCount": 1,
             "contractDeclared": false,
             "renderedEvidenceVerified": false,
             "baselines": [
-              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json"
+              "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
+              "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json"
             ]
           }
         }
@@ -36433,7 +36436,7 @@
           "member": "Items",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
-          "surfaceHash": "57924f58bf7df5bf042ab24e7a0685660a7c66cb08752943784278c62850fda4",
+          "surfaceHash": "1524fa8a557b5a944326a90cbddf51796c51384745f33eb5e6b2693034440cdb",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
@@ -59421,7 +59424,17 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusKpiGroup"
+          "type": "FsusUI.Avalonia.Controls.FsusKpiGroup",
+          "tokenThemeContract": {
+            "fingerprint": "3d34e1a4d3cf239a3b7950c34bd2e43af7e0d51752d960e97025dfc55d947d0e",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json"
+            ]
+          }
         }
       },
       "inputs": [
@@ -59592,7 +59605,7 @@
           "member": "Items",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
-          "surfaceHash": "1b76bed7f785513e63198c0b448467115f7fa53d9b53ed9ffdf479e9faf96a24",
+          "surfaceHash": "c79cfcffbdc11b6832e55009b06098665a0060ad607ce8ee2b05d4fba0b8f4c8",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
@@ -158304,7 +158317,17 @@
         "avalonia": {
           "status": "bound",
           "package": "FsusUI.Avalonia",
-          "type": "FsusUI.Avalonia.Controls.FsusKpiGroup"
+          "type": "FsusUI.Avalonia.Controls.FsusKpiGroup",
+          "tokenThemeContract": {
+            "fingerprint": "3d34e1a4d3cf239a3b7950c34bd2e43af7e0d51752d960e97025dfc55d947d0e",
+            "dependencyCount": 1,
+            "resolvedCount": 1,
+            "contractDeclared": false,
+            "renderedEvidenceVerified": false,
+            "baselines": [
+              "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json"
+            ]
+          }
         }
       },
       "inputs": [
@@ -158475,7 +158498,7 @@
           "member": "Items",
           "kind": "avalonia-extra",
           "surfaceKind": "property",
-          "surfaceHash": "1b76bed7f785513e63198c0b448467115f7fa53d9b53ed9ffdf479e9faf96a24",
+          "surfaceHash": "c79cfcffbdc11b6832e55009b06098665a0060ad607ce8ee2b05d4fba0b8f4c8",
           "governance": {
             "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
             "owner": "FsusUI Core",
@@ -189086,11 +189109,11 @@
   "tokenThemeBaselines": {
     "avalonia": {
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "fingerprint": "658bec26f8802b1ea714486d09bfe71c0a72f80ca6184f01da66ab2249076b5f",
+      "fingerprint": "5b8697165376f540a951b4c5fd8d520359f7927a420a705d34c0adfcc97ad813",
       "definitionCount": 116,
-      "dependencyCount": 23,
-      "resolvedCount": 23,
-      "ownerBoundCount": 19,
+      "dependencyCount": 25,
+      "resolvedCount": 25,
+      "ownerBoundCount": 21,
       "contractDeclared": false,
       "renderedEvidenceVerified": false
     },

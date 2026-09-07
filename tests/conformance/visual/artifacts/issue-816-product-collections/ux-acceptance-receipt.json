@@ -1,0 +1,70 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "9f041c3f9125a82945d1597752aa2cfc22382561b704299b0a56a663357948e0",
+  "candidateSha": "e9a57de035a5b5e1a7eb67a9ae7bd8d5491c676b",
+  "candidateDigest": "18da7ff49e3b25344b84e37f74f9507b9f2383991dd5dbc55f47b80a7312a5e4",
+  "verificationClass": "ux-local",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18",
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104",
+    "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
+    "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042",
+    "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b",
+    "a259a52a313449613bfca0ac40588dc29ca590316569e5ded60cd7161a6eb3f7",
+    "11df8490f908fafb975082c196f11907cdad65c3bfdede8c2e380cbd5b6454ef",
+    "9f3449f2d5e384b3d4f58b3f5c5284d98f0b6a9aafd74e6876b3cf402e0522b6",
+    "49a65565a1322edad16d9e2c95df67f8f403f7b874e170de7ce3f892159b0d27",
+    "dd8692775e7e02c3a25d40dc8e3c837e6c970563792ceff8e344869d2aec63e5",
+    "8e2d22844842afd676d2d625c2d10b903ce3969aec27e014c3c85bef455c0c7e"
+  ],
+  "activeBaselineIdentityDigest": "ea2f2051c2fb0f8e437a389451aa599fffa357fd5f984a415b731e0de1e4e488",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "57ced065924aadbf4e6ba00526e35b3a20b43d4385a7ba7f064a5690e4732ae8",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "avalonia-headless-640x320",
+      "state": "desktop-four-kpi-two-column-descriptions",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "aafcdcb2c21710ebc7fa44d5b47a1c00756a4cec98fa1e664dc2e85008433ca5"
+    },
+    {
+      "viewport": "avalonia-headless-640x320",
+      "state": "desktop-four-kpi-two-column-descriptions",
+      "theme": "dark",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "36c935c38bbf03ed53c7c60158e9782a53569fa41833a111b18fcd38d9e21e93"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "product-collections-light",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-816-product-collections/product-collections-light.png",
+      "digest": "aafcdcb2c21710ebc7fa44d5b47a1c00756a4cec98fa1e664dc2e85008433ca5",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "product-collections-dark",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-816-product-collections/product-collections-dark.png",
+      "digest": "36c935c38bbf03ed53c7c60158e9782a53569fa41833a111b18fcd38d9e21e93",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "234ac1a30491fc3cfdedceffc888959e4d9319abc2c452f3132c5b49b476b2ea"
+}

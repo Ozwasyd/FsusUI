@@ -1,26 +1,26 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "c51f456aff7c87a626ef087f6f675998c33be767",
+  "candidateSha": "b1fda1b69a3adf0c89a2df8c1eea0563671195b5",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-c51f456aff7c87a626ef087f6f675998c33be767",
+    "executionId": "conformance-v2-check-tag-b1fda1b69a3adf0c89a2df8c1eea0563671195b5",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "7cb0f79829788ffac4e7bcf61bc1e9748023a3041f3bbb8a9636238193ecf671",
+    "contractHash": "ff27165acab23044aaf78029f369ff99c94d6c54eea7dff010715325539b793f",
     "webBaselineHash": "6d43c3f504bbad092869c64456a4247eb4dd8be7648ed05bfda4cfc6ff303444",
-    "avaloniaBaselineHash": "5c40db1724bf216278c7ed940a8b27eddce13a95d8a4c672b6748a73fefafef0",
-    "runnerHash": "e117b08149b2ea8559231b713b5abe6b0e80f9c43ae4193fbb768f7d244e999b"
+    "avaloniaBaselineHash": "355d8bdb7f42b5fef2e4a3bbdff0c1e51d557599a6bb4dcf96ee424bcd709b11",
+    "runnerHash": "d6561b070afc3d632835e779066970a4f669291add0efda428b855fd26332607"
   },
   "viewportStateMatrix": [
     {
       "platform": "web",
       "viewport": {
         "width": 88,
-        "height": 25
+        "height": 24
       },
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
@@ -34,7 +34,7 @@
         "screen-reader",
         "reduced-motion"
       ],
-      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
+      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
     },
     {
       "platform": "avalonia",
@@ -54,7 +54,7 @@
         "automation-peer",
         "reduced-motion"
       ],
-      "evidenceDigest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127"
+      "evidenceDigest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -63,10 +63,10 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70",
-      "bytes": 1480,
+      "digest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170",
+      "bytes": 1237,
       "width": 88,
-      "height": 25,
+      "height": 24,
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -75,8 +75,8 @@
       "platform": "avalonia",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "f7ca6d3590c1564f723003a9ed7843dcf33ae09ba0f4dc4d10db920823add127",
-      "bytes": 9690,
+      "digest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5",
+      "bytes": 9960,
       "width": 960,
       "height": 720,
       "inspected": true,
