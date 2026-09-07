@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "1f45a5394cf7d9b6c6d6cb12200a063581a34f70",
+    "commitSha": "5b0333a402cb848f6c612eb804c0f2fcfacd4d16",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
-    "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
+    "tokenHash": "f40182721e8a812c248cb0bc43de556cd7568c5a9de1bc8b2c099df9b78e47b0",
     "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c",
     "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
     "inputTreeHash": "8f3772cc51d36040782dd8da602bba89f96d4aee7ee55757e37cfdc521096198",
@@ -12,7 +12,7 @@
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "b4b7c00db1f817b08a1e7bec8a6af03a505f605d2dcf16fb2e52febbf830388f",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "221c186ed7cebda904b9434d909f77f4c25fa7b5c3203bb724b8a2d24a3dd03d"
+    "outputHash": "162f7fefef637bc824b6de688cfb5d7c356d81fa51208ce7b4c49d2b9f5fbe27"
   },
   "summary": {
     "componentModules": 93,
@@ -21,7 +21,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 487,
+    "cssVariables": 495,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -43242,6 +43242,21 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-component-alert-danger-stripe-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-alert-success-stripe-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-alert-warning-stripe-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-component-button-padding-x",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
@@ -43342,6 +43357,31 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/markdown-editor.scss"
       ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-progress-danger-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-progress-height",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-progress-radius",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-progress-success-color",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-skeleton-radius",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
       "classification": "portable"
     },
     {
