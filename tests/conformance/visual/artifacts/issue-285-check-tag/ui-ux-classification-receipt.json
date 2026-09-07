@@ -39,8 +39,8 @@
     "authorityDigest": "0899bb73568e4e0430595ecce3c1d605d51c963e27e37250b6dcc0e1a6ff77a9",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "45f0a7f797004aa574a4a91683de4f298624a715",
-  "candidateDigest": "276432df2bd4bc6d09548c226ccb72e5c4bbf98c34a9cfda4f5e37bde0ec0d12",
+  "candidateSha": "13733ec19121cee98531f5149416a8cf34336434",
+  "candidateDigest": "483fa65f66e8728b3a8bf0959dcf55c88b983f41d1a880af4029995dd44e0e01",
   "stateEvidenceMatrix": [
     {
       "state": "focused-unchecked-after-pointer-keyboard",
@@ -68,5 +68,5 @@
   "classificationEvidenceDigest": "bf1cf46ccbef62abbf4f30a6bb0a0031a8607149ead79dab2eabe35e983ab126",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "f5ec109dc3b6bce8372adacfbc634c91306e84415b3345881fc63de994196e91"
+  "receiptDigest": "c6e7572abc6a59dc8f3efafbbaf2c5fee7b7026426da01b511397eebea9f9617"
 }
