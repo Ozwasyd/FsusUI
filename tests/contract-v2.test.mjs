@@ -169,7 +169,7 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     properties.filter((property) => typeof property.required === 'boolean')
       .length,
-    2085,
+    2098,
   )
   assert.equal(properties.filter((property) => property.required).length, 15)
   assert.equal(
@@ -678,23 +678,23 @@ test('automation mutations invalidate independent Contract V2 identities without
 test('Avalonia token/theme baseline retains generated authorities and honest dependency ownership', () => {
   const avalonia = avaloniaBaselines.avalonia.tokenThemeContract
   const themes = avaloniaBaselines.avaloniaThemes.tokenThemeContract
-  assert.equal(avalonia.definitions.length, 116)
-  assert.equal(themes.definitions.length, 116)
+  assert.equal(avalonia.definitions.length, 124)
+  assert.equal(themes.definitions.length, 124)
   assert.equal(avalonia.dependencies.length, 25)
-  assert.equal(themes.dependencies.length, 987)
+  assert.equal(themes.dependencies.length, 1000)
   assert.equal(
     avalonia.dependencies.filter((dependency) => dependency.resolved).length,
     25,
   )
   assert.equal(
     themes.dependencies.filter((dependency) => dependency.resolved).length,
-    488,
+    501,
   )
   assert.equal(
     themes.dependencies.filter(
       (dependency) => dependency.ownership === 'resolved',
     ).length,
-    604,
+    617,
   )
   assert.ok(
     [avalonia, themes].every(

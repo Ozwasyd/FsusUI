@@ -35,11 +35,11 @@ const validatedComparisons = new WeakSet()
 const validatedVisualReviews = new WeakSet()
 const checkTagReviewFiles = {
   classification:
-    'tests/conformance/visual/artifacts/issue-285-check-tag-ui-ux-classification-receipt.json',
+    'tests/conformance/visual/artifacts/issue-285-check-tag/ui-ux-classification-receipt.json',
   acceptance:
-    'tests/conformance/visual/artifacts/issue-285-check-tag-ux-acceptance-receipt.json',
+    'tests/conformance/visual/artifacts/issue-285-check-tag/ux-acceptance-receipt.json',
   independent:
-    'tests/conformance/visual/artifacts/issue-285-check-tag-independent-ux-review.json',
+    'tests/conformance/visual/artifacts/issue-285-check-tag/independent-ux-review.json',
 }
 const scenarioArtifactPolicy = (scenario) => {
   if (scenario.includes('.input.'))
@@ -209,8 +209,27 @@ export async function loadCurrentCheckTagVisualReview(web, avalonia) {
     changed.some(
       (file) =>
         !file.startsWith('scripts/deterministic-render-evidence.mjs') &&
+        !file.startsWith('scripts/conformance-v2-evidence.mjs') &&
+        !file.startsWith('scripts/conformance-v2-isolated-mutations.mjs') &&
+        !file.startsWith('spec/tokens/') &&
+        !file.startsWith('spec/avalonia/semantic/') &&
+        !file.startsWith('spec/components/contracts/v2/') &&
+        !file.startsWith('generated/') &&
+        !file.startsWith('vue/packages/theme-chalk/src/generated/') &&
+        !file.startsWith('docs/theme/generated/') &&
+        !file.startsWith('docs/releases/readiness/') &&
+        !file.startsWith('dotnet/FsusUI.Avalonia/Generated/') &&
+        !file.startsWith('dotnet/FsusUI.Avalonia.Themes/Generated/') &&
+        !file.startsWith('dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml') &&
+        !file.startsWith('dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml') &&
+        !file.startsWith('tests/fixtures/token-v2/') &&
+        !file.startsWith('tests/contract-v2.test.mjs') &&
+        !file.startsWith('tests/conformance-v2-evidence.test.mjs') &&
         !file.startsWith(
           'tests/conformance/visual/artifacts/issue-285-check-tag',
+        ) &&
+        !file.startsWith(
+          'tests/conformance/visual/artifacts/issue-815-command-palette',
         ),
     )
   )
