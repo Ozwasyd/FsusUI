@@ -1087,8 +1087,24 @@ const cases = [
     ],
     [
       'check-tag-evidence-checkpoint-mutated',
-      (execution) => (execution.identity.checkpoint = 'wrong-checkpoint'),
-      'check-tag.visual-review.identity.checkpoint mismatch',
+      (execution) => {
+        execution.identity.checkpoint = 'wrong-checkpoint'
+        for (const step of execution.steps ?? []) {
+          if (step?.binding) step.binding = structuredClone(execution.identity)
+        }
+        if (execution.performance?.identity) {
+          execution.performance.identity = structuredClone(execution.identity)
+        }
+        if (execution.visual?.identity) {
+          execution.visual.identity = structuredClone(execution.identity)
+        }
+        for (const artifact of execution.accessibility?.artifacts ?? []) {
+          if (artifact?.identity) {
+            artifact.identity = structuredClone(execution.identity)
+          }
+        }
+      },
+      'identity.checkpoint mismatch',
     ],
     [
       'check-tag-evidence-coverage-mutated',
