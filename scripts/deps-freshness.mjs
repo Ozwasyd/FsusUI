@@ -16,9 +16,13 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   evaluateFreshnessEntry,
-  extractPullRequestTarget,
+  selectRenovatePullRequests,
   validateExceptionRegistry,
 } from './dependency-freshness-evaluator.mjs'
+import {
+  resolveCurrentVersion,
+  resolveLatestVersion,
+} from './dependency-freshness-adapters.mjs'
 import { writeFreshnessReport } from './deps-freshness-report.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -60,60 +64,50 @@ function npmLatest(name) {
   }
 }
 
-function ghReleaseLatest(repo) {
+function githubTags(repo) {
   try {
     const r = execSync(
-      `gh release view --repo "${repo}" --json tagName --jq '.tagName' 2>/dev/null`,
+      `gh api --paginate --slurp "repos/${repo}/tags?per_page=100" 2>/dev/null`,
       { encoding: 'utf-8', timeout: 15_000 },
     ).trim()
-    return r?.replace(/^v/, '') || null
+    return r
+      ? JSON.parse(r)
+          .flat()
+          .map((entry) => entry.name)
+      : null
   } catch {
     return operationalError('github-api', repo)
   }
 }
 
-function normalizeCheck(check) {
-  return {
-    name: check.name ?? check.context ?? '',
-    conclusion: String(
-      check.conclusion ?? check.state ?? check.status ?? 'missing',
-    ).toLowerCase(),
-    createdAt: check.createdAt ?? null,
-    startedAt: check.startedAt ?? null,
-    completedAt: check.completedAt ?? null,
-  }
-}
+let openRenovatePullRequests
 
-function findRenovatePRs(entry) {
+function loadOpenRenovatePullRequests() {
   try {
     const r = execSync(
-      `gh pr list --state open --search "${entry.id} in:title" --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 5 2>/dev/null`,
+      'gh pr list --state open --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 100 2>/dev/null',
       { encoding: 'utf-8', timeout: 15_000 },
     ).trim()
     if (!r || r === '[]') return []
     const prs = JSON.parse(r)
-    return prs
-      .filter((pullRequest) =>
-        /^renovate(?:[/-]|$)/iu.test(pullRequest.headRefName ?? ''),
+    if (prs.length >= 100) {
+      operationalError(
+        'github-api',
+        'open pull request inventory reached limit',
       )
-      .map((pullRequest) => ({
-        number: pullRequest.number,
-        title: pullRequest.title,
-        url: pullRequest.url,
-        headRefName: pullRequest.headRefName,
-        targetVersion: extractPullRequestTarget(pullRequest, entry),
-        state: 'OPEN',
-        createdAt: pullRequest.createdAt,
-        superseding: /(?:supersedes|replaces)\s+#\d+/iu.test(
-          pullRequest.body ?? '',
-        ),
-        labels: (pullRequest.labels ?? []).map((label) => label.name),
-        checks: (pullRequest.statusCheckRollup ?? []).map(normalizeCheck),
-      }))
+      return null
+    }
+    return prs
   } catch {
-    operationalError('github-api', `pull requests for ${entry.id}`)
-    return []
+    return operationalError('github-api', 'open pull requests')
   }
+}
+
+function findRenovatePRs(entry) {
+  if (openRenovatePullRequests === undefined) {
+    openRenovatePullRequests = loadOpenRenovatePullRequests()
+  }
+  return selectRenovatePullRequests(openRenovatePullRequests ?? [], entry)
 }
 
 function curlJson(url) {
@@ -131,103 +125,27 @@ function curlJson(url) {
 // ===== Version resolvers per datasource =====
 
 function resolveCurrent(entry) {
-  const ds = entry.datasource
-
-  if (ds === 'npm') {
-    // Read installed version from pnpm-lock.yaml via npm ls
-    // For npm workspace, deps:check already verifies consistency.
-    // Freshness: check if lockfile is current vs registry for key packages.
-    // Use the first specific package name from the group
-    const keyPkg = {
-      'npm-workspace-root': 'semver',
-      'npm-vue-runtime': 'vue',
-      'npm-vue-build': 'vite',
-      'npm-js-test': 'vitest',
-      'pnpm-package-manager': 'pnpm',
-    }[entry.id]
-    if (!keyPkg) return null
-    // Read from installed node_modules
-    const modPath = path.resolve(
-      repoRoot,
-      'node_modules',
-      keyPkg,
-      'package.json',
-    )
-    if (!existsSync(modPath)) return null
-    return JSON.parse(readFileSync(modPath, 'utf-8')).version
-  }
-
-  if (ds === 'nuget') {
-    const propsPath = path.resolve(repoRoot, 'dotnet/Directory.Packages.props')
-    if (!existsSync(propsPath)) return null
-    const content = readFileSync(propsPath, 'utf-8')
-    const pkgName = entry.packageName.split(',')[0]?.trim()
-    const re = new RegExp(`Include="${pkgName}"\\s+Version="([^"]+)"`, 'i')
-    const match = content.match(re)
-    return match ? match[1] : null
-  }
-
-  if (ds === 'dotnet-version') {
-    return readJson('dotnet/global.json')?.sdk?.version || null
-  }
-
-  if (ds === 'node-version') {
-    const f = path.resolve(repoRoot, '.github/workflows/quality.yml')
-    if (!existsSync(f)) return null
-    const m = readFileSync(f, 'utf-8').match(/node-version:\s*(\d+)/)
-    return m ? m[1] : null
-  }
-
-  if (ds === 'github-releases' && entry.packageName.includes('emsdk')) {
-    const f = path.resolve(repoRoot, '.github/workflows/quality.yml')
-    if (!existsSync(f)) return null
-    const m = readFileSync(f, 'utf-8').match(
-      /emscripten-core\/setup-emsdk@(v[\d.]+)/,
-    )
-    return m ? m[1].replace(/^v/, '') : null
-  }
-
-  if (entry.id === 'pnpm-package-manager') {
-    const m = (readJson('package.json')?.packageManager || '').match(
-      /pnpm@(.+)/,
-    )
-    return m ? m[1] : null
-  }
-
-  return null
+  return resolveCurrentVersion(entry, repoRoot)
 }
 
-function resolveLatest(entry) {
-  const ds = entry.datasource
-  if (ds === 'npm') {
-    const keyPkg = {
-      'npm-workspace-root': 'semver',
-      'npm-vue-runtime': 'vue',
-      'npm-vue-build': 'vite',
-      'npm-js-test': 'vitest',
-      'pnpm-package-manager': 'pnpm',
-    }[entry.id]
-    return keyPkg ? npmLatest(keyPkg) : null
-  }
-  if (ds === 'nuget') return null
-  if (ds === 'dotnet-version') {
-    const idx = curlJson(
-      'https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json',
-    )
-    const rel = idx?.['releases-index']?.find(
-      (r) => r['channel-version'] === '10.0',
-    )
-    return rel?.['latest-sdk'] || null
-  }
-  if (ds === 'node-version') {
-    const versions = curlJson('https://nodejs.org/dist/index.json')
-    const lts = versions?.find((v) => v.lts !== false)
-    return lts ? lts.version.replace(/^v/, '') : null
-  }
-  if (ds === 'github-releases' && entry.packageName.includes('emsdk')) {
-    return ghReleaseLatest('emscripten-core/emsdk')
-  }
-  return null
+function nugetVersions(packageName) {
+  const id = encodeURIComponent(packageName.toLowerCase())
+  return curlJson(`https://api.nuget.org/v3-flatcontainer/${id}/index.json`)
+    ?.versions
+}
+
+function resolveLatest(entry, currentVersion) {
+  return resolveLatestVersion(entry, currentVersion, {
+    npm: npmLatest,
+    nuget: nugetVersions,
+    githubTags,
+    githubReleases: githubTags,
+    dotnet: () =>
+      curlJson(
+        'https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json',
+      ),
+    node: () => curlJson('https://nodejs.org/dist/index.json'),
+  })
 }
 
 // ===== Main =====
@@ -260,16 +178,16 @@ let failures = exceptionRegistry.errors.length > 0 ? 1 : 0
 
 for (const entry of surface.surfaces || []) {
   const current = resolveCurrent(entry)
-  const latest = resolveLatest(entry)
+  const latest = resolveLatest(entry, current)
   const pullRequests =
     current && latest && current !== latest ? findRenovatePRs(entry) : []
-  const recordedException = exceptionRegistry.byDependency.get(entry.id) ?? null
+  const recordedExceptions = exceptionRegistry.byDependency.get(entry.id) ?? []
   const evaluated = evaluateFreshnessEntry({
     entry,
     currentVersion: current,
     latestVersion: latest,
     pullRequests,
-    exception: recordedException,
+    exceptions: recordedExceptions,
     now: now.toISOString(),
   })
   for (const error of evaluated.errors) {
@@ -280,8 +198,12 @@ for (const entry of surface.surfaces || []) {
     })
   }
   if (evaluated.state === 'stale' || evaluated.errors.length > 0) failures += 1
-  const exception = recordedException
-    ? { owner: recordedException.owner, expiresAt: recordedException.expiresAt }
+  const exception = evaluated.selectedException
+    ? {
+        id: evaluated.selectedException.id,
+        owner: evaluated.selectedException.owner,
+        expiresAt: evaluated.selectedException.expiresAt,
+      }
     : null
 
   results.push({

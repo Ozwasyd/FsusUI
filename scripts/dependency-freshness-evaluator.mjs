@@ -1,4 +1,5 @@
 const requiredExceptionFields = [
+  'id',
   'dependencyId',
   'datasource',
   'packageName',
@@ -28,8 +29,8 @@ function instant(value) {
 function cleanCell(value) {
   return String(value ?? '')
     .trim()
-    .replace(/^`|`$/gu, '')
-    .replace(/^\*\*|\*\*$/gu, '')
+    .replace(/^`([^`]*)`$/u, '$1')
+    .replace(/^\*\*([^*]*)\*\*$/u, '$1')
     .trim()
 }
 
@@ -41,6 +42,23 @@ function tableCells(line) {
   const trimmed = line.trim()
   if (!trimmed.startsWith('|') || !trimmed.endsWith('|')) return null
   return trimmed.slice(1, -1).split('|').map(cleanCell)
+}
+
+function tablePackage(cell) {
+  const cleaned = cleanCell(cell)
+  const link = cleaned.match(/^\[([^\]]+)\]\([^)]*\)$/u)
+  return cleanCell(link?.[1] ?? cleaned)
+}
+
+function tableVersion(cell) {
+  const codeValues = [...String(cell ?? '').matchAll(/`([^`]+)`/gu)].map(
+    (match) => match[1],
+  )
+  if (codeValues.length > 0) {
+    return normalizeDependencyVersion(codeValues.at(-1))
+  }
+  const arrow = cleanCell(cell).match(/(?:->|→)\s*([^\s\]]+)\s*\]?$/u)
+  return normalizeDependencyVersion(arrow?.[1] ?? cell)
 }
 
 function tableTarget(body, identities) {
@@ -59,15 +77,15 @@ function tableTarget(body, identities) {
       /^(?:package|dependency)$/iu.test(header),
     )
     const targetIndex = headers.findIndex((header) =>
-      /^(?:new value|new|to|target)$/iu.test(header),
+      /^(?:change|new value|new|to|target)$/iu.test(header),
     )
     if (packageIndex < 0 || targetIndex < 0) continue
     const targets = []
     for (let rowIndex = index + 2; rowIndex < lines.length; rowIndex += 1) {
       const cells = tableCells(lines[rowIndex])
       if (!cells) break
-      if (identities.has(cleanCell(cells[packageIndex]))) {
-        targets.push(normalizeDependencyVersion(cells[targetIndex]))
+      if (identities.has(tablePackage(cells[packageIndex]))) {
+        targets.push(tableVersion(cells[targetIndex]))
       }
     }
     const unique = [...new Set(targets.filter(Boolean))]
@@ -87,7 +105,7 @@ export function extractPullRequestTarget(pullRequest, entry) {
     const escaped = identity.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
     const match = title.match(
       new RegExp(
-        `^(?:chore\\(deps\\):\\s*)?(?:update|bump)\\s+${escaped}\\s+to\\s+([^\\s]+)$`,
+        `^(?:chore\\(deps\\):\\s*)?(?:update|bump)\\s+(?:dependency\\s+)?${escaped}\\s+to\\s+([^\\s]+)$`,
         'iu',
       ),
     )
@@ -96,9 +114,43 @@ export function extractPullRequestTarget(pullRequest, entry) {
   return null
 }
 
+function normalizeCheck(check) {
+  return {
+    name: check.name ?? check.context ?? '',
+    conclusion: String(
+      check.conclusion ?? check.state ?? check.status ?? 'missing',
+    ).toLowerCase(),
+    createdAt: check.createdAt ?? null,
+    startedAt: check.startedAt ?? null,
+    completedAt: check.completedAt ?? null,
+  }
+}
+
+export function selectRenovatePullRequests(pullRequests, entry) {
+  return (pullRequests ?? [])
+    .filter((pullRequest) =>
+      /^renovate(?:[/-]|$)/iu.test(pullRequest.headRefName ?? ''),
+    )
+    .map((pullRequest) => ({
+      number: pullRequest.number,
+      title: pullRequest.title,
+      url: pullRequest.url,
+      headRefName: pullRequest.headRefName,
+      targetVersion: extractPullRequestTarget(pullRequest, entry),
+      state: 'OPEN',
+      createdAt: pullRequest.createdAt,
+      superseding: /(?:supersedes|replaces)\s+#\d+/iu.test(
+        pullRequest.body ?? '',
+      ),
+      labels: (pullRequest.labels ?? []).map((label) => label.name),
+      checks: (pullRequest.statusCheckRollup ?? []).map(normalizeCheck),
+    }))
+    .filter((pullRequest) => pullRequest.targetVersion !== null)
+}
+
 export function validateFreshnessException(
   exception,
-  { entry, currentVersion, latestVersion, now },
+  { entry, currentVersion, latestVersion, now, allowExpired = false },
 ) {
   const errors = []
   if (!exception || typeof exception !== 'object' || Array.isArray(exception)) {
@@ -162,7 +214,12 @@ export function validateFreshnessException(
   if (createdAt !== null && observedAt !== null && createdAt > observedAt) {
     errors.push('exception-created-in-future')
   }
-  if (expiresAt !== null && observedAt !== null && expiresAt <= observedAt) {
+  if (
+    !allowExpired &&
+    expiresAt !== null &&
+    observedAt !== null &&
+    expiresAt <= observedAt
+  ) {
     errors.push('exception-expired')
   }
   return [...new Set(errors)]
@@ -180,12 +237,14 @@ export function validateExceptionRegistry(registry, entries, now) {
     return { byDependency, errors: ['exception-registry-invalid'] }
   }
   const entryById = new Map(entries.map((entry) => [entry.id, entry]))
+  const ids = new Set()
   for (const exception of registry.exceptions) {
     const dependencyId = exception?.dependencyId
-    if (byDependency.has(dependencyId)) {
-      errors.push(`exception-duplicate:${dependencyId ?? '-'}`)
+    if (ids.has(exception?.id)) {
+      errors.push(`exception-duplicate-id:${exception?.id ?? '-'}`)
       continue
     }
+    ids.add(exception?.id)
     const entry = entryById.get(dependencyId)
     if (!entry) {
       errors.push(`exception-unowned:${dependencyId ?? '-'}`)
@@ -196,12 +255,15 @@ export function validateExceptionRegistry(registry, entries, now) {
       currentVersion: exception.currentVersion,
       latestVersion: exception.targetVersion,
       now,
+      allowExpired: true,
     })
     if (recordErrors.length > 0) {
       errors.push(...recordErrors.map((error) => `${dependencyId}:${error}`))
       continue
     }
-    byDependency.set(dependencyId, exception)
+    const records = byDependency.get(dependencyId) ?? []
+    records.push(exception)
+    byDependency.set(dependencyId, records)
   }
   return { byDependency, errors }
 }
@@ -212,6 +274,7 @@ export function evaluateFreshnessEntry({
   latestVersion,
   pullRequests = [],
   exception = null,
+  exceptions = null,
   now,
 }) {
   const errors = []
@@ -223,17 +286,41 @@ export function evaluateFreshnessEntry({
       blockerReasons: ['incomplete-version-evidence'],
       errors,
       selectedPullRequest: null,
+      selectedException: null,
     }
   }
 
-  const exceptionErrors = exception
-    ? validateFreshnessException(exception, {
-        entry,
-        currentVersion,
-        latestVersion,
-        now,
-      })
-    : []
+  const records = exceptions ?? (exception ? [exception] : [])
+  const observedAt = instant(now)
+  const activeCandidates = records.filter((record) => {
+    const createdAt = instant(record?.createdAt)
+    const expiresAt = instant(record?.expiresAt)
+    return (
+      record?.dependencyId === entry?.id &&
+      record?.datasource === entry?.datasource &&
+      record?.packageName === entry?.packageName &&
+      normalizeDependencyVersion(record?.currentVersion) ===
+        normalizeDependencyVersion(currentVersion) &&
+      normalizeDependencyVersion(record?.targetVersion) ===
+        normalizeDependencyVersion(latestVersion) &&
+      createdAt !== null &&
+      expiresAt !== null &&
+      observedAt !== null &&
+      createdAt <= observedAt &&
+      expiresAt > observedAt
+    )
+  })
+  const exceptionErrors = activeCandidates.flatMap((record) =>
+    validateFreshnessException(record, {
+      entry,
+      currentVersion,
+      latestVersion,
+      now,
+    }),
+  )
+  if (activeCandidates.length > 1) {
+    exceptionErrors.push('exception-active-not-exact-one')
+  }
   errors.push(...exceptionErrors)
   if (
     normalizeDependencyVersion(currentVersion) ===
@@ -245,6 +332,7 @@ export function evaluateFreshnessEntry({
       blockerReasons: [],
       errors,
       selectedPullRequest: null,
+      selectedException: null,
     }
   }
 
@@ -260,15 +348,18 @@ export function evaluateFreshnessEntry({
       blockerReasons: [],
       errors,
       selectedPullRequest,
+      selectedException: null,
     }
   }
-  if (exception && exceptionErrors.length === 0) {
+  const selectedException = activeCandidates[0] ?? null
+  if (selectedException && exceptionErrors.length === 0) {
     return {
       state: 'exception',
-      detail: `expires ${exception.expiresAt}: ${exception.reason}`,
+      detail: `expires ${selectedException.expiresAt}: ${selectedException.reason}`,
       blockerReasons: [],
       errors,
       selectedPullRequest: null,
+      selectedException,
     }
   }
   return {
@@ -279,5 +370,6 @@ export function evaluateFreshnessEntry({
     ],
     errors,
     selectedPullRequest: null,
+    selectedException: null,
   }
 }
