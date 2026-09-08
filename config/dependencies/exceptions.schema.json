@@ -4,6 +4,7 @@
   "title": "FsusUI Dependency Freshness Exceptions",
   "description": "Temporary exceptions for dependency freshness checks (#411).",
   "type": "object",
+  "additionalProperties": false,
   "required": ["schemaVersion", "exceptions"],
   "properties": {
     "schemaVersion": { "const": 1 },
@@ -11,10 +12,18 @@
       "type": "array",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
-          "dependencyId", "datasource", "packageName",
-          "currentVersion", "targetVersion", "reason",
-          "evidence", "owner", "createdAt", "expiresAt"
+          "dependencyId",
+          "datasource",
+          "packageName",
+          "currentVersion",
+          "targetVersion",
+          "reason",
+          "evidence",
+          "owner",
+          "createdAt",
+          "expiresAt"
         ],
         "properties": {
           "dependencyId": {

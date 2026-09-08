@@ -14,6 +14,11 @@ import { existsSync, readFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  evaluateFreshnessEntry,
+  extractPullRequestTarget,
+  validateExceptionRegistry,
+} from './dependency-freshness-evaluator.mjs'
 import { writeFreshnessReport } from './deps-freshness-report.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -45,7 +50,10 @@ function readJson(relPath) {
 
 function npmLatest(name) {
   try {
-    const r = execSync(`npm view "${name}" version 2>/dev/null`, { encoding: 'utf-8', timeout: 10_000 }).trim()
+    const r = execSync(`npm view "${name}" version 2>/dev/null`, {
+      encoding: 'utf-8',
+      timeout: 10_000,
+    }).trim()
     return r || null
   } catch {
     return operationalError('npm-registry', name)
@@ -54,7 +62,10 @@ function npmLatest(name) {
 
 function ghReleaseLatest(repo) {
   try {
-    const r = execSync(`gh release view --repo "${repo}" --json tagName --jq '.tagName' 2>/dev/null`, { encoding: 'utf-8', timeout: 15_000 }).trim()
+    const r = execSync(
+      `gh release view --repo "${repo}" --json tagName --jq '.tagName' 2>/dev/null`,
+      { encoding: 'utf-8', timeout: 15_000 },
+    ).trim()
     return r?.replace(/^v/, '') || null
   } catch {
     return operationalError('github-api', repo)
@@ -73,43 +84,44 @@ function normalizeCheck(check) {
   }
 }
 
-function findRenovatePRs(depId) {
+function findRenovatePRs(entry) {
   try {
     const r = execSync(
-      `gh pr list --state open --search "${depId} in:title" --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 5 2>/dev/null`,
+      `gh pr list --state open --search "${entry.id} in:title" --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 5 2>/dev/null`,
       { encoding: 'utf-8', timeout: 15_000 },
     ).trim()
     if (!r || r === '[]') return []
     const prs = JSON.parse(r)
-    const selected =
-      prs.find((pullRequest) =>
-        pullRequest.headRefName?.includes('renovate'),
-      ) ?? prs[0]
-    return [
-      selected,
-      ...prs.filter((pullRequest) => pullRequest !== selected),
-    ].map((pullRequest) => ({
-      number: pullRequest.number,
-      title: pullRequest.title,
-      url: pullRequest.url,
-      headRefName: pullRequest.headRefName,
-      state: 'OPEN',
-      createdAt: pullRequest.createdAt,
-      superseding: /(?:supersedes|replaces)\s+#\d+/iu.test(
-        pullRequest.body ?? '',
-      ),
-      labels: (pullRequest.labels ?? []).map((label) => label.name),
-      checks: (pullRequest.statusCheckRollup ?? []).map(normalizeCheck),
-    }))
+    return prs
+      .filter((pullRequest) =>
+        /^renovate(?:[/-]|$)/iu.test(pullRequest.headRefName ?? ''),
+      )
+      .map((pullRequest) => ({
+        number: pullRequest.number,
+        title: pullRequest.title,
+        url: pullRequest.url,
+        headRefName: pullRequest.headRefName,
+        targetVersion: extractPullRequestTarget(pullRequest, entry),
+        state: 'OPEN',
+        createdAt: pullRequest.createdAt,
+        superseding: /(?:supersedes|replaces)\s+#\d+/iu.test(
+          pullRequest.body ?? '',
+        ),
+        labels: (pullRequest.labels ?? []).map((label) => label.name),
+        checks: (pullRequest.statusCheckRollup ?? []).map(normalizeCheck),
+      }))
   } catch {
-    operationalError('github-api', `pull requests for ${depId}`)
+    operationalError('github-api', `pull requests for ${entry.id}`)
     return []
   }
 }
 
 function curlJson(url) {
   try {
-    const r = execSync(`curl -sSL "${url}" 2>/dev/null`, { encoding: 'utf-8', timeout: 10_000 }).trim()
+    const r = execSync(`curl -sSL "${url}" 2>/dev/null`, {
+      encoding: 'utf-8',
+      timeout: 10_000,
+    }).trim()
     return r ? JSON.parse(r) : null
   } catch {
     return operationalError('upstream-registry', url)
@@ -135,7 +147,12 @@ function resolveCurrent(entry) {
     }[entry.id]
     if (!keyPkg) return null
     // Read from installed node_modules
-    const modPath = path.resolve(repoRoot, 'node_modules', keyPkg, 'package.json')
+    const modPath = path.resolve(
+      repoRoot,
+      'node_modules',
+      keyPkg,
+      'package.json',
+    )
     if (!existsSync(modPath)) return null
     return JSON.parse(readFileSync(modPath, 'utf-8')).version
   }
@@ -164,12 +181,16 @@ function resolveCurrent(entry) {
   if (ds === 'github-releases' && entry.packageName.includes('emsdk')) {
     const f = path.resolve(repoRoot, '.github/workflows/quality.yml')
     if (!existsSync(f)) return null
-    const m = readFileSync(f, 'utf-8').match(/emscripten-core\/setup-emsdk@(v[\d.]+)/)
+    const m = readFileSync(f, 'utf-8').match(
+      /emscripten-core\/setup-emsdk@(v[\d.]+)/,
+    )
     return m ? m[1].replace(/^v/, '') : null
   }
 
   if (entry.id === 'pnpm-package-manager') {
-    const m = (readJson('package.json')?.packageManager || '').match(/pnpm@(.+)/)
+    const m = (readJson('package.json')?.packageManager || '').match(
+      /pnpm@(.+)/,
+    )
     return m ? m[1] : null
   }
 
@@ -190,13 +211,17 @@ function resolveLatest(entry) {
   }
   if (ds === 'nuget') return null
   if (ds === 'dotnet-version') {
-    const idx = curlJson('https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json')
-    const rel = idx?.['releases-index']?.find(r => r['channel-version'] === '10.0')
+    const idx = curlJson(
+      'https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json',
+    )
+    const rel = idx?.['releases-index']?.find(
+      (r) => r['channel-version'] === '10.0',
+    )
     return rel?.['latest-sdk'] || null
   }
   if (ds === 'node-version') {
     const versions = curlJson('https://nodejs.org/dist/index.json')
-    const lts = versions?.find(v => v.lts !== false)
+    const lts = versions?.find((v) => v.lts !== false)
     return lts ? lts.version.replace(/^v/, '') : null
   }
   if (ds === 'github-releases' && entry.packageName.includes('emsdk')) {
@@ -208,61 +233,56 @@ function resolveLatest(entry) {
 // ===== Main =====
 
 const surface = readJson(SURFACE_REL)
-if (!surface) { console.error('[deps:freshness] missing update-surface.json'); process.exit(1) }
+if (!surface) {
+  console.error('[deps:freshness] missing update-surface.json')
+  process.exit(1)
+}
 
 const exceptions = readJson(EXCEPTIONS_REL)
 const requiredChecks =
   readJson(REQUIRED_CHECKS_REL)?.branchProtection?.requiredChecks
 const now = new Date()
-const activeExceptions = new Map()
-const exceptionHistory = new Map()
-for (const exc of (exceptions?.exceptions || [])) {
-  exceptionHistory.set(exc.dependencyId, exc)
-  if (new Date(exc.expiresAt) > now) activeExceptions.set(exc.dependencyId, exc)
+const exceptionRegistry = validateExceptionRegistry(
+  exceptions,
+  surface.surfaces ?? [],
+  now.toISOString(),
+)
+for (const error of exceptionRegistry.errors) {
+  operationalErrors.push({
+    source: 'exception-config',
+    identity: error.split(':')[0],
+    message: error,
+  })
 }
 
 const results = []
-let failures = 0
+let failures = exceptionRegistry.errors.length > 0 ? 1 : 0
 
-for (const entry of (surface.surfaces || [])) {
+for (const entry of surface.surfaces || []) {
   const current = resolveCurrent(entry)
   const latest = resolveLatest(entry)
-  let state = 'skipped'
-  let detail = ''
-  let pullRequests = []
-  const recordedException = exceptionHistory.get(entry.id)
-  let exception = recordedException
+  const pullRequests =
+    current && latest && current !== latest ? findRenovatePRs(entry) : []
+  const recordedException = exceptionRegistry.byDependency.get(entry.id) ?? null
+  const evaluated = evaluateFreshnessEntry({
+    entry,
+    currentVersion: current,
+    latestVersion: latest,
+    pullRequests,
+    exception: recordedException,
+    now: now.toISOString(),
+  })
+  for (const error of evaluated.errors) {
+    operationalErrors.push({
+      source: 'freshness-evaluator',
+      identity: entry.id,
+      message: `${entry.id}:${error}`,
+    })
+  }
+  if (evaluated.state === 'stale' || evaluated.errors.length > 0) failures += 1
+  const exception = recordedException
     ? { owner: recordedException.owner, expiresAt: recordedException.expiresAt }
     : null
-
-  if (!latest || !current) {
-    state = 'skipped'
-    detail = 'cannot determine version'
-  } else if (current === latest) {
-    state = 'current'
-    detail = current
-  } else {
-    pullRequests = findRenovatePRs(entry.id)
-    const pr = pullRequests[0]
-    if (pr) {
-      state = 'latest-target-pr'
-      detail = `PR #${pr.number}: ${pr.title}`
-    } else {
-      const exc = activeExceptions.get(entry.id)
-      if (exc) {
-        state = 'exception'
-        detail = `expires ${exc.expiresAt}: ${exc.reason}`
-        exception = {
-          owner: exc.owner,
-          expiresAt: exc.expiresAt,
-        }
-      } else {
-        state = 'stale'
-        detail = `current=${current} latest=${latest}`
-        failures += 1
-      }
-    }
-  }
 
   results.push({
     dependencyId: entry.id,
@@ -270,36 +290,25 @@ for (const entry of (surface.surfaces || [])) {
     packageName: entry.packageName,
     currentVersion: current,
     targetVersion: latest,
-    state,
-    detail,
+    state: evaluated.state,
+    detail: evaluated.detail,
     pullRequests,
     exception,
-    blockerReasons: state === 'stale' ? ['stale'] : [],
+    blockerReasons: evaluated.blockerReasons,
   })
-  console.log(`[deps:freshness] ${state.padEnd(16)} ${entry.id}: ${detail}`)
-}
-
-// Expired exceptions
-for (const exc of (exceptions?.exceptions || [])) {
-  if (new Date(exc.expiresAt) <= now) {
-    console.error(`[deps:freshness] FAIL expired-exception ${exc.dependencyId}`)
-    const result = results.find(
-      (entry) => entry.dependencyId === exc.dependencyId,
-    )
-    if (result && !result.blockerReasons.includes('expired-exception')) {
-      result.blockerReasons.push('expired-exception')
-    }
-    failures += 1
-  }
+  console.log(
+    `[deps:freshness] ${evaluated.state.padEnd(16)} ${entry.id}: ${evaluated.detail}`,
+  )
 }
 
 const summary = {
   total: results.length,
-  current: results.filter(r => r.state === 'current').length,
-  'latest-target-pr': results.filter(r => r.state === 'latest-target-pr').length,
-  exception: results.filter(r => r.state === 'exception').length,
-  stale: results.filter(r => r.state === 'stale').length,
-  skipped: results.filter(r => r.state === 'skipped').length,
+  current: results.filter((r) => r.state === 'current').length,
+  'latest-target-pr': results.filter((r) => r.state === 'latest-target-pr')
+    .length,
+  exception: results.filter((r) => r.state === 'exception').length,
+  stale: results.filter((r) => r.state === 'stale').length,
+  skipped: results.filter((r) => r.state === 'skipped').length,
 }
 console.log(`\n[deps:freshness] summary ${JSON.stringify(summary)}`)
 

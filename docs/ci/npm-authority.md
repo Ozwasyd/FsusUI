@@ -149,6 +149,13 @@ fixed `Dependency freshness blockers` issue plus the `dependency-blocked` label
 for upgrade PRs whose required checks have failed for more than 24 hours.
 Operational lookup errors, incomplete registry results, permission failures,
 and older result watermarks stop reconciliation before an issue can be closed.
+An open PR covers freshness only when its declared target exactly matches the
+latest stable target. Exceptions bind the complete dependency identity and
+current/target versions; general exceptions expire within 14 days and known
+vulnerability exceptions within 72 hours. Missing current identity, malformed
+or expired exceptions, and oversized TTLs fail rather than becoming `skipped`
+or accounted-for results. Replaying an unchanged blocker result does not issue
+a redundant GitHub update.
 The lifecycle does not close or replace dependency PRs, select lower versions,
 create exceptions, change required checks, or enable automerge.
 
