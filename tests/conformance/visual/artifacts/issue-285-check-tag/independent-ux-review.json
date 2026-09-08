@@ -1,7 +1,7 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "13733ec19121cee98531f5149416a8cf34336434",
+  "candidateSha": "102c57cade8e1c53b946ed6a46633db77a494a4d",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
