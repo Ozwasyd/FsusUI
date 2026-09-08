@@ -85,7 +85,7 @@ let openRenovatePullRequests
 function loadOpenRenovatePullRequests() {
   try {
     const r = execSync(
-      'gh pr list --state open --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 100 2>/dev/null',
+      `gh pr list --state open --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 100 2>/dev/null`,
       { encoding: 'utf-8', timeout: 15_000 },
     ).trim()
     if (!r || r === '[]') return []
