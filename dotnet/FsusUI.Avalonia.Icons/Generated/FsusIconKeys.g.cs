@@ -22,4 +22,9 @@ public static class FsusIconKeys
   public const string FileDocument = "FsusIconFileDocument";
   public const string Confirm = "FsusIconConfirm";
   public const string FileImport = "FsusIconFileImport";
+  public const string AddDocument = "FsusIconAddDocument";
+  public const string ApplicationMenu = "FsusIconApplicationMenu";
+  public const string Close = "FsusIconClose";
+  public const string RefreshReplace = "FsusIconRefreshReplace";
+  public const string SearchFilter = "FsusIconSearchFilter";
 }

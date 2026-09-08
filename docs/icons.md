@@ -78,6 +78,24 @@ extension to a semantic key: `FsusIconFileText`, `FsusIconFileMarkdown`,
 accessible name and treat the resolved icon as decorative; icons inherit row
 foreground in light, dark, and high-contrast themes.
 
+## Desktop Shell Actions (Avalonia)
+
+Use these semantic keys for native desktop shell actions:
+
+| Action | Avalonia key | Intended sizes |
+| --- | --- | --- |
+| Add a document or tab | `FsusIconKeys.AddDocument` | 16, 20, 24 DIP |
+| Application menu | `FsusIconKeys.ApplicationMenu` | 16, 20, 24 DIP |
+| Close a surface | `FsusIconKeys.Close` | 16, 20, 24 DIP |
+| Refresh or replace | `FsusIconKeys.RefreshReplace` | 16, 20, 24 DIP |
+| Search/filter | `FsusIconKeys.SearchFilter` | 16, 20, 24 DIP |
+
+`FsusIcon` supplies the theme-aware 16 DIP default and inherits the host
+foreground in light, dark, and high-contrast themes. Set explicit `Width` and
+`Height` when 20 or 24 DIP presentation is required. Keep these icons
+decorative beside a visible label; for an icon-only action, put the stable
+accessible name on the host control, such as `FsusIconButton.AccessibleName`.
+
 ## Generation Workflow
 
 SVG sources live in `vue/packages/icons-svg/*.svg`; Vue components are generated
