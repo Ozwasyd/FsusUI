@@ -292,17 +292,13 @@ export function evaluateFreshnessEntry({
 
   const records = exceptions ?? (exception ? [exception] : [])
   const observedAt = instant(now)
-  const activeCandidates = records.filter((record) => {
+  const activeRecords = records.filter((record) => {
     const createdAt = instant(record?.createdAt)
     const expiresAt = instant(record?.expiresAt)
     return (
       record?.dependencyId === entry?.id &&
       record?.datasource === entry?.datasource &&
       record?.packageName === entry?.packageName &&
-      normalizeDependencyVersion(record?.currentVersion) ===
-        normalizeDependencyVersion(currentVersion) &&
-      normalizeDependencyVersion(record?.targetVersion) ===
-        normalizeDependencyVersion(latestVersion) &&
       createdAt !== null &&
       expiresAt !== null &&
       observedAt !== null &&
@@ -310,6 +306,27 @@ export function evaluateFreshnessEntry({
       expiresAt > observedAt
     )
   })
+  const activeCandidates = activeRecords.filter(
+    (record) =>
+      normalizeDependencyVersion(record?.currentVersion) ===
+        normalizeDependencyVersion(currentVersion) &&
+      normalizeDependencyVersion(record?.targetVersion) ===
+        normalizeDependencyVersion(latestVersion),
+  )
+  for (const record of activeRecords) {
+    if (
+      normalizeDependencyVersion(record.currentVersion) !==
+      normalizeDependencyVersion(currentVersion)
+    ) {
+      errors.push(`exception-current-stale:${record.id}`)
+    }
+    if (
+      normalizeDependencyVersion(record.targetVersion) !==
+      normalizeDependencyVersion(latestVersion)
+    ) {
+      errors.push(`exception-target-stale:${record.id}`)
+    }
+  }
   const exceptionErrors = activeCandidates.flatMap((record) =>
     validateFreshnessException(record, {
       entry,
@@ -322,44 +339,62 @@ export function evaluateFreshnessEntry({
     exceptionErrors.push('exception-active-not-exact-one')
   }
   errors.push(...exceptionErrors)
-  if (
-    normalizeDependencyVersion(currentVersion) ===
-    normalizeDependencyVersion(latestVersion)
-  ) {
-    return {
-      state: 'current',
-      detail: currentVersion,
-      blockerReasons: [],
-      errors,
-      selectedPullRequest: null,
-      selectedException: null,
-    }
-  }
-
-  const selectedPullRequest = pullRequests.find(
+  const matchingPullRequests = pullRequests.filter(
     (pullRequest) =>
       normalizeDependencyVersion(pullRequest.targetVersion) ===
       normalizeDependencyVersion(latestVersion),
   )
-  if (selectedPullRequest) {
-    return {
+  const matches = []
+  if (
+    normalizeDependencyVersion(currentVersion) ===
+    normalizeDependencyVersion(latestVersion)
+  ) {
+    matches.push({ state: 'current' })
+  }
+  if (matchingPullRequests.length > 0) {
+    matches.push({
       state: 'latest-target-pr',
-      detail: `PR #${selectedPullRequest.number}: ${selectedPullRequest.title}`,
-      blockerReasons: [],
-      errors,
-      selectedPullRequest,
-      selectedException: null,
-    }
+      pullRequest: matchingPullRequests[0],
+    })
   }
   const selectedException = activeCandidates[0] ?? null
-  if (selectedException && exceptionErrors.length === 0) {
+  if (selectedException) {
+    matches.push({ state: 'exception', exception: selectedException })
+  }
+  if (matches.length > 1) {
+    errors.push(
+      `state-not-exact-one:${matches.map((match) => match.state).join(',')}`,
+    )
+  }
+  if (matches.length === 1 && errors.length === 0) {
+    const match = matches[0]
+    if (match.state === 'current') {
+      return {
+        state: 'current',
+        detail: currentVersion,
+        blockerReasons: [],
+        errors,
+        selectedPullRequest: null,
+        selectedException: null,
+      }
+    }
+    if (match.state === 'latest-target-pr') {
+      return {
+        state: 'latest-target-pr',
+        detail: `PR #${match.pullRequest.number}: ${match.pullRequest.title}`,
+        blockerReasons: [],
+        errors,
+        selectedPullRequest: match.pullRequest,
+        selectedException: null,
+      }
+    }
     return {
       state: 'exception',
-      detail: `expires ${selectedException.expiresAt}: ${selectedException.reason}`,
+      detail: `expires ${match.exception.expiresAt}: ${match.exception.reason}`,
       blockerReasons: [],
       errors,
       selectedPullRequest: null,
-      selectedException,
+      selectedException: match.exception,
     }
   }
   return {

@@ -160,6 +160,63 @@ const covered = evaluateFreshnessEntry({
 assert.equal(covered.state, 'exception')
 assert.deepEqual(covered.errors, [])
 
+const currentWithException = evaluateFreshnessEntry({
+  entry,
+  currentVersion: '2.0.0',
+  latestVersion: '2.0.0',
+  exceptions: [exception({ currentVersion: '2.0.0', targetVersion: '2.0.0' })],
+  now,
+})
+assert.equal(currentWithException.state, 'stale')
+assert.ok(
+  currentWithException.errors.includes('state-not-exact-one:current,exception'),
+)
+
+const pullRequestWithException = evaluateFreshnessEntry({
+  entry,
+  currentVersion: '1.0.0',
+  latestVersion: '2.0.0',
+  pullRequests: [{ number: 2, title: 'latest target', targetVersion: '2.0.0' }],
+  exceptions: [exception()],
+  now,
+})
+assert.equal(pullRequestWithException.state, 'stale')
+assert.ok(
+  pullRequestWithException.errors.includes(
+    'state-not-exact-one:latest-target-pr,exception',
+  ),
+)
+
+const currentWithPullRequest = evaluateFreshnessEntry({
+  entry,
+  currentVersion: '2.0.0',
+  latestVersion: '2.0.0',
+  pullRequests: [
+    { number: 2, title: 'current target', targetVersion: '2.0.0' },
+  ],
+  now,
+})
+assert.equal(currentWithPullRequest.state, 'stale')
+assert.ok(
+  currentWithPullRequest.errors.includes(
+    'state-not-exact-one:current,latest-target-pr',
+  ),
+)
+
+const staleActiveException = evaluateFreshnessEntry({
+  entry,
+  currentVersion: '1.0.0',
+  latestVersion: '2.0.0',
+  exceptions: [exception({ currentVersion: '0.9.0' })],
+  now,
+})
+assert.equal(staleActiveException.state, 'stale')
+assert.ok(
+  staleActiveException.errors.includes(
+    'exception-current-stale:npm-workspace-root-20260901',
+  ),
+)
+
 const registry = validateExceptionRegistry(
   { schemaVersion: 1, exceptions: [exception(), exception()] },
   [entry],

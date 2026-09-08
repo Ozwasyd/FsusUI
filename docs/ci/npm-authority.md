@@ -156,8 +156,12 @@ their declared source files. Latest-version adapters query the matching npm,
 NuGet, GitHub tag, Node, or .NET stable channel; an unsupported datasource,
 missing source value, empty registry response, or prerelease-only response is
 an operational failure rather than an ignored surface.
-An open PR covers freshness only when its declared target exactly matches the
-latest stable target. Exceptions bind the complete dependency identity and
+The checker reads the bounded open Renovate PR inventory once and attributes a
+PR only through an exact package/id title or dependency-table row. Current,
+latest-target PR, and active exception are mutually exclusive evidence states;
+zero or multiple matching states fail closed. An open PR covers freshness only
+when its declared target exactly matches the latest stable target. Exceptions
+bind the complete dependency identity and
 current/target versions; general exceptions expire within 14 days and known
 vulnerability exceptions within 72 hours. Missing current identity, malformed
 exceptions, expired-only coverage, multiple simultaneously active records, and

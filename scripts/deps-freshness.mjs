@@ -179,8 +179,7 @@ let failures = exceptionRegistry.errors.length > 0 ? 1 : 0
 for (const entry of surface.surfaces || []) {
   const current = resolveCurrent(entry)
   const latest = resolveLatest(entry, current)
-  const pullRequests =
-    current && latest && current !== latest ? findRenovatePRs(entry) : []
+  const pullRequests = current && latest ? findRenovatePRs(entry) : []
   const recordedExceptions = exceptionRegistry.byDependency.get(entry.id) ?? []
   const evaluated = evaluateFreshnessEntry({
     entry,
