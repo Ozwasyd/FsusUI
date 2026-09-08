@@ -359,12 +359,23 @@ export async function reconcileFreshnessReport({ report, client }) {
 
   const body = renderBlockerIssue(report, blockers)
   const canonical = canonicalIssue(issues)
+  let action = 'created'
   if (canonical) {
-    await client.updateIssue(canonical.number, {
-      title: BLOCKER_ISSUE_TITLE,
-      body,
-      state: 'open',
-    })
+    if (
+      issues.length === 1 &&
+      canonical.state === 'open' &&
+      canonical.title === BLOCKER_ISSUE_TITLE &&
+      canonical.body === body
+    ) {
+      action = 'noop'
+    } else {
+      await client.updateIssue(canonical.number, {
+        title: BLOCKER_ISSUE_TITLE,
+        body,
+        state: 'open',
+      })
+      action = 'updated'
+    }
   } else {
     await client.createIssue({ title: BLOCKER_ISSUE_TITLE, body })
   }
@@ -374,7 +385,7 @@ export async function reconcileFreshnessReport({ report, client }) {
     throw new Error('failed to establish exact-one open blocker issue')
   }
   return {
-    action: canonical ? 'updated' : 'created',
+    action,
     blockers: blockers.length,
     issueNumber: issues[0].number,
   }
