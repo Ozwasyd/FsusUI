@@ -6,7 +6,7 @@
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-798961cebb51b3fddc6ebb96b449f91ab3d6d816",
+    "executionId": "conformance-v2-check-tag-102c57cade8e1c53b946ed6a46633db77a494a4d",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
@@ -20,7 +20,7 @@
       "platform": "web",
       "viewport": {
         "width": 88,
-        "height": 24
+        "height": 25
       },
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
@@ -29,7 +29,7 @@
       "direction": "ltr",
       "motion": "reduced",
       "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
-      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
+      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
     },
     {
       "platform": "avalonia",
@@ -49,7 +49,7 @@
         "automation-peer",
         "reduced-motion"
       ],
-      "evidenceDigest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5"
+      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -58,10 +58,10 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170",
-      "bytes": 1237,
+      "digest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70",
+      "bytes": 1480,
       "width": 88,
-      "height": 24,
+      "height": 25,
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -70,8 +70,8 @@
       "platform": "avalonia",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5",
-      "bytes": 9960,
+      "digest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b",
+      "bytes": 10049,
       "width": 960,
       "height": 720,
       "inspected": true,
@@ -101,6 +101,7 @@
     }
   ],
   "observations": [
+    "Two consecutive governed reruns produced identical Web and Avalonia raster digests, and independent read-only inspection confirmed the focused unchecked state, Scholarly Blue focus ring, complete label, and absence of a black adorner, clipping, overlap, or bounds shift.",
     "Web artifact (88x25 production component crop, light theme): a single rounded-rectangle CheckTag with a continuous blue focus ring, pale background, and a dark centered label \"Check tag\" that is fully readable at this size; no clipping, no black default outline, no other elements in the crop.",
     "Avalonia artifact (960x720 real non-headless window, light theme): the CheckTag renders with a white fill and a blue focus ring, alongside the harness \"Run action\" header and a trace textbox showing the \"Trace start\" caret; the tag carries the same focused-unchecked semantic as the Web render, with no black adorner, no overlap, and undisturbed surrounding controls.",
     "Both platforms present the same focused-unchecked-after-pointer-keyboard semantics (label \"Check tag\", checked=false, focused=true, visible blue focus indicator); native renderer and viewport scope differ, so the agreement is semantic rather than pixel-geometric."
