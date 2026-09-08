@@ -150,6 +150,24 @@ const latestTarget = evaluateFreshnessEntry({
 })
 assert.equal(latestTarget.state, 'latest-target-pr')
 
+const duplicateLatestTarget = evaluateFreshnessEntry({
+  entry,
+  currentVersion: '1.0.0',
+  latestVersion: '2.0.0',
+  pullRequests: [
+    { number: 2, title: 'latest target', targetVersion: '2.0.0' },
+    { number: 3, title: 'duplicate latest target', targetVersion: '2.0.0' },
+  ],
+  now,
+})
+assert.equal(duplicateLatestTarget.state, 'stale')
+assert.equal(duplicateLatestTarget.selectedPullRequest, null)
+assert.ok(
+  duplicateLatestTarget.errors.includes(
+    'pull-request-latest-target-not-exact-one',
+  ),
+)
+
 const covered = evaluateFreshnessEntry({
   entry,
   currentVersion: '1.0.0',

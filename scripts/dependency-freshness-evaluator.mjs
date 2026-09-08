@@ -344,6 +344,9 @@ export function evaluateFreshnessEntry({
       normalizeDependencyVersion(pullRequest.targetVersion) ===
       normalizeDependencyVersion(latestVersion),
   )
+  if (matchingPullRequests.length > 1) {
+    errors.push('pull-request-latest-target-not-exact-one')
+  }
   const matches = []
   if (
     normalizeDependencyVersion(currentVersion) ===
@@ -351,7 +354,7 @@ export function evaluateFreshnessEntry({
   ) {
     matches.push({ state: 'current' })
   }
-  if (matchingPullRequests.length > 0) {
+  if (matchingPullRequests.length === 1) {
     matches.push({
       state: 'latest-target-pr',
       pullRequest: matchingPullRequests[0],

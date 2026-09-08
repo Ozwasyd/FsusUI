@@ -158,9 +158,10 @@ missing source value, empty registry response, or prerelease-only response is
 an operational failure rather than an ignored surface.
 The checker reads the bounded open Renovate PR inventory once and attributes a
 PR only through an exact package/id title or dependency-table row. Current,
-latest-target PR, and active exception are mutually exclusive evidence states;
-zero or multiple matching states fail closed. An open PR covers freshness only
-when its declared target exactly matches the latest stable target. Exceptions
+exactly one latest-target PR, and one active exception are mutually exclusive
+evidence states; zero or multiple matches within or across states fail closed.
+An open PR covers freshness only when its declared target exactly matches the
+latest stable target. Exceptions
 bind the complete dependency identity and
 current/target versions; general exceptions expire within 14 days and known
 vulnerability exceptions within 72 hours. Missing current identity, malformed
