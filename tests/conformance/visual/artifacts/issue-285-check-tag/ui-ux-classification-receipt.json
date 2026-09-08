@@ -36,20 +36,20 @@
     "authorityDigest": "0899bb73568e4e0430595ecce3c1d605d51c963e27e37250b6dcc0e1a6ff77a9",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "13733ec19121cee98531f5149416a8cf34336434",
-  "candidateDigest": "d3d963eb540b67315abcbac1e8d482832a7a90b9f69927e16c02c0586f55797f",
+  "candidateSha": "102c57cade8e1c53b946ed6a46633db77a494a4d",
+  "candidateDigest": "b049e4f6ad50e468bb8a729df4492f673632275cc36203987937ca0a9f5954ff",
   "stateEvidenceMatrix": [
     {
       "state": "focused-unchecked-after-pointer-keyboard",
       "viewport": "88x25",
       "theme": "light",
-      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
+      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
     },
     {
       "state": "focused-unchecked-after-pointer-keyboard",
       "viewport": "960x720",
       "theme": "light",
-      "evidenceDigest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5"
+      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
     }
   ],
   "inScope": [
@@ -65,5 +65,5 @@
   "classificationEvidenceDigest": "bf1cf46ccbef62abbf4f30a6bb0a0031a8607149ead79dab2eabe35e983ab126",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "9221544bb6df7b65752b26237d3072a0dc0bea2f02e6ad55daef6ed5435335a3"
+  "receiptDigest": "b5fead5f15e2634a1074abfa3a93fbc11a72e448bdea73ca0719ca7bbb0e55b8"
 }

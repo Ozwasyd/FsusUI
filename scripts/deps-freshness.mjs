@@ -14,6 +14,15 @@ import { existsSync, readFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  evaluateFreshnessEntry,
+  selectRenovatePullRequests,
+  validateExceptionRegistry,
+} from './dependency-freshness-evaluator.mjs'
+import {
+  resolveCurrentVersion,
+  resolveLatestVersion,
+} from './dependency-freshness-adapters.mjs'
 import { writeFreshnessReport } from './deps-freshness-report.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -45,71 +54,68 @@ function readJson(relPath) {
 
 function npmLatest(name) {
   try {
-    const r = execSync(`npm view "${name}" version 2>/dev/null`, { encoding: 'utf-8', timeout: 10_000 }).trim()
+    const r = execSync(`npm view "${name}" version 2>/dev/null`, {
+      encoding: 'utf-8',
+      timeout: 10_000,
+    }).trim()
     return r || null
   } catch {
     return operationalError('npm-registry', name)
   }
 }
 
-function ghReleaseLatest(repo) {
+function githubTags(repo) {
   try {
-    const r = execSync(`gh release view --repo "${repo}" --json tagName --jq '.tagName' 2>/dev/null`, { encoding: 'utf-8', timeout: 15_000 }).trim()
-    return r?.replace(/^v/, '') || null
+    const r = execSync(
+      `gh api --paginate --slurp "repos/${repo}/tags?per_page=100" 2>/dev/null`,
+      { encoding: 'utf-8', timeout: 15_000 },
+    ).trim()
+    return r
+      ? JSON.parse(r)
+          .flat()
+          .map((entry) => entry.name)
+      : null
   } catch {
     return operationalError('github-api', repo)
   }
 }
 
-function normalizeCheck(check) {
-  return {
-    name: check.name ?? check.context ?? '',
-    conclusion: String(
-      check.conclusion ?? check.state ?? check.status ?? 'missing',
-    ).toLowerCase(),
-    createdAt: check.createdAt ?? null,
-    startedAt: check.startedAt ?? null,
-    completedAt: check.completedAt ?? null,
-  }
-}
+let openRenovatePullRequests
 
-function findRenovatePRs(depId) {
+function loadOpenRenovatePullRequests() {
   try {
     const r = execSync(
-      `gh pr list --state open --search "${depId} in:title" --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 5 2>/dev/null`,
+      `gh pr list --state open --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 100 2>/dev/null`,
       { encoding: 'utf-8', timeout: 15_000 },
     ).trim()
     if (!r || r === '[]') return []
     const prs = JSON.parse(r)
-    const selected =
-      prs.find((pullRequest) =>
-        pullRequest.headRefName?.includes('renovate'),
-      ) ?? prs[0]
-    return [
-      selected,
-      ...prs.filter((pullRequest) => pullRequest !== selected),
-    ].map((pullRequest) => ({
-      number: pullRequest.number,
-      title: pullRequest.title,
-      url: pullRequest.url,
-      headRefName: pullRequest.headRefName,
-      state: 'OPEN',
-      createdAt: pullRequest.createdAt,
-      superseding: /(?:supersedes|replaces)\s+#\d+/iu.test(
-        pullRequest.body ?? '',
-      ),
-      labels: (pullRequest.labels ?? []).map((label) => label.name),
-      checks: (pullRequest.statusCheckRollup ?? []).map(normalizeCheck),
-    }))
+    if (prs.length >= 100) {
+      operationalError(
+        'github-api',
+        'open pull request inventory reached limit',
+      )
+      return null
+    }
+    return prs
   } catch {
-    operationalError('github-api', `pull requests for ${depId}`)
-    return []
+    return operationalError('github-api', 'open pull requests')
   }
+}
+
+function findRenovatePRs(entry) {
+  if (openRenovatePullRequests === undefined) {
+    openRenovatePullRequests = loadOpenRenovatePullRequests()
+  }
+  return selectRenovatePullRequests(openRenovatePullRequests ?? [], entry)
 }
 
 function curlJson(url) {
   try {
-    const r = execSync(`curl -sSL "${url}" 2>/dev/null`, { encoding: 'utf-8', timeout: 10_000 }).trim()
+    const r = execSync(`curl -sSL "${url}" 2>/dev/null`, {
+      encoding: 'utf-8',
+      timeout: 10_000,
+    }).trim()
     return r ? JSON.parse(r) : null
   } catch {
     return operationalError('upstream-registry', url)
@@ -119,150 +125,85 @@ function curlJson(url) {
 // ===== Version resolvers per datasource =====
 
 function resolveCurrent(entry) {
-  const ds = entry.datasource
-
-  if (ds === 'npm') {
-    // Read installed version from pnpm-lock.yaml via npm ls
-    // For npm workspace, deps:check already verifies consistency.
-    // Freshness: check if lockfile is current vs registry for key packages.
-    // Use the first specific package name from the group
-    const keyPkg = {
-      'npm-workspace-root': 'semver',
-      'npm-vue-runtime': 'vue',
-      'npm-vue-build': 'vite',
-      'npm-js-test': 'vitest',
-      'pnpm-package-manager': 'pnpm',
-    }[entry.id]
-    if (!keyPkg) return null
-    // Read from installed node_modules
-    const modPath = path.resolve(repoRoot, 'node_modules', keyPkg, 'package.json')
-    if (!existsSync(modPath)) return null
-    return JSON.parse(readFileSync(modPath, 'utf-8')).version
-  }
-
-  if (ds === 'nuget') {
-    const propsPath = path.resolve(repoRoot, 'dotnet/Directory.Packages.props')
-    if (!existsSync(propsPath)) return null
-    const content = readFileSync(propsPath, 'utf-8')
-    const pkgName = entry.packageName.split(',')[0]?.trim()
-    const re = new RegExp(`Include="${pkgName}"\\s+Version="([^"]+)"`, 'i')
-    const match = content.match(re)
-    return match ? match[1] : null
-  }
-
-  if (ds === 'dotnet-version') {
-    return readJson('dotnet/global.json')?.sdk?.version || null
-  }
-
-  if (ds === 'node-version') {
-    const f = path.resolve(repoRoot, '.github/workflows/quality.yml')
-    if (!existsSync(f)) return null
-    const m = readFileSync(f, 'utf-8').match(/node-version:\s*(\d+)/)
-    return m ? m[1] : null
-  }
-
-  if (ds === 'github-releases' && entry.packageName.includes('emsdk')) {
-    const f = path.resolve(repoRoot, '.github/workflows/quality.yml')
-    if (!existsSync(f)) return null
-    const m = readFileSync(f, 'utf-8').match(/emscripten-core\/setup-emsdk@(v[\d.]+)/)
-    return m ? m[1].replace(/^v/, '') : null
-  }
-
-  if (entry.id === 'pnpm-package-manager') {
-    const m = (readJson('package.json')?.packageManager || '').match(/pnpm@(.+)/)
-    return m ? m[1] : null
-  }
-
-  return null
+  return resolveCurrentVersion(entry, repoRoot)
 }
 
-function resolveLatest(entry) {
-  const ds = entry.datasource
-  if (ds === 'npm') {
-    const keyPkg = {
-      'npm-workspace-root': 'semver',
-      'npm-vue-runtime': 'vue',
-      'npm-vue-build': 'vite',
-      'npm-js-test': 'vitest',
-      'pnpm-package-manager': 'pnpm',
-    }[entry.id]
-    return keyPkg ? npmLatest(keyPkg) : null
-  }
-  if (ds === 'nuget') return null
-  if (ds === 'dotnet-version') {
-    const idx = curlJson('https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json')
-    const rel = idx?.['releases-index']?.find(r => r['channel-version'] === '10.0')
-    return rel?.['latest-sdk'] || null
-  }
-  if (ds === 'node-version') {
-    const versions = curlJson('https://nodejs.org/dist/index.json')
-    const lts = versions?.find(v => v.lts !== false)
-    return lts ? lts.version.replace(/^v/, '') : null
-  }
-  if (ds === 'github-releases' && entry.packageName.includes('emsdk')) {
-    return ghReleaseLatest('emscripten-core/emsdk')
-  }
-  return null
+function nugetVersions(packageName) {
+  const id = encodeURIComponent(packageName.toLowerCase())
+  return curlJson(`https://api.nuget.org/v3-flatcontainer/${id}/index.json`)
+    ?.versions
+}
+
+function resolveLatest(entry, currentVersion) {
+  return resolveLatestVersion(entry, currentVersion, {
+    npm: npmLatest,
+    nuget: nugetVersions,
+    githubTags,
+    githubReleases: githubTags,
+    dotnet: () =>
+      curlJson(
+        'https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json',
+      ),
+    node: () => curlJson('https://nodejs.org/dist/index.json'),
+  })
 }
 
 // ===== Main =====
 
 const surface = readJson(SURFACE_REL)
-if (!surface) { console.error('[deps:freshness] missing update-surface.json'); process.exit(1) }
+if (!surface) {
+  console.error('[deps:freshness] missing update-surface.json')
+  process.exit(1)
+}
 
 const exceptions = readJson(EXCEPTIONS_REL)
 const requiredChecks =
   readJson(REQUIRED_CHECKS_REL)?.branchProtection?.requiredChecks
 const now = new Date()
-const activeExceptions = new Map()
-const exceptionHistory = new Map()
-for (const exc of (exceptions?.exceptions || [])) {
-  exceptionHistory.set(exc.dependencyId, exc)
-  if (new Date(exc.expiresAt) > now) activeExceptions.set(exc.dependencyId, exc)
+const exceptionRegistry = validateExceptionRegistry(
+  exceptions,
+  surface.surfaces ?? [],
+  now.toISOString(),
+)
+for (const error of exceptionRegistry.errors) {
+  operationalErrors.push({
+    source: 'exception-config',
+    identity: error.split(':')[0],
+    message: error,
+  })
 }
 
 const results = []
-let failures = 0
+let failures = exceptionRegistry.errors.length > 0 ? 1 : 0
 
-for (const entry of (surface.surfaces || [])) {
+for (const entry of surface.surfaces || []) {
   const current = resolveCurrent(entry)
-  const latest = resolveLatest(entry)
-  let state = 'skipped'
-  let detail = ''
-  let pullRequests = []
-  const recordedException = exceptionHistory.get(entry.id)
-  let exception = recordedException
-    ? { owner: recordedException.owner, expiresAt: recordedException.expiresAt }
-    : null
-
-  if (!latest || !current) {
-    state = 'skipped'
-    detail = 'cannot determine version'
-  } else if (current === latest) {
-    state = 'current'
-    detail = current
-  } else {
-    pullRequests = findRenovatePRs(entry.id)
-    const pr = pullRequests[0]
-    if (pr) {
-      state = 'latest-target-pr'
-      detail = `PR #${pr.number}: ${pr.title}`
-    } else {
-      const exc = activeExceptions.get(entry.id)
-      if (exc) {
-        state = 'exception'
-        detail = `expires ${exc.expiresAt}: ${exc.reason}`
-        exception = {
-          owner: exc.owner,
-          expiresAt: exc.expiresAt,
-        }
-      } else {
-        state = 'stale'
-        detail = `current=${current} latest=${latest}`
-        failures += 1
-      }
-    }
+  const latest = resolveLatest(entry, current)
+  const pullRequests = current && latest ? findRenovatePRs(entry) : []
+  const recordedExceptions = exceptionRegistry.byDependency.get(entry.id) ?? []
+  const evaluated = evaluateFreshnessEntry({
+    entry,
+    currentVersion: current,
+    latestVersion: latest,
+    pullRequests,
+    exceptions: recordedExceptions,
+    now: now.toISOString(),
+  })
+  for (const error of evaluated.errors) {
+    operationalErrors.push({
+      source: 'freshness-evaluator',
+      identity: entry.id,
+      message: `${entry.id}:${error}`,
+    })
   }
+  if (evaluated.state === 'stale' || evaluated.errors.length > 0) failures += 1
+  const exception = evaluated.selectedException
+    ? {
+        id: evaluated.selectedException.id,
+        owner: evaluated.selectedException.owner,
+        expiresAt: evaluated.selectedException.expiresAt,
+      }
+    : null
 
   results.push({
     dependencyId: entry.id,
@@ -270,36 +211,25 @@ for (const entry of (surface.surfaces || [])) {
     packageName: entry.packageName,
     currentVersion: current,
     targetVersion: latest,
-    state,
-    detail,
+    state: evaluated.state,
+    detail: evaluated.detail,
     pullRequests,
     exception,
-    blockerReasons: state === 'stale' ? ['stale'] : [],
+    blockerReasons: evaluated.blockerReasons,
   })
-  console.log(`[deps:freshness] ${state.padEnd(16)} ${entry.id}: ${detail}`)
-}
-
-// Expired exceptions
-for (const exc of (exceptions?.exceptions || [])) {
-  if (new Date(exc.expiresAt) <= now) {
-    console.error(`[deps:freshness] FAIL expired-exception ${exc.dependencyId}`)
-    const result = results.find(
-      (entry) => entry.dependencyId === exc.dependencyId,
-    )
-    if (result && !result.blockerReasons.includes('expired-exception')) {
-      result.blockerReasons.push('expired-exception')
-    }
-    failures += 1
-  }
+  console.log(
+    `[deps:freshness] ${evaluated.state.padEnd(16)} ${entry.id}: ${evaluated.detail}`,
+  )
 }
 
 const summary = {
   total: results.length,
-  current: results.filter(r => r.state === 'current').length,
-  'latest-target-pr': results.filter(r => r.state === 'latest-target-pr').length,
-  exception: results.filter(r => r.state === 'exception').length,
-  stale: results.filter(r => r.state === 'stale').length,
-  skipped: results.filter(r => r.state === 'skipped').length,
+  current: results.filter((r) => r.state === 'current').length,
+  'latest-target-pr': results.filter((r) => r.state === 'latest-target-pr')
+    .length,
+  exception: results.filter((r) => r.state === 'exception').length,
+  stale: results.filter((r) => r.state === 'stale').length,
+  skipped: results.filter((r) => r.state === 'skipped').length,
 }
 console.log(`\n[deps:freshness] summary ${JSON.stringify(summary)}`)
 

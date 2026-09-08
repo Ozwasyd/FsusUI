@@ -149,12 +149,34 @@ fixed `Dependency freshness blockers` issue plus the `dependency-blocked` label
 for upgrade PRs whose required checks have failed for more than 24 hours.
 Operational lookup errors, incomplete registry results, permission failures,
 and older result watermarks stop reconciliation before an issue can be closed.
+Current-version evidence covers every generated update-surface entry: npm uses
+the npm authority (with the package-manager pin handled separately), NuGet uses
+central package management, and GitHub Actions, Node, .NET, and Emscripten use
+their declared source files. Latest-version adapters query the matching npm,
+NuGet, GitHub tag, Node, or .NET stable channel; an unsupported datasource,
+missing source value, empty registry response, or prerelease-only response is
+an operational failure rather than an ignored surface.
+The checker reads the bounded open Renovate PR inventory once and attributes a
+PR only through an exact package/id title or dependency-table row. Current,
+exactly one latest-target PR, and one active exception are mutually exclusive
+evidence states; zero or multiple matches within or across states fail closed.
+An open PR covers freshness only when its declared target exactly matches the
+latest stable target. Exceptions
+bind the complete dependency identity and
+current/target versions; general exceptions expire within 14 days and known
+vulnerability exceptions within 72 hours. Missing current identity, malformed
+exceptions, expired-only coverage, multiple simultaneously active records, and
+oversized TTLs fail rather than becoming `skipped` or accounted-for results.
+Each record has an immutable unique id, so expired history remains in the
+registry while one exact active renewal can cover the current-to-target pair.
+Replaying an unchanged blocker result does not issue a redundant GitHub update.
 The lifecycle does not close or replace dependency PRs, select lower versions,
 create exceptions, change required checks, or enable automerge.
 
 The deterministic local lifecycle simulation is:
 
 ```bash
+node scripts/test-dependency-freshness-evaluator.mjs
 node scripts/test-dependency-freshness-blocker.mjs
 ```
 

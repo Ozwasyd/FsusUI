@@ -116,9 +116,12 @@ async function lifecycleTransitions() {
     report: initial,
     client: github,
   })
-  assert.equal(rerun.action, 'updated')
+  assert.equal(rerun.action, 'noop')
   assert.equal(github.issues.length, 1, 'idempotent update must not duplicate')
   assert.equal(github.issues[0].body, initialBody, 'content must be stable')
+  assert.deepEqual(github.operations, [
+    { action: 'create-issue', number: issueNumber },
+  ])
 
   const recovered = report('2026-08-30T01:00:00.000Z', [
     dependency('npm-z', {
