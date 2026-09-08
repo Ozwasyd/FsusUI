@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "c6e7572abc6a59dc8f3efafbbaf2c5fee7b7026426da01b511397eebea9f9617",
+  "classificationReceiptDigest": "9221544bb6df7b65752b26237d3072a0dc0bea2f02e6ad55daef6ed5435335a3",
   "candidateSha": "13733ec19121cee98531f5149416a8cf34336434",
-  "candidateDigest": "483fa65f66e8728b3a8bf0959dcf55c88b983f41d1a880af4029995dd44e0e01",
+  "candidateDigest": "d3d963eb540b67315abcbac1e8d482832a7a90b9f69927e16c02c0586f55797f",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -15,7 +15,7 @@
   ],
   "activeBaselineIdentityDigest": "5d9888d74dafebcd791aaa3d367bf09d013f0a824f7afa31fe64c6e1f113cc38",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "c389d2037d8bd43a4b9b76b592fd824fbbee328200668970df83d1ca08b7e971",
+  "independenceEvidenceDigest": "eba3f3f4bcb7e3b87891aff13acf73d0b91841f2d250ffd5456cd637f063b208",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -23,23 +23,14 @@
       "viewport": "88x25",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
-      "inputModes": [
-        "pointer",
-        "keyboard",
-        "screen-reader",
-        "reduced-motion"
-      ],
+      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
       "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
     },
     {
       "viewport": "960x720",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
-      "inputModes": [
-        "pointer",
-        "keyboard",
-        "reduced-motion"
-      ],
+      "inputModes": ["pointer", "keyboard", "reduced-motion"],
       "evidenceDigest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5"
     }
   ],
@@ -63,5 +54,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "31f3b4f58a6256ca3a25983cd0b704cde7b20ad21bb5c4352aabf761f8b394d0"
+  "receiptDigest": "f698df1c21a68a89e867f6bdb006cb4f2f8ffb722ca11b6cd2babb31cedea17a"
 }

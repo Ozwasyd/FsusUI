@@ -10,10 +10,10 @@
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "5d63304a05b7b7cb7f89c6eedb3ddb7215c1f0d795d99ac00822ce615a918dd9",
-    "webBaselineHash": "6d43c3f504bbad092869c64456a4247eb4dd8be7648ed05bfda4cfc6ff303444",
-    "avaloniaBaselineHash": "6fe4938dda08ce1be90429e8ccc7b6ee62c5997ee582876d552d1d0d357d70cd",
-    "runnerHash": "d6561b070afc3d632835e779066970a4f669291add0efda428b855fd26332607"
+    "contractHash": "3a95ea8bc348692efc892f79344684e878ceb323cbbcaf68133f21a4355bcf19",
+    "webBaselineHash": "9ed701881a2d41873ffe41ffb17c5257c6d1f33119822205ba0ef700e5806ab1",
+    "avaloniaBaselineHash": "acc27f78f6b45cb3d2bd3efa5b56f0e1583ef350c49c683f4c4a5211c48de229",
+    "runnerHash": "5f8d30bc360781bde14400afc72c08c4e61601efced09f07910642ad8a23cff5"
   },
   "viewportStateMatrix": [
     {
@@ -28,12 +28,7 @@
       "locale": "zh-CN",
       "direction": "ltr",
       "motion": "reduced",
-      "inputModes": [
-        "pointer",
-        "keyboard",
-        "screen-reader",
-        "reduced-motion"
-      ],
+      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
       "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
     },
     {

@@ -109,7 +109,6 @@ export const sealExecutionCoverage = (coverage) => ({
   outputHash: executionCoverageHash(coverage),
 })
 
-
 export async function loadCurrentCheckTagVisualReview(web, avalonia) {
   const entries = Object.entries(checkTagReviewFiles)
   const existing = entries.filter(([, file]) =>
@@ -214,14 +213,23 @@ export async function loadCurrentCheckTagVisualReview(web, avalonia) {
         !file.startsWith('spec/tokens/') &&
         !file.startsWith('spec/avalonia/semantic/') &&
         !file.startsWith('spec/components/contracts/v2/') &&
+        !file.startsWith('spec/baselines/') &&
+        !file.startsWith('docs/avalonia/vue-public-api-baseline.md') &&
+        !file.startsWith(
+          'spec/components/component-surface-semantic-registry.json',
+        ) &&
         !file.startsWith('generated/') &&
         !file.startsWith('vue/packages/theme-chalk/src/generated/') &&
         !file.startsWith('docs/theme/generated/') &&
         !file.startsWith('docs/releases/readiness/') &&
         !file.startsWith('dotnet/FsusUI.Avalonia/Generated/') &&
         !file.startsWith('dotnet/FsusUI.Avalonia.Themes/Generated/') &&
-        !file.startsWith('dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml') &&
-        !file.startsWith('dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml') &&
+        !file.startsWith(
+          'dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Display.axaml',
+        ) &&
+        !file.startsWith(
+          'dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Feedback.axaml',
+        ) &&
         !file.startsWith('tests/fixtures/token-v2/') &&
         !file.startsWith('tests/contract-v2.test.mjs') &&
         !file.startsWith('tests/conformance-v2-evidence.test.mjs') &&
@@ -1457,27 +1465,33 @@ const validateReceiptForContract = (contract, receipt) => {
   const claimedMembers = [...(receipt.coverage?.requiredMembers ?? [])].sort()
   for (const scenario of claimedScenarios) {
     if (!expectedScenarios.includes(scenario))
-      fail(`alignment.receipt.${contract.id}.coverage.scenario.${scenario} unexpected`)
+      fail(
+        `alignment.receipt.${contract.id}.coverage.scenario.${scenario} unexpected`,
+      )
   }
   for (const member of claimedMembers) {
     if (!expectedMembers.includes(member))
-      fail(`alignment.receipt.${contract.id}.coverage.member.${member} unexpected`)
+      fail(
+        `alignment.receipt.${contract.id}.coverage.member.${member} unexpected`,
+      )
   }
   for (const member of claimedMembers) {
-      const [kind, ...nameParts] = member.split('.')
-      const name = nameParts.join('.')
-      const contractMember = contractMembers(contract).find(
-        (candidate) =>
-          toCoverageKind(candidate.kind) === kind && candidate.name === name,
-      )
-      const expectedMemberScenarios = [
-        ...new Set(contractMember?.scenarioIds ?? []),
-      ].sort()
-      for (const scenario of receipt.coverage?.memberScenarios?.[member] ?? []) {
-        if (!expectedMemberScenarios.includes(scenario))
-          fail(`alignment.receipt.${contract.id}.coverage.member.${member}.scenario.${scenario} unexpected`)
-      }
+    const [kind, ...nameParts] = member.split('.')
+    const name = nameParts.join('.')
+    const contractMember = contractMembers(contract).find(
+      (candidate) =>
+        toCoverageKind(candidate.kind) === kind && candidate.name === name,
+    )
+    const expectedMemberScenarios = [
+      ...new Set(contractMember?.scenarioIds ?? []),
+    ].sort()
+    for (const scenario of receipt.coverage?.memberScenarios?.[member] ?? []) {
+      if (!expectedMemberScenarios.includes(scenario))
+        fail(
+          `alignment.receipt.${contract.id}.coverage.member.${member}.scenario.${scenario} unexpected`,
+        )
     }
+  }
   if (receipt.performanceBudget)
     same(
       {
@@ -1854,360 +1868,363 @@ const mutationCases = (positive, visualReview = null) => {
   )
   const expectedComparisonIdentity = { ...currentComparison.identity }
   return [
-  [
-    'vue-prop-removed',
-    'vue.baseline.inputTreeHash stale',
-    () =>
-      validateBaselineFreshness({
-        platform: 'vue',
-        inputTreeHash: 'old',
-        currentInputTreeHash: 'changed-prop',
-        outputHash: digest({}),
-        payload: {},
-      }),
-  ],
-  [
-    'avalonia-property-default-nullability-changed',
-    'avalonia.baseline.inputTreeHash stale',
-    () =>
-      validateBaselineFreshness({
-        platform: 'avalonia',
-        inputTreeHash: 'old',
-        currentInputTreeHash: 'changed-property',
-        outputHash: digest({}),
-        payload: {},
-      }),
-  ],
-  [
-    'unmapped-public-member',
-    'coverage.member.new-public-member missing scenario',
-    () =>
-      validateCoverage({
-        requiredMembers: ['new-public-member'],
-        memberScenarios: {},
-        executions: {},
-      }),
-  ],
-  [
-    'runner-skips-action',
-    'avalonia.steps[1] failed',
-    () =>
-      validateEvidence(
-        {
-          ...positive.avalonia,
-          steps: [
-            positive.avalonia.steps[0],
-            { observation: { passed: false } },
-          ],
-        },
-        'avalonia',
-      ),
-  ],
-  [
-    'focus-drift',
-    'state.focus mismatch',
-    () => same('markdown', 'button', 'state.focus'),
-  ],
-  [
-    'selection-direction-drift',
-    'state.selection.direction mismatch',
-    () => same('none', 'backward', 'state.selection.direction'),
-  ],
-  [
-    'revision-drift',
-    'state.revision mismatch',
-    () => same(2, 3, 'state.revision'),
-  ],
-  [
-    'history-drift',
-    'state.history.undoDepth mismatch',
-    () => same(0, 1, 'state.history.undoDepth'),
-  ],
-  [
-    'document-epoch-drift',
-    'identity.documentEpoch mismatch',
-    () => same(348, 349, 'identity.documentEpoch'),
-  ],
-  [
-    'role-drift',
-    'accessibility.markdown.role mismatch',
-    () => same('edit', 'article', 'accessibility.markdown.role'),
-  ],
-  [
-    'name-value-state-drift',
-    'accessibility.markdown.name mismatch',
-    () =>
-      same('Markdown editor', 'Fixture name', 'accessibility.markdown.name'),
-  ],
-  [
-    'required-coverage-missing',
-    'coverage.member.selection missing scenario',
-    () =>
-      validateCoverage({
-        requiredMembers: ['selection'],
-        memberScenarios: {},
-        executions: {},
-      }),
-  ],
-  [
-    'stale-evidence-hash',
-    'identity.contractHash mismatch',
-    () => same('current', 'stale', 'identity.contractHash'),
-  ],
-  [
-    'stale-comparison-candidate',
-    'comparison.identity.candidate mismatch',
-    () =>
-      validateCurrentComparison(
-        {
-          ...currentComparison,
-          identity: {
-            ...currentComparison.identity,
-            candidate: 'stale-candidate',
-          },
-        },
-        positive.web,
-        positive.avalonia,
-        expectedComparisonIdentity,
-      ),
-  ],
-  [
-    'stale-comparison-contract',
-    'comparison.identity.contractHash mismatch',
-    () =>
-      validateCurrentComparison(
-        {
-          ...currentComparison,
-          identity: {
-            ...currentComparison.identity,
-            contractHash: 'stale-contract',
-          },
-        },
-        positive.web,
-        positive.avalonia,
-        expectedComparisonIdentity,
-      ),
-  ],
-  [
-    'stale-comparison-web-baseline',
-    'comparison.identity.webBaselineHash mismatch',
-    () =>
-      validateCurrentComparison(
-        {
-          ...currentComparison,
-          identity: {
-            ...currentComparison.identity,
-            webBaselineHash: 'stale-web-baseline',
-          },
-        },
-        positive.web,
-        positive.avalonia,
-        expectedComparisonIdentity,
-      ),
-  ],
-  [
-    'stale-comparison-avalonia-baseline',
-    'comparison.identity.avaloniaBaselineHash mismatch',
-    () =>
-      validateCurrentComparison(
-        {
-          ...currentComparison,
-          identity: {
-            ...currentComparison.identity,
-            avaloniaBaselineHash: 'stale-avalonia-baseline',
-          },
-        },
-        positive.web,
-        positive.avalonia,
-        expectedComparisonIdentity,
-      ),
-  ],
-  [
-    'stale-comparison-runner',
-    'comparison.identity.runnerHash mismatch',
-    () =>
-      validateCurrentComparison(
-        {
-          ...currentComparison,
-          identity: {
-            ...currentComparison.identity,
-            runnerHash: 'stale-runner',
-          },
-        },
-        positive.web,
-        positive.avalonia,
-        expectedComparisonIdentity,
-      ),
-  ],
-  [
-    'stale-comparison-scenario',
-    'comparison.identity.scenario mismatch',
-    () =>
-      validateCurrentComparison(
-        {
-          ...currentComparison,
-          identity: {
-            ...currentComparison.identity,
-            scenario: 'scenario.stale',
-          },
-        },
-        positive.web,
-        positive.avalonia,
-        expectedComparisonIdentity,
-      ),
-  ],
-  [
-    'tampered-comparison-web-evidence-digest',
-    'comparison.evidenceDigests.web mismatch',
-    () =>
-      validateCurrentComparison(
-        {
-          ...currentComparison,
-          evidenceDigests: {
-            ...currentComparison.evidenceDigests,
-            web: 'tampered-web-evidence',
-          },
-        },
-        positive.web,
-        positive.avalonia,
-        expectedComparisonIdentity,
-      ),
-  ],
-  [
-    'comparison-required-artifact-removed',
-    'comparison.requiredArtifact.accessibility missing',
-    () =>
-      validateCurrentComparison(
-        {
-          ...currentComparison,
-          compared: currentComparison.compared.filter(
-            (artifact) => artifact !== 'accessibility',
-          ),
-        },
-        positive.web,
-        positive.avalonia,
-        expectedComparisonIdentity,
-      ),
-  ],
-  [
-    'partial-enters-stable',
-    'readiness.stable.partial-component is partial',
-    () =>
-      validateReadiness({
-        statuses: [
-          { id: 'partial-component', status: 'partial', source: 'derived' },
-        ],
-        stable: ['partial-component'],
-      }),
-  ],
-  [
-    'gap-detail-missing-owner',
-    'alignment.gap.partial-component.owner missing',
-    () =>
-      validateReadiness({
-        statuses: [
-          { id: 'partial-component', status: 'partial', source: 'derived' },
-        ],
-        stable: [],
-        gaps: [
+    [
+      'vue-prop-removed',
+      'vue.baseline.inputTreeHash stale',
+      () =>
+        validateBaselineFreshness({
+          platform: 'vue',
+          inputTreeHash: 'old',
+          currentInputTreeHash: 'changed-prop',
+          outputHash: digest({}),
+          payload: {},
+        }),
+    ],
+    [
+      'avalonia-property-default-nullability-changed',
+      'avalonia.baseline.inputTreeHash stale',
+      () =>
+        validateBaselineFreshness({
+          platform: 'avalonia',
+          inputTreeHash: 'old',
+          currentInputTreeHash: 'changed-property',
+          outputHash: digest({}),
+          payload: {},
+        }),
+    ],
+    [
+      'unmapped-public-member',
+      'coverage.member.new-public-member missing scenario',
+      () =>
+        validateCoverage({
+          requiredMembers: ['new-public-member'],
+          memberScenarios: {},
+          executions: {},
+        }),
+    ],
+    [
+      'runner-skips-action',
+      'avalonia.steps[1] failed',
+      () =>
+        validateEvidence(
           {
-            contract: 'partial-component',
-            status: 'partial',
-            reason: 'A real mapped member is missing.',
-            owner: '',
-            requiredMembers: [],
-            requiredScenarios: ['scenario.partial'],
-            requiredEvidence: ['required-member-coverage'],
-            evidencePolicy: {
-              realExecution: true,
-              allowSkip: false,
-              allowOverrideWithoutGovernance: false,
+            ...positive.avalonia,
+            steps: [
+              positive.avalonia.steps[0],
+              { observation: { passed: false } },
+            ],
+          },
+          'avalonia',
+        ),
+    ],
+    [
+      'focus-drift',
+      'state.focus mismatch',
+      () => same('markdown', 'button', 'state.focus'),
+    ],
+    [
+      'selection-direction-drift',
+      'state.selection.direction mismatch',
+      () => same('none', 'backward', 'state.selection.direction'),
+    ],
+    [
+      'revision-drift',
+      'state.revision mismatch',
+      () => same(2, 3, 'state.revision'),
+    ],
+    [
+      'history-drift',
+      'state.history.undoDepth mismatch',
+      () => same(0, 1, 'state.history.undoDepth'),
+    ],
+    [
+      'document-epoch-drift',
+      'identity.documentEpoch mismatch',
+      () => same(348, 349, 'identity.documentEpoch'),
+    ],
+    [
+      'role-drift',
+      'accessibility.markdown.role mismatch',
+      () => same('edit', 'article', 'accessibility.markdown.role'),
+    ],
+    [
+      'name-value-state-drift',
+      'accessibility.markdown.name mismatch',
+      () =>
+        same('Markdown editor', 'Fixture name', 'accessibility.markdown.name'),
+    ],
+    [
+      'required-coverage-missing',
+      'coverage.member.selection missing scenario',
+      () =>
+        validateCoverage({
+          requiredMembers: ['selection'],
+          memberScenarios: {},
+          executions: {},
+        }),
+    ],
+    [
+      'stale-evidence-hash',
+      'identity.contractHash mismatch',
+      () => same('current', 'stale', 'identity.contractHash'),
+    ],
+    [
+      'stale-comparison-candidate',
+      'comparison.identity.candidate mismatch',
+      () =>
+        validateCurrentComparison(
+          {
+            ...currentComparison,
+            identity: {
+              ...currentComparison.identity,
+              candidate: 'stale-candidate',
             },
           },
-        ],
-      }),
-  ],
-  [
-    'candidate-identity-mismatch',
-    'identity.candidate mismatch',
-    () => same('candidate-a', 'candidate-b', 'identity.candidate'),
-  ],
-  [
-    'override-governance-missing',
-    'override[0].reviewPolicy missing governance',
-    () =>
-      validateOverride({
-        field: 'state.value',
-        reason: 'platform',
-        owner: 'conformance',
-        testPolicy: 'test',
-      }),
-  ],
-  [
-    'markdown-write-alias',
-    'contract.mode.write forbidden',
-    () => validateMarkdownEvidence({ modes: ['source', 'write'] }),
-  ],
-  [
-    'same-source-document-history',
-    'document.identity history isolation failed',
-    () =>
-      validateMarkdownEvidence({
-        documents: [
-          { source: 'same', identity: 'a' },
-          { source: 'same', identity: 'b' },
-        ],
-        sharedHistory: true,
-      }),
-  ],
-  [
-    'crlf-normalized-offset',
-    'source.offset CRLF normalization drift',
-    () =>
-      validateMarkdownEvidence({ source: 'a\r\nb', offsetSpace: 'normalized' }),
-  ],
-  [
-    'dom-source-mapping',
-    'projection.source mapping used DOM',
-    () => validateMarkdownEvidence({ sourceMappingOwner: 'DOM' }),
-  ],
-  [
-    'synthetic-ime-as-native',
-    'ime.native evidence is synthetic',
-    () => validateMarkdownEvidence({ nativeIme: { synthetic: true } }),
-  ],
-  [
-    'metadata-only-counted',
-    'coverage.scenario.generated-metadata metadata-only',
-    () =>
-      validateCoverage({
-        requiredMembers: ['document'],
-        memberScenarios: { document: ['generated-metadata'] },
-        executions: { 'generated-metadata': { real: false } },
-      }),
-  ],
-  [
-    'filename-matching',
-    'identity.checkpoint mismatch',
-    () => same('after-undo', 'same-file-name', 'identity.checkpoint'),
-  ],
-  [
-    'visual-masking-semantic',
-    'accessibility.markdown.role mismatch',
-    () => same('edit', 'article', 'accessibility.markdown.role'),
-  ],
-  [
-    'broad-override',
-    'override[0].field broad override forbidden',
-    () =>
-      validateOverride({
-        field: 'accessibility.*',
-        reason: 'platform',
-        owner: 'conformance',
-        testPolicy: 'exact',
-        reviewPolicy: 'per-release',
-      }),
-  ],
+          positive.web,
+          positive.avalonia,
+          expectedComparisonIdentity,
+        ),
+    ],
+    [
+      'stale-comparison-contract',
+      'comparison.identity.contractHash mismatch',
+      () =>
+        validateCurrentComparison(
+          {
+            ...currentComparison,
+            identity: {
+              ...currentComparison.identity,
+              contractHash: 'stale-contract',
+            },
+          },
+          positive.web,
+          positive.avalonia,
+          expectedComparisonIdentity,
+        ),
+    ],
+    [
+      'stale-comparison-web-baseline',
+      'comparison.identity.webBaselineHash mismatch',
+      () =>
+        validateCurrentComparison(
+          {
+            ...currentComparison,
+            identity: {
+              ...currentComparison.identity,
+              webBaselineHash: 'stale-web-baseline',
+            },
+          },
+          positive.web,
+          positive.avalonia,
+          expectedComparisonIdentity,
+        ),
+    ],
+    [
+      'stale-comparison-avalonia-baseline',
+      'comparison.identity.avaloniaBaselineHash mismatch',
+      () =>
+        validateCurrentComparison(
+          {
+            ...currentComparison,
+            identity: {
+              ...currentComparison.identity,
+              avaloniaBaselineHash: 'stale-avalonia-baseline',
+            },
+          },
+          positive.web,
+          positive.avalonia,
+          expectedComparisonIdentity,
+        ),
+    ],
+    [
+      'stale-comparison-runner',
+      'comparison.identity.runnerHash mismatch',
+      () =>
+        validateCurrentComparison(
+          {
+            ...currentComparison,
+            identity: {
+              ...currentComparison.identity,
+              runnerHash: 'stale-runner',
+            },
+          },
+          positive.web,
+          positive.avalonia,
+          expectedComparisonIdentity,
+        ),
+    ],
+    [
+      'stale-comparison-scenario',
+      'comparison.identity.scenario mismatch',
+      () =>
+        validateCurrentComparison(
+          {
+            ...currentComparison,
+            identity: {
+              ...currentComparison.identity,
+              scenario: 'scenario.stale',
+            },
+          },
+          positive.web,
+          positive.avalonia,
+          expectedComparisonIdentity,
+        ),
+    ],
+    [
+      'tampered-comparison-web-evidence-digest',
+      'comparison.evidenceDigests.web mismatch',
+      () =>
+        validateCurrentComparison(
+          {
+            ...currentComparison,
+            evidenceDigests: {
+              ...currentComparison.evidenceDigests,
+              web: 'tampered-web-evidence',
+            },
+          },
+          positive.web,
+          positive.avalonia,
+          expectedComparisonIdentity,
+        ),
+    ],
+    [
+      'comparison-required-artifact-removed',
+      'comparison.requiredArtifact.accessibility missing',
+      () =>
+        validateCurrentComparison(
+          {
+            ...currentComparison,
+            compared: currentComparison.compared.filter(
+              (artifact) => artifact !== 'accessibility',
+            ),
+          },
+          positive.web,
+          positive.avalonia,
+          expectedComparisonIdentity,
+        ),
+    ],
+    [
+      'partial-enters-stable',
+      'readiness.stable.partial-component is partial',
+      () =>
+        validateReadiness({
+          statuses: [
+            { id: 'partial-component', status: 'partial', source: 'derived' },
+          ],
+          stable: ['partial-component'],
+        }),
+    ],
+    [
+      'gap-detail-missing-owner',
+      'alignment.gap.partial-component.owner missing',
+      () =>
+        validateReadiness({
+          statuses: [
+            { id: 'partial-component', status: 'partial', source: 'derived' },
+          ],
+          stable: [],
+          gaps: [
+            {
+              contract: 'partial-component',
+              status: 'partial',
+              reason: 'A real mapped member is missing.',
+              owner: '',
+              requiredMembers: [],
+              requiredScenarios: ['scenario.partial'],
+              requiredEvidence: ['required-member-coverage'],
+              evidencePolicy: {
+                realExecution: true,
+                allowSkip: false,
+                allowOverrideWithoutGovernance: false,
+              },
+            },
+          ],
+        }),
+    ],
+    [
+      'candidate-identity-mismatch',
+      'identity.candidate mismatch',
+      () => same('candidate-a', 'candidate-b', 'identity.candidate'),
+    ],
+    [
+      'override-governance-missing',
+      'override[0].reviewPolicy missing governance',
+      () =>
+        validateOverride({
+          field: 'state.value',
+          reason: 'platform',
+          owner: 'conformance',
+          testPolicy: 'test',
+        }),
+    ],
+    [
+      'markdown-write-alias',
+      'contract.mode.write forbidden',
+      () => validateMarkdownEvidence({ modes: ['source', 'write'] }),
+    ],
+    [
+      'same-source-document-history',
+      'document.identity history isolation failed',
+      () =>
+        validateMarkdownEvidence({
+          documents: [
+            { source: 'same', identity: 'a' },
+            { source: 'same', identity: 'b' },
+          ],
+          sharedHistory: true,
+        }),
+    ],
+    [
+      'crlf-normalized-offset',
+      'source.offset CRLF normalization drift',
+      () =>
+        validateMarkdownEvidence({
+          source: 'a\r\nb',
+          offsetSpace: 'normalized',
+        }),
+    ],
+    [
+      'dom-source-mapping',
+      'projection.source mapping used DOM',
+      () => validateMarkdownEvidence({ sourceMappingOwner: 'DOM' }),
+    ],
+    [
+      'synthetic-ime-as-native',
+      'ime.native evidence is synthetic',
+      () => validateMarkdownEvidence({ nativeIme: { synthetic: true } }),
+    ],
+    [
+      'metadata-only-counted',
+      'coverage.scenario.generated-metadata metadata-only',
+      () =>
+        validateCoverage({
+          requiredMembers: ['document'],
+          memberScenarios: { document: ['generated-metadata'] },
+          executions: { 'generated-metadata': { real: false } },
+        }),
+    ],
+    [
+      'filename-matching',
+      'identity.checkpoint mismatch',
+      () => same('after-undo', 'same-file-name', 'identity.checkpoint'),
+    ],
+    [
+      'visual-masking-semantic',
+      'accessibility.markdown.role mismatch',
+      () => same('edit', 'article', 'accessibility.markdown.role'),
+    ],
+    [
+      'broad-override',
+      'override[0].field broad override forbidden',
+      () =>
+        validateOverride({
+          field: 'accessibility.*',
+          reason: 'platform',
+          owner: 'conformance',
+          testPolicy: 'exact',
+          reviewPolicy: 'per-release',
+        }),
+    ],
   ]
 }
 
