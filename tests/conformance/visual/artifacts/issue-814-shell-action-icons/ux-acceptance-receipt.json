@@ -1,0 +1,111 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "0f6ae8019c50248be166f770fca1ecc00ad4769720c2138b000c5f329b9f8276",
+  "candidateSha": "161d995d00b879880a11baa05befd64cc303a11a",
+  "candidateDigest": "188ba9085980e0e6453cbfb733738e2c3f0718f2d5f928cc038feb11da8463af",
+  "verificationClass": "ux-local",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18",
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104",
+    "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
+    "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042",
+    "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b",
+    "07727b06932d8aae37b6d1ad425d6ed2a3230713580d20eddbbafd6e82b8bff6",
+    "f399b6f8e2d13bd40dfeaea0b207c24e4f09299303df13559f3c9f1de7d1e0fe",
+    "49a65565a1322edad16d9e2c95df67f8f403f7b874e170de7ce3f892159b0d27",
+    "c62ce65cf1c3fcbf77c8fc271c52c5471ebab7ad37d57c75c6551816d448e5a7",
+    "8e2d22844842afd676d2d625c2d10b903ce3969aec27e014c3c85bef455c0c7e"
+  ],
+  "activeBaselineIdentityDigest": "2a6b0cfaa551c57290a6899efdbead9e56749b0c8d3b3c5b22a33279d8192e9e",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "fd5cbcca4ae25ee11f8f65fc4799e6f4789315f2f466b36c8dc7e7a2eaf4d3fd",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "avalonia-headless 560x180",
+      "state": "shell-actions-16dip",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "6b78ef84741efc8743ca4ee75d63d4af3379b6be430c6e1495b610bcc18346e8"
+    },
+    {
+      "viewport": "avalonia-headless 560x180",
+      "state": "shell-actions-16dip",
+      "theme": "dark",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "ea24ba196d5efbf6ed454a882867eed165821d83fdb43ecff4b1574d6d0f2048"
+    },
+    {
+      "viewport": "avalonia-headless 560x180",
+      "state": "shell-actions-20dip",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "c9614ac0132bd65cbda532df1388a405c9bff34b6711cd740ecc31a9f923c3c4"
+    },
+    {
+      "viewport": "avalonia-headless 560x180",
+      "state": "shell-actions-24dip",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "303d4567aa263bf2bf162143fdbee7def663238e3b2bdcfa7074c16ff7597f30"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "shell-actions-light-16",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-16.png",
+      "digest": "6b78ef84741efc8743ca4ee75d63d4af3379b6be430c6e1495b610bcc18346e8",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "shell-actions-dark-16",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-dark-16.png",
+      "digest": "ea24ba196d5efbf6ed454a882867eed165821d83fdb43ecff4b1574d6d0f2048",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "shell-actions-high-contrast-16",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-high-contrast-16.png",
+      "digest": "5d87047af5edcef50258bf713d91cbee0fccd1ea2062461f05725c667640acb2",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "shell-actions-light-20",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-20.png",
+      "digest": "c9614ac0132bd65cbda532df1388a405c9bff34b6711cd740ecc31a9f923c3c4",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "shell-actions-light-24",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-24.png",
+      "digest": "303d4567aa263bf2bf162143fdbee7def663238e3b2bdcfa7074c16ff7597f30",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [],
+  "status": "accepted",
+  "receiptDigest": "a28d78fe644e6f319ae7babc15f21b7577f73069f0e50e94c5c1f7dc9b74c919"
+}
