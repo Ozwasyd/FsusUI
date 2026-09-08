@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "candidateSha": "ad51456ec078aa5a1d9579eec62354f4a00dff60",
+  "evidenceClass": "local-headless-skia",
+  "productionFixture": true,
+  "limitation": "Avalonia Headless Skia rendering; no physical display or screen-reader session claim.",
+  "motionMode": "reduced",
+  "states": [
+    "default-presenter",
+    "custom-workspace-presenter",
+    "30-dip-row",
+    "file-type-icon",
+    "truncated-name",
+    "dirty-indicator",
+    "independent-current-file",
+    "independent-selection"
+  ],
+  "captures": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-813-tree-row-presenter/tree-row-presenter-light-compact-zoom-100.png",
+      "theme": "light",
+      "density": "compact",
+      "zoomPercent": 100,
+      "sha256": "e734804db87995b3ec6b2f0ebe6185ee6154ff1ee1a886e48b294e0c5e2d9fd8",
+      "customRowMinHeight": 30,
+      "defaultRowMinHeight": 40,
+      "selectedKey": "notes",
+      "currentFileKey": "editor",
+      "focusedKey": "editor",
+      "currentAndSelectedAreIndependent": true
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-813-tree-row-presenter/tree-row-presenter-dark-compact-zoom-200.png",
+      "theme": "dark",
+      "density": "compact",
+      "zoomPercent": 200,
+      "sha256": "e752f4c9a6a5977df3b9ebb5c8d520847f8fc87a7f63e41c9bdaf084c7e1a286",
+      "customRowMinHeight": 30,
+      "defaultRowMinHeight": 40,
+      "selectedKey": "notes",
+      "currentFileKey": "editor",
+      "focusedKey": "editor",
+      "currentAndSelectedAreIndependent": true
+    }
+  ]
+}
