@@ -1,5 +1,7 @@
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Controls;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
@@ -9,6 +11,121 @@ namespace FsusUI.Avalonia.Tests.Controls;
 
 public class FsusTreePrimitiveTests
 {
+  [Fact]
+  public async Task TreeRowPresenterReceivesConsumerPayloadStateAndInvalidation()
+  {
+    var fileMetadata = new WorkspaceRowMetadata(IsCurrent: false, IsDirty: true);
+    var root = new FsusTreeNode("src", "src") { HasLazyChildren = true };
+    var file = new FsusTreeNode("file", "EditorView.axaml") { Payload = fileMetadata };
+    root.Children.Add(file);
+
+    var contexts = new List<FsusTreeRowContext>();
+    var tree = new FsusTree
+    {
+      Checkable = true,
+      RowMinHeight = 30,
+      RowPadding = new Thickness(6, 0),
+      RowPresenter = context =>
+      {
+        contexts.Add(context);
+        return new TextBlock
+        {
+          Text = context.Payload is WorkspaceRowMetadata metadata
+            ? $"{context.Node.Label}|current={metadata.IsCurrent}|dirty={metadata.IsDirty}"
+            : context.Node.Label,
+        };
+      },
+    };
+    tree.Nodes.Add(root);
+    tree.RefreshView();
+
+    var rootContext = contexts.Last(context => context.Key == "src");
+    Assert.True(rootContext.IsFocused);
+    Assert.True(rootContext.IsExpandable);
+    Assert.False(rootContext.IsExpanded);
+    Assert.Null(rootContext.LazyLoadState);
+
+    Assert.True(tree.Expand("src"));
+    Assert.True(tree.ToggleSelection("file"));
+    Assert.True(tree.ToggleCheck("file"));
+    Assert.True(tree.FocusNode("file"));
+
+    var fileContext = contexts.Last(context => context.Key == "file");
+    Assert.Same(file, fileContext.Node);
+    Assert.Same(fileMetadata, fileContext.Payload);
+    Assert.Equal(2, fileContext.Level);
+    Assert.Equal(1, fileContext.Position);
+    Assert.Equal(1, fileContext.SetSize);
+    Assert.True(fileContext.IsSelected);
+    Assert.True(fileContext.IsChecked);
+    Assert.True(fileContext.IsFocused);
+    Assert.False(fileContext.IsExpanded);
+    Assert.False(fileContext.IsExpandable);
+
+    var rows = Assert.IsType<StackPanel>(tree.Content);
+    var fileRow = Assert.IsType<Border>(rows.Children.Single(control =>
+      AutomationProperties.GetAutomationId(control) == "fsus-tree-node-file"));
+    Assert.Equal(30, fileRow.MinHeight);
+    Assert.Equal(new Thickness(6, 0), fileRow.Padding);
+    Assert.Contains("current=False|dirty=True", Assert.IsType<TextBlock>(fileRow.Child).Text);
+
+    file.Payload = fileMetadata with { IsCurrent = true };
+    Assert.Contains("current=True|dirty=True", Assert.IsType<TextBlock>(fileRow.Child).Text);
+
+    var mutableMetadata = new MutableWorkspaceRowMetadata { IsCurrent = true };
+    file.Payload = mutableMetadata;
+    mutableMetadata.IsDirty = true;
+    file.InvalidatePresentation();
+    Assert.Equal(
+      "EditorView.axaml",
+      contexts.Last(context => context.Key == "file").Node.Label);
+
+    Assert.True(tree.StartRename("file", "EditorView.axaml"));
+    fileRow = Assert.IsType<Border>(rows.Children.Single(control =>
+      AutomationProperties.GetAutomationId(control) == "fsus-tree-node-file"));
+    var activeEditor = Assert.IsType<TextBox>(fileRow.Child);
+    activeEditor.Text = "EditorRenamed.axaml";
+    mutableMetadata.IsDirty = false;
+    file.InvalidatePresentation();
+    Assert.Same(activeEditor, fileRow.Child);
+    Assert.Equal("EditorRenamed.axaml", activeEditor.Text);
+    Assert.True(tree.CancelInlineEdit());
+
+    var completion = new TaskCompletionSource<IReadOnlyList<FsusTreeNode>>();
+    tree.ChildrenLoader = (_, _) => new ValueTask<IReadOnlyList<FsusTreeNode>>(completion.Task);
+    var load = tree.LoadChildrenAsync("src");
+    Assert.Equal(
+      FsusTreeLazyLoadState.Started,
+      contexts.Last(context => context.Key == "src").LazyLoadState);
+    completion.SetResult([new FsusTreeNode("generated", "Generated.cs")]);
+    Assert.True(await load);
+    Assert.Equal(
+      FsusTreeLazyLoadState.Completed,
+      contexts.Last(context => context.Key == "src").LazyLoadState);
+  }
+
+  [Fact]
+  public void TreeV2InheritsConsumerRowPresenterContract()
+  {
+    var presented = new List<FsusTreeRowContext>();
+    var tree = new FsusTreeV2
+    {
+      RowPresenter = context =>
+      {
+        presented.Add(context);
+        return new TextBlock { Text = context.Node.Label };
+      },
+    };
+    tree.Nodes.Add(new FsusTreeNode("readme", "README.md") { Payload = "markdown" });
+
+    tree.RefreshView();
+
+    var context = Assert.Single(presented);
+    Assert.Equal("readme", context.Key);
+    Assert.Equal("markdown", context.Payload);
+    Assert.Single(tree.VisibleNodes);
+  }
+
   [Fact]
   public async Task TreeExpandsSelectsChecksFiltersAndKeyboardNavigates()
   {
@@ -511,6 +628,14 @@ public class FsusTreePrimitiveTests
   private sealed class KeyboardTree : FsusTree
   {
     public ValueTask<bool> PressAsync(Key key) => HandleKeyAsync(key);
+  }
+
+  private sealed record WorkspaceRowMetadata(bool IsCurrent, bool IsDirty);
+
+  private sealed class MutableWorkspaceRowMetadata
+  {
+    public bool IsCurrent { get; init; }
+    public bool IsDirty { get; set; }
   }
 
   private static string ReadControlTheme(string fileName) =>

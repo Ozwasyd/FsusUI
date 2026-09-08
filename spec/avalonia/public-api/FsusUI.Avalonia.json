@@ -447,6 +447,7 @@
     "FsusTreeNodeContextEventArgs",
     "FsusTreeNodeState",
     "FsusTreeNodeView",
+    "FsusTreeRowContext",
     "FsusTreeSelect",
     "FsusTreeSelectionChangedEventArgs",
     "FsusTreeSelectionMode",
