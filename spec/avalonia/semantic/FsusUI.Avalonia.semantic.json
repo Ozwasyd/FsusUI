@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "54697e2a6e0358660afd94d9840ddb4874c985cae58ec520d057d9381c573ed9",
+    "inputTreeHash": "4afb90b6b6f4dab08dbdcb2db2a38cb5bcf221764d42151a730e0a1fc24ff03f",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "dfd681daeeb2102199a3da02a55583168dd6de84227948cc017df0b9a47f2249"
+    "outputHash": "39a2706297e2acaa4d75a59ae44d1d00b0f1c36088be6329220cf92cfb6dcb90"
   },
   "semanticTypes": [
     {
@@ -55723,6 +55723,39 @@
           "deprecated": false
         },
         {
+          "name": "RowMinHeight",
+          "type": "System.Double?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "RowPadding",
+          "type": "Avalonia.Thickness?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "RowPresenter",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeRowPresenter",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "SelectedKeys",
           "type": "System.Collections.Generic.IReadOnlySet\u003CSystem.String\u003E",
           "nullable": true,
@@ -55859,7 +55892,7 @@
             "valueKnown": true,
             "value": "Polite",
             "publicDependencies": [],
-            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow"
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ApplyRowState"
           },
           {
             "semantic": "live-setting",
@@ -55870,7 +55903,7 @@
             "valueKnown": true,
             "value": "Polite",
             "publicDependencies": [],
-            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows"
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow"
           },
           {
             "semantic": "name",
@@ -55901,6 +55934,20 @@
             "semantic": "name",
             "provider": "AutomationProperties.SetName",
             "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "row",
+            "valueKnown": false,
+            "valueExpression": "context.Node.Label",
+            "publicDependencies": [
+              "FsusUI.Avalonia.Controls.FsusTreeNode.Label",
+              "FsusUI.Avalonia.Controls.FsusTreeRowContext.Node"
+            ],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ApplyRowState"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": false,
@@ -55920,7 +55967,7 @@
             "valueKnown": true,
             "value": "TreeItem",
             "publicDependencies": [],
-            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow"
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ApplyRowState"
           },
           {
             "semantic": "role",
@@ -55931,7 +55978,7 @@
             "valueKnown": true,
             "value": "TreeItem",
             "publicDependencies": [],
-            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows"
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow"
           },
           {
             "semantic": "role",
@@ -55970,6 +56017,22 @@
               "FsusUI.Avalonia.Controls.FsusTreeInlineEditState.ValidationError"
             ],
             "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildInlineEditContent"
+          },
+          {
+            "semantic": "state",
+            "provider": "AutomationProperties.SetItemStatus",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "row",
+            "valueKnown": false,
+            "valueExpression": "$\u0022{(context.IsSelected ? \u0022selected\u0022 : \u0022not selected\u0022)}, \u0022 \u002B $\u0022{(context.IsExpandable ? context.IsExpanded ? \u0022expanded\u0022 : \u0022collapsed\u0022 : \u0022leaf\u0022)}, \u0022 \u002B $\u0022{loadState}, level {context.Level.ToString(CultureInfo.InvariantCulture)}\u0022",
+            "publicDependencies": [
+              "FsusUI.Avalonia.Controls.FsusTreeRowContext.IsExpandable",
+              "FsusUI.Avalonia.Controls.FsusTreeRowContext.IsExpanded",
+              "FsusUI.Avalonia.Controls.FsusTreeRowContext.IsSelected",
+              "FsusUI.Avalonia.Controls.FsusTreeRowContext.Level"
+            ],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ApplyRowState"
           },
           {
             "semantic": "state",
@@ -56137,6 +56200,19 @@
           "name": "LoadChildrenAsync",
           "isStatic": false,
           "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "RefreshNodePresentation",
+          "isStatic": false,
+          "returnType": "System.Boolean",
           "deprecated": false,
           "parameters": [
             {
@@ -56892,11 +56968,30 @@
           "required": false,
           "defaultKnown": false,
           "deprecated": false
+        },
+        {
+          "name": "Payload",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
         }
       ],
       "avaloniaProperties": [],
       "events": [],
-      "methods": []
+      "methods": [
+        {
+          "name": "InvalidatePresentation",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": []
+        }
+      ]
     },
     {
       "name": "FsusUI.Avalonia.Controls.FsusTreeNodeActivatedEventArgs",
@@ -57233,6 +57328,307 @@
             {
               "name": "SetSize",
               "type": "System.Int32\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTreeRowContext",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [
+        {
+          "name": "IsChecked",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "IsDisabled",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "IsExpandable",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "IsExpanded",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "IsFocused",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "IsSelected",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "LazyLoadState",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeLazyLoadState?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Level",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Node",
+          "type": "FsusUI.Avalonia.Controls.FsusTreeNode",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Payload",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "Position",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "SetSize",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusTreeRowContext",
+          "deprecated": false,
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "Key",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Node",
+              "type": "FsusUI.Avalonia.Controls.FsusTreeNode\u0026",
+              "optional": false
+            },
+            {
+              "name": "Payload",
+              "type": "System.Object\u0026",
+              "optional": false
+            },
+            {
+              "name": "Level",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "Position",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "SetSize",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsDisabled",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsSelected",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsChecked",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsFocused",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsExpanded",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsExpandable",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "LazyLoadState",
+              "type": "System.Nullable\u00601[[FsusUI.Avalonia.Controls.FsusTreeLazyLoadState, FsusUI.Avalonia, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusTreeRowPresenter",
+      "kind": "delegate",
+      "baseType": "System.MulticastDelegate",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "BeginInvoke",
+          "isStatic": false,
+          "returnType": "System.IAsyncResult",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "context",
+              "type": "FsusUI.Avalonia.Controls.FsusTreeRowContext",
+              "optional": false
+            },
+            {
+              "name": "callback",
+              "type": "System.AsyncCallback",
+              "optional": false
+            },
+            {
+              "name": "object",
+              "type": "System.Object",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "EndInvoke",
+          "isStatic": false,
+          "returnType": "Avalonia.Controls.Control",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "result",
+              "type": "System.IAsyncResult",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Invoke",
+          "isStatic": false,
+          "returnType": "Avalonia.Controls.Control",
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "context",
+              "type": "FsusUI.Avalonia.Controls.FsusTreeRowContext",
               "optional": false
             }
           ]
@@ -67898,6 +68294,18 @@
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
         "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ApplyRowState",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildInlineEditContent",
         "dependency": "Space1Thickness",
         "canonicalName": "space.1",
@@ -67959,30 +68367,6 @@
         "authority": "roslyn-symbol-reference",
         "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
-        "dependency": "DensityControlDefaultYDouble",
-        "canonicalName": "density.control.default.y",
-        "resolved": true,
-        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
-        "ownership": "resolved",
-        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
-      },
-      {
-        "kind": "csharp-token-member-reference",
-        "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
-        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
-        "dependency": "DensityControlDefaultYResourceKey",
-        "canonicalName": "density.control.default.y",
-        "resolved": true,
-        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
-        "ownership": "resolved",
-        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
-      },
-      {
-        "kind": "csharp-token-member-reference",
-        "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
-        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
         "dependency": "Space2Thickness",
         "canonicalName": "space.2",
         "resolved": true,
@@ -67997,6 +68381,30 @@
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
         "dependency": "Space5Thickness",
         "canonicalName": "space.5",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ResolveRowMinHeight",
+        "dependency": "DensityControlDefaultYDouble",
+        "canonicalName": "density.control.default.y",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ResolveRowMinHeight",
+        "dependency": "DensityControlDefaultYResourceKey",
+        "canonicalName": "density.control.default.y",
         "resolved": true,
         "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
         "ownership": "resolved",

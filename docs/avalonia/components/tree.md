@@ -22,6 +22,76 @@ Space toggles selection and Right/Left expand/collapse; programmatic
 or expansion events (`SelectionChanged` reports every state change). A stale
 lazy-load request reports `Canceled` and never emits a stale `Completed`.
 
+## Consumer row presentation
+
+`FsusTree.RowPresenter` is the public boundary for application-owned row
+content. The callback receives `FsusTreeRowContext`, including the stable key,
+`FsusTreeNode`, `Payload`, level, position/set size, disabled, selected,
+checked, focused, expanded/expandable, and lazy-load state. `FsusTreeV2`
+inherits the same contract. When no presenter is assigned, the existing text
+label and disclosure glyph remain the default presentation.
+
+Attach arbitrary application metadata to `FsusTreeNode.Payload`. Replacing the
+payload, label, disabled state, or lazy-child flag invalidates the visible row
+automatically. If a mutable payload changes in place, call
+`node.InvalidatePresentation()` or `tree.RefreshNodePresentation(key)` to rebuild
+only that visible content. These presentation refreshes keep tree-owned
+selection, expansion, focus, context-menu routing, keyboard handling, and
+automation semantics intact; an active rename editor is not replaced by a
+metadata-only invalidation.
+
+Consumers that need denser application rows can set optional `RowMinHeight`
+and `RowPadding` values. The defaults remain the shared density height and
+spacing tokens. This lets an application opt into a 30 DIP workspace row
+without changing the FsusUI density contract for every tree.
+
+```csharp
+using Avalonia;
+using Avalonia.Controls;
+using FsusUI.Avalonia.Controls;
+using FsusUI.Avalonia.Icons;
+
+var tree = new FsusTree
+{
+  RowMinHeight = 30,
+  RowPadding = new Thickness(6, 0),
+  RowPresenter = context =>
+  {
+    var metadata = (WorkspaceRowMetadata?)context.Payload;
+    var row = new StackPanel
+    {
+      Orientation = Avalonia.Layout.Orientation.Horizontal,
+      Spacing = 6,
+    };
+    row.Children.Add(new FsusIcon
+    {
+      IconKey = FsusFileTypeIcon.Resolve(metadata?.Path ?? context.Node.Label),
+    });
+    row.Children.Add(new FsusText
+    {
+      Text = context.Node.Label,
+      IsTruncated = true,
+    });
+    if (metadata?.IsDirty == true)
+    {
+      row.Children.Add(new FsusText { Text = "•", AccessibleName = "Modified" });
+    }
+    row.Classes.Set("workspace-current-file", metadata?.IsCurrent == true);
+    return row;
+  },
+};
+
+var file = new FsusTreeNode("file:readme", "README.md")
+{
+  Payload = new WorkspaceRowMetadata("README.md", IsCurrent: true, IsDirty: false),
+};
+tree.Nodes.Add(file);
+tree.RefreshView();
+
+// For a mutable metadata object changed in place:
+file.InvalidatePresentation();
+```
+
 ## Inline editing
 
 `StartRename(key, initialValue)` replaces a visible node label with an editor,
