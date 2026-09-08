@@ -5,10 +5,10 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "fd5b21f19674378c01c4b4b238bed850338591419e93650081c9c21d655ab5a8",
+    "hash": "efabd953d091398e425d9e7f585053ec0cf9099e460b84cd2d9eb22aac090011",
     "packageVersion": "1.5.1",
-    "tokenHash": "78abd16c3426a62b9a035c394f460b4a085d857a35e6ffaffe422f42a43c4d48",
-    "iconHash": "dd0098afc869c8e6846ec15fce1abfc240eb495650d69e9a5f89579fdade824c"
+    "tokenHash": "f40182721e8a812c248cb0bc43de556cd7568c5a9de1bc8b2c099df9b78e47b0",
+    "iconHash": "6ae868b15cefc99ebec9d8a78c7602da1fb07b46ec172c43f6a3662af54be167"
   },
   "changeClassifications": [
     "patch",
@@ -807,7 +807,13 @@
         }
       ],
       "events": [],
-      "contentRegions": [],
+      "contentRegions": [
+        {
+          "name": "default",
+          "scoped": true,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -5101,43 +5107,57 @@
       },
       "props": [
         {
-          "name": "...datePickerSharedProps",
+          "name": "...timePickerDefaultProps",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "cellClassName",
+          "name": "date",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "selectionMode",
+          "name": "disabledDate",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "showWeekNumber",
+          "name": "maxDate",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
-        }
-      ],
-      "events": [
+        },
         {
           "name": "minDate",
-          "payload": "vue-source"
-        }
-      ],
-      "contentRegions": [],
-      "exposed": [
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
         {
-          "name": "focus",
-          "signature": "vue-source"
+          "name": "parsedValue",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "rangeState",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
         }
       ],
+      "events": [],
+      "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5324,69 +5344,9 @@
         "module": "descriptions",
         "baseline": "spec/baselines/vue-current.json"
       },
-      "props": [
-        {
-          "name": "border",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "column",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "direction",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "extra",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "responsive",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "scrollAriaLabel",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "size",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "title",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        }
-      ],
+      "props": [],
       "events": [],
-      "contentRegions": [
-        {
-          "name": "extra",
-          "scoped": false,
-          "required": false
-        },
-        {
-          "name": "title",
-          "scoped": false,
-          "required": false
-        }
-      ],
+      "contentRegions": [],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -16558,26 +16518,7 @@
         "module": "select-v2",
         "baseline": "spec/baselines/vue-current.json"
       },
-      "props": [
-        {
-          "name": "height",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "item",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "style",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        }
-      ],
+      "props": [],
       "events": [],
       "contentRegions": [
         {
@@ -18653,32 +18594,7 @@
         "module": "table",
         "baseline": "spec/baselines/vue-current.json"
       },
-      "props": [
-        {
-          "name": "column",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "placement",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "store",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "upDataColumn",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        }
-      ],
+      "props": [],
       "events": [],
       "contentRegions": [],
       "exposed": [],
@@ -19106,7 +19022,13 @@
         }
       ],
       "events": [],
-      "contentRegions": [],
+      "contentRegions": [
+        {
+          "name": "cell",
+          "scoped": true,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -19171,24 +19093,94 @@
       },
       "props": [
         {
-          "name": "tabs",
+          "name": "...componentMotionProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "activeName",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "addable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "beforeLeave",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "closable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "editable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "modelValue",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "stretch",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "tabPosition",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "type",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [],
-      "contentRegions": [],
-      "exposed": [
+      "events": [
         {
-          "name": "ref",
-          "signature": "vue-source"
+          "name": "[UPDATE_MODEL_EVENT]",
+          "payload": "vue-source"
         },
         {
-          "name": "update",
-          "signature": "vue-source"
+          "name": "edit",
+          "payload": "vue-source"
+        },
+        {
+          "name": "tabAdd",
+          "payload": "vue-source"
+        },
+        {
+          "name": "tabChange",
+          "payload": "vue-source"
+        },
+        {
+          "name": "tabClick",
+          "payload": "vue-source"
+        },
+        {
+          "name": "tabRemove",
+          "payload": "vue-source"
         }
       ],
+      "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19954,85 +19946,7 @@
       },
       "props": [
         {
-          "name": "...disabledTimeListsProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "arrowControl",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "cellClassName",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "clearIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "clearable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "dateFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "defaultTime",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "defaultValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabledDate",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "editable",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "endPlaceholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "format",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "id",
+          "name": "...timePickerDefaultProps",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -20042,155 +19956,11 @@
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
-        },
-        {
-          "name": "label",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "modelValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "name",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "placeholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperClass",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperOptions",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "prefixIcon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "rangeSeparator",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "readonly",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "shortcuts",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "size",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "startPlaceholder",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "tabindex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "timeFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "type",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "unlinkPanels",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "validateEvent",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "valueFormat",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
         }
       ],
       "events": [],
-      "contentRegions": [
-        {
-          "name": "default",
-          "scoped": true,
-          "required": false
-        },
-        {
-          "name": "range-separator",
-          "scoped": false,
-          "required": false
-        }
-      ],
-      "exposed": [
-        {
-          "name": "focus",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleBlurInput",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleClose",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleFocusInput",
-          "signature": "vue-source"
-        },
-        {
-          "name": "handleOpen",
-          "signature": "vue-source"
-        },
-        {
-          "name": "onPick",
-          "signature": "vue-source"
-        }
-      ],
+      "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20474,18 +20244,7 @@
         }
       ],
       "events": [],
-      "contentRegions": [
-        {
-          "name": "default",
-          "scoped": false,
-          "required": false
-        },
-        {
-          "name": "dot",
-          "scoped": false,
-          "required": false
-        }
-      ],
+      "contentRegions": [],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
@@ -20823,7 +20582,49 @@
           "required": false
         },
         {
-          "name": "...tooltipV2ArrowSpecialProps",
+          "name": "...tooltipV2ContentProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "...tooltipV2RootProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "...tooltipV2TriggerProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "alwaysOn",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "fullTransition",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "teleported",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "to",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "transitionProps",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -21427,37 +21228,85 @@
       },
       "props": [
         {
-          "name": "checked",
+          "name": "accordion",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "current",
+          "name": "checkOnClickNode",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "disabled",
+          "name": "checkStrictly",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "expanded",
+          "name": "currentNodeKey",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "hiddenExpandIcon",
+          "name": "data",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "indeterminate",
+          "name": "defaultCheckedKeys",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "defaultExpandedKeys",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "emptyText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "expandOnClickNode",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "filterMethod",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "height",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "highlightCurrent",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "indent",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -21469,7 +21318,13 @@
           "required": false
         },
         {
-          "name": "node",
+          "name": "perfMode",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "props",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -21483,20 +21338,101 @@
       ],
       "events": [
         {
-          "name": "check",
+          "name": "[CURRENT_CHANGE]",
           "payload": "vue-source"
         },
         {
-          "name": "click",
+          "name": "[NODE_CHECK]",
           "payload": "vue-source"
         },
         {
-          "name": "toggle",
+          "name": "[NODE_CHECK_CHANGE]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_CLICK]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_COLLAPSE]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_CONTEXTMENU]",
+          "payload": "vue-source"
+        },
+        {
+          "name": "[NODE_EXPAND]",
           "payload": "vue-source"
         }
       ],
       "contentRegions": [],
-      "exposed": [],
+      "exposed": [
+        {
+          "name": "collapseNode",
+          "signature": "vue-source"
+        },
+        {
+          "name": "expandNode",
+          "signature": "vue-source"
+        },
+        {
+          "name": "filter",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCheckedKeys",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCheckedNodes",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCurrentKey",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCurrentNode",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getHalfCheckedKeys",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getHalfCheckedNodes",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getNode",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setChecked",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setCheckedKeys",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setCurrentKey",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setData",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setExpandedKeys",
+          "signature": "vue-source"
+        },
+        {
+          "name": "toggleCheckbox",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -28069,7 +28005,13 @@
         }
       ],
       "events": [],
-      "contentRegions": [],
+      "contentRegions": [
+        {
+          "name": "cell",
+          "scoped": true,
+          "required": false
+        }
+      ],
       "exposed": [],
       "defaults": {
         "source": "vue-baseline",
