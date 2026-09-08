@@ -1,19 +1,19 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "b1fda1b69a3adf0c89a2df8c1eea0563671195b5",
+  "candidateSha": "13733ec19121cee98531f5149416a8cf34336434",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-b1fda1b69a3adf0c89a2df8c1eea0563671195b5",
+    "executionId": "conformance-v2-check-tag-798961cebb51b3fddc6ebb96b449f91ab3d6d816",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "ff27165acab23044aaf78029f369ff99c94d6c54eea7dff010715325539b793f",
-    "webBaselineHash": "6d43c3f504bbad092869c64456a4247eb4dd8be7648ed05bfda4cfc6ff303444",
-    "avaloniaBaselineHash": "355d8bdb7f42b5fef2e4a3bbdff0c1e51d557599a6bb4dcf96ee424bcd709b11",
-    "runnerHash": "d6561b070afc3d632835e779066970a4f669291add0efda428b855fd26332607"
+    "contractHash": "3a95ea8bc348692efc892f79344684e878ceb323cbbcaf68133f21a4355bcf19",
+    "webBaselineHash": "9ed701881a2d41873ffe41ffb17c5257c6d1f33119822205ba0ef700e5806ab1",
+    "avaloniaBaselineHash": "acc27f78f6b45cb3d2bd3efa5b56f0e1583ef350c49c683f4c4a5211c48de229",
+    "runnerHash": "5f8d30bc360781bde14400afc72c08c4e61601efced09f07910642ad8a23cff5"
   },
   "viewportStateMatrix": [
     {
@@ -28,12 +28,7 @@
       "locale": "zh-CN",
       "direction": "ltr",
       "motion": "reduced",
-      "inputModes": [
-        "pointer",
-        "keyboard",
-        "screen-reader",
-        "reduced-motion"
-      ],
+      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
       "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
     },
     {

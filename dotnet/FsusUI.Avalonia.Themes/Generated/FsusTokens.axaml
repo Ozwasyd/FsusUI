@@ -200,6 +200,19 @@
   <SolidColorBrush x:Key="FsusComponentStateSurfaceSelectedBackgroundBrush" Color="#0D2A599C" />
   <Color x:Key="FsusComponentStateSurfaceSelectedBackgroundDark">#1A4B79CC</Color>
   <SolidColorBrush x:Key="FsusComponentStateSurfaceSelectedBackgroundDarkBrush" Color="#1A4B79CC" />
+  <Color x:Key="FsusComponentAlertSuccessStripeColor">#166534</Color>
+  <SolidColorBrush x:Key="FsusComponentAlertSuccessStripeColorBrush" Color="#166534" />
+  <Color x:Key="FsusComponentAlertWarningStripeColor">#92400E</Color>
+  <SolidColorBrush x:Key="FsusComponentAlertWarningStripeColorBrush" Color="#92400E" />
+  <Color x:Key="FsusComponentAlertDangerStripeColor">#991B1B</Color>
+  <SolidColorBrush x:Key="FsusComponentAlertDangerStripeColorBrush" Color="#991B1B" />
+  <Color x:Key="FsusComponentProgressSuccessColor">#16A34A</Color>
+  <SolidColorBrush x:Key="FsusComponentProgressSuccessColorBrush" Color="#16A34A" />
+  <Color x:Key="FsusComponentProgressDangerColor">#DC2626</Color>
+  <SolidColorBrush x:Key="FsusComponentProgressDangerColorBrush" Color="#DC2626" />
+  <x:Double x:Key="FsusComponentProgressHeight">4</x:Double>
+  <CornerRadius x:Key="FsusComponentProgressRadius">2</CornerRadius>
+  <CornerRadius x:Key="FsusComponentSkeletonRadius">2</CornerRadius>
   <Color x:Key="FsusComponentStateSurfaceEmphasisBackground">#142A599C</Color>
   <SolidColorBrush x:Key="FsusComponentStateSurfaceEmphasisBackgroundBrush" Color="#142A599C" />
   <Color x:Key="FsusComponentStateSurfaceEmphasisBackgroundDark">#294B79CC</Color>

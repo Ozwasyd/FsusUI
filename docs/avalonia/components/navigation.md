@@ -11,8 +11,9 @@ Use `FsusTabs`, `FsusTabPane`, `FsusMenu`, `FsusMenuItem`, `FsusSubMenu`,
 `FsusNativeMenuItemModel`, `FsusNativeMenuBuilder`, `FsusNativeMenuOptions`,
 `FsusNativeMenuProfile`, `FsusNativeMenuSynthesizedRoots`,
 `FsusCommandPalette`, `FsusCommandPaletteProvider`,
-`FsusCommandPaletteResult`, `FsusCommandPaletteState`, and
-`FsusCommandPaletteFailureStage`.
+`FsusCommandPaletteResult`, `FsusCommandPaletteState`,
+`FsusCommandPaletteFailureStage`, and
+`FsusCommandPaletteInitialSelection`.
 
 Desktop editor shells use `FsusActivityRailShell`, `FsusDocumentTabs`, and
 `FsusNativeTitleBar`; their close, reorder, resize, overflow, window-state, and
@@ -115,7 +116,11 @@ Up and Down wrap across enabled results, Enter activates the selected result,
 and Escape dismisses the palette. Pointer press selects and activates the same
 result path. A result with children enters that group; `NavigateBackAsync` and
 the visible back control return one level. Selection is scrolled into view by
-the internal `FsusVirtualList` without moving focus away from search.
+the internal `FsusVirtualList` without moving focus away from search. The
+default `InitialSelection` selects the first enabled result for source
+compatibility; set it to `None` to open with no selection, so the first
+`Down` selects the first enabled command and `Enter` before that navigation
+does not activate anything.
 
 `BeginImeComposition`, `UpdateImeComposition`, and `CommitImeComposition`
 provide an explicit host bridge when a platform input adapter surfaces IME
@@ -124,7 +129,9 @@ commit updates `Query` once. The production text box remains the focused input
 for Avalonia's native IME path.
 
 The results surface exposes list/list-item automation roles, accessible names,
-help text, selected/disabled status, and position-in-set metadata. Search,
+help text, selected/disabled status, and position-in-set metadata.
+`ResultsAccessibleName` localizes the results-list name; the default remains
+`Command results`. Search,
 running, empty, and failure states are announced through the palette status.
 Successful sync or async execution raises `CommandExecuted` and dismisses the
 overlay; failure leaves it open. Closing by execution, Escape, or pointer

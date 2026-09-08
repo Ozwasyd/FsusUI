@@ -150,6 +150,14 @@ $fsus-component-state-surface-hover-background: #2A599C0E;
 $fsus-component-state-surface-hover-background-dark: #4B79CC1F;
 $fsus-component-state-surface-selected-background: #2A599C0D;
 $fsus-component-state-surface-selected-background-dark: #4B79CC1A;
+$fsus-component-alert-success-stripe-color: #166534;
+$fsus-component-alert-warning-stripe-color: #92400E;
+$fsus-component-alert-danger-stripe-color: #991B1B;
+$fsus-component-progress-success-color: #16A34A;
+$fsus-component-progress-danger-color: #DC2626;
+$fsus-component-progress-height: 4px;
+$fsus-component-progress-radius: 2px;
+$fsus-component-skeleton-radius: 2px;
 $fsus-component-state-surface-emphasis-background: #2A599C14;
 $fsus-component-state-surface-emphasis-background-dark: #4B79CC29;
 $fsus-component-state-surface-focus-border: #2A599C47;
@@ -272,6 +280,14 @@ $fsus-tokens: (
   'component.material.paper.saturate': 100%,
   'component-state.surface.hover.background': #2A599C0E,
   'component-state.surface.selected.background': #2A599C0D,
+  'component.alert.success.stripe.color': #166534,
+  'component.alert.warning.stripe.color': #92400E,
+  'component.alert.danger.stripe.color': #991B1B,
+  'component.progress.success.color': #16A34A,
+  'component.progress.danger.color': #DC2626,
+  'component.progress.height': 4px,
+  'component.progress.radius': 2px,
+  'component.skeleton.radius': 2px,
   'component-state.surface.emphasis.background': #2A599C14,
   'component-state.surface.focus.border': #2A599C47,
   'component-state.surface.invalid.border': #D92D20,

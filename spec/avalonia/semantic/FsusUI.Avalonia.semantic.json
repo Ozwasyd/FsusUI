@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "1a1f016b22fedb83c431886d3db260bd5e6e16bcfba4e46b6f95b0b13f7cb495",
+    "inputTreeHash": "54697e2a6e0358660afd94d9840ddb4874c985cae58ec520d057d9381c573ed9",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "6191bb4cb9abc9fbaa554140a7b1b3ae2d5bcd866b85c3fe9ccb9046b93bca3c"
+    "outputHash": "dfd681daeeb2102199a3da02a55583168dd6de84227948cc017df0b9a47f2249"
   },
   "semanticTypes": [
     {
@@ -10197,6 +10197,17 @@
           "deprecated": false
         },
         {
+          "name": "InitialSelection",
+          "type": "FsusUI.Avalonia.Controls.FsusCommandPaletteInitialSelection",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "IsBusy",
           "type": "System.Boolean",
           "nullable": false,
@@ -10268,6 +10279,17 @@
           "nullable": true,
           "canRead": true,
           "canWrite": false,
+          "isStatic": false,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ResultsAccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
           "isStatic": false,
           "required": false,
           "defaultKnown": false,
@@ -10420,6 +10442,15 @@
           "deprecated": false
         },
         {
+          "name": "InitialSelection",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusCommandPaletteInitialSelection",
+          "nullable": false,
+          "defaultKnown": true,
+          "defaultValue": "FirstEnabled",
+          "deprecated": false
+        },
+        {
           "name": "Providers",
           "kind": "styled",
           "type": "System.Collections.Generic.IEnumerable\u003CFsusUI.Avalonia.Controls.FsusCommandPaletteProvider\u003E",
@@ -10433,6 +10464,15 @@
           "type": "System.String",
           "nullable": true,
           "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ResultsAccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true,
+          "defaultKnown": true,
+          "defaultValue": "Command results",
           "deprecated": false
         },
         {
@@ -10968,6 +11008,31 @@
         },
         {
           "name": "Execution",
+          "value": 1,
+          "deprecated": false
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusCommandPaletteInitialSelection",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "deprecated": false,
+      "contentRegions": [],
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "FirstEnabled",
+          "value": 0,
+          "deprecated": false
+        },
+        {
+          "name": "None",
           "value": 1,
           "deprecated": false
         }
@@ -62656,6 +62721,72 @@
           "deprecated": false
         },
         {
+          "name": "ComponentAlertDangerStripeColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentAlertDangerStripeColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentAlertSuccessStripeColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentAlertSuccessStripeColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentAlertWarningStripeColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentAlertWarningStripeColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "ComponentButtonPaddingXThickness",
           "type": "Avalonia.Thickness",
           "nullable": false,
@@ -62856,6 +62987,83 @@
         {
           "name": "ComponentOverlayScrimColor",
           "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentProgressDangerColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentProgressDangerColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentProgressHeightDouble",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentProgressRadiusCornerRadius",
+          "type": "Avalonia.CornerRadius",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentProgressSuccessColorBrush",
+          "type": "Avalonia.Media.SolidColorBrush",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentProgressSuccessColorColor",
+          "type": "Avalonia.Media.Color",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
+          "name": "ComponentSkeletonRadiusCornerRadius",
+          "type": "Avalonia.CornerRadius",
           "nullable": false,
           "canRead": true,
           "canWrite": false,
@@ -65749,6 +65957,69 @@
         "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
       },
       {
+        "canonicalName": "component.alert.danger.stripe.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentAlertDangerStripeColor",
+          "FsusComponentAlertDangerStripeColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentAlertDangerStripeColorBrush",
+          "ComponentAlertDangerStripeColorBrushResourceKey",
+          "ComponentAlertDangerStripeColorColor",
+          "ComponentAlertDangerStripeColorName",
+          "ComponentAlertDangerStripeColorResourceKey",
+          "ComponentAlertDangerStripeColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.alert.success.stripe.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentAlertSuccessStripeColor",
+          "FsusComponentAlertSuccessStripeColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentAlertSuccessStripeColorBrush",
+          "ComponentAlertSuccessStripeColorBrushResourceKey",
+          "ComponentAlertSuccessStripeColorColor",
+          "ComponentAlertSuccessStripeColorName",
+          "ComponentAlertSuccessStripeColorResourceKey",
+          "ComponentAlertSuccessStripeColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.alert.warning.stripe.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentAlertWarningStripeColor",
+          "FsusComponentAlertWarningStripeColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentAlertWarningStripeColorBrush",
+          "ComponentAlertWarningStripeColorBrushResourceKey",
+          "ComponentAlertWarningStripeColorColor",
+          "ComponentAlertWarningStripeColorName",
+          "ComponentAlertWarningStripeColorResourceKey",
+          "ComponentAlertWarningStripeColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
         "canonicalName": "component.button.padding.x",
         "owner": "FsusUI component maintainers",
         "generatedOutputs": [
@@ -66045,6 +66316,102 @@
           "ComponentOverlayScrimName",
           "ComponentOverlayScrimResourceKey",
           "ComponentOverlayScrimValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.progress.danger.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentProgressDangerColor",
+          "FsusComponentProgressDangerColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentProgressDangerColorBrush",
+          "ComponentProgressDangerColorBrushResourceKey",
+          "ComponentProgressDangerColorColor",
+          "ComponentProgressDangerColorName",
+          "ComponentProgressDangerColorResourceKey",
+          "ComponentProgressDangerColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.progress.height",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentProgressHeight"
+        ],
+        "csharpMembers": [
+          "ComponentProgressHeightDouble",
+          "ComponentProgressHeightName",
+          "ComponentProgressHeightResourceKey",
+          "ComponentProgressHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.progress.radius",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentProgressRadius"
+        ],
+        "csharpMembers": [
+          "ComponentProgressRadiusCornerRadius",
+          "ComponentProgressRadiusName",
+          "ComponentProgressRadiusResourceKey",
+          "ComponentProgressRadiusValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.progress.success.color",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentProgressSuccessColor",
+          "FsusComponentProgressSuccessColorBrush"
+        ],
+        "csharpMembers": [
+          "ComponentProgressSuccessColorBrush",
+          "ComponentProgressSuccessColorBrushResourceKey",
+          "ComponentProgressSuccessColorColor",
+          "ComponentProgressSuccessColorName",
+          "ComponentProgressSuccessColorResourceKey",
+          "ComponentProgressSuccessColorValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.skeleton.radius",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentSkeletonRadius"
+        ],
+        "csharpMembers": [
+          "ComponentSkeletonRadiusCornerRadius",
+          "ComponentSkeletonRadiusName",
+          "ComponentSkeletonRadiusResourceKey",
+          "ComponentSkeletonRadiusValue"
         ],
         "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
       },

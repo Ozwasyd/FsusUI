@@ -64,6 +64,7 @@
     "FsusCommandPaletteExecutedEventArgs",
     "FsusCommandPaletteFailedEventArgs",
     "FsusCommandPaletteFailureStage",
+    "FsusCommandPaletteInitialSelection",
     "FsusCommandPaletteItem",
     "FsusCommandPaletteModel",
     "FsusCommandPaletteResult",

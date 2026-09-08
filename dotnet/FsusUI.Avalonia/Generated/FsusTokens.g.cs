@@ -726,6 +726,56 @@ public static class FsusTokens
     public static Color ComponentStateSurfaceSelectedBackgroundColor => Color.Parse(ComponentStateSurfaceSelectedBackgroundValue);
     public static SolidColorBrush ComponentStateSurfaceSelectedBackgroundBrush => new(ComponentStateSurfaceSelectedBackgroundColor);
 
+    public const string ComponentAlertSuccessStripeColorName = "component.alert.success.stripe.color";
+    public const string ComponentAlertSuccessStripeColorResourceKey = "FsusComponentAlertSuccessStripeColor";
+    public const string ComponentAlertSuccessStripeColorValue = "#166534";
+    public const string ComponentAlertSuccessStripeColorBrushResourceKey = "FsusComponentAlertSuccessStripeColorBrush";
+    public static Color ComponentAlertSuccessStripeColorColor => Color.Parse(ComponentAlertSuccessStripeColorValue);
+    public static SolidColorBrush ComponentAlertSuccessStripeColorBrush => new(ComponentAlertSuccessStripeColorColor);
+
+    public const string ComponentAlertWarningStripeColorName = "component.alert.warning.stripe.color";
+    public const string ComponentAlertWarningStripeColorResourceKey = "FsusComponentAlertWarningStripeColor";
+    public const string ComponentAlertWarningStripeColorValue = "#92400E";
+    public const string ComponentAlertWarningStripeColorBrushResourceKey = "FsusComponentAlertWarningStripeColorBrush";
+    public static Color ComponentAlertWarningStripeColorColor => Color.Parse(ComponentAlertWarningStripeColorValue);
+    public static SolidColorBrush ComponentAlertWarningStripeColorBrush => new(ComponentAlertWarningStripeColorColor);
+
+    public const string ComponentAlertDangerStripeColorName = "component.alert.danger.stripe.color";
+    public const string ComponentAlertDangerStripeColorResourceKey = "FsusComponentAlertDangerStripeColor";
+    public const string ComponentAlertDangerStripeColorValue = "#991B1B";
+    public const string ComponentAlertDangerStripeColorBrushResourceKey = "FsusComponentAlertDangerStripeColorBrush";
+    public static Color ComponentAlertDangerStripeColorColor => Color.Parse(ComponentAlertDangerStripeColorValue);
+    public static SolidColorBrush ComponentAlertDangerStripeColorBrush => new(ComponentAlertDangerStripeColorColor);
+
+    public const string ComponentProgressSuccessColorName = "component.progress.success.color";
+    public const string ComponentProgressSuccessColorResourceKey = "FsusComponentProgressSuccessColor";
+    public const string ComponentProgressSuccessColorValue = "#16A34A";
+    public const string ComponentProgressSuccessColorBrushResourceKey = "FsusComponentProgressSuccessColorBrush";
+    public static Color ComponentProgressSuccessColorColor => Color.Parse(ComponentProgressSuccessColorValue);
+    public static SolidColorBrush ComponentProgressSuccessColorBrush => new(ComponentProgressSuccessColorColor);
+
+    public const string ComponentProgressDangerColorName = "component.progress.danger.color";
+    public const string ComponentProgressDangerColorResourceKey = "FsusComponentProgressDangerColor";
+    public const string ComponentProgressDangerColorValue = "#DC2626";
+    public const string ComponentProgressDangerColorBrushResourceKey = "FsusComponentProgressDangerColorBrush";
+    public static Color ComponentProgressDangerColorColor => Color.Parse(ComponentProgressDangerColorValue);
+    public static SolidColorBrush ComponentProgressDangerColorBrush => new(ComponentProgressDangerColorColor);
+
+    public const string ComponentProgressHeightName = "component.progress.height";
+    public const string ComponentProgressHeightResourceKey = "FsusComponentProgressHeight";
+    public const string ComponentProgressHeightValue = "4px";
+    public static double ComponentProgressHeightDouble => 4d;
+
+    public const string ComponentProgressRadiusName = "component.progress.radius";
+    public const string ComponentProgressRadiusResourceKey = "FsusComponentProgressRadius";
+    public const string ComponentProgressRadiusValue = "2px";
+    public static CornerRadius ComponentProgressRadiusCornerRadius => new(2d);
+
+    public const string ComponentSkeletonRadiusName = "component.skeleton.radius";
+    public const string ComponentSkeletonRadiusResourceKey = "FsusComponentSkeletonRadius";
+    public const string ComponentSkeletonRadiusValue = "2px";
+    public static CornerRadius ComponentSkeletonRadiusCornerRadius => new(2d);
+
     public const string ComponentStateSurfaceEmphasisBackgroundName = "component-state.surface.emphasis.background";
     public const string ComponentStateSurfaceEmphasisBackgroundResourceKey = "FsusComponentStateSurfaceEmphasisBackground";
     public const string ComponentStateSurfaceEmphasisBackgroundValue = "#142A599C";

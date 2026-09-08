@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "issue": 815,
+  "generatedBy": "FsusCommandPaletteHeadlessTests.RealHeadlessSkiaRenderProducesIssue815SelectionEvidenceMatrix",
+  "fixtureClass": "production",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "avaloniaVersion": "12.0.4.0"
+  },
+  "simulation": "Local deterministic Headless Skia simulation; no external hardware, screen reader, or CI service is represented.",
+  "captures": [
+    {
+      "file": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-default-first-enabled-selection.png",
+      "sha256": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc",
+      "automationFile": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-default-first-enabled-selection-automation.json",
+      "automationSha256": "36f850aa83c68531e0c84d4442dc68197f8fa2b4415e514960b9cdff1c2da875",
+      "pixelSize": {
+        "width": 900,
+        "height": 620
+      },
+      "scenario": "default-first-enabled-selection",
+      "theme": "light",
+      "widthDip": 900,
+      "heightDip": 620,
+      "initialSelection": "FirstEnabled",
+      "resultsAccessibleName": "Command results",
+      "resultCount": 2,
+      "selectedIndex": 1,
+      "selectedCommandId": "file.open"
+    },
+    {
+      "file": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-initial-selection-localized-name.png",
+      "sha256": "76dd302c51c7791aefa2b83297858e3dda0df2266f4330e306d0ca1aa4536eec",
+      "automationFile": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-initial-selection-localized-name-automation.json",
+      "automationSha256": "df3124191bef32d806022f882ac3fcb1a2f1c8a76001f5b0656429b464a00ca2",
+      "pixelSize": {
+        "width": 900,
+        "height": 620
+      },
+      "scenario": "none-initial-selection-localized-name",
+      "theme": "light",
+      "widthDip": 900,
+      "heightDip": 620,
+      "initialSelection": "None",
+      "resultsAccessibleName": "Available commands",
+      "resultCount": 2,
+      "selectedIndex": -1,
+      "selectedCommandId": ""
+    },
+    {
+      "file": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-selection-keyboard-path.png",
+      "sha256": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc",
+      "automationFile": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-selection-keyboard-path-automation.json",
+      "automationSha256": "62c7a239c503c91a8d1aea4467d6aa6bead954e803906bcc70ad2ee9214b2f07",
+      "pixelSize": {
+        "width": 900,
+        "height": 620
+      },
+      "scenario": "none-selection-keyboard-path",
+      "theme": "light",
+      "widthDip": 900,
+      "heightDip": 620,
+      "initialSelection": "None",
+      "resultsAccessibleName": "Available commands",
+      "resultCount": 2,
+      "selectedIndex": 1,
+      "selectedCommandId": "file.open"
+    }
+  ]
+}
