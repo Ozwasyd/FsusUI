@@ -1,0 +1,216 @@
+{
+  "schema": "fsusui-independent-ux-review.v1",
+  "issue": 814,
+  "candidateSha": "161d995d00b879880a11baa05befd64cc303a11a",
+  "candidateDigest": "188ba9085980e0e6453cbfb733738e2c3f0718f2d5f928cc038feb11da8463af",
+  "reviewMode": "read-only-rendered-evidence-inspection",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "identity": {
+    "executionId": "issue-814-shell-action-icons-161d995d00b879880a11baa05befd64cc303a11a",
+    "generatedBy": "FsusShellActionIconHeadlessTests.RenderedShellActionsProduceIssue814ThemeAndSizeEvidence",
+    "contract": "Avalonia stable shell action icon keys and generated StreamGeometry resources",
+    "renderer": "Avalonia Headless Skia 12.0.4 on Linux x64",
+    "candidateDigestAlgorithm": "sha256(canonical-json({candidateSha,<candidate file sha256 digests>}))",
+    "candidateDigestInputs": {
+      "spec/icons/registry.yaml": "fd8fa84e3e87d1621990351eb3f2600061c25a4b362930578d5f4bd354014e86",
+      "generated/icons.hash.json": "9a580f7b414fcce8452328fa356a66939898a8dcec4bd1963bc4b39350f3de5f",
+      "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json": "64709523884bf29777b55fefc3cf953799bccbe376f15b9abe8bd324d960bc42",
+      "spec/baselines/vue-current.json": "712e38de6bb677474cfdd0cf2f2b8a1f960577f39b4d305cee2a8f43d652e9f2",
+      "spec/components/contracts/v2/contract-v2.json": "2872b77da1c04ea3aceacd8bccea629c4627c215ca5479a483f6af573f9d3033",
+      "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-action-render-manifest.json": "d6e76d7adc98c7bb398a8927684b0265d3a22faffc7f1c4432902642d27583ac"
+    }
+  },
+  "viewportStateMatrix": [
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 560,
+        "height": 180
+      },
+      "state": "16dip-shell-actions",
+      "theme": "light",
+      "density": "default",
+      "locale": "en-US",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "6b78ef84741efc8743ca4ee75d63d4af3379b6be430c6e1495b610bcc18346e8"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 560,
+        "height": 180
+      },
+      "state": "16dip-shell-actions",
+      "theme": "dark",
+      "density": "default",
+      "locale": "en-US",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "ea24ba196d5efbf6ed454a882867eed165821d83fdb43ecff4b1574d6d0f2048"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 560,
+        "height": 180
+      },
+      "state": "16dip-shell-actions",
+      "theme": "high-contrast",
+      "density": "default",
+      "locale": "en-US",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "5d87047af5edcef50258bf713d91cbee0fccd1ea2062461f05725c667640acb2"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 560,
+        "height": 180
+      },
+      "state": "20dip-shell-actions",
+      "theme": "light",
+      "density": "default",
+      "locale": "en-US",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "c9614ac0132bd65cbda532df1388a405c9bff34b6711cd740ecc31a9f923c3c4"
+    },
+    {
+      "platform": "avalonia",
+      "viewport": {
+        "width": 560,
+        "height": 180
+      },
+      "state": "24dip-shell-actions",
+      "theme": "light",
+      "density": "default",
+      "locale": "en-US",
+      "direction": "ltr",
+      "motion": "reduced",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "303d4567aa263bf2bf162143fdbee7def663238e3b2bdcfa7074c16ff7597f30"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "shell-actions-light-16",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-16.png",
+      "digest": "6b78ef84741efc8743ca4ee75d63d4af3379b6be430c6e1495b610bcc18346e8",
+      "bytes": 2756,
+      "width": 560,
+      "height": 180,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "shell-actions-dark-16",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-dark-16.png",
+      "digest": "ea24ba196d5efbf6ed454a882867eed165821d83fdb43ecff4b1574d6d0f2048",
+      "bytes": 2474,
+      "width": 560,
+      "height": 180,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "shell-actions-high-contrast-16",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-high-contrast-16.png",
+      "digest": "5d87047af5edcef50258bf713d91cbee0fccd1ea2062461f05725c667640acb2",
+      "bytes": 2327,
+      "width": 560,
+      "height": 180,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "shell-actions-light-20",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-20.png",
+      "digest": "c9614ac0132bd65cbda532df1388a405c9bff34b6711cd740ecc31a9f923c3c4",
+      "bytes": 3172,
+      "width": 560,
+      "height": 180,
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "shell-actions-light-24",
+      "platform": "avalonia",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-24.png",
+      "digest": "303d4567aa263bf2bf162143fdbee7def663238e3b2bdcfa7074c16ff7597f30",
+      "bytes": 3451,
+      "width": 560,
+      "height": 180,
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "governedCriteria": [
+    {
+      "id": "stable-semantic-key-set",
+      "status": "accepted",
+      "observation": "All five requested semantic keys resolve to non-empty generated StreamGeometry resources: FsusIconAddDocument, FsusIconApplicationMenu, FsusIconClose, FsusIconRefreshReplace, and FsusIconSearchFilter."
+    },
+    {
+      "id": "theme-aware-current-foreground",
+      "status": "accepted",
+      "observation": "The 16 DIP light, dark, and high-contrast renders show all five glyphs with visible geometry and measured foreground-match ratios above the production test threshold; visual inspection found no inversion, empty geometry, or clipping."
+    },
+    {
+      "id": "documented-16-20-24-dip-usage",
+      "status": "accepted",
+      "observation": "Separate production renders at actual 16, 20, and 24 DIP sizes are present. Each size preserves recognizable geometry and consistent centering without relying on text-glyph fallbacks."
+    },
+    {
+      "id": "existing-catalog-regression-preserved",
+      "status": "accepted",
+      "observation": "The existing FsusIconCatalogHeadlessTests.cs is byte-for-byte unchanged from the active baseline, including its full-catalog and high-contrast regression coverage; issue 814 adds a separate focused headless test instead."
+    },
+    {
+      "id": "frozen-evidence-and-checker-boundary-preserved",
+      "status": "accepted",
+      "observation": "Issue 285 frozen CheckTag receipts and scripts/conformance-v2-evidence.mjs are byte-for-byte unchanged from the active baseline. Issue 814 establishes its own classification, independent review, and acceptance receipt."
+    },
+    {
+      "id": "current-main-baseline-preserved",
+      "status": "accepted",
+      "observation": "spec/baselines/vue-current.json and docs/avalonia/vue-public-api-baseline.md retain the active main baseline commitSha 5b0333a402cb848f6c612eb804c0f2fcfacd4d16; only hashes affected by the new icon catalog are refreshed."
+    }
+  ],
+  "observations": [
+    "Read-only visual inspection of the five 560x180 Skia screenshots found all requested icons centered, legible, and unclipped in light, dark, high-contrast, 20 DIP, and 24 DIP evidence.",
+    "The production render manifest records per-icon non-background and foreground-match ratios for every screenshot; every measurement remains above the focused test threshold.",
+    "The acceptance evidence is issue-specific and does not inherit or rewrite facts from Issue 285 or any other frozen task."
+  ],
+  "limitations": [
+    "The uploaded offline dependency set does not contain every Windows, macOS, and WASM native package required to restore the full Avalonia HeadlessTests project, so the focused Linux x64 Skia evidence was run through a local harness that compiles the new test source against production assemblies without downloading dependencies.",
+    "No Docker, physical display, native Windows/macOS rendering, or physical assistive-technology certification was performed."
+  ],
+  "blockers": [],
+  "status": "accepted"
+}

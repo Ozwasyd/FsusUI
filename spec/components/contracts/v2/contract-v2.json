@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "9ed701881a2d41873ffe41ffb17c5257c6d1f33119822205ba0ef700e5806ab1",
+      "hash": "712e38de6bb677474cfdd0cf2f2b8a1f960577f39b4d305cee2a8f43d652e9f2",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -25,7 +25,7 @@
     },
     "avaloniaIcons": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json",
-      "hash": "b6c8b6f2d9c0d160d6811771f173ebff66a7ce7f36c1ff14a7a83dd809a30dac",
+      "hash": "64709523884bf29777b55fefc3cf953799bccbe376f15b9abe8bd324d960bc42",
       "packageId": "FsusUI.Avalonia.Icons"
     },
     "markdownEditorGate": {

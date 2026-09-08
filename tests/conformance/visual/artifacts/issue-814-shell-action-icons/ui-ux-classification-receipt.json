@@ -1,0 +1,127 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "Avalonia generated shell action icon resources",
+    "Avalonia desktop shell action icon documentation and generated catalog metadata"
+  ],
+  "uiDecisionClass": "prescribed",
+  "verificationClass": "ux-local",
+  "requiredAuthorities": [
+    {
+      "id": "index",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "design",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "design-governance",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "change-classification",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "visual-change",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "consumer",
+      "path": "docs/consumers/design-integration.md",
+      "digest": "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b"
+    },
+    {
+      "id": "icons",
+      "path": "docs/icons.md",
+      "digest": "07727b06932d8aae37b6d1ad425d6ed2a3230713580d20eddbbafd6e82b8bff6"
+    },
+    {
+      "id": "icon-registry",
+      "path": "spec/icons/README.md",
+      "digest": "f399b6f8e2d13bd40dfeaea0b207c24e4f09299303df13559f3c9f1de7d1e0fe"
+    },
+    {
+      "id": "avalonia",
+      "path": "docs/avalonia/README.md",
+      "digest": "49a65565a1322edad16d9e2c95df67f8f403f7b874e170de7ce3f892159b0d27"
+    },
+    {
+      "id": "avalonia-icon-text",
+      "path": "docs/avalonia/components/icon-text.md",
+      "digest": "c62ce65cf1c3fcbf77c8fc271c52c5471ebab7ad37d57c75c6551816d448e5a7"
+    },
+    {
+      "id": "accessibility",
+      "path": "spec/accessibility/README.md",
+      "digest": "8e2d22844842afd676d2d625c2d10b903ce3969aec27e014c3c85bef455c0c7e"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "3202a49cd2584d6113c434e9fdec1281209cb0fc",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "0dc83998ce303b89e2d2c380ffd8bd6a018e1946d7804d50acbee7cf164fa732",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "161d995d00b879880a11baa05befd64cc303a11a",
+  "candidateDigest": "188ba9085980e0e6453cbfb733738e2c3f0718f2d5f928cc038feb11da8463af",
+  "stateEvidenceMatrix": [
+    {
+      "state": "shell-actions-16dip",
+      "viewport": "avalonia-headless 560x180",
+      "theme": "light",
+      "evidenceDigest": "6b78ef84741efc8743ca4ee75d63d4af3379b6be430c6e1495b610bcc18346e8"
+    },
+    {
+      "state": "shell-actions-16dip",
+      "viewport": "avalonia-headless 560x180",
+      "theme": "dark",
+      "evidenceDigest": "ea24ba196d5efbf6ed454a882867eed165821d83fdb43ecff4b1574d6d0f2048"
+    },
+    {
+      "state": "shell-actions-16dip-high-contrast",
+      "viewport": "avalonia-headless 560x180",
+      "theme": "not-applicable",
+      "evidenceDigest": "5d87047af5edcef50258bf713d91cbee0fccd1ea2062461f05725c667640acb2"
+    },
+    {
+      "state": "shell-actions-20dip",
+      "viewport": "avalonia-headless 560x180",
+      "theme": "light",
+      "evidenceDigest": "c9614ac0132bd65cbda532df1388a405c9bff34b6711cd740ecc31a9f923c3c4"
+    },
+    {
+      "state": "shell-actions-24dip",
+      "viewport": "avalonia-headless 560x180",
+      "theme": "light",
+      "evidenceDigest": "303d4567aa263bf2bf162143fdbee7def663238e3b2bdcfa7074c16ff7597f30"
+    }
+  ],
+  "inScope": [
+    "stable generated keys for add-document, application-menu, close, refresh-replace, and search-filter shell actions",
+    "theme-aware current-foreground vector rendering in light, dark, and high-contrast themes",
+    "documented 16, 20, and 24 DIP usage with independent issue-specific rendered evidence",
+    "source-compatible generated icon registry and Avalonia public surface updates"
+  ],
+  "outOfScope": [
+    "rewriting frozen acceptance evidence from unrelated issues",
+    "weakening conformance scripts, checkers, baselines, or thresholds",
+    "replacing the existing full icon-catalog regression and high-contrast tests",
+    "consumer application business logic, filesystem behavior, or physical assistive-technology certification"
+  ],
+  "classificationEvidenceDigest": "369b64ac0f38f882dd4ada8f6a96a659121f3fd5543935eaf23d24aef75a3a64",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "0f6ae8019c50248be166f770fca1ecc00ad4769720c2138b000c5f329b9f8276"
+}

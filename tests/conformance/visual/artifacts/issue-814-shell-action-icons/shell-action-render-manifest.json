@@ -1,0 +1,182 @@
+[
+  {
+    "Name": "shell-actions-light-16",
+    "File": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-16.png",
+    "Sha256": "6b78ef84741efc8743ca4ee75d63d4af3379b6be430c6e1495b610bcc18346e8",
+    "PixelWidth": 560,
+    "PixelHeight": 180,
+    "IconSize": 16,
+    "HighContrast": false,
+    "Icons": [
+      {
+        "IconKey": "FsusIconAddDocument",
+        "NonBackgroundRatio": 0.716263,
+        "ForegroundMatchRatio": 0.705314
+      },
+      {
+        "IconKey": "FsusIconApplicationMenu",
+        "NonBackgroundRatio": 1,
+        "ForegroundMatchRatio": 0.747405
+      },
+      {
+        "IconKey": "FsusIconClose",
+        "NonBackgroundRatio": 0.653979,
+        "ForegroundMatchRatio": 0.465608
+      },
+      {
+        "IconKey": "FsusIconRefreshReplace",
+        "NonBackgroundRatio": 0.602076,
+        "ForegroundMatchRatio": 0.603448
+      },
+      {
+        "IconKey": "FsusIconSearchFilter",
+        "NonBackgroundRatio": 0.553633,
+        "ForegroundMatchRatio": 0.625
+      }
+    ]
+  },
+  {
+    "Name": "shell-actions-dark-16",
+    "File": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-dark-16.png",
+    "Sha256": "ea24ba196d5efbf6ed454a882867eed165821d83fdb43ecff4b1574d6d0f2048",
+    "PixelWidth": 560,
+    "PixelHeight": 180,
+    "IconSize": 16,
+    "HighContrast": false,
+    "Icons": [
+      {
+        "IconKey": "FsusIconAddDocument",
+        "NonBackgroundRatio": 0.716263,
+        "ForegroundMatchRatio": 0.705314
+      },
+      {
+        "IconKey": "FsusIconApplicationMenu",
+        "NonBackgroundRatio": 1,
+        "ForegroundMatchRatio": 0.747405
+      },
+      {
+        "IconKey": "FsusIconClose",
+        "NonBackgroundRatio": 0.653979,
+        "ForegroundMatchRatio": 0.465608
+      },
+      {
+        "IconKey": "FsusIconRefreshReplace",
+        "NonBackgroundRatio": 0.602076,
+        "ForegroundMatchRatio": 0.603448
+      },
+      {
+        "IconKey": "FsusIconSearchFilter",
+        "NonBackgroundRatio": 0.553633,
+        "ForegroundMatchRatio": 0.625
+      }
+    ]
+  },
+  {
+    "Name": "shell-actions-high-contrast-16",
+    "File": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-high-contrast-16.png",
+    "Sha256": "5d87047af5edcef50258bf713d91cbee0fccd1ea2062461f05725c667640acb2",
+    "PixelWidth": 560,
+    "PixelHeight": 180,
+    "IconSize": 16,
+    "HighContrast": true,
+    "Icons": [
+      {
+        "IconKey": "FsusIconAddDocument",
+        "NonBackgroundRatio": 0.716263,
+        "ForegroundMatchRatio": 0.705314
+      },
+      {
+        "IconKey": "FsusIconApplicationMenu",
+        "NonBackgroundRatio": 1,
+        "ForegroundMatchRatio": 0.747405
+      },
+      {
+        "IconKey": "FsusIconClose",
+        "NonBackgroundRatio": 0.653979,
+        "ForegroundMatchRatio": 0.465608
+      },
+      {
+        "IconKey": "FsusIconRefreshReplace",
+        "NonBackgroundRatio": 0.602076,
+        "ForegroundMatchRatio": 0.603448
+      },
+      {
+        "IconKey": "FsusIconSearchFilter",
+        "NonBackgroundRatio": 0.553633,
+        "ForegroundMatchRatio": 0.625
+      }
+    ]
+  },
+  {
+    "Name": "shell-actions-light-20",
+    "File": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-20.png",
+    "Sha256": "c9614ac0132bd65cbda532df1388a405c9bff34b6711cd740ecc31a9f923c3c4",
+    "PixelWidth": 560,
+    "PixelHeight": 180,
+    "IconSize": 20,
+    "HighContrast": false,
+    "Icons": [
+      {
+        "IconKey": "FsusIconAddDocument",
+        "NonBackgroundRatio": 0.673469,
+        "ForegroundMatchRatio": 0.727273
+      },
+      {
+        "IconKey": "FsusIconApplicationMenu",
+        "NonBackgroundRatio": 0.963719,
+        "ForegroundMatchRatio": 0.818824
+      },
+      {
+        "IconKey": "FsusIconClose",
+        "NonBackgroundRatio": 0.555556,
+        "ForegroundMatchRatio": 0.718367
+      },
+      {
+        "IconKey": "FsusIconRefreshReplace",
+        "NonBackgroundRatio": 0.54195,
+        "ForegroundMatchRatio": 0.669456
+      },
+      {
+        "IconKey": "FsusIconSearchFilter",
+        "NonBackgroundRatio": 0.505669,
+        "ForegroundMatchRatio": 0.686099
+      }
+    ]
+  },
+  {
+    "Name": "shell-actions-light-24",
+    "File": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-24.png",
+    "Sha256": "303d4567aa263bf2bf162143fdbee7def663238e3b2bdcfa7074c16ff7597f30",
+    "PixelWidth": 560,
+    "PixelHeight": 180,
+    "IconSize": 24,
+    "HighContrast": false,
+    "Icons": [
+      {
+        "IconKey": "FsusIconAddDocument",
+        "NonBackgroundRatio": 0.616,
+        "ForegroundMatchRatio": 0.696104
+      },
+      {
+        "IconKey": "FsusIconApplicationMenu",
+        "NonBackgroundRatio": 0.8464,
+        "ForegroundMatchRatio": 0.877127
+      },
+      {
+        "IconKey": "FsusIconClose",
+        "NonBackgroundRatio": 0.4816,
+        "ForegroundMatchRatio": 0.72093
+      },
+      {
+        "IconKey": "FsusIconRefreshReplace",
+        "NonBackgroundRatio": 0.4944,
+        "ForegroundMatchRatio": 0.71521
+      },
+      {
+        "IconKey": "FsusIconSearchFilter",
+        "NonBackgroundRatio": 0.4544,
+        "ForegroundMatchRatio": 0.683099
+      }
+    ]
+  }
+]
