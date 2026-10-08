@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "baseRef": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "headRef": "HEAD",
+  "group": "pr",
+  "registryHash": "5666d3d139e25ac93cae2b2d63b7f2f11f626b9cd0de5947c4fa1167f8ad638a",
+  "generatedAt": "2026-10-08T15:12:18.283Z",
+  "changedFiles": [
+    ".changeset/select-v2-focus-accessibility.md",
+    "vue/packages/components/select-v2/__tests__/select.test.ts",
+    "vue/packages/components/select-v2/src/option-item.vue",
+    "vue/packages/components/select-v2/src/select-dropdown.tsx",
+    "vue/packages/components/select-v2/src/select.vue",
+    "vue/packages/components/select-v2/src/useSelect.ts"
+  ],
+  "decisions": [
+    {
+      "suiteId": "view-transitions",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more",
+      "cells": [
+        "view-transitions/chromium",
+        "view-transitions/firefox",
+        "view-transitions/webkit"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "motion-ssr",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more",
+      "cells": [
+        "motion-ssr/chromium"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "dom-layout",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more",
+      "cells": [
+        "dom-layout/desktop-light",
+        "dom-layout/mobile-light",
+        "dom-layout/desktop-dark",
+        "dom-layout/mobile-dark"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "geometry-smoke",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more",
+      "cells": [
+        "geometry-smoke/chromium"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "markdown-editor-interaction",
+      "decision": "skip",
+      "reasonCode": "no-relevant-change",
+      "reason": "no relevant source or test change",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "visual-boundary-audit",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more",
+      "cells": [
+        "visual-boundary-audit/desktop-light",
+        "visual-boundary-audit/mobile-light",
+        "visual-boundary-audit/tiny-light",
+        "visual-boundary-audit/desktop-dark",
+        "visual-boundary-audit/mobile-dark",
+        "visual-boundary-audit/tiny-dark",
+        "visual-boundary-audit/safe-area-chromium",
+        "visual-boundary-audit/safe-area-webkit"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "web-interaction-conformance",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more",
+      "cells": [
+        "web-interaction-conformance/chromium",
+        "web-interaction-conformance/firefox",
+        "web-interaction-conformance/webkit"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "visual-runtime-reuse",
+      "decision": "skip",
+      "reasonCode": "no-relevant-change",
+      "reason": "no relevant source or test change",
+      "cells": [],
+      "matchedRoots": []
+    }
+  ],
+  "planDigest": "55a8f24529e6df83f442ed36fd10bf9170a17c41f57765eba39ea053e3efefbd"
+}

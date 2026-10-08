@@ -1,0 +1,42 @@
+[
+  {
+    "name": "repair-identity-tests",
+    "args": [
+      "node",
+      "--test",
+      "tests/conformance-playwright-identity.test.mjs"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "repair-lint",
+    "args": [
+      "pnpm",
+      "exec",
+      "eslint",
+      "--config",
+      "vue/eslint.config.mjs",
+      "scripts/conformance-playwright-owner-run.mjs",
+      "scripts/conformance-playwright-runner.mjs",
+      "scripts/markdown-playwright-runner.mjs",
+      "tests/conformance-playwright-identity.test.mjs"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "repair-conformance-policy",
+    "args": [
+      "node",
+      "scripts/check-playwright-conformance-owner-policy.mjs"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "repair-markdown-policy",
+    "args": [
+      "node",
+      "scripts/check-playwright-markdown-owner-policy.mjs"
+    ],
+    "exitCode": 0
+  }
+]

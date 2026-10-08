@@ -1,0 +1,50 @@
+{"conclusion":"failure","id":113384930697,"name":"pr-feedback","status":"completed"}
+{"conclusion":"failure","id":113384930826,"name":"premerge-main / dotnet-package","status":"completed"}
+{"conclusion":"success","id":113384930872,"name":"premerge-main / build-package","status":"completed"}
+{"conclusion":"failure","id":113384930921,"name":"premerge-main / real-render-performance","status":"completed"}
+{"conclusion":"failure","id":113384930932,"name":"premerge-main / static-quality","status":"completed"}
+{"conclusion":"success","id":113384930948,"name":"pr-real-render-performance","status":"completed"}
+{"conclusion":"success","id":113384930958,"name":"premerge-main / capacity","status":"completed"}
+{"conclusion":"success","id":113384931012,"name":"premerge-playwright / playwright-pr-impact-plan","status":"completed"}
+{"conclusion":"failure","id":113384931043,"name":"premerge-main / dotnet-platform (macos, macos-latest)","status":"completed"}
+{"conclusion":"failure","id":113384931046,"name":"premerge-main / visual","status":"completed"}
+{"conclusion":"success","id":113384931082,"name":"pr-avalonia-aot-plan","status":"completed"}
+{"conclusion":"failure","id":113384931084,"name":"premerge-main / dotnet-platform (windows, windows-latest)","status":"completed"}
+{"conclusion":"success","id":113384931105,"name":"premerge-main / unit-artifacts","status":"completed"}
+{"conclusion":"failure","id":113384931201,"name":"premerge-main / dotnet-platform (linux, ubuntu-latest)","status":"completed"}
+{"conclusion":"success","id":113384931211,"name":"premerge-main / coverage-plan","status":"completed"}
+{"conclusion":"success","id":113384931229,"name":"premerge-main / build-demo","status":"completed"}
+{"conclusion":"success","id":113384931284,"name":"premerge-main / typecheck","status":"completed"}
+{"conclusion":"skipped","id":113384932672,"name":"main-playwright","status":"completed"}
+{"conclusion":"skipped","id":113384932957,"name":"release-playwright","status":"completed"}
+{"conclusion":"skipped","id":113384934379,"name":"release","status":"completed"}
+{"conclusion":"skipped","id":113384934729,"name":"nightly","status":"completed"}
+{"conclusion":"skipped","id":113384935268,"name":"main","status":"completed"}
+{"conclusion":"skipped","id":113384975491,"name":"nightly-playwright","status":"completed"}
+{"conclusion":"skipped","id":113385095064,"name":"pr-avalonia-aot-candidate","status":"completed"}
+{"conclusion":"skipped","id":113385095895,"name":"pr-avalonia-aot","status":"completed"}
+{"conclusion":"success","id":113385109611,"name":"premerge-main / coverage-shard (3, 3, 3/3, 1)","status":"completed"}
+{"conclusion":"success","id":113385109715,"name":"premerge-main / coverage-shard (1, 3, 1/3, 1)","status":"completed"}
+{"conclusion":"failure","id":113385109820,"name":"premerge-main / coverage-shard (2, 3, 2/3, 1)","status":"completed"}
+{"conclusion":"skipped","id":113385111983,"name":"premerge-main / coverage-single","status":"completed"}
+{"conclusion":"success","id":113385195203,"name":"premerge-playwright / playwright-boundary","status":"completed"}
+{"conclusion":"failure","id":113385195237,"name":"premerge-playwright / playwright-conformance","status":"completed"}
+{"conclusion":"success","id":113385195265,"name":"premerge-playwright / playwright-motion","status":"completed"}
+{"conclusion":"success","id":113385195330,"name":"premerge-playwright / playwright-markdown","status":"completed"}
+{"conclusion":"success","id":113385195349,"name":"premerge-playwright / playwright-layout","status":"completed"}
+{"conclusion":"success","id":113385195352,"name":"premerge-playwright / visual-runtime-reuse","status":"completed"}
+{"conclusion":"success","id":113385443172,"name":"premerge-main / unit (1/3, 1)","status":"completed"}
+{"conclusion":"success","id":113385443195,"name":"premerge-main / unit (2/3, 1)","status":"completed"}
+{"conclusion":"success","id":113385443215,"name":"premerge-main / unit (3/3, 1)","status":"completed"}
+{"conclusion":"failure","id":113385517540,"name":"premerge-main / avalonia-aot","status":"completed"}
+{"conclusion":"skipped","id":113385519379,"name":"premerge-main / avalonia-aot-linux","status":"completed"}
+{"conclusion":"failure","id":113387230489,"name":"premerge-playwright / playwright-pr-readiness","status":"completed"}
+{"conclusion":"skipped","id":113387566612,"name":"premerge-main / consumer-install","status":"completed"}
+{"conclusion":"failure","id":113387569430,"name":"premerge-main / coverage","status":"completed"}
+{"conclusion":"skipped","id":113387570416,"name":"premerge-main / coverage-merge","status":"completed"}
+{"conclusion":"failure","id":113390169480,"name":"premerge-main / stable-readiness","status":"completed"}
+{"conclusion":"failure","id":113390255149,"name":"pr-fast","status":"completed"}
+{"conclusion":"skipped","id":113390255719,"name":"premerge-main / nightly-readiness","status":"completed"}
+{"conclusion":"skipped","id":113390256885,"name":"premerge-main / release-readiness","status":"completed"}
+{"conclusion":"skipped","id":113390257297,"name":"pr-real-render-performance","status":"completed"}
+{"conclusion":"skipped","id":113390257468,"name":"pr-fast","status":"completed"}

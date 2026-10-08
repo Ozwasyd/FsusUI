@@ -1,0 +1,21 @@
+{
+  "checkout": "/tmp/issue825-861-shallow-vkd3b84c",
+  "actualSha": "e36ce622a4a99fa21ab0f85fa2170499c2d3bd70",
+  "remoteRefs": "",
+  "results": [
+    {
+      "name": "unchanged-shallow-negative",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "fatal: Not a valid object name origin/main\nnode:internal/errors:985\n  const err = new Error(message);\n              ^\n\nError: Command failed: git merge-base e36ce622a4a99fa21ab0f85fa2170499c2d3bd70 origin/main\nfatal: Not a valid object name origin/main\n\n    at genericNodeError (node:internal/errors:985:15)\n    at wrappedFn (node:internal/errors:539:14)\n    at checkExecSyncError (node:child_process:942:11)\n    at execFileSync (node:child_process:978:15)\n    at file:///tmp/issue825-861-shallow-vkd3b84c/baseline-probe.mjs:7:3\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at async node:internal/modules/esm/loader:643:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {\n  status: 128,\n  signal: null,\n  output: [ null, '', 'fatal: Not a valid object name origin/main\\n' ],\n  pid: 409353,\n  stdout: '',\n  stderr: 'fatal: Not a valid object name origin/main\\n'\n}\n\nNode.js v24.19.0\n",
+      "scope": "Original collection-time revision/baseline/candidate expression only; no spec collection or browser execution"
+    },
+    {
+      "name": "existing-baseline-input-positive",
+      "exitCode": 0,
+      "stdout": "{\"baseline\":\"b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2\",\"candidate\":\"e36ce622a4a99fa21ab0f85fa2170499c2d3bd70\"}\n",
+      "stderr": "",
+      "scope": "Original collection-time revision/baseline/candidate expression only; no spec collection or browser execution"
+    }
+  ]
+}

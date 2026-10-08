@@ -1,0 +1,58 @@
+{
+  "scripts/conformance-playwright-owner-run.mjs": {
+    "sha256": "fc27be82607dcb8a5bb341e4ab56d5204d868fd06a9a1783d81e2eb1a80f0b7b",
+    "gitBlob": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+    "identicalAt": [
+      "83036006069be5cfcd09724273d5705d8f848ad0",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2"
+    ]
+  },
+  "scripts/conformance-playwright-plan.mjs": {
+    "sha256": "6670d75c1dcfd3c601f55f33441b20cc71113185cccc2ce80d19708cb1ba1cfe",
+    "gitBlob": "02b383fb983bc39aee447d9a26c9e795cb733a12",
+    "identicalAt": [
+      "83036006069be5cfcd09724273d5705d8f848ad0",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2"
+    ]
+  },
+  "scripts/conformance-playwright-runner.mjs": {
+    "sha256": "91c6c38986a2dd52894ea3bbc6564dc00da905219a19824663f1539ec7937ed8",
+    "gitBlob": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+    "identicalAt": [
+      "83036006069be5cfcd09724273d5705d8f848ad0",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2"
+    ]
+  },
+  "scripts/markdown-playwright-runner.mjs": {
+    "sha256": "c4718265512b2018e211fb3ce106b21284d58a75c1151f724acf3857d2447209",
+    "gitBlob": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+    "identicalAt": [
+      "83036006069be5cfcd09724273d5705d8f848ad0",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2"
+    ]
+  },
+  "vue/packages/wasm/markdown-interaction-trace.ts": {
+    "sha256": "7a10cafb5708ea67da1fe030574c92f3c98bea07d6a3e8a29cb0ded5b2f5cfa0",
+    "gitBlob": "34826492d8674e26ebf7246fbbdabf62d72199e1",
+    "identicalAt": [
+      "83036006069be5cfcd09724273d5705d8f848ad0",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2"
+    ]
+  },
+  "vue/playwright.conformance-interaction.config.ts": {
+    "sha256": "f7681ebf32578fea9cd60eb43e2214102fb70a6436f21c54abb41008e873031c",
+    "gitBlob": "26ecb2d8730f7cac5bd3ea201d5487ae4c9a1ce8",
+    "identicalAt": [
+      "83036006069be5cfcd09724273d5705d8f848ad0",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2"
+    ]
+  },
+  "vue/tests/markdown-editor/markdown-interaction-trace.spec.ts": {
+    "sha256": "84ec1959634de11bc13c0776c64bf5fce76044a5ca4ecc50a7e898d1d930b1bd",
+    "gitBlob": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734",
+    "identicalAt": [
+      "83036006069be5cfcd09724273d5705d8f848ad0",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2"
+    ]
+  }
+}

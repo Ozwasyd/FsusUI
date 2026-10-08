@@ -1,0 +1,67 @@
+{
+  "task": "Read-only UI861 conformance trace failure diagnosis",
+  "runId": 37798728109,
+  "jobId": 113385195237,
+  "headSha": "83036006069be5cfcd09724273d5705d8f848ad0",
+  "baseSha": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "actualCheckoutSha": "e36ce622a4a99fa21ab0f85fa2170499c2d3bd70",
+  "allJobsCompleted": 50,
+  "artifacts": [
+    {
+      "id": 11560395574,
+      "name": "playwright-conformance-evidence-pr",
+      "bytes": 80645,
+      "digest": "sha256:001e3e6aa950f87d1d6de4c21dd23f4f435c9638ac635fc30a7c5779fe8dcb34",
+      "verified": true
+    },
+    {
+      "id": 11558839365,
+      "name": "playwright-pr-impact-plan",
+      "bytes": 961,
+      "digest": "sha256:5e96d094a6bc963da9ecaddac23ffd91626370df4d2d4687e2236b282e1b533e",
+      "verified": true
+    }
+  ],
+  "cells": [
+    "web-interaction-conformance/chromium",
+    "web-interaction-conformance/firefox",
+    "web-interaction-conformance/webkit"
+  ],
+  "rootCause": "All three original JSON reports contain a top-level collection error at markdown-interaction-trace.spec.ts:112: git merge-base e36ce622a4a99fa21ab0f85fa2170499c2d3bd70 origin/main fails with fatal: Not a valid object name origin/main. The job fetched depth=1 into refs/remotes/pull/861/merge. No tests were registered or executed; attachment calls were not reached.",
+  "browserResults": "Installation succeeded for all three. Interaction execution UNRUN, zero suites and zero attachments in every report. This does not establish successful browser launch or component behavior.",
+  "callSites": {
+    "collection": "vue/tests/markdown-editor/markdown-interaction-trace.spec.ts:107-115",
+    "generation": "same spec attachTrace:217-229; calls:437,440,780,824,859",
+    "discovery": "scripts/conformance-playwright-runner.mjs:42-77; receiptExtension:214-219",
+    "launch": "scripts/markdown-playwright-runner.mjs:236-269",
+    "masking": "runMarkdownCell calls receiptExtension before composing receipt; catch writes zero counters and null report at lines375-376, masking retained report-level collection errors with missing attachments"
+  },
+  "sourceVersions": "All seven copied runner, plan, config, spec and trace-kernel blobs are identical at head, actual merge and base. See source-blobs.json.",
+  "actualChecks": {
+    "artifactDigest": "PASS both official archives",
+    "jobPagination": "PASS50/50terminal",
+    "negativeBaselineExpression": "PASS expected exit1, missing origin/main at exact merge SHA in a real depth1 local checkout",
+    "positiveBaselineExpression": "PASS exit0 using existing FSUS_INTERACTION_BASELINE and FSUS_INTERACTION_CANDIDATE inputs; scope collection expression only",
+    "browserSuite": "UNRUN, per instruction"
+  },
+  "proposedBoundary": [
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "new dedicated runner identity regression test"
+  ],
+  "proposal": "For PR conformance only, derive baseline from the existing impact-plan baseRef, validate full SHA and its relationship to the actual checkout, then pass baseline/candidate via the spec's existing environment inputs into the child. A shallow GitHub merge can prove parent identity from the raw commit object without origin/main or fetching. Full local history can prove base ancestry. Pass a narrow optional interaction identity through the shared runner instead of mutating process.env. Reject absent/malformed/unrelated base and stale candidate before spawning. Preserve attachment, trace validity, cell cardinality, failure and standalone controls.",
+  "proposedPositiveTests": [
+    "Real shallow merge checkout with no origin/main: authenticate impact-plan baseRef to raw first parent, candidate to actualHEAD; original baseline expression succeeds.",
+    "Full local PR checkout: exact valid ancestor baseline accepted; existing non-conformance child env unchanged.",
+    "Focused real three-browser conformance execution after implementation on a capable host; retain real original traces and exact receipts."
+  ],
+  "proposedNegativeTests": [
+    "Missing/malformed/unrelated impact-plan baseRef fails before spawn.",
+    "Stale GITHUB_SHA or explicit candidate/baseline mismatch fails.",
+    "No-attachment report still fails; collection error stays diagnostic; failed actions, stale/mock/metadata-only/no-op traces and missing required cells remain failures.",
+    "Standalone occupied-port rejection and frozen server ownership regressions remain unchanged."
+  ],
+  "restrictions": "No source edits, content API mutations, PR movements, source push, package publication, workflow edits, trace synthesis, browser reruns, AOT changes, renderer optimization, producer edits or alias changes.",
+  "remaining": "Coordinator shared-file boundary confirmation required before any fix. All three interactions and readiness remain OPEN. Frozen d456 and210 preserved."
+}
