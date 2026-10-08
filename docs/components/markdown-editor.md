@@ -226,6 +226,11 @@ projection ID, duplicate/invalid ID, or stale revision rejects the transaction. 
 surfaces locate through the public anchor-map identity, so consumers need not pass a DOM
 selector/ref; source reveal, cancellation, and successful commit restore the same source selection/focus.
 
+The package root `@ozwasyd/element-plus` exports `currentMarkdownAnchors`,
+`planMarkdownAnchorInsert`, `planMarkdownAnchorEdit`, and `planMarkdownAnchorRemove`.
+These existing planners return transactions for the editor transaction authority;
+consumers must not apply them with a separate source writer.
+
 Command pending/abort/stale state is managed by one editor command session. An asynchronous
 result commits only while the original document identity, epoch, and revision remain current;
 an external reset or component unmount aborts the pending session. `statusDensity="none"` hides

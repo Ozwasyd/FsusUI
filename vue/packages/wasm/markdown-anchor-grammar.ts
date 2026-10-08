@@ -155,7 +155,9 @@ export const parseMarkdownAnchorMarker = (
   text: string,
   start: number,
 ): MarkdownAnchorNode | null => {
-  const match = /(?:^| )(\^([a-zA-Z0-9-]{1,64}))$/.exec(text)
+  // Recognize a marker token before validating its ID; malformed IDs must
+  // remain available for diagnostics. Backticks and whitespace delimit prose.
+  const match = /(?:^| )(\^([^\s`]+))$/u.exec(text)
   if (!match || match.index === undefined) return null
   const marker = match[1]!
   const id = match[2]!
