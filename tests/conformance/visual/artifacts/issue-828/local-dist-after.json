@@ -1,0 +1,35 @@
+{
+  "phase": "after",
+  "repositoryHead": "79988a85e5f893a5d06eb9ee499c07c3abc37e39",
+  "observedAt": "2026-10-08T03:47:51.346Z",
+  "files": [
+    {
+      "path": "vue/packages/theme-chalk/dist/index.css",
+      "bytes": 558274,
+      "sha256": "081d9f1036095d1f7c70326c147e073717888a50570f01686745e3f318f8c74c",
+      "shortLandscape": true,
+      "hasSpace2Compact": true
+    },
+    {
+      "path": "vue/packages/theme-chalk/dist/el-public-shell-critical.css",
+      "bytes": 16953,
+      "sha256": "489ffa4cff3a3903dfb9d19e23cdbad084a8e24aa898e3602c5dbe58e35962e0",
+      "shortLandscape": true,
+      "hasSpace2Compact": true
+    },
+    {
+      "path": "vue/packages/theme-chalk/dist/el-public-shell.css",
+      "bytes": 18472,
+      "sha256": "d1ea41e1ab744c241415914be2fb8d8df02b4689daf521a993706ac4871a7d89",
+      "shortLandscape": true,
+      "hasSpace2Compact": true
+    },
+    {
+      "path": "vue/packages/theme-chalk/dist/el-fsus.css",
+      "bytes": 655034,
+      "sha256": "1a6f02236679c7d56b71a79f56a478fe764bf51c59521347a77749720412ea8c",
+      "shortLandscape": true,
+      "hasSpace2Compact": true
+    }
+  ]
+}
