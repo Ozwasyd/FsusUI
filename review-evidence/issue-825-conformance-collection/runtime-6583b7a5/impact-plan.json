@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "baseRef": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "headRef": "HEAD",
+  "group": "pr",
+  "registryHash": "5666d3d139e25ac93cae2b2d63b7f2f11f626b9cd0de5947c4fa1167f8ad638a",
+  "generatedAt": "2026-10-08T16:04:28.227Z",
+  "changedFiles": [
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "decisions": [
+    {
+      "suiteId": "view-transitions",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "view-transitions/chromium",
+        "view-transitions/firefox",
+        "view-transitions/webkit"
+      ],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "motion-ssr",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "motion-ssr/chromium"
+      ],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "dom-layout",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "dom-layout/desktop-light",
+        "dom-layout/mobile-light",
+        "dom-layout/desktop-dark",
+        "dom-layout/mobile-dark"
+      ],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "geometry-smoke",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "geometry-smoke/chromium"
+      ],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "markdown-editor-interaction",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "markdown-editor-interaction/chromium",
+        "markdown-editor-interaction/firefox",
+        "markdown-editor-interaction/webkit"
+      ],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "visual-boundary-audit",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "visual-boundary-audit/desktop-light",
+        "visual-boundary-audit/mobile-light",
+        "visual-boundary-audit/tiny-light",
+        "visual-boundary-audit/desktop-dark",
+        "visual-boundary-audit/mobile-dark",
+        "visual-boundary-audit/tiny-dark",
+        "visual-boundary-audit/safe-area-chromium",
+        "visual-boundary-audit/safe-area-webkit"
+      ],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "web-interaction-conformance",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "web-interaction-conformance/chromium",
+        "web-interaction-conformance/firefox",
+        "web-interaction-conformance/webkit"
+      ],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "visual-runtime-reuse",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "visual-runtime-reuse/desktop-light",
+        "visual-runtime-reuse/mobile-light",
+        "visual-runtime-reuse/desktop-dark",
+        "visual-runtime-reuse/mobile-dark"
+      ],
+      "matchedRoots": []
+    }
+  ],
+  "planDigest": "514da81577459f77f60ee432cb2042b793e90eebecd6e7efb04251c181f5e5d5"
+}

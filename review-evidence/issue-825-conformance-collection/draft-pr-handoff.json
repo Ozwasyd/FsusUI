@@ -1,0 +1,8 @@
+{
+  "title": "fix(ci): validate conformance checkout identities before trace collection",
+  "head": "fix/issue-825-conformance-identity",
+  "base": "main",
+  "draft": true,
+  "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+  "body": "A shallow PR merge checkout has no origin/main ref, so the unchanged interaction spec aborts during collection before registering tests or creating traces. Bind its existing baseline/candidate inputs to the exact impact-plan base and actual checkout, verify commit identity and relationship, acquire a missing shallow parent object through origin, and retain original collection diagnostics.\n\nValidation at 6583b7a59a0a871e13b97594a583ca58ca63027e:18 focused regressions, focused lint, both existing owner-policy checks and genuine Chromium2/2 passed with2 valid traces/14 actions. Original three-cell attempt at80f6e96b remains strict FAIL:Firefox2 launch timeouts andWebKit2 missing-host-library failures; all0skips. Three-browser/readiness and unavailable consumer/published-artifact acceptance remain OPEN. Changeset not needed:internal runners only. No workflow, component, trace producer or security changes."
+}

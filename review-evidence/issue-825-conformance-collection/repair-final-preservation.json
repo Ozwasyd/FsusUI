@@ -1,0 +1,11 @@
+{
+  "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+  "freshDefaultSha": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "conflictCheckExitCode": 0,
+  "conflictCheckOutput": "c475de56e6954d3ad954be643041b989e8c4820c\n",
+  "conflictCheckError": "",
+  "sourceWorktreeStatus": "",
+  "frozenStartupSha": "d456f80e2f411ca81b4e98168638411e09eeac6a",
+  "frozenPackageSha": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216",
+  "realBlogAlias": "/workspace/FsusBlog/src/frontend/node_modules/vue"
+}

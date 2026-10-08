@@ -1,0 +1,11 @@
+RUN  view-transitions                    unknown-production-change      3 cells  unknown production change; conservative run
+RUN  motion-ssr                          unknown-production-change      1 cells  unknown production change; conservative run
+RUN  dom-layout                          unknown-production-change      4 cells  unknown production change; conservative run
+RUN  geometry-smoke                      unknown-production-change      1 cells  unknown production change; conservative run
+RUN  markdown-editor-interaction         unknown-production-change      3 cells  unknown production change; conservative run
+RUN  visual-boundary-audit               unknown-production-change      8 cells  unknown production change; conservative run
+RUN  web-interaction-conformance         unknown-production-change      3 cells  unknown production change; conservative run
+RUN  visual-runtime-reuse                unknown-production-change      4 cells  unknown production change; conservative run
+
+digest=514da81577459f77f60ee432cb2042b793e90eebecd6e7efb04251c181f5e5d5
+receipt=/workspace/issue825-conformance-identity/.tmp/issue825-conformance-final-impact.json

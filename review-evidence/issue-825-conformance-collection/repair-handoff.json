@@ -1,5 +1,5 @@
 {
-  "sourceSha": "80f6e96b8d5419942583711fb417492b1f0abb67",
+  "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
   "baseSha": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
   "sourceBranch": "fix/issue-825-conformance-identity",
   "sourceFiles": [
@@ -10,14 +10,15 @@
   ],
   "changeset": "not needed; internal runner controls only",
   "scopedRegressionTests": {
-    "total": 17,
-    "pass": 17,
+    "total": 18,
+    "pass": 18,
     "fail": 0,
     "skip": 0
   },
   "checks": [
     {
-      "name": "repair-identity-tests",
+      "name": "repair-final-identity-tests",
+      "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
       "args": [
         "node",
         "--test",
@@ -26,7 +27,8 @@
       "exitCode": 0
     },
     {
-      "name": "repair-lint",
+      "name": "repair-final-lint",
+      "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
       "args": [
         "pnpm",
         "exec",
@@ -41,7 +43,8 @@
       "exitCode": 0
     },
     {
-      "name": "repair-conformance-policy",
+      "name": "repair-final-conformance-policy",
+      "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
       "args": [
         "node",
         "scripts/check-playwright-conformance-owner-policy.mjs"
@@ -49,7 +52,8 @@
       "exitCode": 0
     },
     {
-      "name": "repair-markdown-policy",
+      "name": "repair-final-markdown-policy",
+      "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
       "args": [
         "node",
         "scripts/check-playwright-markdown-owner-policy.mjs"
@@ -57,7 +61,7 @@
       "exitCode": 0
     }
   ],
-  "runtimeStatus": "Complete original three-cell run at80f6e96b:ChromiumPASS2;FirefoxFAIL2 on180s browser launch timeouts with sandbox/cacheEROFS;WebKitFAIL2 on7missinghostlibraries. All0skips and0collectionerrors. OverallFAIL. Tightened baseline-object check and final Chromium rerun ongoing; aggregate acceptance OPEN.",
+  "runtimeStatus": "Latest6583b7a5:ChromiumPASS2,FAIL0,SKIP0 with2 valid real-browser interaction traces and14 actions. Firefox/WebKit not rerun after commit-object-type tightening; their exact80f6e96b attempts are retained, FAIL2 each at browser launch. Overall3browser/readiness acceptance remains OPEN. No missing/invalid traces or required cells waived.",
   "frozenCandidatesPreserved": [
     "d456f80e2f411ca81b4e98168638411e09eeac6a",
     "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216"
@@ -67,9 +71,40 @@
     "pnpm install --frozen-lockfile --offline --ignore-scripts --store-dir /workspace/.setup/pnpm-store",
     "node --test tests/conformance-playwright-identity.test.mjs",
     "node scripts/check-playwright-conformance-owner-policy.mjs",
-    "node scripts/check-playwright-markdown-owner-policy.mjs"
+    "node scripts/check-playwright-markdown-owner-policy.mjs",
+    "pnpm run ensure:icons",
+    "pnpm run ensure:wasm",
+    "node scripts/playwright-impact-plan.mjs --base b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2 --receipt .tmp/conformance-impact.json",
+    "PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/ms-playwright FSUS_CONFORMANCE_INTERACTION_PORT=5312 node scripts/conformance-playwright-owner-run.mjs --owner playwright-conformance --group pr --impact-plan .tmp/conformance-impact.json --evidence-dir .tmp/conformance-evidence",
+    "git restore -- vue/packages/icons-vue/src/components/index.ts"
   ],
   "restrictions": "Root alone creates/updates PRs and GitHub content APIs; no package publication or merge.",
-  "runtimeSourceSha": "80f6e96b8d5419942583711fb417492b1f0abb67",
-  "runtimeGeneratedArtifacts": "Original icons build temporarily added5 exports in its generated index; original producer patch retained. No authored component/spec/producer edit. WASM artifacts reused from exact baseline with identical source inputs."
+  "runtimeSourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+  "runtimeGeneratedArtifacts": "Original ensure:icons producer temporarily adds5 exports to its generated index during genuine builds. Exact producer patch retained and restored after final run; source worktree now clean. WASM reused only with identical baseline source inputs and content hashes.",
+  "priorFullMatrixSourceSha": "80f6e96b8d5419942583711fb417492b1f0abb67",
+  "preservation": {
+    "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+    "freshDefaultSha": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+    "conflictCheckExitCode": 0,
+    "conflictCheckOutput": "c475de56e6954d3ad954be643041b989e8c4820c\n",
+    "conflictCheckError": "",
+    "sourceWorktreeStatus": "",
+    "frozenStartupSha": "d456f80e2f411ca81b4e98168638411e09eeac6a",
+    "frozenPackageSha": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216",
+    "realBlogAlias": "/workspace/FsusBlog/src/frontend/node_modules/vue"
+  },
+  "missingCapabilities": {
+    "firefox": "Both original180000ms launch attempts timed out; /proc/self/uid_map EROFS, read-only dconf cache and no writable Fontconfig caches.",
+    "webkit": [
+      "libgtk-4.so.1",
+      "libgraphene-1.0.so.0",
+      "libharfbuzz-icu.so.0",
+      "libmanette-0.2.so.0",
+      "libhyphen.so.0",
+      "libwoff2dec.so.1.0.2",
+      "libGLESv2.so.2"
+    ]
+  },
+  "integration": "No Blog manage-write rerun or acceptance claim; consumer evidence remains with original2228. Real Blog-owned alias unchanged.",
+  "review": "Root creates draft PR and assigns independent reviewer. This actor did not call GitHub content APIs or merge."
 }

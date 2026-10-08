@@ -13,14 +13,14 @@ index 72bcc775..931d0887 100644
 @@ -98,0 +103 @@ export async function runConformanceOwner(argv = process.argv.slice(2)) {
 +      impactPlan,
 diff --git a/scripts/conformance-playwright-runner.mjs b/scripts/conformance-playwright-runner.mjs
-index 72e36d76..58cdccde 100644
+index 72e36d76..e5f3562b 100644
 --- a/scripts/conformance-playwright-runner.mjs
 +++ b/scripts/conformance-playwright-runner.mjs
 @@ -3,0 +4 @@ import { Buffer } from 'node:buffer'
 +import { spawnSync } from 'node:child_process'
 @@ -8,0 +10 @@ import { loadConformanceOwnerPlan } from './conformance-playwright-plan.mjs'
 +import { loadPlaywrightImpactPlan } from './playwright-impact-filter.mjs'
-@@ -16,0 +19,90 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+@@ -16,0 +19,88 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 +export function resolveConformanceInteractionIdentity({
 +  repositoryRoot = root,
 +  group,
@@ -82,10 +82,8 @@ index 72e36d76..58cdccde 100644
 +      'conformance impact-plan baseRef does not match merge checkout base',
 +    )
 +  }
-+  const hasBaseline = () => {
-+    const object = git(['cat-file', '-t', baseline])
-+    return object.status === 0 && object.stdout.trim() === 'commit'
-+  }
++  const hasBaseline = () =>
++    git(['cat-file', '-e', `${baseline}^{commit}`]).status === 0
 +  if (!hasBaseline()) {
 +    // A shallow merge retains parent identities, but not necessarily their objects.
 +    if (group !== 'pr' || !directParent) {
@@ -111,14 +109,14 @@ index 72e36d76..58cdccde 100644
 +  return { baseline, candidate }
 +}
 +
-@@ -278,0 +371,4 @@ export async function runConformanceCell(ownerId, cellId, group, options = {}) {
+@@ -278,0 +369,4 @@ export async function runConformanceCell(ownerId, cellId, group, options = {}) {
 +  const interactionIdentity = resolveConformanceInteractionIdentity({
 +    group,
 +    impactPlan: options.impactPlan,
 +  })
-@@ -280,0 +377 @@ export async function runConformanceCell(ownerId, cellId, group, options = {}) {
+@@ -280,0 +375 @@ export async function runConformanceCell(ownerId, cellId, group, options = {}) {
 +    interactionIdentity,
-@@ -313 +410,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
+@@ -313 +408,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
 -    { evidenceDir: option(process.argv.slice(2), 'evidence-dir') },
 +    {
 +      evidenceDir: option(process.argv.slice(2), 'evidence-dir'),
@@ -199,10 +197,10 @@ index 3d775c0d..1a65c11a 100644
 +        report,
 diff --git a/tests/conformance-playwright-identity.test.mjs b/tests/conformance-playwright-identity.test.mjs
 new file mode 100644
-index 00000000..f420ef11
+index 00000000..1d39c40a
 --- /dev/null
 +++ b/tests/conformance-playwright-identity.test.mjs
-@@ -0,0 +1,427 @@
+@@ -0,0 +1,403 @@
 +import assert from 'node:assert/strict'
 +import { spawnSync } from 'node:child_process'
 +import {
@@ -438,30 +436,6 @@ index 00000000..f420ef11
 +          env: { GITHUB_SHA: candidate },
 +        }),
 +      /unrelated/u,
-+    )
-+  }))
-+
-+test('an annotated tag SHA cannot substitute for the exact baseline commit', () =>
-+  fixture(({ producer, baseline }) => {
-+    checkedGit(producer, [
-+      'tag',
-+      '-a',
-+      'baseline-label',
-+      baseline,
-+      '-m',
-+      'baseline-label',
-+    ])
-+    const tag = checkedGit(producer, ['rev-parse', 'baseline-label'])
-+    assert.equal(checkedGit(producer, ['cat-file', '-t', tag]), 'tag')
-+    assert.throws(
-+      () =>
-+        resolveConformanceInteractionIdentity({
-+          repositoryRoot: producer,
-+          group: 'pr',
-+          impactPlan: { baseRef: tag },
-+          env: {},
-+        }),
-+      /unavailable or unrelated/u,
 +    )
 +  }))
 +

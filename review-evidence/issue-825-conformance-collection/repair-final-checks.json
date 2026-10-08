@@ -1,0 +1,46 @@
+[
+  {
+    "name": "repair-final-identity-tests",
+    "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+    "args": [
+      "node",
+      "--test",
+      "tests/conformance-playwright-identity.test.mjs"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "repair-final-lint",
+    "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+    "args": [
+      "pnpm",
+      "exec",
+      "eslint",
+      "--config",
+      "vue/eslint.config.mjs",
+      "scripts/conformance-playwright-owner-run.mjs",
+      "scripts/conformance-playwright-runner.mjs",
+      "scripts/markdown-playwright-runner.mjs",
+      "tests/conformance-playwright-identity.test.mjs"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "repair-final-conformance-policy",
+    "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+    "args": [
+      "node",
+      "scripts/check-playwright-conformance-owner-policy.mjs"
+    ],
+    "exitCode": 0
+  },
+  {
+    "name": "repair-final-markdown-policy",
+    "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+    "args": [
+      "node",
+      "scripts/check-playwright-markdown-owner-policy.mjs"
+    ],
+    "exitCode": 0
+  }
+]

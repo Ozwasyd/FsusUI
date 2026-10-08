@@ -1,0 +1,193 @@
+{
+  "schema": "fsusui.interaction.v2",
+  "scenario": "scenario.v2.web.real-components",
+  "contract": "spec/components/contracts/v2/contract-v2.json",
+  "contractRegistry": {
+    "source": "spec/components/contracts/v2/contract-v2.json",
+    "schemaVersion": 2,
+    "registryVersion": "2.0.0"
+  },
+  "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "browser": "chromium",
+  "browserIdentity": {
+    "name": "chromium",
+    "project": "chromium",
+    "version": "147.0.7727.15"
+  },
+  "candidate": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+  "runtime": {
+    "component": "ElButton, ElInput, ElDialog",
+    "mount": "vue",
+    "realBrowser": true
+  },
+  "steps": [
+    {
+      "index": 0,
+      "action": "focus",
+      "target": "ElButton.primary",
+      "scenario": "scenario.v2.el-button.focus",
+      "contract": "component-v2.el-button",
+      "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "candidate": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "focusTarget": "Save draft"
+      },
+      "actual": {
+        "focusTarget": "Save draft"
+      },
+      "passed": true,
+      "artifact": "representative-components-chromium.interaction-trace.json"
+    },
+    {
+      "index": 1,
+      "action": "pointer",
+      "target": "ElButton.primary",
+      "scenario": "scenario.v2.el-button.output.click",
+      "contract": "component-v2.el-button",
+      "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "candidate": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "emittedEvents": [
+          "button.click"
+        ],
+        "activations": 1
+      },
+      "actual": {
+        "emittedEvents": [
+          "button.click"
+        ],
+        "activations": 1
+      },
+      "passed": true,
+      "artifact": "representative-components-chromium.interaction-trace.json"
+    },
+    {
+      "index": 2,
+      "action": "keyboard",
+      "target": "ElButton.primary",
+      "scenario": "scenario.v2.el-button.keyboard",
+      "contract": "component-v2.el-button",
+      "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "candidate": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "key": "Enter",
+        "emittedEvents": [
+          "button.click"
+        ],
+        "activations": 2
+      },
+      "actual": {
+        "key": "Enter",
+        "emittedEvents": [
+          "button.click",
+          "button.click"
+        ],
+        "activations": 2
+      },
+      "passed": true,
+      "artifact": "representative-components-chromium.interaction-trace.json"
+    },
+    {
+      "index": 3,
+      "action": "input",
+      "target": "ElInput.modelValue",
+      "scenario": "scenario.v2.el-input.output.input",
+      "contract": "component-v2.el-input",
+      "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "candidate": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "value": "Trace input value",
+        "emittedEvents": [
+          "input.input"
+        ]
+      },
+      "actual": {
+        "value": "Trace input value",
+        "emittedEvents": [
+          "input.input"
+        ]
+      },
+      "passed": true,
+      "artifact": "representative-components-chromium.interaction-trace.json"
+    },
+    {
+      "index": 4,
+      "action": "open",
+      "target": "ElDialog.modelValue",
+      "scenario": "scenario.v2.el-dialog.output.open",
+      "contract": "component-v2.el-dialog",
+      "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "candidate": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "open": true,
+        "content": "Real default slot content",
+        "emittedEvents": [
+          "dialog.open"
+        ]
+      },
+      "actual": {
+        "open": true,
+        "content": "Real default slot content",
+        "emittedEvents": [
+          "dialog.open"
+        ]
+      },
+      "passed": true,
+      "artifact": "representative-components-chromium.interaction-trace.json"
+    },
+    {
+      "index": 5,
+      "action": "close",
+      "target": "ElDialog.modelValue",
+      "scenario": "scenario.v2.el-dialog.output.close",
+      "contract": "component-v2.el-dialog",
+      "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "candidate": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "open": false,
+        "emittedEvents": [
+          "dialog.close"
+        ]
+      },
+      "actual": {
+        "open": false,
+        "emittedEvents": [
+          "dialog.close",
+          "dialog.closed"
+        ]
+      },
+      "passed": true,
+      "artifact": "representative-components-chromium.interaction-trace.json"
+    }
+  ]
+}
