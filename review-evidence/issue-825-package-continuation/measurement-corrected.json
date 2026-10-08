@@ -1,0 +1,53 @@
+{
+  "sourceSha": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216",
+  "profile": "npm-peer-floor",
+  "originalManifest": true,
+  "observerInitialCssCorrection": "Initial observer omitted startup CSS from exclusions; corrected to original measureManifestClosure initial.files semantics. No original artifact or threshold changed.",
+  "entry": "node_modules/@ozwasyd/element-plus/es/components/markdown-renderer/index.mjs",
+  "closure": [
+    "__baseAssignValue-B3L7yHoK.js",
+    "__defineProperty-BjTHTA_3.js",
+    "_fsus-icons-DPt36vOn.js",
+    "_fsus-wasm-DdxuqT3U.js",
+    "_index-SfDR-ucc.js",
+    "_preload-helper-BXl3LOEh.js",
+    "_vue-vendor-D1D5ht6F.js",
+    "index.html",
+    "node_modules/@ozwasyd/element-plus/es/components/markdown-renderer/index.mjs"
+  ],
+  "initialFilesIncludingCss": [
+    "assets/_baseAssignValue-B3L7yHoK.js",
+    "assets/_defineProperty-BjTHTA_3.js",
+    "assets/fsus-icons-DPt36vOn.js",
+    "assets/index-CxGuw7Qb.js",
+    "assets/index-d34hb3yA.css",
+    "assets/preload-helper-BXl3LOEh.js",
+    "assets/vue-vendor-D1D5ht6F.js"
+  ],
+  "measuredFiles": [
+    {
+      "path": "assets/fsus-markdown-CODLJk3l.js",
+      "bytes": 18961,
+      "sha256": "dc795f91189fc2d38ec8560191ca54baa2d5a46d0da3c93a1de5b7b78b517ca6",
+      "markdownEditorMarker": true,
+      "canonicalRendererMarker": true
+    },
+    {
+      "path": "assets/fsus-wasm-DdxuqT3U.js",
+      "bytes": 30220,
+      "sha256": "f77e10f7af29d0cb0e981c33fb0f02b4401528b6467b661c0713cb97572b1746",
+      "markdownEditorMarker": false,
+      "canonicalRendererMarker": true
+    },
+    {
+      "path": "assets/index-SfDR-ucc.js",
+      "bytes": 42563,
+      "sha256": "5d4c3e15d66bdb7d208ca064e9832025cb5c38958c2cd39add79b6a93e2a56af",
+      "markdownEditorMarker": true,
+      "canonicalRendererMarker": false
+    }
+  ],
+  "raw": 91744,
+  "limitRaw": 91730,
+  "editorAttribution": "Not proven by closure alone; no baseline bundle comparison. Renderer source differs from current main only by borrowed canonical early-theme-listener call."
+}

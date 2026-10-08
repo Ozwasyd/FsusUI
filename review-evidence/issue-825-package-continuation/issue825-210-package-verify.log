@@ -1,0 +1,5 @@
+
+> @ package:candidate:verify /workspace/issue825-package-native
+> node ./scripts/with-node-heap.mjs node ./scripts/package-candidate.mjs verify -- --tarball dist/npm-candidate/fsusui-npm-candidate.tgz --commit 2103366e4a3d79e0dc5ab0ac5445afc2f1f35216
+
+Verified /workspace/issue825-package-native/dist/npm-candidate/fsusui-npm-candidate.tgz (5da2623bd5d839fa6be533f8fed8ab8852120d03eb6c8cad245db597470c08a1) for @ozwasyd/element-plus@1.5.1 with dist-tag latest.

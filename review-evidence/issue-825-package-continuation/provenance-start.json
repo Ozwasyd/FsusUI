@@ -1,0 +1,22 @@
+{
+  "sourceSha": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216",
+  "parent": "badb1fcf",
+  "canonicalSource": "6727b003275a4e04c2dcddb5ec5b6fa321acdaef",
+  "frozenStartup": "d456f80e2f411ca81b4e98168638411e09eeac6a",
+  "freshBlog": "5798707d359ce5ee57752aa868d0ccbf3f889494",
+  "packageBuildDependencyIdentity": {
+    "vue": "3.5.32",
+    "serverRenderer": "3.5.32",
+    "install": "frozen lock/offline, explicit saved store; first default-store invocation failed ENOENT under read-only HOME"
+  },
+  "BlogLocalAlias": "preserved /workspace/FsusUI; typecheck command exit0 during docs-only continuation; no current route/browser evidence",
+  "canonicalBlobs": {
+    "scripts/prepare-npm-package.mjs": "f06a15f457725f1ce0c7716ed5433eb09093f7ac",
+    "scripts/prepare-npm-package.test.mjs": "68e7d811a422e3eb5952f1a05787a50abd5d3221",
+    "scripts/test-npm-candidate.mjs": "26bdcf32556db31a5ccbc7589865dabf2086e9b0"
+  },
+  "canonicalDiff": "git diff canonicalSource sourceSha -- three source paths: empty",
+  "docs": "badb1fcf isolated four-line setup doc update, check:documentation-architecture PASS",
+  "packageFixtures": "exact210 13 original +9 canonical regression +2 Rollup PASS, terminal0",
+  "actualPackageBuild": "running; no new source fixes or candidate qualification claimed yet"
+}

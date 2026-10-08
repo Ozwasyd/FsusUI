@@ -1,0 +1,44 @@
+{
+  "sourceSha": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216",
+  "canonicalPackageSource": "6727b003275a4e04c2dcddb5ec5b6fa321acdaef",
+  "docsCommit": "badb1fcf919f314d1d837cdbbef9d048ed1883fe",
+  "frozenStartupSource": "d456f80e2f411ca81b4e98168638411e09eeac6a",
+  "packageCandidateBuild": {
+    "exit": 0,
+    "dependencyIdentity": "isolated frozen Vue/server-renderer3.5.32",
+    "sha256": "5da2623bd5d839fa6be533f8fed8ab8852120d03eb6c8cad245db597470c08a1"
+  },
+  "packageCandidateVerify": {
+    "exit": 0,
+    "requiredSourceSha": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216"
+  },
+  "packageFixtures": {
+    "exit": 0,
+    "originalScenarios": 13,
+    "newCanonicalRegressions": 9,
+    "rollup": 2
+  },
+  "consumerMatrix": {
+    "exit": 1,
+    "profiles": {
+      "npm-latest": "FAIL hydration raw budget",
+      "pnpm-latest": "FAIL hydration raw budget",
+      "npm-peer-floor": "FAIL hydration raw budget"
+    },
+    "observedPeerFloorRaw": 91744,
+    "unchangedLimit": 91730,
+    "excess": 14,
+    "individualProfileReceipts": "not emitted after original failure; original matrix summary reports all failed",
+    "laterChecks": "remaining stages after bundle guard unrun",
+    "sourceAttribution": "unproven; sole renderer source delta vs main is borrowed canonical early theme listener; no main artifact comparison or waiver"
+  },
+  "freshBlogLocalAlias": {
+    "blogSha": "5798707d359ce5ee57752aa868d0ccbf3f889494",
+    "command": "npm --prefix src/frontend run typecheck:local-fsusui",
+    "exit": 0,
+    "timing": "ran while docs-only continuation was created; all library source/typecheck inputs identical to d456; not a new exact210 route runtime claim"
+  },
+  "publishedArtifactAcceptance": "OPEN: local candidate only; no registry/package publication",
+  "remainingAuth": "original2228 owns real authenticated/admitted manage-write light/dark evidence; no duplicate browser matrix",
+  "review": "same root-created reviewer; startup d456 frozen; no new PR/review/API writes"
+}

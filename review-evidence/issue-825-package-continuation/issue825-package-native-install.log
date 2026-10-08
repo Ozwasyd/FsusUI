@@ -1,0 +1,11 @@
+Scope: all 20 workspace projects
+ ENOENT  ENOENT: no such file or directory, mkdir '/home/agent/.local/share/pnpm'
+
+pnpm: ENOENT: no such file or directory, mkdir '/home/agent/.local/share/pnpm'
+    at async Object.mkdir (node:internal/fs/promises:916:10)
+    at async createNewStoreController (/workspace/.setup/tools/node_modules/pnpm/dist/pnpm.cjs:106002:7)
+    at async installDeps (/workspace/.setup/tools/node_modules/pnpm/dist/pnpm.cjs:164659:21)
+    at async /workspace/.setup/tools/node_modules/pnpm/dist/pnpm.cjs:201528:23
+    at async main (/workspace/.setup/tools/node_modules/pnpm/dist/pnpm.cjs:201486:34)
+    at async runPnpm (/workspace/.setup/tools/node_modules/pnpm/dist/pnpm.cjs:201753:5)
+    at async /workspace/.setup/tools/node_modules/pnpm/dist/pnpm.cjs:201745:7

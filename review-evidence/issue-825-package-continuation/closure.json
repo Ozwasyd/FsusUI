@@ -1,0 +1,37 @@
+{
+  "fixture": "/tmp/fsusui-consumer-MmHYVJ/fixture",
+  "entry": "node_modules/@ozwasyd/element-plus/es/components/markdown-renderer/index.mjs",
+  "closure": [
+    "__baseAssignValue-B3L7yHoK.js",
+    "__defineProperty-BjTHTA_3.js",
+    "_fsus-icons-DPt36vOn.js",
+    "_fsus-wasm-DdxuqT3U.js",
+    "_index-SfDR-ucc.js",
+    "_preload-helper-BXl3LOEh.js",
+    "_vue-vendor-D1D5ht6F.js",
+    "index.html",
+    "node_modules/@ozwasyd/element-plus/es/components/markdown-renderer/index.mjs"
+  ],
+  "files": [
+    "assets/_baseAssignValue-B3L7yHoK.js",
+    "assets/_defineProperty-BjTHTA_3.js",
+    "assets/fsus-icons-DPt36vOn.js",
+    "assets/fsus-markdown-CODLJk3l.js",
+    "assets/fsus-wasm-DdxuqT3U.js",
+    "assets/index-CxGuw7Qb.js",
+    "assets/index-SfDR-ucc.js",
+    "assets/index-d34hb3yA.css",
+    "assets/preload-helper-BXl3LOEh.js",
+    "assets/vue-vendor-D1D5ht6F.js"
+  ],
+  "initialFiles": [
+    "assets/_baseAssignValue-B3L7yHoK.js",
+    "assets/_defineProperty-BjTHTA_3.js",
+    "assets/fsus-icons-DPt36vOn.js",
+    "assets/index-CxGuw7Qb.js",
+    "assets/preload-helper-BXl3LOEh.js",
+    "assets/vue-vendor-D1D5ht6F.js"
+  ],
+  "rawExcludingInitialFiles": 140668,
+  "originalLimit": 91730
+}
