@@ -300,15 +300,19 @@
     @include e(row) {
       min-height: 58px;
       column-gap: 12px;
+      border-bottom: 1px solid getCssVar('border-color-lighter');
 
       @include when(active) {
         --el-data-list-row-accent-color: #{getCssVar('color-primary')};
         --el-data-list-row-accent-opacity: 1;
 
-        &:not(.is-disabled) {
-          background: var(--el-data-list-active-background);
-        }
+        background: var(--el-data-list-active-background);
         box-shadow: inset 2px 0 0 var(--el-data-list-active-indicator);
+      }
+
+      @include when(disabled) {
+        background: getCssVar('disabled-bg-color');
+        border-bottom-color: getCssVar('disabled-border-color');
       }
     }
 
