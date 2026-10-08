@@ -212,6 +212,11 @@ the palette consumes Ctrl/Cmd+P (including repeat) without reopening or executin
 a command; the consumer still owns its first host-scoped `openCommandPalette()`
 invocation. Disabled, composing, modified or unrelated keys remain unclaimed.
 See the [palette keyboard boundary](../api/markdown-editor-input.md).
+The public `closeCommandPalette(): void` is idempotent and restores source
+selection/focus only for a dismissal that still owns palette focus. Closing after
+focus moves to another control, or repeating a close, preserves that newer focus.
+Pending restoration also yields to a reopened palette, a replaced document or
+revision, composition and disposal.
 `Esc` in the selection toolbar or slash menu closes
 the current surface, restores source focus, and retains source, selection, and history. The
 current projection/input context validates a slash trigger; execution merges the trigger range

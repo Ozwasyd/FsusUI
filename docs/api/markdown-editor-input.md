@@ -52,6 +52,14 @@ already-handled keys, unrelated targets and retired dialog elements are left
 unclaimed. The public `openCommandPalette()` method remains unchanged; consumers
 own the first shortcut within their host scope. No global listener is installed.
 
+`closeCommandPalette(): void` is idempotent. It closes the current palette and
+restores the saved source selection/focus only when focus still belongs to that
+palette. A newer control or source caret keeps its focus and selection. Delayed
+restoration is cancelled if focus moves, the palette reopens, the document
+identity/revision changes, composition starts, or the editor is disposed. Normal
+Escape, backdrop and command dismissals retain their selection-restoration
+behavior. Document replacement keeps its existing reset/focus lifecycle.
+
 `ElMarkdownEditor` emits `selection-change` for accepted transaction selection
 changes and native selection/caret movement, including Ctrl+Home/End and pointer
 selection. Its immutable payload contains `documentIdentity: { id, epoch }`,
