@@ -2311,10 +2311,11 @@ const operationTransaction = (
 const restoreTextareaSelection = async (
   selection: MarkdownEditorSelection,
   focus = true,
+  shouldRestore?: () => boolean,
 ) => {
-  if (isComposing.value) return
+  if (isComposing.value || shouldRestore?.() === false) return
   await nextTick()
-  if (isComposing.value) return
+  if (isComposing.value || shouldRestore?.() === false) return
   const textarea = textareaRef.value
   if (!textarea) return
 
@@ -3169,13 +3170,33 @@ const openCommandPalette = () => {
   void nextTick(() => commandPaletteInputRef.value?.focus())
 }
 const closeCommandPalette = () => {
+  if (!commandPaletteOpen.value) return
+  const focusOwner = document.activeElement
+  const paletteOwnsFocus =
+    commandPaletteInputRef.value?.parentElement?.contains(focusOwner) ?? false
   commandPaletteOpen.value = false
   const selection = paletteRestoreSelection.value
   paletteRestoreSelection.value = null
+  if (!paletteOwnsFocus) return
+
+  const textarea = textareaRef.value
+  const { id, epoch } = documentIdentity
+  const revision = editorRevision.value
+  const shouldRestore = () =>
+    !commandPaletteOpen.value &&
+    textareaRef.value === textarea &&
+    !!textarea?.isConnected &&
+    documentIdentity.id === id &&
+    documentIdentity.epoch === epoch &&
+    editorRevision.value === revision &&
+    (document.activeElement === focusOwner ||
+      document.activeElement === document.body)
   if (selection) {
-    void restoreTextareaSelection(selection)
+    void restoreTextareaSelection(selection, true, shouldRestore)
   } else {
-    textareaRef.value?.focus()
+    void nextTick(() => {
+      if (shouldRestore()) textarea?.focus()
+    })
   }
 }
 const movePaletteIndex = (direction: 1 | -1) => {
