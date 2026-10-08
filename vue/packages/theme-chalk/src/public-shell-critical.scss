@@ -724,6 +724,7 @@
       flex-wrap: wrap;
       gap: var(--fsus-space-2, 8px);
       padding-block: 0;
+      padding-inline: var(--fsus-space-2, 8px);
     }
 
     @include e(primary-row) {
@@ -731,7 +732,7 @@
       min-inline-size: min-content;
       grid-template-columns:
         minmax(var(--fsus-public-shell-mobile-action-height, 44px), 1fr)
-        minmax(0, auto);
+        auto;
     }
 
     @include e(brand) {
@@ -746,7 +747,7 @@
       display: flex;
       flex: 1 1 0;
       align-items: center;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: var(--fsus-space-2, 8px);
       margin-block: 0;
     }
@@ -783,7 +784,7 @@
     }
 
     @include e(mobile-actions) {
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       margin-block: 0;
     }
 
