@@ -348,6 +348,35 @@ test('T400-02 traces every constraint to spec, design, token, and component cont
   )
 })
 
+test('production component authority rejects stale bindings and changed source', async () => {
+  const subject = await loadSubject()
+  const assets = await subject.loadComponentSurfaceSemanticRegistry({ root })
+  const stale = clone(assets.registry)
+  stale.sourceDigests['component-contracts'].digest =
+    '25c0ec51de05d6e66147ee2d2a17522b5fdd92f521fde6bbac1197f5b0825d41'
+  await assert.doesNotReject(() =>
+    subject.validateComponentSurfaceSemanticRegistry({ ...assets, root }),
+  )
+  await expectValidationRejected(
+    subject,
+    assets,
+    stale,
+    'registry-source-digest-drift',
+  )
+  const sourcePath = assets.registry.sourceDigests['component-contracts'].path
+  await expectValidationRejected(
+    subject,
+    assets,
+    assets.registry,
+    'registry-source-digest-drift',
+    {
+      sourceOverrides: {
+        [sourcePath]: `${fs.readFileSync(path.join(root, sourcePath), 'utf8')}\nunauthorized drift`,
+      },
+    },
+  )
+})
+
 test('T400-03 fails closed when a canonical source digest drifts', async () => {
   const registry = readJson('valid-registry.json')
   const designPath = path.join(root, 'docs/design.md')
