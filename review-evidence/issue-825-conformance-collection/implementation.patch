@@ -2,52 +2,25 @@ diff --git a/scripts/conformance-playwright-owner-run.mjs b/scripts/conformance-
 index 72bcc775..931d0887 100644
 --- a/scripts/conformance-playwright-owner-run.mjs
 +++ b/scripts/conformance-playwright-owner-run.mjs
-@@ -10,7 +10,10 @@ import {
-   loadConformanceReceiptsFromDirectory,
-   verifyConformanceOwnerReceipts,
- } from './conformance-playwright-verify.mjs'
+@@ -13 +13,4 @@ import {
 -import { filterOwnerPlanByImpact } from './playwright-impact-filter.mjs'
 +import {
 +  filterOwnerPlanByImpact,
 +  loadPlaywrightImpactPlan,
 +} from './playwright-impact-filter.mjs'
- 
- const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
- 
-@@ -93,9 +96,11 @@ export async function runConformanceOwner(argv = process.argv.slice(2)) {
- 
-   const results = []
-   let overallFailed = false
+@@ -95,0 +99 @@ export async function runConformanceOwner(argv = process.argv.slice(2)) {
 +  const impactPlan = loadPlaywrightImpactPlan(root, impactPlanPath)
-   for (const cell of cells) {
-     const result = await runConformanceCell(ownerId, cell.id, group, {
-       evidenceDir,
+@@ -98,0 +103 @@ export async function runConformanceOwner(argv = process.argv.slice(2)) {
 +      impactPlan,
-     })
-     results.push(result)
-     if (!result.ok) overallFailed = true
 diff --git a/scripts/conformance-playwright-runner.mjs b/scripts/conformance-playwright-runner.mjs
 index 72e36d76..e5f3562b 100644
 --- a/scripts/conformance-playwright-runner.mjs
 +++ b/scripts/conformance-playwright-runner.mjs
-@@ -1,11 +1,13 @@
- #!/usr/bin/env node
- 
- import { Buffer } from 'node:buffer'
+@@ -3,0 +4 @@ import { Buffer } from 'node:buffer'
 +import { spawnSync } from 'node:child_process'
- import { createHash } from 'node:crypto'
- import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
- import { dirname, resolve } from 'node:path'
- import { fileURLToPath, pathToFileURL } from 'node:url'
- import { loadConformanceOwnerPlan } from './conformance-playwright-plan.mjs'
+@@ -8,0 +10 @@ import { loadConformanceOwnerPlan } from './conformance-playwright-plan.mjs'
 +import { loadPlaywrightImpactPlan } from './playwright-impact-filter.mjs'
- import {
-   readBrowserToolchain,
-   runMarkdownCell,
-@@ -14,6 +16,94 @@ import {
- 
- const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
- 
+@@ -16,0 +19,88 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 +export function resolveConformanceInteractionIdentity({
 +  repositoryRoot = root,
 +  group,
@@ -136,27 +109,14 @@ index 72e36d76..e5f3562b 100644
 +  return { baseline, candidate }
 +}
 +
- export const CONFORMANCE_IDENTITY_SOURCES = Object.freeze({
-   contract: 'spec/components/contracts/v2/contract-v2.json',
-   vueBaseline: 'spec/baselines/vue-current.json',
-@@ -276,8 +366,13 @@ const receiptExtension = async ({ cell, parsedReport, evidenceDir }) => {
- }
- 
- export async function runConformanceCell(ownerId, cellId, group, options = {}) {
+@@ -278,0 +369,4 @@ export async function runConformanceCell(ownerId, cellId, group, options = {}) {
 +  const interactionIdentity = resolveConformanceInteractionIdentity({
 +    group,
 +    impactPlan: options.impactPlan,
 +  })
-   return runMarkdownCell(ownerId, cellId, group, {
-     ...options,
+@@ -280,0 +375 @@ export async function runConformanceCell(ownerId, cellId, group, options = {}) {
 +    interactionIdentity,
-     planLoader: loadConformanceOwnerPlan,
-     fingerprintInputsBySuite: CONFORMANCE_FINGERPRINT_INPUTS,
-     logPrefix: 'playwright-conformance',
-@@ -310,7 +405,13 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-     option(process.argv.slice(2), 'owner', 'playwright-conformance'),
-     cellId,
-     option(process.argv.slice(2), 'group', 'main'),
+@@ -313 +408,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
 -    { evidenceDir: option(process.argv.slice(2), 'evidence-dir') },
 +    {
 +      evidenceDir: option(process.argv.slice(2), 'evidence-dir'),
@@ -165,17 +125,11 @@ index 72e36d76..e5f3562b 100644
 +        option(process.argv.slice(2), 'impact-plan'),
 +      ),
 +    },
-   )
-   if (!result.ok) process.exitCode = 1
- }
 diff --git a/scripts/markdown-playwright-runner.mjs b/scripts/markdown-playwright-runner.mjs
 index 3d775c0d..1a65c11a 100644
 --- a/scripts/markdown-playwright-runner.mjs
 +++ b/scripts/markdown-playwright-runner.mjs
-@@ -118,6 +118,47 @@ const testsFromStats = (stats) => {
-   }
- }
- 
+@@ -120,0 +121,41 @@ const testsFromStats = (stats) => {
 +export function createMarkdownPlaywrightEnvironment(
 +  identity,
 +  env = process.env,
@@ -217,62 +171,30 @@ index 3d775c0d..1a65c11a 100644
 +  }
 +}
 +
- const MARKDOWN_FINGERPRINT_INPUTS = Object.freeze({
-   'markdown-editor-interaction': [
-     'vue/playwright.markdown-editor.config.ts',
-@@ -209,6 +250,8 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
-   const startedAt = new Date().toISOString()
-   let failureReason = null
-   let runtime = null
+@@ -211,0 +253,2 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
 +  let report = null
 +  let tests = testsFromStats(null)
- 
-   const reportRelative = `${evidenceDir}/reports/${cell.suiteId}/${cell.project}/report.json`
-   const reportPath = resolve(root, reportRelative)
-@@ -246,15 +289,21 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
-       ],
-       {
-         cwd: root,
+@@ -249 +292 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
 -        env: { ...process.env, CI: 'true' },
 +        env: createMarkdownPlaywrightEnvironment(options.interactionIdentity),
-         encoding: 'utf8',
-         maxBuffer: 256 * 1024 * 1024,
-       },
-     )
-     const stdout = result.stdout ?? ''
-     const parsed = parseJsonReporterOutput(stdout)
+@@ -256 +299 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
 -    const tests = testsFromStats(parsed?.stats)
 +    tests = testsFromStats(parsed?.stats)
-     writeFileSync(reportPath, stdout.trim() ? stdout : '{}')
+@@ -257,0 +301,6 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
 +    writeFileSync(
 +      resolve(dirname(reportPath), 'stderr.log'),
 +      result.stderr ?? '',
 +    )
 +    report = { path: reportRelative, sha256: sha256File(reportPath) }
 +    assertMarkdownPlaywrightCollection(parsed, result)
-     const status = result.status === 0 ? 'success' : 'failure'
- 
-     const playwrightVersion = spawnSync(
-@@ -319,7 +368,7 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
-       },
-       config: { path: cell.config, sha256: cell.configSha256 },
-       tests,
+@@ -322 +371 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
 -      report: { path: reportRelative, sha256: sha256File(reportPath) },
 +      report,
-       status,
-       failureReason: null,
-       startedAt,
-@@ -372,8 +421,8 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
-         },
-         runtime,
-         config: { path: cell.config, sha256: cell.configSha256 },
+@@ -375,2 +424,2 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
 -        tests: { total: 0, passed: 0, failed: 0, skipped: 0, flaky: 0 },
 -        report: null,
 +        tests,
 +        report,
-         status: 'failure',
-         failureReason,
-         startedAt,
 diff --git a/tests/conformance-playwright-identity.test.mjs b/tests/conformance-playwright-identity.test.mjs
 new file mode 100644
 index 00000000..1d39c40a

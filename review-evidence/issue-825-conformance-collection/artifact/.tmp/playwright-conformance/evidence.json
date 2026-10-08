@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "owner": "playwright-conformance",
+  "gate": "playwright-conformance",
+  "group": "pr",
+  "commitSha": "e36ce622a4a99fa21ab0f85fa2170499c2d3bd70",
+  "planDigest": "0f392705938f3884d30771f8aebf74a71cf0a5bd3748c6b350aef5c796edc7f8",
+  "impactPlanDigest": "55a8f24529e6df83f442ed36fd10bf9170a17c41f57765eba39ea053e3efefbd",
+  "runtimeMode": "native",
+  "cells": [
+    {
+      "ok": false,
+      "cellId": "web-interaction-conformance/chromium",
+      "status": "failure",
+      "receiptPath": ".readiness/receipts/playwright-conformance/web-interaction-conformance-chromium.json",
+      "error": "cell web-interaction-conformance/chromium produced no real interaction trace attachments"
+    },
+    {
+      "ok": false,
+      "cellId": "web-interaction-conformance/firefox",
+      "status": "failure",
+      "receiptPath": ".readiness/receipts/playwright-conformance/web-interaction-conformance-firefox.json",
+      "error": "cell web-interaction-conformance/firefox produced no real interaction trace attachments"
+    },
+    {
+      "ok": false,
+      "cellId": "web-interaction-conformance/webkit",
+      "status": "failure",
+      "receiptPath": ".readiness/receipts/playwright-conformance/web-interaction-conformance-webkit.json",
+      "error": "cell web-interaction-conformance/webkit produced no real interaction trace attachments"
+    }
+  ],
+  "aggregate": {
+    "owner": "playwright-conformance",
+    "gate": "playwright-conformance",
+    "group": "pr",
+    "cells": [
+      {
+        "cellId": "web-interaction-conformance/chromium",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "web-interaction-conformance/firefox",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "web-interaction-conformance/webkit",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      }
+    ],
+    "status": "failure",
+    "traceDigest": null
+  },
+  "status": "failure"
+}
