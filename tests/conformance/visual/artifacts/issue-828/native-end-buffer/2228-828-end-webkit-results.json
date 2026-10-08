@@ -1,0 +1,12 @@
+[
+  {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "command": [
+      "node",
+      ".tmp/issue-828-end/probe-webkit-labels.mjs",
+      "webkit-labels"
+    ],
+    "exitCode": 1,
+    "log": "/tmp/2228-828-end-webkit-labels-first.log"
+  }
+]

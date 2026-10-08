@@ -1,0 +1,297 @@
+{
+  "schema": "issue-828.native-end-buffer-custody.v1",
+  "testedCandidate": "e30778563d2271acd924f65ded814bfb0c972076",
+  "productSource": "20e4a21b398fb8450b9c948c39e2760450fa4477",
+  "sourceIncludes": [
+    "dc8aed9b0d50c69f27999722a434cf3c0d164fac",
+    "777fcf62f19ff801cb733cfe7a155ee653da76b4"
+  ],
+  "qualificationEligible": false,
+  "independentUXReceipt": null,
+  "fullExitCode": 1,
+  "preview": {
+    "passed": 647,
+    "failed": 41,
+    "total": 688
+  },
+  "dev": {
+    "passed": 9,
+    "failed": 10,
+    "total": 19
+  },
+  "nativeDefaultChecks": 144,
+  "nativeLocaleChecks": 432,
+  "strictNativeMinimum": 44,
+  "nativeFailures": 0,
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-before-label-targets-first.log",
+      "bytes": 238,
+      "sha256": "9b1dfbd09318a6d5fcc9678788b0916896bc777ac245cceeda0d6350e35302c1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-before-locale-targets-first.log",
+      "bytes": 240,
+      "sha256": "394fb37dd641acdf06c67ccc28f49b8ec220119078204ecb9a5f062fd4b423b7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-check-0-first.log",
+      "bytes": 230,
+      "sha256": "4279a23e62876cc584953511b64c6d49a2fe26fe9cd457d6c26230c8df1c1876"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-check-1-first.log",
+      "bytes": 1576,
+      "sha256": "88bdf2f4c9c2b4d6bec96c70bc5e21c3a88ee7921caac52048ca70243a8e12b7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-check-2-first.log",
+      "bytes": 197,
+      "sha256": "ce9645ceb00b4b48e547f2acc8f70de75a1370d82e8702cc040d0980201ccc0f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-check-3-first.log",
+      "bytes": 401,
+      "sha256": "95608a388723215c809dac9590fe6d9bec8697c2caaa3b5281819b17d56e11f8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-check-4-first.log",
+      "bytes": 4873,
+      "sha256": "a563f7310e1aca526f9d73a309adf764bc5a5cef71fd7138ccfd61cf205222e2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-check-5-first.log",
+      "bytes": 164,
+      "sha256": "73837efb8cbe189623eae5576fa9512939572c88404743cce831f33423b4b40a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-check-6-first.log",
+      "bytes": 86,
+      "sha256": "04331bd11f1dbecbcf6841dfff20ac936c2a59340bc3f982790e263d5808dbe1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-check-results.json",
+      "bytes": 1885,
+      "sha256": "f16f7a3b3508049d65cbc8a08b184db63ba7e5135126deeb60bb061664d293a8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-classification-first.log",
+      "bytes": 292,
+      "sha256": "6dffb8871ab12e7a809a979ecd551d10a63507b603ef213c6030680dcf1da8a6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-full-result.json",
+      "bytes": 370,
+      "sha256": "b2044c6a8193fd250b7a295a3406430807e41241215f2194fa3a5c9fc3763533"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-full-visual-first.log",
+      "bytes": 300802,
+      "sha256": "dca7658c6db86285ef630f4dcc188ecf58ef166f3341caf1b83068617292e13f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-install-first.log",
+      "bytes": 4866,
+      "sha256": "833332dcec136b600d348846a780ed58554611cc5d20385b9ac0b1f9509c34d9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-label-targets-first.log",
+      "bytes": 233,
+      "sha256": "9df2ca266e489ac346da69440c3441a4bdf9b088be7f1434dd0fb789753f01c9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-labels-first.log",
+      "bytes": 1459,
+      "sha256": "1dd4770cabcbf86d09bda8590cd6be4c938a62edf1c657e0af0296dcb8a3d617"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-locale-targets-first.log",
+      "bytes": 235,
+      "sha256": "96a3f0bce29416e43329d32f10d3a3b2a07a46d1b14710cdf20ee46b79f1ca24"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-locales-first.log",
+      "bytes": 7085,
+      "sha256": "107c979ec4f0a7865d4d43abeb7bdaac39a8ce70968578523523e96fb32107b7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-long-auth-budget-readonly-first.log",
+      "bytes": 3607,
+      "sha256": "2f32626c99df4f67e2e697d05544ac307351ff892331955e5ecbfbefa075bc42"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-matrix-first.log",
+      "bytes": 3829,
+      "sha256": "ef427b1672bae6cd5e3c5c570236b0ab7344cbb9ca005076b8bc08d0d451502d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-preview-first.log",
+      "bytes": 39,
+      "sha256": "fdd0c725f02168fdd4f33a34eff3433b11786d38ce4197075208a57227296611"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-preview-results.json",
+      "bytes": 1969,
+      "sha256": "f6192fa1aca414dceb20b4ee1a6421d8da60e6e0ff97efb1ca732963df7b9c33"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-runtime-first.log",
+      "bytes": 145,
+      "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-setup-0-first.log",
+      "bytes": 1337,
+      "sha256": "e43621e36f05852f2d2c5b4a88ba64f1052e21ba91686b0fd3a891567842f997"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-setup-1-first.log",
+      "bytes": 15151,
+      "sha256": "d1d3c8cb6daa841befe0b2cb64bc62d2bb6ea3a51dacd5efda7f59311db818b8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-setup-2-first.log",
+      "bytes": 6023,
+      "sha256": "7bcf0c35672c8d1ed039458f2699423d5bde56cb678e45d5793963cd8978298e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-setup-3-first.log",
+      "bytes": 85806,
+      "sha256": "f454c149155cf39222697cec17157ca9ef7f6c40c875a2dca3df596ea089327c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-setup-results.json",
+      "bytes": 605,
+      "sha256": "51023d59158adeeb62678c7b7210dfb38993e48308930db33eb5321787376eba"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-shell42-first.log",
+      "bytes": 6358,
+      "sha256": "38047020321e2a38f663dcda420661e00f731c109e83ef8dda84bfe1d8923049"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-webkit-labels-first.log",
+      "bytes": 748,
+      "sha256": "7210bf40b3dbb5d16b72b53b4e8a337824659a293817287b38f15d5ffd1b5a46"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-webkit-native-lib-cached-manifest.json",
+      "bytes": 230,
+      "sha256": "5e2b4ae67afbeba6697a14fce9b297a146246d6c2294a46f7e87af5ce1183dce"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-webkit-native-lib-download-first.log",
+      "bytes": 129,
+      "sha256": "2f6585b2cee8eac63205d00f3eef5832900b88f89591f16385084de649152f8c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-webkit-native-lib-manifest.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-webkit-preview-first.log",
+      "bytes": 39,
+      "sha256": "72a698f6af87c32b54f207e39501c1feee1b0c34b1bde9871c47297886d50e43"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/2228-828-end-webkit-results.json",
+      "bytes": 258,
+      "sha256": "e8f38e9604a2788bc7d7bc6b379cc17bf1860eca639381a6908fdcf2c8cf0826"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/README.md",
+      "bytes": 6891,
+      "sha256": "d8d35f80d2545dd6027130da85cd8da74555f31645f3c4f5aa2edf342b20c884"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/after-labels-labels.json",
+      "bytes": 152653,
+      "sha256": "80b34288d1aa3b3c801815118982df41d10e1235eea6da7b365c41fbd5262f7d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/after-labels-native-target-result.json",
+      "bytes": 275,
+      "sha256": "1f5584f2d4679508079706415484563e32d1476523be7fa7d2c05c8ddc7ab3be"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/after-locales-labels.json",
+      "bytes": 459179,
+      "sha256": "670d03641e081a3af3694f5712541912991993e90a6eea9ddb717d369fc07108"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/after-locales-native-target-result.json",
+      "bytes": 277,
+      "sha256": "4f242a0d3e7628d02a0d27191e9523d3fc1dd7ab6eb4419ce8be42d6c0644543"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/after-matrix-matrix.json",
+      "bytes": 2164583,
+      "sha256": "3e89c21d55fac29c6d3fbf4c215e6b37abfd301427e6422929c5941dc8d2409d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/current-first-raw-manifest.json",
+      "bytes": 565378,
+      "sha256": "45f020d57b856266f46dd19725ac62df4cd10b5fb37d6def38a9d99844294ecf"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/label-preimplementation-classification-evidence.json",
+      "bytes": 947,
+      "sha256": "9d286a1da3b83c96e5229bc2bd8c4c3be2a194c253518fa1f8119ce242645dbc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/label-preimplementation-classification-receipt.json",
+      "bytes": 3791,
+      "sha256": "6f5b6983986329c7b47f8739c194d1400610073e34c367dd2fe7ca0159965972"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/native-and-text-first.zip",
+      "bytes": 26314880,
+      "sha256": "d14806929c299b520a9fd2d4f2de795b7ced6cc269fc0e892296755e3880b2c3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/original-full-dev-failures-first.zip",
+      "bytes": 12609549,
+      "sha256": "c337875081d92f10d9f93664a2f749f7efa49a04fbb13cd6e1c714ae11b3424a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/original-full-generated-metrics-first.zip",
+      "bytes": 4514533,
+      "sha256": "319fa251d20980b6a2debb98411c06875438c16c573b12289acd9957c398fa25"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/original-full-preview-failures-first.zip",
+      "bytes": 78021883,
+      "sha256": "1680edced9962ab9c2b79e83005accb515c4587d8052df99f76f67259e692675"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/original-full-runtime-report-first-part1.zip",
+      "bytes": 78634377,
+      "sha256": "f4754551ee97847864ee50ace516ebc117cf86369de875a15c1ee751a5811d1e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/original-full-runtime-report-first-part2.zip",
+      "bytes": 55983199,
+      "sha256": "76ed9e57705b7fea8f9f08c30ef98c6eaecd73623f4bc0624da653fbfabafe57"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/original-shell42-traces-first.zip",
+      "bytes": 28810402,
+      "sha256": "1b2da5e01ffd194dd058c09868c8c7c14db7360b591c45567d09171d2156c4d7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/prepared-draft-pr-body.md",
+      "bytes": 1046,
+      "sha256": "385fa6b6693ec65b34e8fdd049075efd1f31c4031a2b35b4391cae4718a51e8b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/recovery-shell-check-20261008.json",
+      "bytes": 647,
+      "sha256": "b8989a4f78b21003e89d4045d775854983d463d3284b735c551f4f0e0d70eaec"
+    }
+  ],
+  "entryCount": 53,
+  "rawZIPEntryCount": 2279,
+  "firstFailurePolicy": "Before43.75 failures, current51 full failures and WebKit refusal remain; no current failure is erased or waived",
+  "evidenceCommitNote": "Artifact head is not tested product head"
+}

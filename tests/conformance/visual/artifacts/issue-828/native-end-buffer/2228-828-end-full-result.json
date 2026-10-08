@@ -1,0 +1,16 @@
+{
+  "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+  "command": [
+    "pnpm",
+    "run",
+    "test:visual:full"
+  ],
+  "exitCode": 1,
+  "log": "/tmp/2228-828-end-full-visual-first.log",
+  "environment": {
+    "CI": "unset; original zero retries",
+    "FSUS_VISUAL_EVIDENCE": "1",
+    "FSUS_VISUAL_PREVIEW_PORT": "5371",
+    "FSUS_VISUAL_DEV_PORT": "5372"
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "header": {
+    "text": "International Field Research PublicationsHomeArchiveTopicsAboutAccount: International ResearcherCancelAccount: International ResearcherHomeArchiveTopicsAbout",
+    "width": 571,
+    "height": 181,
+    "font": "16px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "normal",
+    "gap": "normal",
+    "padding": "0px",
+    "boxSizing": "content-box"
+  },
+  "inner": {
+    "text": "International Field Research PublicationsHomeArchiveTopicsAboutAccount: International ResearcherCancelAccount: International ResearcherHomeArchiveTopicsAbout",
+    "width": 571,
+    "height": 179,
+    "font": "16px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "normal",
+    "gap": "4px 0px",
+    "padding": "0px 4px",
+    "boxSizing": "border-box"
+  },
+  "primary": {
+    "text": "International Field Research PublicationsHomeArchiveTopicsAboutAccount: International ResearcherCancelAccount: International Researcher",
+    "width": 317,
+    "height": 179,
+    "font": "16px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "normal",
+    "gap": "4px",
+    "padding": "0px",
+    "boxSizing": "content-box"
+  },
+  "actions": {
+    "text": "CancelAccount: International Researcher",
+    "width": 221,
+    "height": 179,
+    "font": "16px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "normal",
+    "gap": "4px",
+    "padding": "0px",
+    "boxSizing": "content-box"
+  },
+  "trigger": {
+    "text": "Cancel",
+    "width": 88,
+    "height": 88,
+    "font": "500 14px / 14px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "14px",
+    "gap": "normal",
+    "padding": "0px 8px",
+    "boxSizing": "border-box"
+  },
+  "auth": {
+    "text": "Account: International Researcher",
+    "width": 125,
+    "height": 179,
+    "font": "500 14px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "normal",
+    "gap": "normal",
+    "padding": "0px",
+    "boxSizing": "border-box"
+  },
+  "toolbar": {
+    "text": "HomeArchiveTopicsAbout",
+    "width": 238,
+    "height": 88,
+    "font": "16px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "normal",
+    "gap": "4px",
+    "padding": "0px",
+    "boxSizing": "content-box"
+  },
+  "nav": {
+    "text": "HomeArchiveTopicsAbout",
+    "width": 110,
+    "height": 88,
+    "font": "16px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "normal",
+    "gap": "24px",
+    "padding": "0px 4px 0px 0px",
+    "boxSizing": "border-box"
+  },
+  "field": {
+    "text": "",
+    "width": 120,
+    "height": 88,
+    "font": "12px / 40px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+    "lineHeight": "40px",
+    "gap": "normal",
+    "padding": "1px 7px",
+    "boxSizing": "border-box"
+  },
+  "authWordLogicalWidths": [
+    [
+      "Account:",
+      59
+    ],
+    [
+      "International",
+      82
+    ],
+    [
+      "Researcher",
+      76
+    ]
+  ],
+  "canvasFont": "500 14px \"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif"
+}

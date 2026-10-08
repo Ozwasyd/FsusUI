@@ -1,0 +1,12 @@
+{
+  "sourceHead": "e30778563d2271acd924f65ded814bfb0c972076",
+  "phase": "after-locales",
+  "qualificationEligible": false,
+  "rows": 108,
+  "navChecks": 432,
+  "minVisibleLogicalWidth": 44,
+  "minHeight": 44,
+  "threshold": 44,
+  "thresholdRelaxed": false,
+  "failures": []
+}

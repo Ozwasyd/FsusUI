@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "ensure:icons"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-setup-0-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "ensure:wasm"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-setup-1-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "build:theme"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-setup-2-first.log"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/prepare-visual-runtime.mjs"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-setup-3-first.log"
+  }
+]

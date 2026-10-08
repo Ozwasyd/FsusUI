@@ -1,0 +1,79 @@
+[
+  {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "command": [
+      "node",
+      ".tmp/issue-828-end/probe-labels-final.mjs",
+      "after-labels"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-labels-first.log"
+  },
+  {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "command": [
+      "node",
+      ".tmp/issue-828-end/check-native-targets.mjs",
+      "after-labels"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-label-targets-first.log"
+  },
+  {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "command": [
+      "node",
+      ".tmp/issue-828-end/probe-locales-final.mjs",
+      "after-locales"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-locales-first.log"
+  },
+  {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "command": [
+      "node",
+      ".tmp/issue-828-end/check-native-targets.mjs",
+      "after-locales"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-locale-targets-first.log"
+  },
+  {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "command": [
+      "node",
+      ".tmp/issue-828-end/capture-matrix.mjs",
+      "after-matrix"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-matrix-first.log"
+  },
+  {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "command": [
+      "pnpm",
+      "exec",
+      "playwright",
+      "test",
+      "--config=vue/playwright.config.ts",
+      "vue/tests/visual/public-shell-mobile-nav.spec.ts",
+      "vue/tests/visual/public-shell-desktop-search.spec.ts",
+      "--workers=1",
+      "--trace=on",
+      "--output=/tmp/2228-828-end-shell42-first"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-shell42-first.log"
+  },
+  {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "command": [
+      "node",
+      "scripts/prepare-visual-runtime.mjs",
+      "--check"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-end-runtime-first.log"
+  }
+]

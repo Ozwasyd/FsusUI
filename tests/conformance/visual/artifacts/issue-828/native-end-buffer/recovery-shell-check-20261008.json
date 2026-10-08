@@ -1,0 +1,11 @@
+{
+  "command": "date -u '+%Y-%m-%d %H:%M:%S UTC'\npwd\ngit rev-parse HEAD\ngit status --short",
+  "workdir": "/workspace/FsusUI-828-native-end-buffer",
+  "exitCode": 0,
+  "actualUTC": "2026-10-08 15:49:48 UTC",
+  "actualHEAD": "e30778563d2271acd924f65ded814bfb0c972076",
+  "sourcePreserved": true,
+  "sourcePreviouslyCommittedAndPushed": true,
+  "actualStatus": "14 original full visual producer metric PNGs modified; no product source changes. Current bytes archived before exact frozen tracked files restored.",
+  "recoveryProof": "Actual bounded shell result only; no old tests/inProgress status used. No visual test rerun for connectivity."
+}
