@@ -6,6 +6,9 @@ const open = ref(false)
 const nestedOpen = ref(false)
 const destroyOnClose = ref(false)
 const closedCount = ref(0)
+const opener = new URLSearchParams(window.location.search).get('opener')
+const conditionalMount = opener?.startsWith('conditional') ?? false
+const openDelay = opener?.includes('delay') ? 30 : 0
 
 async function reopen() {
   open.value = false
@@ -15,17 +18,29 @@ async function reopen() {
 </script>
 
 <template>
-  <ElButton @click="open = true"><span>Open dialog</span></ElButton>
+  <template v-if="opener">
+    <input aria-label="Previous focus" />
+    <button
+      :tabindex="opener === 'negative-tabindex' ? -1 : 0"
+      @mousedown.prevent
+      @click="open = true"
+    >
+      <span>Open dialog</span>
+    </button>
+  </template>
+  <ElButton v-else @click="open = true"><span>Open dialog</span></ElButton>
   <ElButton @click="open = false">External close</ElButton>
   <label
     ><input v-model="destroyOnClose" type="checkbox" /> Destroy content</label
   >
   <output aria-label="Closed count">{{ closedCount }}</output>
   <ElDialog
+    v-if="!conditionalMount || open"
     v-model="open"
     title="Focus restoration"
     append-to-body
     :destroy-on-close="destroyOnClose"
+    :open-delay="openDelay"
     @closed="closedCount++"
   >
     <p>Dialog content uses the public component and its production theme.</p>

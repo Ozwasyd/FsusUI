@@ -3,7 +3,9 @@ import {
   getCurrentInstance,
   nextTick,
   onMounted,
+  provide,
   ref,
+  shallowRef,
   watch,
 } from 'vue'
 import { useTimeoutFn } from '@element-plus/hooks/use-runtime'
@@ -18,13 +20,15 @@ import {
 import { UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { addUnit, isClient } from '@element-plus/utils'
 import { useGlobalConfig } from '@element-plus/components/config-provider'
+import { getPointerFocusTarget } from '@element-plus/components/focus-trap/src/utils'
+import { focusRestoreTargetKey } from '@element-plus/components/focus-trap/src/restore-target'
 
 import type { CSSProperties, Ref, SetupContext } from 'vue'
 import type { DialogEmits, DialogProps } from './dialog'
 
 export const useDialog = (
   props: DialogProps,
-  targetRef: Ref<HTMLElement | undefined>
+  targetRef: Ref<HTMLElement | undefined>,
 ) => {
   const instance = getCurrentInstance()!
   const emit = instance.emit as SetupContext<DialogEmits>['emit']
@@ -37,6 +41,8 @@ export const useDialog = (
   const closed = ref(false)
   const rendered = ref(false) // when desctroyOnClose is true, we initialize it as false vise versa
   const zIndex = ref(props.zIndex ?? nextZIndex())
+  const restoreTarget = shallowRef<HTMLElement | null>(null)
+  provide(focusRestoreTargetKey, restoreTarget)
 
   let openTimer: (() => void) | undefined = undefined
   let closeTimer: (() => void) | undefined = undefined
@@ -80,6 +86,11 @@ export const useDialog = (
   function open() {
     closeTimer?.()
     openTimer?.()
+    if (isClient) {
+      restoreTarget.value =
+        getPointerFocusTarget() ??
+        (document.activeElement as HTMLElement | null)
+    }
 
     if (props.openDelay && props.openDelay > 0) {
       ;({ stop: openTimer } = useTimeoutFn(() => doOpen(), props.openDelay))
@@ -168,12 +179,13 @@ export const useDialog = (
           }
         })
       } else {
+        openTimer?.()
         // this.$el.removeEventListener('scroll', this.updatePopper
         if (visible.value) {
           close()
         }
       }
-    }
+    },
   )
 
   watch(
@@ -186,12 +198,11 @@ export const useDialog = (
       } else {
         targetRef.value.style.transform = lastPosition
       }
-    }
+    },
   )
 
   onMounted(() => {
     if (props.modelValue) {
-      visible.value = true
       rendered.value = true // enables lazy rendering
       open()
     }

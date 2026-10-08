@@ -184,8 +184,14 @@ const notifyPointerActivation = (event: MouseEvent) => {
           .find(
             (target) =>
               target instanceof HTMLElement &&
-              target.tabIndex >= 0 &&
+              (target.tabIndex >= 0 ||
+                target.hasAttribute('tabindex') ||
+                target.isContentEditable ||
+                target.matches(
+                  'button, input, select, textarea, a[href], area[href], iframe, summary',
+                )) &&
               !target.matches(':disabled') &&
+              !target.matches('input[type="hidden"]') &&
               !target.closest('[hidden], [inert]'),
           ) as HTMLElement | undefined) ?? null)
       : null
@@ -195,6 +201,12 @@ const notifyPointerActivation = (event: MouseEvent) => {
 }
 
 export const getPointerFocusTarget = () => pointerFocusTarget
+
+// Capture before a click can mount its first Dialog. The target expires after
+// this event turn; Dialog snapshots it for its own delayed opening session.
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', notifyPointerActivation, true)
+}
 
 export const useFocusReason = (): {
   focusReason: typeof focusReason
@@ -206,7 +218,6 @@ export const useFocusReason = (): {
       document.addEventListener('mousedown', notifyFocusReasonPointer)
       document.addEventListener('touchstart', notifyFocusReasonPointer)
       document.addEventListener('keydown', notifyFocusReasonKeydown)
-      document.addEventListener('click', notifyPointerActivation, true)
     }
     focusReasonUserCount++
   })
@@ -217,9 +228,6 @@ export const useFocusReason = (): {
       document.removeEventListener('mousedown', notifyFocusReasonPointer)
       document.removeEventListener('touchstart', notifyFocusReasonPointer)
       document.removeEventListener('keydown', notifyFocusReasonKeydown)
-      document.removeEventListener('click', notifyPointerActivation, true)
-      clearTimeout(pointerFocusTargetTimer)
-      pointerFocusTarget = null
     }
   })
 

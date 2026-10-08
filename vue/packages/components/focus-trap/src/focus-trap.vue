@@ -4,6 +4,7 @@
 <script lang="ts">
 import {
   defineComponent,
+  inject,
   nextTick,
   onBeforeUnmount,
   onMounted,
@@ -16,6 +17,7 @@ import { isNil } from 'lodash-unified'
 import { EVENT_CODE } from '@element-plus/constants'
 import { useEscapeKeydown } from '@element-plus/hooks'
 import { isString } from '@element-plus/utils'
+import { focusRestoreTargetKey } from './restore-target'
 import {
   createFocusOutPreventedEvent,
   focusFirstDescendant,
@@ -61,6 +63,9 @@ export default defineComponent({
     'release-requested',
   ],
   setup(props, { emit }) {
+    const restoreTarget = inject(focusRestoreTargetKey, null)
+    // Descendant traps must capture their own opener, not inherit this session.
+    provide(focusRestoreTargetKey, null)
     const forwardRef = ref<HTMLElement | undefined>()
     let lastFocusBeforeTrapped: HTMLElement | null
     let lastFocusAfterTrapped: HTMLElement | null
@@ -247,7 +252,7 @@ export default defineComponent({
 
     async function startTrap() {
       const generation = ++trapGeneration
-      const pointerTarget = getPointerFocusTarget()
+      const pointerTarget = restoreTarget?.value ?? getPointerFocusTarget()
       const activeElement = document.activeElement
       // Wait for forwardRef to resolve
       await nextTick()
