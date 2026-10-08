@@ -9,7 +9,10 @@ import {
   ElEmptyState,
   type EmptyStateProps,
 } from '__FSUS_PACKAGE_NAME__/es/components/empty-state/index.mjs'
-import type { MotionPresetName } from '__FSUS_PACKAGE_NAME__/motion'
+import type {
+  MotionPresetName,
+  useScrollReveal,
+} from '__FSUS_PACKAGE_NAME__/motion'
 import type {
   CharacterChallengeProps,
   PerceptionCharacterMedia,
@@ -20,6 +23,22 @@ import '__FSUS_PACKAGE_NAME__/theme-chalk/el-button.css'
 import '__FSUS_PACKAGE_NAME__/theme-chalk/el-empty-state.css'
 import '__FSUS_PACKAGE_NAME__/theme-chalk/el-markdown-renderer.css'
 import App from './App.vue'
+
+type AssertMotionDeclaration<T extends true> = T
+export type ConsumerScrollRevealControls = AssertMotionDeclaration<
+  'reveal' | 'kill' | 'refresh' | 'tweens' extends keyof ReturnType<
+    typeof useScrollReveal
+  >
+    ? true
+    : false
+>
+type RequireScrollRevealOptions<
+  T extends Parameters<typeof useScrollReveal>[0],
+> = T
+// @ts-expect-error compiled motion declarations must reject string disabled values
+export type ConsumerInvalidScrollRevealOptions = RequireScrollRevealOptions<{
+  disabled: 'true'
+}>
 
 const loadPublicShellCriticalCss = () =>
   import('__FSUS_PACKAGE_NAME__/dist/public-shell-critical.css')
