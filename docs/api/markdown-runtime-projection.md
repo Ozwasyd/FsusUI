@@ -108,7 +108,10 @@ ranges, parent/child ranges, diagnostics, presentation, and syntax coverage.
 
 Syntax ids are opaque and scoped to both the document id and document epoch. A
 new document or epoch never reuses an earlier document's ids, even when the
-source bytes match.
+source bytes match. Document ids may contain separators, including
+`document:N` or multiple colons. Direct and revived Worker projections use the
+same canonical resolver without changing the `syn:<document>:<epoch>:<kind>:<ordinal>`
+encoding; consumers must not split or rewrite these opaque ids.
 
 - Creation allocates a monotonically increasing ordinal for the syntax kind.
   Deleted ordinals remain consumed for the rest of the document epoch.
