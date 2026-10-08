@@ -17,6 +17,11 @@
       "sha256": "50b02b5ff9a70429eeb87cd88e213d63eebcd88b90ad7085918a676842a6d26c"
     },
     {
+      "path": "final-default-source-checkpoint.json",
+      "bytes": 1239,
+      "sha256": "caef92f019b5418f4362fbd52b7f2b203409f54e1103d8d98bb2f61b9064142e"
+    },
+    {
       "path": "fsusui-npm-candidate.manifest.json",
       "bytes": 1418,
       "sha256": "a6adc98a4c17fb4f1b3c0ca4b0e8740fd23a2d21950d95c76d49f18ccc6dfff2"
