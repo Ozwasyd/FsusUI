@@ -1277,8 +1277,10 @@ const performRender = async () => {
     const resolvedResult = result.value
 
     await commitRenderedContent(resolvedResult.html, true)
+    if (taskId !== currentTaskId) return
     emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
     await activateRenderedFeatures(resolvedResult)
+    if (taskId !== currentTaskId) return
     emit('render-profile', {
       engine: resolvedResult.engine,
       phase: 'full-result',
@@ -1293,8 +1295,10 @@ const performRender = async () => {
 
     const fallback = renderMarkdownFallbackWithRuntime(request)
     await commitRenderedContent(fallback.html, true)
+    if (taskId !== currentTaskId) return
     emit('placeholders-ready', fallback.placeholders, fallback)
     await activateRenderedFeatures(fallback)
+    if (taskId !== currentTaskId) return
     emit(
       'render-error',
       toFsusError(error, 'markdown_renderer_render_failed', 'infra'),

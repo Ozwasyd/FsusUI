@@ -670,6 +670,11 @@ describe('MarkdownRenderer.vue', () => {
     expect(renderMarkdownResult).toHaveBeenCalledTimes(2)
     expect(signal?.aborted).toBe(true)
 
+    finishActivations[0]()
+    await flushRenderer()
+    expect(wrapper.emitted('features-activated')).toBeUndefined()
+    expect(wrapper.emitted('render-complete')).toBeUndefined()
+
     wrapper.unmount()
     finishActivations.forEach((finish) => finish())
     await flushRenderer()
