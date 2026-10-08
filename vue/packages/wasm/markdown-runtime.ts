@@ -104,6 +104,13 @@ export {
   type MarkdownUrlValidation,
 } from './markdown-url'
 export {
+  cancelMarkdownEmbedRequest,
+  createMarkdownEmbedProjectionRequest,
+  prepareMarkdownEmbedResult,
+  readMarkdownEmbedProjection,
+  type MarkdownEmbedProjection,
+  type MarkdownEmbedProjectionAuthority,
+  type MarkdownEmbedTargetVersion,
   commitMarkdownEmbedResult,
   createMarkdownEmbedRequest,
   evaluateMarkdownEmbedProviderMutations,
