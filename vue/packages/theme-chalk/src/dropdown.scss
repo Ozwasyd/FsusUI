@@ -246,6 +246,15 @@ $dropdown-menu-padding-vertical: map.merge(
 }
 
 @media (forced-colors: active) {
+  // System color mapping preserves token alpha; the popup must hide its underlay.
+  .#{$namespace}-dropdown__popper.#{$namespace}-popper.is-pure {
+    background-color: Canvas;
+
+    .#{$namespace}-popper__arrow::before {
+      background-color: Canvas;
+    }
+  }
+
   .#{$namespace}-dropdown [aria-haspopup='menu']:focus-visible,
   .#{$namespace}-dropdown-menu__item:not(.is-disabled):focus-visible {
     position: relative;
