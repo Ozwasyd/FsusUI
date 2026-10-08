@@ -778,13 +778,18 @@
     @include when(mobile-nav-inline) {
       .#{$namespace}-public-shell__auth-link--mobile {
         padding-inline: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
       }
 
       .#{$namespace}-public-shell__mobile-nav-link {
         flex: 0 0 auto;
         width: auto;
         min-inline-size: var(--fsus-public-shell-mobile-action-height, 44px);
-        padding-inline: var(--fsus-space-2, 8px);
+        max-inline-size: 100%;
+        padding-inline: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
       }
     }
 
@@ -801,14 +806,20 @@
 
     @include e(mobile-search-row) {
       flex: 1 1 0;
-      min-inline-size: var(--fsus-public-shell-mobile-action-height, 44px);
+      min-inline-size: calc(
+        var(--fsus-public-shell-mobile-action-height, 44px) +
+          2 * var(--fsus-space-2, 8px)
+      );
       margin-block: 0;
     }
 
     @include e(search) {
       @include m(mobile) {
         flex: 1 1 0;
-        min-inline-size: var(--fsus-public-shell-mobile-action-height, 44px);
+        min-inline-size: calc(
+          var(--fsus-public-shell-mobile-action-height, 44px) +
+            2 * var(--fsus-space-2, 8px)
+        );
       }
     }
 
