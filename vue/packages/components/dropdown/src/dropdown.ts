@@ -99,6 +99,10 @@ export const dropdownItemProps = buildProps({
     default: () => ({}),
   },
   disabled: Boolean,
+  checked: {
+    type: Boolean,
+    default: undefined,
+  },
   divided: Boolean,
   textValue: String,
   icon: {

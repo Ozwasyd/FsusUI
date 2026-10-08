@@ -9,6 +9,7 @@
     :ref="itemRef"
     v-bind="{ ...dataset, ...$attrs }"
     :aria-disabled="disabled"
+    :aria-checked="checkedState"
     :class="[ns.be('menu', 'item'), ns.is('disabled', disabled)]"
     :tabindex="tabIndex"
     :role="role"
@@ -52,7 +53,7 @@ export default defineComponent({
   },
   props: dropdownItemProps,
   emits: ['pointermove', 'pointerleave', 'click', 'clickimpl'],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const ns = useNamespace('dropdown')
 
     const { role: menuRole } = inject(DROPDOWN_INJECTION_KEY, undefined)!
@@ -89,12 +90,15 @@ export default defineComponent({
 
     const role = computed<string>(() => {
       if (menuRole.value === 'menu') {
-        return 'menuitem'
+        return props.checked === undefined ? 'menuitem' : 'menuitemradio'
       } else if (menuRole.value === 'navigation') {
         return 'link'
       }
       return 'button'
     })
+    const checkedState = computed(() =>
+      menuRole.value === 'menu' ? props.checked : undefined
+    )
 
     const handleKeydown = composeEventHandlers((e: KeyboardEvent) => {
       const { code } = e
@@ -113,6 +117,7 @@ export default defineComponent({
         [COLLECTION_ITEM_SIGN]: '',
       },
       role,
+      checkedState,
       tabIndex,
       handleFocus,
       handleKeydown,
