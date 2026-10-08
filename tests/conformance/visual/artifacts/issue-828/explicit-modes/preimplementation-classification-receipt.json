@@ -1,0 +1,85 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "ElPublicShell explicit short-landscape modes; full and critical CSS and existing BottomTabBar composition"
+  ],
+  "uiDecisionClass": "layout-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "docs/index.md",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "docs/design.md",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "docs/design/governance.md",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "docs/design/change-classification.md",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "docs/workflows/visual-change.md",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "docs/components/public-shell.md",
+      "path": "docs/components/public-shell.md",
+      "digest": "df3c544c21d5ddf97e9d04aa41cc40431513a27276c2b1dbd7fe690be3b909a8"
+    },
+    {
+      "id": "docs/consumers/design-integration.md",
+      "path": "docs/consumers/design-integration.md",
+      "digest": "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b"
+    },
+    {
+      "id": "spec/tokens/tokens.json",
+      "path": "spec/tokens/tokens.json",
+      "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "7193be992f05897b8dd6d6e16783ca90952a5914",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "76d480b7e9ae98275cea3a3fe930dfeb09cdf7f636619546a1fb77b9f76f7b8e",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "7193be992f05897b8dd6d6e16783ca90952a5914",
+  "candidateDigest": "b4c443b756a03505e120566f469562545220e5a5fbf0fd1f459ee04bca68d049",
+  "stateEvidenceMatrix": [
+    {
+      "state": "Planned collapsed/search/menu-expanded and inline/bottom/none; before source edit; historical measured failures retained",
+      "viewport": "landscape heights240,260,264,265,280,300,320,375,390,430,520 at CSS zoom1/1.5/2; portrait/desktop controls",
+      "theme": "both",
+      "evidenceDigest": "03f41e4a4b9cbab4700d3cef8c554371cc74b4d0bb2f6a450d77df6a2d4091ea"
+    }
+  ],
+  "inScope": [
+    "Owned full/critical PublicShell CSS spacing and secondary-row layout; docs/patch changeset",
+    "BottomTabBar box sizing within owned PublicShell composition without changing public56px minimum",
+    "Exact before/after geometry, original unit/type/browser checks; mathematical range and reviewer handoff"
+  ],
+  "outOfScope": [
+    "Blog product/matrix/helpers/assertions/snapshots",
+    "Mode removal,44px shrinking,34percent exemptions, design-token/authority changes",
+    "Package publication/deployment/merge; unrelated implementation and producer changes"
+  ],
+  "classificationEvidenceDigest": "03f41e4a4b9cbab4700d3cef8c554371cc74b4d0bb2f6a450d77df6a2d4091ea",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "979b02b82004714291184ed9f5ca2f552e32888c7ce80d67d1e48245534db195"
+}
