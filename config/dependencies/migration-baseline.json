@@ -4,32 +4,23 @@
   "createdAt": "2026-08-09T02:20:00.000Z",
   "files": {
     "pnpm-lock.yaml": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
-    "package.json": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+    "package.json": "8eaa4c0266796dc19a528dc7eef25b920a5ded87aac2b42ec0681a975fc6052f",
     "vue/packages/element-plus/package.json": "e869928c42ed32578ebbc269e1fb66293a85a64324f484ce7dc142afae9e884c",
     "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
   "installPackageCount": 94,
-  "note": "zero-version-change migration freeze; synchronized package.json hash after adding the canonical #826 test:dialog:focus command. All dependency fields, pins, overrides, lockfile and other authority bindings unchanged.",
+  "note": "zero-version-change migration freeze; synchronized package.json hash after adding canonical #826 test:dialog:focus and approved #827 registry-refresh test commands. All dependency fields, pins, overrides, lockfile and other authority bindings unchanged.",
   "multiVersionUnifications": {
     "consola": {
-      "from": [
-        "2.15.3",
-        "3.4.2"
-      ],
+      "from": ["2.15.3", "3.4.2"],
       "to": "3.4.2"
     },
     "tsx": {
-      "from": [
-        "3.14.0",
-        "4.21.0"
-      ],
+      "from": ["3.14.0", "4.21.0"],
       "to": "4.21.0"
     },
     "csstype": {
-      "from": [
-        "2.6.21",
-        "3.2.3"
-      ],
+      "from": ["2.6.21", "3.2.3"],
       "to": "3.2.3"
     }
   }

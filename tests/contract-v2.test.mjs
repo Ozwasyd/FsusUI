@@ -169,7 +169,7 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     properties.filter((property) => typeof property.required === 'boolean')
       .length,
-    2098,
+    2115,
   )
   assert.equal(properties.filter((property) => property.required).length, 15)
   assert.equal(
@@ -217,9 +217,10 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
     assert.equal(region.canRead, true)
     assert.equal(region.required, false)
   }
-  const typesWithContentProperty = avaloniaBaselines.avalonia.semanticTypes.filter(
-    (type) => typeof type.contentProperty === 'string',
-  )
+  const typesWithContentProperty =
+    avaloniaBaselines.avalonia.semanticTypes.filter(
+      (type) => typeof type.contentProperty === 'string',
+    )
   assert.equal(typesWithContentProperty.length, 158)
   for (const type of typesWithContentProperty) {
     assert.ok(
@@ -427,12 +428,12 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 408)
+  assert.equal(mappings.length, 410)
   assert.deepEqual(semanticCounts, {
     role: 107,
-    name: 123,
+    name: 124,
     value: 4,
-    state: 115,
+    state: 116,
     'help-text': 25,
     'accessibility-view': 22,
     'live-setting': 12,
@@ -680,11 +681,11 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
   const themes = avaloniaBaselines.avaloniaThemes.tokenThemeContract
   assert.equal(avalonia.definitions.length, 124)
   assert.equal(themes.definitions.length, 124)
-  assert.equal(avalonia.dependencies.length, 25)
+  assert.equal(avalonia.dependencies.length, 26)
   assert.equal(themes.dependencies.length, 1000)
   assert.equal(
     avalonia.dependencies.filter((dependency) => dependency.resolved).length,
-    25,
+    26,
   )
   assert.equal(
     themes.dependencies.filter((dependency) => dependency.resolved).length,
@@ -1494,7 +1495,8 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
     clone(
       duplicate.mappings.find(
         (mapping) =>
-          mapping.component === 'ElMarkdownEditor' && mapping.web === 'modelValue',
+          mapping.component === 'ElMarkdownEditor' &&
+          mapping.web === 'modelValue',
       ),
     ),
   )
@@ -1626,14 +1628,14 @@ test('real mapped inputs use compiler-known metadata and keep unknown values par
   const mappedInputs = registry.contracts.flatMap((contract) =>
     contract.inputs.filter((input) => input.avalonia != null),
   )
-  assert.equal(mappedInputs.length, 184)
+  assert.equal(mappedInputs.length, 185)
   assert.equal(
     mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
     14,
   )
   assert.equal(
     mappedInputs.filter((input) => input.status === 'partial').length,
-    170,
+    171,
   )
   const max = registry.contracts
     .find((contract) => contract.component.name === 'ElBadge')
