@@ -11,7 +11,6 @@
           :wrap-style="wrapStyle"
           tag="div"
           :view-class="ns.e('list')"
-          @keydown.capture="handleContentKeydown"
         >
           <el-roving-focus-group
             v-bind="rovingFocusGroupBindings"
@@ -293,6 +292,7 @@ export default defineComponent({
       isUsingKeyboard,
       onItemEnter,
       onItemLeave,
+      onMenuKeydown: handleContentKeydown,
     })
 
     provide('elDropdown', {
