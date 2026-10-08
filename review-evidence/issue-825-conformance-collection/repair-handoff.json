@@ -57,7 +57,7 @@
       "exitCode": 0
     }
   ],
-  "runtimeStatus": "Not run yet; preparation ongoing. No browser/device/UX acceptance claimed.",
+  "runtimeStatus": "Chromium actual PASS2, FAIL0, SKIP0;2 real traces14 actions. Firefox/WebKit still pending; aggregate acceptance OPEN.",
   "frozenCandidatesPreserved": [
     "d456f80e2f411ca81b4e98168638411e09eeac6a",
     "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216"
@@ -69,5 +69,7 @@
     "node scripts/check-playwright-conformance-owner-policy.mjs",
     "node scripts/check-playwright-markdown-owner-policy.mjs"
   ],
-  "restrictions": "Root alone creates/updates PRs and GitHub content APIs; no package publication or merge."
+  "restrictions": "Root alone creates/updates PRs and GitHub content APIs; no package publication or merge.",
+  "runtimeSourceSha": "80f6e96b8d5419942583711fb417492b1f0abb67",
+  "runtimeGeneratedArtifacts": "Original icons build temporarily added5 exports in its generated index; original producer patch retained. No authored component/spec/producer edit. WASM artifacts reused from exact baseline with identical source inputs."
 }

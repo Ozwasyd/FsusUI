@@ -1,0 +1,221 @@
+{
+  "config": {
+    "configFile": "/workspace/issue825-conformance-identity/vue/playwright.conformance-interaction.config.ts",
+    "rootDir": "/workspace/issue825-conformance-identity/vue/tests/markdown-editor",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/issue825-conformance-identity/vue/test-results/conformance-interaction",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/workspace/issue825-conformance-identity/vue/tests/markdown-editor",
+        "testIgnore": [],
+        "testMatch": [
+          "markdown-interaction-trace.spec.ts"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/issue825-conformance-identity/vue/test-results/conformance-interaction",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/workspace/issue825-conformance-identity/vue/tests/markdown-editor",
+        "testIgnore": [],
+        "testMatch": [
+          "markdown-interaction-trace.spec.ts"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/issue825-conformance-identity/vue/test-results/conformance-interaction",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/workspace/issue825-conformance-identity/vue/tests/markdown-editor",
+        "testIgnore": [],
+        "testMatch": [
+          "markdown-interaction-trace.spec.ts"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": {
+      "command": "pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port 5192 --strictPort",
+      "url": "http://127.0.0.1:5192",
+      "reuseExistingServer": false,
+      "timeout": 180000
+    }
+  },
+  "suites": [
+    {
+      "title": "markdown-interaction-trace.spec.ts",
+      "file": "markdown-interaction-trace.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "mounts representative Vue components and traces real public interactions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "1461f41558b2703c2449-e14b892f67bedf21bdeb",
+          "file": "markdown-interaction-trace.spec.ts",
+          "line": 271,
+          "column": 5
+        },
+        {
+          "title": "traces MarkdownEditor input, paste, drop, exposed methods, and public state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "1461f41558b2703c2449-f165fcc6324e807aa4f3",
+          "file": "markdown-interaction-trace.spec.ts",
+          "line": 445,
+          "column": 5
+        },
+        {
+          "title": "mounts representative Vue components and traces real public interactions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "1461f41558b2703c2449-d05f10855f66f493e5f6",
+          "file": "markdown-interaction-trace.spec.ts",
+          "line": 271,
+          "column": 5
+        },
+        {
+          "title": "traces MarkdownEditor input, paste, drop, exposed methods, and public state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "1461f41558b2703c2449-611351e2642de4b7fa19",
+          "file": "markdown-interaction-trace.spec.ts",
+          "line": 445,
+          "column": 5
+        },
+        {
+          "title": "mounts representative Vue components and traces real public interactions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "1461f41558b2703c2449-e807a2affdf70b9c56aa",
+          "file": "markdown-interaction-trace.spec.ts",
+          "line": 271,
+          "column": 5
+        },
+        {
+          "title": "traces MarkdownEditor input, paste, drop, exposed methods, and public state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "1461f41558b2703c2449-7bb9ebed053ef81df545",
+          "file": "markdown-interaction-trace.spec.ts",
+          "line": 445,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-08T15:52:52.602Z",
+    "duration": 465.77600000000007,
+    "expected": 0,
+    "skipped": 6,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
