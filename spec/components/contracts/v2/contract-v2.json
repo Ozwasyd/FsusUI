@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "712e38de6bb677474cfdd0cf2f2b8a1f960577f39b4d305cee2a8f43d652e9f2",
+      "hash": "ba17dfcdb15f6e86b11b7fe289b073bb260d5085ff05ab27a66787441571fe8a",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
