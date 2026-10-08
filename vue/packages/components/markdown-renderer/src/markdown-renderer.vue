@@ -136,6 +136,7 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
 const handleHeavyFeatureThemeChange = () => {
+  activationController?.abort()
   heavyThemeRevision.value += 1
 }
 const ensureHeavyFeatureThemeListener = () => {
