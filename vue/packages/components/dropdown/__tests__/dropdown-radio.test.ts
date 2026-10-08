@@ -1,6 +1,6 @@
 import { defineComponent, nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
-import { afterEach, describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import {
   ElButton,
   ElDropdown,
@@ -86,6 +86,33 @@ describe('Dropdown public checked state', () => {
     await item.trigger('keydown', { key: ' ', code: 'Space' })
     expect(wrapper.getComponent(ElDropdown).emitted('command')).toBeUndefined()
     expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe('true')
+    wrapper.unmount()
+  })
+
+  test('ArrowUp keyboard entry focuses the committed checked item', async () => {
+    const wrapper = mount(host, { props: { committed: 'ja' }, attachTo: document.body })
+    ;(wrapper.get('button').element as HTMLButtonElement).focus()
+    await wrapper.get('button').trigger('keydown', { key: 'ArrowUp', code: 'ArrowUp' })
+    await flushPromises()
+    await vi.waitFor(() => {
+      expect(document.activeElement).toBe(wrapper.get('[data-item="ja"]').element)
+    })
+    wrapper.unmount()
+  })
+
+  test('Escape restores the trigger after checked-item keyboard entry', async () => {
+    const wrapper = mount(host, { attachTo: document.body })
+    const trigger = wrapper.get('button')
+    ;(trigger.element as HTMLButtonElement).focus()
+    await trigger.trigger('keydown', { key: 'Enter', code: 'Enter' })
+    await vi.waitFor(() => {
+      expect(document.activeElement).toBe(wrapper.get('[data-item="en"]').element)
+    })
+    await wrapper.get('[data-item="en"]').trigger('keydown', { key: 'Escape', code: 'Escape' })
+    await vi.waitFor(() => {
+      expect(document.activeElement).toBe(trigger.element)
+      expect(wrapper.getComponent(ElDropdown).emitted('visible-change')?.at(-1)).toEqual([false])
+    })
     wrapper.unmount()
   })
 

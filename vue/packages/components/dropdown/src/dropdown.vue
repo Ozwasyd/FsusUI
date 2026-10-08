@@ -10,6 +10,7 @@
           :wrap-style="wrapStyle"
           tag="div"
           :view-class="ns.e('list')"
+          @keydown.capture="handleContentKeydown"
         >
           <el-roving-focus-group
             v-bind="rovingFocusGroupBindings"
@@ -113,6 +114,7 @@ export default defineComponent({
       (ComponentPublicInstance & { $el: HTMLElement }) | null
     >(null)
     const popperRef = ref<InstanceType<typeof ElTooltip> | null>(null)
+    let restoreTriggerAfterHide = false
     const contentRef = ref<HTMLElement | null>(null)
     const scrollbar = ref(null)
     const currentTabId = ref<string | null>(null)
@@ -179,6 +181,7 @@ export default defineComponent({
       'before-show': handleBeforeShowTooltip,
       show: handleShowTooltip,
       'before-hide': handleBeforeHideTooltip,
+      hide: handleHideTooltip,
     }
     const rovingFocusGroupBindings = computed(() => ({
       loop: props.loop,
@@ -243,7 +246,9 @@ export default defineComponent({
       }
     }
 
-    function handleBeforeShowTooltip() {
+    function handleBeforeShowTooltip(event?: Event) {
+      restoreTriggerAfterHide = false
+      isUsingKeyboard.value = event?.type === 'keydown'
       emit('visible-change', true)
     }
 
@@ -255,6 +260,17 @@ export default defineComponent({
 
     function handleBeforeHideTooltip() {
       emit('visible-change', false)
+    }
+
+    function handleContentKeydown(event: KeyboardEvent) {
+      restoreTriggerAfterHide = event.code === EVENT_CODE.esc
+    }
+
+    function handleHideTooltip() {
+      if (restoreTriggerAfterHide) {
+        restoreTriggerAfterHide = false
+        triggeringElementRef.value?.$el?.focus({ preventScroll: true })
+      }
     }
 
     provide(DROPDOWN_INJECTION_KEY, {
@@ -314,6 +330,7 @@ export default defineComponent({
       handleBeforeShowTooltip,
       handleShowTooltip,
       handleBeforeHideTooltip,
+      handleContentKeydown,
       onFocusAfterTrapped,
       popperRef,
       contentRef,
