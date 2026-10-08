@@ -677,6 +677,7 @@ describe('MarkdownRenderer.vue', () => {
           detail: { mode: 'dark', resolved: 'dark' },
         }),
       )
+      expect(pendingSignal?.aborted).toBe(true)
       await flushRenderer()
       expect(renderMarkdownResult).toHaveBeenCalledTimes(initialCalls + 1)
       expect(pendingSignal?.aborted).toBe(true)
