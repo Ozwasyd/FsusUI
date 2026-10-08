@@ -14,6 +14,11 @@ using a configured port is rejected, not treated as runtime evidence.
 and release verification must leave it unset so the server starts from the
 validated runtime manifest.
 
+The boundary owner passes its managed preview URL through
+`FSUS_PLAYWRIGHT_EXTERNAL_SERVER`, as the layout and preview runners do.
+The boundary config starts its strict standalone server only when that URL is
+absent; an unrelated process on the standalone port is still rejected in CI.
+
 ## What the profiles prove
 
 A passing profile proves that selected existing fixtures conform to their recorded baselines and contracts. It does not prove an absent state, viewport, locale, content length, platform, or consumer composition.
