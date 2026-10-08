@@ -1,0 +1,25 @@
+{
+  "uiSource": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216",
+  "freshUiMain": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "uiConflictCheck": {
+    "exit": 0,
+    "tree": "0653be83e90ec5c3b9a91adbbe5a9cce8a4beddf"
+  },
+  "freshBlogMaster": "6e287562b3f861d3eb81dcb23f93e6243205abd8",
+  "blogCheckout": "6e287562b3f861d3eb81dcb23f93e6243205abd8",
+  "blogConflictCheck": {
+    "exit": 0,
+    "tree": "f784569df667a88b3aebede4815b6d2ab787ffbd"
+  },
+  "blogTypecheckActuallyRunAt": "5798707d359ce5ee57752aa868d0ccbf3f889494",
+  "frontendBlobEquivalence": {
+    "579Tree": "a9802eb409aac6c50bbaf874eb752e75c3db26ea",
+    "6e287Tree": "a9802eb409aac6c50bbaf874eb752e75c3db26ea",
+    "proof": "exact full tracked frontend tree equal; intervening eleven paths are backend C#/PDF/tests only, no new frontend check claimed"
+  },
+  "uiToolbarDiffD456To210": "empty all owning component/theme/direct test/doc paths",
+  "canonicalPackageDiff6727To210": "empty all three borrowed package-source paths",
+  "rootVueAlias": "/workspace/FsusUI/vue/packages/node_modules/vue -> /workspace/FsusBlog/src/frontend/node_modules/vue",
+  "frozenDraft856": "657d7652342ba53735324bb512e4fe806efad8a1",
+  "frozenStartup": "d456f80e2f411ca81b4e98168638411e09eeac6a"
+}
