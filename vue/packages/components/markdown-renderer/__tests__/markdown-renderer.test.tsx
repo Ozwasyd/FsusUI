@@ -646,9 +646,54 @@ describe('MarkdownRenderer.vue', () => {
     expect(renderMarkdownResult).toHaveBeenCalledTimes(initialCalls + 1)
   })
 
+  test('invalidates pending heavy activation when the shared theme changes', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    const html =
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>graph LR\nA--&gt;B</code></figure>'
+    renderMarkdownResult.mockResolvedValue(fsusOk(makeResult(source, html)))
+    let settleActivation:
+      | ((
+          value: Awaited<ReturnType<typeof activateMarkdownHeavyFeatures>>,
+        ) => void)
+      | undefined
+    activateFeatures.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          settleActivation = resolve
+        }),
+    )
+    const wrapper = mount(MarkdownRenderer, { props: { content: source } })
+    try {
+      await flushRenderer()
+      await vi.dynamicImportSettled()
+      await flushRenderer()
+      expect(settleActivation).toBeTypeOf('function')
+      const pendingSignal = activateFeatures.mock.calls[0][0].signal
+      expect(pendingSignal?.aborted).toBe(false)
+      const initialCalls = renderMarkdownResult.mock.calls.length
+
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change', {
+          detail: { mode: 'dark', resolved: 'dark' },
+        }),
+      )
+      expect(pendingSignal?.aborted).toBe(true)
+      await flushRenderer()
+      expect(renderMarkdownResult).toHaveBeenCalledTimes(initialCalls + 1)
+      expect(pendingSignal?.aborted).toBe(true)
+    } finally {
+      wrapper.unmount()
+      settleActivation?.({ activated: [], errors: [] })
+      await flushRenderer()
+    }
+  })
+
   test('refreshes the theme while heavy feature activation is pending', async () => {
     const source = '```mermaid\ngraph LR\nA-->B\n```'
-    const result = makeResult(source, '<figure data-mermaid-placeholder="true"></figure>')
+    const result = makeResult(
+      source,
+      '<figure data-mermaid-placeholder="true"></figure>',
+    )
     renderMarkdownResult.mockResolvedValue(fsusOk(result))
     const finishActivations: (() => void)[] = []
     activateFeatures.mockImplementation(
@@ -685,7 +730,10 @@ describe('MarkdownRenderer.vue', () => {
 
   test('retains theme invalidation while the replacement parse is pending', async () => {
     const source = '```mermaid\ngraph LR\nA-->B\n```'
-    const result = makeResult(source, '<figure data-mermaid-placeholder="true"></figure>')
+    const result = makeResult(
+      source,
+      '<figure data-mermaid-placeholder="true"></figure>',
+    )
     renderMarkdownResult.mockResolvedValueOnce(fsusOk(result))
     activateFeatures.mockResolvedValue({
       activated: [{ count: 1, kind: 'mermaid' }],
@@ -721,7 +769,9 @@ describe('MarkdownRenderer.vue', () => {
   test('does not invalidate disabled heavy features on theme changes', async () => {
     const source = '```mermaid\ngraph LR\nA-->B\n```'
     renderMarkdownResult.mockResolvedValue(
-      fsusOk(makeResult(source, '<figure data-mermaid-placeholder="true"></figure>')),
+      fsusOk(
+        makeResult(source, '<figure data-mermaid-placeholder="true"></figure>'),
+      ),
     )
     activateFeatures.mockResolvedValue({ activated: [], errors: [] })
     const wrapper = mount(MarkdownRenderer, {

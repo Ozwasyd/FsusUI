@@ -197,3 +197,5 @@ Large documents prefer the Render Pipeline adapter's shared Worker pool. Each po
 | 名称   | 说明         |
 | ------ | ------------ |
 | rootEl | 渲染容器元素 |
+
+Shared theme invalidation aborts pending heavy-feature work immediately and remains subscribed during replacement parsing. Aborted or superseded async stages cannot emit stale render completion/profile/error events; disabling heavy features and unmount remove the listener.
