@@ -52,6 +52,14 @@ Frozen positive and negative cases live in
 | #289 anchor     | `parseMarkdownAnchorMarker` / `collectMarkdownAnchorNodes`                                                             | `anchor` projection nodes                                            |
 | #291 import     | `importMarkdownClipboardSnapshot` / `convertMarkdownHtmlImportSnapshot`                                                | explicit clipboard snapshot → import tree → Markdown and loss report |
 
+Anchor candidate recognition retains malformed trailing `^id` tokens for
+`anchor-invalid-id` diagnostics, including underscores, non-ASCII IDs, and IDs
+longer than 64 characters. Validation still accepts exactly
+`[a-z][a-z0-9-]{0,63}`; raw ranges and `#id` fragments are unchanged. Whitespace,
+backticks, and atomic literal regions keep ordinary source outside this marker
+boundary. This repairs the historical #446 contract; it does not renew #448
+aggregate acceptance.
+
 All entries reuse `stabilizeMarkdownEditorProjection` identities.
 `resolveMarkdownConsumerIdentity` reports `current`, `deleted`, or `invalid`.
 A deleted heading, table, fence, link, or image must not be retargeted.
