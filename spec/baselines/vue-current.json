@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "7253a363ac4fc22c2619ab3d14860d302852c387",
+    "commitSha": "08eb2c3b191985e8bef041b9e5f06bf99cc32aa2",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "f40182721e8a812c248cb0bc43de556cd7568c5a9de1bc8b2c099df9b78e47b0",
@@ -12,7 +12,7 @@
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "b4b7c00db1f817b08a1e7bec8a6af03a505f605d2dcf16fb2e52febbf830388f",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "6da78b95cf5c888f72d7c4c360e478b2f82ff565560fe1661c341272c80e31c2"
+    "outputHash": "11adfbe38b79fce0bdfb3963a0e8d9cbf5820128f94263c2e2eace7e23b8f3ad"
   },
   "summary": {
     "componentModules": 93,
@@ -43841,6 +43841,7 @@
       "files": [
         "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/dropdown.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
@@ -45036,6 +45037,7 @@
         "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
         "vue/packages/theme-chalk/src/date-picker/time-picker.scss",
+        "vue/packages/theme-chalk/src/dropdown.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
