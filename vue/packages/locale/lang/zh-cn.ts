@@ -126,6 +126,18 @@ export default {
       noCheckedFormat: '共 {total} 项',
       hasCheckedFormat: '已选 {checked}/{total} 项',
     },
+    imageViewer: {
+      close: '关闭',
+      previous: '上一张',
+      next: '下一张',
+      title: '图片预览',
+
+      zoomOut: '缩小',
+      zoomIn: '放大',
+      toggleMode: '切换图片尺寸',
+      rotateLeft: '向左旋转',
+      rotateRight: '向右旋转',
+    },
     image: {
       error: '加载失败',
     },

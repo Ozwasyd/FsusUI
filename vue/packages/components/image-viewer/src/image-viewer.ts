@@ -14,7 +14,37 @@ export type ImageViewerAction =
   | 'clockwise'
   | 'anticlockwise'
 
+export interface ImageViewerLabels {
+  close: string
+  previous: string
+  next: string
+  zoomOut: string
+  zoomIn: string
+  toggleMode: string
+  rotateLeft: string
+  rotateRight: string
+}
+
 export const imageViewerProps = buildProps({
+  /** @description Whether the modal is visible; defaults to mounted visibility. */
+  visible: { type: Boolean, default: true },
+  /** @description Accessible modal name. */
+  ariaLabel: { type: String, default: '' },
+  /** @description Alternative text aligned with url-list. */
+  altList: { type: definePropType<string[]>(Array), default: () => [] },
+  /** @description Localized accessible names for the viewer controls. */
+  labels: {
+    type: definePropType<Partial<ImageViewerLabels>>(Object),
+    default: () => ({}),
+  },
+  /** @description Reactive image index; initial-index remains initialization only. */
+  activeIndex: Number,
+  /** @description Enable zoom, rotation and image dragging controls. */
+  showToolbar: { type: Boolean, default: true },
+  /** @description Teleport target. Use a dedicated host for SSR hydration. */
+  appendTo: { type: String, default: 'body' },
+  /** @description Omit style attributes from SSR; apply dynamic styles via CSSOM after mount. */
+  cspSafe: Boolean,
   /**
    * @description preview link list.
    */
@@ -82,6 +112,10 @@ export const imageViewerProps = buildProps({
 export type ImageViewerProps = ExtractPropTypes<typeof imageViewerProps>
 
 export const imageViewerEmits = {
+  'update:visible': (visible: boolean) => typeof visible === 'boolean',
+  'update:activeIndex': (index: number) => isNumber(index),
+  previous: (index: number) => isNumber(index),
+  next: (index: number) => isNumber(index),
   close: () => true,
   switch: (index: number) => isNumber(index),
   rotate: (deg: number) => isNumber(deg),
