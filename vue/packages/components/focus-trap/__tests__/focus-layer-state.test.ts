@@ -25,7 +25,7 @@ describe('canonical focus-layer notifications', () => {
         trapped: false,
         focusTrapEl: container,
         focusStartEl: 'container',
-        onFocusLayerChange: (state: LayerState) => {
+        'onFocus-layer-change': (state: LayerState) => {
           states.push({ ...state })
           onState(state)
         },
@@ -90,7 +90,7 @@ describe('canonical focus-layer notifications', () => {
     await settle()
     expect(upper.container.hasAttribute('inert')).toBe(true)
     await upper.wrapper.setProps({
-      onFocusLayerChange: (state: LayerState) => {
+      'onFocus-layer-change': (state: LayerState) => {
         if (state.active && !state.paused) {
           order.push('upper active')
           expect(upper.container.closest('[inert]')).toBeNull()
@@ -122,7 +122,7 @@ describe('canonical focus-layer notifications', () => {
     await upper.wrapper.setProps({ trapped: true })
     await settle()
     await lower.wrapper.setProps({
-      onFocusLayerChange: (state: LayerState) => {
+      'onFocus-layer-change': (state: LayerState) => {
         if (state.active && !state.paused) order.push('lower resumed')
       },
     })
@@ -192,12 +192,12 @@ describe('canonical focus-layer notifications', () => {
     const upperRelease = vi.fn()
     await lower.wrapper.setProps({
       trapped: true,
-      onReleaseRequested: lowerRelease,
+      'onRelease-requested': lowerRelease,
     })
     await settle()
     await upper.wrapper.setProps({
       trapped: true,
-      onReleaseRequested: upperRelease,
+      'onRelease-requested': upperRelease,
     })
     await settle()
     document.dispatchEvent(
