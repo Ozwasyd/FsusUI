@@ -1,0 +1,3318 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "ElPublicShell short-landscape full/critical inner padding at realistic 320–520px heights"
+  ],
+  "uiDecisionClass": "layout-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "docs/index.md",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "docs/design.md",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "docs/design/governance.md",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "docs/design/change-classification.md",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "docs/workflows/visual-change.md",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "docs/components/public-shell.md",
+      "path": "docs/components/public-shell.md",
+      "digest": "ba48704f77a4ff58856c66d761917a106613341ae651d475ff26780b64d7c883"
+    },
+    {
+      "id": "docs/consumers/design-integration.md",
+      "path": "docs/consumers/design-integration.md",
+      "digest": "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b"
+    },
+    {
+      "id": "spec/tokens/tokens.json",
+      "path": "spec/tokens/tokens.json",
+      "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "cecf260475fab0a3efb3225f6d7aa39f96a0ae6b",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "88a28a15b0a5a649532f2d88c28153b50e2d970265ad36671fa329a4801a9295",
+    "dirtyFingerprint": "6c32cf94f903977945fb1eb124c413fb7672b2f8dec52d8091041931d8c5ff50"
+  },
+  "candidateSha": "ac1280894c7ec66b208f3ec5794040845fa4263b",
+  "candidateDigest": "527f9ce0ac7239ff83660bb58a5d0090895196ee5200632538edd17dff1ce8cd",
+  "stateEvidenceMatrix": [
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "a9cbf94235bd617ba5f7ccbda7c4c9c079794e3c27ab48056af5aa2b32a2a0e1"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "4e5a79c0d3935fca785c5e2faca34e960700fb823fed4b84169acda3bbb2b43a"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "607d073b979cc2768e54ba7925ba9bb9b2d45b5e8030e9f52c5fb8d527dc9302"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "d02f8f29d79a7c9b0de5cd022377bf462a95e2fdda64d7c2e1406a7c6de6769b"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e5a895d635e88ab0c45cc6aa627c227908d8c7858c7730fd9356d2ac173ec9a6"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "50e4acbabd6e57245d092db4362059b8d0382d7bee8e55278e7b171dd0b7b254"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "16b34521e577fbb47870997aa51acd186e6aa6c65984e8f5ea119b1b4fdcf858"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "becda5fb5a7f3c3c78f288b550f0bfa7429e5e566adfb6d96d6248cda931d223"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "6998560094c2835f40ff3b8ca97793373db30c35876c57aafa2fbd919edc8c19"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "ddc44be29a8150f01d5e340fcac72509308130e74ff31010912cc67c799ea06d"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "beb811b09ced216f2daf2dae0d4415a4551ba1116088c21637f5bc3465ae44e4"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "a42ce444651272eed512b83df48846df66f8a9123262fa99b08e4240a67504de"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "f5571b5b0ce97340ecd39c6f51b20040a887c4223015d1c302dfe2a512228fac"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2ef8d3f5b0796f21c928abbffdeb09883ef073b71d6b61c062f03c0d32f654bc"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "f630e9203ee8282955ac4b57125d3c105095b2a52d98e34b2aa9f81a3e15287d"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "f9b93b403f13a5ac4574816f0ea83150f3697b96311a64ac303221a640b4cb6f"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "7f47ed0a667aee00f749aed9bc3ff0c787eda8fd302fa349ba5e8f354a0501fd"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "f4929e564f06393953bbe474fa25ca103e6bee12222c1f9a87cbdd69266fdc8b"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "93795cfd5035e09196e483e4cdd7eeefc2f8422842809f0d143ae0e0afdb72e1"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c6b8463e9c635a678483a04979d5b4cb8b0d7447c211249602a3dadb8c81c6f0"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "eb3861bd87a13b729bdad243e4e535363913b566b4a794e9a56be480bb782c75"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "981308b594f940c23331a8061b3c5e15babb12cf3a80ca804320c63e2cfd7e00"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "e88d8c9f93ee0882d146392b6cb8cf328023470c23c00aecdf30741d8abd8a8b"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "58bae4f616c8c975b15fb45f2a36e1a65dec3438335e9f5bc09eff3727f6301b"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "6d34382fbe24499f7d774da782b44042843cc2a4307fcc7ae61af6ca226d7c4c"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "a1236510b1f0bc6818c8542ff91c979262826c20c749882974b8a69728069b87"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "153a361f0e20e49a1415e2a4a3c5eab558a24de6101fd5d6e46bff7780670512"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "76a50fcbee1b3732f5d25cb9ac342af69928729a25abecc04b4cf965e3f5b0f4"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3f7f920a88c895b40d79f9f6b372842378c4c5cfaf8c355820472b44f0a7159e"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "52c3aa9d0966d71e4f64570ff88a385b4fa31cf485b37b464deccbe9f43567d0"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "5de6c12416371b2f9525caa048e8ad19be98b30f6ce153b6fea541720ddb1955"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "0bc7756082fec8616030dec5888cc537d62c893d3a135ed4d8e10e68f448cc90"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "fb57f2ba6ccc99c37397da3e74a4b50f4983a752cb41bb24850906a2c9cec71f"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1c448df30be7f588dd92f9915dea838d720014872989c46a0f5b86c8fd788174"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "ea00309d5631069976db5a1bb8da1f783b06d4ededbdac0ca2ad1eaf8443eb0f"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "340b5af81ceb216d2e45fb6b0963c27746d3a442be702cecc5203364011aa937"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "a87deeff882d6dcc3c73bb9143f51de3100cbfd6748b2ad571cc31e08d1493f1"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "783cef5f8acec36bdcea432edc88a0e0b599d22a92070f6945866239885fd6ea"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2a06cf95b8cb9125ecbc46f043290abd82e4ce370a2c61c3b852c447fc902ecc"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "12a897864ed00cad8c568c32046da36c78b173e2bcf54a4746599c1d9cfcfd6a"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "656619de1d4c156538dce339ed41c02c15edda8561e825fc369effef96ac4e27"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "9ecfe34c8874386827fc0784c2ff71a2716a987cd5356535779bdb0860796bb1"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "d255bd7aa6c3f3037435ff683e72a20784ffc8eb42246657bd888b6801ca0f84"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "d9a1b00f87174325212e85d955f0a203aa36f825c2eef3d9ab659833d73d863e"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "db2eb9f04feb49a57b371fb363640f836d74d3855259692b7908ab9f9730eaec"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "11dcef46091550b7332e1687fceed59a04b522f81d0923c9ffd1f3e69391cf7f"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "1c398b04ce2d88a473b825e03d24a2a2f6236c0a2ae9126da5f0e749cd66b5f4"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "9ba675ac6b819d595249948c26c5f09d2b3f5b9c62395f325f67bfa561a9531e"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "a1ddf3caf36157fba112d687b649280c0849d3b37d7ad0121ca20d66c2a16228"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "2dae443d0f305d4d2a9906f0268f0afc5bfe6f7dc938a555e84a1674def6e0a5"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "bde1250e3fe3c7dfc760d0e0fd7e4e97db95618f9b615442cd909063a3733427"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "cefd0c902f863ae0af0fcd54bf7d9060ed6acf3d77176f10ee981a9b17ad0f83"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2e3311632461faa290dddb4ac56477a174554fb39f3060ef3225c11bb189de23"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "9689292222060bd4e5cbda3a2bfc3d364449c065474d29bd0210bc1630ac396f"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "40c2189e5a7ca967d4032e78dad5ce799c40cc66c72788c7591640968d32ec1d"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "82ab497a914f3dbfea84fdc04d5c814ae04455f986aeb806f042bce5ed44e957"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "adfabbdbe50c0f8e78fff8062de9926c03603dbc0caab64f34f3f6c26191e268"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "718cd9a018593077149738e476721e752ce5601ff506ce9b2479757e81bedbdd"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f50f4c51f0543bb52bd6810dd345e1bb27fcb2519ec5ba5755609f1e86f3b597"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "374cb6381d2a531515e4bbcc13c6e060d09364afb226c46616b6d872c3d3287a"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "06a87cc0b5df59ef2d1535e909558825016d1ed8b130f1fc83968d0ccdb7c067"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "02367163f08be05fd5d386234be91a346ed7a9e92694e01533d424ab52632dca"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8045ae10d18a22c340a3ca6b96cec8ce36c329bf27526a3ab20278d3ec3a465e"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "258678eff741925c5dd4d3202b9c295709ac50c5cf6b11cc9f3ef0748f012ea0"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "77578c25de44cc742857a85b6e400bb2fa7278a2091ef4fd65b033076e998669"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "77ca393150f0d7c9a78ce83076abc23b21b61b6ceb6fe6d5620c1cb7634e96a7"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "c62dccc163cf475bc941a533341fbe8dc97ab2111464d55f82751a3eec2a564e"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "c33c9e4f43f0d71eafa632dffb52a07df83fa90e8360f224c5b507da9009c9c2"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b86f603169b78fa927789d7fb66cf526ff01eb21191c1af2bdd54459a1ec2472"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b8fa01aecebf2610074171ae6b3935b5fb5ed600e7a1a1d84b48cb842d3952e4"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "0dd133724e1b67421d5144f30683fab9f21e1322cf4d0464cdca121dc9c80f8c"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "ed53a948e4173d117d092cd5c1db8ba6529decd537c66fe56ff27fa299c531be"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "a85ffcd95aef157ad1c3aad3f1412bc371b59d87656615646c2796fb7104c5f3"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "d0da7ef93615240cc2881a7d5dcf0ca915741e96aa2023c1bd29061d1e176129"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "af699a9718aedc26f2250b074510497d2782cab7e8882e379c8dc5d0b39a3a15"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "57771dceb23ad2cb4619e8a2c23e8335e520735409a07047fbc9dc781d7773e0"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "9f8193b1176d0838e2b17a4a4dbab96618c1dedeafdf72c7703db160ea532c06"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "5b55e22d7dfb21a1dbfb1d6d22d473fa642eab4c1bb266846a5b4f568eca89e4"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8e895cf2dcc8408a592072b8ff1d9110cf2f6c094ccfee73292932a7fc09e641"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "c0577a52f574ab53acd67bd96c4cdb8ad7253adcdee0e0ed43e294a4a8a14cb3"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "eb6b6d6179d86b7cb92ca71d91819b0d98d3fb300d959125e291057e786dda66"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "aabb8d7f709dbe5c69aa559bd9f20152564dc921d4654e76f5688e08d42b899f"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "0880a2feef8d483818ac22ad395de13ecb03e76828bc2c6b76df92ef500ede4c"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "0fbef8aed0f0039a5239c7549f05df2565b0421d514951e1c1e2165fdc4f86ac"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c097a922257f0f4a4455d7aa102b67c84ec203472987dd2b1de59f93fd2ee014"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "a96557949c886feb20e7217d20b10cc8ba7143aeaf785561f1d319615efeb060"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e12a1ddb3132a6d76228a12d851dd2fce9b0dd43fa87fad8ff10e1c4299a4aad"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "51dd89373ae0cb79f7f3c75e213de6b3211c9aaf0bb08c63995763e52a8b6861"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d58f02954dce80896dbe0674af44926f1b4dc9baed66b882f7bc6119605c8659"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "cde3d1869d5a521711ba890187dcb3309c3bd8853cd6f9e0f482b58a1e707329"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "c6ee902070ea9b80060e3b2a3c0f736ceafce9495d11ae4add11704706d08065"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "97f90f98f59adcb9c3b07e05e473b541cfa41accd13ff0eb20580404680ba5b5"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "a1550c98b44eadece3e8484762f8c7a7d37ddc49e8e29760e36f0fc592401389"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "214c84a3d3d3fcbe15c60580cfe237fb45338e41ab4e2186d385592bb37046cf"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "a9c85806b3f798a0c5b7af807cb692af0051f1f6de8205731be7b9a69896ef2b"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "346466c29cc1f1b215cb4ac73b07965817ff601881ec170cb3b0cccb4fdaa257"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "541c887f991a8a4d72712fb05a5fa729da3d61b30ac5af03735fc798e5ea3168"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e0f1fc7f4940b5d49e6cef5d5fcc18edf0133dfd15405f65bd3684379f3549e5"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "8641f4f8e0ade2ee0e69fbefd96a245788dd202a03803ed673e8850f3cc0f42c"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e1c95628436d07a0c62e88ee5717bca569aa7326671fcdfd9ccf37592866fbfc"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "63113bb33bedd6608ab2ada2b9fdeee46a893f28cce2eaf95b4cbfefa19e60ea"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "1fcf1ba4cfac8526e4f205f0dc2ac3009368a1e532d414fa6200ee2b17f69397"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8fbae61a229342187d42e6e8bf04d668689b3cbad12691e85dbba7345f22e80b"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d782f706815abeb7f5cf038ce54ca475ae46ae1bd57ba861e854f3d101ce45ae"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "1cf8fe7dc171a023397c478e37931385cb4338f6c6da2564ccac0467e0cfc34b"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "d747439860de81473f2478c0037717cd524f2ce75a3e2457423bbc1219a998b3"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "4effef25a1fed1ee3de3fccd218fec1806ebb40e7b82224191370f1075b2853f"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "01d44398b3a9a34cd8b544124b1d21e8d6e0fdca52be88a0a4aa691fe5e59a5b"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "fce5f29a5c4f503dbf7980178483c668554dc47c63e7df73011a506f6428fe70"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "6f01dd687747484bc71c1456cae0f766df1dfefb2c22ff403dd5f045aa391cab"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "0c39cb60af49ba56bd937dde89130c26a89c3bbc4f1de48fa0eb9cb5ddcbb4e9"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "38786b95bedb5cbdb5b4fa01674f162a6ad1b032308c3a30fe663915b6ee6164"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "da1416a3bf489e336468ca582aa40c37afedd528eea3593f08d566bf8e709118"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "af5a3e3426f18ebd189e3633c1b1bdc1a0f32181281dc3d7b7e11439b844e86f"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "7a2281e2f2c586875ae1f72f59afce3a421ced3bd48b6b17d205d69b6f432b7e"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "997918a336c176aafb1398f8cb5f47654de0ebcf966cb00604996f4a43413f2f"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d39e0bb6e0cd9a0a26bc5b3441c298c31ddd33f883d4b806453d36f758d94456"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "86c9ced10932cbe0ad1bdbcef8fe827a959719899ae9f46f12eb9245a1865d0c"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3d791b676e3955e065df41a68a1664ca27a5911e22a61e6ba76fd9ce809c22d6"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8cb9238cbdbd86b505e2db004e8fa772bbd9374e4e81e383463f1f54cdc309d3"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3877f4f19dd6ce232ef8635b7c6cc92f8f1d0839649d804a4765d116b229161c"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "4db13fe69deea63dc8ea7a968f3a41ac10745d1a59d63417cc61b62c42793d13"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "1ebb3b7c5a68dde2122e73759f2d0e28b421acd71b4f34f4f6fd6d0e24e310e9"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "fbc97a3af407272c335f88da96e37d9da8935a7d05428ca124402c28c960754f"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "cd27e96a4246f9359dd38c2d381e38409f8723c002ddd0f0d4ce5db08c2b185a"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "e610eed688d3b89e09cf10a860e6b8746f8fe8e1007e2e219a97e2583fa5d358"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "8bcfd3a0e6fd53147bf7714eb733479910959228dd425c5ca9d14b78dc215c21"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "7220987980675792b5684f0c51b2f83c8db725e100856b6c231c99c170ae9337"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "d863ac22d9f18b16668ad8d1a020db355b02de13b30c23fc3233531b283ead01"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f209c1cc3e3f04e6c045b9267c219de5b92d0d1bf41a20a1a5606cf64025760b"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "29a71daeded5b8c19e421c2057a6fc23dcd83e55fecdcd26687e6fac793b5475"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f175fb7c2a8760f6742da1a5fa414a7c8c76a7009dd2848f34fbfda290470097"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "812a46765ce0ee6289006fe55a7411341098eb3f00513663f4f1185f10fc4b02"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "9dc639221f8287bd33d4d7e15d6a0ddc5f84d3709061e21b4ed378e650530cbf"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b0c7fd013c1c7d18402cedf9d0e5f28c2f1aca765d2cadf8f23718870209ffe0"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "29207b2ef9ce88b4b7500ce6add48e28b0bbb6ab3b541c1ebb3e9636f4b0c9a6"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "5ced4710dc4c9fcd9e3c2785a78bbf7b245699f3199c889f0b22a2031b82bdaa"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "034ffa3fe54b4d6e578ceb010c9171cac466d51366d2244af8a3defc78c011fc"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "93e4175ca7d6bcd73f91678b5eeb8393775ac8fe42c02775da4ca7e0204cf0ba"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c03bd0e2ed6b8771dc86b26285bf3675c11aef691fe350f8e76a4e03cc288eb1"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "563373b01525be6c502cac0c40ba2410e14cf8e2f7a1f24189a6671e391f5ad3"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "68effebc92a1bc214281c0e0601408fe642b631a7b80d76b648d2ff7d309060f"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3aa4da7992ee02cf474d09570dcbc0fb736d49caede4a7c66aed25949c4950b9"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "7dc0136a3eb19a5bf70926426d5bd0c189302725ffecbc660f967e03911e1716"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "ac97ffdb564555c9674f8636acd98d15941045be9941adc25cce75841b7f2cef"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "48dceccbdc1b2d77e36fd0078895597bc2399d9867204c366ea19167940bd1bd"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "48fae6aee57771dc2595995c3d94121218695a4524d155f978786c707e2e2725"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "bc98d92ab455120737257770b4c08da4a1bd3618d728fc86f71bd60d383f6ac5"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "e0b545659a2c5354e98ccb29e227d84fc1d09e6531d9186498d2954041bb0914"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "ab116576268d064ef37f2158f4f989b73b0ca2756833efa02d93436db076da90"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "9814bda9e8194db2fd61d443998f49211f013cf54939b455efaf6632d87d07cc"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "6588773be6aab585b626544de2a298813d9b32fac6eab84c07d16bad00d2f5d1"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "de7741c95ceaaf8f8a665f9e5b659eca75ce6552bbd3c4f87cb581b5364fdbe8"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "ccbdf8ca8967038de5bc4a222b19521d6102f78c22f9f7a9c099078b9964ef46"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "4bf49d687243e33572b8100044698d2a9aec810e7b640361923311ab8402f9c1"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8ddb831d3d1f0692d8965c573f50e38f13f7c9218db6d9d478a2abc1c0256a17"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "6d602e1d61f5346e93a86a063f76bc7abd303f6ed353cf1f91ce886f786d8d6f"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f74879e902f7b2a4314192b6ee7c3f7a7df6b6a938457c2b0ba94d5c5faabb53"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "45e64dfbc6060179e61c6e005f352f78a59e5e05dce8cd71c775672383f487a6"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3ad42d26e9f541bfeb798cdd734358eab79eca37bc574e18542af3b17087125d"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b0859c81de1d54a53a8e22b039ca4d54922760d0672534cb75dfdace803b40bf"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b9ffd90b5577c5aed46d6f8e8ad61b5d53348411f2c9fb264a48aaedf24f279e"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "998fc521f8a61f02982bdaa91bd09d79adfea6fe3e678baf069acc96ea0551f9"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "90cfb1004dea71d5f613f6ccb1c18ee7c8f493e20a3d908115519d88987c4604"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "0efd1581b1868ff76421988dd9d0d3cfaaf0af6fa6c7dda66f2ab858aa57edf3"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "2c5d04529956773bf796b9317726e7fe831c20f3c21485560d48b1aef03dafa1"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "3ca612532f32b247217a1a4650ae75bc2943260a103440a3ae9d3e84a028a0dc"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f07569196d78cd40f00caad493477d64f0b03ded9d61d29d320e21d90b000821"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "dd311d20a64a3674aac3db14812694d93a625d0a7e172c72e04331375bac019c"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3e6c036e4240433370c0fa63fbcac32be2360027722f59150e85752722da3746"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "e62a65710ec2518f0b1f30638bf3e4f4c5f300e381af92f5d177f2cd630cab8d"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "fc927b91115efd314abe62d179f766a722138fc62ba32aff3af7a562e715bbaa"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "ade5308465f228396ae502b48eba4e550db57860892e93012814129d90bc9b72"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "1dc6dd139493f8c4fa2eb35d20bc12bc6079a6ddf5157345a2a8dc054a3b6d20"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2f8f702a46bba968dcb329b7a1bf648bce49f0d06af8aad95565589b6713d0ae"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "83d4456f130e8f3821d1ecde795f6a1c7b6e3fd1dbb2277a42180d19b2030538"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "fb7db29f99ee30256dd56b8986dadbb20ddd77cbc480577a30729ebec2d1c829"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "05670991b5f65b73ea7029da7cbc4a593194dea0671d2ade16b0c9e02635c30d"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "40c21a3cd4806da1d9250f66c6ddefd421fb066b4b0490a674a74d42bfa2ecdb"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "6fe691828204fee5a6777039829a1f6f90d93b730cf3f88b08417ad0ad65593b"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "9182f3d567a60e01fcce54874da140769edc34c0066252bd00af44373619afd2"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e2bb4331d13cd05390c778948c60a9057e68dccb0676d07cde8c484a45efc62d"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "bc2876ecfbc443c5c34fbe245a76064cfb6357cf81e698163262d0e238e0a5bf"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f8ae8b3a60aed1069093781fe53d833129bbcbe14eda36f92cdca33a730e707f"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "00643c4c47dc30b6c19ae6f86f786484bb919ec6b63942efa7220a4ee4e84079"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "5d4577fb90d9fbac20ef4f76c26a4be13fab510ad24101fed4b50e697d7f6833"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "a8d4be82bb1e34453cd6b4e9053e766eb38fb693a344f5229315b26d7ec4bbac"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "52e61beabc375223771abb589cbc2c58380685e5bfa39105fe3902530864dc77"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "7a64e70f402ae2b5cb17fd2205df4912ed895323cdfa1e23e680c70b6c4a1830"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "8b39df5710422fb1b0309138d867b0ee9ab67658d0fd290c123bf16be8aac34d"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "5b359934b77e74fdf758dbdc449718a4327366898b63130af791fb17da25cedc"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "9bd27e35d9f83748287807ae0b8b5954d591bf64a6de153a11b98023c13ae4e3"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "4bf4898ed27c02d7e3144497570189ac4b158b5809f9f37acc7f717a29fde5d7"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "362de6d91cb62d5b4f746e05482e29a0bd1f13b59ccc021bbc7087f9b9906a42"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b8e9c7277c9e5fa4aa86a02df6e3cdbbdc51a1ccc0f7c924c0ecb2bd1acf06ed"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "866bc8fa2e5e4152adce9ab44dfc22b665f2d1d664e6052a69c264507f6ff58b"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "683a4fca9cc62b353422e64e1c6313a932f615d44a52f5d95fa23a6f8e1497af"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "0fd800e49f3c7f8e04e914cb1df1df0189b1c18c9edade91d2566913a2fd56a4"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d9325c6a4913a7167970ee23327b1ad6db0e9155539d6b040720ddeab08554c6"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "bdbd2c38de2ba48641a1607b70e15d31d48b5c3bc73cd1a9bb97ba76793ad4e5"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3c11e4d7e7264ebdeeebd3d3baba4b872cca1eef20e4f381cee6793078730785"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "0c1cab7e32b1fd1fdb8e2062220c2f668e36329cb5f7002d0147b686dcb796dd"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2fc5f050591f3fa6338c2a39ed0168d22a7cf4a7aaddf8563690261c1e507cf0"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "9a32c7f9bf218ed313d1279d9ba6ee86c94f32a533cc6c59691edebb5478ccdf"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "076a0ea63f1941cc4ae2001d47328e24b574eb13328a3f82f6fc661f92659044"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "7da85860b117c13d7257328786ce83de40233c233aa49f68873c62f9edd93025"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e5363b0073c1d419e352b1bde746b0720ef1115f210d1ffb1510a560d9b8b6f4"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "ac136bbdda9d91adbab2a404dda9cdb9bd16d37618e9dd6841bb3a15700b5c42"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "03e2f8ec5d5b76432c5e80988944c729cb60dc307f2894002d122821acbc3e47"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d0f6d58d5cfab72bd23bf8336286ca4b0eccfd69454c06c72b9e0c539248cad3"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "11d7d92d889dca75304d34829af3fcb3fc0c9a95f6e7aa27959e315331f483c4"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "37e2493dd5b6b2b4e44a7a5a401af64323be4a5ddf523b77f680b3764b46ccb6"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "457194b69b0ee539ca6d3839b45fab4e6f81071c51d2779ece3319d2422d4d4b"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "f60fcef668a7c2341bb71b70c5361e31ea6a0d09d356e5ef67171a404b655c55"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "16da61c7f6cb5a3e41b3d925e79172c5bc55e3f67b844d00c400fa1b63c3da88"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "c6622dfb037fe0dbe692b8afff9bd67fe06e2893e748f9adcc3a2cb358d192c7"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f0bcb51c5d3aec491ee5cb182c080a390603577c3c9e2a42bfca6d011cba79f9"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "75bd38fd328af45f06cd0a269ffec4a4d2d090b5531737ec4960dce4aa216b7f"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "101d2bb6e2dd6a4292fd7731c57b6cc64117a3de9b82d08270be5ecb7bb0a111"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "85f117e8fde102f0375257d952b6393222e7a4aaccd7cca61f071c8f579b5073"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f70c12a1f727e7b2f3c4dca7335900ac11af046242b29a7b64b17b2d7304db86"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1d83a94d2317b569e5f8f90b6e29251c157f59caa67aa3c60f04c3088aceed38"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "aa08b4038f179bc60406c663ca42b5232bb786bea1d0b5189adf59540cfac0f0"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "1ec742fa7c78dc003c4290f38ba4054c2e6fe223eb45656b0d8b5a41b0c04f57"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "0bc5b7787457534ef5aea7f0a797211186ea3e673c9c33015d3720daf6aae68e"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3efd7ecc542c9a14748d88a5551fdfb83d966b2e0911f37d528ef21a0ad2d989"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "639a051c92121349a51ded0dce6d486a45cd55d720b634bbc53809b063b15fec"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "0b6fb35537a846a0fc79fbfd8902e8d86b49f71de1176d078a02eb5fcf8395af"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "fce5191f32b8a1c3df015a70e50274b7d72096cb7d57a949b41f04b34e41b7e2"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "09b4b9d6c6c423699f45b722d4d7b9769019d6d6439d792296c1f5203106c940"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "526e91af82a2f0862a7ba19192c19b38351d68b2c54dcc600f1aba16e4703a3b"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "12686b62f45cee20b11df9c643c4a06737aa34b9d35e0b530854a140ecd03758"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2ff5b4039eafd98ff36c369742d0c569628cc9a6cee2ed7bd94b112345fe248f"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "a3830efe9cfa6cefe7d6ef521aa753bf0712c9a01ea524b811389e9b0332323a"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b3537e8270ff105105e76455fa1acaef2a58599f04ce452f3a78945ed76a1c5b"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e3e71cf43339c7468f90475ebe952efa61d060eb07c7ddf48a2f158056dfd5ad"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b6134e91695c99d0979ac7d7a5d90618bdfd319c6d90dab7448e8e63ce266e05"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "fd0f52411e40dcf2eebca1c024a561e8ec1609d951f83af43610258eabf86c41"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "1859b1c7a78ad06922d79a07518eb55eeba2efd0206ee0b150eceb780fd87bbe"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "deb68bfd6850753bc1f5663ac2e5d5edb79dc4c58b280b7a72b7516d6ad410f7"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3dd1796b1328d9894d0122976d0b935c1bb144b3bda2dc4c25b8b317235c8386"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "48e34614b922f4d52756d56e85c8b2f9bbcc8200b08457bebcd63b0ab52cc662"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "ba4c2e162837e258118b634e77f237a3873c805611756c1781dfef82356d576a"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2904155a14f625608a67119488a8c85c1eeb7ad6d74bd5a35f942303f82958ff"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "527d7c7271b9073b1303821c9ca9db5cd333e5f6b056db029ef821992552f24c"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "44efe0018072818f3077005407f2b5b73962aae81ff996d8df489e328f6317aa"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f6c0d7bfcf77c84c50bd11cdb3533425d49f9965ba6bfa70066f7a0797a1efad"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "bd7f76d55a3aca08eef10ec2515ae1e60a617fc17fd47aea1dd5026f9d7c4eec"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "85797e46d8ca898a6851adcbc934b47f0698c206c8ed03b58f54f131c6d9d205"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "96db0fc108a873db4d4ee8487793a3ed5a968917a1ecd82119427c9fb417a954"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "dfc86d2fe5d947343e92f5469c549fe8403c90b8f5fb5f9e7a1fcb130ebd4cac"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "5802dff2766f9a45934ed6a5135330612f770f46987bb4ddc74974a946fb8435"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "db1e358c6faed74cac37d93ca3adab745f2cebb4e3ed0d9f8949d333541a3b79"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "5016dafbd4cf08392bdbeb7990c2d48ee5651d4bc85ca02b276d4ca9550565d7"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "ee14da0859d0788bcdd56138e2cbe7f46abff5f3055a69fc7304c949227ca8b0"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b984020732173a8328fc4e2744c8719abd19daef65972388d86fe47167cdfafa"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2e7d5a9cb833d1b2498cc572b808bf7d2692b13e797c314fcf7c89c3e5d6d027"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "443a25e080095ae7fbf10aa1308ede14c0479837721102db8363a763aabff434"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "9bbcdd62271bd6cd68b54d73d260d7d14eda1f5b5ddacbd59a833f5751b73481"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "a1f1432f48a8986d75aaf944dc3dc32060a5b11bc1beaa8b5c4b466958709619"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1eaf5a75d1fb9cf138f2b5f6e2480fdbd626c4edccd3fbfd27fd250dc4db3306"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c0d8a510128b4b901ffd7bd2c4bb39b080b24227a68c1808ab6ae9d39c8bc5b9"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "cff1612e53d021e1c8313254deb4f0b49e09fcd8aedc324356b72947bc935411"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "06ede3e43cfcecd06357df0c896788b6115fd02aa49cc04b423127e4acc829e1"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "70c6223755ca43de463e1fc9fbb3558b65aa8d3465c62aad621e38c7031029a6"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "71970671588a67efdd99b1721511a5b2fa3387508aa79b5c1bc54caf0ab8e167"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "775d4837e18bd45e6c1ad6cd419f729a2294b65e89bb21baeab68ec54f82f954"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "40aa8b33a3c232c58c1137f6f8c53244f34ed521ad6efb4427f6ac03de07dcab"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "e599f768531a68d3fb05ec158063ce47b3a60d6cd29ebe7b6f8fc94c9251571d"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2702a7274935b27bef540169a8dec344a4dcd35fc4b46920a2dafa136f3f9273"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "6e5617340b170c09d0e10b7e9bccb04ee312df44f6759f4f155cf866e91b1716"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "7d1e4d9e02b42288c41c0c7bdbecb431039be60149942599e958c88004af0245"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "f58b0d98198ea9932137e7271d7b6e11a5dedbc336e2c3df51e2d893c1a08317"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "4e1bc4e29b9545b8011b0cebbac3418b4cd5ee7e65432c5948a04c4738d50507"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "dd84bb63e852054517c2f19e0310e1064eaa2a143b1ed70c455ee239a9a49df1"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "aed6a002b809d22947b14c8acd426c86b2038fa8f77a56eb9b59af7805dc2b70"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "c8b1f59f5fd45abf1c2b7206164af30287eef86200143b9927eb1e044ff6de45"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "455f968f39be76eee34d7a1bffc47bb46b52c56a2ab6ec088a2487c125417d2b"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e88accb6132dc0a6529cc7293722b192994946ee3fc67574a4e16145230c9c6b"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "ef350ae5115f9e7fe89bf7f5181feb43593e71d9f3e2deb5d76832616346919e"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "1c066d8c36e6c16fe3d186e0f54583c0e2079916f551a55886900d944f8112de"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a875114edee99fdd53f236d880d9035d9e14412f3de7f44b6c08d513d3f91035"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "79069d10e2557ac6e92e3bfbe1b705616795c4e9e0fa720c61361687dc7c8275"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "26450c42fa94d006fe896deb37a2db81219450ca9a93a78f02e2749e302ef0c7"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "88c4342d560ea1c8458a57a12787f16e77e214fb4ea854c19e32206990056ac9"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0633f0a0018889889fcb715fa00761e13986538987d9d5cd21e8ac412740e842"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "86a77b66875cb2951c2eac27e9825a587f24f74b66e8fdaf38b0f83f2944b4c8"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "8ddb1d6d5b8f0c2397a05fc25e7e4c816b0da5e16d201d4da96503797acccd33"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "8b2fa1b6abc41c9f67c58e82900181e899d2f05da899b307cd40508872df624f"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "ebdbe0bed99e083c4fde45ade30f215d090c165364e353a6bf1a9e4fa2947702"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "749c878915b4d795f4a0c1ff85e91a9e9967aaa384c44f84c20488a39d6a15a7"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "9be26223feff4d453087702b1cecef62b919bab748f12087d1a3d319e60702dc"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b939cbbe0755836a9b04ed7592c923af6e07c65a090e3243d69155e10df80927"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0e97797c1eb913a4324bde65429fa972220fa7f7d5ec3ee59bac22993b0f4dad"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a452e4b87c65a32563957f4a6fc8766748f4e47f6ba756657299b3dc548dfc80"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "651ac0a06237cc543f0f77c6c8a90ca0c0f4775e5e143b3150f02c8c5ed7a5d0"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "641eb50ee319731e45caa4ef910a5cc4cae9ca00a47024f31d30fbf6e3cdd63d"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "34014c61d0d39c29a3bcc65fa63b0e4e255e105bf1c88362bbcf6f8361c4d33b"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "8a47be1f07ab216c0be5a7c02ad10e285d0206b209e040f639d9984e925fc34c"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "467012516be7a1b0cbd8d2a6bf8d5ac7ddfb20ee78e789249978cf57823db8b9"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "717460d9e42d2dd424024e76a0f5868cfeac83d0b2befd24adec54efa3ea8e53"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "4c4ce8d1557eaf2429b3edef026cab6a74b66cdf6617e3073f92a1142d26ac65"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "2c4992f9ea3149f7f385e32cfa59f89047016035f6b8065f2e4948f4d068df8e"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "10a44875841b7e41a0a9c39648df7485463ca0ce168f3dd180ef0ceb21e3a067"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "ae337f5aee2d2c1ed95c5deadcad126358a98bd447da2dd75f10a4bbb2ba855b"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "10d1fc0667f7051b8216ec96983ec22fef0132c726452a0c7d13e254d990c6ab"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "eeb030ffc8cec8d9c9e33db4a2959087139579242afae1591c8c958029bb7aee"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "43b8336635cf4f2414a9251ce59aeb0a733cf4b8358ddbc4ff5b68def236a83c"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "ab61ba21d3b1fd06d08ff4bd0f0555785bae876537bad3c00c79dbd09b763565"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "37aef0c403bb0a390af6bf5906ee185bd6b2a049d6be24440e5487f3a3f05fef"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "42b1ca1d1fd70215a540eb038379c3d8a9199c1b2c0bcba32d79263f0522b894"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "703c511b73f75a26b7783c07ca17719d9194c210e245c619d4b45d8e9490d3dd"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "2ce03a6e1271577c7c7ad3a76533adbdc706429b07671590f6023c69e2d2f727"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "fccbe1d5d803c6c746452fc64b3c9785c4f460e5bcfb092f61c5dae10a653296"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "08cfd951c6bc5c4c49b835387fc129897098e1d078cf3fa873c1c248fd1bfc11"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "1a58d4b91fe65f7b7e2960c760b11a00b0da98626ff871fbd1a18a3a7009f04d"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0f84ad03e4d10b63bae9e137a649f95be78313378c38a7a7bbdbd32535265237"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "d6ad59320986272c9820e487f050130556eefa0dd14e85f5d81e39662a417c9b"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e5bfde5a70f74a8110def85e93a8ba033c887513e71f3e5445952b05a2d25e64"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "2eccbaad94aec010aaaec19b0ad0295e01c73f4d4fb851f11164b54d9c0d9042"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "16a558586fbc8641708408510af1954bc34d205a6b9b9fcdbaa0002d9d9b4c43"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0c001721e91aa6a8c8e00bd880a1859efb8b7bdfd38167ef1dd9318ef44c7a82"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "bc0b697480e8e95633872d5a862e8873643d357fab157f5393ba6617740660bb"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "d72fd7ab62d522b89351ae1168c70bc24b6a4d3a7af01200c42aa66b93e0f564"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "109b59bd0efb2b4fdb6c912534ba8e481ac8729f1ae6e44b55ec283011118bb5"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "dc46d389cc7b4f72fc4856481f5014f9b9376ca6ccdcf82c10d978ed25c5ec11"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "d019a65b31de65a0e4d1fdd5d170d3a69e6ef3c2de6be586baf3184c12453ac7"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "e854b74264edd377ed2a669cabe585e5deb7d926dc39399bf460d05d0baebce8"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "ece8c1760c7f01c54d61a8c16e7ca6b6817e6c8c0da6ad8c9f2510c0eee1a8c4"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c01fef19758250c869697c1b680199beb950804403d8ac6eabf7b6757b360289"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a19b4eb245133d3934b3297a243e3aa73151177443999476a6490d27792bf25c"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "52b510f06970ae16d15c092cd6e2396bb0b9fb8ae323d286d13b9d1c48c1fe45"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "784e22828c3f67e70916228d6982960dc0e8e36bf1cd94dc69579f73bf750c32"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "92c50bce92cf5ed39b23d7156e53d8dd54cfdd4a83831b9b03d54a5c374f920e"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "42d5c9f5eef356bb3cb76d3f448b932c2bf70a0a75a2a3cd95dfc4363d9eefe9"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "176625690d0fef044def7f58d9df0236f35f1632861ff5ffbcaf3b40afb56816"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "8179026ad438b22a1fcda05985a945d0aaac6674aef52545e870551cf2523574"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "cbd4514b1dea4a28096aaac0226569c3230cdd4f2f5376b8602253feaaad924c"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "493c28808824b0b8abdb3538d42373d29247b62845ad443011669d150ea781bb"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "58d22778ea6f8b0ce6dd4605b367871f51a6c4b5b8687e1033967a466bbf6fc8"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "bc71587a82ef54d9b5d4ca26c7684027bfc051032f155bad4d7d0c7c31404832"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "6398f878c229ccd18cf11ff5eea9a5a94e6b15eecbf5978d2d47d24552d32e1f"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "9ba6aeb1607ee67cb634f452fe07dc05bb4d0735adb7ef89a5ee8431a0b75b87"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "3dac6cbe014d48fd55f421dfc51fc3fb5b75ffa2c0aa20afbd0eec83285a6d4c"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "d549d79ad52b33bf9ba2fd8d95f9f52a1b0354648cb3ac13fdfbef9e53fd4331"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "71960adf9d5f8c6836d2cb55c1ea36ff5610c859caff90d2f2cbe9f4495159e6"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "621161f97f71d3eac4a09f76565925761751149543a5e420d02b6c1036a7b6cc"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "ed206124bf6e336bb58e948314673629fab93ed554611437aef11936209104c6"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "c9ddb29b3e0ea5dc8728f1a7d559a8e0e5b5135557a5190db4c4a67a8038e756"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "dcfccd3f7ded15355e7940954c3076fc6dc83eb01c5e0c8bcf9615d5d02d3233"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "8db8ec75d68c6cca52ce5e98deac3b8197d504cae19ed00d4f7cff79c6defc59"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "7a3e1bee8c8a797f590bba6ac9f829bdab12f7d1bbe438343746ab96ad0bc78b"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "79fefcaf18d7647e5f31a40a6d662a842392b9dbe914665118e65cb0acf04798"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "139b78e7efc0f06e812f1f1b360a483b02be75c92924698334f398a1fd8c76b6"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "24b54fe970be07d9ade27da1feacaf36de8a1e0670203947f6b0f3a2cdac4162"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "fd83565bdeb4c1a33356c043b8da8d6215b18e5a9bca5105b023b4b02f0001ed"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "8870730ebcf8b60af9a602d84efa2ba3247359e346f6a9f29745baf3b9fac98c"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "32108082ca2ef25687a55bb0d74f4f8892aa817016ee2dd9b830e572b1efc6d9"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "86b3b35b01bad903205d812d4c06338b7bbb6ed0e2010548b63996e470e54452"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a06a2d3681945691bd79d68c1ab2f915d11be55935c5c5c5ca3320befd7f5152"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "bc52646c5bd226c38748969249b1daf2d574179a9ec2cab583fb7d96134dbc54"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e234f191eb6bbaa8761af92e169b07d1211557b403a5bb7e564458fb4e1397f2"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "dcdd9c1f338563227633ccd93d01eddd27467f6db993a2b1bd775aaf3e0ac74b"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "d95fced0e2c96aaef31e5235a5c30fe9f0fdf0c92c106ee26f2234d87c11b2f6"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "dad6f00b02c4e77d51bbc2d6e15f49886d3a72860b9c4f40e10427b7708665c0"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "407ad4d0f6238e8e3549a83fe4a4a512ec49ad7a110792ab095486e1b5fe58aa"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "a6278ee5a1c7555b050dacb76edad5a2878e1dc8f52649696ac2a9c55095b7ed"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "97c73b175d1b2c773cd66deea4c7a853ec2a6192473f47bb01ce2db5046a526a"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "2be0d1cbadaa6c3727e68eccdb1266f7d74cb9c944b5cb2e31b6e683584e6940"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "04e8d593b6fc43cd3917ddd1c80e7c2557a2d6a455c1e4d4b5a7714342f83900"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0ed1df875bb70b2a6e00be821e3903470adf302843cec72de237e6bfa750a036"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "1377ea92b77f4a0d5c121c943db5c82ac80ddf1ed1de7e521d6b41bc41622995"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e6af3203cd94a3b39efc0a6542fc4d8bbfaf86c8d0d86f314695a192a5298ed3"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "bc4f27c7f0918018eb65a3cdcddd0a14968cce82b3557cc98f6bd209ee193df3"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "d6366a55768499ac34fa8b6522779f19e1fa7b8375435aa1f55c831b0af66e7d"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "2ae2c070b5629b288b8149bbb2a5d158a646dc7ce4e49b664045c7aa6cc9b068"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "4b2a3cea28c2e7915544939b26caf14a27b08faa943e597bae6ffacc5293eb1c"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "f6d8067efe944af5fb4e432f57a83447c38107ac0d8f20445ef609f653962d02"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "50c23ef859e75413ccd79620bee320c6161be8b3ca19f9be4327c0fe378fbc9b"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "0385e522058bce7afc49abd9a9e025769d68348726bf147badd65d84bfe48641"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "5ab75044050cab869ecf76f894b4ca7af94528f47495825e5de9822487d4e63b"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "5069828190ee84b54e5a5fc20b523b5abe47c02660c6a013247a768db9aa8504"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "54c66b6cb322b2423f50cc1b3d685a9d19396322503de7fb54551378855809a7"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "7aa519c9144da81bcbf3e4ec4c5e9d806768335b646dec431c4b6f6b479d70f6"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "20095b32987ac95c9688f029a3a4feb04dec4df3223f92a6e3184a5d9b64113b"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "8acf236a79a65f5e5c62128f761a8cfcf2efc42e0963db5cb3996cef17b8c1c8"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "d0bdd6c788aa6983c12e83d27fb2b680289327b1073b8b11b3f921c7bd29fe6a"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b036a127ddac3cb267d95258e985bc9503ff5825f414c3ec1e3246eb9a3fd917"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0edfdd9ca314379ee8c0b4ce951fcae6ba6ad3161da0e7272a958f70080cb2e6"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "cabcd40c72d7d6530c4f2373cc19f2633b88929395e26f32d6f31c8ec6e32b3a"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "a8a6e76670dd29beaf090bc12b61ccdde5e0396c80e46dce6f3bbd28193a05a4"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "4da5c8fbb3517c45918e9190efb5513151279cf8beac683c15125979fc94a945"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "dfb97b54ad6ed329eaf266a6cacfd0b23b50540d2686b9d93347a6d272c78280"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "c028a9606234cc25309c42ef5ce8807e141a0a3855fb6a56e19e98c8ff90d22b"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "328285082388387701056a26d89f04ba0ca6f217385afbfe6e039a1ab14782c8"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "04515f9ee15d291291a0750e75780c28f7f74dc011741d0909976885f17eaf1b"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "275b5fefa1b0cc6b4b0a3c9ce32db55cb77793528590949b9c400eebe1d39ba3"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "94cf1cbc55b3c5317de4e2e4b9002529ba7df9b1c81f71e59af5322a528772a9"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "95b690a7b19f29d2172298fd573ace23bf8db8d278355c31faafe82a8b5a8403"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "98d6242290f7e93a9ac5eb232c2d405a836e3ce3496c71e675942a9b67fbafc7"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "49d43f40da4d8749e6f9e91183fbf3e88c13ff0893a902723767c0254d0f598b"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "25fbadd7921c5198837ce1cff67ce9e6e7353895c3a1421d9c2375d5d402c265"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "baaa505ed66c5ade113c5c39150c84ce192345a05cb1668fa9168a99a7bfab66"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "27a6b0eb966ddddd5951180e64fa005007f5ab0a171622a01e184aa642dad68f"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "f0994d0cff1e925b0153268d9b2c15b7bae8583c472eefae59ab7fe4acfb3cf4"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "ef2d149ec660f2be4e7214b9340af718f83ec7e674b1b0f7ed39e92d014dab7f"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "2b1ef831cee7650aa86ddabd8ca8f662add6b477aa6c4090a4e2595e3706e196"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "a4bc743fbbac017c2c2531acc0978b2f81494b2d7a7dc7095abd0b837c61719f"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "a12417b1a2389c009c4476cceec4dcaa974a31e76e5144eda004c467128fd878"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c7ee0995312a5a0e22c0ae1ba2b45391cc86435b50696bc07a76e1853203f844"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "8dd61ae4024acd55c352092fe150696154e2ca4e3e72d84e39b1edeaf63529a7"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "6cae5f10fa2c01ba0d0c44189b4e3d4580bf4082e646a12b49424f09f03ecd2a"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0bc00e1d81645af24fec014a2163c5f3e5517d5d4f748a94b7800505864d2028"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "cbcbb85e2bb3b00aedc629ed18a9fa52c803d73e2b632cd07576bc849dcf309d"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "3d3fa1efb9e1cb76618d3139a6f27cc9f02b4f635af85ce3da30255fe228bba6"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "4bd229f8d370c72cc7ed5372e791775c7d32946e468e4f7f0976644cf1fdc6b1"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "849c9ca776574f4f4f7c6b5573003eb748a381fc16e8ed704c7b0a820e61cf85"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "44a6185c08ccfd0d2be6d7877ec16f618da2c586c5c0e2c0545ac14fc77ffee4"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "50dbe9863fbe8008789c8ec20e1942fef01f0a0791f7c7e363cb0d70c6ff869d"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "b23f5581b78fee950f679bede83b7612c98da684977c56f4c483d45efca02abf"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "93dcefc2762ac5c241425661b7eb351c8a2a46186a91fffe789b596a0cc4840e"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "a95b3a79dbd97bd362b82d32bb27bbb658db73e41382446c29572ee88359e9fe"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "3101ce5ad6ea9a2cf12957c127a4bcbba13a5ef82a66cc7236d41ce913d01eaf"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "20cdcde878be98d4854d5e2d7d4b2f37ff8521f528f91a10b53243b4f99db342"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "088c52d09da872dc223b8da3ddfa25c19355ba7c434ebd8e62d81c33e6edc87e"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "4e7a13cd7e051cc26ad2a38947d49490addcec74c6999bc03c2d03b6888bf1c0"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e1de854fcba7f11d48809cedde855a5a3a70e7e4ecbbfec05835220bbae61c1e"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "3f2875bd8207253b96c29c6626fce67c534484d7d4c1df40a59d27c55a2d29f6"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "7665e74e53ca5dd972c87cd796dd20a6193aad5bbcbcb599b11a0aef1bd41213"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "4b99ce83bd9f0fc5daea78ab25052600450d23eb447f4388aa9b117c5dfefe7b"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0b0939d90d939a9fb32f8b440db5328ce6fc60f90abfdba0aad7cb0ad4f5f71b"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "6700def031db4f72db8c2ff6d36880e20371a28dfb7dc974884053575d4eba10"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "cec38ba406186ed5bfcb31d24960f2bdc2346ba29b257961912d6dade28b6bce"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "9ce6371e545d77f7260b94225cb6e8d486d39f17607a4a55018e91274b937cbe"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "d7cdf1ef4df782c83ed5faab17192e6a58edcc6528a70f2028d27295e1d2fd15"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "982935c184d1d5c3d75e2d1a82b02229c488c35e9e7e624c82f7910bbb4bd4cd"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "b04ef41b4dbfe2eca913b96d43910840b3a1feead5b104f744f7567f0c02a5d4"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "64c447c75222716154f950eb62c78c6b6b16b2d6592469df6921ff0472573265"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "aaeaf905aeb42657651d6ad00624798dae216e8e2d6b2434f003eb73e72e8b5b"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "78ef64666d01309db584af4e9802b7f8e96692022b445db3711f57dd53576ad2"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "22cd4b1611c8b34d24a3bfde47f0379079c251f847f79b76821ff9445c003ac8"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "9a051fc63a31a2db472c78827c6f71fb777c7be04cf73b910f5c3ef3fb04d3f7"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "8f29ae0d1236432f47478ba199c014b006b128aec3abdcfceeea238a8cb5ab82"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "c03b68c072cc6ec910be47ae8c34b5d6ae48b769f0cf7429fef8e4e183d06d15"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "6d8fd0ca4af5f27f5e2c7b5b897a6eb11ec0250827906505f68f4a81d6b8d6da"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "8424c74d5bde1e1c046550002adf88056f73aae10f708d32d8d8ac1f57e712ba"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "cbd6ea8a0449df6fa6765408215360632503bd33d5cd2a439219449ee2dbbcdd"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "078f2ac3460bb5dc2678790e6522d7df82779c35620aba13ea30ff21a601c038"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "7c0475d7a6e401a006584d6767ae2ea53cde93fd381ef087825698cbf0b3c318"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "37cc0bae1b3d0bcea6059473fc837f4eb69bcfb64a2358f1550f64b7dfe24d62"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "ff8dda8908d276d3871aec7ae6dac19085c7b558b416da7c20bb34be089d8398"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "638260e7f2642d1893b9ccdcfdf87cfdf712810d8b1c5e55b5272f451ca24875"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "92008ecac4f98942d9bf32f7627e446f8c183698f29427cfd4f6d9e17299d801"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "7f53aa1ed16b4efc38f0ee61a4d457e1660fc43bc473e7b63b1c6576d4a2056a"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "07df56a318133ff66d5cfebbe744d80ed87dd921b7d0981c067c984902f1b187"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0a8111ea30c81502918a2c7284aabd642e9b4972d898c957650a4c31d2456084"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "7cc7f170d77d247169723197a5d5ab0a9ff364b13b875ed107bc142339028c3e"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "7b15b52868b26969494966a5752afa6414d2be2f584ba2f1c33e9b9bd674c073"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "17e4144d7b1ccf4598fb3c74df2dcded9d8867d6e8b18c40f00cb972162e2799"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "5cf76211bd52dacd0f8617357883b001bd4e7e21bfe2e11f335292701d9ddbc1"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "2c2dad9b3b81cb153bc834338a18dc693d03cefd9aff8c40c66ecf8d33371ce5"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "151324c8d36d27ebad86863f9f3d7aca03f5b9ce8a873f30b9b054e7f5c52620"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c009fd2ffa157bce6574b35896a3f7a733a8b1b88c772f95fce30f46585b24fe"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "1b090058871b5a5691c154e9b2960754c1996b66aa35ecf699f86d071485ab9c"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "2f4370d83bd4f2f22c15cf53acfa31075ec8ef9b42ad6aca7f0ee5ac40cddc16"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "2ed44143783a7b7f81b3e21d8aea7a7ed64d96324f72e3371582a6629cc8ce9e"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "2e9cc02f78347d91daba27f973d949a88992f3c20ddcba291fd07c47930454be"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f55d5c83d20d101d80e2939d27cf3decdf536954a342630987ae3f6b73385c45"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "8db610a14e4dd8589b99a70c8430f7964e13e318ed508a585c067b73deda2973"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "4cda03557c2fe6396bd39b6046f9d1e755905b5e0ed3be57146d8208f976df93"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "840bb88eb66d66e87afb8335191079d6a595471fd0ba9b74ebeb92b4990f9947"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "a7e74c39cf58950785ab6bdc59880a3633c114f2e2d4f2d65332c5b271fa9d14"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "5242449c85e49d5308ed9da46a4e0b2a659e4576526ce8e66dfaec8f728b1516"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "a7e37d3bf32c4145d2f2c76fa2110741ab1d562399b006712fa1d341502d9b24"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "665f1c3af1ee2aa718162ee5d89dc38d43a8a4af84595b49d8838909ede817f9"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "3ebfb9825fc3204f23d83e6e0c94dea1691f064db28d68ea68a7c6fb7c9b26de"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "dc9e0a0ce3dee659a4f9b05fd434306092cb135234a3060edfe8aa69848bafe1"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "8658f130ed158c4e3842fe0d564db43b74bdb0f5cdefded6d1ab32b8b994026e"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f0ea8934cba884a83e05d0b5389b503fe45b3f5c4943a3c30828fab86cbc1cdb"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f705196fa79e747fcda6545059ecadaf23e1988e0c7d63234669b0decb19c5a7"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b5a29be6d38eeea0894115b1971602dd2b17bf69798ebca5396caf93074026ce"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b409e01abea2e3401d155ac641af420308f1798502cd86065d516b06ab233678"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0376836da71a14cc764d5b25eaa95af02753e25f78f103d434d9aa2d068f6458"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "b798806831dc258c9e4927e7e2dfa0ef56698a2f020741300a22fe57a08aaa09"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "68900559c6509427e505aaa7bb5ff8d999a767245711662c9ffd9418bc643b0a"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "4577a89019e8db9c9b6fc9686a25d7e66bf28d239338d13c36066a1a7a337303"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "4b052150b742e959c2ce232c1d27cdec25b85c77558e3dca6c3e2593f01b5da0"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "124f50ff00639952bce1aedccd7d77c6497f07b2d7202b8bcbe25f3a95e996f0"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "235d776960af401d974d12c92b91aada8c5befba7d3d2577d3e4ece3b6454cd0"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "7f617d8fe4c968ad9bb56ffd5a9fd263878d16d67950def4c1bf92dc15cc6fa9"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "de2c52f1290b92751c726124dee0f22158ac7e4dcd8695c2eca4fcbc426fd954"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "e66371a3442b173dbd39b44e92df92e2804eca966c70abba5d1ee57dab6154fb"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b957ca02fbc56dc49555b3c6441cd81b107c9ff6b5a7baa8901a892357f7a4fc"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "cc1e0b4aa3d79bf842980dd7e7eef50a5a8206422edfe8f81e5b3c6e4592f8f6"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "d3c4a0820f6d855c6e76dffb379530a159a3220653c3422b45f7b3176b336577"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "2b09101492cf96a4f98be8e29a78b36e351480441d4c596d431592572905a8ab"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "890b57be7e53608bd706aa0524cc2370ccb9d77f2e8b7ce348f8386c44de93ba"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "3f62d358c7ef8873a197c3723be0386cf6fcb5506530faac49c4536d58cc5013"
+    },
+    {
+      "state": "menu/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "ebd1e2e171d3f8194e409aded531ce6cdb401b2a4d93166f80653a250ccc2c81"
+    },
+    {
+      "state": "menu/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "4506f7c05994f136c7d3cc2278f5cd38d7870aa1ae80bf0a97393dc6ef4ca79f"
+    },
+    {
+      "state": "menu/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "e7b89b95c937a3ee643c6f7d6258d69795bc95e54454955197b25be0fe71d63d"
+    },
+    {
+      "state": "menu/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "8793482ddd207005fa0382c3dd01e1be6bb0aa3966e7977cf188ebd749438598"
+    },
+    {
+      "state": "menu/menu-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "94a085e23f20b70eb341e692e56576c2f5834d5ff1018e1051fd49247175e7ed"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "aafdc9d4080a07c096e9c350498cdffa10edde4d43215413fb14109aefcc533d"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "e4247b366e363c09750c0823753f58995fccb126d66a7cbd6d2c5d9c0eff2c28"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "dbf68066ccb85e37961d807fb298811fd529f0a9d9301474b3fd98d1f5a7204a"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "62cc5788be153ac7810b53380083885a373aac1b6d3b339ab17250f3715dcb8b"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "fe093e05ccf413c814021e50792935232d17799525b8c7eb1d71211180907289"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "68bc3dc0334dffb78fc5a765e733a0cbc5c802e3b0a8f995d0714c7a8b6c00be"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "2915d85109de8b71f8d0bbbea2379c3fd904b76ae2aaa4af0c5ee4abed367b9d"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b68a6709ddfb6e451e26e37926b83e649e399dca77f95e95842283d656911392"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "1fdf38d40f82eaa6a0ba953e7f6936a8e2e1862a2f1b5d994aa5c42ecda18e72"
+    },
+    {
+      "state": "inline/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "7f8ae1cc60ada0e658e2323a0971a6ae7a064bc105d79287417709b533d414a1"
+    },
+    {
+      "state": "inline/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "e421b736a294474b77b2c783d9d6f84a412ed304b1bae6f10ca9780ce7dbf497"
+    },
+    {
+      "state": "inline/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0b008dd00919978c11b06f615d34be0e9c41e98caaf2cf6e158d311373b32b5b"
+    },
+    {
+      "state": "inline/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0fa4cb2d0fc448921ccad8f09d1b9368487b81a666979a1b887f0b06eb5cf69b"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "e5858b99b80293e156722a9863ad33265b397a5078253b36d30a157031102fbe"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "b7866d4a8003a029c48f8de7b64271b998293a3b4fe66c8a77e2fa0895197c97"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "12b02e14aef3095a24cae6475fcb1c4c83053e6c7830efc3ae3892ef9decc64c"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "936a46e93c80023be465269738b91132d448f3348b6f9b5fd330f7ba97764c7e"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0fa4b21f5e6cbf6418e4f36627e37b4b3b6928a4173b3c3468da5fcb5ab27067"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "42105f336f00417633ab205103d24a5e411a011234db1dae1e8d09cc71c8a834"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "1a6b0b42a964f852f72104b692c170170a7261ed92c5320de6e3b671d09d8741"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "02f45a84246a653fdc5ac0de266b178eb0ee81add8540b365b9529f7fc6dbe88"
+    },
+    {
+      "state": "bottom/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "33aef8b0be74488a8f3a87310d3df2b84d2a13e8f87cf7eb02f3afbbbb9c315a"
+    },
+    {
+      "state": "bottom/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "c5f82a5b0dabad18fa4b8aa7c43f4e6115931ff7c2b3fa5202edab2909ade1be"
+    },
+    {
+      "state": "bottom/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "08f117862ab8a561bf6596e5cb7089a83e95faced32f621c03b2d8aab89841ce"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "46f32d642f7bd02a70eaea4ee4219fb8a7156e773f42685df3eac8e9a88d0fb6"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c7d359be8d927f1bdd71b3de995903c7166e24f1c669c3b5bf49bd61d3595e79"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "0b4a23f9e036a7ef97876f7497a604149580f15f315428294c1a26d7c61fd58b"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "4635dd2323123e59816f6dc09be3509b50236eb4f78018b221e8e7323ff04b29"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "676744dbf347020c8b0439fbe62e37d50f7916b88a1093d7b324152e19e48bde"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a192aab5ff7876d2467a80a290b110174b6c7c7457c64eb2fae2187f41bb8a10"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f68206125f52f77ee5aa0d5349b8fc1dea4bb14264587aa182a0d73428787bdb"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "8a215443f2c9cb2eb2a5856ff28e0a1c5295a2a42af66d80340de22295ebdbc4"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "494b2e3af152ac84ec2ec1418bf659f84b1a72ade8069ec0b013429c572356c0"
+    },
+    {
+      "state": "none/collapsed/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "90fcd0fd3b3907ddb11c998f441a5da84aa248dd4dc23dd6653ae30821542bb2"
+    },
+    {
+      "state": "none/collapsed/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "421aa937cfd893d4d44ed8d874058f37c6c3fb8e0c3919344e324e3a8f80c414"
+    },
+    {
+      "state": "none/search-expanded/full (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "87981f6b95fbfdbea4d60a45af39a314141424473915cec4a2fe209216a6fee7"
+    },
+    {
+      "state": "none/search-expanded/critical-only (diagnostic; actual state recorded)",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "50da6f0d79754d96ce7910962f0b2db9436856aa863c9b55e1cae4b5dc5c9291"
+    }
+  ],
+  "inScope": [
+    "Safe reduction to existing space-1 vertical padding in both source CSS entrypoints; public doc and patch changeset",
+    "Observed geometry and reachability gaps across existing modes, without changing or waiving their acceptance criteria"
+  ],
+  "outOfScope": [
+    "Unresolved universal chrome-budget/44px-target interaction strategy adjudication; no implicit expanded/inline/bottom exemption",
+    "Blog source, tests, fixtures, matrices, assertions, snapshots and authorities",
+    "New design tokens, package publication, deployment, merging; canonical #842 source is integrated with provenance rather than reimplemented"
+  ],
+  "classificationEvidenceDigest": "eb1ea94859343612d1c5caf6591131f73b95069c137b0187ff10ca566121d9d2",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "a4cb0b85b5d40c79389736cf58f9b8bd583cad63286817731bc784ec5db44867"
+}

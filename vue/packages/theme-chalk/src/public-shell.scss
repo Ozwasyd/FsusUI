@@ -728,7 +728,7 @@
 
   @media (max-height: 520px) and (orientation: landscape) {
     @include e(inner) {
-      padding-block: var(--fsus-space-2, 8px);
+      padding-block: var(--fsus-space-1, 4px);
     }
   }
 
