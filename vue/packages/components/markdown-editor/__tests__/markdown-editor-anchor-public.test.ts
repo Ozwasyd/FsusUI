@@ -5,7 +5,7 @@ import {
   planMarkdownAnchorEdit,
   planMarkdownAnchorInsert,
   planMarkdownAnchorRemove,
-} from '../index'
+} from '../../../element-plus'
 import * as publicApi from '../../../element-plus'
 import * as commands from '../src/markdown-editor-anchor-commands'
 
