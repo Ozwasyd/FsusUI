@@ -21,9 +21,9 @@
           :class="ns.e('wrapper')"
           v-bind="{
             ...$attrs,
+            'data-fsus-material': 'glass',
             ...(cspSafe ? {} : { style: { zIndex: computedZIndex } }),
           }"
-          data-fsus-material="glass"
         >
           <div :class="ns.e('mask')" @click.self="hideOnClickModal && hide()" />
 
