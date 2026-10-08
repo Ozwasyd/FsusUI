@@ -11,8 +11,13 @@ namespace FsusUI.Avalonia.HeadlessTests;
 
 public class FsusNativeMenuTests
 {
-  [AvaloniaFact]
-  public void SameCommandModelUsableByCommandPaletteAndNativeMenu()
+  [AvaloniaTheory]
+  [InlineData(FsusShortcutPlatform.Windows, "Ctrl+S")]
+  [InlineData(FsusShortcutPlatform.Linux, "Ctrl+S")]
+  [InlineData(FsusShortcutPlatform.macOS, "Command+S")]
+  public void SameCommandModelUsableByCommandPaletteAndNativeMenu(
+    FsusShortcutPlatform platform,
+    string displayShortcut)
   {
     var saveCommand = new FsusPlatformCommand("file.save", "Save Document", FsusPlatformRole.FileSave)
     {
@@ -37,7 +42,7 @@ public class FsusNativeMenuTests
       FsusNativeMenuItemModel.Action(exportCommand));
 
     using var builder = new FsusNativeMenuBuilder();
-    var nativeMenu = builder.Build([fileMenuModel], FsusShortcutPlatform.Windows);
+    var nativeMenu = builder.Build([fileMenuModel], platform);
 
     Assert.NotNull(nativeMenu);
     var rootFile = Assert.IsType<NativeMenuItem>(Assert.Single(nativeMenu.Items, i => i is NativeMenuItem m && m.Header == "File"));
@@ -46,15 +51,16 @@ public class FsusNativeMenuTests
     Assert.Equal("Save Document", saveItem.Header);
     Assert.NotNull(saveItem.Gesture);
     Assert.Equal(Key.S, saveItem.Gesture.Key);
+    Assert.Equal(KeyModifiers.Control, saveItem.Gesture.KeyModifiers);
 
     // 2. Used by Command Palette
     var palette = new FsusCommandPaletteModel(commands);
-    var searchResults = palette.Search("save");
+    var searchResults = palette.Search("save", platform);
     Assert.Single(searchResults);
     Assert.Equal("file.save", searchResults[0].CommandId);
     Assert.Equal("Save Document", searchResults[0].Label);
     Assert.Equal("File", searchResults[0].Category);
-    Assert.Equal("Ctrl+S", searchResults[0].DisplayShortcut);
+    Assert.Equal(displayShortcut, searchResults[0].DisplayShortcut);
     Assert.True(searchResults[0].IsEnabled);
 
     // Execute via palette
@@ -62,6 +68,23 @@ public class FsusNativeMenuTests
     saveCommand.ExecuteAction = _ => executed = true;
     searchResults[0].Execute();
     Assert.True(executed);
+  }
+
+  [AvaloniaFact]
+  public void DefaultPaletteSearchUsesHostPlatformAfterExplicitSearches()
+  {
+    var gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control);
+    var command = new FsusPlatformCommand("file.save", "Save") { Gesture = gesture };
+    var palette = new FsusCommandPaletteModel([command]);
+
+    Assert.Equal("Ctrl+S", Assert.Single(palette.Search(platform: FsusShortcutPlatform.Windows)).DisplayShortcut);
+    Assert.Equal("Command+S", Assert.Single(palette.Search(platform: FsusShortcutPlatform.macOS)).DisplayShortcut);
+    Assert.Equal(
+      OperatingSystem.IsMacOS() ? "Command+S" : "Ctrl+S",
+      Assert.Single(palette.Search()).DisplayShortcut);
+    Assert.Same(gesture, command.Gesture);
+    Assert.Equal("Ctrl+S", gesture.SerializedText);
+    Assert.Equal(KeyModifiers.Control, gesture.ToKeyGesture().KeyModifiers);
   }
 
   [AvaloniaFact]

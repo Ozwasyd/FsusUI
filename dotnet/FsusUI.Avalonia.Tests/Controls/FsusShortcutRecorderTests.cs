@@ -138,12 +138,19 @@ public class FsusShortcutRecorderTests
       FsusShortcutGesture.Parse("Win+Shift+P"));
   }
 
-  [Fact]
-  public void RecorderCapturesSingleShortcutOnKeyCombination()
+  [Theory]
+  [InlineData(FsusShortcutPlatform.Windows, KeyModifiers.Control, "Ctrl+Shift+P")]
+  [InlineData(FsusShortcutPlatform.Linux, KeyModifiers.Control, "Ctrl+Shift+P")]
+  [InlineData(FsusShortcutPlatform.macOS, KeyModifiers.Meta, "Command+Shift+P")]
+  public void RecorderCapturesSingleShortcutOnKeyCombination(
+    FsusShortcutPlatform platform,
+    KeyModifiers primaryModifier,
+    string displayShortcut)
   {
     var recorder = new TestShortcutRecorder
     {
       AccessibleName = "Editor shortcut",
+      Platform = platform,
     };
 
     var valuesEmitted = new List<FsusShortcutGesture?>();
@@ -157,8 +164,8 @@ public class FsusShortcutRecorderTests
     Assert.True(recorder.IsRecording);
     Assert.Contains("fsus-recording", recorder.Classes);
 
-    // Simulates pressing Ctrl+Shift+P
-    recorder.SimulateKeyDown(Key.P, KeyModifiers.Control | KeyModifiers.Shift);
+    // Capture the platform's primary modifier without changing serialization.
+    recorder.SimulateKeyDown(Key.P, primaryModifier | KeyModifiers.Shift);
 
     Assert.False(recorder.IsRecording);
     Assert.DoesNotContain("fsus-recording", recorder.Classes);
@@ -166,7 +173,8 @@ public class FsusShortcutRecorderTests
     Assert.Equal(Key.P, recorder.Value.Key);
     Assert.Equal(KeyModifiers.Control | KeyModifiers.Shift, recorder.Value.Modifiers);
     Assert.Single(valuesEmitted);
-    Assert.Equal("Ctrl+Shift+P", recorder.DisplayText);
+    Assert.Equal(displayShortcut, recorder.DisplayText);
+    Assert.Equal("Ctrl+Shift+P", recorder.Value.SerializedText);
     Assert.Equal(FsusShortcutValidationStatus.Valid, recorder.Status);
     Assert.False(recorder.IsInvalid);
   }
@@ -177,6 +185,7 @@ public class FsusShortcutRecorderTests
     var initialGesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control);
     var recorder = new TestShortcutRecorder
     {
+      Platform = FsusShortcutPlatform.Windows,
       Value = initialGesture,
     };
 
@@ -319,6 +328,33 @@ public class FsusShortcutRecorderTests
     recorder.StatusMessage = "Modifier key required.";
     recorder.IsInvalid = true;
     Assert.False(recorder.ClearCommand.CanExecute(null));
+  }
+
+  [Fact]
+  public void AutoRecorderUsesHostPlatformAndExplicitDisplayChangesPreserveValue()
+  {
+    var recorder = new TestShortcutRecorder();
+    Assert.Equal(FsusShortcutPlatform.Auto, recorder.Platform);
+    recorder.StartRecording();
+    recorder.SimulateKeyDown(
+      Key.S,
+      OperatingSystem.IsMacOS() ? KeyModifiers.Meta : KeyModifiers.Control);
+
+    var value = Assert.IsType<FsusShortcutGesture>(recorder.Value);
+    Assert.Equal("Ctrl+S", value.SerializedText);
+    Assert.Equal(KeyModifiers.Control, value.Modifiers);
+    Assert.Equal(OperatingSystem.IsMacOS() ? "Command+S" : "Ctrl+S", recorder.DisplayText);
+
+    foreach (var platform in new[] { FsusShortcutPlatform.Windows, FsusShortcutPlatform.Linux, FsusShortcutPlatform.macOS })
+    {
+      recorder.Platform = platform;
+      Assert.Equal(platform == FsusShortcutPlatform.macOS ? "Command+S" : "Ctrl+S", recorder.DisplayText);
+      recorder.StartRecording();
+      recorder.SimulateKeyDown(Key.Escape, KeyModifiers.None);
+      Assert.False(recorder.IsRecording);
+      Assert.Same(value, recorder.Value);
+      Assert.Equal(platform == FsusShortcutPlatform.macOS ? "Command+S" : "Ctrl+S", recorder.DisplayText);
+    }
   }
 
   private sealed class TestShortcutRecorder : FsusShortcutRecorder
