@@ -1,5 +1,5 @@
 ---
-"@ozwasyd/element-plus": patch
+'element-plus': patch
 ---
 
 Honor the public textarea `resize` prop in CSP-safe Input rendering through
