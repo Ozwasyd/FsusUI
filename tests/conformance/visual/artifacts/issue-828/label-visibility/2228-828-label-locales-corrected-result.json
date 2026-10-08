@@ -1,0 +1,5 @@
+{
+  "candidate": "dc8aed9b0d50c69f27999722a434cf3c0d164fac",
+  "command": "node .tmp/issue-828-label/probe-locales.mjs after-locales",
+  "exitCode": 0
+}

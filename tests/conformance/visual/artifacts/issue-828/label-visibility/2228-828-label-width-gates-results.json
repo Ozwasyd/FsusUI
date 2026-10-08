@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "check:documentation-architecture"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-width-gate-0-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "check:fsusui-design-conformance"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-width-gate-1-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "tokens:check"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-width-gate-2-first.log"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/conformance-v2-vue-public-gate.mjs"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-width-gate-3-first.log"
+  }
+]

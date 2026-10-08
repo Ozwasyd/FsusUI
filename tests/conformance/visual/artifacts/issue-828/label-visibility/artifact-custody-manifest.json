@@ -1,0 +1,399 @@
+{
+  "schema": "issue-828.label-visibility-custody.v1",
+  "productSource": [
+    "dc8aed9b0d50c69f27999722a434cf3c0d164fac",
+    "777fcf62f19ff801cb733cfe7a155ee653da76b4"
+  ],
+  "testedCandidate": "6d52b389b03bcaecdc01a3ed9531e43efdc7e2ce",
+  "successorProduct": "20e4a21b398fb8450b9c948c39e2760450fa4477",
+  "successorCandidate": "e30778563d2271acd924f65ded814bfb0c972076",
+  "qualificationEligible": false,
+  "independentUXReceipt": null,
+  "fullExitCode": 1,
+  "preview": {
+    "passed": 646,
+    "failed": 42,
+    "total": 688
+  },
+  "dev": {
+    "passed": 9,
+    "failed": 10,
+    "total": 19
+  },
+  "nativeEndTargetFailuresRetained": 48,
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-after-preview-first.log",
+      "bytes": 39,
+      "sha256": "ab13e8d7727beb1db19e85af8c885ffe6ed0b76e567daa93f256690bbf6fe03b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-api-projection-first.log",
+      "bytes": 299974,
+      "sha256": "b875df4bdd27d88d321b8e9d9fe067dd976bd6ba73b41f7f490eb97847cdf2cc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-before-first.log",
+      "bytes": 825,
+      "sha256": "91702a46ebd344601be38ced891722668aa1ea4b11261823ae63baf9321d4832"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-before-preview-first.log",
+      "bytes": 39,
+      "sha256": "ab13e8d7727beb1db19e85af8c885ffe6ed0b76e567daa93f256690bbf6fe03b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-check-0-first.log",
+      "bytes": 228,
+      "sha256": "0f593d9df1fc64aee39a5f2aa9fc4bb80c40071cc2b736db6ec628ade69c4e7c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-check-1-first.log",
+      "bytes": 1571,
+      "sha256": "239c502687829c317546577ef873633f662cfc76da8dc407defe59b0a3a9bce1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-check-2-first.log",
+      "bytes": 346,
+      "sha256": "fa092ec9cab227e0e065b90af156ef27c1472bd029fc379a40159a5a76a76a7b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-check-results.json",
+      "bytes": 812,
+      "sha256": "f952328d2731abba9c3268f066af20b62be06e35c972120ece364794eabe31ce"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-classification-first.log",
+      "bytes": 292,
+      "sha256": "a3033b91eec16d91185a3a3e18c37cc66e9327347a2f9748556efe0473fcb193"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-check-0-first.log",
+      "bytes": 229,
+      "sha256": "ad9351787e71cb6b1e6b38023a49289157e14accf62fccce3d1d1455b92f1e93"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-check-1-first.log",
+      "bytes": 1571,
+      "sha256": "e23458b1d5cdd177b0e960ec8ac321b4326ccb1a75bd43add363cd77d3c1712d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-check-2-first.log",
+      "bytes": 145,
+      "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-check-3-first.log",
+      "bytes": 196,
+      "sha256": "1fa0da586089c47bf8b4d3beebe3119f4d9824203f87632c4cf5271efbec7609"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-check-results.json",
+      "bytes": 1257,
+      "sha256": "a9254909833bbee356c8e7fb85049035dcf493dcf50aa51bc58e625a895f718b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-full-result.json",
+      "bytes": 378,
+      "sha256": "3c11a7dcd7d8a2597a29dac1268eedfccc298f42fa4871d79c7f89b1f800169d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-full-visual-first.log",
+      "bytes": 304435,
+      "sha256": "2c31164a26ba6c970712994789a263d08cdaeac7d666c82c60682b77d1cedafd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-labels-first.log",
+      "bytes": 1459,
+      "sha256": "1dd4770cabcbf86d09bda8590cd6be4c938a62edf1c657e0af0296dcb8a3d617"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-locales-first.log",
+      "bytes": 7085,
+      "sha256": "107c979ec4f0a7865d4d43abeb7bdaac39a8ce70968578523523e96fb32107b7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-matrix-first.log",
+      "bytes": 3829,
+      "sha256": "ac427f54bad92865919415078a01d666d91ab7ce23ced2dca7ab88c138e08781"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-preview-first.log",
+      "bytes": 39,
+      "sha256": "ab13e8d7727beb1db19e85af8c885ffe6ed0b76e567daa93f256690bbf6fe03b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-preview-results.json",
+      "bytes": 1265,
+      "sha256": "b62fefbcc3007dcfea2e012822c852560e1ffc034dca7decfb2611aa6eff73ff"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-final-shell42-first.log",
+      "bytes": 6359,
+      "sha256": "284eccaa4dcd47da428168eba8d6ed0ef6ba59a0bae07c978c820fb5e888a115"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-install-first.log",
+      "bytes": 4806,
+      "sha256": "f615551d911aff40cd338dd4d8bdcfb139e6a9b50296397aa259754891e1f8f2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-labels-first.log",
+      "bytes": 758,
+      "sha256": "0271d2437e861d6dd7146faac92e6384d5a56987aae4603593ba2e7c5756ecdf"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-locales-corrected-result.json",
+      "bytes": 152,
+      "sha256": "7e0ee240017a7a9c4b22d5ac1913fd6d7161c7ab822eb0d0c33d261762bf39e9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-locales-corrected.log",
+      "bytes": 7158,
+      "sha256": "00eabc23435000e0f6008701d816c9d69c3f61f68424be1651a9fd022bd376b2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-locales-first.log",
+      "bytes": 579,
+      "sha256": "d5ecd454a39a7e34317eec39b9fb6c9498ef1ff2815e7f4580059cd514f11cae"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-locales-preview-corrected.log",
+      "bytes": 39,
+      "sha256": "ab13e8d7727beb1db19e85af8c885ffe6ed0b76e567daa93f256690bbf6fe03b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-locales-preview-first.log",
+      "bytes": 1405,
+      "sha256": "9b0cfd6ac7b02298f410891c9ec962227c6a4cd1f737492fb24debe8eb8553e2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-locales-result.json",
+      "bytes": 152,
+      "sha256": "e30c3f6b64f7573b373546649757911cfb9a047e6f24798475be0ab8e0ac4665"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-matrix-first.log",
+      "bytes": 3829,
+      "sha256": "ef427b1672bae6cd5e3c5c570236b0ab7344cbb9ca005076b8bc08d0d451502d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-preview-results.json",
+      "bytes": 968,
+      "sha256": "866d89448b6d3dd2961209bfef0bb91d81ac3db6feb0bdd5c07a9cfca621e6db"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-prior-critical-first.log",
+      "bytes": 280,
+      "sha256": "5397ae79b1962f993aa72642e255871c551078192d70c92e3c94cc8fc6544d16"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-prior-critical-preview-first.log",
+      "bytes": 39,
+      "sha256": "00047c7ab683a24d2e9918bc4b75c2c77642d92997edee48a0fac11a62c2aa05"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-setup-0-first.log",
+      "bytes": 1332,
+      "sha256": "0d483c3417c3065c7e97f72d36c89c97290702834d19529f0c490365e09bb4a8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-setup-1-first.log",
+      "bytes": 15141,
+      "sha256": "64b3004c9e96788fb47ebefc4d9cd8f6ccad403b8bccf94deaae695da0a1a203"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-setup-2-first.log",
+      "bytes": 6024,
+      "sha256": "45956cb36d9d2d3665ef16114c36c2c25417df1a1136b13b83a1f17c51811c55"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-setup-3-first.log",
+      "bytes": 85803,
+      "sha256": "ae73a3e9f03d25326995a0c948a1bec94f529b1a9d6e4a2535867c212cbde55f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-setup-results.json",
+      "bytes": 613,
+      "sha256": "1dbdc98c771cb47986efee8ac6ee9cb07eb3683233b86b4e5ab24bf33526ad55"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-shell42-first.log",
+      "bytes": 6358,
+      "sha256": "c332bf5e861ceab5e3f03b7d5efb97acd282b4b3248e102356e1350d06d7e951"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-api-producer-first.log",
+      "bytes": 179,
+      "sha256": "6688f65a78966e0a457d2091940b977da51f67929114c00c43b15d519807e4fe"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-api-recheck-first.log",
+      "bytes": 196,
+      "sha256": "1fa0da586089c47bf8b4d3beebe3119f4d9824203f87632c4cf5271efbec7609"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-classification-first.log",
+      "bytes": 292,
+      "sha256": "f182367e6ec5ec95fcf6bb82b6acd3ae4abfb7852b2c8158fdda6f79f18f2561"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-gate-0-first.log",
+      "bytes": 400,
+      "sha256": "cd41a17e0a6bc7fc6876e295152a3cc7054fd1dba7a7f26bb3401483bf61f3fc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-gate-1-first.log",
+      "bytes": 4872,
+      "sha256": "54b1a622a42d54299afbdd9c3a8407b6b2fc802b5b6a036748f94a056e416740"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-gate-2-first.log",
+      "bytes": 163,
+      "sha256": "bf2c8748fae9d1343b68c0c75eb7c38ed6b521f2adda747d616110bd6b0e8b31"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-gate-3-first.log",
+      "bytes": 86,
+      "sha256": "04331bd11f1dbecbcf6841dfff20ac936c2a59340bc3f982790e263d5808dbe1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-gates-results.json",
+      "bytes": 682,
+      "sha256": "7ce2e452a6610da16891fa59e4e74e2c1105fabf52d1dd8025be609711a3eef7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-setup-0-first.log",
+      "bytes": 6024,
+      "sha256": "b1859ff600c12b90ef25117d4c12444d10e69a7afde9fe738cd0eafd0af3105f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-setup-1-first.log",
+      "bytes": 84903,
+      "sha256": "f6612289256a201b098ba5478b44caa717e0d9639e9279eaa48ca312a2dac8e0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/2228-828-label-width-setup-results.json",
+      "bytes": 324,
+      "sha256": "4b52bf522388d9b0e5cb93d4af58e1767ef609b4d2c267c305a2fecbc5f56be3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/README.md",
+      "bytes": 6489,
+      "sha256": "4536c7df291d822a44ced2f8167007bf3d658c7c44792e32ef3a89a7b34cfe97"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/component-and-label-attempts-first.zip",
+      "bytes": 39347445,
+      "sha256": "9f46bfe87e94e855827569e9699fc10f28d827d2aa5fe92b9921cadbd56dd75a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/critical-portrait-prior-comparison.json",
+      "bytes": 1251,
+      "sha256": "3755fa1655293ce49b91e0008968e745f9e99662105cfdedecc29754eb7ba0cb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/final-default-labels.json",
+      "bytes": 152667,
+      "sha256": "ff98115a53cd787c080800f9b5df7af8cdbf5e6c98d6a9aba0d2dd137df130c6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/final-locale-labels.json",
+      "bytes": 459227,
+      "sha256": "49356f9f43157b5bf32ec04adb1722c15e79f9ea09d869fa1c923b611ecb02d7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/final-matrix.json",
+      "bytes": 2166095,
+      "sha256": "41600f13be932cca82004859a0fc22fa544b6d938830b8152f983da43732ad14"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/final-original-shell42-traces-first.zip",
+      "bytes": 28615701,
+      "sha256": "fb46956fca119c71c68043f257679b1a79446fe46a6e3e5a90212c1ae0e7acbd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/focused-raw-archives-manifest.json",
+      "bytes": 441610,
+      "sha256": "e6b0d334e7b0f5f7c6b665831343263b6ee5ea12e3e43fec14252dc9566a5e84"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/label-preimplementation-classification-evidence.json",
+      "bytes": 909,
+      "sha256": "831439148d4991d9f4b50e0ed429a9739b1a02aead0313741531c541b5c16645"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/label-preimplementation-classification-receipt.json",
+      "bytes": 3791,
+      "sha256": "2ad350f13e46f4ef9b8f7a8dc7f94d81da1324daedd253af37b0075a6b58d7e7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/native-end-visible-target-first-failures.json",
+      "bytes": 36471,
+      "sha256": "72291b47f8b43627cd5b3c449a8a9adfcdea41c27217139c43651d47cefc9c64"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/original-full-dev-failures-first.zip",
+      "bytes": 12306540,
+      "sha256": "6cd1290198566ce663bf4f5c54c36e322e1263ef4f2ce219c44e00851edd5eff"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/original-full-first-manifest.json",
+      "bytes": 261494,
+      "sha256": "3515b548dedc6258f45f6c206dae643a99f26d14d28a50df22e7763046e0dfcc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/original-full-generated-metrics-first.zip",
+      "bytes": 4514533,
+      "sha256": "18480280aee87f2f83d950c00c40deb64f0f39285ca5dde5dc0fd7e32687906e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/original-full-preview-failures-first.zip",
+      "bytes": 80583996,
+      "sha256": "8d1a517e5893fa8ec9c3f728c059c87a7eae6ffe571e41525ca3056bd0ee481b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/original-full-runtime-report-first-part1.zip",
+      "bytes": 77192923,
+      "sha256": "471f04125c9c2a2c19ed1e21c31a789378c7970c5bdc562dbc6c585b06f20187"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/original-full-runtime-report-first-part2.zip",
+      "bytes": 59481037,
+      "sha256": "f2ed70ca797fba8d4b0219ffbd59c1fb4f1c723ab9a1ef57889c9fd4a15eef03"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/original-generated-metrics-first-manifest.json",
+      "bytes": 4856,
+      "sha256": "181412f443d5f192acbde9aa9d7eb54d31e914f245c820368c490792df8c99cc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/original-shell42-traces-first.zip",
+      "bytes": 28934121,
+      "sha256": "fdbceaa35ee5b2c745f735e59f75a253d5d07a54d66457d5b00682b8955f7911"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/portrait-unchanged-comparison.json",
+      "bytes": 7842,
+      "sha256": "deb38c9b7ce8a09c20d24a46838cd3b86b0f5410b0a58d56d69f7d9d9f0417a2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/prepared-draft-pr-body.md",
+      "bytes": 831,
+      "sha256": "d221424ae6fb3c10c78c1ac2eeeeb0f500a5261baed44fa72d48c64e962ca493"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/width-followup/label-preimplementation-classification-evidence.json",
+      "bytes": 966,
+      "sha256": "641618e24ac2df2a8dd76bb84b9d733119ccc9aa03cd4c844ea8ac420d8022aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/label-visibility/width-followup/label-preimplementation-classification-receipt.json",
+      "bytes": 3791,
+      "sha256": "893e456b7e9175613c9b5e8b6af0caac225287cf199477af122d951b90173549"
+    }
+  ],
+  "entryCount": 74,
+  "rawZIPEntryCount": 3035,
+  "evidenceCommitNote": "Later artifact commit is not relabeled as tested source"
+}

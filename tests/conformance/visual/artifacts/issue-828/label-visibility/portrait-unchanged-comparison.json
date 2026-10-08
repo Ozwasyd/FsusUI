@@ -1,0 +1,474 @@
+{
+  "beforeCandidate": "dc8aed9b0d50c69f27999722a434cf3c0d164fac",
+  "afterCandidate": "6d52b389b03bcaecdc01a3ed9531e43efdc7e2ce",
+  "rows": [
+    {
+      "key": [
+        "en",
+        "anonymous",
+        "light",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "anonymous",
+        "light",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "anonymous",
+        "light",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "authenticated",
+        "light",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "authenticated",
+        "light",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "authenticated",
+        "light",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "en",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "anonymous",
+        "light",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "anonymous",
+        "light",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "anonymous",
+        "light",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "authenticated",
+        "light",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "authenticated",
+        "light",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "authenticated",
+        "light",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 58,
+      "afterOverflow": 58,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "zh",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 58,
+      "afterOverflow": 58,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "anonymous",
+        "light",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "anonymous",
+        "light",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 28,
+      "afterOverflow": 28,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "anonymous",
+        "light",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 132,
+      "afterOverflow": 132,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 28,
+      "afterOverflow": 28,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "anonymous",
+        "dark",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 132,
+      "afterOverflow": 132,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "authenticated",
+        "light",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "authenticated",
+        "light",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 131,
+      "afterOverflow": 131,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "authenticated",
+        "light",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 275,
+      "afterOverflow": 275,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        1
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        1.5
+      ],
+      "beforeOverflow": 131,
+      "afterOverflow": 131,
+      "identicalGeometry": true
+    },
+    {
+      "key": [
+        "long",
+        "authenticated",
+        "dark",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 275,
+      "afterOverflow": 275,
+      "identicalGeometry": true
+    }
+  ]
+}

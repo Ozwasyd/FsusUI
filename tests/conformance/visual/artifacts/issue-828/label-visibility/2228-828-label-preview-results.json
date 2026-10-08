@@ -1,0 +1,39 @@
+[
+  {
+    "candidate": "dc8aed9b0d50c69f27999722a434cf3c0d164fac",
+    "command": [
+      "node",
+      ".tmp/issue-828-label/probe-labels.mjs",
+      "after"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-labels-first.log"
+  },
+  {
+    "candidate": "dc8aed9b0d50c69f27999722a434cf3c0d164fac",
+    "command": [
+      "node",
+      ".tmp/issue-828-label/capture-matrix.mjs",
+      "after-matrix"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-matrix-first.log"
+  },
+  {
+    "candidate": "dc8aed9b0d50c69f27999722a434cf3c0d164fac",
+    "command": [
+      "pnpm",
+      "exec",
+      "playwright",
+      "test",
+      "--config=vue/playwright.config.ts",
+      "vue/tests/visual/public-shell-mobile-nav.spec.ts",
+      "vue/tests/visual/public-shell-desktop-search.spec.ts",
+      "--workers=1",
+      "--trace=on",
+      "--output=/tmp/2228-828-label-shell42-first"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-shell42-first.log"
+  }
+]

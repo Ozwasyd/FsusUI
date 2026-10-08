@@ -1,0 +1,49 @@
+[
+  {
+    "candidate": "6d52b389b03bcaecdc01a3ed9531e43efdc7e2ce",
+    "command": [
+      "node",
+      ".tmp/issue-828-label/probe-labels-final.mjs",
+      "final-labels"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-final-labels-first.log"
+  },
+  {
+    "candidate": "6d52b389b03bcaecdc01a3ed9531e43efdc7e2ce",
+    "command": [
+      "node",
+      ".tmp/issue-828-label/probe-locales-final.mjs",
+      "final-locales"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-final-locales-first.log"
+  },
+  {
+    "candidate": "6d52b389b03bcaecdc01a3ed9531e43efdc7e2ce",
+    "command": [
+      "node",
+      ".tmp/issue-828-label/capture-matrix.mjs",
+      "final-matrix"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-final-matrix-first.log"
+  },
+  {
+    "candidate": "6d52b389b03bcaecdc01a3ed9531e43efdc7e2ce",
+    "command": [
+      "pnpm",
+      "exec",
+      "playwright",
+      "test",
+      "--config=vue/playwright.config.ts",
+      "vue/tests/visual/public-shell-mobile-nav.spec.ts",
+      "vue/tests/visual/public-shell-desktop-search.spec.ts",
+      "--workers=1",
+      "--trace=on",
+      "--output=/tmp/2228-828-label-final-shell42-first"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-final-shell42-first.log"
+  }
+]

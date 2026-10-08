@@ -1,0 +1,19 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "build:theme"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-width-setup-0-first.log"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/prepare-visual-runtime.mjs"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-label-width-setup-1-first.log"
+  }
+]

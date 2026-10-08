@@ -1,0 +1,60 @@
+{
+  "beforeDiagnosticHead": "a0047666e559724ffefc2b1aac2402563ddbb2c2",
+  "beforeRuntime": "prior-runtime-manifest.json; prior tested d182 product697; not relabeled as a004-built source",
+  "afterCandidate": "6d52b389b03bcaecdc01a3ed9531e43efdc7e2ce",
+  "qualificationEligible": false,
+  "rows": [
+    {
+      "key": [
+        "full",
+        "light",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalInitialGeometry": true,
+      "identicalNativeNav": true
+    },
+    {
+      "key": [
+        "full",
+        "dark",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "identicalInitialGeometry": true,
+      "identicalNativeNav": true
+    },
+    {
+      "key": [
+        "critical-only",
+        "light",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 48,
+      "afterOverflow": 48,
+      "identicalInitialGeometry": true,
+      "identicalNativeNav": true
+    },
+    {
+      "key": [
+        "critical-only",
+        "dark",
+        375,
+        812,
+        2
+      ],
+      "beforeOverflow": 48,
+      "afterOverflow": 48,
+      "identicalInitialGeometry": true,
+      "identicalNativeNav": true
+    }
+  ]
+}
