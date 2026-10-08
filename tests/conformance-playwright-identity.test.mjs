@@ -236,6 +236,30 @@ test('an unrelated existing commit is rejected', () =>
     )
   }))
 
+test('an annotated tag SHA cannot substitute for the exact baseline commit', () =>
+  fixture(({ producer, baseline }) => {
+    checkedGit(producer, [
+      'tag',
+      '-a',
+      'baseline-label',
+      baseline,
+      '-m',
+      'baseline-label',
+    ])
+    const tag = checkedGit(producer, ['rev-parse', 'baseline-label'])
+    assert.equal(checkedGit(producer, ['cat-file', '-t', tag]), 'tag')
+    assert.throws(
+      () =>
+        resolveConformanceInteractionIdentity({
+          repositoryRoot: producer,
+          group: 'pr',
+          impactPlan: { baseRef: tag },
+          env: {},
+        }),
+      /unavailable or unrelated/u,
+    )
+  }))
+
 test('an unavailable unrelated SHA is rejected without acquisition', () =>
   fixture(({ options }) => {
     assert.throws(

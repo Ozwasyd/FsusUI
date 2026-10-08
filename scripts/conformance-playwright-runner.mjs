@@ -77,8 +77,10 @@ export function resolveConformanceInteractionIdentity({
       'conformance impact-plan baseRef does not match merge checkout base',
     )
   }
-  const hasBaseline = () =>
-    git(['cat-file', '-e', `${baseline}^{commit}`]).status === 0
+  const hasBaseline = () => {
+    const object = git(['cat-file', '-t', baseline])
+    return object.status === 0 && object.stdout.trim() === 'commit'
+  }
   if (!hasBaseline()) {
     // A shallow merge retains parent identities, but not necessarily their objects.
     if (group !== 'pr' || !directParent) {
