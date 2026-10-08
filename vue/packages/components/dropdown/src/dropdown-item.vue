@@ -11,6 +11,12 @@
         @clickimpl="handleClick"
       >
         <slot />
+        <template v-if="$slots.description" #description>
+          <slot name="description" />
+        </template>
+        <template v-if="$slots.suffix" #suffix>
+          <slot name="suffix" />
+        </template>
       </el-dropdown-item-impl>
     </el-roving-focus-item>
   </el-dropdown-collection-item>

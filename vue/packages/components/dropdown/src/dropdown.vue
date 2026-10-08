@@ -80,6 +80,7 @@ import {
 } from '@element-plus/components/motion'
 import { ElCollection as ElDropdownCollection, dropdownProps } from './dropdown'
 import { DROPDOWN_INJECTION_KEY } from './tokens'
+import { dropdownViewportModifiers } from './viewport-modifiers'
 
 import type { CSSProperties, ComponentPublicInstance } from 'vue'
 import type { Measurable } from '@element-plus/components/popper'
@@ -132,7 +133,9 @@ export default defineComponent({
     )
 
     const wrapStyle = computed<CSSProperties>(() => ({
-      maxHeight: addUnit(props.maxHeight),
+      maxHeight: props.viewportBounded
+        ? `min(${addUnit(props.maxHeight) || '274px'}, calc(var(--el-dropdown-viewport-height, 100dvh) - 24px))`
+        : addUnit(props.maxHeight),
     }))
     const dropdownTriggerKls = computed(() => [ns.m(dropdownSize.value)])
     const trigger = computed(() => ensureArray(props.trigger))
@@ -160,10 +163,22 @@ export default defineComponent({
       role: props.role,
       effect: props.effect,
       fallbackPlacements,
-      popperOptions: props.popperOptions,
+      popperOptions: props.viewportBounded
+        ? {
+            ...props.popperOptions,
+            modifiers: [
+              ...dropdownViewportModifiers(),
+              ...(props.popperOptions.modifiers || []),
+            ],
+          }
+        : props.popperOptions,
       hideAfter: trigger.value.includes('hover') ? props.hideTimeout : 0,
       placement: props.placement,
-      popperClass: [ns.e('popper'), props.popperClass],
+      popperClass: [
+        ns.e('popper'),
+        ns.is('viewport-bounded', props.viewportBounded),
+        props.popperClass,
+      ],
       referenceElement: referenceElementRef.value?.$el,
       trigger: trigger.value,
       triggerKeys,

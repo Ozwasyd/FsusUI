@@ -91,6 +91,7 @@ export const dropdownProps = buildProps({
     type: definePropType<ButtonProps>(Object),
   },
   teleported: useTooltipContentProps.teleported,
+  viewportBounded: Boolean,
 } as const)
 
 export const dropdownItemProps = buildProps({
@@ -99,6 +100,7 @@ export const dropdownItemProps = buildProps({
     default: () => ({}),
   },
   disabled: Boolean,
+  multiline: Boolean,
   checked: {
     type: Boolean,
     default: undefined,
