@@ -45,8 +45,11 @@ const installClipboardSnapshot = async (
 const openFixture = async (
   page: Page,
   gate?: 'disabled' | 'preview-only' | 'readonly',
+  theme?: 'light' | 'dark',
 ) => {
-  const suffix = gate ? `&markdownPasteGate=${gate}` : ''
+  const suffix =
+    (gate ? `&markdownPasteGate=${gate}` : '') +
+    (theme ? `&theme=${theme}` : '')
   await page.goto(`/?audit=ui-states&markdownEditorTransaction=1${suffix}`, {
     waitUntil: 'domcontentloaded',
   })
@@ -411,38 +414,140 @@ test('makes composition-active an explicit gate', async ({ page }) => {
 test.describe('touch path', () => {
   test.use({ hasTouch: true })
 
-  test('chooses Markdown import by touch and returns focus to the editor', async ({
-    page,
-  }) => {
-    await installClipboardSnapshot(page, {
-      html: '<strong>Touch import</strong>',
-      plain: 'Touch plain',
-    })
-    const viewports = [
-      { height: 844, width: 390 },
-      { height: 640, width: 320 },
-    ]
-    const triggerGeometry = []
-
-    for (const viewport of viewports) {
-      await page.setViewportSize(viewport)
-      const { fixture } = await openFixture(page)
-      const commands = fixture.locator('.el-markdown-editor__commands')
-      const trigger = fixture.locator('.el-markdown-editor__command-more')
-      await expect(commands).toBeVisible()
-      await commands.evaluate((element) => {
-        const container = element as HTMLElement
-        container.scrollIntoView({ block: 'center', inline: 'nearest' })
-        container.scrollLeft = 0
+  for (const theme of ['light', 'dark'] as const) {
+    test(`chooses Markdown import by touch and returns focus to the editor ${theme}`, async ({
+      page,
+    }, testInfo) => {
+      await installClipboardSnapshot(page, {
+        html: '<strong>Touch import</strong>',
+        plain: 'Touch plain',
       })
-      await expect(trigger).toBeAttached()
-      triggerGeometry.push(
-        await trigger.evaluate((element) => {
+      const viewports = [
+        { height: 844, width: 390 },
+        { height: 640, width: 320 },
+      ]
+      const triggerGeometry = []
+
+      for (const viewport of viewports) {
+        await page.setViewportSize(viewport)
+        const { fixture } = await openFixture(page, undefined, theme)
+        await expect(page.locator('html')).toHaveAttribute(
+          'data-theme-resolved',
+          theme,
+        )
+        const commands = fixture.locator('.el-markdown-editor__commands')
+        const trigger = fixture.locator('.el-markdown-editor__command-more')
+        await expect(commands).toBeVisible()
+        await commands.evaluate((element) => {
+          const container = element as HTMLElement
+          container.scrollIntoView({ block: 'center', inline: 'nearest' })
+          container.scrollLeft = 0
+        })
+        await expect(trigger).toBeAttached()
+        triggerGeometry.push(
+          await trigger.evaluate((element) => {
+            const target = element as HTMLElement
+            const container = target.closest<HTMLElement>(
+              '.el-markdown-editor__command-group',
+            )
+            const primary = container?.querySelector<HTMLElement>(
+              '.el-markdown-editor__commands',
+            )
+            if (!container || !primary)
+              throw new Error('Command group is not mounted')
+            const targetRect = target.getBoundingClientRect()
+            const containerRect = container.getBoundingClientRect()
+            const primaryRect = primary.getBoundingClientRect()
+            const left = Math.max(targetRect.left, containerRect.left, 0)
+            const right = Math.min(
+              targetRect.right,
+              containerRect.right,
+              window.innerWidth,
+            )
+            const top = Math.max(targetRect.top, containerRect.top, 0)
+            const bottom = Math.min(
+              targetRect.bottom,
+              containerRect.bottom,
+              window.innerHeight,
+            )
+            const x = left + Math.max(0, right - left) / 2
+            const y = top + Math.max(0, bottom - top) / 2
+            const hit =
+              right > left && bottom > top
+                ? document.elementFromPoint(x, y)
+                : null
+
+            return {
+              clientWidth: primary.clientWidth,
+              directlyTappable:
+                hit === target || (hit !== null && target.contains(hit)),
+              scrollLeft: primary.scrollLeft,
+              scrollWidth: primary.scrollWidth,
+              siblingLayout:
+                target.parentElement === container &&
+                primary.parentElement === container &&
+                primaryRect.right <= targetRect.left,
+              targetHeight: targetRect.height,
+              targetWidth: targetRect.width,
+              viewport: {
+                height: window.innerHeight,
+                width: window.innerWidth,
+              },
+              visibleHeight: Math.max(0, bottom - top),
+              visibleWidth: Math.max(0, right - left),
+            }
+          }),
+        )
+      }
+
+      expect(
+        triggerGeometry.every(
+          (geometry) =>
+            geometry.siblingLayout &&
+            geometry.scrollLeft === 0 &&
+            geometry.scrollWidth > geometry.clientWidth &&
+            geometry.targetHeight >= 44 &&
+            geometry.targetWidth >= 44 &&
+            geometry.visibleHeight >= 44 &&
+            geometry.visibleWidth >= 44 &&
+            geometry.directlyTappable,
+        ),
+        `Pre-scroll overflow geometry: ${JSON.stringify(triggerGeometry)}`,
+      ).toBe(true)
+      await testInfo.attach('pre-scroll-overflow-geometry', {
+        body: JSON.stringify({ theme, triggerGeometry }, null, 2),
+        contentType: 'application/json',
+      })
+
+      for (const viewport of viewports) {
+        await page.setViewportSize(viewport)
+        const { fixture, textarea } = await openFixture(page, undefined, theme)
+        await expect(page.locator('html')).toHaveAttribute(
+          'data-theme-resolved',
+          theme,
+        )
+        await textarea.tap()
+        const trigger = fixture.locator('.el-markdown-editor__command-more')
+        await trigger.tap()
+        await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+        const expandedTriggerReadability = await trigger.evaluate((element) => {
           const target = element as HTMLElement
           const container = target.closest<HTMLElement>(
-            '.el-markdown-editor__commands',
+            '.el-markdown-editor__command-group',
           )
-          if (!container) throw new Error('Command strip is not mounted')
+          if (!container) throw new Error('Command group is not mounted')
+
+          const background = getComputedStyle(target).backgroundColor
+          const canvas = document.createElement('canvas')
+          canvas.width = 1
+          canvas.height = 1
+          const context = canvas.getContext('2d')
+          if (!context) throw new Error('Canvas color probe is unavailable')
+          context.clearRect(0, 0, 1, 1)
+          context.fillStyle = background
+          context.fillRect(0, 0, 1, 1)
+          const backgroundAlpha = context.getImageData(0, 0, 1, 1).data[3] / 255
+
           const targetRect = target.getBoundingClientRect()
           const containerRect = container.getBoundingClientRect()
           const left = Math.max(targetRect.left, containerRect.left, 0)
@@ -457,152 +562,76 @@ test.describe('touch path', () => {
             containerRect.bottom,
             window.innerHeight,
           )
-          const x = left + Math.max(0, right - left) / 2
-          const y = top + Math.max(0, bottom - top) / 2
-          const hit =
-            right > left && bottom > top
-              ? document.elementFromPoint(x, y)
-              : null
+          const y = top + (bottom - top) / 2
+          const hitSamples = [0.25, 0.5, 0.75].map((ratio) => {
+            const x = left + (right - left) * ratio
+            const stack = document.elementsFromPoint(x, y)
+            const triggerIndex = stack.findIndex(
+              (candidate) => candidate === target || target.contains(candidate),
+            )
+            const underlyingPrimaryIndex = stack.findIndex((candidate) => {
+              const command = candidate.closest?.(
+                '.el-markdown-editor__command',
+              )
+              return command !== null && command !== target
+            })
+            return {
+              triggerBeforePrimary:
+                triggerIndex >= 0 &&
+                (underlyingPrimaryIndex < 0 ||
+                  triggerIndex < underlyingPrimaryIndex),
+              triggerOwnsTop:
+                stack[0] === target ||
+                (stack[0] !== undefined && target.contains(stack[0])),
+              x,
+              y,
+            }
+          })
 
           return {
-            clientWidth: container.clientWidth,
-            directlyTappable:
-              hit === target || (hit !== null && target.contains(hit)),
-            scrollLeft: container.scrollLeft,
-            scrollWidth: container.scrollWidth,
-            targetHeight: targetRect.height,
-            targetWidth: targetRect.width,
+            background,
+            backgroundAlpha,
+            hitSamples,
             viewport: {
               height: window.innerHeight,
               width: window.innerWidth,
             },
-            visibleHeight: Math.max(0, bottom - top),
-            visibleWidth: Math.max(0, right - left),
-          }
-        }),
-      )
-    }
-
-    expect(
-      triggerGeometry.every(
-        (geometry) =>
-          geometry.scrollLeft === 0 &&
-          geometry.scrollWidth > geometry.clientWidth &&
-          geometry.targetHeight >= 44 &&
-          geometry.targetWidth >= 44 &&
-          geometry.visibleHeight >= 44 &&
-          geometry.visibleWidth >= 44 &&
-          geometry.directlyTappable,
-      ),
-      `Pre-scroll overflow geometry: ${JSON.stringify(triggerGeometry)}`,
-    ).toBe(true)
-
-    for (const viewport of viewports) {
-      await page.setViewportSize(viewport)
-      const { fixture, textarea } = await openFixture(page)
-      await textarea.tap()
-      const trigger = fixture.locator('.el-markdown-editor__command-more')
-      await trigger.tap()
-      await expect(trigger).toHaveAttribute('aria-expanded', 'true')
-      const expandedTriggerReadability = await trigger.evaluate((element) => {
-        const target = element as HTMLElement
-        const container = target.closest<HTMLElement>(
-          '.el-markdown-editor__commands',
-        )
-        if (!container) throw new Error('Command strip is not mounted')
-
-        const background = getComputedStyle(target).backgroundColor
-        const canvas = document.createElement('canvas')
-        canvas.width = 1
-        canvas.height = 1
-        const context = canvas.getContext('2d')
-        if (!context) throw new Error('Canvas color probe is unavailable')
-        context.clearRect(0, 0, 1, 1)
-        context.fillStyle = background
-        context.fillRect(0, 0, 1, 1)
-        const backgroundAlpha = context.getImageData(0, 0, 1, 1).data[3] / 255
-
-        const targetRect = target.getBoundingClientRect()
-        const containerRect = container.getBoundingClientRect()
-        const left = Math.max(targetRect.left, containerRect.left, 0)
-        const right = Math.min(
-          targetRect.right,
-          containerRect.right,
-          window.innerWidth,
-        )
-        const top = Math.max(targetRect.top, containerRect.top, 0)
-        const bottom = Math.min(
-          targetRect.bottom,
-          containerRect.bottom,
-          window.innerHeight,
-        )
-        const y = top + (bottom - top) / 2
-        const hitSamples = [0.25, 0.5, 0.75].map((ratio) => {
-          const x = left + (right - left) * ratio
-          const stack = document.elementsFromPoint(x, y)
-          const triggerIndex = stack.findIndex(
-            (candidate) => candidate === target || target.contains(candidate),
-          )
-          const underlyingPrimaryIndex = stack.findIndex((candidate) => {
-            const command = candidate.closest?.('.el-markdown-editor__command')
-            return command !== null && command !== target
-          })
-          return {
-            triggerBeforePrimary:
-              triggerIndex >= 0 &&
-              (underlyingPrimaryIndex < 0 ||
-                triggerIndex < underlyingPrimaryIndex),
-            triggerOwnsTop:
-              stack[0] === target ||
-              (stack[0] !== undefined && target.contains(stack[0])),
-            x,
-            y,
           }
         })
+        expect(
+          expandedTriggerReadability.backgroundAlpha,
+          `Expanded overflow background at ${JSON.stringify(
+            expandedTriggerReadability.viewport,
+          )}: ${expandedTriggerReadability.background}`,
+        ).toBe(1)
+        expect(
+          expandedTriggerReadability.hitSamples.every(
+            (sample) => sample.triggerOwnsTop && sample.triggerBeforePrimary,
+          ),
+          `Expanded overflow hit stack: ${JSON.stringify(
+            expandedTriggerReadability,
+          )}`,
+        ).toBe(true)
 
-        return {
-          background,
-          backgroundAlpha,
-          hitSamples,
-          viewport: {
-            height: window.innerHeight,
-            width: window.innerWidth,
-          },
-        }
-      })
-      expect(
-        expandedTriggerReadability.backgroundAlpha,
-        `Expanded overflow background at ${JSON.stringify(
-          expandedTriggerReadability.viewport,
-        )}: ${expandedTriggerReadability.background}`,
-      ).toBe(1)
-      expect(
-        expandedTriggerReadability.hitSamples.every(
-          (sample) => sample.triggerOwnsTop && sample.triggerBeforePrimary,
-        ),
-        `Expanded overflow hit stack: ${JSON.stringify(
-          expandedTriggerReadability,
-        )}`,
-      ).toBe(true)
+        const tray = fixture.locator('.el-markdown-editor__command-tray')
+        await expect(tray).toBeVisible()
+        const entry = tray.getByRole('button', {
+          name: '粘贴为 Markdown',
+        })
+        await expect(entry).toBeVisible()
+        const entryTarget = await entry.boundingBox()
+        expect(entryTarget?.width).toBeGreaterThanOrEqual(44)
+        expect(Math.round(entryTarget?.height ?? 0)).toBeGreaterThanOrEqual(44)
 
-      const tray = fixture.locator('.el-markdown-editor__command-tray')
-      await expect(tray).toBeVisible()
-      const entry = tray.getByRole('button', {
-        name: '粘贴为 Markdown',
-      })
-      await expect(entry).toBeVisible()
-      const entryTarget = await entry.boundingBox()
-      expect(entryTarget?.width).toBeGreaterThanOrEqual(44)
-      expect(Math.round(entryTarget?.height ?? 0)).toBeGreaterThanOrEqual(44)
-
-      await entry.tap()
-      const surface = visiblePasteAsMarkdownDialog(page)
-      await expect(surface).toBeVisible()
-      await surface.getByRole('button', { name: '导入 Markdown' }).tap()
-      await expect(textarea).toHaveValue(`${initialValue}**Touch import**`)
-      await expect(textarea).toBeFocused()
-    }
-  })
+        await entry.tap()
+        const surface = visiblePasteAsMarkdownDialog(page)
+        await expect(surface).toBeVisible()
+        await surface.getByRole('button', { name: '导入 Markdown' }).tap()
+        await expect(textarea).toHaveValue(`${initialValue}**Touch import**`)
+        await expect(textarea).toBeFocused()
+      }
+    })
+  }
 })
 
 test('records the issue 395 viewport, zoom, theme, long-warning, and accessibility evidence', async ({
