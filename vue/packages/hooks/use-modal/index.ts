@@ -31,16 +31,16 @@ export const useModal = (instance: ModalInstance, visibleRef: Ref<boolean>) => {
 
 if (isClient) useEventListener(document, 'keydown', closeModal)
 
-// Inert ownership is shared between modal instances, including nested viewers.
-// Only the top modal's ancestor path remains interactive. Restore attributes
-// exactly, including an inert attribute owned by the application.
-const inertLayers: { root: Ref<HTMLElement | undefined> }[] = []
+// The canonical focus layer activates or suspends isolation synchronously.
+// Retain only that owner's writes, without maintaining another modal order.
+// Restore attributes exactly, including inert owned by the application.
+let inertOwner: { root: Ref<HTMLElement | undefined> } | undefined
 const inertAttributes = new Map<HTMLElement, string | null>()
 let inertObserver: MutationObserver | undefined
 
 const refreshInert = () => {
   const targets = new Set<HTMLElement>()
-  let branch = inertLayers.at(-1)?.root.value
+  let branch = inertOwner?.root.value
   while (branch?.parentElement) {
     const parent = branch.parentElement
     for (const sibling of parent.children) {
@@ -71,12 +71,10 @@ export const useModalInert = (
 ) => {
   const layer = { root }
   const release = () => {
-    const index = inertLayers.indexOf(layer)
-    if (index !== -1) inertLayers.splice(index, 1)
-    if (!inertLayers.length) {
-      inertObserver?.disconnect()
-      inertObserver = undefined
-    }
+    if (inertOwner !== layer) return
+    inertOwner = undefined
+    inertObserver?.disconnect()
+    inertObserver = undefined
     if (isClient) refreshInert()
   }
   watch(
@@ -84,7 +82,7 @@ export const useModalInert = (
     ([enabled, element]) => {
       if (!isClient) return
       if (!enabled || !element) return release()
-      if (!inertLayers.includes(layer)) inertLayers.push(layer)
+      inertOwner = layer
       refreshInert()
       if (!inertObserver) {
         inertObserver = new MutationObserver(refreshInert)

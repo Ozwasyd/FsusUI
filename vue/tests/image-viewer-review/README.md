@@ -17,7 +17,7 @@ pnpm exec playwright test --config vue/playwright.image-viewer-review.config.ts
 Chromium and WebKit run separately through their standard Playwright projects.
 Use `FSUS_IMAGE_VIEWER_REVIEW_PORT` to select an isolated server port.
 
-The nested Dialog case is a retained failing control pending the canonical
-focus-owner suspension handoff. The caption and original-size corrections can
-be checked independently with `--grep 'wheel|original size'`. That focused
-result does not establish that the whole modal composition suite passes.
+The nested Dialog case preserves the regression that failed before canonical
+focus-layer suspension notified viewer isolation. The caption and original-size
+cases can be checked independently with `--grep 'wheel|original size'`. That
+focused result does not establish that the whole modal composition suite passes.
