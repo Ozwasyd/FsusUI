@@ -1,0 +1,13 @@
+[playwright-boundary] owner=playwright-boundary group=main cells=1 commit=d456f80e2f411ca81b4e98168638411e09eeac6a digest=4662122d518905a82a69a418bae4f2badc9923d1144c9a3765422fe18b0827b4
+[visual-runtime] Preview ready http://127.0.0.1:5252 dist=.tmp/issue825-ownership-runtime/demo-dist fingerprint=1a05af734b7c9f242891d815f9ab94b93f1b629743553ed344127149009c7f81
+[playwright-boundary] visual-boundary-audit/safe-area-chromium status=failure passed=1 failed=1 skipped=0 receipt=.readiness/receipts/playwright-boundary/visual-boundary-audit-safe-area-chromium.json
+[playwright-boundary] owner=playwright-boundary group=main status=failure cells=8 evidence=.tmp/issue825-ownership-positive/evidence.json
+
+[playwright-boundary] invalid receipt visual-boundary-audit/desktop-light: receipt visual-boundary-audit/desktop-light binds 3edfed2c6d119a302b7d50031e300761d1d22e59, expected d456f80e2f411ca81b4e98168638411e09eeac6a
+[playwright-boundary] invalid receipt visual-boundary-audit/mobile-light: receipt visual-boundary-audit/mobile-light binds 3edfed2c6d119a302b7d50031e300761d1d22e59, expected d456f80e2f411ca81b4e98168638411e09eeac6a
+[playwright-boundary] invalid receipt visual-boundary-audit/tiny-light: receipt visual-boundary-audit/tiny-light binds 3edfed2c6d119a302b7d50031e300761d1d22e59, expected d456f80e2f411ca81b4e98168638411e09eeac6a
+[playwright-boundary] invalid receipt visual-boundary-audit/desktop-dark: receipt visual-boundary-audit/desktop-dark binds 3edfed2c6d119a302b7d50031e300761d1d22e59, expected d456f80e2f411ca81b4e98168638411e09eeac6a
+[playwright-boundary] invalid receipt visual-boundary-audit/mobile-dark: receipt visual-boundary-audit/mobile-dark binds 3edfed2c6d119a302b7d50031e300761d1d22e59, expected d456f80e2f411ca81b4e98168638411e09eeac6a
+[playwright-boundary] invalid receipt visual-boundary-audit/tiny-dark: receipt visual-boundary-audit/tiny-dark binds 3edfed2c6d119a302b7d50031e300761d1d22e59, expected d456f80e2f411ca81b4e98168638411e09eeac6a
+[playwright-boundary] invalid receipt visual-boundary-audit/safe-area-chromium: cell visual-boundary-audit/safe-area-chromium status=failure
+[playwright-boundary] invalid receipt visual-boundary-audit/safe-area-webkit: receipt visual-boundary-audit/safe-area-webkit binds 3edfed2c6d119a302b7d50031e300761d1d22e59, expected d456f80e2f411ca81b4e98168638411e09eeac6a

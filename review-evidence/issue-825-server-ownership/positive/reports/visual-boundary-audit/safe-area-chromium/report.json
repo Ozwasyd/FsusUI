@@ -1,0 +1,304 @@
+{
+  "config": {
+    "configFile": "/workspace/FsusUI/vue/playwright.boundary-audit.config.ts",
+    "rootDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop-light",
+        "name": "desktop-light",
+        "testDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+        "testIgnore": [
+          "**/safe-area-*.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      },
+      {
+        "outputDir": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-light",
+        "name": "mobile-light",
+        "testDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+        "testIgnore": [
+          "**/safe-area-*.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      },
+      {
+        "outputDir": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "tiny-light",
+        "name": "tiny-light",
+        "testDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+        "testIgnore": [
+          "**/safe-area-*.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      },
+      {
+        "outputDir": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop-dark",
+        "name": "desktop-dark",
+        "testDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+        "testIgnore": [
+          "**/safe-area-*.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      },
+      {
+        "outputDir": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-dark",
+        "name": "mobile-dark",
+        "testDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+        "testIgnore": [
+          "**/safe-area-*.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      },
+      {
+        "outputDir": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "tiny-dark",
+        "name": "tiny-dark",
+        "testDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+        "testIgnore": [
+          "**/safe-area-*.spec.ts"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 600000
+      },
+      {
+        "outputDir": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "safe-area-chromium",
+        "name": "safe-area-chromium",
+        "testDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+        "testIgnore": [],
+        "testMatch": [
+          "**/safe-area-*.spec.ts"
+        ],
+        "timeout": 600000
+      },
+      {
+        "outputDir": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "safe-area-webkit",
+        "name": "safe-area-webkit",
+        "testDir": "/workspace/FsusUI/vue/tests/visual-boundary",
+        "testIgnore": [],
+        "testMatch": [
+          "**/safe-area-*.spec.ts"
+        ],
+        "timeout": 600000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "safe-area-overlay-matrix.spec.ts",
+      "file": "safe-area-overlay-matrix.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "safe-area matrix projects include Chromium and WebKit",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 600000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "safe-area-chromium",
+              "projectName": "safe-area-chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 123,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-08T12:38:31.705Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2e5bfd1d3c011f0815da-2d6ff8d105313bd2203c",
+          "file": "safe-area-overlay-matrix.spec.ts",
+          "line": 301,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "safe-area overlay matrix (full)",
+          "file": "safe-area-overlay-matrix.spec.ts",
+          "line": 312,
+          "column": 6,
+          "specs": [
+            {
+              "title": "runs 34 required cases with geometry assertions",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 408000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "safe-area-chromium",
+                  "projectName": "safe-area-chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 34094,
+                      "error": {
+                        "message": "Error: drawer-ttb/landscape-notch must stay inside safe rect {\"left\":59,\"top\":0,\"right\":785,\"bottom\":369,\"width\":726,\"height\":369} under profile landscape-notch\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 10\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bottom\": 71,\u001b[39m\n\u001b[31m+     \"className\": \"el-drawer__close-btn\",\u001b[39m\n\u001b[31m+     \"left\": 765,\u001b[39m\n\u001b[31m+     \"right\": 819,\u001b[39m\n\u001b[31m+     \"role\": \"button\",\u001b[39m\n\u001b[31m+     \"top\": 17,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                        "stack": "Error: drawer-ttb/landscape-notch must stay inside safe rect {\"left\":59,\"top\":0,\"right\":785,\"bottom\":369,\"width\":726,\"height\":369} under profile landscape-notch\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 10\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bottom\": 71,\u001b[39m\n\u001b[31m+     \"className\": \"el-drawer__close-btn\",\u001b[39m\n\u001b[31m+     \"left\": 765,\u001b[39m\n\u001b[31m+     \"right\": 819,\u001b[39m\n\u001b[31m+     \"role\": \"button\",\u001b[39m\n\u001b[31m+     \"top\": 17,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at assertControlsInsideSafeRect (/workspace/FsusUI/vue/tests/support/dom-layout-assertions.ts:776:5)\n    at runCase (/workspace/FsusUI/vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts:253:3)\n    at /workspace/FsusUI/vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts:330:9",
+                        "location": {
+                          "file": "/workspace/FsusUI/vue/tests/support/dom-layout-assertions.ts",
+                          "column": 5,
+                          "line": 776
+                        },
+                        "snippet": "   at ../support/dom-layout-assertions.ts:776\n\n  774 |     offenders,\n  775 |     `${label} must stay inside safe rect ${JSON.stringify(safeRect)} under profile ${profile.id}`,\n> 776 |   ).toEqual([])\n      |     ^\n  777 | }\n  778 |\n  779 | /**"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/workspace/FsusUI/vue/tests/support/dom-layout-assertions.ts",
+                            "column": 5,
+                            "line": 776
+                          },
+                          "message": "Error: drawer-ttb/landscape-notch must stay inside safe rect {\"left\":59,\"top\":0,\"right\":785,\"bottom\":369,\"width\":726,\"height\":369} under profile landscape-notch\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 10\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bottom\": 71,\u001b[39m\n\u001b[31m+     \"className\": \"el-drawer__close-btn\",\u001b[39m\n\u001b[31m+     \"left\": 765,\u001b[39m\n\u001b[31m+     \"right\": 819,\u001b[39m\n\u001b[31m+     \"role\": \"button\",\u001b[39m\n\u001b[31m+     \"top\": 17,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n   at ../support/dom-layout-assertions.ts:776\n\n  774 |     offenders,\n  775 |     `${label} must stay inside safe rect ${JSON.stringify(safeRect)} under profile ${profile.id}`,\n> 776 |   ).toEqual([])\n      |     ^\n  777 | }\n  778 |\n  779 | /**\n    at assertControlsInsideSafeRect (/workspace/FsusUI/vue/tests/support/dom-layout-assertions.ts:776:5)\n    at runCase (/workspace/FsusUI/vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts:253:3)\n    at /workspace/FsusUI/vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts:330:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-10-08T12:38:32.341Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/workspace/FsusUI/.tmp/issue825-ownership-positive/output/visual-boundary-audit/safe-area-chromium/safe-area-overlay-matrix-s-dcf44-es-with-geometry-assertions-safe-area-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/workspace/FsusUI/vue/tests/support/dom-layout-assertions.ts",
+                        "column": 5,
+                        "line": 776
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "2e5bfd1d3c011f0815da-6c58a3c39019139aa181",
+              "file": "safe-area-overlay-matrix.spec.ts",
+              "line": 313,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-08T12:38:30.824Z",
+    "duration": 35738.866,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

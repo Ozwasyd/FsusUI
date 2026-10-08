@@ -1,0 +1,27 @@
+{
+  "sourceSha": "d456f80e2f411ca81b4e98168638411e09eeac6a",
+  "parentSha": "74a232ff312f1ded70007beb224c9218ecc2ad7e",
+  "referenceMain": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "startupPositive": "PASS: exactly one own server binds5252, two original browser tests execute",
+  "productTests": {
+    "pass": 1,
+    "fail": 1,
+    "unrun": "remaining matrix cases after original Drawer failure"
+  },
+  "productFailure": "drawer-ttb/landscape-notch close right819 exceeds safe right785",
+  "wholeOwner": "FAIL: product assertion and seven stale-SHA cells remain strict",
+  "occupiedOwner": "PASS refusal: exit1/EADDRINUSE, zero browser reports, existing server alive",
+  "standaloneNegative": "PASS refusal: unchanged config, CI=true, externalURL unset; exit1/zero tests",
+  "regressionTests": "3 PASS/0 FAIL at exact sourceSha",
+  "focusedLint": "PASS exact sourceSha",
+  "changeset": "not needed: internal startup ownership only",
+  "testsNotRerun": [
+    "whole3014 unit suite",
+    "whole coverage",
+    "four type lanes",
+    "52-case visual suite",
+    "SSR",
+    "Blog manage-write"
+  ],
+  "conflictCheck": "git merge-tree --write-tree referenceMain sourceSha exit0 tree629c4ef215ffac4f2dc0ae350deee31b86d5dd9c"
+}

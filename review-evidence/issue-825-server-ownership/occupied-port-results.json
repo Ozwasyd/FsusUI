@@ -1,0 +1,16 @@
+{
+  "port": 5252,
+  "existingPreviewHttp": 200,
+  "ownerExit": 1,
+  "ownerReportsCreated": false,
+  "standaloneExit": 1,
+  "standaloneStats": {
+    "startTime": "2026-10-08T12:38:25.151Z",
+    "duration": 17.435000000000173,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "existingServerSurvived": true
+}

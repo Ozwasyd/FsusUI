@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "owner": "playwright-boundary",
+  "gate": "playwright-boundary",
+  "group": "main",
+  "commitSha": "d456f80e2f411ca81b4e98168638411e09eeac6a",
+  "planDigest": "4662122d518905a82a69a418bae4f2badc9923d1144c9a3765422fe18b0827b4",
+  "impactPlanDigest": null,
+  "runtimeMode": "prepared-preview",
+  "runtimeManifest": ".tmp/issue825-ownership-runtime/manifest.json",
+  "cells": [
+    {
+      "ok": false,
+      "cellId": "visual-boundary-audit/safe-area-chromium",
+      "status": "failure",
+      "receiptPath": ".readiness/receipts/playwright-boundary/visual-boundary-audit-safe-area-chromium.json"
+    }
+  ],
+  "aggregate": {
+    "owner": "playwright-boundary",
+    "gate": "playwright-boundary",
+    "group": "main",
+    "cells": [
+      {
+        "cellId": "visual-boundary-audit/desktop-light",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "visual-boundary-audit/mobile-light",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "visual-boundary-audit/tiny-light",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "visual-boundary-audit/desktop-dark",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "visual-boundary-audit/mobile-dark",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "visual-boundary-audit/tiny-dark",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "visual-boundary-audit/safe-area-chromium",
+        "status": "failure",
+        "tests": {
+          "total": 2,
+          "passed": 1,
+          "failed": 1,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "visual-boundary-audit/safe-area-webkit",
+        "status": "failure",
+        "tests": {
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      }
+    ],
+    "status": "failure"
+  }
+}

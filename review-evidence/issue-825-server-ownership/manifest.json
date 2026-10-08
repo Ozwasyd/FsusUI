@@ -1,0 +1,90 @@
+{
+  "sourceSha": "d456f80e2f411ca81b4e98168638411e09eeac6a",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2117,
+      "sha256": "b6d4668dbca6fdb6054b97a0b141b0e99392d5605da7bc32b8376e2da0573bc8"
+    },
+    {
+      "path": "exact-sha-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "exact-sha-regression.log",
+      "bytes": 364,
+      "sha256": "b266d43b4fec3eb153f06e1483899eca6a1138839308b09f40dc72458c1b31bb"
+    },
+    {
+      "path": "issue825-ownership-controls.log",
+      "bytes": 275,
+      "sha256": "0df9f9c3f602bb85c27c884a0babaf4058c1d50cd7123ab54edb4ddef220b207"
+    },
+    {
+      "path": "issue825-ownership-controls.mjs",
+      "bytes": 3801,
+      "sha256": "32a6fffe9790d59b796145b2a6b3b656b45a7150bdd5ce77004a8b0f39ac30c5"
+    },
+    {
+      "path": "issue825-ownership-prepare.log",
+      "bytes": 79742,
+      "sha256": "f18002b865d03a462bfd53d0ed0ffc6f78b0a395a82e55a7e53eeafa03471b06"
+    },
+    {
+      "path": "occupied-port-owner.log",
+      "bytes": 878,
+      "sha256": "f1d299fe17cc8de6213cd859efc569f9a17fcb6456f146ee959f84b292427492"
+    },
+    {
+      "path": "occupied-port-results.json",
+      "bytes": 338,
+      "sha256": "e9dd94ac21a972776673cabba074e0d4c80604ad3b1b42d0cd1f74f7e3abb499"
+    },
+    {
+      "path": "occupied-port-standalone.log",
+      "bytes": 5242,
+      "sha256": "ef0bbc18f9c55207f14d6ef69e77521a19c918a50247fd0151e6f03ab5b630e2"
+    },
+    {
+      "path": "positive/evidence.json",
+      "bytes": 2750,
+      "sha256": "a331b844634c2218337b7ffb25d295f5ad56fbf60a1c1817d797899f52319229"
+    },
+    {
+      "path": "positive/output/visual-boundary-audit/safe-area-chromium/.last-run.json",
+      "bytes": 96,
+      "sha256": "e8f1b893b8b482c3f1790c6fdf887c90e12aa85d3b1d363ec0fa1ccafda6b3a7"
+    },
+    {
+      "path": "positive/output/visual-boundary-audit/safe-area-chromium/safe-area-overlay-matrix-s-dcf44-es-with-geometry-assertions-safe-area-chromium/error-context.md",
+      "bytes": 90110,
+      "sha256": "49e2ae7c2c67f82fb1b9d3d0cfdaaeba6cb7084d96a689e9e91b95e36e15d7eb"
+    },
+    {
+      "path": "positive/reports/visual-boundary-audit/safe-area-chromium/report.json",
+      "bytes": 13131,
+      "sha256": "c0d5c8febb698320238e79d1a3a6e4fee778d8db1385d8be1106cd948843c6e0"
+    },
+    {
+      "path": "positive/runtime-manifests/visual-boundary-audit.json",
+      "bytes": 3888,
+      "sha256": "062896b242b0fc2bc7a33846234d339b2403cf4037389cff6e9385ecfd620bc9"
+    },
+    {
+      "path": "results.json",
+      "bytes": 1225,
+      "sha256": "14ce87d54b6a3026163a9a4e8ab69c89d36b63dd1af3b992225b5eb9f92f4a93"
+    },
+    {
+      "path": "unrelated-preview.log",
+      "bytes": 177,
+      "sha256": "3ea27539dc1ed09254bb7189dc1399ee47c96868f19ecfa33871231e9d638795"
+    },
+    {
+      "path": "valid-single-server-owner.log",
+      "bytes": 2347,
+      "sha256": "c99bd25dfd78efa75a2c4ebf6ced93fffdbdd413c7e2fd77758e41131e0adefe"
+    }
+  ]
+}
