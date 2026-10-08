@@ -55,7 +55,9 @@ Frozen positive and negative cases live in
 Anchor candidate recognition retains malformed trailing `^id` tokens for
 `anchor-invalid-id` diagnostics, including underscores, non-ASCII IDs, and IDs
 longer than 64 characters. Validation still accepts exactly
-`[a-z][a-z0-9-]{0,63}`; raw ranges and `#id` fragments are unchanged. Whitespace,
+`[a-z][a-z0-9-]{0,63}`; raw ranges and `#id` fragments are unchanged.
+A line-end marker requires exactly one ASCII space after non-whitespace content;
+repeated whitespace or indentation returns `anchor-placement`. Whitespace,
 backticks, and atomic literal regions keep ordinary source outside this marker
 boundary. This repairs the historical #446 contract; it does not renew #448
 aggregate acceptance.

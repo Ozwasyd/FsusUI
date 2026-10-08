@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { currentMarkdownAnchors } from '../../components/markdown-editor/src/markdown-editor-anchor-commands'
+
 import {
   getMarkdownXssSourceAttackFragment,
   getMarkdownXssSourceUrl,
@@ -18,6 +20,7 @@ import {
   stabilizeMarkdownEditorProjection,
   validateMarkdownUrl,
   type MarkdownAnchorInvalidNode,
+  type MarkdownAnchorNode,
   type MarkdownAnchorValidNode,
 } from '../markdown-runtime'
 
@@ -30,6 +33,53 @@ const invalidNodes = (source: string) =>
   collectMarkdownAnchorNodes(source).filter(
     (node): node is MarkdownAnchorInvalidNode => !node.ok,
   )
+
+const expectRejectedAnchorCandidate = (
+  source: string,
+  range: { readonly start: number; readonly end: number } | null,
+  nodes: readonly MarkdownAnchorNode[] = collectMarkdownAnchorNodes(source),
+  parsed = parseMarkdownAnchorMarker(source.slice(0, -1), 0),
+) => {
+  if (range === null) {
+    expect(nodes, JSON.stringify(source)).toEqual([])
+    expect(parsed, JSON.stringify(source)).toBeNull()
+  } else {
+    const diagnostic = {
+      ok: false,
+      kind: 'anchor',
+      code: 'anchor-invalid-id',
+      message: 'anchor id must match [a-z][a-z0-9-]{0,63}',
+      range,
+    }
+    expect(nodes, JSON.stringify(source)).toEqual([diagnostic])
+    expect(parsed, JSON.stringify(source)).toEqual(diagnostic)
+    expect(source.slice(range.start, range.end)).toBe(source.slice(5, -1))
+  }
+  expect(nodes.filter((node) => node.ok)).toEqual([])
+  for (const node of nodes) {
+    expect(node).not.toHaveProperty('id')
+    expect(node).not.toHaveProperty('fragment')
+  }
+  const projection = createMarkdownEditorProjection(source)
+  expect(
+    projection.nodes.filter(
+      (node) => node.kind === 'anchor' && node.status === 'valid',
+    ),
+  ).toEqual([])
+  if (range !== null) {
+    expect(
+      projection.diagnostics.some(
+        (diagnostic) =>
+          diagnostic.code === 'anchor-invalid-id' &&
+          diagnostic.rawRange.start === range.start &&
+          diagnostic.rawRange.end === range.end,
+      ),
+    ).toBe(true)
+  }
+  // The public command query supplies navigable anchors and fragments. Invalid
+  // marker diagnostics must never enter that output, even as normalized IDs.
+  expect(currentMarkdownAnchors(source)).toEqual([])
+}
 
 /**
  * Issue #448 block anchor acceptance: grammar coverage, diagnostics, source-only
@@ -222,8 +272,9 @@ describe('issue #448: duplicate, invalid, orphan, and cross-gap diagnostics fail
     }
   })
 
-  it('mints nothing at all for spellings outside the marker candidate charset', () => {
-    for (const source of [
+  it('diagnoses malformed marker tokens while retaining non-candidate refusal', () => {
+    const ranges = [20, 71, null, 13, 18, null, 7, 7] as const
+    for (const [index, source] of [
       'text ^has_underscore\n',
       `text ^${'a'.repeat(65)}\n`,
       'text ^with space\n',
@@ -232,13 +283,50 @@ describe('issue #448: duplicate, invalid, orphan, and cross-gap diagnostics fail
       'text ^\n',
       'text ^\u200b\n',
       'text ^\u202e\n',
-    ]) {
-      expect(
-        collectMarkdownAnchorNodes(source),
-        `outside candidate charset: ${JSON.stringify(source)}`,
-      ).toHaveLength(0)
-      expect(parseMarkdownAnchorMarker(source.split('\n')[0]!, 0)).toBeNull()
+    ].entries()) {
+      const end = ranges[index]!
+      expectRejectedAnchorCandidate(
+        source,
+        end === null ? null : { start: 5, end },
+      )
     }
+  })
+
+  it('kills dropped diagnostics, invalid admission, identity leakage, and range/code mutations', () => {
+    const source = 'text ^has_underscore\n'
+    const range = { start: 5, end: 20 }
+    const nodes = collectMarkdownAnchorNodes(source)
+    const diagnostic = nodes[0]!
+    const admitted = {
+      ok: true as const,
+      kind: 'anchor' as const,
+      id: 'has_underscore',
+      fragment: '#has_underscore',
+      placement: 'line-end' as const,
+      ranges: { full: range, marker: range, id: { start: 6, end: 20 } },
+    }
+    const mutations = [
+      [],
+      [admitted],
+      [...nodes, admitted],
+      [{ ...diagnostic, id: 'normalized', fragment: '#normalized' }],
+      [{ ...diagnostic, code: 'anchor-orphan' as const }],
+      [{ ...diagnostic, range: { start: 5, end: 19 } }],
+    ]
+    for (const mutated of mutations) {
+      expect(() =>
+        expectRejectedAnchorCandidate(source, range, mutated),
+      ).toThrow()
+    }
+    expect(() =>
+      expectRejectedAnchorCandidate(source, range, nodes, null),
+    ).toThrow()
+    expect(() =>
+      expectRejectedAnchorCandidate(source, range, nodes, admitted),
+    ).toThrow()
+    expect(() =>
+      expectRejectedAnchorCandidate('text ^with space\n', null, nodes),
+    ).toThrow()
   })
 
   it('keeps a duplicate unresolved instead of first-wins or silent rename', () => {
@@ -405,7 +493,22 @@ describe('issue #448: anchor security corpus', () => {
   })
 
   it('refuses control, bidi, HTML, and URL injection inside an id', () => {
-    for (const source of [
+    const ranges = [
+      11,
+      11,
+      11,
+      11,
+      11,
+      null,
+      null,
+      48,
+      17,
+      25,
+      11,
+      15,
+      null,
+    ] as const
+    for (const [index, source] of [
       'text ^ab\u0000cd\n',
       'text ^ab\u0007cd\n',
       'text ^ab\u001bcd\n',
@@ -423,11 +526,12 @@ describe('issue #448: anchor security corpus', () => {
       'text ^a%20b\n',
       'text ^../escape\n',
       'text ^a b\n',
-    ]) {
-      expect(
-        collectMarkdownAnchorNodes(source),
-        `injection source ${JSON.stringify(source)}`,
-      ).toHaveLength(0)
+    ].entries()) {
+      const end = ranges[index]!
+      expectRejectedAnchorCandidate(
+        source,
+        end === null ? null : { start: 5, end },
+      )
     }
   })
 
@@ -455,7 +559,7 @@ describe('issue #448: anchor security corpus', () => {
       // Underscore is outside the grammar, so prototype-pollution spellings die.
       expect(MARKDOWN_ANCHOR_ID.test(`__${id}__`)).toBe(false)
     }
-    expect(collectMarkdownAnchorNodes('text ^__proto__\n')).toHaveLength(0)
+    expectRejectedAnchorCandidate('text ^__proto__\n', { start: 5, end: 15 })
   })
 
   it('maps ids to fragments injectively with no ^ in renderer identity', () => {

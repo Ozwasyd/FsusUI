@@ -163,7 +163,7 @@ export const parseMarkdownAnchorMarker = (
   const id = match[2]!
   const markerStart = start + match.index + (match[0].startsWith(' ') ? 1 : 0)
   const markerEnd = markerStart + marker.length
-  if (!match[0].startsWith(' ') && match.index !== 0) {
+  if (match[0].startsWith(' ') && (match.index === 0 || /\s/u.test(text[match.index - 1]!))) {
     return fail(markerStart, markerEnd, 'anchor-placement', 'anchor requires a single leading space or exclusive line')
   }
   if (!MARKDOWN_ANCHOR_ID.test(id)) {
