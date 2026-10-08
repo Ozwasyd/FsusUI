@@ -1,0 +1,57 @@
+[
+  {
+    "entry": "828-canonical-capabilities-icons-first.log",
+    "bytes": 1307,
+    "sha256": "3cdaaac98ebe918e2f7418126e18dd27d9e9009521090f9c6311f0af367fa22d"
+  },
+  {
+    "entry": "828-canonical-editor-chromium-production-first.log",
+    "bytes": 1944,
+    "sha256": "c16f19170bc2640302aa25fabb93d2c56bd32c732a3660e4d77be081ec12ce45"
+  },
+  {
+    "entry": "828-canonical-capabilities-docs-first.log",
+    "bytes": 395,
+    "sha256": "79f9abc2463563e76818d188bed14e00c8b480b99c29c43da806ede458b97405"
+  },
+  {
+    "entry": "828-canonical-drawer-chromium-first.log",
+    "bytes": 2021,
+    "sha256": "8f317dce25b516312e427fc54d91fa82570b60c92e73ba1c52488039a1c55cbe"
+  },
+  {
+    "entry": "828-canonical-capabilities-unit-first.log",
+    "bytes": 11836,
+    "sha256": "e6e7c09b259811aebeaa3b55fcfb11b09705d890ad8964f232e02898d3f2e989"
+  },
+  {
+    "entry": "828-canonical-capabilities-design-first.log",
+    "bytes": 4867,
+    "sha256": "2515306239980f48c47bea8e6fbb395fe44583b467d805885c502d4c6708194b"
+  },
+  {
+    "entry": "828-canonical-drawer-dialog-focus-unit-first.log",
+    "bytes": 224,
+    "sha256": "45efd58653f3516df5bfe4dbebb42e3f8061685720721aef34b0d05c096911b5"
+  },
+  {
+    "entry": "828-825-locked-install-first.log",
+    "bytes": 4860,
+    "sha256": "cf81b9a787ee7940d1cc94726e52ad5f80c880fad57d89f3413e31ef546897b7"
+  },
+  {
+    "entry": "828-canonical-drawer-chromium-evidence.log",
+    "bytes": 2021,
+    "sha256": "4807fb236a6c2e5fdc93f0e7ae01b05ffee8b9c00190269092be5eadc30343fa"
+  },
+  {
+    "entry": "828-canonical-capabilities-theme-first.log",
+    "bytes": 6005,
+    "sha256": "5475b02ec1dc1c169205bb3016212038f6028f16f5202b1c96c1cfd640b69fbd"
+  },
+  {
+    "entry": "828-canonical-capabilities-unit-after-icons.log",
+    "bytes": 232,
+    "sha256": "e87f8b6167f184207a15bd85c652a8c71819b1c8a301c2ccbe549d2b4c60a528"
+  }
+]

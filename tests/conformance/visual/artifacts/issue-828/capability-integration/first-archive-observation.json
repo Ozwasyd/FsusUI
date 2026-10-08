@@ -1,0 +1,7 @@
+{
+  "qualificationEligible": false,
+  "firstEvidenceHead": "551ff457",
+  "missingIgnoredRawLogGitBlobs": 26,
+  "firstDiffCheckExit": 2,
+  "repair": "Archive original bytes of every log/context in ZIPs with per-entry byte digests, retain disk originals, remove text-context duplicates from final tree. No output bytes are trimmed or reformatted."
+}
