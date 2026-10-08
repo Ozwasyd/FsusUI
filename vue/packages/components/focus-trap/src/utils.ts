@@ -5,6 +5,8 @@ const focusReason = ref<'pointer' | 'keyboard'>()
 const lastUserFocusTimestamp = ref<number>(0)
 const lastAutomatedFocusTimestamp = ref<number>(0)
 let focusReasonUserCount = 0
+let pointerFocusTarget: HTMLElement | null = null
+let pointerFocusTargetTimer: ReturnType<typeof setTimeout> | undefined
 const focusableCache = new WeakMap<HTMLElement, HTMLElement[]>()
 
 export type FocusLayer = {
@@ -166,8 +168,44 @@ const notifyFocusReasonPointer = () => {
 }
 
 const notifyFocusReasonKeydown = () => {
+  pointerFocusTarget = null
   focusReason.value = 'keyboard'
   lastUserFocusTimestamp.value = window.performance.now()
+}
+
+// WebKit can activate a button without moving document.activeElement to it.
+// Remember the activating control for this event turn without focusing it.
+const notifyPointerActivation = (event: MouseEvent) => {
+  clearTimeout(pointerFocusTargetTimer)
+  pointerFocusTarget =
+    event.detail > 0
+      ? ((event
+          .composedPath()
+          .find(
+            (target) =>
+              target instanceof HTMLElement &&
+              (target.tabIndex >= 0 ||
+                target.hasAttribute('tabindex') ||
+                target.isContentEditable ||
+                target.matches(
+                  'button, input, select, textarea, a[href], area[href], iframe, summary',
+                )) &&
+              !target.matches(':disabled') &&
+              !target.matches('input[type="hidden"]') &&
+              !target.closest('[hidden], [inert]'),
+          ) as HTMLElement | undefined) ?? null)
+      : null
+  pointerFocusTargetTimer = setTimeout(() => {
+    pointerFocusTarget = null
+  }, 0)
+}
+
+export const getPointerFocusTarget = () => pointerFocusTarget
+
+// Capture before a click can mount its first Dialog. The target expires after
+// this event turn; Dialog snapshots it for its own delayed opening session.
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', notifyPointerActivation, true)
 }
 
 export const useFocusReason = (): {
