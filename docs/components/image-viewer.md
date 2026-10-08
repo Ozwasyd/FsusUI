@@ -74,7 +74,10 @@ const images = [
 ## Modal composition and SSR
 
 ImageViewer owns dialog semantics, focus entry/trapping/return, background inert
-state and the shared body scroll lock. `visible` defaults to true for existing
+state and the shared body scroll lock. Background isolation follows the
+canonical focus layer: opening an appended Dialog suspends the viewer's inert
+writes, and closing that Dialog restores viewer isolation before focus return.
+`visible` defaults to true for existing
 `v-if` consumers; `v-model:visible` also supports reusing a mounted instance.
 `initial-index` initializes an uncontrolled viewer only. Use `active-index` (or
 `v-model:active-index`) for reactive changes, or the exposed `setActiveItem(index)`

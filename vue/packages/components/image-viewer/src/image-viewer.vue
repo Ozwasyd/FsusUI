@@ -6,8 +6,7 @@
       focus-start-el="container"
       loop
       @release-requested="closeOnPressEscape && hide()"
-      @focus-after-trapped="inertActive = true"
-      @focus-after-released="inertActive = false"
+      @focus-layer-change="inertActive = $event.active && !$event.paused"
     >
       <transition name="viewer-fade" appear>
         <div
