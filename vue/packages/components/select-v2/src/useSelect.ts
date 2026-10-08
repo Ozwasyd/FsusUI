@@ -11,7 +11,7 @@ import {
 import { isArray, isFunction, isObject } from '@vue/shared'
 import { get, isEqual, isNil, debounce as lodashDebounce } from 'lodash-unified'
 import { useResizeObserver } from '@element-plus/hooks/use-runtime'
-import { useLocale, useNamespace } from '@element-plus/hooks'
+import { useId, useLocale, useNamespace } from '@element-plus/hooks'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import {
   ValidateComponentsMap,
@@ -93,7 +93,7 @@ const useSelect = (props: ISelectProps, emit) => {
 
   // DOM & Component refs
   const controlRef = ref(null)
-  const inputRef = ref(null) // el-input ref
+  const inputRef = ref<HTMLInputElement | null>(null)
   const menuRef = ref(null)
   const popper = ref<InstanceType<typeof ElTooltip> | null>(null)
   const selectRef = ref(null)
@@ -114,6 +114,10 @@ const useSelect = (props: ISelectProps, emit) => {
 
   // the controller of the expanded popup
   const expanded = ref(false)
+  const listboxId = useId()
+  const activeOptionId = computed(() =>
+    expanded.value ? menuRef.value?.activeOptionId : undefined,
+  )
 
   const selectDisabled = computed(() => props.disabled || elForm?.disabled)
 
@@ -559,8 +563,17 @@ const useSelect = (props: ISelectProps, emit) => {
   } = useInput((e) => onInput(e))
 
   // methods
+  const focus = () => {
+    inputRef.value?.focus()
+  }
+
+  const blur = () => {
+    expanded.value = false
+    inputRef.value?.blur()
+  }
+
   const focusAndUpdatePopup = () => {
-    inputRef.value?.focus?.()
+    focus()
     popper.value?.updatePopper()
   }
 
@@ -1071,6 +1084,8 @@ const useSelect = (props: ISelectProps, emit) => {
     collapseTagSize,
     currentPlaceholder,
     expanded,
+    listboxId,
+    activeOptionId,
     emptyText,
     popupHeight,
     debounce,
@@ -1108,6 +1123,8 @@ const useSelect = (props: ISelectProps, emit) => {
     collapseTagList,
 
     // methods exports
+    focus,
+    blur,
     debouncedOnInputChange,
     deleteTag,
     getLabel,

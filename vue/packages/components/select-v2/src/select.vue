@@ -168,6 +168,8 @@
                 aria-haspopup="listbox"
                 autocapitalize="off"
                 :aria-expanded="expanded"
+                :aria-controls="listboxId"
+                :aria-activedescendant="activeOptionId"
                 :aria-labelledby="label"
                 :class="[
                   nsSelectV2.is(selectSize),
@@ -216,6 +218,8 @@
                 aria-haspopup="listbox"
                 :aria-labelledby="label"
                 :aria-expanded="expanded"
+                :aria-controls="listboxId"
+                :aria-activedescendant="activeOptionId"
                 autocapitalize="off"
                 :autocomplete="autocomplete"
                 :class="nsSelectV2.e('combobox-input')"
@@ -287,6 +291,7 @@
       </template>
       <template #content>
         <el-select-menu
+          :id="listboxId"
           ref="menuRef"
           :data="filteredOptions"
           :width="popperSize"
