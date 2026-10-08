@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/cssVariables/418/files",
+    "before": [
+      "vue/packages/theme-chalk/src/check-tag.scss",
+      "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+      "vue/packages/theme-chalk/src/descriptions.scss",
+      "vue/packages/theme-chalk/src/generated/tokens.css",
+      "vue/packages/theme-chalk/src/markdown-editor.scss",
+      "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
+      "vue/packages/theme-chalk/src/motion.scss",
+      "vue/packages/theme-chalk/src/perception-challenge.scss",
+      "vue/packages/theme-chalk/src/public-shell-critical.scss",
+      "vue/packages/theme-chalk/src/scrollbar.scss",
+      "vue/packages/theme-chalk/src/task-page-header.scss"
+    ],
+    "after": [
+      "vue/packages/theme-chalk/src/check-tag.scss",
+      "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+      "vue/packages/theme-chalk/src/descriptions.scss",
+      "vue/packages/theme-chalk/src/generated/tokens.css",
+      "vue/packages/theme-chalk/src/markdown-editor.scss",
+      "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
+      "vue/packages/theme-chalk/src/motion.scss",
+      "vue/packages/theme-chalk/src/perception-challenge.scss",
+      "vue/packages/theme-chalk/src/public-shell-critical.scss",
+      "vue/packages/theme-chalk/src/public-shell.scss",
+      "vue/packages/theme-chalk/src/scrollbar.scss",
+      "vue/packages/theme-chalk/src/task-page-header.scss"
+    ]
+  },
+  {
+    "path": "/source/commitSha",
+    "before": "5b0333a402cb848f6c612eb804c0f2fcfacd4d16",
+    "after": "9edce660ed1b71d094fa6acb2f0b7f1967808f63"
+  },
+  {
+    "path": "/source/inputTreeHash",
+    "before": "8f3772cc51d36040782dd8da602bba89f96d4aee7ee55757e37cfdc521096198",
+    "after": "e5565098f12cbc55ea2a70e74222f27730303338c25a27c47c7d8b65c1dcd7e0"
+  },
+  {
+    "path": "/source/outputHash",
+    "before": "195e70c3b81a0fbd788cdef26f843619a47afc9b5a5b3c1d8f34687d6fa42393",
+    "after": "eac884f1591a418a3c23ecbdecad77a5451f5d9ab744e04f7e4addd0324b6910"
+  }
+]

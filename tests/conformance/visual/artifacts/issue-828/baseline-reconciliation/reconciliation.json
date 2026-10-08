@@ -1,0 +1,13 @@
+{
+  "candidateInputsCommit": "9edce660ed1b71d094fa6acb2f0b7f1967808f63",
+  "testedProductSource": "5d6541461ccd96bd9edba0a223635920682a8e13",
+  "generator": "pnpm run avalonia:baseline",
+  "firstCheckExitCode": 1,
+  "producerExitCode": 0,
+  "recheckExitCode": 0,
+  "inputTreeHash": "e5565098f12cbc55ea2a70e74222f27730303338c25a27c47c7d8b65c1dcd7e0",
+  "outputHash": "eac884f1591a418a3c23ecbdecad77a5451f5d9ab744e04f7e4addd0324b6910",
+  "semanticDelta": "No component/API/token names or values added/removed; only existing --fsus-space-1 records public-shell.scss usage, plus generated provenance hashes",
+  "geometryManifestUnchanged": "decb72347624ede29c15840c84a9f6e43a92ec7206e1b712bc0a11a26cb1c98f",
+  "qualificationEligible": false
+}

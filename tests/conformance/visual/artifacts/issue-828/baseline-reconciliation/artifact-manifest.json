@@ -1,0 +1,47 @@
+{
+  "sourceProductCommit": "5d6541461ccd96bd9edba0a223635920682a8e13",
+  "inputCaptureCommit": "9edce660ed1b71d094fa6acb2f0b7f1967808f63",
+  "qualificationEligible": false,
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/baseline-reconciliation/README.md",
+      "sha256": "ce73d13ade87de267ab7f28143eff5b8d86f5098f5aa71b824519e422da9ef55",
+      "bytes": 1552
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/baseline-reconciliation/avalonia-baseline-delta-small.json",
+      "sha256": "ed946c2a67a65f601549488671c630bf52e89e0f8f4e9f6985d84b70156615cc",
+      "bytes": 2034
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/baseline-reconciliation/avalonia-baseline-first.log",
+      "sha256": "3ba227c06bd72d16a941c06a4c09f663e2e29c05ca2fdd4f6960882af9b45a38",
+      "bytes": 338
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/baseline-reconciliation/avalonia-baseline-producer-first.log",
+      "sha256": "42c21deb85f3bf1cfdc3344edecbeb4fd6e58efa5f8aa2aeeaed1bbec41d167a",
+      "bytes": 171
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/baseline-reconciliation/avalonia-baseline-recheck-first.log",
+      "sha256": "4e358fe0c69a43fe7b2f5f3e67166c22f2792e7ed16f52f118e00c619fea6a34",
+      "bytes": 188
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/baseline-reconciliation/reconciliation.json",
+      "sha256": "31070e822b7956b6eff9d7d9718e7b4973928ab0135c9d8880ee022e4014536b",
+      "bytes": 739
+    },
+    {
+      "path": "spec/baselines/vue-current.json",
+      "sha256": "9b536c5f68225285abb61f07477b7295e0a271f7b8027bac99253c22a75728fd",
+      "bytes": 1274635
+    },
+    {
+      "path": "docs/avalonia/vue-public-api-baseline.md",
+      "sha256": "666f83fcdb5db71fc2c3335bfcee3de9bf4b9ccf7aa2bc351a04fff4ab05bac2",
+      "bytes": 121109
+    }
+  ]
+}
