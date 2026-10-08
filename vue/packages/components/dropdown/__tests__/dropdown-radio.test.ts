@@ -123,4 +123,17 @@ describe('Dropdown public checked state', () => {
     expect(item.attributes('aria-checked')).toBeUndefined()
     wrapper.unmount()
   })
+
+  test('Escape closes a pointer-opened popup while focus remains on its trigger', async () => {
+    const wrapper = mount(host, { attachTo: document.body })
+    const trigger = wrapper.get('button')
+    ;(trigger.element as HTMLButtonElement).focus()
+    await trigger.trigger('click')
+    const dropdown = wrapper.getComponent(ElDropdown)
+    await vi.waitFor(() => expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([true]))
+    await trigger.trigger('keydown', { key: 'Escape', code: 'Escape' })
+    await vi.waitFor(() => expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([false]))
+    expect(document.activeElement).toBe(trigger.element)
+    wrapper.unmount()
+  })
 })

@@ -2,6 +2,7 @@
   <div
     v-bind="componentMotionAttrs"
     :class="[ns.b(), ns.is('disabled', disabled)]"
+    @keydown="handleTriggerKeydown"
   >
     <el-tooltip ref="popperRef" v-bind="tooltipBindings" v-on="tooltipEvents">
       <template #content>
@@ -115,6 +116,7 @@ export default defineComponent({
     >(null)
     const popperRef = ref<InstanceType<typeof ElTooltip> | null>(null)
     let restoreTriggerAfterHide = false
+    let popupVisible = false
     const contentRef = ref<HTMLElement | null>(null)
     const scrollbar = ref(null)
     const currentTabId = ref<string | null>(null)
@@ -247,6 +249,7 @@ export default defineComponent({
     }
 
     function handleBeforeShowTooltip(event?: Event) {
+      popupVisible = true
       restoreTriggerAfterHide = false
       isUsingKeyboard.value = event?.type === 'keydown'
       emit('visible-change', true)
@@ -259,11 +262,21 @@ export default defineComponent({
     }
 
     function handleBeforeHideTooltip() {
+      popupVisible = false
       emit('visible-change', false)
     }
 
     function handleContentKeydown(event: KeyboardEvent) {
       restoreTriggerAfterHide = event.code === EVENT_CODE.esc
+    }
+
+    function handleTriggerKeydown(event: KeyboardEvent) {
+      if (popupVisible && event.code === EVENT_CODE.esc) {
+        event.preventDefault()
+        event.stopPropagation()
+        restoreTriggerAfterHide = true
+        popperRef.value?.onClose(event)
+      }
     }
 
     function handleHideTooltip() {
@@ -331,6 +344,7 @@ export default defineComponent({
       handleShowTooltip,
       handleBeforeHideTooltip,
       handleContentKeydown,
+      handleTriggerKeydown,
       onFocusAfterTrapped,
       popperRef,
       contentRef,
