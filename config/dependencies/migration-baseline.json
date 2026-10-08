@@ -4,12 +4,12 @@
   "createdAt": "2026-08-09T02:20:00.000Z",
   "files": {
     "pnpm-lock.yaml": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
-    "package.json": "4e61b5388df742010033ef6be7b553376dde5446f87411fd8412754ab79970ab",
+    "package.json": "8eaa4c0266796dc19a528dc7eef25b920a5ded87aac2b42ec0681a975fc6052f",
     "vue/packages/element-plus/package.json": "e869928c42ed32578ebbc269e1fb66293a85a64324f484ce7dc142afae9e884c",
     "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
   "installPackageCount": 94,
-  "note": "zero-version-change migration freeze; synchronized package.json hash after the documentation compression checker was retired (no version-pin changes). Other authority files unchanged.",
+  "note": "Zero-version-change migration freeze; root package manifest identity refreshed after the Dialog focus test command and additive semantic-registry refresh tests were registered. Compared with f7e0e2d526c43ec4a24f06fe649a38797e1fbd9a: only scripts changed; dependency pins, lockfile, published manifest, and npm authority are unchanged.",
   "multiVersionUnifications": {
     "consola": {
       "from": [
