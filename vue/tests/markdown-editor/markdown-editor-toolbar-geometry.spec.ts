@@ -72,3 +72,66 @@ for (const theme of ['light', 'dark'] as const) {
     })
   }
 }
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`long locale keeps narrow primary commands visible and keyboard reachable ${theme}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 812 })
+    await page.emulateMedia({ colorScheme: theme })
+    await page.goto(
+      '/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=long',
+      { waitUntil: 'domcontentloaded' },
+    )
+    const editor = page
+      .getByTestId('markdown-editor-transaction-fixture')
+      .locator('.el-markdown-editor')
+    const toolbar = editor.locator('.el-markdown-editor__toolbar')
+    const commands = editor.locator('.el-markdown-editor__commands')
+    const more = editor.locator('.el-markdown-editor__command-more')
+    const buttons = commands.getByRole('button')
+    await expect(buttons).toHaveCount(6)
+    await page.evaluate(() => document.fonts.ready)
+    await toolbar.evaluate((element) =>
+      element.scrollIntoView({ block: 'start' }),
+    )
+    const minimumCommandWidth = await buttons.first().evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).minInlineSize),
+    )
+    expect((await commands.boundingBox())!.width).toBeGreaterThanOrEqual(
+      minimumCommandWidth,
+    )
+    await buttons.first().focus()
+    for (let index = 0; index < 6; index++) {
+      const button = buttons.nth(index)
+      await expect(button).toBeFocused()
+      const visibleWidth = await button.evaluate((element) => {
+        const target = element.getBoundingClientRect()
+        const scroller = element.parentElement!.getBoundingClientRect()
+        return Math.max(
+          0,
+          Math.min(target.right, scroller.right, innerWidth) -
+            Math.max(target.left, scroller.left, 0),
+        )
+      })
+      expect(visibleWidth).toBeGreaterThanOrEqual(minimumCommandWidth)
+      await button.press('Tab')
+    }
+    await expect(more).toBeFocused()
+    await expect(more).toBeInViewport()
+    const overflowBox = (await more.boundingBox())!
+    expect(overflowBox.x).toBeGreaterThanOrEqual(0)
+    expect(overflowBox.x + overflowBox.width).toBeLessThanOrEqual(375)
+    await expect(more).toHaveAccessibleName(
+      'A deliberately extended localization fixture that preserves every semantic label 2 format tools',
+    )
+    await more.press('Enter')
+    const tray = editor.locator('.el-markdown-editor__command-tray')
+    await expect(tray.getByRole('button')).toHaveCount(2)
+    await expect(tray.getByRole('button').first()).toBeFocused()
+    await tray.getByRole('button').first().press('Escape')
+    await expect(tray).toBeHidden()
+    await expect(more).toBeFocused()
+    await expect(buttons).toHaveCount(6)
+  })
+}

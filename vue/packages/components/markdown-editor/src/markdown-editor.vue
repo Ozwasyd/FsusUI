@@ -207,7 +207,9 @@
           :disabled="editingBlocked"
           @click="toggleCommands"
         >
-          <span>{{ resolvedCommandOverflowLabel }}</span>
+          <span :class="ns.e('command-more-label')">{{
+            resolvedCommandOverflowLabel
+          }}</span>
           <span :class="ns.e('command-more-count')">{{
             overflowItemCount
           }}</span>
