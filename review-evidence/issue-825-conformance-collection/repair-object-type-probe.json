@@ -1,0 +1,11 @@
+{
+  "probeScope": "Git identity validation only; no browser or trace",
+  "implementationSource": "80f6e96b8d5419942583711fb417492b1f0abb67",
+  "suppliedObjectType": "tag",
+  "underlyingCommit": "7a5cb642b83ab932f7d92cbd7c9e4c61dbcecf34",
+  "acceptedIdentity": {
+    "baseline": "7f6d4e8b6dba9abdeb5a4697636c8c021b6bb5c2",
+    "candidate": "1b2a21326542014feb961cbed2836c0116251df6"
+  },
+  "result": "Existing ^{commit} check accepts an annotated tag SHA. Tighten to exact commit object type before final handoff."
+}

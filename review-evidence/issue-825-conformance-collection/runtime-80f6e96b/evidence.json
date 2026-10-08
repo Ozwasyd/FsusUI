@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "owner": "playwright-conformance",
+  "gate": "playwright-conformance",
+  "group": "pr",
+  "commitSha": "80f6e96b8d5419942583711fb417492b1f0abb67",
+  "planDigest": "f4cd593b6b746a3175ff020465b21c7d21c5eb8667e7f8b13421169a75dbd9f5",
+  "impactPlanDigest": "514da81577459f77f60ee432cb2042b793e90eebecd6e7efb04251c181f5e5d5",
+  "runtimeMode": "native",
+  "cells": [
+    {
+      "ok": true,
+      "cellId": "web-interaction-conformance/chromium",
+      "status": "success",
+      "receiptPath": ".readiness/receipts/playwright-conformance/web-interaction-conformance-chromium.json"
+    },
+    {
+      "ok": false,
+      "cellId": "web-interaction-conformance/firefox",
+      "status": "failure",
+      "receiptPath": ".readiness/receipts/playwright-conformance/web-interaction-conformance-firefox.json",
+      "error": "cell web-interaction-conformance/firefox produced no real interaction trace attachments"
+    },
+    {
+      "ok": false,
+      "cellId": "web-interaction-conformance/webkit",
+      "status": "failure",
+      "receiptPath": ".readiness/receipts/playwright-conformance/web-interaction-conformance-webkit.json",
+      "error": "cell web-interaction-conformance/webkit produced no real interaction trace attachments"
+    }
+  ],
+  "aggregate": {
+    "owner": "playwright-conformance",
+    "gate": "playwright-conformance",
+    "group": "pr",
+    "cells": [
+      {
+        "cellId": "web-interaction-conformance/chromium",
+        "status": "success",
+        "tests": {
+          "total": 2,
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "web-interaction-conformance/firefox",
+        "status": "failure",
+        "tests": {
+          "total": 2,
+          "passed": 0,
+          "failed": 2,
+          "skipped": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "cellId": "web-interaction-conformance/webkit",
+        "status": "failure",
+        "tests": {
+          "total": 2,
+          "passed": 0,
+          "failed": 2,
+          "skipped": 0,
+          "flaky": 0
+        }
+      }
+    ],
+    "status": "failure",
+    "traceDigest": null
+  },
+  "status": "failure"
+}

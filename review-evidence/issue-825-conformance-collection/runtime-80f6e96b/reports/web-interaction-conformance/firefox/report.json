@@ -1,0 +1,215 @@
+{
+  "config": {
+    "configFile": "/workspace/issue825-conformance-identity/vue/playwright.conformance-interaction.config.ts",
+    "rootDir": "/workspace/issue825-conformance-identity/vue/tests/markdown-editor",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/workspace/issue825-conformance-identity/.tmp/issue825-conformance-repair/output/web-interaction-conformance/firefox",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/workspace/issue825-conformance-identity/vue/tests/markdown-editor",
+        "testIgnore": [],
+        "testMatch": [
+          "markdown-interaction-trace.spec.ts"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/issue825-conformance-identity/.tmp/issue825-conformance-repair/output/web-interaction-conformance/firefox",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/workspace/issue825-conformance-identity/vue/tests/markdown-editor",
+        "testIgnore": [],
+        "testMatch": [
+          "markdown-interaction-trace.spec.ts"
+        ],
+        "timeout": 180000
+      },
+      {
+        "outputDir": "/workspace/issue825-conformance-identity/.tmp/issue825-conformance-repair/output/web-interaction-conformance/firefox",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/workspace/issue825-conformance-identity/vue/tests/markdown-editor",
+        "testIgnore": [],
+        "testMatch": [
+          "markdown-interaction-trace.spec.ts"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": {
+      "command": "pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port 5312 --strictPort",
+      "url": "http://127.0.0.1:5312",
+      "reuseExistingServer": false,
+      "timeout": 180000
+    }
+  },
+  "suites": [
+    {
+      "title": "markdown-interaction-trace.spec.ts",
+      "file": "markdown-interaction-trace.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "mounts representative Vue components and traces real public interactions",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3,
+                  "error": {
+                    "message": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - <launching> /workspace/.setup/ms-playwright/firefox-1511/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-PC5qhm -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=421279\u001b[22m\n\u001b[2m  - [pid=421279][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  30 × [pid=421279][err] Fontconfig error: No writable cache directories\u001b[22m\n\u001b[2m  - [pid=421279][err] [421317] Sandbox: writing /proc/self/uid_map: EROFS\u001b[22m\n\u001b[2m  4 × [pid=421279][err] [Parent 421279, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=421279][err]\u001b[22m\n\u001b[2m    - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:55:36.205: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=421279][err] [Parent 421279, Unnamed thread 7f8b531fb160] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=421279][err]\u001b[22m\n\u001b[2m  - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:55:36.205: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  2 × [pid=421279][err] [Parent 421279, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=421279][err]\u001b[22m\n\u001b[2m    - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:56:42.275: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n",
+                    "stack": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - <launching> /workspace/.setup/ms-playwright/firefox-1511/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-PC5qhm -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=421279\u001b[22m\n\u001b[2m  - [pid=421279][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  30 × [pid=421279][err] Fontconfig error: No writable cache directories\u001b[22m\n\u001b[2m  - [pid=421279][err] [421317] Sandbox: writing /proc/self/uid_map: EROFS\u001b[22m\n\u001b[2m  4 × [pid=421279][err] [Parent 421279, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=421279][err]\u001b[22m\n\u001b[2m    - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:55:36.205: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=421279][err] [Parent 421279, Unnamed thread 7f8b531fb160] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=421279][err]\u001b[22m\n\u001b[2m  - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:55:36.205: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  2 × [pid=421279][err] [Parent 421279, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=421279][err]\u001b[22m\n\u001b[2m    - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:56:42.275: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n"
+                  },
+                  "errors": [
+                    {
+                      "message": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - <launching> /workspace/.setup/ms-playwright/firefox-1511/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-PC5qhm -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=421279\u001b[22m\n\u001b[2m  - [pid=421279][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  30 × [pid=421279][err] Fontconfig error: No writable cache directories\u001b[22m\n\u001b[2m  - [pid=421279][err] [421317] Sandbox: writing /proc/self/uid_map: EROFS\u001b[22m\n\u001b[2m  4 × [pid=421279][err] [Parent 421279, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=421279][err]\u001b[22m\n\u001b[2m    - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:55:36.205: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=421279][err] [Parent 421279, Unnamed thread 7f8b531fb160] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=421279][err]\u001b[22m\n\u001b[2m  - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:55:36.205: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  2 × [pid=421279][err] [Parent 421279, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=421279][err]\u001b[22m\n\u001b[2m    - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:56:42.275: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-08T15:54:35.287Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/workspace/issue825-conformance-identity/.tmp/issue825-conformance-repair/output/web-interaction-conformance/firefox/markdown-interaction-trace-c7d47-es-real-public-interactions-firefox/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/workspace/issue825-conformance-identity/.tmp/issue825-conformance-repair/output/web-interaction-conformance/firefox/markdown-interaction-trace-c7d47-es-real-public-interactions-firefox/trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1461f41558b2703c2449-d05f10855f66f493e5f6",
+          "file": "markdown-interaction-trace.spec.ts",
+          "line": 271,
+          "column": 5
+        },
+        {
+          "title": "traces MarkdownEditor input, paste, drop, exposed methods, and public state",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2,
+                  "error": {
+                    "message": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - <launching> /workspace/.setup/ms-playwright/firefox-1511/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-u65Iuw -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=422924\u001b[22m\n\u001b[2m  - [pid=422924][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  30 × [pid=422924][err] Fontconfig error: No writable cache directories\u001b[22m\n\u001b[2m  - [pid=422924][err] [422962] Sandbox: writing /proc/self/uid_map: EROFS\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.214: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.215: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Unnamed thread 7fcef3311160] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.215: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  2 × [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=422924][err]\u001b[22m\n\u001b[2m    - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.216: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:59:44.273: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:59:44.274: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n",
+                    "stack": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - <launching> /workspace/.setup/ms-playwright/firefox-1511/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-u65Iuw -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=422924\u001b[22m\n\u001b[2m  - [pid=422924][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  30 × [pid=422924][err] Fontconfig error: No writable cache directories\u001b[22m\n\u001b[2m  - [pid=422924][err] [422962] Sandbox: writing /proc/self/uid_map: EROFS\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.214: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.215: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Unnamed thread 7fcef3311160] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.215: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  2 × [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=422924][err]\u001b[22m\n\u001b[2m    - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.216: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:59:44.273: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:59:44.274: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n"
+                  },
+                  "errors": [
+                    {
+                      "message": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - <launching> /workspace/.setup/ms-playwright/firefox-1511/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-u65Iuw -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=422924\u001b[22m\n\u001b[2m  - [pid=422924][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  30 × [pid=422924][err] Fontconfig error: No writable cache directories\u001b[22m\n\u001b[2m  - [pid=422924][err] [422962] Sandbox: writing /proc/self/uid_map: EROFS\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.214: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.215: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Unnamed thread 7fcef3311160] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.215: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  2 × [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=422924][err]\u001b[22m\n\u001b[2m    - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.216: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:59:44.273: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:59:44.274: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-08T15:57:36.941Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/workspace/issue825-conformance-identity/.tmp/issue825-conformance-repair/output/web-interaction-conformance/firefox/markdown-interaction-trace-cbb0c-ed-methods-and-public-state-firefox/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/workspace/issue825-conformance-identity/.tmp/issue825-conformance-repair/output/web-interaction-conformance/firefox/markdown-interaction-trace-cbb0c-ed-methods-and-public-state-firefox/trace.zip"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "1461f41558b2703c2449-611351e2642de4b7fa19",
+          "file": "markdown-interaction-trace.spec.ts",
+          "line": 445,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-08T15:53:38.657Z",
+    "duration": 418420.505,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

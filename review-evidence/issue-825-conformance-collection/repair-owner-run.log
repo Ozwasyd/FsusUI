@@ -1,0 +1,7 @@
+[playwright-conformance] owner=playwright-conformance group=pr cells=3 commit=80f6e96b8d5419942583711fb417492b1f0abb67 digest=f4cd593b6b746a3175ff020465b21c7d21c5eb8667e7f8b13421169a75dbd9f5
+[playwright-conformance] web-interaction-conformance/chromium status=success passed=2 failed=0 skipped=0 receipt=.readiness/receipts/playwright-conformance/web-interaction-conformance-chromium.json
+[playwright-conformance] web-interaction-conformance/firefox failed: cell web-interaction-conformance/firefox produced no real interaction trace attachments
+[playwright-conformance] web-interaction-conformance/webkit failed: cell web-interaction-conformance/webkit produced no real interaction trace attachments
+[playwright-conformance] invalid receipt web-interaction-conformance/firefox: cell web-interaction-conformance/firefox status=failure
+[playwright-conformance] invalid receipt web-interaction-conformance/webkit: cell web-interaction-conformance/webkit status=failure
+[playwright-conformance] owner=playwright-conformance group=pr status=failure cells=3

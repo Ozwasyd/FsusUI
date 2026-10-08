@@ -57,7 +57,7 @@
       "exitCode": 0
     }
   ],
-  "runtimeStatus": "Chromium actual PASS2, FAIL0, SKIP0;2 real traces14 actions. Firefox/WebKit still pending; aggregate acceptance OPEN.",
+  "runtimeStatus": "Complete original three-cell run at80f6e96b:ChromiumPASS2;FirefoxFAIL2 on180s browser launch timeouts with sandbox/cacheEROFS;WebKitFAIL2 on7missinghostlibraries. All0skips and0collectionerrors. OverallFAIL. Tightened baseline-object check and final Chromium rerun ongoing; aggregate acceptance OPEN.",
   "frozenCandidatesPreserved": [
     "d456f80e2f411ca81b4e98168638411e09eeac6a",
     "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216"
