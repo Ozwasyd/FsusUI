@@ -124,6 +124,45 @@ An end column that contains an icon must reserve the icon width plus the
 variant's 16px trailing inset. A 22px indicator therefore uses a track of at
 least 40px; narrower tracks can force the cell outside its row.
 
+### Controlled activation and disabled state
+
+Each row belongs to a list item and contains a native button, or a link when
+`href` supplies a destination. Buttons retain native Tab, Enter, and Space
+behavior; links retain native Tab and Enter behavior. `active-key` exposes the
+current row through `aria-current`. The component emits `change(row, key, event)`
+and `row-click(row, key, event)` without changing the current identity. Use a
+stable, unique `row-key` and update `active-key` only after accepting activation.
+
+`disabled` rejects activation across the collection. `disabled-keys` rejects
+specific stable keys. `loading` makes the collection busy and disables every
+row; `loading-key` makes one row busy and disabled. These states reject native
+and synthetic clicks as well as native keyboard and touch activation. Disabled
+buttons use native disabling. Disabled links retain link semantics, remove the
+destination, leave the tab order, and reject navigation. Busy and disabled rows
+announce their state; the cell slot receives `disabled` and `loading` alongside
+`row`, `column`, `value`, and `active`.
+
+```vue
+<FsusDataList
+  :rows="records"
+  :columns="columns"
+  row-key="id"
+  :active-key="selectedId"
+  :disabled-keys="unavailableIds"
+  :loading="loadingRecords"
+  :loading-key="openingId"
+  aria-label="Records"
+  variant="navigation"
+  :show-header="false"
+  @change="acceptRecord"
+/>
+```
+
+Interactive rows provide a system-color focus outline in forced-colors mode.
+With `interactive="false"` and no destination, rows are passive content and do
+not emit activation. Empty, loading, and error copy remains consumer owned;
+compose public feedback components through the empty slot or next to the list.
+
 ## Empty State
 
 Use `FsusEmptyState size="inline"` inside compact collection bodies. Do not
