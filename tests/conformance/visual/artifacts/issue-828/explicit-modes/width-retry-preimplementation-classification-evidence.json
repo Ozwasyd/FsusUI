@@ -1,0 +1,8 @@
+{
+  "baseline": "2f76110ec39311c83faacf2b86fd4511eadbb389",
+  "parentReview": "01a11b52-ec77-7602-9d9e-3f040157403f; parent reported actual live Blog d1b2c66cdf982d9a9f58db4a98ca2f83db3a71fd, not root894 replay report as source",
+  "scope": "Short landscape only: existing space1 gaps in primary/action/toolbar groups, inner padding-inline space1 and zero column gap; preserve row gap space1, horizontal regions and actual min-content reservation; fix measured667x375 zoom2 inline-expanded wrapping without hiding any mode, reducing44px targets or changing56px bottom minimum",
+  "prohibited": "No mode hiding/remap, no44px target shrink, no34percent relaxation, no authority/snapshot/test changes, no package publication",
+  "unresolved": "Arbitrary low heights cannot simultaneously fit minimum controls and34percent; bottom56-64px contract retained",
+  "changeset": "consumer-visible layout patch"
+}
