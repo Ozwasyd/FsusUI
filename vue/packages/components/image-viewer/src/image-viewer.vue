@@ -19,7 +19,10 @@
           :aria-describedby="$slots.caption ? captionId : undefined"
           :tabindex="-1"
           :class="ns.e('wrapper')"
-          v-bind="cspSafe ? {} : { style: { zIndex: computedZIndex } }"
+          v-bind="{
+            ...$attrs,
+            ...(cspSafe ? {} : { style: { zIndex: computedZIndex } }),
+          }"
           data-fsus-material="glass"
         >
           <div :class="ns.e('mask')" @click.self="hideOnClickModal && hide()" />
@@ -205,6 +208,7 @@ const modes: Record<'CONTAIN' | 'ORIGINAL', ImageViewerMode> = {
 
 defineOptions({
   name: 'ElImageViewer',
+  inheritAttrs: false,
 })
 
 const props = defineProps(imageViewerProps)
