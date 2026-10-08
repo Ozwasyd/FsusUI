@@ -9,7 +9,6 @@
     @blur="onBlur"
     @focus="onFocus"
     @keydown="handleKeydown"
-    @keydown.capture="onMenuKeydown"
     @mousedown.self="onMousedown"
   >
     <slot />
@@ -236,6 +235,7 @@ export default defineComponent({
     const handleKeydown = (e: KeyboardEvent) => {
       composedKeydown(e)
       onKeydown(e)
+      if (!e.cancelBubble) onMenuKeydown(e)
     }
 
     return {

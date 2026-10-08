@@ -153,6 +153,134 @@ describe('Dropdown public checked state', () => {
     wrapper.unmount()
   })
 
+  test('cancelled item Escape does not restore the trigger on later outside dismissal', async () => {
+    const wrapper = mount(
+      defineComponent({
+        components: { ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu },
+        template: `
+          <div>
+            <el-dropdown trigger="click" :hide-on-click="false" :teleported="false">
+              <el-button>Language</el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item :checked="true" @keydown.esc.stop.prevent>English</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <button data-outside>Outside</button>
+          </div>
+        `,
+      }),
+      { attachTo: document.body },
+    )
+    const trigger = wrapper.get('button')
+    const dropdown = wrapper.getComponent(ElDropdown)
+    ;(trigger.element as HTMLButtonElement).focus()
+    await trigger.trigger('keydown', { key: 'Enter', code: 'Enter' })
+    await vi.waitFor(() => {
+      expect(document.activeElement).toBe(
+        wrapper.get('[role="menuitemradio"]').element,
+      )
+    })
+    await wrapper
+      .get('[role="menuitemradio"]')
+      .trigger('keydown', { key: 'Escape', code: 'Escape' })
+    await flushPromises()
+    expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([true])
+    expect(document.activeElement).toBe(
+      wrapper.get('[role="menuitemradio"]').element,
+    )
+    const outside = wrapper.get('[data-outside]')
+    await outside.trigger('pointerdown')
+    await outside.trigger('mousedown')
+    ;(outside.element as HTMLButtonElement).focus()
+    await outside.trigger('click')
+    await vi.waitFor(() => {
+      expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([false])
+      expect(document.activeElement).toBe(outside.element)
+    })
+    wrapper.unmount()
+  })
+
+  test.each([false, true])(
+    'nested Escape (cancelled=%s) preserves parent state and subsequent outside focus',
+    async (cancelled) => {
+      const wrapper = mount(
+        defineComponent({
+          components: { ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu },
+          template: `
+            <div>
+              <el-dropdown trigger="click" :hide-on-click="false" :teleported="false">
+                <el-button data-parent-trigger>Parent</el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item :checked="true">
+                      <el-dropdown trigger="click" :hide-on-click="false" :teleported="false">
+                        <el-button data-child-trigger>Child</el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item :checked="true" data-child-item ${cancelled ? '@keydown.esc.stop.prevent' : ''}>English</el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+              <button data-outside>Outside</button>
+            </div>
+          `,
+        }),
+        { attachTo: document.body },
+      )
+      const [parent, child] = wrapper.findAllComponents(ElDropdown)
+      const parentTrigger = wrapper.get('[data-parent-trigger]')
+      ;(parentTrigger.element as HTMLButtonElement).focus()
+      await parentTrigger.trigger('keydown', { key: 'Enter', code: 'Enter' })
+      await vi.waitFor(() =>
+        expect(parent.emitted('visible-change')?.at(-1)).toEqual([true]),
+      )
+      const childTrigger = wrapper.get('[data-child-trigger]')
+      ;(childTrigger.element as HTMLButtonElement).focus()
+      await childTrigger.trigger('keydown', { key: 'Enter', code: 'Enter' })
+      await vi.waitFor(() =>
+        expect(document.activeElement).toBe(
+          wrapper.get('[data-child-item]').element,
+        ),
+      )
+      await wrapper
+        .get('[data-child-item]')
+        .trigger('keydown', { key: 'Escape', code: 'Escape' })
+      await flushPromises()
+      if (cancelled) {
+        expect(child.emitted('visible-change')?.at(-1)).toEqual([true])
+        expect(document.activeElement).toBe(
+          wrapper.get('[data-child-item]').element,
+        )
+      } else {
+        await vi.waitFor(() => {
+          expect(child.emitted('visible-change')?.at(-1)).toEqual([false])
+          expect(document.activeElement).toBe(childTrigger.element)
+        })
+      }
+      expect(parent.emitted('visible-change')?.at(-1)).toEqual([true])
+      expect(wrapper.get('[data-child-item]').attributes('aria-checked')).toBe(
+        'true',
+      )
+      const outside = wrapper.get('[data-outside]')
+      await outside.trigger('pointerdown')
+      await outside.trigger('mousedown')
+      ;(outside.element as HTMLButtonElement).focus()
+      await outside.trigger('click')
+      await vi.waitFor(() => {
+        expect(parent.emitted('visible-change')?.at(-1)).toEqual([false])
+        expect(child.emitted('visible-change')?.at(-1)).toEqual([false])
+        expect(document.activeElement).toBe(outside.element)
+      })
+      wrapper.unmount()
+    },
+  )
+
   test.each(['navigation', 'group'])(
     'keeps checked state out of the %s role',
     async (role) => {

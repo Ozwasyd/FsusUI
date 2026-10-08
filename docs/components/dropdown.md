@@ -83,6 +83,11 @@ in the default slot; public `visible-change` and `handleOpen` / `handleClose`
 provide an observable visibility contract. Changing `checked` does not move
 focus away from a user who is navigating pending or retry content.
 
+Trigger focus is restored only when Escape actually dismisses that dropdown.
+An item that cancels Escape with `@keydown.esc.stop.prevent` keeps the popup
+open; a later outside-button dismissal preserves the outside button's focus.
+An Escape handled by a nested dropdown does not close its parent.
+
 Forced-colors mode preserves the trigger and item inset keyboard focus rings when the browser
 suppresses box shadows. The ring uses the existing focus tokens and lets the
 browser map its border color to the user's contrast palette; it does not change

@@ -115,7 +115,6 @@ export default defineComponent({
       (ComponentPublicInstance & { $el: HTMLElement }) | null
     >(null)
     const popperRef = ref<InstanceType<typeof ElTooltip> | null>(null)
-    let restoreTriggerAfterHide = false
     let popupVisible = false
     const contentRef = ref<HTMLElement | null>(null)
     const scrollbar = ref(null)
@@ -264,7 +263,6 @@ export default defineComponent({
 
     function handleBeforeShowTooltip(event?: Event) {
       popupVisible = true
-      restoreTriggerAfterHide = false
       isUsingKeyboard.value = event?.type === 'keydown'
       emit('visible-change', true)
     }
@@ -281,21 +279,26 @@ export default defineComponent({
     }
 
     function handleContentKeydown(event: KeyboardEvent) {
-      restoreTriggerAfterHide = event.code === EVENT_CODE.esc
+      handleTriggerKeydown(event)
     }
 
     function handleTriggerKeydown(event: KeyboardEvent) {
-      if (popupVisible && event.code === EVENT_CODE.esc) {
+      if (
+        popupVisible &&
+        !event.defaultPrevented &&
+        event.code === EVENT_CODE.esc
+      ) {
         event.preventDefault()
         event.stopPropagation()
-        restoreTriggerAfterHide = true
         popperRef.value?.onClose(event)
       }
     }
 
-    function handleHideTooltip() {
-      if (restoreTriggerAfterHide) {
-        restoreTriggerAfterHide = false
+    function handleHideTooltip(event?: Event) {
+      if (
+        event?.type === 'keydown' &&
+        (event as KeyboardEvent).code === EVENT_CODE.esc
+      ) {
         triggeringElementRef.value?.$el?.focus({ preventScroll: true })
       }
     }
