@@ -226,7 +226,10 @@ projection ID, duplicate/invalid ID, or stale revision rejects the transaction. 
 surfaces locate through the public anchor-map identity, so consumers need not pass a DOM
 selector/ref; source reveal, cancellation, and successful commit restore the same source selection/focus.
 
-Anchor form intent and its target are captured when the form opens. A selection-only
+Anchor form intent, target, document, and revision are captured before awaiting
+the command. A stale selection, revision, or cancelled surface refuses the
+pending open; an older attempt cannot replace or steal focus from a newer form.
+A selection-only
 transaction cannot convert creation into rename or retarget an existing anchor; apply,
 remove, and copy revalidate the original document, revision, and target. Cancellation
 discards that session, and reopening captures a fresh target and draft. Consumer-owned

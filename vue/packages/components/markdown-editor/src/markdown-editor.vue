@@ -1198,6 +1198,7 @@ import type {
   MarkdownEditorActionItem,
   MarkdownEditorActionKey,
   MarkdownEditorCommand,
+  MarkdownEditorCommandContext,
   MarkdownEditorInsertOptions,
   MarkdownEditorMode,
   MarkdownEditorSurfaceOptions,
@@ -2846,14 +2847,19 @@ const linkLabelDraft = ref('')
 const linkDestinationDraft = ref('')
 const linkTitleDraft = ref('')
 const anchorIdDraft = ref('')
-const anchorSurfaceTarget = ref<{
+interface MarkdownAnchorSurfaceTarget {
   readonly intent: 'insert' | 'edit'
   readonly documentId: string
+  readonly epoch: number
+  readonly revision: number
   readonly selection: MarkdownEditorSelection
   readonly nodeId: string | undefined
   readonly anchor: MarkdownProjectedAnchor | undefined
-} | null>(null)
+}
+const anchorSurfaceTarget = ref<MarkdownAnchorSurfaceTarget | null>(null)
+let anchorSurfaceGeneration = 0
 watch(contextualSurface, (surface) => {
+  anchorSurfaceGeneration += 1
   if (surface !== 'anchor-properties') anchorSurfaceTarget.value = null
 }, { flush: 'sync' })
 const currentSyntaxNode = computed(() => {
@@ -2885,6 +2891,20 @@ const activeAnchor = computed<MarkdownProjectedAnchor | undefined>(() => {
 const anchorSurfaceNodeId = computed(
   () => anchorSurfaceTarget.value?.anchor?.projectionId ?? '',
 )
+const captureAnchorSurfaceTarget = (context: MarkdownEditorCommandContext, key: string): MarkdownAnchorSurfaceTarget => {
+  const anchor = context.syntax?.type === 'anchor' && context.projection
+    ? currentMarkdownAnchors(context.value, context.projection).find((item) => item.projectionId === context.syntax?.nodeId)
+    : undefined
+  return Object.freeze({
+    intent: key === 'anchor-insert' ? 'insert' : key === 'anchor-properties' || anchor ? 'edit' : 'insert',
+    documentId: context.documentIdentity.id,
+    epoch: context.documentIdentity.epoch,
+    revision: context.revision,
+    selection: Object.freeze({ ...context.selection }),
+    nodeId: context.syntax?.nodeId,
+    anchor,
+  })
+}
 const closeContextualSurface = async (restore = true) => {
   contextualSurface.value = null
   contextualError.value = ''
@@ -2892,7 +2912,10 @@ const closeContextualSurface = async (restore = true) => {
 }
 const openContextualSurface = async (
   surface: 'anchor-properties' | 'link-properties',
+  anchorTarget: MarkdownAnchorSurfaceTarget,
 ) => {
+  if (surface === 'anchor-properties' && !anchorTargetIsCurrent(anchorTarget)) return
+  anchorSurfaceGeneration += 1
   contextualError.value = ''
   contextualSurfaceEpoch.value = documentIdentity.epoch
   contextualSurfaceRevision.value = editorRevision.value
@@ -2903,17 +2926,8 @@ const openContextualSurface = async (
     linkDestinationDraft.value = link.url ?? ''
     linkTitleDraft.value = link.title ?? ''
   } else {
-    const anchor = activeAnchor.value
-    // Bind intent and target once; selection-only transactions do not advance
-    // the source revision and must not turn this form into a different action.
-    anchorSurfaceTarget.value = Object.freeze({
-      intent: anchor ? 'edit' : 'insert',
-      documentId: documentIdentity.id,
-      selection: Object.freeze({ ...editorSelection.value }),
-      nodeId: currentSyntaxNode.value?.id,
-      anchor,
-    })
-    anchorIdDraft.value = anchor?.id ?? ''
+    anchorSurfaceTarget.value = anchorTarget
+    anchorIdDraft.value = anchorTarget.anchor?.id ?? ''
   }
   contextualSurface.value = surface
   await nextTick()
@@ -2923,13 +2937,11 @@ const contextualSurfaceRef = ref<HTMLElement | null>(null)
 const contextualSurfaceIsCurrent = () =>
   contextualSurfaceEpoch.value === documentIdentity.epoch &&
   contextualSurfaceRevision.value === editorRevision.value
-const anchorSurfaceIsCurrent = () => {
-  const target = anchorSurfaceTarget.value
+const anchorTargetIsCurrent = (target: MarkdownAnchorSurfaceTarget) => {
   if (
-    !target ||
-    contextualSurface.value !== 'anchor-properties' ||
-    !contextualSurfaceIsCurrent() ||
     target.documentId !== documentIdentity.id ||
+    target.epoch !== documentIdentity.epoch ||
+    target.revision !== editorRevision.value ||
     target.nodeId !== currentSyntaxNode.value?.id
   ) return false
   if (target.intent === 'edit') {
@@ -2941,6 +2953,11 @@ const anchorSurfaceIsCurrent = () => {
     target.selection.start === editorSelection.value.start &&
     target.selection.end === editorSelection.value.end
 }
+const anchorSurfaceIsCurrent = () =>
+  contextualSurface.value === 'anchor-properties' &&
+  contextualSurfaceIsCurrent() &&
+  !!anchorSurfaceTarget.value &&
+  anchorTargetIsCurrent(anchorSurfaceTarget.value)
 const applyLinkProperties = () => {
   const link = activeLink.value
   if (!link || !contextualSurfaceIsCurrent()) {
@@ -4578,6 +4595,10 @@ const runCommand = async (
       ? resolveMarkdownEditorSyntaxContext(projection, selection)
       : undefined,
   }
+  // Capture before calling an async command; source revision alone cannot
+  // detect a selection-only retarget or cancellation of the current form.
+  const anchorTarget = captureAnchorSurfaceTarget(initialContext, command.key)
+  const anchorGeneration = anchorSurfaceGeneration
   const session = createMarkdownEditorCommandSession(
     command.key,
     initialContext,
@@ -4605,6 +4626,17 @@ const runCommand = async (
       return
     const result = await runMarkdownEditorCommand(command, context)
     if (commandSessions.get(command.key) !== session) return
+    if (result?.surface === 'anchor-properties' && (
+      editingBlocked.value ||
+      nativeMachine.freezeSmartInput ||
+      anchorGeneration !== anchorSurfaceGeneration ||
+      !anchorTargetIsCurrent(anchorTarget)
+    )) {
+      session.state = 'stale'
+      commandRuntimeStates.value.set(command.key, { state: 'stale' })
+      triggerRef(commandRuntimeStates)
+      return
+    }
     const currentContext = commandContext.value
     const positionMap = positionMapFromRevision(
       session.revision,
@@ -4629,7 +4661,7 @@ const runCommand = async (
     triggerRef(commandRuntimeStates)
     if (resolvedState !== 'resolved-current') return
     if (result?.surface) {
-      await openContextualSurface(result.surface)
+      await openContextualSurface(result.surface, anchorTarget)
       return
     }
     if (!result?.transaction) {
@@ -4668,6 +4700,15 @@ const runCommand = async (
       await restoreTextareaSelection(selection)
     }
   } catch (error) {
+    if (command.key === 'anchor-insert' || command.key === 'anchor-properties') {
+      if (commandSessions.get(command.key) !== session) return
+      if (anchorGeneration !== anchorSurfaceGeneration || !anchorTargetIsCurrent(anchorTarget)) {
+        session.state = 'stale'
+        commandRuntimeStates.value.set(command.key, { state: 'stale' })
+        triggerRef(commandRuntimeStates)
+        return
+      }
+    }
     const state = resolveMarkdownEditorCommandSession(
       session,
       commandContext.value,
