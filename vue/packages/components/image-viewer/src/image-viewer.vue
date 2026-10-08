@@ -131,6 +131,7 @@
               "
               :class="[
                 ns.e('img'),
+                ns.is('contain', mode.name === modes.CONTAIN.name),
                 ns.is('hidden', cspSafe && i !== activeIndex),
               ]"
               @load="handleImgLoad"
@@ -138,7 +139,12 @@
               @mousedown="handleMouseDown"
             />
           </div>
-          <div v-if="$slots.caption" :id="captionId" :class="ns.e('caption')">
+          <div
+            v-if="$slots.caption"
+            :id="captionId"
+            ref="caption"
+            :class="ns.e('caption')"
+          >
             <slot
               name="caption"
               :index="activeIndex"
@@ -219,6 +225,7 @@ const ns = useNamespace('image-viewer')
 const { nextZIndex } = useZIndex()
 const viewerZIndex = nextZIndex()
 const wrapper = ref<HTMLDivElement>()
+const caption = ref<HTMLElement>()
 const imgRefs = ref<HTMLImageElement[]>([])
 
 let scopeEventListener = effectScope()
@@ -307,9 +314,8 @@ const imgStyle = computed(() => {
     transform: `scale(${scale}) rotate(${deg}deg) translate(${translateX}px, ${translateY}px)`,
     transition: enableTransition ? 'transform .3s' : '',
   }
-  if (mode.value.name === modes.CONTAIN.name) {
-    style.maxWidth = style.maxHeight = '100%'
-  }
+  const sizeLimit = mode.value.name === modes.CONTAIN.name ? '100%' : 'none'
+  style.maxWidth = style.maxHeight = sizeLimit
   return style
 })
 
@@ -351,6 +357,7 @@ function registerEventListener() {
     }
   })
   const mousewheelHandler = throttle((e: WheelEvent) => {
+    if (!props.showToolbar || caption.value?.contains(e.target as Node)) return
     e.preventDefault()
     const delta = e.deltaY || e.deltaX
     handleActions(delta < 0 ? 'zoomIn' : 'zoomOut', {

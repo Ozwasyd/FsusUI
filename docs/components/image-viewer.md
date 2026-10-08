@@ -88,7 +88,10 @@ Use `alt-list` aligned with `url-list`, `aria-label` for the dialog name and
 rotateLeft and rotateRight accessible names. Defaults use the configured locale;
 new action translations fall back to English until that locale supplies them.
 The optional `caption` slot receives `{ index, url, alt }` and is associated with
-the dialog using `aria-describedby`. The existing default slot remains supported. Standard non-prop attributes are forwarded to the dialog root.
+the dialog using `aria-describedby`. Long captions scroll with native wheel
+input without zooming the image. Original-size mode removes contain limits;
+switching back restores viewport fitting, including with `csp-safe`.
+The existing default slot remains supported. Standard non-prop attributes are forwarded to the dialog root.
 `show-toolbar="false"` disables zoom, rotation, size switching and dragging,
 while preserving close and previous/next keyboard and touch navigation.
 
