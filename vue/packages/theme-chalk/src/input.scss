@@ -177,6 +177,14 @@
     }
   }
 
+  @each $resize in none, both, horizontal, vertical {
+    &.#{$namespace}-textarea--resize-#{$resize} {
+      .#{$namespace}-textarea__inner {
+        resize: $resize;
+      }
+    }
+  }
+
   @include when(disabled) {
     .#{$namespace}-textarea__inner {
       @include inset-input-border(#{getCssVar('disabled-border-color')});
