@@ -1,0 +1,9 @@
+
+ RUN  v4.1.5 /workspace/FsusUI-828-explicit-widths
+
+
+ Test Files  3 passed (3)
+      Tests  67 passed (67)
+   Start at  13:05:29
+   Duration  15.24s (transform 5.72s, setup 280ms, import 7.47s, tests 4.02s, environment 2.84s)
+

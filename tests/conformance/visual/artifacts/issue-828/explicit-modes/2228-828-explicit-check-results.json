@@ -1,0 +1,62 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--config",
+      "vue/vitest.config.ts",
+      "--maxWorkers=1",
+      "vue/packages/components/public-shell/__tests__/public-shell.test.tsx",
+      "vue/packages/theme-chalk/__tests__/public-shell-reduced-motion-state-machine.test.ts",
+      "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-check-0-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "typecheck:no-cache"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-check-1-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "check:documentation-architecture"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-check-2-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "check:fsusui-design-conformance"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-check-3-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "tokens:check"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-check-4-first.log"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/prepare-visual-runtime.mjs"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-check-5-first.log"
+  }
+]

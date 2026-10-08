@@ -1,0 +1,8 @@
+{
+  "frozenOriginalEvidenceHead": "51b51eb1b3c9ccbae5cbdc7fb265c724320568ab",
+  "originalManifestSHA256": "decb72347624ede29c15840c84a9f6e43a92ec7206e1b712bc0a11a26cb1c98f",
+  "currentCandidate": "d182cf93cbb852006047bc2b7eea0ba28daa4955",
+  "gitTreeEvidenceDirectoriesUnchanged": true,
+  "originalReceiptStatus": "Original invalid preclassification and rejected UX receipt are retained; not reinterpreted as new acceptance",
+  "qualificationEligible": false
+}

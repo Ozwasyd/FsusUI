@@ -1,0 +1,3 @@
+→ No staged files match any configured task.
+[fix/828-explicit-landscape-widths-20261008 b0a43ba5] fix(public-shell): fit expanded inline mode with existing compact gaps
+ 2 files changed, 12 insertions(+), 6 deletions(-)

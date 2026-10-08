@@ -1,0 +1,441 @@
+{
+  "candidate": "d182cf93cbb852006047bc2b7eea0ba28daa4955",
+  "productSource": "69705ac1ca5d3c07fa955486646a1861ba5bb50a",
+  "exitCode": 0,
+  "testsPassed": 42,
+  "actualOriginalOutput": "/tmp/2228-828-empty-shell42-first",
+  "traceCount": 42,
+  "archive": "final-original-shell42-actual-output-first.zip",
+  "size": 28718864,
+  "sha256": "ca93fcaf2bf0ebebdc6939b01cfbb080301493d4cdeb8d339799679b469d4f35",
+  "entryCount": 85,
+  "entries": [
+    {
+      "path": ".last-run.json",
+      "size": 45,
+      "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903"
+    },
+    {
+      "path": "public-shell-desktop-searc-518f8-out-shifting-shell-geometry-desktop-dark/test-finished-1.png",
+      "size": 42158,
+      "sha256": "113c31b7c6684f06fcf4ed7050c74007943592bef5244ad5f0a33f9d2a4ba134"
+    },
+    {
+      "path": "public-shell-desktop-searc-518f8-out-shifting-shell-geometry-desktop-dark/trace.zip",
+      "size": 558510,
+      "sha256": "e6dcf678aa3639589e49c93692da79cbd1b5218408883f42ee204d850bdc3eae"
+    },
+    {
+      "path": "public-shell-desktop-searc-518f8-out-shifting-shell-geometry-desktop-light/test-finished-1.png",
+      "size": 41667,
+      "sha256": "40757ae32382f0fb15b2292a8dd286346e94c911973d55412088ea52c584972d"
+    },
+    {
+      "path": "public-shell-desktop-searc-518f8-out-shifting-shell-geometry-desktop-light/trace.zip",
+      "size": 556306,
+      "sha256": "d4d8d0946c8a2b52f9a9356105dc5d2508276a9d69ac3fcbaf42eb5760d08eea"
+    },
+    {
+      "path": "public-shell-desktop-searc-7c7b4-ine-styles-in-CSP-safe-mode-desktop-dark/test-finished-1.png",
+      "size": 47621,
+      "sha256": "f572e507cd5b328b93538905bf72d25accf247df162842017fa1295a98e49413"
+    },
+    {
+      "path": "public-shell-desktop-searc-7c7b4-ine-styles-in-CSP-safe-mode-desktop-dark/trace.zip",
+      "size": 419898,
+      "sha256": "58b0db098add53820d999c9a4cf61d27911ff5133a4fa554ff261bc9a8feebab"
+    },
+    {
+      "path": "public-shell-desktop-searc-7c7b4-ine-styles-in-CSP-safe-mode-desktop-light/test-finished-1.png",
+      "size": 47612,
+      "sha256": "63e4ee9870981be7fbdc60cb13aaa95b71cfb94f6cd525c9a24713a54c394a27"
+    },
+    {
+      "path": "public-shell-desktop-searc-7c7b4-ine-styles-in-CSP-safe-mode-desktop-light/trace.zip",
+      "size": 431619,
+      "sha256": "2e4f0941d930fa33ec56effcce5c16eb9cbc06e81e69ecbdaf53f79bb4d9615f"
+    },
+    {
+      "path": "public-shell-desktop-searc-c2408-side-without-stealing-focus-desktop-dark/test-finished-1.png",
+      "size": 42873,
+      "sha256": "cf6124eafdb680f6e44c0b226974846e1e5c17a7475d1c80238b4e3804fcc3bd"
+    },
+    {
+      "path": "public-shell-desktop-searc-c2408-side-without-stealing-focus-desktop-dark/trace.zip",
+      "size": 634610,
+      "sha256": "17dd44f4e47556d12736f27cb493fc3318f9e4edb5035cce9325617173fa5f17"
+    },
+    {
+      "path": "public-shell-desktop-searc-c2408-side-without-stealing-focus-desktop-light/test-finished-1.png",
+      "size": 42446,
+      "sha256": "66db7eafb375c5002089a56c43d7e0308e84fc644ad731ca7e0b8275a00d7d6e"
+    },
+    {
+      "path": "public-shell-desktop-searc-c2408-side-without-stealing-focus-desktop-light/trace.zip",
+      "size": 634922,
+      "sha256": "9a6ee075493f3df3293c1913e85d34b4e606cad03af1711aa39fed22640f0738"
+    },
+    {
+      "path": "public-shell-desktop-searc-d6088-stable-2px-active-indicator-desktop-dark/test-finished-1.png",
+      "size": 44323,
+      "sha256": "a6dd3409b10c18c2ca8b24f3a790ea8b1b3fc405119b7eb6a3f0d47f8ee862b5"
+    },
+    {
+      "path": "public-shell-desktop-searc-d6088-stable-2px-active-indicator-desktop-dark/trace.zip",
+      "size": 553341,
+      "sha256": "6d294657d41fdb5a63661ba786c0a4d0310748de685859ff20b26a8efd371ddb"
+    },
+    {
+      "path": "public-shell-desktop-searc-d6088-stable-2px-active-indicator-desktop-light/test-finished-1.png",
+      "size": 43795,
+      "sha256": "5c8450b4f87d34b2d4e501209536c6302a066f55b54212f7b88ab2b02df914f5"
+    },
+    {
+      "path": "public-shell-desktop-searc-d6088-stable-2px-active-indicator-desktop-light/trace.zip",
+      "size": 496696,
+      "sha256": "34abc7e6ac1cee0b95996a55f0745745a7adbac80c1ec6360dbc788947250033"
+    },
+    {
+      "path": "public-shell-desktop-searc-e9fc9-text-in-the-desktop-project-desktop-dark/test-finished-1.png",
+      "size": 44325,
+      "sha256": "422fcc02760688e682118f2661d48e5f991d0e10e0292651bb36b0f87b54d90a"
+    },
+    {
+      "path": "public-shell-desktop-searc-e9fc9-text-in-the-desktop-project-desktop-dark/trace.zip",
+      "size": 500188,
+      "sha256": "a35d84f0b615667f9be9567036f141b54625d711a3bf01ab79e11a23d4cb33a0"
+    },
+    {
+      "path": "public-shell-desktop-searc-e9fc9-text-in-the-desktop-project-desktop-light/test-finished-1.png",
+      "size": 43796,
+      "sha256": "52a671851e112b51ca37602279c243eded9aed8f244fc41b98e85ff8ca4bb1a3"
+    },
+    {
+      "path": "public-shell-desktop-searc-e9fc9-text-in-the-desktop-project-desktop-light/trace.zip",
+      "size": 499683,
+      "sha256": "a154f7957ac60d42f8eaa1c8eb5b26182d57002977956aa00c6a93eb411401c3"
+    },
+    {
+      "path": "public-shell-mobile-nav-de-fc1ae--menu-without-a-bottom-dock-mobile-dark/test-finished-1.png",
+      "size": 95531,
+      "sha256": "94d80591c060a891e182c0769cb25e7046b6215dddf167d5217035fa5d5233e4"
+    },
+    {
+      "path": "public-shell-mobile-nav-de-fc1ae--menu-without-a-bottom-dock-mobile-dark/trace.zip",
+      "size": 455026,
+      "sha256": "b94a4c91993ad608fd52ec0c0fba01a426c0856378c0cd18dc6ed986d375d9a1"
+    },
+    {
+      "path": "public-shell-mobile-nav-de-fc1ae--menu-without-a-bottom-dock-mobile-light/test-finished-1.png",
+      "size": 94070,
+      "sha256": "e1c71917510505cbfdeadf3b85540b4e57e44ff781c9106207b0bf013ebff63b"
+    },
+    {
+      "path": "public-shell-mobile-nav-de-fc1ae--menu-without-a-bottom-dock-mobile-light/trace.zip",
+      "size": 452868,
+      "sha256": "0c1af9d284c77a7322a01a2045c08c2f5bdcb8ad299a36d8f12a1a57c6d2dca5"
+    },
+    {
+      "path": "public-shell-mobile-nav-ex-dd259-without-duplicate-landmarks-mobile-dark/test-finished-1.png",
+      "size": 93493,
+      "sha256": "7e1acb45c2678fa6300d7b016a9f3051f65c5a64f743710d5794afd6a9f07feb"
+    },
+    {
+      "path": "public-shell-mobile-nav-ex-dd259-without-duplicate-landmarks-mobile-dark/trace.zip",
+      "size": 584993,
+      "sha256": "dacd0df07374030368fe71b22c30edcfd526d1e032b1de212c792b36f50a68ff"
+    },
+    {
+      "path": "public-shell-mobile-nav-ex-dd259-without-duplicate-landmarks-mobile-light/test-finished-1.png",
+      "size": 92077,
+      "sha256": "bd54f9c0f32f256c4f1a716d3af0e06e7e8f5bfbf19af96a2f6ff9da02066594"
+    },
+    {
+      "path": "public-shell-mobile-nav-ex-dd259-without-duplicate-landmarks-mobile-light/trace.zip",
+      "size": 567186,
+      "sha256": "07bc417598b1b31af4795537636e8d5218a5c323a8b6974a82f87feb1fdfb07b"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-c0a02-lass-driven-leave-lifecycle-mobile-dark/test-finished-1.png",
+      "size": 97574,
+      "sha256": "64138a948bf846dd440fff0e08efc57de5908013b30ff6d0db1ceed67d7d8d48"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-c0a02-lass-driven-leave-lifecycle-mobile-dark/trace.zip",
+      "size": 825552,
+      "sha256": "cab065ccc736d6f3bdc4109f594455b31743c2761494fcbd501baf3d80ab61ec"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-c0a02-lass-driven-leave-lifecycle-mobile-light/test-finished-1.png",
+      "size": 95956,
+      "sha256": "0f71cbc9434bce148a51ffb1288258d463677ae2c0e1942ac17630ce5a6986bd"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-c0a02-lass-driven-leave-lifecycle-mobile-light/trace.zip",
+      "size": 807102,
+      "sha256": "b6865d712e63be3890de828f041b99bac71ff4b0a49777ad0d7518280716da6d"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-e13f2-rch-Menu-then-panel-actions-mobile-dark/test-finished-1.png",
+      "size": 120378,
+      "sha256": "26786cef828f4eb46734d925f1683e4f81eb04e6abaffe77a8ed7077ddaacc42"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-e13f2-rch-Menu-then-panel-actions-mobile-dark/trace.zip",
+      "size": 1043661,
+      "sha256": "53533131be7b5602cae1de923077b19ff391ca193e7b7a113e2289c1edb3bdd5"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-e13f2-rch-Menu-then-panel-actions-mobile-light/test-finished-1.png",
+      "size": 120641,
+      "sha256": "98b47c6d8c8999f8fca4f8507d91929efe6418333f3714684dd8c4418342d138"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-e13f2-rch-Menu-then-panel-actions-mobile-light/trace.zip",
+      "size": 1025026,
+      "sha256": "17adabc6c881810162ac452a4024c49fdfb7327d3497c7ede3b526898397fd87"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-ff62a-navigation-semantics-native-mobile-dark/test-finished-1.png",
+      "size": 97967,
+      "sha256": "2cd09921170c4a914f3dd916568293fe0120b4d30d94a533eafc4f035e692948"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-ff62a-navigation-semantics-native-mobile-dark/trace.zip",
+      "size": 520832,
+      "sha256": "87cfe91316d0bd4888a34bb3509e397a4a1585048cddeb2222fb824758dea2b1"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-ff62a-navigation-semantics-native-mobile-light/test-finished-1.png",
+      "size": 96259,
+      "sha256": "85ece05fce961c5e06aae40f479ef9209e586ae41450baf902166878dc183a07"
+    },
+    {
+      "path": "public-shell-mobile-nav-ke-ff62a-navigation-semantics-native-mobile-light/trace.zip",
+      "size": 535163,
+      "sha256": "67266f184e066ff7d6125c247f8ff002bccaf4735eef73d2d66df03831957708"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-00944-anonymous-zh-long-brand-320-mobile-dark/test-finished-1.png",
+      "size": 122165,
+      "sha256": "fb9216647ed6400028b07d0969154a1b4f4d9fbf8042d1301da1c24e9390bb50"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-00944-anonymous-zh-long-brand-320-mobile-dark/trace.zip",
+      "size": 1023566,
+      "sha256": "fbda896a0fbfbfd55181247348d33983a63af045da7e0dfe97b147fc7b742e6c"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-00944-anonymous-zh-long-brand-320-mobile-light/test-finished-1.png",
+      "size": 117976,
+      "sha256": "f22d480c49a217291e3304f2fd43eff67053e10eb374d33a2dd362ffc9590080"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-00944-anonymous-zh-long-brand-320-mobile-light/trace.zip",
+      "size": 1022309,
+      "sha256": "57066110b5b962203b24cb5281b877cc2f6130ae082be587489327b1538c8a44"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-12b97-anonymous-en-breakpoint-768-mobile-dark/test-finished-1.png",
+      "size": 127276,
+      "sha256": "4710e83be6607d01834cfa1546f35227a4c5ab368113ea12a19243fd3ec05e0c"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-12b97-anonymous-en-breakpoint-768-mobile-dark/trace.zip",
+      "size": 466819,
+      "sha256": "9a4e2581f04c050425e6ada0119c22c2a450549953f2231c853b3bf47b7c5d4f"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-12b97-anonymous-en-breakpoint-768-mobile-light/test-finished-1.png",
+      "size": 126374,
+      "sha256": "5bc8d52b380ecbc09f7177f92a15b30944cbaa78b8ed5c646b9ea55ece4b6d20"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-12b97-anonymous-en-breakpoint-768-mobile-light/trace.zip",
+      "size": 478460,
+      "sha256": "d8d4af94b48bf98b225c811a008aa0536f3841acadb671d91bf8e03b5532f3b8"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-28c1e-nticated-long-copy-zoom-200-mobile-dark/test-finished-1.png",
+      "size": 130637,
+      "sha256": "14b8a677929742cefd2904566f1210b12a2e71a677d9e4ea22b4fb4071cfc8c6"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-28c1e-nticated-long-copy-zoom-200-mobile-dark/trace.zip",
+      "size": 600529,
+      "sha256": "bcc1f5d1ebad82e4a93f5df3b2fed57bc1abd981e8f7fc2351692ec8f5569434"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-28c1e-nticated-long-copy-zoom-200-mobile-light/test-finished-1.png",
+      "size": 118837,
+      "sha256": "c9509954a258d3a23aa55cffedbc620281665f8f9784a980389d720f76287956"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-28c1e-nticated-long-copy-zoom-200-mobile-light/trace.zip",
+      "size": 626507,
+      "sha256": "ff8e40edcf6b6733fd6e8a9e690ee0b3051d15ab8d7af5777ba4c47347eb3eab"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-a8cd5-authenticated-long-copy-390-mobile-dark/test-finished-1.png",
+      "size": 149786,
+      "sha256": "1fe1b61ae1de6d7c140e13640851e215ec8269404ae19d8393d6156e66033b17"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-a8cd5-authenticated-long-copy-390-mobile-dark/trace.zip",
+      "size": 614932,
+      "sha256": "f8f1449049f66d0077f55fa14a100f8881e5331d00816fb148b5f8bc3086982a"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-a8cd5-authenticated-long-copy-390-mobile-light/test-finished-1.png",
+      "size": 145384,
+      "sha256": "b00edc1b27aad27322f4e613331f90d5aa7082ff010c0e6d652052415ab1b799"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-a8cd5-authenticated-long-copy-390-mobile-light/trace.zip",
+      "size": 577467,
+      "sha256": "4b791ddde6a78d772202e9263c35b3f0674e988696d6a211e664ba4074ce79bd"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-d5164-metry-anonymous-zh-zoom-150-mobile-dark/test-finished-1.png",
+      "size": 156638,
+      "sha256": "bf1cec6548f1d42a57fc19de191e43119173eee7e6af3ff953464a65c062a4be"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-d5164-metry-anonymous-zh-zoom-150-mobile-dark/trace.zip",
+      "size": 1155821,
+      "sha256": "290ebc4d33309a9d17c3189087700c4412eaeeec61b5a9142672cfa29edeaa85"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-d5164-metry-anonymous-zh-zoom-150-mobile-light/test-finished-1.png",
+      "size": 151881,
+      "sha256": "a8570969c47181325a6f848f757c9edfb04d4b378e23a9a185525e052c07c39a"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-d5164-metry-anonymous-zh-zoom-150-mobile-light/trace.zip",
+      "size": 1106170,
+      "sha256": "2a347138b449e776b6772bad6d8eb2deb0d4bfda91b9f926e39dfea399524e19"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-f6cc8-ometry-authenticated-en-375-mobile-dark/test-finished-1.png",
+      "size": 130041,
+      "sha256": "80ff59876681b6fbff187a395f609d361b30b274efa49f72405105098d3787e5"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-f6cc8-ometry-authenticated-en-375-mobile-dark/trace.zip",
+      "size": 546900,
+      "sha256": "b24cc232e304ac77182ea2276385e393a732d1eff4f468073f2ee0b936dff583"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-f6cc8-ometry-authenticated-en-375-mobile-light/test-finished-1.png",
+      "size": 128921,
+      "sha256": "467358d57bb455c228e9d88a9a45e9ec5f0db6e86512b96e5e452c06e78c85a7"
+    },
+    {
+      "path": "public-shell-mobile-nav-mo-f6cc8-ometry-authenticated-en-375-mobile-light/trace.zip",
+      "size": 578272,
+      "sha256": "af40360f7eb541491e4cfe2f61b4703e7b6c6e7d924f0a146df467d8a6ef31b2"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-bottom-strategy-snapshot-mobile-dark/test-finished-1.png",
+      "size": 94451,
+      "sha256": "94a5967958c597f50b9ea331753194286c8bce1836c49c03765ccaed3c4c8be9"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-bottom-strategy-snapshot-mobile-dark/trace.zip",
+      "size": 533613,
+      "sha256": "5522c6c64403228b2ee6a1bda830382700885c8e09a4211ff4667431de823a80"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-bottom-strategy-snapshot-mobile-light/test-finished-1.png",
+      "size": 93266,
+      "sha256": "0ce3cc343596568618dcfed3d02f95bab26b99eea45adbfe83c74844525c597e"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-bottom-strategy-snapshot-mobile-light/trace.zip",
+      "size": 531793,
+      "sha256": "b4d67e84b92adc363f3dd7a2ac06043862b4e868aa0f2d09728304acbe2a2021"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-inline-strategy-snapshot-mobile-dark/test-finished-1.png",
+      "size": 102751,
+      "sha256": "da0d4b3d1e4ded1dbe251fdd4525b2117c36ca309769557ce55dd4668e99f9dd"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-inline-strategy-snapshot-mobile-dark/trace.zip",
+      "size": 497871,
+      "sha256": "71b38932299a731c8cc216f09ef1898a17146451967487d828be30a24198c56a"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-inline-strategy-snapshot-mobile-light/test-finished-1.png",
+      "size": 100387,
+      "sha256": "0556a3ab045e72e0c9d3b5b00a081bb1a9246d3fb1497b8a48282dd6c994e4b9"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-inline-strategy-snapshot-mobile-light/trace.zip",
+      "size": 512089,
+      "sha256": "13cacf997fccc534ba25707cc562be4b732c7edd43e86d46bca596c5dacb2b9c"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-menu-strategy-snapshot-mobile-dark/test-finished-1.png",
+      "size": 95531,
+      "sha256": "94d80591c060a891e182c0769cb25e7046b6215dddf167d5217035fa5d5233e4"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-menu-strategy-snapshot-mobile-dark/trace.zip",
+      "size": 486033,
+      "sha256": "3c5ec253d4237880257849aee4de2855ee43a34bf62519338fddc4b03eeead03"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-menu-strategy-snapshot-mobile-light/test-finished-1.png",
+      "size": 94070,
+      "sha256": "e1c71917510505cbfdeadf3b85540b4e57e44ff781c9106207b0bf013ebff63b"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-menu-strategy-snapshot-mobile-light/trace.zip",
+      "size": 452782,
+      "sha256": "1b02c7b051803b2add3fc55d9e08769fb175e880649e3a16114d8593ff39bb59"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-none-strategy-snapshot-mobile-dark/test-finished-1.png",
+      "size": 93493,
+      "sha256": "7e1acb45c2678fa6300d7b016a9f3051f65c5a64f743710d5794afd6a9f07feb"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-none-strategy-snapshot-mobile-dark/trace.zip",
+      "size": 482027,
+      "sha256": "b392cb6df6e604b341328fca1469fb2f05223f893774bb52ccb4bb922946fffd"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-none-strategy-snapshot-mobile-light/test-finished-1.png",
+      "size": 92077,
+      "sha256": "bd54f9c0f32f256c4f1a716d3af0e06e7e8f5bfbf19af96a2f6ff9da02066594"
+    },
+    {
+      "path": "public-shell-mobile-nav-mobile-none-strategy-snapshot-mobile-light/trace.zip",
+      "size": 480475,
+      "sha256": "7632cc232e178d6dbb8ba9699d175b80e382cd553244fbb891e30d86dbe5b981"
+    },
+    {
+      "path": "public-shell-mobile-nav-us-a389c-guage-in-the-mobile-project-mobile-dark/test-finished-1.png",
+      "size": 100045,
+      "sha256": "c8ae14005ee05890defb619d3d6b1f84eafe9cb034dcccd880e68342d136c5a4"
+    },
+    {
+      "path": "public-shell-mobile-nav-us-a389c-guage-in-the-mobile-project-mobile-dark/trace.zip",
+      "size": 548606,
+      "sha256": "edaeec5b61fa492785279d2f2158438cbd395717c896634a2b5dd74c00219726"
+    },
+    {
+      "path": "public-shell-mobile-nav-us-a389c-guage-in-the-mobile-project-mobile-light/test-finished-1.png",
+      "size": 97552,
+      "sha256": "6e3fa76be83ad2247287b85d589f3b7bf7f53cb55e763aa3f4e07d3f486741fd"
+    },
+    {
+      "path": "public-shell-mobile-nav-us-a389c-guage-in-the-mobile-project-mobile-light/trace.zip",
+      "size": 528298,
+      "sha256": "13959d21a0b0d54c0ec78486759260486d7fdb880f83312db21cddb0e073e37a"
+    }
+  ],
+  "qualificationEligible": false,
+  "exportCorrection": "Initial exporter looked at default Vue profile-direct path, yielding empty archive. CLI --output actually directs files to this original tmp output. Both export records retained; no test rerun or result change."
+}

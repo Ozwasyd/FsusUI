@@ -1,0 +1,338 @@
+{
+  "candidate": "2f76110ec39311c83faacf2b86fd4511eadbb389",
+  "baseline": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "rows": [
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-live-actual.png",
+      "currentSHA256": "9da121b7312ecc2cbf369fd0131034db58f0ecbcff68c78b2a52a220ae22b813",
+      "frozenBaselineSHA256": "9da121b7312ecc2cbf369fd0131034db58f0ecbcff68c78b2a52a220ae22b813",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-split-actual.png",
+      "currentSHA256": "6d29b895e91d1ed00f34fa24859800fa6fe2b2ec8964ad63f43dab2d877c4fd8",
+      "frozenBaselineSHA256": "6d29b895e91d1ed00f34fa24859800fa6fe2b2ec8964ad63f43dab2d877c4fd8",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-source-actual.png",
+      "currentSHA256": "1ab49ac360e65ade10d6b0474c4678c0b647d98ac746399c7e616cc4cc9a8f21",
+      "frozenBaselineSHA256": "1ab49ac360e65ade10d6b0474c4678c0b647d98ac746399c7e616cc4cc9a8f21",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-split-actual.png",
+      "currentSHA256": "9afad452fb9e862e50f97bc5948f7e2a26c3b43727418deb6f6e1b636891a640",
+      "frozenBaselineSHA256": "9afad452fb9e862e50f97bc5948f7e2a26c3b43727418deb6f6e1b636891a640",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/chrome-evidence/forced-colors-actual.png",
+      "currentSHA256": "e2bdb41b664b08718d9503c54ffda60ffe5d7df944ccaa44ffa866bfa3139859",
+      "frozenBaselineSHA256": "e2bdb41b664b08718d9503c54ffda60ffe5d7df944ccaa44ffa866bfa3139859",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-live-actual.png",
+      "currentSHA256": "3d300356e998ea2365660ef4aa1bc078acf9ba5f6b588faa9ac0c277bef22065",
+      "frozenBaselineSHA256": "3d300356e998ea2365660ef4aa1bc078acf9ba5f6b588faa9ac0c277bef22065",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-live-actual.png",
+      "currentSHA256": "0ac9cef96515302e126b3166d57c7c597df16d90922fd42ef1e0d08dbd1a2544",
+      "frozenBaselineSHA256": "0ac9cef96515302e126b3166d57c7c597df16d90922fd42ef1e0d08dbd1a2544",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/chrome-evidence/zoom-150-actual.png",
+      "currentSHA256": "43e350f81d80596943c7af907541357f55cba7353ff6ae532109e309df6edb97",
+      "frozenBaselineSHA256": "43e350f81d80596943c7af907541357f55cba7353ff6ae532109e309df6edb97",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-source-actual.png",
+      "currentSHA256": "caf961f36948e39ed634a29b5a714a2f09966184b2c1e7dc4a5f489565864d47",
+      "frozenBaselineSHA256": "caf961f36948e39ed634a29b5a714a2f09966184b2c1e7dc4a5f489565864d47",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-source-actual.png",
+      "currentSHA256": "f834c6ebd31b0246a20f9c5379fb7e8420ed771ba8b87b81963d8c8ba9ca5a17",
+      "frozenBaselineSHA256": "f834c6ebd31b0246a20f9c5379fb7e8420ed771ba8b87b81963d8c8ba9ca5a17",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-split-actual.png",
+      "currentSHA256": "d3c832a503a84bb43da00edb82c8eb633cca6aa4827debca4ee7c18f5fe54806",
+      "frozenBaselineSHA256": "d3c832a503a84bb43da00edb82c8eb633cca6aa4827debca4ee7c18f5fe54806",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-live-actual.png",
+      "currentSHA256": "fd935e9251bb9dee2d771a0912a3d1ed4bd299fb3515e2825dfff5549a8ffcfb",
+      "frozenBaselineSHA256": "fd935e9251bb9dee2d771a0912a3d1ed4bd299fb3515e2825dfff5549a8ffcfb",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-split-actual.png",
+      "currentSHA256": "906532d8f61bfd38176abf2344863895f376746eac75d7d1be45202f7c8869de",
+      "frozenBaselineSHA256": "906532d8f61bfd38176abf2344863895f376746eac75d7d1be45202f7c8869de",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-source-actual.png",
+      "currentSHA256": "181c931736ce881689867b45a9e64a1f4f5bbf3dedf0134c680db5fabf0e188a",
+      "frozenBaselineSHA256": "181c931736ce881689867b45a9e64a1f4f5bbf3dedf0134c680db5fabf0e188a",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-split-actual.png",
+      "currentSHA256": "7cf96559a6e864afc8ba66bc201040573180e80cc4c93687f0513335c24f307a",
+      "frozenBaselineSHA256": "7098d76222227f67dedcbdb038b670bf312b0add37697803007a288a668d73ab",
+      "sameBytes": false,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 14
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/chrome-evidence/forced-colors-actual.png",
+      "currentSHA256": "1328dce9266986fe32c7fb7d0204ff020c3dedc136d8220603bbdb8a59008aea",
+      "frozenBaselineSHA256": "1328dce9266986fe32c7fb7d0204ff020c3dedc136d8220603bbdb8a59008aea",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-live-actual.png",
+      "currentSHA256": "6f0cfc206570c869d39738973ccfe654aab776c2a07d340e01d37a9900f52f6e",
+      "frozenBaselineSHA256": "6f0cfc206570c869d39738973ccfe654aab776c2a07d340e01d37a9900f52f6e",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-live-actual.png",
+      "currentSHA256": "ff718ff80b4923444a364de5c66cacb0c7595bf86cb3e642e55bbc4ee27a738e",
+      "frozenBaselineSHA256": "ff718ff80b4923444a364de5c66cacb0c7595bf86cb3e642e55bbc4ee27a738e",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/chrome-evidence/zoom-150-actual.png",
+      "currentSHA256": "a9957480770a073ed3465b278501d5350f3790986b71699ef5169a1c1a1f9265",
+      "frozenBaselineSHA256": "a9957480770a073ed3465b278501d5350f3790986b71699ef5169a1c1a1f9265",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-source-actual.png",
+      "currentSHA256": "447dfb0cb0d2953ce64057f4c2b673a2ae46a1047937296b6b183e8526e16df1",
+      "frozenBaselineSHA256": "447dfb0cb0d2953ce64057f4c2b673a2ae46a1047937296b6b183e8526e16df1",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-source-actual.png",
+      "currentSHA256": "c9f78b06c40c66886c3af46991fa1892f750eab1694f86c075adcb0d71ce35a5",
+      "frozenBaselineSHA256": "c9f78b06c40c66886c3af46991fa1892f750eab1694f86c075adcb0d71ce35a5",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    },
+    {
+      "case": "project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-split-actual.png",
+      "currentSHA256": "1f7e5708686f9139864a3d3c4ecaef06c37d5d7ff43f1afd2560c1bed82e792a",
+      "frozenBaselineSHA256": "1f7e5708686f9139864a3d3c4ecaef06c37d5d7ff43f1afd2560c1bed82e792a",
+      "sameBytes": true,
+      "dimensions": [
+        412,
+        1200
+      ],
+      "baselineDimensions": [
+        412,
+        1200
+      ],
+      "differentRGBApixels": 0
+    }
+  ],
+  "qualificationEligible": false,
+  "reason": "Read-only immutable first-failure PNG comparison; not screenshot qualification and not a golden update"
+}

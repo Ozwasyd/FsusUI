@@ -1,0 +1,37 @@
+{
+  "candidate": "d182cf93cbb852006047bc2b7eea0ba28daa4955",
+  "productSource": "69705ac1ca5d3c07fa955486646a1861ba5bb50a",
+  "rows": 756,
+  "headerBudgetFailures": 72,
+  "combinedChromeBudgetFailures": 176,
+  "documentOverflowRows": 0,
+  "pageErrorRows": 0,
+  "fullHeaderHeights": {
+    "1": [
+      45
+    ],
+    "1.5": [
+      67
+    ],
+    "2": [
+      90
+    ]
+  },
+  "fullBottomChromeHeights": {
+    "1": [
+      102
+    ],
+    "1.5": [
+      152
+    ],
+    "2": [
+      204
+    ]
+  },
+  "diagnosticVisibleRows": 480,
+  "unhittableVisibleControls": 0,
+  "nativeNavReachChecks": 480,
+  "nativeNavReachFailures": 0,
+  "qualificationEligible": false,
+  "reason": "Captures completed with retained72/176budget failures; isolated critical CSS is not full theme parity; real Blog/current full/dev/device/provider/package gates are distinct."
+}

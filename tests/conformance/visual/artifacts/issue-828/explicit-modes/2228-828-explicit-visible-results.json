@@ -1,0 +1,35 @@
+[
+  {
+    "command": [
+      "node",
+      ".tmp/issue-828-explicit/probe-visible-controls.mjs"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-visible-controls-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "exec",
+      "playwright",
+      "test",
+      "--config=vue/playwright.config.ts",
+      "vue/tests/visual/public-shell-mobile-nav.spec.ts",
+      "vue/tests/visual/public-shell-desktop-search.spec.ts",
+      "--workers=1",
+      "--trace=on",
+      "--output=/tmp/2228-828-explicit-shell42-first"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-shell42-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "test:visual:full"
+    ],
+    "exitCode": 1,
+    "log": "/tmp/2228-828-explicit-full-visual-first.log"
+  }
+]

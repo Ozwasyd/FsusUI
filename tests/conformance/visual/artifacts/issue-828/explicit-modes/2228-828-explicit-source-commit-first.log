@@ -1,0 +1,4 @@
+→ No staged files match any configured task.
+[fix/828-explicit-landscape-modes-20261008 abb0adee] fix(public-shell): share short landscape chrome across explicit modes
+ 4 files changed, 120 insertions(+), 3 deletions(-)
+ create mode 100644 .changeset/public-shell-explicit-landscape-modes.md

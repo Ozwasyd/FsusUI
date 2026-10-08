@@ -1,0 +1,3 @@
+→ No staged files match any configured task.
+[fix/828-explicit-landscape-widths-20261008 69705ac1] fix(public-shell): avoid compact spacing for empty action wrappers
+ 2 files changed, 8 insertions(+)

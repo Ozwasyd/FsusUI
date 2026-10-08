@@ -1,0 +1,400 @@
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-2-first.log:9: new blank line at EOF.
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:804: trailing whitespace.
++  2) [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:844: trailing whitespace.
++  3) [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:906: trailing whitespace.
++  4) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:944: trailing whitespace.
++  5) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:982: trailing whitespace.
++  6) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1020: trailing whitespace.
++  7) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1096: trailing whitespace.
++  9) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1150: trailing whitespace.
++  10) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1204: trailing whitespace.
++  11) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1258: trailing whitespace.
++  12) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1312: trailing whitespace.
++  13) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1366: trailing whitespace.
++  14) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1420: trailing whitespace.
++  15) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1474: trailing whitespace.
++  16) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1528: trailing whitespace.
++  17) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1582: trailing whitespace.
++  18) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1624: trailing whitespace.
++  19) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1678: trailing whitespace.
++  20) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1740: trailing whitespace.
++  21) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1832: trailing whitespace.
++  23) [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1894: trailing whitespace.
++  24) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1932: trailing whitespace.
++  25) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:1970: trailing whitespace.
++  26) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2008: trailing whitespace.
++  27) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2084: trailing whitespace.
++  29) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2138: trailing whitespace.
++  30) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2192: trailing whitespace.
++  31) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2246: trailing whitespace.
++  32) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2300: trailing whitespace.
++  33) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2354: trailing whitespace.
++  34) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2408: trailing whitespace.
++  35) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2462: trailing whitespace.
++  36) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2516: trailing whitespace.
++  37) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2570: trailing whitespace.
++  38) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2611: trailing whitespace.
++  39) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2665: trailing whitespace.
++  40) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2727: trailing whitespace.
++  41) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2783: trailing whitespace.
++    [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2784: trailing whitespace.
++    [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2785: trailing whitespace.
++    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2786: trailing whitespace.
++    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2787: trailing whitespace.
++    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2788: trailing whitespace.
++    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2790: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2791: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2792: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2793: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2794: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2795: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2796: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2797: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2798: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2799: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2800: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2801: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2802: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2804: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2805: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2806: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2807: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2808: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2810: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2811: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2812: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2813: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2814: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2815: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2816: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2817: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2818: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2819: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2820: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2821: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2822: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2848: trailing whitespace.
++  1) vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server home route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2886: trailing whitespace.
++  2) vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server data route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2924: trailing whitespace.
++  3) vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server markdown-stress route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2938: trailing whitespace.
++  4) vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 › default home mounts only the virtual window and navigates to sections 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:2976: trailing whitespace.
++  5) vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 › default home TreeSelect dropdown does not bleed into the next section 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3014: trailing whitespace.
++  6) vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 › Calendar header controls use soft segmented styling 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3052: trailing whitespace.
++  7) vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 › Calendar title follows the browser locale in demo app 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3090: trailing whitespace.
++  8) vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 › markdown stress route renders long raw HTML without browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3127: trailing whitespace.
++  9) vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 › markdown stress scrollbar thumb drag stays smooth without text blur 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3164: trailing whitespace.
++  10) vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 › markdown stress preview scroll remains monotonic while renderer settles 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3199: trailing whitespace.
++  11) vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 › markdown stress preview keeps position in narrow devtools-like viewport 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3239: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server home route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3240: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server data route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3241: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server markdown-stress route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3242: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 › default home mounts only the virtual window and navigates to sections 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3243: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 › default home TreeSelect dropdown does not bleed into the next section 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3244: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 › Calendar header controls use soft segmented styling 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3245: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 › Calendar title follows the browser locale in demo app 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3246: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 › markdown stress route renders long raw HTML without browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3247: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 › markdown stress scrollbar thumb drag stays smooth without text blur 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3248: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 › markdown stress preview scroll remains monotonic while renderer settles 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log:3249: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 › markdown stress preview keeps position in narrow devtools-like viewport 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-ensure-wasm.log:63: new blank line at EOF.
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-check-0-first.log:9: new blank line at EOF.
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-check-0-first.log:9: new blank line at EOF.
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:804: trailing whitespace.
++  2) [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:866: trailing whitespace.
++  3) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:904: trailing whitespace.
++  4) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:942: trailing whitespace.
++  5) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:980: trailing whitespace.
++  6) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1056: trailing whitespace.
++  8) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1110: trailing whitespace.
++  9) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1164: trailing whitespace.
++  10) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1218: trailing whitespace.
++  11) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1272: trailing whitespace.
++  12) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1326: trailing whitespace.
++  13) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1380: trailing whitespace.
++  14) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1434: trailing whitespace.
++  15) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1488: trailing whitespace.
++  16) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1542: trailing whitespace.
++  17) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1596: trailing whitespace.
++  18) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1658: trailing whitespace.
++  19) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1750: trailing whitespace.
++  21) [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1786: trailing whitespace.
++  22) [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1848: trailing whitespace.
++  23) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1886: trailing whitespace.
++  24) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1924: trailing whitespace.
++  25) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:1962: trailing whitespace.
++  26) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2038: trailing whitespace.
++  28) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2092: trailing whitespace.
++  29) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2146: trailing whitespace.
++  30) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2200: trailing whitespace.
++  31) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2254: trailing whitespace.
++  32) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2308: trailing whitespace.
++  33) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2362: trailing whitespace.
++  34) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2416: trailing whitespace.
++  35) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2470: trailing whitespace.
++  36) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2524: trailing whitespace.
++  37) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2564: trailing whitespace.
++  38) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2618: trailing whitespace.
++  39) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2680: trailing whitespace.
++  40) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2736: trailing whitespace.
++    [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2737: trailing whitespace.
++    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2738: trailing whitespace.
++    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2739: trailing whitespace.
++    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2740: trailing whitespace.
++    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2742: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2743: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2744: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2745: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2746: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2747: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2748: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2749: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2750: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2751: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2752: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2753: trailing whitespace.
++    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2755: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2756: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2757: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2758: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2759: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2760: trailing whitespace.
++    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2762: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2763: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2764: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2765: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2766: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2767: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2768: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2769: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2770: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2771: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2772: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2773: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2774: trailing whitespace.
++    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2800: trailing whitespace.
++  1) vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server home route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2836: trailing whitespace.
++  2) vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server data route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2874: trailing whitespace.
++  3) vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 › default home mounts only the virtual window and navigates to sections 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2910: trailing whitespace.
++  4) vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 › default home TreeSelect dropdown does not bleed into the next section 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2948: trailing whitespace.
++  5) vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 › Calendar header controls use soft segmented styling 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:2986: trailing whitespace.
++  6) vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 › Calendar title follows the browser locale in demo app 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3024: trailing whitespace.
++  7) vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 › markdown stress route renders long raw HTML without browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3061: trailing whitespace.
++  8) vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 › markdown stress scrollbar thumb drag stays smooth without text blur 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3098: trailing whitespace.
++  9) vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 › markdown stress preview scroll remains monotonic while renderer settles 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3137: trailing whitespace.
++  10) vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 › markdown stress preview keeps position in narrow devtools-like viewport 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3173: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server home route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3174: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server data route has no browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3175: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 › default home mounts only the virtual window and navigates to sections 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3176: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 › default home TreeSelect dropdown does not bleed into the next section 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3177: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 › Calendar header controls use soft segmented styling 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3178: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 › Calendar title follows the browser locale in demo app 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3179: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 › markdown stress route renders long raw HTML without browser diagnostics 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3180: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 › markdown stress scrollbar thumb drag stays smooth without text blur 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3181: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 › markdown stress preview scroll remains monotonic while renderer settles 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log:3182: trailing whitespace.
++    vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 › markdown stress preview keeps position in narrow devtools-like viewport 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-2-first.log:9: new blank line at EOF.
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-check-1-first.log:9: new blank line at EOF.
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-setup-1-first.log:63: new blank line at EOF.
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:16: trailing whitespace.
++ 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:25: trailing whitespace.
++ 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:30: trailing whitespace.
++ 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:40: trailing whitespace.
++ 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:56: trailing whitespace.
++ 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:65: trailing whitespace.
++ 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:70: trailing whitespace.
++ 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:80: trailing whitespace.
++ 
+tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch:80: new blank line at EOF.

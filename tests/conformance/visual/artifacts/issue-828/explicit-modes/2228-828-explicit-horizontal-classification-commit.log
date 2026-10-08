@@ -1,0 +1,5 @@
+→ No staged files match any configured task.
+[fix/828-explicit-landscape-modes-20261008 2ea638c0] docs(viewport): freeze horizontal shell composition before repair
+ 2 files changed, 93 insertions(+)
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/horizontal-preimplementation-classification-evidence.json
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/horizontal-preimplementation-classification-receipt.json

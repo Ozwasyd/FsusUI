@@ -1,0 +1,36 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--config",
+      "vue/vitest.config.ts",
+      "--maxWorkers=1",
+      "vue/packages/components/public-shell/__tests__/public-shell.test.tsx",
+      "vue/packages/theme-chalk/__tests__/public-shell-reduced-motion-state-machine.test.ts",
+      "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-bounded-check-0-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "typecheck:no-cache"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-bounded-check-1-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "avalonia:baseline:check"
+    ],
+    "exitCode": 1,
+    "log": "/tmp/2228-828-explicit-bounded-check-2-first.log"
+  }
+]

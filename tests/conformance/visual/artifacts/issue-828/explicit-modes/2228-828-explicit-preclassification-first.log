@@ -1,0 +1,12 @@
+/workspace/FsusUI-828-explicit-modes/node_modules/ajv/dist/core.js:148
+                throw new Error(`no schema with key or ref "${schemaKeyRef}"`);
+                      ^
+
+Error: no schema with key or ref "http://json-schema.org/draft-07/schema#"
+    at Ajv2020.validate (/workspace/FsusUI-828-explicit-modes/node_modules/ajv/dist/core.js:148:23)
+    at Ajv2020.validateSchema (/workspace/FsusUI-828-explicit-modes/node_modules/ajv/dist/core.js:261:28)
+    at Ajv2020._addSchema (/workspace/FsusUI-828-explicit-modes/node_modules/ajv/dist/core.js:461:18)
+    at Ajv2020.compile (/workspace/FsusUI-828-explicit-modes/node_modules/ajv/dist/core.js:159:26)
+    at file:///workspace/FsusUI-828-explicit-modes/.tmp/issue-828-explicit/freeze-classification.mjs:23:66
+
+Node.js v24.19.0

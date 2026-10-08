@@ -1,0 +1,916 @@
+{
+  "schema": "issue-828.explicit-modes-custody.v1",
+  "createdAt": "2026-10-08T13:46:52.252172+00:00",
+  "testedCandidate": "d182cf93cbb852006047bc2b7eea0ba28daa4955",
+  "productSource": "69705ac1ca5d3c07fa955486646a1861ba5bb50a",
+  "frozenParentEvidence": "51b51eb1b3c9ccbae5cbdc7fb265c724320568ab",
+  "fetchedMain": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "blogReviewerSource": "d1b2c66cdf982d9a9f58db4a98ca2f83db3a71fd",
+  "fetchedBlogMaster": "5798707d359ce5ee57752aa868d0ccbf3f889494",
+  "fullOriginalExitCode": 1,
+  "preview": {
+    "passed": 647,
+    "failed": 41,
+    "total": 688
+  },
+  "dev": {
+    "passed": 8,
+    "failed": 11,
+    "total": 19
+  },
+  "shellOriginalExitCode": 0,
+  "shellOriginalPassed": 42,
+  "unitsPassed": 67,
+  "actualNoCacheTypeProjects": 4,
+  "componentMatrix": {
+    "rows": 756,
+    "headerBudgetFailures": 72,
+    "chromeBudgetFailures": 176,
+    "overflowRows": 0,
+    "pageErrorRows": 0
+  },
+  "nativeVisibleDiagnosticRows": 480,
+  "nativeReachChecks": 480,
+  "nativeReachFailures": 0,
+  "interactionRows": 30,
+  "interactionFailures": 0,
+  "originalFrozenGeometryEntriesVerified": 1244,
+  "originalFrozenGeometryManifestSHA256": "decb72347624ede29c15840c84a9f6e43a92ec7206e1b712bc0a11a26cb1c98f",
+  "independentNewUXReceipt": null,
+  "qualificationEligible": false,
+  "sourceUsePermittedWithoutQualification": true,
+  "unmet": [
+    "Literal34percent budget at impossible minimum-target height/mode ranges",
+    "Required current full visual/CI gate",
+    "Same independent rendered UX review",
+    "Published package parity",
+    "Blog current live readiness/fixtures/Chromium/WebKit/AOT identities and required matrix",
+    "Real current-candidate iOS17+ device/operator receipts"
+  ],
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-api-commit-first.log",
+      "bytes": 213,
+      "sha256": "c2e7b00ceef90d400b2e0ad04150ec799a00cf0aa5ef7d19152b746edbbfe9a6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-build-theme-first.log",
+      "bytes": 6022,
+      "sha256": "f001443a78903aa9ad2fb6baa64f873334ba62ef99d8f530127c278c46863bfd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-0-first.log",
+      "bytes": 178,
+      "sha256": "c0b72b451aa12ea28a9861c44a576d16ff440bf9e51dd841f52577f91cb66051"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-1-first.log",
+      "bytes": 195,
+      "sha256": "8de7a43a98f2f412a1088e9342af96eff4fd22cccab1117a0bbbc69ed9b8001a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-2-first.log",
+      "bytes": 227,
+      "sha256": "509f118667b997202ad62c4dc73015ef8e58231185f8d38f3c01f20f6c9e5f5b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-3-first.log",
+      "bytes": 1566,
+      "sha256": "70ff6d2325251b1abe947123d2e0c480f787e23c78770d1349024590a5bf4c9a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-4-first.log",
+      "bytes": 399,
+      "sha256": "780588fcfc78f66c4e8efcb5744ea24a38327c301d21f738e075405b9608a5e7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-5-first.log",
+      "bytes": 4871,
+      "sha256": "af4f51155e1df75381a08b0e73ff7c5286be50c82bf618a663c59df47af713d7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-6-first.log",
+      "bytes": 162,
+      "sha256": "61865ec57d8dcc5a15e9aa45f1ef2aebf34c2108a937dd03ac20595b8082038a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-7-first.log",
+      "bytes": 86,
+      "sha256": "04331bd11f1dbecbcf6841dfff20ac936c2a59340bc3f982790e263d5808dbe1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-check-results.json",
+      "bytes": 1628,
+      "sha256": "c6b3ac091cd76550877f60ee62dad9581ac5cc347510a717032e92e9436c346e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-full-visual-first.log",
+      "bytes": 303727,
+      "sha256": "e4d00dc739dfd41c7355a78d08d1edd06b7ccb081f8b9a767be315233cbf37bd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-interactions-first.log",
+      "bytes": 574,
+      "sha256": "2adfaa6a88b35d50eed6f3181db7b6e032734034e44634812edbfe08111d22fb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-matrix-first.log",
+      "bytes": 3740,
+      "sha256": "9a21006db0fe680fb189c0ed15268858cffb6d8a1fbf8a5b13447bb26f77da86"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-preclassification-commit-first.log",
+      "bytes": 482,
+      "sha256": "6b6a5b6f744cde7f2ad4a7436c8b53dc81667b4aef9e45f7298cf20f7fd4f298"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-preclassification-first.log",
+      "bytes": 292,
+      "sha256": "17febb465a3cb04a47665ba2ee0336c5b4461f99c729135dbce0bb34805057f8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-preview-first.log",
+      "bytes": 39,
+      "sha256": "f47144e672e6dd63f63d9049bd1a8729a16f7e2548643e59e5a8e58799b7a421"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-preview-results.json",
+      "bytes": 1448,
+      "sha256": "45aa1189822c0e6934b1171b46c4bc90d18c522c0716ce21046a64ee2c8f423e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-runtime-check-first.log",
+      "bytes": 145,
+      "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-runtime-first.log",
+      "bytes": 84902,
+      "sha256": "68f410a0e2871a078e1eab7a805d0752eb1bf3b82d45075f2cd51986a4426553"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-shell42-first.log",
+      "bytes": 6359,
+      "sha256": "eccbcd65ba94d0ceecfe7dbdfd7385b77b4f47713172cc814ddbb46deb283f93"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-source-commit-first.log",
+      "bytes": 202,
+      "sha256": "042e07d9bf50ed8acb1d2e0c6968a0fdee5943fb5b7e702a6b1d2c53c48de7a4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-empty-visible-controls-first.log",
+      "bytes": 2730,
+      "sha256": "bf87cfb407424be7e3940baa2c695287f4a3721329aea52e0abbf7eb849f77e3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-after-bounded-matrix-first.log",
+      "bytes": 3918,
+      "sha256": "6b122124f87c035af7cb80d6ab0cf6527954d2eff39e361258a70bf454a2afb8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-after-build-theme-first.log",
+      "bytes": 6019,
+      "sha256": "a8d002d7804a040dfbd77546e64e40091c5e3118927cfe6bd4a5b63307544ba1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-after-first-matrix-result.json",
+      "bytes": 95,
+      "sha256": "606f576120fd874c6d04f6572c98c59b79750dd3c15ea8e1d90e72d61ed9968c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-after-matrix-first.log",
+      "bytes": 3740,
+      "sha256": "2352bdc8af0ebed0ee7f8035b8ab6d722eb4d43003b1a5a161e98cd1c46bf8ae"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-after-preview.log",
+      "bytes": 39,
+      "sha256": "ded8592e42b36f00c151b6d28fb65807be8d8639233fb7504e84de973822cc61"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-api-readonly-diff.json",
+      "bytes": 1362,
+      "sha256": "60521850133b09e3e81869bee5b44f92d0c886a62cd26736da6c55297f46fb03"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-api-readonly-projection.json",
+      "bytes": 1285981,
+      "sha256": "9f4a221e0cba12b3c8822e4bd81ab77cb157d8654f67c52f66f48e5b27cc405f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-api-readonly-projection.md",
+      "bytes": 22131,
+      "sha256": "2c2752924661a5411dcb1b0d6939e6475e541f588d39336f934c3b95b8a8c3b8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-build-theme.log",
+      "bytes": 6019,
+      "sha256": "9c1b7f221e2c390d16e992b9d4cda6450d9b5c441d44f0b00ac29b45a2249fbd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-ensure-icons.log",
+      "bytes": 1322,
+      "sha256": "84abe93599aa83fa52a870708a3a0f3d0b1fbd40342c997e5f02eec87d380666"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-ensure-wasm.log",
+      "bytes": 15121,
+      "sha256": "69b07deba76d6c7199dc58b11d3d13b29d775b67b0c5b76a9b20681e0899151c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-matrix-first.log",
+      "bytes": 3296,
+      "sha256": "f0ed71902deef5a5a074ad4b1ebe1b9427b437d14bf557536d4df388d6fa8b45"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-matrix-result.json",
+      "bytes": 90,
+      "sha256": "d47e252f843e328cb89980c1f8c46a890f4c7ee0231bf35da5e40632d189ef66"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-preview.log",
+      "bytes": 39,
+      "sha256": "ded8592e42b36f00c151b6d28fb65807be8d8639233fb7504e84de973822cc61"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-scripts-prepare-visual-runtime.mjs.log",
+      "bytes": 85797,
+      "sha256": "d8421982ef80c67653bfa13b88460f6cb524f2d2f5e9bcd70a90cda7ddae800b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-before-setup-results.json",
+      "bytes": 669,
+      "sha256": "f9e22fc66097babc7e33e3bba3f6dabbb7762112dbdc3ee79edcbb165502dfab"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-build-theme-first.log",
+      "bytes": 6019,
+      "sha256": "8880003b1a49076ce8f5b61e025755afb4e1d2f74979028323a50594cf23a59c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-check-0-first.log",
+      "bytes": 226,
+      "sha256": "9409dcfe37e4d4fe7c190132bd8e6681f8e7ad27aa4cae335cc204e4c782fa6e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-check-1-first.log",
+      "bytes": 1561,
+      "sha256": "677e0172e4f9cc83d74706180ec6f1cf4155d9194c3900ef56b17437b341fcf6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-check-2-first.log",
+      "bytes": 344,
+      "sha256": "0680d152f81f70af24e98f9ca70569bc7028b4e17d8799f028d87b9d0aaeb540"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-check-results.json",
+      "bytes": 845,
+      "sha256": "68f9367ac61f645524ecaaa16ad9e2384c6f724c433afb282e7182441be5320d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-commit.log",
+      "bytes": 206,
+      "sha256": "208b5d7d1f5d27d48412fe28b596c127021853ec1da3a47f6f2f3e78876945d7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-format.log",
+      "bytes": 137,
+      "sha256": "6f663316ccd49a1ae3dcc0534a4aa2553e7499ef041e06d6088961f8c95ca7b1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-preview-results.json",
+      "bytes": 389,
+      "sha256": "8cab527c7f3531963d8596dcc51ff95513fdd66337164dda6a1320646e6ff10b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-preview.log",
+      "bytes": 39,
+      "sha256": "ded8592e42b36f00c151b6d28fb65807be8d8639233fb7504e84de973822cc61"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-runtime-first.log",
+      "bytes": 84901,
+      "sha256": "1b3657952bad2a0f3cc05d601b981c11ea3909e573a5be9b684cf2f192d01a90"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-bounded-scoped-build-theme-first.log",
+      "bytes": 6019,
+      "sha256": "8d55de391775b5e0c6418e85ec9417926a395874d310783a5043d57c5588f169"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-check-0-first.log",
+      "bytes": 226,
+      "sha256": "b6bfda62eb8ec0384c5aca043882eb00d8a8637527d81b241201d8b71da3f376"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-check-1-first.log",
+      "bytes": 1561,
+      "sha256": "4b74f3349ef61a49d30e36c87ceabc80bbea6fc496120d9d4f569fd3f1324fc0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-check-2-first.log",
+      "bytes": 398,
+      "sha256": "0cfb4d3782842673cc927576e3779a3946b8bc5a270662e1c842c77374d1c4a7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-check-3-first.log",
+      "bytes": 4870,
+      "sha256": "6d98b87224a85b8123cd47eb280b47ce8e2c636653446bf21f434978220f88d5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-check-4-first.log",
+      "bytes": 161,
+      "sha256": "f3e6da19db08cd3baa71c0d4eeb4fa5c193472ab1df196106d7786ef817b25ef"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-check-5-first.log",
+      "bytes": 84901,
+      "sha256": "e32f14097b976e720966d6b495a7f682eb218c95a37f8e756934f17d3452cc4a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-check-results.json",
+      "bytes": 1320,
+      "sha256": "70a3303d3d04c752585c91e780e3777b26fd22359f5c29f98d3cd52d60f7b4c4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-current-issue.json",
+      "bytes": 3885,
+      "sha256": "d8029805ae0ff8c14e632596e704126dd4ab3e499b523050420b49ff09349d4d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-full-visual-first.log",
+      "bytes": 297108,
+      "sha256": "bc2ce0b2245f631bfcd709d1718dc984bd563bb8795fd370e52eea75adea0fb3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-horizontal-classification-commit.log",
+      "bytes": 476,
+      "sha256": "565075c759fd5ef9cb71c2e4b53e1246c17a815f5e71239a027c3a0f8b1793f7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-horizontal-preclassification-first.log",
+      "bytes": 292,
+      "sha256": "9431f501a6659dae41dea6c0246c23e0a05bd1209f8e3d33bd5e9d8d9d9ac361"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-install-first.log",
+      "bytes": 5340,
+      "sha256": "82bdee7e0353bbc63bdaf473c1612dc054d277b4d4238185c8fed5394c88aee4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-interactions-first.log",
+      "bytes": 574,
+      "sha256": "2adfaa6a88b35d50eed6f3181db7b6e032734034e44634812edbfe08111d22fb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-natural-width-commit.log",
+      "bytes": 219,
+      "sha256": "09a51b98e70f45e9c66a768036f2c3f78b46dcb3df2b911344418f6b36dcfbca"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-natural-width-format.log",
+      "bytes": 137,
+      "sha256": "0d386af017cb5437c4c4c8e8418fa9b255b38145fd54ce56210412e5c1b00277"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-preclassification-commit.log",
+      "bytes": 452,
+      "sha256": "edc32fa1a4258941bd1de74f1467a05f1f3ef8c161297198619c37dcd9c3f412"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-preclassification-first.log",
+      "bytes": 783,
+      "sha256": "c10332a525b5c0c3534a6374aaa9549025d0ac6c518953d1a34ca1b9973b95c1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-preclassification-recheck.log",
+      "bytes": 292,
+      "sha256": "cc6656f45cefdfc0e5e6977741716d895a6a141df8ca7038073cb2be0cf3cd05"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-build-theme-first.log",
+      "bytes": 6019,
+      "sha256": "8ea5f04b93fe80384b5df11f2618d6ba08cfef4514ea98519a9390666013f1fb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-0-first.log",
+      "bytes": 177,
+      "sha256": "449e02943a8fbe7c78dd4a675192a8163af81acc2bcea44ee54e41fe80dc924d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-1-first.log",
+      "bytes": 194,
+      "sha256": "5724b693017947edb0691eb95f6b570db552ee8d3e306150c5572b7576a2a00c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-2-first.log",
+      "bytes": 226,
+      "sha256": "0bd6fd9bdc6745c7f9f44b8dc97d4a1325652763f72173e10a3358950946ec2c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-3-first.log",
+      "bytes": 1561,
+      "sha256": "443679b8310ead1a281f6a1ff0d3fc385a13a8a7eccf7274d3163fda0a5c5cbf"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-4-first.log",
+      "bytes": 398,
+      "sha256": "0cfb4d3782842673cc927576e3779a3946b8bc5a270662e1c842c77374d1c4a7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-5-first.log",
+      "bytes": 4870,
+      "sha256": "6d98b87224a85b8123cd47eb280b47ce8e2c636653446bf21f434978220f88d5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-6-first.log",
+      "bytes": 161,
+      "sha256": "f3e6da19db08cd3baa71c0d4eeb4fa5c193472ab1df196106d7786ef817b25ef"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-check-results.json",
+      "bytes": 1544,
+      "sha256": "135d58860818d25c206963464e7301254f6c86369c61127201665cb4a6205b0b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-interaction-first.log",
+      "bytes": 574,
+      "sha256": "2adfaa6a88b35d50eed6f3181db7b6e032734034e44634812edbfe08111d22fb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-matrix-first.log",
+      "bytes": 4007,
+      "sha256": "ec7b00ee4db4d53adcd61a84b021980ae0f6db34e371c01f2615f8e44a46381c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-preview-first.log",
+      "bytes": 39,
+      "sha256": "ded8592e42b36f00c151b6d28fb65807be8d8639233fb7504e84de973822cc61"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-preview-results.json",
+      "bytes": 393,
+      "sha256": "94ee07a4c3d2ba3fc410075658ecb48d454f8b2f460f9cbe50ccb262e3806c8e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-reserved-runtime-first.log",
+      "bytes": 84901,
+      "sha256": "c83072430b4155e9221996cf97f8d1ff1c89cfc12b5c3eea84c3c82603c01092"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-shell-browser-first.log",
+      "bytes": 4681,
+      "sha256": "ac89f1984bc178107147ef566bfc8d075ef7a5ac03e58ddb99c759f7b434c71e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-shell42-first.log",
+      "bytes": 6360,
+      "sha256": "242dc86d66532bf6a3e6d185ee46cef225f732779e937e885f81aceb1fbe44ec"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-source-commit-first.log",
+      "bytes": 294,
+      "sha256": "00e5d6a2ca8b5fe253fd135ee216040ec4a8f3fd203cef103a89c7e4c681891b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-source-format-first.log",
+      "bytes": 137,
+      "sha256": "fc2ada7571c90fbe233250741fc33c33890e00b1e3f2e953335e95c7ecdf13fa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-visible-controls-first.log",
+      "bytes": 2730,
+      "sha256": "bf87cfb407424be7e3940baa2c695287f4a3721329aea52e0abbf7eb849f77e3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-visible-preview-first.log",
+      "bytes": 39,
+      "sha256": "ded8592e42b36f00c151b6d28fb65807be8d8639233fb7504e84de973822cc61"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-explicit-visible-results.json",
+      "bytes": 778,
+      "sha256": "7b64b3619dd1084cbfb5f41bcdee3e57ab6277c846732ad4e79654efe1fb3be5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-final-evidence-whitespace-first.log",
+      "bytes": 57688,
+      "sha256": "ce21a330ddb1cb2ee514a4d15192d25230d56fb70db0476135030ca4a2088d72"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-owned-source-and-doc-whitespace-check-first.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-owned-source-whitespace-check-first.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-api-readonly-diff.json",
+      "bytes": 1153,
+      "sha256": "41930f2c96a39072e9bc162a54d861c8dfe2108a145c3b87be55856cef5f7be9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-api-readonly-projection.json",
+      "bytes": 1285981,
+      "sha256": "5173f7d7f8c334bb9763a7d67ce8bb718a6bc97bdf9d705783091f017515d606"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-api-readonly-projection.md",
+      "bytes": 22131,
+      "sha256": "ecc1f7c91a87e9aa1e76b2c1e1077e9195e042feb8ee80c81342b6b81229b3f6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-check-0-first.log",
+      "bytes": 345,
+      "sha256": "3a565ea85686b074b858e0cdaaf7256b6e88bf15b5dda71998219fa9b656b1fb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-check-1-first.log",
+      "bytes": 228,
+      "sha256": "9bc594315583cd6292e226dace955055f9fe7db4317f8e1b686a2d211154ca5d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-check-2-first.log",
+      "bytes": 1566,
+      "sha256": "aa1e70347cef1f468576a2e3c3cbb12e8d73310eb1a25939f814782137ec408e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-check-3-first.log",
+      "bytes": 399,
+      "sha256": "780588fcfc78f66c4e8efcb5744ea24a38327c301d21f738e075405b9608a5e7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-check-4-first.log",
+      "bytes": 4871,
+      "sha256": "af4f51155e1df75381a08b0e73ff7c5286be50c82bf618a663c59df47af713d7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-check-5-first.log",
+      "bytes": 162,
+      "sha256": "61865ec57d8dcc5a15e9aa45f1ef2aebf34c2108a937dd03ac20595b8082038a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-check-results.json",
+      "bytes": 1310,
+      "sha256": "889e9606ee7455a7145f3e7e0da724c901db8efe46c48aa70fa42444175660c8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-install-first.log",
+      "bytes": 789,
+      "sha256": "3b0c7eb597e050a74d1f11422a23c90fc81f635fe11416d026ef062fec9d622d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-install-store-first.log",
+      "bytes": 4864,
+      "sha256": "b8eb6c0b9583245fbc1b8f2a290bbf0e506a31b83b91bb855ea1b79600c45345"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-interactions-first.log",
+      "bytes": 574,
+      "sha256": "2adfaa6a88b35d50eed6f3181db7b6e032734034e44634812edbfe08111d22fb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-matrix-first.log",
+      "bytes": 3829,
+      "sha256": "962c57f8cda96230918c2dcc597d3afe83dad478f9edb08ed05d494031d5b0a9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-preclassification-commit-actual.log",
+      "bytes": 750,
+      "sha256": "a0cbed61a0e7b8dcd71636e16757c4e088e8335f5e30cd572067972a01bc01a4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-preclassification-first.log",
+      "bytes": 292,
+      "sha256": "404d96cfc94a71038390543ba1405d393c6d9455e6552bc42624a6a6ab65fc71"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-preclassification-retry-first.log",
+      "bytes": 292,
+      "sha256": "404d96cfc94a71038390543ba1405d393c6d9455e6552bc42624a6a6ab65fc71"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-preview-first.log",
+      "bytes": 39,
+      "sha256": "f47144e672e6dd63f63d9049bd1a8729a16f7e2548643e59e5a8e58799b7a421"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-preview-results.json",
+      "bytes": 978,
+      "sha256": "35b64c51658b486a3d5dcb090f63b0098592bdac0ff6e76985e35f700dbceeaf"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-setup-0-first.log",
+      "bytes": 1327,
+      "sha256": "c22013ea2e212ea763b3137753dbe5bb62f0b1d03992807c684c7c2149ef24f4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-setup-1-first.log",
+      "bytes": 15131,
+      "sha256": "f172638b12313949d0a1675f9491f7ea394a9a7dcf3b242e34724ee7e18e57dd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-setup-2-first.log",
+      "bytes": 6017,
+      "sha256": "189dc39a17adcb5679b87a39930cd0bf24e72412b0cdd8b53cf3966dda6d2fc9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-setup-3-first.log",
+      "bytes": 85800,
+      "sha256": "b5e0fce1aa992572a711980f598a240cecef6b2c1c42eb37876d087b07d7ef86"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-setup-results.json",
+      "bytes": 617,
+      "sha256": "84b91a2038714599d327946644fa81ef0520c7102390d8cde7a5de985e57c2d4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-shell42-first.log",
+      "bytes": 6356,
+      "sha256": "12bc2c9604f290723b78deca1270c2ac96a79768bb84741390afd7088936b2ff"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-source-commit-first.log",
+      "bytes": 223,
+      "sha256": "271f49adba97b372c61e805b9e3cbda689c3ea63a5c29d0b227a6548e239bbaf"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-uncommitted-owned-css-first.patch",
+      "bytes": 2438,
+      "sha256": "6c935795437fe25e27fabbe6ec2521caaf75cb167385b35ae7313dbc87ab6d94"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/2228-828-widths-visible-controls-first.log",
+      "bytes": 2730,
+      "sha256": "bf87cfb407424be7e3940baa2c695287f4a3721329aea52e0abbf7eb849f77e3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/README.md",
+      "bytes": 11256,
+      "sha256": "65d106a6a16637a598e42a2b7f3d792622511fad21b6ef8bb46e3a7741a56d65"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-empty-light-667x375-z2-inline-search-expanded-full.png",
+      "bytes": 15849,
+      "sha256": "600bca45ff41b9201bd8725480c354fc14d7457e3e531e95c1558d946c362759"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-empty-light-736x264-z2-menu-collapsed-full.png",
+      "bytes": 11769,
+      "sha256": "bfb6804af9d90b9410fab06af1048ce6ce4a2deafd2327c15712d09588427971"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-empty-light-736x265-z2-menu-collapsed-full.png",
+      "bytes": 12003,
+      "sha256": "608c0255229b3aca9d1260381db081de8a8682523bd811dd20300ec5aa5268e8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-empty-light-736x320-z2-bottom-collapsed-full.png",
+      "bytes": 15611,
+      "sha256": "54e570915276b6bda6986fcb59782fd2f69a75a4243364e3abfd38f41cc3f4a6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-empty-light-736x320-z2-inline-search-expanded-full.png",
+      "bytes": 16360,
+      "sha256": "eb342c67445620dd481b531a9a52cb833d450da5ee440ae5517b59cf70eb30f6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-empty-light-736x320-z2-menu-search-expanded-full.png",
+      "bytes": 13820,
+      "sha256": "4da8652de2c3d716af68643f653a3b7fd7d903f05ac16f72c0abe51a40a5452f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-widths-light-667x375-z2-inline-search-expanded-full.png",
+      "bytes": 16009,
+      "sha256": "27a7cd9917a7a9070258aebf937cdc302f2ee363d7063fd368fc410264fcb4e3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-widths-light-736x264-z2-menu-collapsed-full.png",
+      "bytes": 11769,
+      "sha256": "bfb6804af9d90b9410fab06af1048ce6ce4a2deafd2327c15712d09588427971"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-widths-light-736x265-z2-menu-collapsed-full.png",
+      "bytes": 12003,
+      "sha256": "608c0255229b3aca9d1260381db081de8a8682523bd811dd20300ec5aa5268e8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-widths-light-736x320-z2-bottom-collapsed-full.png",
+      "bytes": 15688,
+      "sha256": "c1113a209082eeb0829d009754589a6ab37e5e1fc635ae233c8231984009e6b0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-widths-light-736x320-z2-inline-search-expanded-full.png",
+      "bytes": 16365,
+      "sha256": "e27a54759d6cd41a35823f5c553262e03f502d19d07c4b00313c9238478e7816"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/after-widths-light-736x320-z2-menu-search-expanded-full.png",
+      "bytes": 13817,
+      "sha256": "8b7ecaffc50b31ca9e4c3bdba80e8aa5f6615e97b5d526296f390af0b94db085"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/empty-actions-preimplementation-classification-evidence.json",
+      "bytes": 929,
+      "sha256": "399fe2f925bb5dae4be45f1cc01f17503e895ece8227872a695c604fc5c1b131"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/empty-actions-preimplementation-classification-receipt.json",
+      "bytes": 3791,
+      "sha256": "e5c0ce92567158b5ccad80e9e86a1ae04be335ba6d985f002d303158bb3cdb6b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-component-diagnostic-summary.json",
+      "bytes": 844,
+      "sha256": "698f18eb927a42568dada211d1adace076795c5ee45878496c1ce3d2e3c201f4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-component-diagnostics-first-manifest.json",
+      "bytes": 149665,
+      "sha256": "3d4dd0cb64191b477e5d5509b23e95dba4687ebf67981678b4a61e893266f32b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-component-diagnostics-first.zip",
+      "bytes": 15316219,
+      "sha256": "0ca178cf6311d92d65972a41c365ac98454e60f396e21451b96c7290f0d9e0fe"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-full-dev-failures-first.zip",
+      "bytes": 13488607,
+      "sha256": "564cd55b5d088478d2d35998daa834d0ca619070977e109da2d6625a3e9c3283"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-full-failures-first-manifest.json",
+      "bytes": 85884,
+      "sha256": "b2199529c97fa8831bf67ec1822bad3891d18bf263d0f444463d30b5a4305026"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-full-generated-metrics-first.zip",
+      "bytes": 6252517,
+      "sha256": "93ca737e204956f02d5f3f3e684ab2b931ab719071d365ba49679c9189adbf2f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-full-preview-failures-first.zip",
+      "bytes": 77472221,
+      "sha256": "12a6f24bff4604ed807f6560ce3cc6a8040026248f7cd57213921f1498c550a3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-full-screenshot-comparison.json",
+      "bytes": 12198,
+      "sha256": "b41533764c1fb8d7eb230917bb77425e96104c82cb6c3fb93ccb87d668712cb4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-shell42-actual-output-first-manifest.json",
+      "bytes": 19543,
+      "sha256": "122c7b7e8d7bf803d5c20a3e1959726573cf80d660628289d4dec341d194d7dd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-shell42-actual-output-first.zip",
+      "bytes": 28718864,
+      "sha256": "ca93fcaf2bf0ebebdc6939b01cfbb080301493d4cdeb8d339799679b469d4f35"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-shell42-traces-first-manifest.json",
+      "bytes": 863,
+      "sha256": "ab0f70f8a8049ed1d295c9e44ee1f822ef47a0e98a3f23b2d1228a94eb33dfae"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/final-original-shell42-traces-first.zip",
+      "bytes": 22,
+      "sha256": "8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/horizontal-preimplementation-classification-evidence.json",
+      "bytes": 831,
+      "sha256": "d54a8cd241aaadf299e4d66bd801b8d9f1105046fce60b8aae4886124d5c83e0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/horizontal-preimplementation-classification-receipt.json",
+      "bytes": 3791,
+      "sha256": "19a07b2160573e7ee8b2a8d12424d0e9cc7576312a3e12bc0644fd41e829e6e5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/original-explicit-attempts-raw-manifest.json",
+      "bytes": 593853,
+      "sha256": "4284bd661be3756568f72e9e21bb80d666abd5f3cb6b7184068e031b737f10d1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/original-explicit-attempts-raw.zip",
+      "bytes": 58575864,
+      "sha256": "6214fb73f2db7238f1557a867bb89fb4ff10f8ddb627a78acf04adf1f87b6c4a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/original-explicit-full-failures-manifest.json",
+      "bytes": 77413,
+      "sha256": "6154b6ebafa4981205264ab1b182f888d774ac930728e1b9d9d6eda191cadcf5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/original-explicit-full-failures.zip",
+      "bytes": 93314397,
+      "sha256": "819d15bdcd14e53dbdebfa971ce82ba0442d027e02f1196282e5b819a1f436da"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/original-explicit-full-screenshot-comparison.json",
+      "bytes": 12212,
+      "sha256": "4f3ebbe0b3278c04508a816af00b730f6bd7b4c4b7c6712e3ac599dc1608ff0e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/original-frozen-evidence-custody.json",
+      "bytes": 461,
+      "sha256": "c2fefdeec72b27be669b1005725efafd14ab4fddc5f44fc5378b3535e1e31e79"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/preimplementation-classification-evidence.json",
+      "bytes": 757,
+      "sha256": "e2fceec69d33ed9aed22ea15f2aef1a0c87dd536f1f25fa03674c5d4eba5337f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/preimplementation-classification-receipt.json",
+      "bytes": 3791,
+      "sha256": "bb409cf9ec2f1b118ab1c7bd4b266b43a557435ddb3bf074c16237f4e12a0053"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/prepared-draft-pr-body.md",
+      "bytes": 3227,
+      "sha256": "fa038d059020b1001be5e303d2882dc716c8a7e46169e93b992bde67e9e630c9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/reserved-light-667x375-z2-inline-search-expanded-full.png",
+      "bytes": 15495,
+      "sha256": "44a689882053c2235e77188015d473048f1b170828e691c92973be9f670aff9e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/reserved-light-736x264-z2-menu-collapsed-full.png",
+      "bytes": 11758,
+      "sha256": "0c57f5076e208a78a9d688c98ea573ed7d86459d43a3068bbbf7d0fbaa1e676b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/reserved-light-736x265-z2-menu-collapsed-full.png",
+      "bytes": 11991,
+      "sha256": "c21b0fa3fb1ced3d36ca0916e2fc1136d306416ac35c7e9f64f4565648943d8d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/reserved-light-736x320-z2-bottom-collapsed-full.png",
+      "bytes": 15617,
+      "sha256": "250df9ea8acb23ff98578333df45503d1b59005c6527e45d308ed9affe1e3511"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/reserved-light-736x320-z2-inline-search-expanded-full.png",
+      "bytes": 15754,
+      "sha256": "cd08b00d4b05578e97992f7521814e358224697c8dfe2db396cd6aa4296f1393"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/reserved-light-736x320-z2-menu-search-expanded-full.png",
+      "bytes": 13828,
+      "sha256": "4428a1e175d60b53c9bbe452db4cd8ec38da1690d49e4e066d74d359b7389a40"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/width-preimplementation-classification-evidence.json",
+      "bytes": 903,
+      "sha256": "20e7ea9d78a468d78ca440e43b1d92f731f4a935968d8e54791601bb26270e72"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/width-preimplementation-classification-receipt.json",
+      "bytes": 3791,
+      "sha256": "c2c844fe2ea2f018c268c83316c9cc17aa4b2189c0e64b81a2382ffe6e35f1c0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/width-repair-first-diagnostics-manifest.json",
+      "bytes": 150764,
+      "sha256": "381dc233e30d66ed0aecdecefe682f114cc35be7338ec0fbf1436ee6f85de5a6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/width-repair-first-diagnostics-metadata-clarification.json",
+      "bytes": 702,
+      "sha256": "9bc4343d92e40c52d5afb1969d0cbb7aa21ea111a92709011f67adb27d09ae13"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/width-repair-first-diagnostics.zip",
+      "bytes": 15309516,
+      "sha256": "ec8999db6641c7eeb4434af378decba371af249612b3ea72d548a79f9d91a7ff"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/width-retry-preimplementation-classification-evidence.json",
+      "bytes": 903,
+      "sha256": "20e7ea9d78a468d78ca440e43b1d92f731f4a935968d8e54791601bb26270e72"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/width-retry-preimplementation-classification-receipt.json",
+      "bytes": 3791,
+      "sha256": "c2c844fe2ea2f018c268c83316c9cc17aa4b2189c0e64b81a2382ffe6e35f1c0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/widths-initial-hook-failure-and-source-custody.json",
+      "bytes": 741,
+      "sha256": "a2f7f6f40559260b55dfea1c8429dcf4e407c83261c8621c22eb908438637bb0"
+    }
+  ],
+  "entryCount": 172,
+  "rawZIPEntryCount": 5125,
+  "firstFailurePolicy": "All raw logs/screenshots/traces and initial export/environment/whitespace failures retained; no retry/timeout/golden/criterion changes",
+  "evidenceCommitNote": "This manifest seals byte custody against exact tested d182 product and prior source commits. Later evidence head is not relabeled as a tested/runtime-qualified source."
+}

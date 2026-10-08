@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "ensure:icons"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-widths-setup-0-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "ensure:wasm"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-widths-setup-1-first.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "build:theme"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-widths-setup-2-first.log"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/prepare-visual-runtime.mjs"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-widths-setup-3-first.log"
+  }
+]

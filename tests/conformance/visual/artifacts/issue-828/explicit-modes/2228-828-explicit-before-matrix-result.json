@@ -1,0 +1,4 @@
+{
+  "exitCode": 0,
+  "command": "node .tmp/issue-828-explicit/capture-matrix.mjs before"
+}

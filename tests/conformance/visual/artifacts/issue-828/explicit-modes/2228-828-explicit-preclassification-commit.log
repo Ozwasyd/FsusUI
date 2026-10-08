@@ -1,0 +1,5 @@
+→ No staged files match any configured task.
+[fix/828-explicit-landscape-modes-20261008 b2ff3357] docs(viewport): freeze explicit landscape layout classification
+ 2 files changed, 93 insertions(+)
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/preimplementation-classification-evidence.json
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/preimplementation-classification-receipt.json

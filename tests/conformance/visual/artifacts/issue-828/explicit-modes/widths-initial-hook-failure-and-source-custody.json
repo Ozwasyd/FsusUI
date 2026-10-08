@@ -1,0 +1,11 @@
+{
+  "operation": "Initial width preclassification commit followed by owned CSS commit",
+  "observedExitCodes": [
+    1,
+    1
+  ],
+  "actualFailure": "Husky invoked a different pnpm executable; automatic dependency-status installation failed ENOENT creating /home/agent/.local/share/pnpm. Original tool output retained in session transcript.",
+  "sourceWasNotCommitted": true,
+  "recovery": "Saved only own CSS patch, restored those two owned files to2f76110, verified classification schema/digests on clean source again, committed classification293cac70 under configured pnpm10.33/store, then reapplied own CSS and committedb0a43ba5. Original validation receipt and firstfailed install log preserved.",
+  "notQualificationEvidence": true
+}

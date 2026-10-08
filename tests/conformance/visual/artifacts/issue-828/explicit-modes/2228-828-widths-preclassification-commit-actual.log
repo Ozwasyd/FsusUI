@@ -1,0 +1,7 @@
+→ No staged files match any configured task.
+[fix/828-explicit-landscape-widths-20261008 293cac70] docs(828): freeze width repair classification before CSS reapplication
+ 4 files changed, 186 insertions(+)
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/width-preimplementation-classification-evidence.json
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/width-preimplementation-classification-receipt.json
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/width-retry-preimplementation-classification-evidence.json
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/width-retry-preimplementation-classification-receipt.json

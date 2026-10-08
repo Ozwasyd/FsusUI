@@ -1,0 +1,6 @@
+{
+  "manifestSHA256": "381dc233e30d66ed0aecdecefe682f114cc35be7338ec0fbf1436ee6f85de5a6",
+  "sourceCandidate": "b0a43ba59ff3be6a423ab950822960042851caa5",
+  "clarification": "The initial runner recorded head b0 at preview start. The42-test CLI did not independently sample GitHEAD per command. A metadata-only classification commit arrived while this runner was active; no product, fixture, assertion, baseline or runtime build changed. Treat42 as actual original tests of the original b0 production build, not proof of independently sampled metadata head. Final d182 runner explicitly records its candidate per command.",
+  "classificationMetadataCommit": "b04b49b3de690181c6c223cd629b53333390215d"
+}

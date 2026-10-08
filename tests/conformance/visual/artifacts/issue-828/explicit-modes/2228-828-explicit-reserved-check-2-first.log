@@ -1,0 +1,9 @@
+
+ RUN  v4.1.5 /workspace/FsusUI-828-explicit-modes
+
+
+ Test Files  3 passed (3)
+      Tests  67 passed (67)
+   Start at  12:52:45
+   Duration  9.64s (transform 3.80s, setup 215ms, import 4.80s, tests 2.41s, environment 1.82s)
+

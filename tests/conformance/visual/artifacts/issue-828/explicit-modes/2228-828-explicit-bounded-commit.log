@@ -1,0 +1,3 @@
+→ No staged files match any configured task.
+[fix/828-explicit-landscape-modes-20261008 a8c2b82c] fix(public-shell): preserve intrinsic primary width and bounded search
+ 2 files changed, 30 insertions(+)

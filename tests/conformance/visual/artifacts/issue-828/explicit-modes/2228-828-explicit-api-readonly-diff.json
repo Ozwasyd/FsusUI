@@ -1,0 +1,40 @@
+[
+  {
+    "path": "$.source.inputTreeHash",
+    "before": "e5565098f12cbc55ea2a70e74222f27730303338c25a27c47c7d8b65c1dcd7e0",
+    "after": "0d8738d9d91b0771b38421495c00a442b1e267985f57969910df744269c1db66"
+  },
+  {
+    "path": "$.source.outputHash",
+    "before": "eac884f1591a418a3c23ecbdecad77a5451f5d9ab744e04f7e4addd0324b6910",
+    "after": "c81389f371314d120d07e515806b8fff067562b184ab8d46ca9048c6e20cab2e"
+  },
+  {
+    "path": "$.cssVariables.418.files.9",
+    "before": "vue/packages/theme-chalk/src/public-shell.scss",
+    "after": "vue/packages/theme-chalk/src/scrollbar.scss"
+  },
+  {
+    "path": "$.cssVariables.418.files.10",
+    "before": "vue/packages/theme-chalk/src/scrollbar.scss",
+    "after": "vue/packages/theme-chalk/src/task-page-header.scss"
+  },
+  {
+    "path": "$.cssVariables.418.files.11",
+    "before": "vue/packages/theme-chalk/src/task-page-header.scss"
+  },
+  {
+    "path": "$.cssVariables.419.files.10",
+    "before": "vue/packages/theme-chalk/src/scrollbar.scss",
+    "after": "vue/packages/theme-chalk/src/public-shell.scss"
+  },
+  {
+    "path": "$.cssVariables.419.files.11",
+    "before": "vue/packages/theme-chalk/src/task-page-header.scss",
+    "after": "vue/packages/theme-chalk/src/scrollbar.scss"
+  },
+  {
+    "path": "$.cssVariables.419.files.12",
+    "after": "vue/packages/theme-chalk/src/task-page-header.scss"
+  }
+]

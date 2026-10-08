@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "ensure:icons"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-before-ensure-icons.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "ensure:wasm"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-before-ensure-wasm.log"
+  },
+  {
+    "command": [
+      "pnpm",
+      "run",
+      "build:theme"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-before-build-theme.log"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/prepare-visual-runtime.mjs"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-before-scripts-prepare-visual-runtime.mjs.log"
+  }
+]

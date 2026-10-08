@@ -1,0 +1,19 @@
+[
+  {
+    "command": [
+      "node",
+      ".tmp/issue-828-explicit/capture-matrix.mjs",
+      "after-bounded"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-after-bounded-matrix-first.log"
+  },
+  {
+    "command": [
+      "node",
+      ".tmp/issue-828-explicit/probe-interactions.mjs"
+    ],
+    "exitCode": 0,
+    "log": "/tmp/2228-828-explicit-interactions-first.log"
+  }
+]

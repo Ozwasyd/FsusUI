@@ -1,0 +1,5 @@
+→ No staged files match any configured task.
+[fix/828-explicit-landscape-widths-20261008 b04b49b3] docs(828): classify empty action wrapper spacing before CSS edit
+ 2 files changed, 93 insertions(+)
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/empty-actions-preimplementation-classification-evidence.json
+ create mode 100644 tests/conformance/visual/artifacts/issue-828/explicit-modes/empty-actions-preimplementation-classification-receipt.json

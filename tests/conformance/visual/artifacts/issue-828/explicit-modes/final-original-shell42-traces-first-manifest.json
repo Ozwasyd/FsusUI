@@ -1,0 +1,21 @@
+{
+  "candidate": "d182cf93cbb852006047bc2b7eea0ba28daa4955",
+  "productSource": "69705ac1ca5d3c07fa955486646a1861ba5bb50a",
+  "command": "pnpm exec playwright test --config=vue/playwright.config.ts vue/tests/visual/public-shell-mobile-nav.spec.ts vue/tests/visual/public-shell-desktop-search.spec.ts --workers=1 --trace=on --output=/tmp/2228-828-empty-shell42-first",
+  "exitCode": 0,
+  "testsPassed": 42,
+  "projects": [
+    "desktop-light",
+    "mobile-light",
+    "desktop-dark",
+    "mobile-dark"
+  ],
+  "traceCount": 0,
+  "archive": "final-original-shell42-traces-first.zip",
+  "size": 22,
+  "sha256": "8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85",
+  "entryCount": 0,
+  "entries": [],
+  "qualificationEligible": false,
+  "reason": "Actual original component shell42 source tests, not full suite/live Blog/device/package qualification"
+}
