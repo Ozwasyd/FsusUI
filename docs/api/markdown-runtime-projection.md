@@ -203,18 +203,18 @@ renderer owns parsing, the URL/feature gateway and its existing safe output
 sink. It is read-only derived presentation and never enters host source,
 transactions or history. Source mode continues to show the exact directive.
 
-Automatic `ElMarkdownEditor` rendering still requires its reserved production
-call-site integration. The embed helpers expose verified Markdown, but this
-candidate does not change `markdown-editor.vue`. The exact owner patch is
-[`markdown-embed-editor-owner-integration.patch`](../../vue/tests/consumer-install/markdown-embed-editor-owner-integration.patch).
-It proposes request digests, cancellation, current host context and both existing
-embed renderer locations, preserving the original metadata fallback. Applying
-that patch, validating the real editor fixture and the consumer's authorized
-payload source, and independent UX acceptance remain required before claiming
-end-to-end completion. The companion
+`ElMarkdownEditor` generates projection request digests and presents prepared
+Markdown through its existing renderer in Live, Split and Preview. It cancels
+pending work on document, revision or provider replacement and disposal;
+document identity is captured before asynchronous hashing. Metadata-only
+providers retain the escaped title/excerpt path, including when Web Crypto is
+unavailable; an undigested request cannot authorize projected content. Source
+mode retains the exact directive. The editor does not supply a materializer or
+target-version authority: the consumer must provide real authorized facts to
+`prepareMarkdownEmbedResult`. The companion
 [`markdown-embed-editor-projection-integration.test.ts`](../../vue/tests/consumer-install/markdown-embed-editor-projection-integration.test.ts)
-mounts the real public editor without mocks and deliberately remains RED until
-that reserved integration is completed.
+mounts the real public editor without mocks. Product payload integration and
+independent rendered UX acceptance remain separate requirements.
 
 The portable public regression is
 [`markdown-embed-projection-public.test.ts`](../../vue/tests/consumer-install/markdown-embed-projection-public.test.ts).

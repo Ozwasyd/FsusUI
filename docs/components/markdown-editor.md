@@ -372,8 +372,11 @@ identity.
 `embed-provider` is the consumer-owned resolution boundary for valid
 `::embed[...]` projection nodes. The editor supplies an identity-, revision-,
 node-, target-, mode-, and version-bound request. It commits only a matching
-result and treats late or mismatched results as stale. Provider excerpts are
-rendered as escaped text, never `innerHTML`; the directive remains the only host
+result and treats late or mismatched results as stale. Prepared Markdown projections
+use the existing read-only renderer and host base URL, CSP and feature settings;
+the consumer supplies authorized bytes and the current target version through
+[`prepareMarkdownEmbedResult`](../api/markdown-runtime-projection.md).
+Metadata-only provider excerpts are rendered as escaped text; the directive remains the only host
 source/history authority. Source mode displays the exact directive. Live keeps
 the textarea as its only input surface and places the controlled read-only embed
 regions below it; Split and Preview interleave those regions with the normal
