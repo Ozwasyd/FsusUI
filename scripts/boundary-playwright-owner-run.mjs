@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* global fetch, setTimeout */
+/* global AbortSignal, URL, clearTimeout, fetch, setTimeout */
 
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -61,20 +61,63 @@ const runPrepare = (runtimeDir, checkOnly = false) => {
   }
 }
 
-const waitForServer = async (url, timeoutMs = 90_000) => {
-  const deadline = Date.now() + timeoutMs
-  let lastError
-  while (Date.now() < deadline) {
-    try {
-      const response = await fetch(url)
-      if (response.status === 200) return true
-      lastError = new Error(`server responded ${response.status}`)
-    } catch (error) {
-      lastError = error
+export const waitForBoundaryServer = async (
+  server,
+  url,
+  timeoutMs = 90_000,
+) => {
+  const address = new URL(url)
+  const ready = await new Promise((resolvePromise, reject) => {
+    const finish = (error, message) => {
+      clearTimeout(timer)
+      server.off('error', onError)
+      server.off('exit', onExit)
+      server.off('message', onMessage)
+      if (error) reject(error)
+      else resolvePromise(message)
     }
-    await new Promise((resolvePromise) => setTimeout(resolvePromise, 500))
+    const onError = (error) => finish(error)
+    const onExit = (code, signal) =>
+      finish(
+        new Error(
+          `boundary server exited before binding ${url} (${signal ?? code})`,
+        ),
+      )
+    const onMessage = (message) => {
+      if (message?.type !== 'visual-runtime-ready') return
+      if (
+        message.host !== address.hostname ||
+        message.port !== Number(address.port) ||
+        typeof message.fingerprint !== 'string' ||
+        !message.fingerprint
+      ) {
+        finish(
+          new Error(`boundary server bind acknowledgement mismatched ${url}`),
+        )
+        return
+      }
+      finish(null, message)
+    }
+    const timer = setTimeout(
+      () => finish(new Error(`boundary server bind timeout: ${url}`)),
+      timeoutMs,
+    )
+    server.once('error', onError)
+    server.once('exit', onExit)
+    server.on('message', onMessage)
+    if (server.exitCode !== null || server.signalCode !== null) {
+      onExit(server.exitCode, server.signalCode)
+    }
+  })
+  const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) })
+  if (
+    server.exitCode !== null ||
+    server.signalCode !== null ||
+    response.status !== 200 ||
+    response.headers.get('X-Fsus-Visual-Runtime') !== ready.fingerprint
+  ) {
+    fail(`boundary server ownership/readiness validation failed: ${url}`)
   }
-  throw lastError ?? new Error(`server readiness timeout: ${url}`)
 }
 
 async function main(argv = process.argv.slice(2)) {
@@ -170,9 +213,11 @@ async function main(argv = process.argv.slice(2)) {
         `--port=${serverPort}`,
         `--runtime-dir=${runtimeDir}`,
       ],
-      { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] },
+      { cwd: root, stdio: ['ignore', 'pipe', 'pipe', 'ipc'] },
     )
-    await waitForServer(serverUrl)
+    server.stdout.pipe(process.stdout)
+    server.stderr.pipe(process.stderr)
+    await waitForBoundaryServer(server, serverUrl)
     for (const cell of cells) {
       const result = await runBoundaryCell(ownerId, cell.id, group, {
         evidenceDir,
