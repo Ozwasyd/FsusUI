@@ -1,0 +1,77 @@
+{
+  "qualificationEligible": false,
+  "entries": [
+    {
+      "path": "/tmp/2228-825-touch-8fe-agents.txt",
+      "name": "2228-825-touch-8fe-agents.txt",
+      "bytes": 8053,
+      "sha256": "8b4a9edb311b50e6c036658c92db7dadf7d71a196039f6da3484933647370e89"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-diff-observation.json",
+      "name": "2228-825-touch-8fe-diff-observation.json",
+      "bytes": 3497,
+      "sha256": "1698f55c5622b8915175397b864013ce5e79c1f41f0b9a5ef5220a9833de5788"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-original-browser-first.log",
+      "name": "2228-825-touch-8fe-original-browser-first.log",
+      "bytes": 162,
+      "sha256": "4da6a3fb0b49d2a31dc4a7435cb54110a79eaf9dadc2bfdc71336bbde318f4f4"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-original.patch",
+      "name": "2228-825-touch-8fe-original.patch",
+      "bytes": 16537,
+      "sha256": "50ec2f26761a1cb92f1f640e0f32b1b24bf194ca0384d9897c5d2902a649a0c7"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-page-identity.json",
+      "name": "2228-825-touch-8fe-page-identity.json",
+      "bytes": 626,
+      "sha256": "929e4df31f2996fb38b72428fba7b39bee268865622b7853c9bbd36ef33231eb"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-setup-0-first.log",
+      "name": "2228-825-touch-8fe-setup-0-first.log",
+      "bytes": 5342,
+      "sha256": "fb782276dc75c34abc3fc32496310b6caadfe10b53fbd9d069e053c2c1f996c7"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-setup-1-first.log",
+      "name": "2228-825-touch-8fe-setup-1-first.log",
+      "bytes": 1332,
+      "sha256": "835a6a4c3344b0c31d358971c9e8756d64e000f67560e0b88ba06a521594ac7d"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-setup-2-first.log",
+      "name": "2228-825-touch-8fe-setup-2-first.log",
+      "bytes": 15141,
+      "sha256": "3527640efba1b35d4215240302cfeb042eaf15b6a6cd22d093ce993732c9fb87"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-setup-3-first.log",
+      "name": "2228-825-touch-8fe-setup-3-first.log",
+      "bytes": 6024,
+      "sha256": "d5fbd336495b91d52cd7ffae7a74c3065d2abd00eacf14c62a1d61d62d8191dc"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-setup-results.json",
+      "name": "2228-825-touch-8fe-setup-results.json",
+      "bytes": 698,
+      "sha256": "334ca7984c421f5542eb2d4ccda8fc5935cec3c0d6101fbeed97e6b3afa0aff2"
+    },
+    {
+      "path": "/tmp/2228-825-touch-8fe-trace-inspection.json",
+      "name": "2228-825-touch-8fe-trace-inspection.json",
+      "bytes": 1865,
+      "sha256": "330c27dbf975570ec7103ea1e17e2a2286f6af84d1003fd97f19ea8cbc9a1980"
+    },
+    {
+      "path": "/tmp/2228-825-touch-ui856-observed.json",
+      "name": "2228-825-touch-ui856-observed.json",
+      "bytes": 16517,
+      "sha256": "818eb591881974ce2189dd03c32881f0736c797260b0ff5ee76810f8db131161"
+    }
+  ]
+}

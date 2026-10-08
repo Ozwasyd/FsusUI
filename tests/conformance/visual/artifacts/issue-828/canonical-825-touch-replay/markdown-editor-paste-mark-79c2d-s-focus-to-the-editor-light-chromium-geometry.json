@@ -1,0 +1,35 @@
+{
+  "theme": "light",
+  "triggerGeometry": [
+    {
+      "clientWidth": 200,
+      "directlyTappable": true,
+      "scrollLeft": 0,
+      "scrollWidth": 388,
+      "siblingLayout": true,
+      "targetHeight": 44,
+      "targetWidth": 112,
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "visibleHeight": 44,
+      "visibleWidth": 112
+    },
+    {
+      "clientWidth": 130,
+      "directlyTappable": true,
+      "scrollLeft": 0,
+      "scrollWidth": 388,
+      "siblingLayout": true,
+      "targetHeight": 44,
+      "targetWidth": 112,
+      "viewport": {
+        "height": 640,
+        "width": 320
+      },
+      "visibleHeight": 44,
+      "visibleWidth": 112
+    }
+  ]
+}

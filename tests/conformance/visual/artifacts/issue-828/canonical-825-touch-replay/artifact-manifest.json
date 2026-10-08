@@ -1,0 +1,101 @@
+{
+  "qualificationEligible": false,
+  "reviewStatus": "UI856 HOLD",
+  "replaySource": "8fe088d906eb08407334e274cff7e1ba43523fd6",
+  "preservedPriorHead": "bdb4126b852a03db3d387c3396f4129f08806405",
+  "browserCommandExitCode": 0,
+  "passed": 9,
+  "conditionalSkipped": 1,
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/README.md",
+      "bytes": 8863,
+      "sha256": "061e440e1689c047d62db686931f4bfea241ef1520d26aa8df8d9880ffed3e27"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/markdown-editor-paste-mark-48de8-ns-focus-to-the-editor-dark-chromium-after-import.jpeg",
+      "bytes": 14538,
+      "sha256": "90c0303a826505f3e7a139a41b43df9f232f1bb060942adae0a55884833c9456"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/markdown-editor-paste-mark-48de8-ns-focus-to-the-editor-dark-chromium-geometry.json",
+      "bytes": 702,
+      "sha256": "197549e89ed23336c87727ee4d54904c15fff971e5d728cd45eaff411052512d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/markdown-editor-paste-mark-79c2d-s-focus-to-the-editor-light-chromium-after-import.jpeg",
+      "bytes": 15330,
+      "sha256": "64053e85d179adce266516f67b9c6b7f437676e1ebc962b7d4f8ff8818491ad2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/markdown-editor-paste-mark-79c2d-s-focus-to-the-editor-light-chromium-geometry.json",
+      "bytes": 703,
+      "sha256": "ac4afd39d6430044c4578b6340b1c749651244f524337f44a7d52ac1876fef8e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/.last-run.json",
+      "bytes": 45,
+      "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-0b99d-s-only-the-explicit-command-chromium/trace.zip",
+      "bytes": 2753669,
+      "sha256": "cc7f889cd3eb7cd981933b4fa0107dd79e33200e0bba67de200aff13aa2122c8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-24458-cit-to-assistive-technology-chromium/trace.zip",
+      "bytes": 1228413,
+      "sha256": "b3d2db549e134c7c25a0ee80383d32055e5cf93e7f78a3a2d9525e985c747271"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-4464e-cit-to-assistive-technology-chromium/trace.zip",
+      "bytes": 1311402,
+      "sha256": "6e426a3518223f3d78576fe378e50ad93d72f8d498f66e92010c10f648d6e727"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-48de8-ns-focus-to-the-editor-dark-chromium/trace.zip",
+      "bytes": 1888320,
+      "sha256": "23db814b1cbae269c58c9a3d4bf085c5a79a01019633647dd05bdaeea2708b95"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-6a872-ion-active-an-explicit-gate-chromium/trace.zip",
+      "bytes": 1306440,
+      "sha256": "017daf5a1f137e977db8650077dc33bdcc577020dbcca362959b08b18baa63cd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-6ccbb-cit-to-assistive-technology-chromium/trace.zip",
+      "bytes": 1229030,
+      "sha256": "b337200d1e950bf9d7ad3e80a1d019330075d8bf128d5e83908c0d00ad9a8399"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-79c2d-s-focus-to-the-editor-light-chromium/trace.zip",
+      "bytes": 1900782,
+      "sha256": "4426b51abf811770ada999266f71c28b76f257ced41d15410e43d67df27fc943"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-858fe-urns-selection-for-one-undo-chromium/trace.zip",
+      "bytes": 2010616,
+      "sha256": "9632ba6b812fecded8805c6a72991a2d4c2537d04bae4ac9b086f82e6f63b723"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-a4d0b--inserting-at-the-new-caret-chromium/trace.zip",
+      "bytes": 2085644,
+      "sha256": "9f9c78c57ac801540cd9ec7e1dda06cfda4d5ad0f49b89ba2b9a8370ef15453b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-browser-output/markdown-editor-paste-mark-d89e0--and-accessibility-evidence-chromium/trace.zip",
+      "bytes": 2622,
+      "sha256": "23158db05c9ec85effc59d894f90e986ad26f19838086b0dce0ad0d5c2168b78"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-contexts-index.json",
+      "bytes": 2830,
+      "sha256": "48ebd10855ac1d7fb1fc330d70fa825c737d984c441a48554a337d47e5185529"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-825-touch-replay/original-contexts.zip",
+      "bytes": 19819,
+      "sha256": "d61ba8267fb040451cd8ba40a9933907348b1f547a4c581ecb684174d6491ee2"
+    }
+  ]
+}
