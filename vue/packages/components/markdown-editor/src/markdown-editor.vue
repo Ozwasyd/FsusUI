@@ -884,11 +884,11 @@
       :class="ns.e('property-surface')"
       role="dialog"
       :aria-label="
-        activeAnchor
+        anchorSurfaceTarget?.intent === 'edit'
           ? localeText.contextual.editAnchor
           : localeText.contextual.insertAnchor
       "
-      :data-markdown-anchor-id="activeAnchorNodeId"
+      :data-markdown-anchor-id="anchorSurfaceNodeId"
       :data-markdown-anchor-epoch="documentIdentity.epoch"
       @submit.prevent="applyAnchorProperties"
       @keydown.esc.prevent.stop="closeContextualSurface()"
@@ -906,10 +906,10 @@
       <p v-if="contextualError" role="alert">{{ contextualError }}</p>
       <footer :class="ns.e('property-actions')">
         <button type="submit">{{ localeText.contextual.apply }}</button>
-        <button v-if="activeAnchor" type="button" @click="copyActiveAnchor">
+        <button v-if="anchorSurfaceTarget?.intent === 'edit'" type="button" @click="copyActiveAnchor">
           {{ localeText.contextual.copy }}
         </button>
-        <button v-if="activeAnchor" type="button" @click="removeActiveAnchor">
+        <button v-if="anchorSurfaceTarget?.intent === 'edit'" type="button" @click="removeActiveAnchor">
           {{ localeText.contextual.removeAnchor }}
         </button>
         <button type="button" @click="closeContextualSurface()">
@@ -2846,6 +2846,16 @@ const linkLabelDraft = ref('')
 const linkDestinationDraft = ref('')
 const linkTitleDraft = ref('')
 const anchorIdDraft = ref('')
+const anchorSurfaceTarget = ref<{
+  readonly intent: 'insert' | 'edit'
+  readonly documentId: string
+  readonly selection: MarkdownEditorSelection
+  readonly nodeId: string | undefined
+  readonly anchor: MarkdownProjectedAnchor | undefined
+} | null>(null)
+watch(contextualSurface, (surface) => {
+  if (surface !== 'anchor-properties') anchorSurfaceTarget.value = null
+}, { flush: 'sync' })
 const currentSyntaxNode = computed(() => {
   const syntax = editorProjection.value
     ? resolveMarkdownEditorSyntaxContext(
@@ -2872,8 +2882,8 @@ const activeAnchor = computed<MarkdownProjectedAnchor | undefined>(() => {
     (anchor) => anchor.projectionId === syntax.id,
   )
 })
-const activeAnchorNodeId = computed(
-  () => activeAnchor.value?.projectionId ?? '',
+const anchorSurfaceNodeId = computed(
+  () => anchorSurfaceTarget.value?.anchor?.projectionId ?? '',
 )
 const closeContextualSurface = async (restore = true) => {
   contextualSurface.value = null
@@ -2893,7 +2903,17 @@ const openContextualSurface = async (
     linkDestinationDraft.value = link.url ?? ''
     linkTitleDraft.value = link.title ?? ''
   } else {
-    anchorIdDraft.value = activeAnchor.value?.id ?? ''
+    const anchor = activeAnchor.value
+    // Bind intent and target once; selection-only transactions do not advance
+    // the source revision and must not turn this form into a different action.
+    anchorSurfaceTarget.value = Object.freeze({
+      intent: anchor ? 'edit' : 'insert',
+      documentId: documentIdentity.id,
+      selection: Object.freeze({ ...editorSelection.value }),
+      nodeId: currentSyntaxNode.value?.id,
+      anchor,
+    })
+    anchorIdDraft.value = anchor?.id ?? ''
   }
   contextualSurface.value = surface
   await nextTick()
@@ -2903,6 +2923,24 @@ const contextualSurfaceRef = ref<HTMLElement | null>(null)
 const contextualSurfaceIsCurrent = () =>
   contextualSurfaceEpoch.value === documentIdentity.epoch &&
   contextualSurfaceRevision.value === editorRevision.value
+const anchorSurfaceIsCurrent = () => {
+  const target = anchorSurfaceTarget.value
+  if (
+    !target ||
+    contextualSurface.value !== 'anchor-properties' ||
+    !contextualSurfaceIsCurrent() ||
+    target.documentId !== documentIdentity.id ||
+    target.nodeId !== currentSyntaxNode.value?.id
+  ) return false
+  if (target.intent === 'edit') {
+    return !!target.anchor &&
+      activeAnchor.value?.projectionId === target.anchor.projectionId &&
+      editorProjection.value?.resolve(target.anchor.projectionId).status === 'current'
+  }
+  return !activeAnchor.value &&
+    target.selection.start === editorSelection.value.start &&
+    target.selection.end === editorSelection.value.end
+}
 const applyLinkProperties = () => {
   const link = activeLink.value
   if (!link || !contextualSurfaceIsCurrent()) {
@@ -2999,22 +3037,23 @@ const openActiveLink = () => {
   window.open(validation.open.href, validation.open.target, validation.open.rel)
 }
 const applyAnchorProperties = () => {
-  if (!contextualSurfaceIsCurrent()) {
+  const target = anchorSurfaceTarget.value
+  if (!target || !anchorSurfaceIsCurrent()) {
     contextualError.value = localeText.value.results.stale
     return
   }
   let transaction: MarkdownEditorTransaction
   try {
-    transaction = activeAnchor.value
+    transaction = target.anchor
       ? planMarkdownAnchorEdit(
           editorValue.value,
-          activeAnchor.value,
+          target.anchor,
           anchorIdDraft.value,
           editorProjection.value,
         )
       : planMarkdownAnchorInsert(
           editorValue.value,
-          editorSelection.value.start,
+          target.selection.start,
           anchorIdDraft.value,
           { projection: editorProjection.value },
         )
@@ -3029,8 +3068,11 @@ const applyAnchorProperties = () => {
   if (result.accepted) void closeContextualSurface()
 }
 const removeActiveAnchor = () => {
-  const anchor = activeAnchor.value
-  if (!anchor || !contextualSurfaceIsCurrent()) return
+  const anchor = anchorSurfaceTarget.value?.anchor
+  if (!anchor || !anchorSurfaceIsCurrent()) {
+    contextualError.value = localeText.value.results.stale
+    return
+  }
   const result = dispatchTransaction({
     ...planMarkdownAnchorRemove(
       anchor,
@@ -3042,8 +3084,11 @@ const removeActiveAnchor = () => {
   if (result.accepted) void closeContextualSurface()
 }
 const copyActiveAnchor = async () => {
-  const anchor = activeAnchor.value
-  if (!anchor || !contextualSurfaceIsCurrent()) return
+  const anchor = anchorSurfaceTarget.value?.anchor
+  if (!anchor || !anchorSurfaceIsCurrent()) {
+    contextualError.value = localeText.value.results.stale
+    return
+  }
   try {
     await navigator.clipboard.writeText(planMarkdownAnchorCopy(anchor, 'exact'))
   } catch {
