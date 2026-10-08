@@ -1,7 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { ElMarkdownEditor, resolveMarkdownEditorLocaleText } from '../../../element-plus'
+import { ElMarkdownEditor, resolveMarkdownEditorLocaleText, type MarkdownEditorTransactionEvent } from '../../../element-plus'
 import { createMarkdownEditorProjection, stabilizeMarkdownEditorProjection } from '../../../wasm/markdown-runtime'
 
 const source = 'First.\n\nOther ^existing\n\nLast ^another'
@@ -40,7 +40,7 @@ const fixture = () => {
   }
   const unchanged = () => {
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
-    expect(wrapper.emitted('transaction')?.every(([event]) =>
+    expect(wrapper.emitted<[MarkdownEditorTransactionEvent]>('transaction')?.every(([event]) =>
       event.transaction.changes.length === 0 && event.revision === 0 && event.value === source,
     )).toBe(true)
   }
