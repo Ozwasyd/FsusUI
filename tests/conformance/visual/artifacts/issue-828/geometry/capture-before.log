@@ -1,0 +1,13 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('.el-public-shell__mobile-search-cancel') to be visible[22m
+
+    at /workspace/FsusUI-828-geometry/.tmp/issue-828-geometry/capture-matrix.mjs:23:165 {
+  name: 'TimeoutError'
+}
+
+Node.js v24.19.0

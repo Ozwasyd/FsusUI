@@ -1,0 +1,15 @@
+strict mode: missing type "array" for keyword "maxItems" at "https://fsusui.dev/contracts/ux-acceptance-receipt.v2.schema.json#/allOf/0/then/properties/blockers" (strictTypes)
+strict mode: missing type "array" for keyword "minItems" at "https://fsusui.dev/contracts/ux-acceptance-receipt.v2.schema.json#/allOf/0/else/properties/blockers" (strictTypes)
+file:///workspace/FsusUI-828-geometry/scripts/check-fsusui-design-conformance.mjs:52
+  throw new FsusUIContractError(code, message)
+        ^
+
+FsusUIContractError: classification-receipt-binding
+    at fail (file:///workspace/FsusUI-828-geometry/scripts/check-fsusui-design-conformance.mjs:52:9)
+    at validateClassificationReceipt (file:///workspace/FsusUI-828-geometry/scripts/check-fsusui-design-conformance.mjs:363:5)
+    at validateFsusUIReceiptPair (file:///workspace/FsusUI-828-geometry/scripts/check-fsusui-design-conformance.mjs:441:26)
+    at async file:///workspace/FsusUI-828-geometry/[eval1]:4:1 {
+  code: 'classification-receipt-binding'
+}
+
+Node.js v24.19.0

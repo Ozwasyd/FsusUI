@@ -1,0 +1,7 @@
+# Issue #828: generated baseline reconciliation
+
+The original `pnpm run avalonia:baseline:check` failed (exit 1) on evidence head `9edce660ed1b71d094fa6acb2f0b7f1967808f63` because the Vue baseline did not record the owned PublicShell use of the existing spacing token. The original `pnpm run avalonia:baseline` producer succeeded (exit 0) using this candidate's own inputs; original recheck succeeded (exit 0).
+
+The generated JSON changes only capture commitSha, inputTreeHash, outputHash and the existing `--fsus-space-1.files` array adding `public-shell.scss`. The generated report changes only its capture commit. All other JSON fields compare identically after normalizing those three provenance fields and that one usage addition. Summary remains 93 modules, 228 components, 153 installable components, 3 directives, 4 services, 7 plugins, 495 CSS variables and 21 deprecated APIs. No declaration/value/semantic API or design authority was changed manually; no other candidate's baseline was copied. Changeset not needed for this generated metadata-only reconciliation.
+
+This fixes the local generated baseline gate; it does not qualify the failed visual/UX gates. Product source remains `5d6541461ccd96bd9edba0a223635920682a8e13`; [geometry evidence](../geometry/README.md), its immutable 1244-entry manifest, first WASM admission refusal and rejected UX receipt remain unchanged. PR #839/#844 are unchanged. Parent compositions with #825/#826 must regenerate their own input-bound baseline. No package publishing, deployment or merge occurred.

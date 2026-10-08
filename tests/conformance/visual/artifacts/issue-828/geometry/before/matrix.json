@@ -1,0 +1,206 @@
+{
+  "sourceHead": "cecf260475fab0a3efb3225f6d7aa39f96a0ae6b",
+  "runtimeManifest": {
+    "configurationFingerprint": "16c4cf3b39c236fe5e10e1269e8d40548c0a20e959ff1237b0f8f1902c386ad4",
+    "createdAt": "2026-10-08T05:12:55.416Z",
+    "groups": {
+      "icons": {
+        "artifactFingerprint": "87920d24537667a365a288fac867f8d2759c5b80eed3ec1fcc989f574c07332f",
+        "runtimePath": "artifacts/icons",
+        "sourceFingerprint": "8bc817f064f994d03c1a9efea3c50db91864e65054021d9e93c7c6a286060f86"
+      },
+      "wasm": {
+        "artifactFingerprint": "a03898265a37aaa28e98acd9d8ce4041ae099f13b3c884e0edb725558fd53b77",
+        "runtimePath": "artifacts/wasm",
+        "sourceFingerprint": "6f1165e005d0b4c75f6a04bfc0bd9f2a95b31fcc3afc1c9d021dc99b27af9def"
+      },
+      "demo": {
+        "artifactFingerprint": "7782e09ac66587363940a24ad489382f9796dd8e86a08166686dbebc3e35ab15",
+        "runtimePath": "demo-dist",
+        "sourceFingerprint": "ca83bc29c6eb9f475c1c6f172941a4b2804c288797321d6c5b8e73b56a333d09"
+      }
+    },
+    "paths": {
+      "demoDist": "demo-dist",
+      "runtimeRoot": ".tmp/visual-runtime"
+    },
+    "readiness": {
+      "groups": [
+        "icons",
+        "wasm",
+        "demo"
+      ],
+      "ready": true
+    },
+    "schemaVersion": 1,
+    "sourceFingerprint": "c8530892ad5dd84ab6ebf1371c6c9d069db027b8668a016abf0d2b7638940205",
+    "tools": {
+      "node": "24.19.0",
+      "playwright": "1.59.1",
+      "pnpm": "pnpm@10.33.0"
+    }
+  },
+  "criticalSHA256": "489ffa4cff3a3903dfb9d19e23cdbad084a8e24aa898e3602c5dbe58e35962e0",
+  "rows": [
+    {
+      "name": "light-844x390-z1-menu-collapsed-full",
+      "theme": "light",
+      "width": 844,
+      "height": 390,
+      "zoom": 1,
+      "nav": "menu",
+      "state": "collapsed",
+      "style": "full",
+      "geometry": {
+        "header": {
+          "x": 24,
+          "y": 24,
+          "width": 796,
+          "height": 61,
+          "display": "block"
+        },
+        "inner": {
+          "x": 24,
+          "y": 24,
+          "width": 796,
+          "height": 60,
+          "display": "block"
+        },
+        "primary": {
+          "x": 48,
+          "y": 32,
+          "width": 748,
+          "height": 44,
+          "display": "grid"
+        },
+        "toolbar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "display": "none"
+        },
+        "dock": null,
+        "chromeHeight": 61,
+        "controls": [
+          {
+            "tag": "A",
+            "classes": "el-public-shell__brand",
+            "label": "Field Notes",
+            "x": 48,
+            "y": 32,
+            "width": 129,
+            "height": 44
+          },
+          {
+            "tag": "A",
+            "classes": "el-public-shell__mobile-search-trigger",
+            "label": "Search",
+            "x": 654,
+            "y": 32,
+            "width": 72,
+            "height": 44
+          },
+          {
+            "tag": "SUMMARY",
+            "classes": "el-public-shell__mobile-nav-menu-trigger",
+            "label": "Menu",
+            "x": 734,
+            "y": 32,
+            "width": 62,
+            "height": 44
+          }
+        ],
+        "overflow": 0,
+        "bodyFont": "\"Google Sans\", \"Noto Sans SC\", \"Noto Sans TC\", \"Noto Sans JP\", ui-sans-serif, system-ui, sans-serif",
+        "activeStyles": 6
+      },
+      "budget": 132.60000000000002,
+      "headerWithinBudget": true,
+      "chromeWithinBudget": true,
+      "errors": [],
+      "screenshot": ".tmp/issue-828-geometry/before/light-844x390-z1-menu-collapsed-full.png",
+      "screenshotSHA256": "a5ace57e34acaf3d78de8c5891ec718519a5f84df1b269fda03d926b1f090969"
+    },
+    {
+      "name": "light-844x390-z1-menu-collapsed-critical-only",
+      "theme": "light",
+      "width": 844,
+      "height": 390,
+      "zoom": 1,
+      "nav": "menu",
+      "state": "collapsed",
+      "style": "critical-only",
+      "geometry": {
+        "header": {
+          "x": 8,
+          "y": 8,
+          "width": 828,
+          "height": 60,
+          "display": "block"
+        },
+        "inner": {
+          "x": 8,
+          "y": 8,
+          "width": 828,
+          "height": 60,
+          "display": "block"
+        },
+        "primary": {
+          "x": 32,
+          "y": 16,
+          "width": 780,
+          "height": 44,
+          "display": "grid"
+        },
+        "toolbar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "display": "none"
+        },
+        "dock": null,
+        "chromeHeight": 60,
+        "controls": [
+          {
+            "tag": "A",
+            "classes": "el-public-shell__brand",
+            "label": "Field Notes",
+            "x": 32,
+            "y": 16,
+            "width": 115.3125,
+            "height": 44
+          },
+          {
+            "tag": "A",
+            "classes": "el-public-shell__mobile-search-trigger",
+            "label": "Search",
+            "x": 685.234375,
+            "y": 16,
+            "width": 62.09375,
+            "height": 44
+          },
+          {
+            "tag": "SUMMARY",
+            "classes": "el-public-shell__mobile-nav-menu-trigger",
+            "label": "Menu",
+            "x": 755.328125,
+            "y": 16,
+            "width": 56.671875,
+            "height": 44
+          }
+        ],
+        "overflow": 0,
+        "bodyFont": "\"Times New Roman\"",
+        "activeStyles": 1
+      },
+      "budget": 132.60000000000002,
+      "headerWithinBudget": true,
+      "chromeWithinBudget": true,
+      "errors": [],
+      "screenshot": ".tmp/issue-828-geometry/before/light-844x390-z1-menu-collapsed-critical-only.png",
+      "screenshotSHA256": "308493b7b44d030a699dbf67e1cd0d21d3940d30e1bde4238d454be03cfed1f0"
+    }
+  ]
+}

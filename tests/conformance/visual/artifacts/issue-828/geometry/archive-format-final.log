@@ -1,0 +1,5 @@
+tests/conformance/visual/artifacts/issue-828/geometry/README.md 61ms
+tests/conformance/visual/artifacts/issue-828/geometry/ux-acceptance-receipt.json 119ms
+tests/conformance/visual/artifacts/issue-828/geometry/dev-followup-summary.json 6ms (unchanged)
+tests/conformance/visual/artifacts/issue-828/geometry/full-first-summary.json 3ms (unchanged)
+tests/conformance/visual/artifacts/issue-828/geometry/full-screenshot-comparison.json 7ms

@@ -1,0 +1,3318 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "ElPublicShell short-landscape full/critical inner padding at realistic 320–520px heights"
+  ],
+  "uiDecisionClass": "layout-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "docs/index.md",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "docs/design.md",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "docs/design/governance.md",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "docs/design/change-classification.md",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "docs/workflows/visual-change.md",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "docs/components/public-shell.md",
+      "path": "docs/components/public-shell.md",
+      "digest": "df3c544c21d5ddf97e9d04aa41cc40431513a27276c2b1dbd7fe690be3b909a8"
+    },
+    {
+      "id": "docs/consumers/design-integration.md",
+      "path": "docs/consumers/design-integration.md",
+      "digest": "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b"
+    },
+    {
+      "id": "spec/tokens/tokens.json",
+      "path": "spec/tokens/tokens.json",
+      "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "cecf260475fab0a3efb3225f6d7aa39f96a0ae6b",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "76d480b7e9ae98275cea3a3fe930dfeb09cdf7f636619546a1fb77b9f76f7b8e",
+    "dirtyFingerprint": "6c32cf94f903977945fb1eb124c413fb7672b2f8dec52d8091041931d8c5ff50"
+  },
+  "candidateSha": "5d6541461ccd96bd9edba0a223635920682a8e13",
+  "candidateDigest": "09294e00bddaebb489dd1fc0d7ee0ef27c52761de0b4b28302e9f6d971910722",
+  "stateEvidenceMatrix": [
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f3564aa9b794909df0758681c1a2f38485cd87983db8e235c9d2ffc171a0f79a"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b699d9c810c9b4e9200e7f645faecab86c418d0a12ea871a82329c4117e7c9ee"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "5ef6919ca882ecb168cf306e632181badae2e65e8756b166558066dd3d070e7b"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "faa06d1b02badee91e7df378b650f07dbe604199e093d34cdfae7fd98efdd7b6"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "0d7986ede6f88e0c2c92bc4aff3561cd4f5fc1cd4ed4c2e22e0115e707a5e1cd"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b680e98bf285c0b45a148eb11420459979fa3a30da2bbdef9e9e1a61e31508ff"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "6faf0fbffe14d175a5ac859fe2cb949a9a6a9c12832c3d8a7333c84b658b4ce4"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "dddd782a766901dcf471bba1a3db58cd1c3ab1a8ebe1a7f90ec0af48fbdc1755"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "67e1e6c7cb012f10ede690bc10e3d6d230e889af2942ed2eccfbb6a4a7b32e0b"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "453244b2d950d38869bab2027658923106cc45055ff01cc752f7c70e56e81d7a"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "9d10938a8018ff473b38f46523d739d6bdd854a4bea87c6523dbd17f4fbe2e9f"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "b01cb9bcf584c128bb977ae84aebd5fd2609b2c64c53c88b0d8a30bd9aa2492e"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "7c863026df21d369e46ba18d8dd5676fc5dbf4305fc24b6fd9f2d8e134999704"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "1e9df8ebc3205e9d4b6a7efc88686b4b31b9ea85728934054926a60b3a0b23d3"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "798486014bd75e9e51312bddee3bb91675c182dfb34ced1407cb2fa3886a6c49"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "1b08d63d3e0f9be77e88285cf4227bf4b70237acd29a9f0bf630f94d3df35663"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "9e47faa5359580445166f5572bba3c0ec88f2151c5dc40e347c7cf36723cc4b8"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "48ee39b8fe32e5e558d577cd714ed541680f5b060205fec243752a65eb16bdd7"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f3a09f4984350017e0c1bffdf41d3ef2fbcb3386182b2b0c8790ef7f0e8dbedd"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1b0dd644dd96fd39a8d3c45c31a1c6d79e5b0c3650d8a448701a59599e1cf669"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "081079fd513fa9b7d81da23a5993590bdce098170632b4648fccf15d9aebec50"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b03f20c79ae0e082849ad6f86a93a4ba6e9f26d8628ec6f2a4db90af767f7d58"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "84c0fee4f8c46d614d52438da2501c63ffcc526976341f000af454e377fe803b"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d61a6c78863648b84eeb968875dd62a054c9b9f90d94b13ae1e69ce3d031ecd5"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "002a22bcc9966465b30ad43b9d91fbe37e5c79358d49696cb003dce44d1c4c49"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "522d00cc36f44fef04fe5f9969789ec51aab50c7badac3fce1cd320b97d1842a"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "8eb921032134fa60af714049b72c99beaf8d55e191c0c6dac9908f0cecada30e"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3ce11050be5db151a42119866104a753ad985fcc33f8942742e1c3058742fa29"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3d59d1e2422feb159b92f62704cf51f047c71c1c1b5558aa338ddb1d45d4c60b"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "62b5b0fc7fce882b14b6334f5b9ec976fbbdab2744cbda1858d2a8bd2d08db85"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "5afa403bb60ec778d82367a01784added9a003ac17d90792966e33a2ccf342cb"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1f9276aca53005daa8856a51b987c487e30b82e0ddbba497eb49afa187774336"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "087ce37e1dbac93fb6d4c4b456bf65b1030143aa754bb9c1f372b8defd5bb179"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "580eaf4a914485c33f5d0c594d5c5ccd07423975e671c5a05160bedf170a4a4d"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "075518a9a5fcee8b35e4c4f6dbdc94f380686eedfa14bd11fda85c1b4d8f0071"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3543f91cdcd383c4952f5782bbdad48e0f8ccfc97b64d446f5ac2182daecd6a3"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8482dcb077a6366dfabeeabaee872e1ba72d6fef5ea9b7a0416cd4341bf1d7e4"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f2b06b9ec27d35467eaa4cdd0845fb4e8150d63f7c37566099365eda4710b6ed"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "dc66ff38ca70dcee7e8ebb8cd9e1c526069ae029d8bab1855b118475d60e454e"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "83b7a05b14e56c042db02dd7e97ec6c24f014f69317a18a31f4295016f97024d"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2f7265f5f6b5a620ca3d68fba35093700eda92f1e984773a1cbf0e40a28e2d30"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "03833246fe08ef00cb430a2a93c7cc9abf14411b5b6da4e2cadf51fdf7211cdf"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "95ba194ab8d855f028629a3886975a81986e536e1784de3d7438ac38eaa010e0"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "526057e1bfd5e070e2ecbc5ec32963ae9f44f0ec6a6ecbdeebcf79275a8db14c"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "6a99c8a9ae1e06ceb410ed99f81c62c5c2c210da3765a64db5f462d73c9c3818"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e73f1ed09626b049c22df142695e6a121af93ce19639a16d9d439209dfdd7a5f"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f0e37180b1c465b8a5f4357a079ee251305a649aef0352e246f0966c6190e2e1"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "27624b50a73882cd38e31d0704f7279d20bcb12c0e726c265a85895bb7641fd9"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "33c87dfd2e4505f56e93f23995457a481fcc6860114f63f02a002ff2039f6b1a"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "66b8ee6e1a78e2fa5ba2ba39b6efdc5618db98fefb095ca48e1e0db93197024c"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "ce01d48900c233d3c48bbb1148c654b628cd2dcf3075ddb3a8774ebc57fa7e4f"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "ada2609d076b4fa3f149a5b995ea485dcdeb16258b6a23e16fd424005d02648d"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "dfeb166ec425c240aaf71debc7370df1c3d348cf5846401243dfa571e52125ab"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "1a5aef831f5166a0a1f69c3106bc76b341557ca768a063e111dd8f889c0ff723"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "13e1528d47674df7cc47c9bb13327b020ceb3ab5e199816dcd72f0bbf3fdce9b"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "11abcdb3611af95857e27703aa2cb1e27854ae2eea387d1ccb74d052b7369a52"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "6694c42b319d762a8bd0c48fe5b78e36416e7315d3b81808c9e72654ddd38d44"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "7826cc3d0222bf103bd7eb559de05eb963136fb8ca941b61d32437202cdd43ee"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "0071aa0e1e901871db89ec162a39d634e217fbb0365e46989f68153f377129ba"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "6495bc0de95735bdc39f9caae2578fe465e500ec2348ed1815750afa7f94cf5b"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "57be6610605c28ad45db0fe89615c37ae39229092a1f3c1578000a8facadaf71"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "ef594ff814dd75e24e121d3cfd27e120ea1f420ed99cbb68486aee7dc187c918"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "fdfebd63d757d2cd4374fb14fda3e3b50ebba73f54dc8d01095c78f36c671511"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "9cdad75df742ddfb0b4af7455ecd06b6abea1e8f290f3e93f40bee003a16265c"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "fbc112b378a9e759043e60459865614fb68d296526b43584256c4ae8d53a288d"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "a3491a6379f83e88d190f2ed5e6bd3ede630d2fc48c733f85109ff14b2701b14"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "49e57c21c178d042817ed965ea2fa526edf3aa31d62c6a402d609898adb50c43"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "cbfd8357e280e05f5d1488c9e2147c613e7ec8c332cad1068c80d760b4562166"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "173c920099d7d6721e221ad457cf9f197f228a99f3b6681dbed715d051bd842d"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "c4b96f7a84c164f9c505136f9c29e03aaaf59e0f340729f0535146c5dc759c43"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "78159e375f0ebcf6cbf4e050a5af5809e7980293c2cc4b7a4e9e07f535a067e5"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "18ce48d4fd2607574ccd51b7c8e8679d7538323633cf6e25aab3da26a5d30781"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "28331db1310635a2da1bd70dadbf51e733361c42367d9333dbe2eed0a9fe25d4"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "2de25beb63f88f0c4f64f8cfef317251be32516d00a1e6165ee8de292da4928c"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "49625f98a57a98ff5638339f0724c11cd29128fed4b1966e1e2e2278b2a6f1c3"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "17ab8fa0ab9d45ad01876b02343eae03a395910612db90b646ac561423ce0a66"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "7970fee7024efd7913d1ccaf2bdf35b41d0f4d2834c08a28f29441b4fa797858"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d2994131c9b5c0d4ef1f88a20f1b7ab1b7a537faf515709f9e61139f9b1d3c78"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d45f0228428668353148f29904c82b055e7b13d315c4dd1ba5ce8e422baa1a3c"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "0afcc8c906c943772028bb680d94c5cccb0142c8902b3194145b41dc9365aabb"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "e0decbc6df6f2532e03be6d34f313c3f19aee1bbe25634df3cadcecdbd789eb4"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3a0a6ab17cea43d8ee63bcfa85e0c15042659fded07c33f30ae68f4da29c3a60"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "d269bee43605307c5f671894013d6dd0c3c7680cd1c561319cfd653597cfedfe"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "cad510b40cb764d04d6ccca938ed64906f38682f2328879d6c1774653ae854a2"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "9fde1ac647579409c003cbc369afd258861bee5482e920e9ad84c406e3e2df3c"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1e651ed342075c0d6b9407474e899d8ec30eed2ae97f15407d1e0817bffaf481"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "64c174eaa9d92f85e9bc2897c3889b92bc4578975556aa7434aa4c861114377d"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "90eb6b5bfbe46ca1b1654ebcdd8d572778b1ca3f0a364c65b52c3bd568bc7104"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8b28334d65e3b6b6eb7af0ed8bb1ad3e2408952a1f52738f757182fd605f8595"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8f5d870cee7a9b077bcd7ac7cd1fe99fff171635f3302fbf7d4a7255ba09b5d1"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "31083213299449a3a57163201161235f40c5df5be50da25fc82e86e591ec53b6"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "b9f34572165e439bc5d921fe5581e2423c4a60d7c87ac26fff3740783166f552"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "6e60dbcb0731d298d2f3f8d30f3ff0aa3b85db9c13caf3078c421460468bdd00"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b756f17fc8215f0a5316d5e9694baa119b84d7a7017b274789e08cc47aa2840e"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "5e2b278b214774aedf80d39e6f887f20265a60dcc4cf124ea1c0b9790cca63fc"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "217515a1de9f4165a5a5251877a313cc961dc1e85f94ea31f13b7709d666c34d"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f49ed55a4e7250765ec8bf2bf4fea7afaf25683de2ca428791cb9504e29a1cbe"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "ed7d0c2337e4983dc8de7f84377d1c64dd245379bc21b5aff9e4e0e88d021db4"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "8f4c9359431876230a362de1408d2bcc556c27ed3ae7e4d84e281c7e15ca0bf2"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "66fb2ab4bcb35e1afd555c2f819b81b809a0655debca600a97d0f4ce2c22ec45"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f108c13a0209769830459fdeeea21c5f4dd82f5fe4a60241675cae20bbf915ce"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "c0e4b7a6bb4ad35a4bcc8fb56763b2894360054dd361bbe6f58b06ef23e7d744"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "25b29418eceb6d2c2ceb5ca9e2d830c2254045f6835d6beba8512c043e3d1d43"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "5ae2ddb1393c97a4ac555febaeaf8abb22357aac21ac86dd08b85df496220f40"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3bd2ab4d670accfc16da7191435374022462b62141cb499169177916bfa4b131"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "428af137decaf0ff2049287135a8f862f13aac7565c1e2621a4a78bd29bd0b2b"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "20725b81db9b2eaa70e031c446987b0b9e3ee9f4c0b4640296ff5c0145d47345"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2b2536f5765424665dcb541d8f0b3d82a2aee5e7ba2e74c73b2e3562b1b95b5b"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b4d889698fa18e1a744f7d185a585a311cc58283fa8a3930bc0e5433c54bb955"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "5009c7bfb9c8249046f1c7482a342ca62ddf5a68ba83c1072ca04c01b78f1778"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e770deff59a0398068080260c7d78200dbcf551e8a9717576be89d454467c902"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "fd49608a1818455720b763c24b5d0e99b8400920f30d54d0f29cb82ee1de1f0d"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "d1798928be6b0955028c243d6546fe470d4fd2adf02497ab333a40e19e6eb96d"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "4f5bd8482d43a6bc58bd4cb78c0b35ac02720c97a604c59437ebbd7d4190bec1"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "126516f809b254376f1e2500c68ee7d786288983e0411453c5cb787dcfc7a553"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "a48202b2edea3bde75cd9bc2d725e2daffedaec36e56f431ec6b205400f95956"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "778945610dd191f299d2f6e615408a0f7af354c4ec20c57477196ef7f716daa4"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "9c1d4a00dea1770d5cf9ddef8cff807fd7a8e9b03b36d61f5396243b7e671ee0"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "250f2466e36a0eebb8b8a56ee6ca267d51f3d4b5e55becaa657c6f2a4ca48489"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "5c17ad51d624318b3b42a2f19d7f9f4900afa0c315a101b56a7574932b939442"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "a263ae9d645165f52e7ab3df774c6e11b58223f940127e73304d8c6f851cf2ef"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2236f0aa1b44049c1c745e80ad75b248efc04c311a4ffb381cf4fec264a1f396"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "eb643a5373e813a0904ae25118ff490b188d76b6f38562c9b9321b93a304b983"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "ecb7a192b5075b5c32bdb0841a6ccfb119c11679a466ce9bf124fd9d6f2f952a"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "bca8e7b611ba6abf78134300f44b757b166859c2300f5dd2ec9b5a738c8e9cfa"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "0ddc392c54c029a9e56625db5387dcc15963b66a592f3877caf2611296e62465"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "9839ea5ca79a681b122e8c9e599c6e0fabf14753799f7e155e13ad2b9d5ec451"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b78ec3506331a1cb3e3dce4f9377ed62d8564ddec20b7bfcb707f0520edd56b3"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "4e7bbaee11ee55f884499e910d0c2eeb83f3b52ccb3e8b7a93924330dcd0dc63"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "512b00a6263b6bab8b0efa6f6558a6bc640b8f8cfec0f751545c4b53e87c68ed"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "68becc3b31e2d435f185a17355fcabfdc5e7cc49573f0c53d49939cfa5b0b51d"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "6dfc55b761cb2521560f0439b8cbffdc9ade13264b1dc6e4323a8ad4719164b1"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3a7ff5d7fb31acdf2264621646a38bb955ef9e6c1c553cecffbd5e31a7a733a3"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "ca01fdd5f8ac2519db16025890698ed0fb5ef40ffe2e257aca23228a9ee94db8"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "365d12021238ee6c0c7dec859dc95bf527e7bda9afac899e6b0799e8b05ee523"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b91a2569108641b4b3297317cd7a843bc5f0fe29745a5deb88378a4f61dcfecd"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "f9efd2d195913a23709fedba5d019bcc25fea38e58694fb794481e7fa751ea5a"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b81d20761fda123f2cc407b2d00cfe4b14e7c90e3eb43fc1147c7c00c16ec360"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e623acd188b610d307064c665fc34e78dcf018405f117fb690d4a316dcdab7c5"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "0807b035ed21e9aeb1c85d359a6adec42b044df2fefec2719176f2382c7af2b1"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "5c0cfd04d2882377f6cfa0a0bb93cf69841c3dd81c0ad724262ab1961a837d23"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "49d7eb8e1fa63101538399870ff31309a3917fd4464a8674ffe414152c6b7da4"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3a46458555c11a5b338cfc1b5ffae85b743fd3aa418846be024bc52531c9de12"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "5f79cd7af0dc98c7965bae586df1b480e7116571e85732e45f8c6ea542e2a06a"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "ae14689be2d21653047cfc69d1bb0f6ba09f9ef68db2870d81445adf4efd46af"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "0d931467053a2b3a64b09bff639a29265097ab119d93df105535098dbb2c26c4"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "cfa90ecbea2193c318eb4879557a97d9e9493c69ff0d9b8b430a452b82f0bf5a"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "381a71a4c8f9ba101fb6bef86d6996fd5e7803c96ec598df4cf7259856876a62"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "0beb7af8d68055ce7f0f887375a4036fd62f75d17e474790eebf77923d96a1e4"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "cd8522f980341fae6f048907ba3709240530ae699b5731ecacb6a28d1caaf0dd"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "d14179c5ea4d40074887ff4ac1894c60e10ce53c56f9fa021e8726e1a981387c"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "dc047c4d544e1a3b188a40273671b42461f226e8ee1c49aa12735fa1dd88a6c4"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c07325e4fa8b69ba3d076c4d3d8219566fc97f573db7744ce5abc933a370dedf"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "78c1db06db240fe45992e188204bffdaa45b35df7198de8b260e2445cbd8b289"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f21f561ba3d9c88862cfff2a831bc6e3435f399175f0ed8359e90569a5e5e6d5"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "9e75367fd1218b6b01baae03649d685bbd6dabc565e385a8065001c66bdf2ede"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "8d83c6f8c58dec1c8ab0f5e6dffcb84672ab725041317ae068fcdba2d1968a37"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "6821a1622572ef018dd844235120365a2c3e76784f943a21f27f182141e66d3a"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "93adfab4e2a215dc0211f94d9fe7d807983a09956c7504f3200e556be7781aa6"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "92e1505a3e4ca3c3b0717d43ee0e8805c5c934ad676a72813e8f32c8fdee73c4"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "ac343f1d38d7e826ca7230d2beb72bc803a632c83107749bcdf574d7cd360f9a"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "5343b643034b63ef0c06492d2bbfb462266cc27411ac88fda7f6c5b9fe6b41c8"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c44ba0cd4e52ed00b98521e30f0cd9e87b963fffb9b40a98474afe3b29e547f9"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "7206ae7fd4022c5e235059513d8eb01c90ffbe88c49f78f77cccc40d4e279fd3"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c28c5be69f4d2ac9e308d20645b54344911db36790e750a84bb4ad8c63bd4e50"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b37e97cdb6e70a084f4cc5de7715be108c391c609fac85340bc495eb26b074eb"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "a032fed26f34c535d38b5a063a03d17fc55137e034c759edd347bd5576fb2383"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "67ce072bf331f3ee56f3726cc9fb951f79b1546007a2e36285f787090139423a"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "16cf322097f97de84952af6ef1cb2ff3dc348dec070d61f7fbee0be05759ec00"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "bd88aa36f4df70732ca2efae18c6d31132bf1e823e3a88d7336d7e6ed8074ba1"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "0a43b055cb1a127da64b6b30d7c462bb4b7c01e828decd5c9df83ce9cd8a581f"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3667791a98ed62cd3522513c6d104f79c929aa04c6e40affc6ee0863f6a638b3"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "7556b4516015b133052f2ee9546486c2bd5ded9ef8ebf950b6878ad0d3d6ba08"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "62c1efbf5140ce851d1cc731cced0bc9f1fa681f102d06ebd8dfac4dde2c2dd9"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "dbbec013c8ec672e603c7e549b270a13dd05fa8ef0baff4fe104fa57d32abbe9"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "0f7ef1f740fa115be8060e0a94fa028c7af55567a8e7d127027ac2a1d46fdba4"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "62017b4a3f13670f5e92e9f10d7aa43156afc1254ffc6ea8d8741960dbe9fb22"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "9525b48260272320d84872c97767347c9a525e86458c1c2407a2dc0e00729d65"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "29aac50b32a2854dfcfd48c2203c6d1942f8245eb9ee5f0a5f1ffd80d3581542"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "f4b8578fc1f8b0cfc035dd4586d95a8fadd8c30a81c883942bfee4003eba0fde"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "42f980977de1dae26e39848ec8eac94efb60fac49979c83c3d4ac2a697262f9d"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1c1c12d2d8c04efe4214b29fc0d6e4847609bf7c79915a3c50fa20137adac1da"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "226d07a27c3b27f3cb2b673f2c0ca5bbe7b5878c1f7736dce1284f457f6a7feb"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f9f95a1f595ab09050ac1b960a1442c03c85e51234da1ac663b1a4dc51ce5149"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "da330737b884a653f2a08536eac7a99cd7e1fdec44c6083417312cd54faf0f68"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "681679ba651b82871b70059c6e22ab4a44263d5a31e3e6156e032afe6cdb9d80"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "e19bf525aeb3871eb3961d0f7961bfb587118011ee36d199a627712a6f85544d"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f2058decd5b587fb7696683642aae9c68f3bae1a8a46736cba63fa3f9da4efca"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "d949373772400d7cdc57a68c84db8a664685f64627a71d8c42e41adda4893f03"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "448a62d3986f73b21810ffcb91c631a27defcf66de02499241a84aed3207412d"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "475dd7367968d5576ddd5fe45cd99e238109ebf5a67123dc66af82b42a66b7f6"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "6d8d299d641797b40023d66515d12c2f516c2c4dbe3fe5bad0e7943e9a4ec5a8"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "cd07c431530b60f0910d970fb4bfd7a0cca6805cf0a32d4205e75a4a946bbbb2"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "9dfa615a6a7be39504a85e8586b7ae6023c4d7f78bf4325b2f34b0745ba12948"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "6645a8574ce24e524b29dd04ab58c8650f0a409ffaa4fc149b3f1f959c129d06"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "93c48e5239cd9b0c3867d9107c86a65aabee56cd163e640cabb035c663538df2"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "c85ba0d5fc8c7e76ba042fe165f8d92f72fe3c95683a25cddeec3799b80d8aed"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "45362a123486e69277d2408d11e4040c3fd2854a9f2b0f7032305d05feb9b9f0"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "39431cf3847f6e70e45705b4cd03c3489d4f0f85481cb986cdf28103e227719c"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "ebd675d4291c209b11ac5b84b4226b58cbf2ac1bf198c7ec4eeb699531d24516"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "544275b05d5f49460ffd0a0a6bcb2d08bcd5c8d7151d3145d8e1322abb706f3b"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "2ebc840f1468adbd2407b40aa79dae16d7ab9c3592037b37f15d282940d11f79"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "89323e46b17e0ba93e91598447408d05d5ac7ff6fe616dc7e51504d937acc4bc"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b5ba19ec15613490e0e1f6b4841024714c830cee7d5382242a25ca5af27e3a46"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "65e70523693343a23128c5b99d045c89687b783dd5869c39ee656dbe5ec9a089"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "0de94e73da5719e2aa42e57e57bed9c140fe407302f5d8b161533d1d452717b0"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "2938655778321a55db67912bc646c997e0b34df57a8d79b9fab86647c20cfe70"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "4b19a16ae5da9d83203b01221636cf247eeff374143b8201e0fc4a726b4708b9"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "d6cb921b040aae85c6fbef093d065e6d0cd3fca0be5abf187c6b112242bc4fd7"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "1da777d06b06795b6f37ff5269416928d9d1a025e2f0ef0b4e551183b818a7fd"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "eb2287a815e50a8031a0dfaa9cb8aec0e13eaae6e472f7e4740e4a7e50b33b47"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f5e61414d2c74a9b770c274d1596ccb1e9bbdb5b9bdb8277314022fe3056a48a"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "d67be0c2a553a3a0a508ac7e47f0973de9cd29f52e2157dbc1c2f9e7576690e6"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "7a55932fcaa89ae9aaa1a303939dad05502a6fae8f23e4eeb8b9d3e321ae2e3b"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "86e61521fb334dcfd340c545f2e09c13b3c32be75c19a181f5e2be9d236b798b"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "bfad1354ba684fa61bf440c434209e65e0e8ef04684afc0b413ae1cca0b00528"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e736026aa8583e150e8671862b7abf299c17df271a2789a2cb7deb69cba525ab"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "cdc93f1353221439ae9fd4fa8fa632fbae1dcf6aff66f2d57f8e2074ae0d238e"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1b3700d8227287c2de9a24ccd6f71d72e7ad1d6227a15eb13ca220fb97d2e7d1"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "5af91c7829101f76977a3f9138ac488fd37ffe3598be9bc023cc45e758a7146d"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "b6dd36049d8a6ead2a206d6636239cf3dc5041a16a5076a25b5dba4a3fcfd058"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "382ae616822c69a5f8bafd0d2f7e161177b104f8bee46e8781af15fdb1305b18"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "f748c3211672374ee377c733c7254f74a96b9eac27b66a1c021b3526912595d3"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "9a1ee3cb749a833f46a555499b6815e3dba8db15665a1810dbbf24ac7689280a"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "4568620864162ef45df0d0d7f0827da08cd12fe9cd4b363d4fe11c612021f880"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "a9846e25cf261dfca69ca2aed003deb1ef28a8eeb36420fa323ede5fdbe5ccf5"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "e42ba4117a1e38052a96972c9594d028c9abf45a346cf59c43c178bb6cb09207"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3c9932a5685820947f4de3c542981bd0dc34cccc8b73efc4304e8c0f59cc029f"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b2359ed3596b9c293a762f670b7f6b61a163271b55fe090e601e01f328274b31"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "3352d091bdc57576ffebdede8ad84974b3ed8429f72e3a6fba5282906f43ae81"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "b197f6f5bc0cba02006128da0ab909700999c22e484f813262961efde6edf881"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "55ad6bdcab99ef31f8dddd6fe05b4fcea4c8a74642eba6bbc9ea796f02febc12"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "81714c401f70cb77aca0d82413bd1e576279089aaebbbb689b4508f0cc947e70"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "47d7c29a863558278f94be3d4bd35615334567e37e889851ffcd65994002b9dd"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "de093f09e84eccd57c6f93148c8867a3d6f546505f960a88aa900bcc7b60b2b4"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "78b6e857dd58bd1636121591bd03f5f104bf4ac540dc9ed7cb4d4aadea03de95"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "e9043a50fe89115616f812691908eecc775d31b0e55a894d3b67a92f7f781b90"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "2a2f1b4f80633c818dcfadc456a0fe8fa87b9781b4a5afeb2747daa263f7f6c0"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "006bb829f4512d6eec4467257024e25f7027dd28ec5bdc9e5157afcab55b13df"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "75397c0c2f0d8392ab6b5eadb112d18ed5253177614cbd06a2796bd433d80b05"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "32275ce3a61b25d9fc8b678b10cb63cb61a8bbe581ede64e541a292b92e3cfd4"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "541c4de179f085273f7abf3fb1b3b7d3a3d854796948de879f61b92868399d9a"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "1f1bc25f182fdd79efd4f9658c4366c2f80a50f51ad85e49898820344dadd1c1"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "eaccfaadb0014e0bb3445d13c8418420908f529a58a38198e6b54aa4957c4a19"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "eba716e88f2d9e755e846e03ad9dae55dcff28d68617a0684ff72c4d1f7ec121"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "e0b788ebb728e69d76d81d1bb9c2ea959c009cd2d03e860ea2945359cda4b8df"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "f3c61e46b4cb9d7f92f5257b2b9acab897bc6276d4a45697a6479d5152c2801d"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c4171ef888dfd4e86aec9aa11cce52905f05c17c206524636c1159b2a4497d74"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "4a50145d968210947be87b0c0d99f6b95d2bb0331b063a8d81963312452b1896"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "ad5ae0e5e73d2cefda9431a62cad1f6ff36a39b3191c434c5d4ae71375a49a61"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "741e99d932f3ffa4dab39a52408718d4795bb9228e6e8f24dbfe25d360c82c22"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "7dd93d56da6b055b909f23383e87c47fc5c9becc561b0fe59968eeddde3d689f"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "c8e13823e31d90da3e9996e3af94f2648e5bdc6eef21002a1f0ec555ecd7c1f9"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "74933744aa6814d4311afbe03169f4be4aedc86bc045dc59cf87e649e6375aab"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "d56d23b102707174baa20f83d82347a0154ef0d9e3b3fdb857305e505bb08ae0"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "9e17857fe1f7d623748441e3c064b6cca7c25c8b843679a483570ce084da6a8c"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "d7a48a3c29f2ae550d47921ac0bc3854f755d77bf394c9320f238740afa29d9c"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "a8912c9952404386e2cd3b5e980b77b4bd532847be7ee7cabd6138c4167ceba1"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "5b5ec3e4d1d8e9bcf90f65b4c397d30d8c89ea4c2621a8ebcf83e3fe72322992"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "1b9cfa2dd385b32b52ba74ec0908e90395d91606db39a460fc330077b5f69784"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "c4c21eb13ea99dab5899f42d6da81b1de8e117eb87902d44ebb51907c69f0701"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "30997b156d8f08c3795cbdaaefdba56b3130fe8338a8b8b9e2f761b1b1cfa111"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "65922aff1fe83707c867c61613b1bdc16090a231d9c12ae377a4fcb7f4a42b2e"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "b4cdef4f1c6f4eb1b94c1fb683ed52dcd8cba4d479fd1c6ea7742d13388ef49d"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "834b0b7fc6c49177a74ec80141cdd4a3f1cb7f945b50dd4dc09507b214ec48e5"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "81e429ac949a5a6a725f746ad5b7ae0d5b71af5435ec5a0f450c7c08cb175d89"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "a561282950f306e1b1b3a3bb95f8dda13d4b1d6cc1dcbe28673f1659891eef0c"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "bb6dc6f60a766607e403b0e372aa84bc4a463b4ca0c6ff4ec26b585921678940"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "1415d3cb90e4d21762a71d8c6d16b6ff1024369c7a40eb828cfaffcf28890502"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "bcb5eab469547b093e1eac424bfc87584a21e1f635adde511b15af930b9427f2"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "8fb21c2ef8db4c03377e0a8d17396f47b43e18e7c3927ca98cf3a92d655a227d"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c8ecec37ee29c352548489580317bd740e4e334793e61c50fc39cc8997afce9b"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "e3f5d02b20cf429f2f92dd6c4735c8be8803cf26dc4e0e27976b963a1a0169d0"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "d67b802e1fab96234381f4087a6508c1d95207cc58ef37a00d2b8d82f7a801e0"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "7778d4af270d38d8f0ffa94a47c7eb509edad70967ccba29bbd60f6f497f3e23"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "5b39a8f4186aa0d65c68e99e1b3d29fdb96784ca5a194f31d1db594785d8dcc7"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "fa6f56fcffa5e3aec3be09fbf64efa91b686c10d00c1c3771f109fee53851c63"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a942950e0b696b6027f35de721d84f3a8165a74f0e502153ab086dd2fdeb25e2"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "8aeae587abae548f8a7d0f7570ec8912d4fc662f50c1864c594b702d8b85a601"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b271bc62f8f4ac25fc328c6b87d8ad4c027f381c27cf3555260fcc78d319fea9"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "6bab224dd53c901a7bd66cafec9540f96fdbb0c59bd87ce6a9ef27450af160f7"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "3ffa64cfae18591cf2b9ac018292c80ce58969ad03ccf30d5e6a5ce7dffe0ba0"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "1f2fc275e3fafb58a97250a9b188b83f11fe00bdc6925e3de574cd0d4bd6ca28"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "67480f9a7de404f418c3d184bf6872d7b3458d3cc380f8ebc44776549585ce80"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "345b65f98d048737a7f90320d68b303116d6ecc7c60e082cce40ba257ea62666"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "2e49bece2059b4b1952fab761ffc7ee479f5c2e113a473214069eb01dfae17e9"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "e6a124d6a32400f28ac97fd442551c57aa2b831791bce2e8cfb8871f693ac862"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "fe7b1f56fd2c1b7568e90504b354deda1c9bcd0136d85f4ef21546c25ed470c7"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "05f8a4bcc8b5f30a38ecddfb6c49265d836c94801404acc7dfa8cf53c72ed0e2"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "608978f059243074ced6595f359dbbe8a759819394a9b18faaf9f7b330ea50ce"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "005a9e53413511c0b6dfdf7c450c1400971ed5a36f0f1139bb01d10351d5694b"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "3d37bad6050b669dfe221078edb27bda54a8c3c6fd9e021ef1eec599b00555b0"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "ef5b0e7209e183c6a02cdbf7702449929c068d347d29dbd8eb7602fa17d530fa"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "216ee901c3aaca4d0fbf67ca4b3675b7f4a77b1fbdcc30c2c64a06c6ee36fa66"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e7fb8a1dd18a1088c5975d2ea7258b749bdba8735a967d645e71a13597d4bef5"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "3b08cac033bbf10511d42b2b8bea29452281e925beef597be259acf205b0edd1"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "3cafbd55ec7a99da1adc63920ef002b5f574988fddfc8b9e8ce4098e5ce4c462"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "9fd88eacee27e69939c7518b410cb5066d67d07231c0ebed79de137dd7a8af23"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "c38e4b957ee975f33a4440cbc560326e3cf03be779e9c7f53894734300f65f43"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "dcaf19392204093dddd583e6493fd4fc89cb648aafa8b024f10af4247db88eb2"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "79e49603cfcb2cd00c3f6a1af1063398d28d9c48bfe1f8c67b3ef205fbedaf3c"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "efffbd47f448dde0890a48703b66ec88b82f6a283b8c430f0165b34e87968662"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "7011de5afc4a943482244fd0846924a72d4e310456fdf1a28438175502729b9a"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "4052447ffd57e7390eb148f7a9c5c345b8de911d07d6cc796a70fda2eff96311"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "57c62d7c86294369e945ea20c96756d5e0aac118e6cf6fd0d50abb72afc4e434"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "d4832d8643b438c72c5b2914535b0bb26f936f9eef456deec7d8951bb30acf7d"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b0eccc4410f2ae3bc9ceade1d95cabc17f77f9311cc1500bf89e3338f92328f6"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "7e60045cec79eaf4461de9f18c5a01488059042f92c74d7cc3a53bb0ee08613a"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "45878ec12c797b3c06fe77711f10d29cc26ab02c9a2733b99dc1cb976836f797"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "1b057733b6cc64eeb90f86dfa368010d0b06500eeb31fd499cd243b1e931a95f"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "44c60ddc505e36da4a8cb8b83ac36568ce0e086cbebb0c62f1a62f1b5c8bcab1"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "f033b01344b270de30904ea80a385db8e0c263e3fe2ec34c7ccdf3ba2e85fcf0"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "a05ef6245997159b36a61df49e15b4b3f3a667e421f186a4aa705aa473f35bbb"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "f9a98098683df23a135cd618ade8f354b446d2cf3ada180a99107b1edbe4cd56"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "4cd7a3a531b572dc08ba58b6d938a062cce797b75fa2ae2ac913c42d87977d99"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "700db4ae844bfc7d8648e5045feba02b7127931a25838bb1a06c0c63475ddc90"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0e87de83da0fdbd1dce43d1f6db68eddbf95b02439404f5fb6c42ed171438dc8"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "7f31c60bbe297d995277b96617aaaad5e92641bbe87cf05f435c9f7177b7e146"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "8892ee7961aba32fe22e6f7dc7f25324f516dca5cb2ac165567ca926da10ab4c"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "8471a61ba8e667f5f8771c3981358da0315994e4b13dc07c2856356c575985e2"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "e9fe2b6ad807dd9a1897254004c6f9f37a8d276b9a38eaf72b8a9c84957a816a"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "9b703102f2e80ea625a66cfbb56a060dc8f8df8b02cf9597e67a8fd3d167764e"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "5172026c903233d6a483de3a39f0454d25ef9ad27e8f33752d7c21ed9181826a"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "8b3a780c5406bd97a5db43f026c5a1bbe857df1f787f09695bc2ce9e54de91d6"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "751ffbf9481276157c1c5f965d7ce9b07c1c2425392aac3441d21e29e8dc42ac"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "dc7ff18c0780375af8aefd4dcc8c613ca5e3d85d1f34cf9bc800df219c7cbe1c"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "6af2125f4130e8cb84b440a8f20e1df8a39e57a11eea9226eac11073f1374807"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "b2401d727329c253725d6d3dfb40af13b9f115a7afc002eca31b588b81c38dd3"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c92aea8086d473945ff0d109eeabb2edf74122888420a20d0c3efb98e5601f8b"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "e278392e6140062970a51d60d45942ff92902931f299bcfd81d2583f1082f20f"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0637e30ba0870a72bb39625f18ee08b8c2d83c966d3f08e08dc6290b14ce520f"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "074c94f0a2b616117f2e2861edc0a93e5dacf32afb438aecddceee8f016abfa2"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "ab02b09419df8eadbe6c195d7e046ce6e3801df7db383a5963348663a1a1b20b"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "d4c3844a09ca3dbcb60bca5440f1eb540bf74aa6db27c2173de97aa3af6cedc0"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b72e712de51a82e8c18dbcfbe21e32ee3d32e0c229b90131b1a6dc2ca6a4811d"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "6776822da316d51213e3140afa3ce5301cfa37f903ebf683fcd685fd62675113"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "ed2bdca0e47528833a8121bd08898add5af2ddc40a7445a9f3e1bb980f70e3f8"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "7a4d1a90c400a8ee041ba6b92ab0097bfac9fb217beb8db7fa61bdec2b37d6e5"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "cdaec26821d05fac747a26d1d93be6374ec35df701c7e861d611eaf000149ad8"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "46641341aa2a8fc6b1b0b3cb18a26362a1d9c7015e798bfefa13e9b235b3b746"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0e565ef4252dd4ec24906a4dc9429eb37f79833fd5b996e516365b72da12ce5f"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "9f229db71defa57892b977ce57feea260e4f7121942341c6eabdfa7c6553f8aa"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "e74c51bd1513f5ecea46f9d54727228abf459781a168f188696f17815c55f74c"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "b9397635676a005818acba565867628d118c15c472260a283338fb6874b01d1b"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "ffe7b59840322943263a69daed4ec3aee3c72a8124672f1cd2c50d6190e5920a"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "03e455674de8da177295b6ab13fca788014d716c5f157ae9b992c45bd6fde517"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "94c911ef7745c8d7f6101a2481c537497fdbf121d90d4613d173c40022ce4b00"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f04cc9259f8002d5cd17b39516f819e6fdf4fc7dc84a74d2831467e56ffac752"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "20dfbab723fcf3fd10de2e88f5f731f98e6f4cab43e3b5c6f10074bd88e584b0"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b4ac49c72d6b39f34a751d340c8d87a9dadc3a01c193cec091942095522321b5"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "cbc4dc2815b7c38cebcb33f13bbaef4b2303188899032068fd8d540577380681"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "56bad95cb3c30eaeb78a3ab9e9968f9706bcf3cb95db063e96f169c4750e453c"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "55b9df0db9262119f73783197b5a85f0c3e654ec3de9b3c6f6964e047cb41211"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "039c32add86955f6e45ea6b4c6a73c7beadc6fb1be6ce4051a1f55f7f3a189f5"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "12cf6eb3eaf8cad60b8de5ac44460db7502c2c09193e1e24ff08d04779fdfe6b"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "cf778e95bbc7a69701331e39599427e19a21e223b3701c327d00451cd2f49cc3"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "3276cce89b5812a0a1816560bf7935cb800349ae37ce84093447a7f92581a321"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "acf5ca2abad5c4306e09801a05b8045487ac7e1a6fe8bcc6bad52d0547d37ea3"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "2555ac4df9f986176a4e9c213c0d3e1c7d327d958552de1c5e10d7e810cf7370"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "60366c7320ccc7520d2183da7c294455e8d3a6e6eaf474388bd05466bb7e10fd"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "9dd19c0eb325f441e734898a14b4b571f5960ce0d469a8624b210197e9dddc25"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "3988a050df256ed859a348e6a890588e1c33125fdd9b06a0d79ac6682072a639"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "029bfb1a88d506c0b21aa8fc54dc8b15cba682e6ff88de7627c4613b686e509e"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "bed65c9cc323966381284a27bd6fc7a3f87b3e6ca65c4faf0a083171eb370bc4"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "4007f445db3e1ce280eb2eae3681c966068de35c73fad6435c1c8bb4c6001bec"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "4aaa4f683d2e5404cd5732ad287c0b3c91fc6ecc2392e12a5070864dfaf94c05"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "0fb00a1774d5667390e82abddd269074f0df56ac6e9935f35f5c0592351edaa5"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "b1ed7ea7d7bf0ff3ca389eda90fb0eb7d237207baffb4ec97e7793efd30512df"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "1e0c549be9a2cc6792808e3478d023bfa911fead9385aaa52a119c12716b703d"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "6354fb2b84b787557dc540a2f2cc1b598c879287ef024741bd44620bdbd17988"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "76cfbd7040bf7f2f63dfd40fd5904445f028b8f9d1ef8f2d26c20f838a634864"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a3bc9145e9f61875278918d22285301bb0a75ec79742277aa21b321b49cf5bb2"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "20c80413fecb9ca8003012b1810e2c84919037d564e596dc5fe6b66f96b69eac"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "603181bd3b77a088e534fe3cc3ea715df0b16f275050f14908d00e9b3c4073aa"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "1fe38206d1b4e34f03273ed462e67bc4abef06a745111eb6afed0648ff110a9b"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "114bb900e405377c97d10b996d669e3bbaf7e688f6076ba8fd109a23dbef30a5"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "1a4e4ac3715696523afe1061368851a7ece50625952f92997ab75df6b3d921d0"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "667x375 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "070c6dffba10f283d0610b96cddeebeace0bf48e0918b053f991c67735530b40"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "304fc0c05b3c2c9d478a2cc8c117887594efe6be0ea93ac676cf5d767c96b391"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "56ebfc27b86e6336184130effc1560e83c3d60a3eca5798052b0f9ae18d8c720"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "445a5d7122e70248ac63006d50160632b4cc16ac4b59794e1ced8ce4950d77ad"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "9249d80a8b3710bcc72c100b7ec1cbf75cc9fa082b18ef5618a5a1086f1e7cd5"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c8a075c214cb44fea75ef71eed8fbc37fa7b8fbe8e3557f413619d34b6f5dc0b"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "dfa0581e8d0681c12ef2bcca06f75e340c82a35449eca7d0572ce3f8ff194aa9"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "44f0752495859d62ece6160cc711ed743e7674215970731a027e4c65a4f7bd4b"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f2708205830370b23568945bbe2e597bb737f8e2bce9c94ad16592bab8e4d7b0"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "dbd875db3077865e1182db2353a70ed69c00d7be1150dee04a523f7f50f6f6eb"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "45e693c26cd4da2b818c8ea0f26b982d79ac764139acb4e0042eff8e7d5afc72"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "70011200058302ee99ce0b1a1eeb9830ed6756147b23a6253d2884a821e7b5a5"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e7fd7c3d6c40734ac881440d54b5d894d27cc06640ed22fe5493ec67185ba7a2"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "9ecd26c364f1644fbd90ce8868f01adac5d177eb066ea345af90ebcff36bf48a"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "db4ad798b7beb72ef2953f5068991913170d47ee10df32b3c50c53ccad1d7129"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "43d89dabbc34d30190b73b804dce3647a1a3e9afa7a4e1b5380cac5eb93e258c"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "a4f2b2a69e2499b4b7aef324d31cebfbd40592098d5e496cf0e069689836dc35"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "3c0c418f8a1bb964a90561c34c078893a7b77db554f6fc4a3eb84b6bca0cbb68"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0512561fd8c25ff09ca6a38a28907b4c87be0264fd6f3871cf024babc8d6fe65"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "2cd6aebfcaef5264319a46d6bb7de6ea4e994e91c83786458d7e9e751e1347f1"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "9109b4f1b050fd952db60d48fc74b317003d874f633da9df8e64374bf97faeed"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "4c7e9b2474b5621ca2d00ad8f7805ddbf12cf3196a77a63c94ffd6f6c2aaed98"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "3b05def92d14044c714151bbd7166ad5d6ecd774288769bf8d2f7756953c3dc0"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "3195d3ae631b3dbe613dffae69f1cd4e6c1f379de4591a76e718adf818942822"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "7e700d2f00ecdff4d43ca52132c3d3df203c9ecb31601483c2dc8550083de485"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "5a76299c83a5d5858a384a4c9c818ee358cc30390ebed6ef92da0a8dca8b5411"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "1618a59b418833c0ea69d7fdbdccfad808a5ecedaa46d00fe81ad637e2b6d771"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "56506d8842d0292dcccf841a7d1ffb576823a4f672399268a5a5d5714df52eb2"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "f1362fe245a85922a9136f5daf7912b339a030c71695e32975553ba9144dee89"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "22ac8e5bfa87c0f7921c50c4abd447795d5186014bf961275d7e40ae8bcfaf0f"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "ac52bfd4d0fc534ca3e920e6575e84ab611a5310322a5369ff68e767af810555"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "104d8c9a0ef1da06ec6ad5c23540a3678eb6d4b9ed79d0e9feaefdce4e1ae7aa"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "12d0d08a628144882f738a368013d9ba155af5262eff5bdb95b00cdab34dd576"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "6b6589e8fc56612be7ba91ab0fca0e99402872b10ad3cc2257f5ca7d684df703"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c725484cb73ca79960519c0ebe5f17f43923f0d64efd7f9079534e7100352810"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "232535c4bf82843ab1eaf02f59800abf2e4bd710a4ae62b22fc21dc7c24097d5"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "fe22efcb67c86e438470ff249edeca6c18f2ef0ac971ca5eab941fdc8e0c4fe5"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "5038a51bca175ecfc35b774e011fab73fde5c144e0092cd5f5c011f7233b7b79"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "12b26576e9e36f8baca27da08f9e592f00888090b82fc0e361f11d8642b88460"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "0729f6ba7e74d632e4469b113b6eb5e14f34a5e9f34eb5e36ea7252b657127ac"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "c19c7416796c32210580cf696ae7fdf7cc7e33cce04858e7cee84f3e1079bc6b"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "96a26715cb5cb193762fcf4e41f93121218b086b1f86aba2a3b0c9bc1db43887"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "35ebcfc8fe9a7264599930f40cf77193c44a4caa53b436c9a2083b7e284c6f3e"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "25fb586e4367958a3e9673a0f9c37105e1ff90712da239163820f4368c286483"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "f7deb1af4c75c794a970992c9affca85a470069efbcf51c1a411c8e51bcc7ef2"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "263b25b5f624225fa39b7ad1caeb47848042cb5815cd3af21cfc6bcbd2a9205c"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "35cad39fb35b48a01c8cf2dd77699badc1a7b51c35c467658ddfb30fb07a9ed0"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "ff70f766eb1d38e8f180ccdc991d87286733de8ffcdd38dc02513c08754e69d7"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "17066470d4b99c20250415d7dce0c26807a78c8af3fbf262ad8c2e031f516ce6"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "06869bd58c5f4ee475bb2b53adb40b28223ac294fbef39c20426a6db71a6e7a8"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "7ea6c79c04394cfc45aa95539fa4fad3184149e101422a722ffa5d6abf84887a"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "144d4b16201154f209f8a60d7a335ad4068b6c9a5f1b9356162e53a894cb2a48"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "d2350edc22e9ac771b3d5718e8312987e9cd0cab8e47185d9d27b68363395aec"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "38daa47c605533b9e283d66849564c247665b82690b0afa201ccf055ad17e80d"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "736x320 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "d5dcd96a20b47d9a7ef9be6ba9c9c8953ce93f17233a135e642b131e2eb6abd8"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "7e1e41c9f5b71e975f7c522949881024381bdd43219d3a67922fc2cb1ed2160b"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "06495bdf3abaedef73bcaccb3ba01e2e31a61d4bc680ef4fe1532a8b874860cf"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "f44337e04b6955a504b2555374680b9fc9c54ae74a0700f1854f42b61104b455"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "88b21ecac20d6030343ac7b02c60283197cf9f07ab9df8965e9f2a2c734e1c00"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "8e290595fbfb4d7c7a151c85ec0833ed6deefef4017642848b12c2e1e0c8e04a"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "8194b162d9eabbe4b10f7fb45a0c726b48193c70e4aa8f79a4c508253746610f"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f83a5ef5bae91d2318a24105d3d4e29df2d5242c4f04f3b7d14bcf2cd36fcf51"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "2602e7d83b2cb889114fd8cdf620b9f20589ad63c84fee29d8ff96c484ae9b3b"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "61e8f30a87859da08369e439fea9d1f73d1faccc436b8a8d9a314af680535bb2"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "570c837878d9ef34ba240db0a86eda5880c542d8997c4dcede03a96c34283f2e"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "73c1d6e301a4d992f785b8c2b82f4132efd49548fc5d918ef430c4f347bc6b84"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "d7419fad575fe59e22b849e44f1e70b811bda9032862685d6e865e93a48fb3cc"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "2c0d286fd2d06fb8aba615b5cbd50f3e556649dc4ef669ecacb547557819bcd7"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "9c420939d7ab081b4344f0c4780979ef4ff9dc6b018f21bdcb677afc568254bd"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "68b304b5a39e6927b9c6b8fd9ca3c83a220784af80c8669fe9609d05862b8279"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "c41272399404d0a3924d6afa545c7aa88c9185856d3fd0c1e02b88a7c8a6eb00"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "04b2ddb3057afab495e289aa5ef21c4cd0a37b1dea706577be43e8b2c2b72bbf"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "a30f18a8093c2c7ebea018cb6f246caa3d3a53a895f535dd24dd2ca8ea38fbb1"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c51a41b871dccf0fd5287c4072b59104cacaae68a73626da3312c35cde37c4b0"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "a594b9eeff55434dcf3a861a5df04f2acfca014b2889e6f4ad0ed41765271a11"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "a0a578df0222d79c0c8e50867d5a33971a8c85b391f18f2a9d3082638ab2a9ee"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "48981a09951e2680f39310f4968aec3bc92c5c7fae7333bf4ae5443d0c6e3ce5"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "d0d7b96aecd3e1d870b6545cae76092ff2ec388a4d372a2259249119cc7162d6"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "1831aec2b9d95bc658b88fc8832a895f7294f87fb89551c1f6fc5aeec7f1a3f6"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "0987c39e17241b14d1e2465e418c3335eb038070d6bd811cc7aa2ac66a8fb638"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "389467929dc7cb90806900a858dcb1007757a777c6e7f5afbeb2c84a690f6cc1"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "4ec048a3b883f26c8d92c2bbaccdbeb638b375bd1e6a2beb1c48b8bd56066585"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "7a2cd05eda1226c2057f56455daab62669d19d708ec532f0fa04d29de88239f9"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "475dba37ad0a2bfe4fcfe78c2f3697fd8ebb86dfdcedd2addbf4ab2f45341703"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "75c86dc05e611c0c3eb851bcd9578a5eea55c7c865f2815a3db4145681e52652"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "2731e70fe86d1c553006e2a8d2a8663862934bb907c2a64b0381aa984b263bfa"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "03461b0855fca490093e1b6bb1198d9292d3d5f130ce0d2f80e3eb7c25052545"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "f7bb80fc55fc4f91b49e57b3d15bdc898a8d98df8dc75ef0d2e944f29f4059c5"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "f4442612dd1887f47ab27b9233d5d3e110d8e31348cd55ae9f665776ad27b9db"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "5a3d273b792e6ed9edc7674c949b100b5942159258b625c4361a593a4fa20478"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f8bd1c8e48dc9e38620302945a9e661eb2c536922f77c295ab620406db17dab8"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "766d3fb9ec44ad98c27ac03ac4737e05c62b3e4028843a549538b800ccee2a2f"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "019e1d7888361d448508b72a6c33ade675bc8ffdf482cabb2542e9399f4b44d5"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "074e28c9134e222cffc17a7892a643921a54365505288a8767105a9ecd743f09"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "97fb13145d06a77131307f9d699a77a2cb7b0f93f5de51c229adbebffc3e3a9f"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "ddb4ece1509d8919d36ee0481a99ddbd2deafd88d17c2dc1c235a86a3158893d"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "17030e622b19ba289892d1474f552cede580fcb9165dae8424ca8d31bd7a8f2d"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "9ecbeb3a541956445243de3caa7b821253ede019cc02b0a0463a7b99c199a2de"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "d0d2685da1d73f5873a39589c31b00fd42665ad808a3abec0c4b00d577bcd902"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "1ee94423b2522f8b7df2fc65495b920653cb3b87e1ca74dc4c0f5968e578f6f3"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "c35b420902ace284c8c0aa5a11c947828558564f3c8b5c0ea95c5022bddc4769"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "5631aea0ff42bfcb5e4f53029cfac517dfec44b094a4caa21a90b7692ab245ce"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a8efedc10759a2458946cfec9131aa4a065cc1a0654d7c6e67bb7f32613389ba"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e172ac042956f0fc64bde4e11c32b01502dc95c74a7c0ebcaeafab0ce67ea859"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "bd27bc08a843a90a1329881ae36d249eae208f6706460a747a1a8e5992401efb"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "7ad79f85f7e43fd3ef854effb77cadddac93a76b1581fb0e57f777fc3b547f49"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "174a4f71fb1558b0e503347d7a56855e8d6c790e5841f292282d1d490e814cec"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "03984d33b0d64ba9258e803418e79beadd7c8ca5d140f9a3106faf2e67383865"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "932x430 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "2833296443d4604ec3dc8c52bf0506caca0eea6f5213c9be986d98050fde7a96"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "1393175dc5c913fa1b720be8c454b26e0ff0a7f26a746468bd8227b3ab549fb5"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "1b811d2c763302ac8a25220314693ff4fe2e1c89fa25fd623d6d8005c46f90ca"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "42067ff147e032db53e44b86ab6c67f9b270424d23b0df7c4494f7b77bc1fe88"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "f74909195b089a0dad9c2d88982a0e21a1250152baa8b69fe7132bd0b25f89dc"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "70abb2e566f7443082d38e49a511eec6177fe710af624f5c3b9ed7fc3d61bb41"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "65076236dd043d023b459e7f631458f9e5eb1dee8f2ec6a9cfd76323356db2d7"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a088d2985753c2d5ecfdfed3a4b7a80eddb8fe56d783df1398b545a6ba9a4661"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "7d8ae654b692389c7bc87e4ab47cd1c2316f9b94bc9abf9389b28d988a2e4b82"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "1a2dfe1c9dfe16175100b3fb9b05e99f5061d3911d9975a933000f3b2cd4319f"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "282c752bcde13baefb078c7ef799365331926753e4f170ad9de01f144107848a"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "79987b118a333b2dc7236a39961816769dcff1dd2f97002b9092754945fd31d5"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "4b14eef6c804f0b105dbcd3712b1ff54c12b59dba9c332698981d91ef459731d"
+    },
+    {
+      "state": "menu/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "3496df4431844c3ba23059167daffd8b27c79f5f51acbfa64a6e0ef999d97291"
+    },
+    {
+      "state": "menu/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "262c2d304cf011d1e5a92cad914f05e4fba619f8009413581ccb70cfb8c6f72a"
+    },
+    {
+      "state": "menu/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "b39fe3219bfab9b06f811a992c87fd2b46b463e83793efdb3461489fa6b5f822"
+    },
+    {
+      "state": "menu/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "e635934b767ee9e8a3cae0e18022656a35d7cd0204cf8606556365df5175124c"
+    },
+    {
+      "state": "menu/menu-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "7777ed39dd89fdf35c1177bc58ca45134130c457795eb9638c4cdb04606184bb"
+    },
+    {
+      "state": "menu/menu-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "b8f84422488385f868200fb4dde260d4e1cdfe9edfd99a508d378912178f3d70"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "dfe7475f59cc29057ae2c6747ed4469c6252775722a592830a4ed98c61e8de13"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "818f340c4391e6665f647476d7a65d7722a32a3b88d1db4634d47d17f64db15c"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "1f6a2789a41c92055b9739cb7ed1b6d88d0446af93c3f8df8cb0fcc3ed2cd8af"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "58290c8982ad56bbfd5e6cba81b982cd4f5606a9587718843d77b3553c3b4b35"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "714ff469457f8e47b2596f4a9242da160b1a865bcbd6667c85f277d699c89512"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "357dd9440d58643c4fee3582c47a6ef93590ff2aa9af2900dab793d0f1ede01f"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "71b51b3266cb6a890883442e5cc190940ce44a6cd1c100eba29012ad13c613b7"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "f4476961bb10b850de9f919d272f9a02c272a83f4aded8b6afb1264db187dd3e"
+    },
+    {
+      "state": "inline/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "feb0479f237bdda2e73d4f80c1a157c4ce4c3cedf1098e7b22081eadeb0e3995"
+    },
+    {
+      "state": "inline/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "901091968576f6cfdfa2dc0e9381d14c478843fe2f5e0605f689ba7a9bc3e48d"
+    },
+    {
+      "state": "inline/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "c4f113b6883179463e70e14f817a9f36d9a2a1941762012e91506b7ff5e5af99"
+    },
+    {
+      "state": "inline/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "d50aafc62ecce169e9bc91a5cbaa281b62421d42de4e8361384fc0492076dff8"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "bb120646b1067959f90e57f5005650a8d0b802241f8167a4c771b2e84996906f"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "39c95995b80f7b98fc61fee12d7027b111506bf422d8378a8957d7d5eddd12de"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "44ed3131e495d66eba1da68163c78d010743a180bdd99f003671e176bcb6638b"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "4b2df5f2e167b95ac829436826a55613a53cc746641a3dd4eb8fbb1980e27adc"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "992e747bf73e6273c230320d7d0f7593cd3891314df4b81d991b3cb0760849df"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "a829135f9e22af20cdacc21f1e6bc437b2b8d52c8d744867dce83ed39eb42739"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "b0bfedae9665248391768e33471d2e4b8d4855a3f68ca0e09063a4a711ece658"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "89372e23fbf9877fb2e4f378e061f594274074a4fcf21200229b84c4e4571f0b"
+    },
+    {
+      "state": "bottom/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "378112ba0b245bfe7c8405e096efbde9cfbb96ebc81981bd72a94fd1bb4b8aff"
+    },
+    {
+      "state": "bottom/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "9047bd3aa62b7de64aacccba410d06e2ecc4533d482cc9798dfcb28e9bc151a8"
+    },
+    {
+      "state": "bottom/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "701f32224d7c96ca4305a81a5ee46b2f7119ee1eb7481e95571a63473163cb65"
+    },
+    {
+      "state": "bottom/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "086a2eb34cc549f7a6b25aff4a0303c835b470163f6997ce4e074a823a9d6245"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "02574e7da431f9e6c4269151cc4aca525137ffaab3c8df0cc176cd6d789d36f3"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "531c7fc5cce255c43e909f0753c121dffbef59e0e7437a6adaca243ccc385e48"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "ee27d9cef8238d551e62276399da5fe00de00c127c7157b8345e706bc07db679"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "3345e3f552544e2e3c44067d5c514e565abc8f2d7ba261cc88c4e29739d80c04"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "2229ca7332bff30054706525aec8e98cdb39152aba927909838240caa0c4cb9b"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "e51239943b4e044e603eb2c5cc33465014eeaf9dfcaec09a4451f092e5ddc93d"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "117797aeb3955d2ae9866d840bb93e70575cc6d22f4a8f02d7af5070ab728bee"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "d54d0fd2224b044030ae9310904ff7b28e9312141535e00a88da5d8d8ab4f16d"
+    },
+    {
+      "state": "none/collapsed/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "549b08105dc8b3bd503d98fce9ff1b9a4fbff30d2adc836642b4ba3e09241d40"
+    },
+    {
+      "state": "none/collapsed/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "703069281cb6d58a730bc0445c50f7bedd68b5016165e687a640fd6f145f50b0"
+    },
+    {
+      "state": "none/search-expanded/full; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "26b47cfe7d33ab457527ad4bb8d519b81e47ea6eac81ec05e2a181cebe6ca330"
+    },
+    {
+      "state": "none/search-expanded/critical-only; measured at ad82, PublicShell source/CSS/chunk unchanged at integrated candidate",
+      "viewport": "1024x520 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "e5760c25889de6a3835afaaad091882ec37dda6358557282c006a2ec8aa6ac81"
+    }
+  ],
+  "inScope": [
+    "Safe reduction to existing space-1 vertical padding in both source CSS entrypoints; public doc and patch changeset",
+    "Observed geometry and reachability gaps across existing modes, without changing or waiving their acceptance criteria"
+  ],
+  "outOfScope": [
+    "Unresolved universal chrome-budget/44px-target interaction strategy adjudication; no implicit expanded/inline/bottom exemption",
+    "Blog source, tests, fixtures, matrices, assertions, snapshots and authorities",
+    "New design tokens, package publication, deployment, merging; canonical #842 source is integrated with provenance rather than reimplemented"
+  ],
+  "classificationEvidenceDigest": "a3887ff598954baa3d3e7f5db30ac5a557230073857cacaf831d7484f51f0575",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "685419e62b6be1a235e00b02ab974a30c9f1b64b7a9d44dbe145731da4168367"
+}

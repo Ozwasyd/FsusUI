@@ -1,0 +1,11 @@
+{
+  "beforeHead": "cecf260475fab0a3efb3225f6d7aa39f96a0ae6b",
+  "beforeMatrixSHA256": "0c70e416867d660a2909dc404081c7ca603212f5d168f6153669cb2396dbafed",
+  "integratedCanonical": [
+    ["7d9de0259f26eb87ac102ca4ceddc2918ff7890a", "bd71b52b"],
+    ["9a482352ebb34b2c6fb079be5742626268cc34a7", "ac128089"]
+  ],
+  "decision": "Confirmed 122px header exceeds 108.8px budget at 736x320 zoom2; existing space-1 produces expected 106px preserving targets; other modes remain unmet pending adjudication",
+  "firstCaptureErrorsPreserved": true,
+  "criticalOnlyIsNotFullThemeOrPackageParity": true
+}

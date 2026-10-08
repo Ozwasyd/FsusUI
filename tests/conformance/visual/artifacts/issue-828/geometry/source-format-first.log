@@ -1,0 +1,3 @@
+Checking formatting...
+[error] No files matching the pattern were found: "vue/packages/theme-chalk/src/el-public-shell-critical.scss".
+All matched files use Prettier code style!

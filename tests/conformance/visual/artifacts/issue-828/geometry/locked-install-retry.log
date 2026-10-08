@@ -1,0 +1,87 @@
+Scope: all 20 workspace projects
+Lockfile is up to date, resolution step is skipped
+Packages: +1697
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 0, reused 0, downloaded 1, added 0
+Progress: resolved 0, reused 0, downloaded 67, added 70
+Progress: resolved 0, reused 0, downloaded 118, added 123
+Progress: resolved 0, reused 0, downloaded 186, added 192
+Progress: resolved 0, reused 0, downloaded 256, added 264
+Progress: resolved 0, reused 0, downloaded 324, added 334
+Progress: resolved 0, reused 0, downloaded 394, added 404
+Progress: resolved 0, reused 0, downloaded 446, added 468
+Progress: resolved 0, reused 0, downloaded 526, added 555
+Progress: resolved 0, reused 0, downloaded 604, added 644
+Progress: resolved 0, reused 0, downloaded 703, added 743
+Progress: resolved 0, reused 0, downloaded 798, added 847
+Progress: resolved 0, reused 0, downloaded 876, added 925
+Progress: resolved 0, reused 0, downloaded 958, added 1006
+Progress: resolved 0, reused 0, downloaded 1058, added 1110
+Progress: resolved 0, reused 0, downloaded 1154, added 1231
+Progress: resolved 0, reused 0, downloaded 1258, added 1358
+Progress: resolved 0, reused 0, downloaded 1353, added 1458
+Progress: resolved 0, reused 0, downloaded 1450, added 1580
+Progress: resolved 0, reused 0, downloaded 1547, added 1697
+Progress: resolved 0, reused 0, downloaded 1547, added 1697, done
+
+dependencies:
++ @element-plus/components 0.0.5 <- vue/packages/components
++ @element-plus/constants <- vue/packages/constants
++ @element-plus/directives 0.0.5 <- vue/packages/directives
++ @element-plus/hooks 0.0.5 <- vue/packages/hooks
++ @element-plus/icons-vue 2.3.2 <- vue/packages/icons-vue
++ @element-plus/locale 0.0.5 <- vue/packages/locale
++ @element-plus/test-utils 0.0.5 <- vue/packages/test-utils
++ @element-plus/theme-chalk 0.1.0 <- vue/packages/theme-chalk
++ @element-plus/utils <- vue/packages/utils
++ @element-plus/wasm 1.0.0 <- vue/packages/wasm
+
+devDependencies:
++ @element-plus/build 0.0.1 <- vue/internal/build
++ @element-plus/build-utils 0.0.1 <- vue/internal/build-utils
++ @element-plus/eslint-config 0.0.1 <- vue/internal/eslint-config
++ @element-plus/icons-svg 2.3.2 <- vue/packages/icons-svg
+
+. postinstall$ pnpm stub
+. postinstall: > @ stub /workspace/FsusUI-828-geometry
+. postinstall: > node ./scripts/with-node-heap.mjs pnpm run -r --parallel stub
+. postinstall: Scope: 19 of 20 workspace projects
+. postinstall: vue/internal/build stub$ unbuild --stub
+. postinstall: vue/internal/build-constants stub$ node ../../../scripts/with-node-heap.mjs unbuild --stub
+. postinstall: vue/internal/build-utils stub$ node ../../../scripts/with-node-heap.mjs unbuild --stub
+. postinstall: vue/packages/wasm stub$ node ../../../scripts/with-node-heap.mjs unbuild --stub
+. postinstall: vue/internal/build stub: Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+. postinstall: vue/internal/build stub:   npx update-browserslist-db@latest
+. postinstall: vue/internal/build stub:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+. postinstall: vue/internal/build-constants stub: Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+. postinstall: vue/internal/build-constants stub:   npx update-browserslist-db@latest
+. postinstall: vue/internal/build-constants stub:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+. postinstall: vue/packages/wasm stub: Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+. postinstall: vue/packages/wasm stub:   npx update-browserslist-db@latest
+. postinstall: vue/packages/wasm stub:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+. postinstall: vue/internal/build-utils stub: Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+. postinstall: vue/internal/build-utils stub:   npx update-browserslist-db@latest
+. postinstall: vue/internal/build-utils stub:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+. postinstall: vue/internal/build-constants stub: [info] Stubbing build-constants
+. postinstall: vue/internal/build-constants stub: [info] Cleaning dist directory: `./dist`
+. postinstall: vue/internal/build-utils stub: [info] Stubbing build-utils
+. postinstall: vue/internal/build-utils stub: [info] Cleaning dist directory: `./dist`
+. postinstall: vue/internal/build stub: [info] Stubbing build
+. postinstall: vue/internal/build stub: [info] Cleaning dist directory: `./dist`
+. postinstall: vue/internal/build-utils stub: Done
+. postinstall: vue/internal/build-constants stub: Done
+. postinstall: vue/internal/build stub: Done
+. postinstall: vue/packages/wasm stub: [info] Stubbing wasm
+. postinstall: vue/packages/wasm stub: Done
+. postinstall: Done
+. prepare$ husky
+. prepare: Done
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @parcel/watcher@2.5.6, esbuild@0.18.20,             │
+│   esbuild@0.25.12, esbuild@0.27.7, esbuild@0.28.0.                           │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 22.2s using pnpm v10.33.0

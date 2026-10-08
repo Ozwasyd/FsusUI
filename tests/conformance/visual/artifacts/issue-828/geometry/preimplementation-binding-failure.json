@@ -1,0 +1,9 @@
+{
+  "originalUnchanged": true,
+  "originalReceiptDigest": "a4cb0b85b5d40c79389736cf58f9b8bd583cad63286817731bc784ec5db44867",
+  "originalAuthorityDigest": "88a28a15b0a5a649532f2d88c28153b50e2d970265ad36671fa329a4801a9295",
+  "failureCode": "classification-receipt-binding",
+  "cause": "authorityDigest was incorrectly derived from authority objects instead of the required digest array",
+  "criterion": "valid preimplementation classification receipt",
+  "result": "unmet; correction is a candidate projection, not retroactive proof"
+}
