@@ -422,7 +422,7 @@ an independent acceptance lane and is not replaced by these simulations.
 | update:modelValue  | 已接受的公开内容更新                                         |
 | change             | 与 `update:modelValue` 相同的公开内容更新                    |
 | transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction |
-| selection-change   | revision 与 grapheme-safe、direction-preserving selection    |
+| selection-change   | producer 捕获的只读 documentIdentity、revision 与 grapheme-safe、direction-preserving selection |
 | history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units            |
 | command            | toolbar command 已通过 dispatcher 执行                       |
 | mode-change        | 编辑模式切换                                                 |

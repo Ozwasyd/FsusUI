@@ -357,6 +357,7 @@
         @pointerup="handleSelectionDragEnd"
         @scroll="handleLayoutScroll"
         @select="handleSelectionMove"
+        @selectionchange="handleSelectionMove"
         @touchmove="handleLayoutTouch"
         @wheel="handleLayoutWheel"
       />
@@ -957,7 +958,7 @@
             "
             @keydown.down.prevent="selectNextPaletteItem"
             @keydown.up.prevent="selectPreviousPaletteItem"
-            @keydown.enter.prevent="executeActivePaletteItem"
+            @keydown.enter="executeActivePaletteItem"
           />
           <div :id="paletteListId" :class="ns.e('palette-list')" role="listbox">
             <div
@@ -2463,6 +2464,7 @@ const dispatchEditorOperation = (
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: result.documentIdentity,
         revision: result.revision,
         selection: result.selection,
       }),
@@ -2514,6 +2516,7 @@ const captureSelection = (breakMerge = true) => {
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: transactionStore.documentIdentity,
         revision: transactionStore.revision,
         selection,
       }),
@@ -3192,7 +3195,9 @@ const movePaletteIndex = (direction: 1 | -1) => {
 }
 const selectNextPaletteItem = () => movePaletteIndex(1)
 const selectPreviousPaletteItem = () => movePaletteIndex(-1)
-const executeActivePaletteItem = () => {
+const executeActivePaletteItem = (event: KeyboardEvent) => {
+  if (event.isComposing || event.keyCode === 229 || isComposing.value) return
+  event.preventDefault()
   const command = paletteCommands.value[activePaletteIndex.value]
   if (command && !isCommandDisabled(command)) {
     executePaletteCommand(command)
@@ -5482,7 +5487,10 @@ const handleKeydown = (event: KeyboardEvent) => {
                 : event.key === 'PageDown'
                   ? 'page-down'
                   : null
-    if (motionKey) {
+    const nativeDocumentNavigation =
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End')
+    if (motionKey && !nativeDocumentNavigation) {
       event.preventDefault()
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return
