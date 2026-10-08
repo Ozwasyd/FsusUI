@@ -1,15 +1,28 @@
 {
   "baselineCommit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
   "runtimeSourceCommit": "c325c600ea2760156d467bfaa375613879211cd9",
-  "candidateEvidenceHead": "55f7951abb75ee5b28f4781ed91ee5aa11f70320",
+  "candidateEvidenceHeadTested": "55f7951abb75ee5b28f4781ed91ee5aa11f70320",
+  "frozenSourcePrHead": "49e64498d5f060482cd0c924070481f30e3e19d4",
   "priorEvidenceManifestSha256": "e455b7dd414e234275fdefd21d1ce8d623642933d7f403cc95cc212c40fe58ca",
   "priorRejectedUxReceiptDigest": "475533dcc3252c125de65000b19a57042c9a030d8f4925f060c088b3e24db6d0",
-  "baselineDevStatus": "running",
+  "priorPreviewDiagnosisManifestSha256AtFrozenHead": "9e421f28d0f5692da2bc38285a698ddf793ffe0414511c35e3ffd8f47214e54f",
+  "baselineDevStatus": "completed_failed",
+  "qualificationEligible": false,
   "files": [
     {
       "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/README.md",
-      "bytes": 8038,
-      "sha256": "577792012b85bff54956b05b9cb864a20edee910cc5a8e1aac1d023c04d7fd41"
+      "bytes": 10146,
+      "sha256": "0de49afabbf87822e278e56844d08e94c21a74a4ccd2a315684647651f99bd03"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-dev-paired-first.log",
+      "bytes": 30545,
+      "sha256": "b9ce8f35b56c40b126ab2b2e5631f791a5d280211bbe6185d6e731e7de52448d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-dev-paired-summary.json",
+      "bytes": 2102,
+      "sha256": "3c3c344dc40d918b84f4504e060ccb5149db330a5db67f1c629844bf200b6e93"
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-preview-paired-first.log",
@@ -27,9 +40,19 @@
       "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
     },
     {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-runtime-custody.json",
+      "bytes": 2327,
+      "sha256": "776ca0688f2a51628486f216ce8b545d716cbd40643300185863a49ec853649e"
+    },
+    {
       "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-runtime-first.log",
       "bytes": 79769,
       "sha256": "072c21d867203e7a41bc3272665550a5f2bc62ae506b6c4643f4ddc240425b28"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/candidate-dev-failure-summary.json",
+      "bytes": 2420,
+      "sha256": "767c6badb61b336993d08967bc64d52937b17540e143e2800cfe42dc4d06474a"
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/candidate-g1.log",
@@ -63,13 +86,18 @@
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/commands.json",
-      "bytes": 4750,
-      "sha256": "050bd99dee60c5668bcdbeaf938709f7236846864452f4df13514943f97d6bf9"
+      "bytes": 4969,
+      "sha256": "632f2ac13c0934616cec4b2f99e887563a6ed30532f8af13de2ea345cbd4e452"
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/failure-index.json",
-      "bytes": 47654,
-      "sha256": "dcd5bfad223e91b9584e8e6c6a8dffae75ff9cbab8c5727bf37703b0b850e842"
+      "bytes": 60760,
+      "sha256": "031bf99cc4d5d90ff4986adf177809225a6a5b9e130a228236de2c3abcebdc47"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-dev-comparison.json",
+      "bytes": 2698,
+      "sha256": "f33635b8efe8fa306eb21b6712e690177b4d47a9da0c4346a8ddf5b7832ad63f"
     },
     {
       "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-live-actual.png",

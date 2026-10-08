@@ -1,0 +1,58 @@
+{
+  "baseline": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "runtimeSource": "c325c600ea2760156d467bfaa375613879211cd9",
+  "frozenSourcePrHead": "49e64498d5f060482cd0c924070481f30e3e19d4",
+  "testedCandidateEvidenceHead": "55f7951abb75ee5b28f4781ed91ee5aa11f70320",
+  "baselineExit": 1,
+  "candidateExit": 1,
+  "baselinePassed": 9,
+  "candidatePassed": 9,
+  "baselineFailed": 10,
+  "candidateFailed": 10,
+  "sameFailedTestNamesAndCauses": true,
+  "causes": [
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 \u203a dev server home route has no browser diagnostics",
+      "cause": "CDN certificate afterEach diagnostics"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 \u203a dev server data route has no browser diagnostics",
+      "cause": "CDN certificate afterEach diagnostics"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 \u203a default home mounts only the virtual window and navigates to sections",
+      "cause": "CDN certificate afterEach diagnostics"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 \u203a default home TreeSelect dropdown does not bleed into the next section",
+      "cause": "CDN certificate afterEach diagnostics"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 \u203a Calendar header controls use soft segmented styling",
+      "cause": "CDN certificate afterEach diagnostics"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 \u203a Calendar title follows the browser locale in demo app",
+      "cause": "CDN certificate afterEach diagnostics"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 \u203a markdown stress route renders long raw HTML without browser diagnostics",
+      "cause": "stress renderer/status timeout"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 \u203a markdown stress scrollbar thumb drag stays smooth without text blur",
+      "cause": "stress renderer/status timeout"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 \u203a markdown stress preview scroll remains monotonic while renderer settles",
+      "cause": "stress renderer/status timeout"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 \u203a markdown stress preview keeps position in narrow devtools-like viewport",
+      "cause": "stress renderer/status timeout"
+    }
+  ],
+  "originalNineDevFailuresReproduced": true,
+  "additionalCase": "Calendar title follows the browser locale; only CDN diagnostics afterEach failed; no locale assertion failure",
+  "qualificationEligible": false
+}

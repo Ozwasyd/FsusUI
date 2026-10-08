@@ -1,0 +1,33 @@
+{
+  "baseRevision": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "candidateRuntimeSource": "c325c600ea2760156d467bfaa375613879211cd9",
+  "candidateEvidenceAtRerun": "55f7951abb75ee5b28f4781ed91ee5aa11f70320",
+  "command": "pnpm exec playwright test --config=vue/playwright.dev.config.ts",
+  "environment": {
+    "activation": "/workspace/.setup/activate.sh",
+    "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.setup/playwright-browsers",
+    "FSUS_VISUAL_DEV_PORT": "5196",
+    "FSUS_VISUAL_PROFILE": "issue-828-baseline-dev"
+  },
+  "exitCode": 1,
+  "total": 19,
+  "passed": 9,
+  "failed": 10,
+  "failedTests": [
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 \u203a dev server data route has no browser diagnostics",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 \u203a dev server home route has no browser diagnostics",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 \u203a default home mounts only the virtual window and navigates to sections",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 \u203a default home TreeSelect dropdown does not bleed into the next section",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 \u203a Calendar header controls use soft segmented styling",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 \u203a Calendar title follows the browser locale in demo app",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 \u203a markdown stress route renders long raw HTML without browser diagnostics",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 \u203a markdown stress scrollbar thumb drag stays smooth without text blur",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 \u203a markdown stress preview scroll remains monotonic while renderer settles",
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 \u203a markdown stress preview keeps position in narrow devtools-like viewport"
+  ],
+  "originalFailedDevNotFailedNow": [],
+  "additionalFailures": [
+    "vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 \u203a Calendar title follows the browser locale in demo app"
+  ],
+  "qualificationEligible": false
+}

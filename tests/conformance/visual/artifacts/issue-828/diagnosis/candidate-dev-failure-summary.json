@@ -1,0 +1,60 @@
+{
+  "sourceCommit": "c325c600ea2760156d467bfaa375613879211cd9",
+  "evidenceHead": "55f7951abb75ee5b28f4781ed91ee5aa11f70320",
+  "exit": 1,
+  "passed": 9,
+  "failed": 10,
+  "total": 19,
+  "failedTests": [
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 \u203a dev server home route has no browser diagnostics",
+      "cause": "CDN certificate afterEach diagnostics",
+      "number": 1
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 \u203a dev server data route has no browser diagnostics",
+      "cause": "CDN certificate afterEach diagnostics",
+      "number": 2
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 \u203a default home mounts only the virtual window and navigates to sections",
+      "cause": "CDN certificate afterEach diagnostics",
+      "number": 3
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 \u203a default home TreeSelect dropdown does not bleed into the next section",
+      "cause": "CDN certificate afterEach diagnostics",
+      "number": 4
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 \u203a Calendar header controls use soft segmented styling",
+      "cause": "CDN certificate afterEach diagnostics",
+      "number": 5
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 \u203a Calendar title follows the browser locale in demo app",
+      "cause": "CDN certificate afterEach diagnostics",
+      "number": 6
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 \u203a markdown stress route renders long raw HTML without browser diagnostics",
+      "cause": "stress renderer/status timeout",
+      "number": 7
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 \u203a markdown stress scrollbar thumb drag stays smooth without text blur",
+      "cause": "stress renderer/status timeout",
+      "number": 8
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 \u203a markdown stress preview scroll remains monotonic while renderer settles",
+      "cause": "stress renderer/status timeout",
+      "number": 9
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 \u203a markdown stress preview keeps position in narrow devtools-like viewport",
+      "cause": "stress renderer/status timeout",
+      "number": 10
+    }
+  ]
+}
