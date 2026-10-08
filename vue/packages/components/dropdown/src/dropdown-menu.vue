@@ -40,22 +40,21 @@ import type { ComponentPublicInstance } from 'vue'
 const TYPEAHEAD_TIMEOUT = 1000
 
 const isTypeaheadEvent = (event: KeyboardEvent) =>
-  event.key.length === 1
-  && !event.ctrlKey
-  && !event.metaKey
-  && !event.altKey
+  event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
 
 const isEditableElement = (target: EventTarget | null) =>
-  target instanceof HTMLElement
-  && (target.isContentEditable
-    || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+  target instanceof HTMLElement &&
+  (target.isContentEditable ||
+    ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
 
 const getItemTextValue = (item: Record<string, any>) => {
   const textValue = item.textValue ?? item['text-value']
 
-  return `${typeof textValue === 'string' && textValue.trim().length > 0
-    ? textValue
-    : item.ref?.textContent ?? ''}`
+  return `${
+    typeof textValue === 'string' && textValue.trim().length > 0
+      ? textValue
+      : (item.ref?.textContent ?? '')
+  }`
     .trim()
     .toLowerCase()
 }
@@ -78,17 +77,17 @@ export default defineComponent({
 
     const { focusTrapRef, onKeydown } = inject(
       FOCUS_TRAP_INJECTION_KEY,
-      undefined
+      undefined,
     )!
 
     const { contentRef, role, triggerId, onMenuKeydown } = inject(
       DROPDOWN_INJECTION_KEY,
-      undefined
+      undefined,
     )!
 
     const { collectionRef: dropdownCollectionRef, getItems } = inject(
       DROPDOWN_COLLECTION_INJECTION_KEY,
-      undefined
+      undefined,
     )!
 
     const {
@@ -104,19 +103,17 @@ export default defineComponent({
     const {
       collectionRef: rovingFocusGroupCollectionRef,
       getItems: getRovingFocusItems,
-    } = inject(
-      ROVING_FOCUS_COLLECTION_INJECTION_KEY,
-      undefined
-    )!
+    } = inject(ROVING_FOCUS_COLLECTION_INJECTION_KEY, undefined)!
 
     const dropdownKls = computed(() => {
       return [ns.b('menu'), ns.bm('menu', size?.value)]
     })
 
     const assignWrapperRef = (
-      element: Element | ComponentPublicInstance | undefined
+      element: Element | ComponentPublicInstance | undefined,
     ) => {
-      const resolvedElement = element instanceof HTMLElement ? element : undefined
+      const resolvedElement =
+        element instanceof HTMLElement ? element : undefined
 
       contentRef.value = resolvedElement ?? null
       dropdownCollectionRef.value = resolvedElement ?? null
@@ -125,9 +122,7 @@ export default defineComponent({
       rovingFocusGroupCollectionRef.value = resolvedElement ?? null
     }
 
-    const dropdownListWrapperRef = composeRefs(
-      assignWrapperRef
-    )
+    const dropdownListWrapperRef = composeRefs(assignWrapperRef)
 
     let typeaheadSearch = ''
     let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
@@ -140,27 +135,35 @@ export default defineComponent({
       }
     }
 
-    const focusMatchingItem = (search: string, currentTarget?: EventTarget | null) => {
-      const items = getItems<{ disabled: boolean }>().filter((item) => !item.disabled)
+    const focusMatchingItem = (
+      search: string,
+      currentTarget?: EventTarget | null,
+    ) => {
+      const items = getItems<{ disabled: boolean }>().filter(
+        (item) => !item.disabled,
+      )
       if (!items.length) return
 
       const activeElement = document.activeElement
       const activeIndex = items.findIndex(
-        (item) => item.ref === activeElement || item.ref === currentTarget
+        (item) => item.ref === activeElement || item.ref === currentTarget,
       )
       const orderedItems =
         activeIndex === -1
           ? items
-          : [...items.slice(activeIndex + 1), ...items.slice(0, activeIndex + 1)]
+          : [
+              ...items.slice(activeIndex + 1),
+              ...items.slice(0, activeIndex + 1),
+            ]
       const normalizedSearch = normalizeTypeaheadSearch(search)
       const matchedItem = orderedItems.find((item) =>
-        getItemTextValue(item).startsWith(normalizedSearch)
+        getItemTextValue(item).startsWith(normalizedSearch),
       )
 
       if (!matchedItem?.ref) return
 
       const rovingItem = getRovingFocusItems<{ id: string }>().find(
-        (item) => item.ref === matchedItem.ref
+        (item) => item.ref === matchedItem.ref,
       )
 
       if (rovingItem?.id) {
@@ -203,9 +206,9 @@ export default defineComponent({
         const content = unref(contentRef)
 
         if (
-          target
-          && (currentTarget as Node).contains(target as Node)
-          && handleTypeaheadSearch(e)
+          target &&
+          (currentTarget as Node).contains(target as Node) &&
+          handleTypeaheadSearch(e)
         ) {
           e.preventDefault()
           return
@@ -220,14 +223,14 @@ export default defineComponent({
         if (!FIRST_LAST_KEYS.includes(code)) return
         e.preventDefault()
         const items = getItems<{ disabled: boolean }>().filter(
-          (item) => !item.disabled
+          (item) => !item.disabled,
         )
         const targets = items.map((item) => item.ref!)
         if (LAST_KEYS.includes(code)) {
           targets.reverse()
         }
         focusFirst(targets)
-      }
+      },
     )
 
     const handleKeydown = (e: KeyboardEvent) => {

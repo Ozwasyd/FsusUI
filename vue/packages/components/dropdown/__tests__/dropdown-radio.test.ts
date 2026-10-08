@@ -46,19 +46,31 @@ describe('Dropdown public checked state', () => {
   test('renders one consumer-committed radio and updates through props only', async () => {
     const wrapper = await mountMenu()
     expect(wrapper.findAll('[role="menuitemradio"]')).toHaveLength(2)
-    expect(wrapper.findAll('[role="menuitemradio"][aria-checked="true"]')).toHaveLength(1)
-    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe('true')
+    expect(
+      wrapper.findAll('[role="menuitemradio"][aria-checked="true"]'),
+    ).toHaveLength(1)
+    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe(
+      'true',
+    )
     await wrapper.setProps({ committed: 'ja' })
-    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe('false')
-    expect(wrapper.get('[data-item="ja"]').attributes('aria-checked')).toBe('true')
+    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe(
+      'false',
+    )
+    expect(wrapper.get('[data-item="ja"]').attributes('aria-checked')).toBe(
+      'true',
+    )
     wrapper.unmount()
   })
 
   test('keeps ordinary command items and removes unsupported checked attrs', async () => {
     const wrapper = await mountMenu()
     for (const item of ['retry', 'uncontrolled']) {
-      expect(wrapper.get(`[data-item="${item}"]`).attributes('role')).toBe('menuitem')
-      expect(wrapper.get(`[data-item="${item}"]`).attributes('aria-checked')).toBeUndefined()
+      expect(wrapper.get(`[data-item="${item}"]`).attributes('role')).toBe(
+        'menuitem',
+      )
+      expect(
+        wrapper.get(`[data-item="${item}"]`).attributes('aria-checked'),
+      ).toBeUndefined()
     }
     wrapper.unmount()
   })
@@ -66,14 +78,24 @@ describe('Dropdown public checked state', () => {
   test('activation never half-commits controlled selection or hides pending content', async () => {
     const wrapper = await mountMenu()
     const dropdown = wrapper.getComponent(ElDropdown)
-    await wrapper.get('[data-item="ja"]').trigger('keydown', { key: 'Enter', code: 'Enter' })
+    await wrapper
+      .get('[data-item="ja"]')
+      .trigger('keydown', { key: 'Enter', code: 'Enter' })
     expect(dropdown.emitted('command')?.[0]?.[0]).toBe('ja')
-    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe('true')
-    expect(wrapper.get('[data-item="ja"]').attributes('aria-checked')).toBe('false')
+    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe(
+      'true',
+    )
+    expect(wrapper.get('[data-item="ja"]').attributes('aria-checked')).toBe(
+      'false',
+    )
     expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([true])
-    await wrapper.get('[data-item="retry"]').trigger('keydown', { key: ' ', code: 'Space' })
+    await wrapper
+      .get('[data-item="retry"]')
+      .trigger('keydown', { key: ' ', code: 'Space' })
     expect(dropdown.emitted('command')?.at(-1)?.[0]).toBe('retry')
-    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe('true')
+    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe(
+      'true',
+    )
     wrapper.unmount()
   })
 
@@ -85,17 +107,26 @@ describe('Dropdown public checked state', () => {
     await item.trigger('keydown', { key: 'Enter', code: 'Enter' })
     await item.trigger('keydown', { key: ' ', code: 'Space' })
     expect(wrapper.getComponent(ElDropdown).emitted('command')).toBeUndefined()
-    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe('true')
+    expect(wrapper.get('[data-item="en"]').attributes('aria-checked')).toBe(
+      'true',
+    )
     wrapper.unmount()
   })
 
   test('ArrowUp keyboard entry focuses the committed checked item', async () => {
-    const wrapper = mount(host, { props: { committed: 'ja' }, attachTo: document.body })
+    const wrapper = mount(host, {
+      props: { committed: 'ja' },
+      attachTo: document.body,
+    })
     ;(wrapper.get('button').element as HTMLButtonElement).focus()
-    await wrapper.get('button').trigger('keydown', { key: 'ArrowUp', code: 'ArrowUp' })
+    await wrapper
+      .get('button')
+      .trigger('keydown', { key: 'ArrowUp', code: 'ArrowUp' })
     await flushPromises()
     await vi.waitFor(() => {
-      expect(document.activeElement).toBe(wrapper.get('[data-item="ja"]').element)
+      expect(document.activeElement).toBe(
+        wrapper.get('[data-item="ja"]').element,
+      )
     })
     wrapper.unmount()
   })
@@ -106,23 +137,34 @@ describe('Dropdown public checked state', () => {
     ;(trigger.element as HTMLButtonElement).focus()
     await trigger.trigger('keydown', { key: 'Enter', code: 'Enter' })
     await vi.waitFor(() => {
-      expect(document.activeElement).toBe(wrapper.get('[data-item="en"]').element)
+      expect(document.activeElement).toBe(
+        wrapper.get('[data-item="en"]').element,
+      )
     })
-    await wrapper.get('[data-item="en"]').trigger('keydown', { key: 'Escape', code: 'Escape' })
+    await wrapper
+      .get('[data-item="en"]')
+      .trigger('keydown', { key: 'Escape', code: 'Escape' })
     await vi.waitFor(() => {
       expect(document.activeElement).toBe(trigger.element)
-      expect(wrapper.getComponent(ElDropdown).emitted('visible-change')?.at(-1)).toEqual([false])
+      expect(
+        wrapper.getComponent(ElDropdown).emitted('visible-change')?.at(-1),
+      ).toEqual([false])
     })
     wrapper.unmount()
   })
 
-  test.each(['navigation', 'group'])('keeps checked state out of the %s role', async (role) => {
-    const wrapper = await mountMenu({ role })
-    const item = wrapper.get('[data-item="en"]')
-    expect(item.attributes('role')).toBe(role === 'navigation' ? 'link' : 'button')
-    expect(item.attributes('aria-checked')).toBeUndefined()
-    wrapper.unmount()
-  })
+  test.each(['navigation', 'group'])(
+    'keeps checked state out of the %s role',
+    async (role) => {
+      const wrapper = await mountMenu({ role })
+      const item = wrapper.get('[data-item="en"]')
+      expect(item.attributes('role')).toBe(
+        role === 'navigation' ? 'link' : 'button',
+      )
+      expect(item.attributes('aria-checked')).toBeUndefined()
+      wrapper.unmount()
+    },
+  )
 
   test('Escape closes a pointer-opened popup while focus remains on its trigger', async () => {
     const wrapper = mount(host, { attachTo: document.body })
@@ -130,9 +172,13 @@ describe('Dropdown public checked state', () => {
     ;(trigger.element as HTMLButtonElement).focus()
     await trigger.trigger('click')
     const dropdown = wrapper.getComponent(ElDropdown)
-    await vi.waitFor(() => expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([true]))
+    await vi.waitFor(() =>
+      expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([true]),
+    )
     await trigger.trigger('keydown', { key: 'Escape', code: 'Escape' })
-    await vi.waitFor(() => expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([false]))
+    await vi.waitFor(() =>
+      expect(dropdown.emitted('visible-change')?.at(-1)).toEqual([false]),
+    )
     expect(document.activeElement).toBe(trigger.element)
     wrapper.unmount()
   })
