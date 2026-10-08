@@ -1,0 +1,9 @@
+
+ RUN  v4.1.5 /workspace/FsusUI-828-label-visibility
+
+
+ Test Files  3 passed (3)
+      Tests  67 passed (67)
+   Start at  15:01:59
+   Duration  9.95s (transform 4.00s, setup 216ms, import 5.16s, tests 2.29s, environment 1.86s)
+

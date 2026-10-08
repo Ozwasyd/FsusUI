@@ -1,0 +1,16 @@
+✘ [ERROR] Could not resolve "/workspace/FsusUI-828-label-visibility/vue/vite.config.ts"
+
+failed to load config from /workspace/FsusUI-828-label-visibility/vue/vite.config.ts
+error when starting preview server:
+Error: Build failed with 1 error:
+error: Could not resolve "/workspace/FsusUI-828-label-visibility/vue/vite.config.ts"
+    at failureErrorWithLog (/workspace/FsusUI-828-label-visibility/node_modules/vite/node_modules/esbuild/lib/main.js:1748:15)
+    at /workspace/FsusUI-828-label-visibility/node_modules/vite/node_modules/esbuild/lib/main.js:1207:25
+    at runOnEndCallbacks (/workspace/FsusUI-828-label-visibility/node_modules/vite/node_modules/esbuild/lib/main.js:1588:45)
+    at buildResponseToResult (/workspace/FsusUI-828-label-visibility/node_modules/vite/node_modules/esbuild/lib/main.js:1205:7)
+    at /workspace/FsusUI-828-label-visibility/node_modules/vite/node_modules/esbuild/lib/main.js:1232:16
+    at responseCallbacks.<computed> (/workspace/FsusUI-828-label-visibility/node_modules/vite/node_modules/esbuild/lib/main.js:884:9)
+    at handleIncomingPacket (/workspace/FsusUI-828-label-visibility/node_modules/vite/node_modules/esbuild/lib/main.js:939:12)
+    at Socket.readFromStdout (/workspace/FsusUI-828-label-visibility/node_modules/vite/node_modules/esbuild/lib/main.js:862:7)
+    at Socket.emit (node:events:509:28)
+    at addChunk (node:internal/streams/readable:563:12)

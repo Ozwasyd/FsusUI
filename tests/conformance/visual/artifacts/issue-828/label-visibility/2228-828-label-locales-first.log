@@ -1,0 +1,13 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:5360/?visual=public-shell-nav-mode&theme=light&contract=1&session=anonymous&fixtureLocale=en&longBrand=1&navMode=inline
+Call log:
+[2m  - navigating to "http://127.0.0.1:5360/?visual=public-shell-nav-mode&theme=light&contract=1&session=anonymous&fixtureLocale=en&longBrand=1&navMode=inline", waiting until "load"[22m
+
+    at /workspace/FsusUI-828-label-visibility/.tmp/issue-828-label/probe-locales.mjs:5:128 {
+  name: 'Error'
+}
+
+Node.js v24.19.0

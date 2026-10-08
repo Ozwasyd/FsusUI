@@ -1,0 +1,25 @@
+
+> @ ensure:icons /workspace/FsusUI-828-label-visibility
+> node ./scripts/with-node-heap.mjs node ./scripts/ensure-icons-artifacts.mjs
+
+[ensure-icons] cache-miss source-hash=d32686b4706e5f7d; rebuilding icons-vue artifacts.
+  - missing icons artifacts: vue/packages/icons-vue/dist/index.js, vue/packages/icons-vue/dist/index.cjs, vue/packages/icons-vue/dist/global.js, vue/packages/icons-vue/dist/types/index.d.ts
+  - icons artifact fingerprint is missing
+
+> @element-plus/icons-vue@2.3.2 build /workspace/FsusUI-828-label-visibility/vue/packages/icons-vue
+> node ../../../scripts/with-node-heap.mjs pnpm run build:generate && node ../../../scripts/with-node-heap.mjs run-p build:build build:types
+
+
+> @element-plus/icons-vue@2.3.2 build:generate /workspace/FsusUI-828-label-visibility/vue/packages/icons-vue
+> node ../../../scripts/with-node-heap.mjs tsx build/generate.ts
+
+Generated 302 FsusUI design-aligned icons.
+
+> @element-plus/icons-vue@2.3.2 build:types /workspace/FsusUI-828-label-visibility/vue/packages/icons-vue
+> node ../../../scripts/with-node-heap.mjs vue-tsc --declaration --emitDeclarationOnly
+
+
+> @element-plus/icons-vue@2.3.2 build:build /workspace/FsusUI-828-label-visibility/vue/packages/icons-vue
+> NODE_ENV=production node ../../../scripts/with-node-heap.mjs tsx build/build.ts
+
+icons-vue bundles generated.
