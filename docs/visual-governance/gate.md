@@ -35,3 +35,18 @@ The gate cannot prove and does not claim to prove:
 ## Report
 
 The gate writes `.tmp/visual-governance/report.json` (or `--output`). Its schema is [`spec/components/visual-governance-report.schema.json`](../../spec/components/visual-governance-report.schema.json). Each violation is locatable by `componentId`, `partId`, `surfaceRole`, `selector`, `scope`, `actual.source.path`, `actual.source.line`, `expected.canonicalReference`, and `actual.value`.
+
+## Refreshing registered source metadata
+
+After an authorized source or producer update, refresh the registered digests
+with the registry's declared producer:
+
+```sh
+node scripts/check-component-surface-semantic-registry.mjs --refresh-source-digests
+```
+
+This explicit mode changes only source digests and the generated source revision.
+It validates the complete registry before writing; rules, ownership, mappings,
+review policy, and negative controls remain unchanged. The default checker stays
+read-only and continues to reject source drift. A registry fixture that references
+the same current sources can use `--registry path` with this refresh mode.

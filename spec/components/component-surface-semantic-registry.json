@@ -14,7 +14,7 @@
   "allowlist": [],
   "generated": {
     "producer": "scripts/check-component-surface-semantic-registry.mjs",
-    "sourceRevision": "2b32686f3ab8645cc5e578ad8218e37459da17a6",
+    "sourceRevision": "2a2870582a4477c29b8f9c6c7ce9876eed64ed03",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -34,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "25c0ec51de05d6e66147ee2d2a17522b5fdd92f521fde6bbac1197f5b0825d41"
+      "digest": "18e3f883cd6e569fd2a3100ec9336d1b3ef2720ab663f9d0f8bc6497c25a4722"
     },
     "component-motion": {
       "path": "docs/components/motion.md",
@@ -178,7 +178,7 @@
       "path": "vue/packages/theme-chalk/src/drawer.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "2b273dd1be59a098370a33cd2a5853d7867dff1edd5fd2331c1120d138e92fad"
+      "digest": "abd8da4be7280e7ee906a1bd225160be3ea732ef6380ece3a2fb39f99f5cb236"
     },
     "implementation-23": {
       "path": "vue/packages/theme-chalk/src/notification.scss",
