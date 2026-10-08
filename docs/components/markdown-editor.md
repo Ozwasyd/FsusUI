@@ -207,7 +207,12 @@ availability state, and pending/result authority.
 
 `surfaces.commandPalette`, `surfaces.selectionToolbar`, and `surfaces.slashMenu` are opt-in
 presentations. Palette search reads only command `label`, `description`, and `keywords`; visible
-copy comes from `localeText.commandPalette`. `Esc` in the selection toolbar or slash menu closes
+copy comes from `localeText.commandPalette`. Within its active teleported dialog,
+the palette consumes Ctrl/Cmd+P (including repeat) without reopening or executing
+a command; the consumer still owns its first host-scoped `openCommandPalette()`
+invocation. Disabled, composing, modified or unrelated keys remain unclaimed.
+See the [palette keyboard boundary](../api/markdown-editor-input.md).
+`Esc` in the selection toolbar or slash menu closes
 the current surface, restores source focus, and retains source, selection, and history. The
 current projection/input context validates a slash trigger; execution merges the trigger range
 and command result into one revision-bound transaction, so it cannot delete the trigger first
