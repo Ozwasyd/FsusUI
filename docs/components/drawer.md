@@ -30,10 +30,19 @@ padding without moving that edge:
 - `btt`: bottom / left / right
 
 The absolutely positioned close button does not move with header padding, so it
-also consumes the top (and `rtl` right) inset through `fsus-inset-safe-area`.
+also consumes the top inset and the right inset on `rtl`, `ttb`, and `btt`
+panels through `fsus-inset-safe-area`.
 
 The overlay scrim still covers the full viewport. Do not patch Drawer geometry
 from a consumer; use the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract).
+
+`size` still specifies the panel width or height, including CSS expressions such
+as `min(86vw, 22rem)`. The edge-attached background is distinct from the safe
+content rectangle. During the opening animation the panel is moving; perform
+settled geometry measurements after `opened`, rather than treating `open` as
+the final layout. Closing immediately marks the panel `inert` and `aria-hidden`
+while its existing leave animation finishes. Retained content becomes
+interactive again on reopening; `destroy-on-close` still controls destruction.
 
 The `pnpm audit:visual-boundaries` matrix covers all four Drawer directions.
 It verifies the viewport-safe CSS contract, not a physical Safari toolbar.

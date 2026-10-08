@@ -5,6 +5,8 @@ const focusReason = ref<'pointer' | 'keyboard'>()
 const lastUserFocusTimestamp = ref<number>(0)
 const lastAutomatedFocusTimestamp = ref<number>(0)
 let focusReasonUserCount = 0
+let pointerFocusTarget: HTMLElement | null = null
+let pointerFocusTargetTimer: ReturnType<typeof setTimeout> | undefined
 const focusableCache = new WeakMap<HTMLElement, HTMLElement[]>()
 
 export type FocusLayer = {
@@ -166,9 +168,33 @@ const notifyFocusReasonPointer = () => {
 }
 
 const notifyFocusReasonKeydown = () => {
+  pointerFocusTarget = null
   focusReason.value = 'keyboard'
   lastUserFocusTimestamp.value = window.performance.now()
 }
+
+// WebKit can activate a button without moving document.activeElement to it.
+// Remember the activating control for this event turn without focusing it.
+const notifyPointerActivation = (event: MouseEvent) => {
+  clearTimeout(pointerFocusTargetTimer)
+  pointerFocusTarget =
+    event.detail > 0
+      ? ((event
+          .composedPath()
+          .find(
+            (target) =>
+              target instanceof HTMLElement &&
+              target.tabIndex >= 0 &&
+              !target.matches(':disabled') &&
+              !target.closest('[hidden], [inert]'),
+          ) as HTMLElement | undefined) ?? null)
+      : null
+  pointerFocusTargetTimer = setTimeout(() => {
+    pointerFocusTarget = null
+  }, 0)
+}
+
+export const getPointerFocusTarget = () => pointerFocusTarget
 
 export const useFocusReason = (): {
   focusReason: typeof focusReason
@@ -180,6 +206,7 @@ export const useFocusReason = (): {
       document.addEventListener('mousedown', notifyFocusReasonPointer)
       document.addEventListener('touchstart', notifyFocusReasonPointer)
       document.addEventListener('keydown', notifyFocusReasonKeydown)
+      document.addEventListener('click', notifyPointerActivation, true)
     }
     focusReasonUserCount++
   })
@@ -190,6 +217,9 @@ export const useFocusReason = (): {
       document.removeEventListener('mousedown', notifyFocusReasonPointer)
       document.removeEventListener('touchstart', notifyFocusReasonPointer)
       document.removeEventListener('keydown', notifyFocusReasonKeydown)
+      document.removeEventListener('click', notifyPointerActivation, true)
+      clearTimeout(pointerFocusTargetTimer)
+      pointerFocusTarget = null
     }
   })
 

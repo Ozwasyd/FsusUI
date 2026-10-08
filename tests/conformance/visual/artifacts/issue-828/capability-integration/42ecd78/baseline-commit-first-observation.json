@@ -1,0 +1,9 @@
+{
+  "qualificationEligible": false,
+  "stage": "first git commit of generated derivative",
+  "result": "husky pre-commit exit1, pnpm delegated install exit254; inactive setup selected platform pnpm and attempted /home/agent/.local/share/pnpm mkdir ENOENT",
+  "rawLogAvailable": false,
+  "evidenceSource": "actual tool output, summarized without relabeling as raw output",
+  "retry": "after original setup activation, same commit exit0; retry log retained",
+  "sourceUnchanged": true
+}

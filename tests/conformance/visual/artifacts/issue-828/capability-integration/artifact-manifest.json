@@ -1,0 +1,420 @@
+{
+  "qualificationEligible": false,
+  "sourceCandidates": [
+    "599ebe4ab1cae03d84163724f7d72d4b337c8136",
+    "42ecd78e01f0e8f52ad4ccbd7ffb87fea0d1c3d6"
+  ],
+  "generatedDerivativeCommit": "1f2db698fb477f4722576f6c349934165835a280",
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-api-first.log",
+      "bytes": 119,
+      "sha256": "7b7061d6847e8a8c0c7e7cbe1342be7397e2507d2f3a5071654ab829ae0ba82f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-baseline-after-producer.log",
+      "bytes": 191,
+      "sha256": "b8929f12e60ca5069d7a1ed9b73c216dfee1e59199acb101b1accec6617cca1d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-baseline-commit-retry.log",
+      "bytes": 195,
+      "sha256": "c65d1ec160355a6f974bcc834050cce9674e77e502c26a0ca1996e2227af6c88"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-baseline-exact-metadata-head.log",
+      "bytes": 191,
+      "sha256": "b8929f12e60ca5069d7a1ed9b73c216dfee1e59199acb101b1accec6617cca1d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-baseline-observation-first.json",
+      "bytes": 317630,
+      "sha256": "db2c65327b972c4225424a9907e7c3e35ac27ef6bf2917de7b3fd479ca4dd769"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-baseline-observation-summary.json",
+      "bytes": 2612,
+      "sha256": "448b35729ea563f8eaeff388e2064cd06a7845c00c5bfe8b18f43ba2d47ce34a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-baseline-producer-first.log",
+      "bytes": 174,
+      "sha256": "2c8d73fe8947e0abbc06351079e7affd6d67290c767f3406ba5b1aea7b404e47"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-combined-unit-first.log",
+      "bytes": 232,
+      "sha256": "0271c1c215aef3c9fa8ff41299b151c7e48c7058d770f247d0d090e36d0fdb54"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-design-first.log",
+      "bytes": 4867,
+      "sha256": "2515306239980f48c47bea8e6fbb395fe44583b467d805885c502d4c6708194b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-docs-exact-metadata-head.log",
+      "bytes": 395,
+      "sha256": "79f9abc2463563e76818d188bed14e00c8b480b99c29c43da806ede458b97405"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-docs-first.log",
+      "bytes": 395,
+      "sha256": "79f9abc2463563e76818d188bed14e00c8b480b99c29c43da806ede458b97405"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-drawer-chromium-first.log",
+      "bytes": 2021,
+      "sha256": "ec58b859e3a937cc8f8ebcd0120514c774f0e4440d665bf7289e971c594c6bfe"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-focus-chromium-first.log",
+      "bytes": 2982,
+      "sha256": "e9851f09178d830af4ab08334a84d0023bd88174edb2a752c2959076b392ee7b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-focus-unit-first.log",
+      "bytes": 224,
+      "sha256": "67e2d7993393431308938c2fa35b277328692cfd80c90457f1b6400e911aee48"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-focus-webkit-first.log",
+      "bytes": 23978,
+      "sha256": "01627489ad289710f0bd223425346ae357d8fef4191796ec765b34a99a115ac3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-public-api-baseline-first.log",
+      "bytes": 341,
+      "sha256": "25d68f6242d0d3009bc1b389214d882fd6687c51366ead2bad54934bb651ca5f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/828-canonical-826-typecheck-first.log",
+      "bytes": 202,
+      "sha256": "62933b396168a4aee015a5fbc2ec348da2800dcb805de9a65435ecd20ec0314c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/baseline-commit-first-observation.json",
+      "bytes": 485,
+      "sha256": "9a57ed948200f3a62cb00bdf189cbf4b5d306f601e1cdee6ea3f789567e5a33b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-images/13609b39dfbad62ce930cb509330df363a7f5430.png",
+      "bytes": 6465,
+      "sha256": "932634b746acff5993ed66a48f4f37a52d90be1de71b688dedf472cb7da6c64a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-images/1479131494ab81f4cb81afe79c1041cfac281642.png",
+      "bytes": 8918,
+      "sha256": "b105bc30a09c65627192f0e1e87f6f98026b52034a4cabcec1d0d3d644afb0f7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-images/1663a675713364847c1fd9e902cec4d4d439d449.png",
+      "bytes": 8555,
+      "sha256": "c4634d387afcdb51e790d13290c807abd81b435dc66d29d74f0f5f3ba48bb464"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-images/36ffdaadd95551a74f82fb1f30f4bf4f2fe81227.png",
+      "bytes": 7123,
+      "sha256": "20e83befa3abfbda100cecf74fee66c43d0c6f52ae7c50a975477d2962dda539"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-images/3ad9c053adc5649a139dd26b70d27e197d50a591.png",
+      "bytes": 8867,
+      "sha256": "f8622972c3c181c4aa74617c06c2751a4e666be247f0db32c51c08361de9d398"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-images/6082432b5c2b479c16a97e29821ece26e81a9c8e.png",
+      "bytes": 7197,
+      "sha256": "34a8b471f9002feb8955931f9c20f5992def110bc4b547ed6e90c4330719fb82"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-images/813f8956005a219f3b97f693900b69ad0145d410.png",
+      "bytes": 8713,
+      "sha256": "26e3f0d6750a75922a655c3be99ebe17160bba7e48c4b48117b30da8ffc46d6e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-images/8a5145a59c1ba9be7573688b60dbd30a0010d953.png",
+      "bytes": 6511,
+      "sha256": "ddc2c9b4e57f2645f744d8f85a76bcccb4d4f53643d9b20bced1e6229cd8fa75"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-0004c--boxes-and-real-hit-targets-safe-area-chromium/trace.zip",
+      "bytes": 361053,
+      "sha256": "4999d8ac7e846d9eebb7ec9aaa63eaacf746ab5755c78de7620b723600964844"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-52d2a-s-lazy-content-after-closed-safe-area-chromium/trace.zip",
+      "bytes": 365731,
+      "sha256": "2af268cf30acac80ac4322e3171c2a87660fe5e32737f19aea5b18c1c2ab8b28"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-76e47-ting-and-programmatic-focus-safe-area-chromium/trace.zip",
+      "bytes": 280934,
+      "sha256": "433c004b64bd95750c161e33667bdd616f7569bb348044a660658f070e9fa7fc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-80896--boxes-and-real-hit-targets-safe-area-chromium/trace.zip",
+      "bytes": 336109,
+      "sha256": "8bb751a9b603f350dec252fa4e212445180e362258de44411723bbd529859c47"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-8ccef--boxes-and-real-hit-targets-safe-area-chromium/trace.zip",
+      "bytes": 346595,
+      "sha256": "aec3b41ce2b1f595199480661ca382c3ed60d8b02d6e0bc2595313c9633760ea"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-8f51a--boxes-and-real-hit-targets-safe-area-chromium/trace.zip",
+      "bytes": 328096,
+      "sha256": "6889ace8b98730e5426606973636c5c88b86f3dff2263e905f8030f0193f2090"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-aa997--boxes-and-real-hit-targets-safe-area-chromium/trace.zip",
+      "bytes": 338230,
+      "sha256": "76d7eeaf8e81b7eef2e6fc407f8f6c6ddd1cacdd50dc0e9c82ef786dc695b9e5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-d70d3--boxes-and-real-hit-targets-safe-area-chromium/trace.zip",
+      "bytes": 323034,
+      "sha256": "ed808bbeec6f9e6559dc300c3ecdc8a22fc2fe54d00f0135b67712a87b823c0c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-fa5c7--boxes-and-real-hit-targets-safe-area-chromium/trace.zip",
+      "bytes": 338644,
+      "sha256": "fb4fae10a797d07b221bce01d908eb9e108ca04a302f5abda011299955e23cec"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/drawer-traces/safe-area-drawer-interacti-fbd5f--boxes-and-real-hit-targets-safe-area-chromium/trace.zip",
+      "bytes": 319643,
+      "sha256": "1ea208bbdc3d898d8e5f8377e44a1ad8791f9d379e0b968b3cd397f11d3db74a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-0a3c9-peated-closes-destroy-true--webkit/error-context.md",
+      "bytes": 950,
+      "sha256": "243ae93d043f6475855cabb0a4ada759b1ea24dffbbf25c478e8a9488d8c3cbd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-198eb-eated-closes-destroy-false--webkit/error-context.md",
+      "bytes": 951,
+      "sha256": "eea8a42a2a7a5a842d1ba1dc40da62413cf8fd4d30281cb3d882cee69460d8b8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-39c2a-peated-closes-destroy-true--webkit/error-context.md",
+      "bytes": 949,
+      "sha256": "2d9c083125e31abeb979de4b4a348899f93073eceac7f177258054138f9b9bad"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-3b842-hrough-an-interrupted-close-webkit/error-context.md",
+      "bytes": 935,
+      "sha256": "bc33d9c6d6d1987627ee145127e6afad47786b0042fd89fce8e32832d9a9bfd6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-82a2e-before-releasing-the-parent-webkit/error-context.md",
+      "bytes": 946,
+      "sha256": "d5bdd33ab9663c74f4739cb75129bf610b12c74b82e952e77ae915bc322b196d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-8b3fd-before-releasing-the-parent-webkit/error-context.md",
+      "bytes": 945,
+      "sha256": "cb84543cf06957063aa5aeb5147e770cefcaf0e5dcad291d4baf72ef9fd202bc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-93419-eated-closes-destroy-false--webkit/error-context.md",
+      "bytes": 950,
+      "sha256": "98eaf9bdc5778d3db7660d9a7cc8fe2b22f5e3ba9e94f7ce924e6d0752fe38c5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-ad69e-hrough-an-interrupted-close-webkit/error-context.md",
+      "bytes": 936,
+      "sha256": "09d3e861f20301a3ab10918ab8cac6b1a5ebc2f9eb2ebf03186965a31ac9e093"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-eaaab-ard-activation-after-Escape-webkit/error-context.md",
+      "bytes": 922,
+      "sha256": "54f078279647c0833730edc32f7ae481d90c198ad1e32b24b5e42eabe6a4d0be"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/42ecd78/webkit-first-errors/dialog-focus-portrait-notc-ff5c9-ard-activation-after-Escape-webkit/error-context.md",
+      "bytes": 923,
+      "sha256": "5336d3cdb795bc0a773b5add785bb26f7029b2f3b75457f5af4a0d23c2e51af3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-825-locked-install-first.log",
+      "bytes": 4860,
+      "sha256": "cf81b9a787ee7940d1cc94726e52ad5f80c880fad57d89f3413e31ef546897b7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-capabilities-design-first.log",
+      "bytes": 4867,
+      "sha256": "2515306239980f48c47bea8e6fbb395fe44583b467d805885c502d4c6708194b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-capabilities-docs-first.log",
+      "bytes": 395,
+      "sha256": "79f9abc2463563e76818d188bed14e00c8b480b99c29c43da806ede458b97405"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-capabilities-icons-first.log",
+      "bytes": 1307,
+      "sha256": "3cdaaac98ebe918e2f7418126e18dd27d9e9009521090f9c6311f0af367fa22d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-capabilities-theme-first.log",
+      "bytes": 6005,
+      "sha256": "5475b02ec1dc1c169205bb3016212038f6028f16f5202b1c96c1cfd640b69fbd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-capabilities-unit-after-icons.log",
+      "bytes": 232,
+      "sha256": "e87f8b6167f184207a15bd85c652a8c71819b1c8a301c2ccbe549d2b4c60a528"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-capabilities-unit-first.log",
+      "bytes": 11836,
+      "sha256": "e6e7c09b259811aebeaa3b55fcfb11b09705d890ad8964f232e02898d3f2e989"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-drawer-chromium-evidence.log",
+      "bytes": 2021,
+      "sha256": "4807fb236a6c2e5fdc93f0e7ae01b05ffee8b9c00190269092be5eadc30343fa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-drawer-chromium-first.log",
+      "bytes": 2021,
+      "sha256": "8f317dce25b516312e427fc54d91fa82570b60c92e73ba1c52488039a1c55cbe"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-drawer-dialog-focus-unit-first.log",
+      "bytes": 224,
+      "sha256": "45efd58653f3516df5bfe4dbebb42e3f8061685720721aef34b0d05c096911b5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/828-canonical-editor-chromium-production-first.log",
+      "bytes": 1944,
+      "sha256": "c16f19170bc2640302aa25fabb93d2c56bd32c732a3660e4d77be081ec12ce45"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/drawer-images/13609b39dfbad62ce930cb509330df363a7f5430.png",
+      "bytes": 6465,
+      "sha256": "932634b746acff5993ed66a48f4f37a52d90be1de71b688dedf472cb7da6c64a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/drawer-images/1479131494ab81f4cb81afe79c1041cfac281642.png",
+      "bytes": 8918,
+      "sha256": "b105bc30a09c65627192f0e1e87f6f98026b52034a4cabcec1d0d3d644afb0f7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/drawer-images/1663a675713364847c1fd9e902cec4d4d439d449.png",
+      "bytes": 8555,
+      "sha256": "c4634d387afcdb51e790d13290c807abd81b435dc66d29d74f0f5f3ba48bb464"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/drawer-images/36ffdaadd95551a74f82fb1f30f4bf4f2fe81227.png",
+      "bytes": 7123,
+      "sha256": "20e83befa3abfbda100cecf74fee66c43d0c6f52ae7c50a975477d2962dda539"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/drawer-images/3ad9c053adc5649a139dd26b70d27e197d50a591.png",
+      "bytes": 8867,
+      "sha256": "f8622972c3c181c4aa74617c06c2751a4e666be247f0db32c51c08361de9d398"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/drawer-images/6082432b5c2b479c16a97e29821ece26e81a9c8e.png",
+      "bytes": 7197,
+      "sha256": "34a8b471f9002feb8955931f9c20f5992def110bc4b547ed6e90c4330719fb82"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/drawer-images/813f8956005a219f3b97f693900b69ad0145d410.png",
+      "bytes": 8713,
+      "sha256": "26e3f0d6750a75922a655c3be99ebe17160bba7e48c4b48117b30da8ffc46d6e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/drawer-images/8a5145a59c1ba9be7573688b60dbd30a0010d953.png",
+      "bytes": 6511,
+      "sha256": "ddc2c9b4e57f2645f744d8f85a76bcccb4d4f53643d9b20bced1e6229cd8fa75"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-command-su-4d09d-nd-unwraps-a-projected-link-chromium/trace.zip",
+      "bytes": 2127266,
+      "sha256": "986cf6edd0a4de21245c9f6c2409a840e2697de56367736c492f022bb886269d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-command-su-82135-nsity-without-fallback-copy-chromium/trace.zip",
+      "bytes": 3743154,
+      "sha256": "203bbe55573ff2c6ca0653e4f6abf4ca85461e494c12465a1e7b3916db9f4b80"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-command-su-ccf85-ithout-a-stale-slash-commit-chromium/trace.zip",
+      "bytes": 2325317,
+      "sha256": "b7d809fb62bbf6fa9db8788aef86636afd26525289d76dd546abc858cd940483"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-command-su-dabe3-es-a-projected-block-anchor-chromium/trace.zip",
+      "bytes": 1976768,
+      "sha256": "e04423bff09939f548c66def0f058745aa5398f26b5ea251929b6fbc23a00fc7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-toolbar-ge-54ec0-al-commands-light-1280x1100-chromium/trace.zip",
+      "bytes": 1795418,
+      "sha256": "3d2fc941c386578450ec8f3f01102ac6017f97036ee6d1c7187f3053c8c9cd06"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-toolbar-ge-7ee27-tal-commands-dark-1280x1100-chromium/trace.zip",
+      "bytes": 1780699,
+      "sha256": "a8d2ee9823e35c3b7e5e93664468e6221cdc2122600eb8c36b1e1c050d0e785f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-toolbar-ge-7ff56-ontal-commands-dark-375x812-chromium/trace.zip",
+      "bytes": 1431452,
+      "sha256": "ce02bd6a7c71bffd230cc9342a2909529b3426070f0f8ff63aae1c8d32af8153"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-toolbar-ge-9c4ef-ntal-commands-light-844x390-chromium/trace.zip",
+      "bytes": 1885075,
+      "sha256": "2558fe9009e088aca635d067e0489ca5e3d8f4203e73fefddcaded486e3aa0e3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-toolbar-ge-caa77-ntal-commands-light-375x812-chromium/trace.zip",
+      "bytes": 1441649,
+      "sha256": "5d2bb285a487e76d7968761673dd33784439a6eab63f905c570c4ded4d1734f2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/editor-traces/markdown-editor-toolbar-ge-dbe15-ontal-commands-dark-844x390-chromium/trace.zip",
+      "bytes": 1880462,
+      "sha256": "40de6fea5233d08dad32e18984034493652c5a8f36ecb70d1f34235fef0f7330"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/review-frames/markdown-editor-toolbar-ge-54ec0-al-commands-light-1280x1100-chromium.jpeg",
+      "bytes": 26478,
+      "sha256": "14dbd212cd431b4b5fc035ef22b919d9ce1c4031adfd58dc6532bd647fa4a5f3"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/review-frames/markdown-editor-toolbar-ge-7ee27-tal-commands-dark-1280x1100-chromium.jpeg",
+      "bytes": 27016,
+      "sha256": "fab6d7aa3287ebdb219f359c9793f317a09672dca2b797dfd2e8d0b6fe75b96c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/review-frames/markdown-editor-toolbar-ge-7ff56-ontal-commands-dark-375x812-chromium.jpeg",
+      "bytes": 16030,
+      "sha256": "aa3297efbc0a7c821f980e759448df384114d15e2e9c083072c223475e6a69e5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/review-frames/markdown-editor-toolbar-ge-9c4ef-ntal-commands-light-844x390-chromium.jpeg",
+      "bytes": 42031,
+      "sha256": "7db025c508aef1f07586daef0b8b956439250fd47cddebef48554a3a809f1eb6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/review-frames/markdown-editor-toolbar-ge-caa77-ntal-commands-light-375x812-chromium.jpeg",
+      "bytes": 16517,
+      "sha256": "17e1d46e5698d647f1d923c14ef36a31729a2a2c54b728f555ca835c997af916"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/599ebe4/review-frames/markdown-editor-toolbar-ge-dbe15-ontal-commands-dark-844x390-chromium.jpeg",
+      "bytes": 39828,
+      "sha256": "ee6153eab2b2a3436600d729c2a0902ddc2b0b4776623c9ac72dc339f20cabf5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capability-integration/README.md",
+      "bytes": 9244,
+      "sha256": "a13d8cab0d8cefbe8bb7cf1c3e340cf45c2574f6d58d470f747562850c4ac673"
+    }
+  ]
+}

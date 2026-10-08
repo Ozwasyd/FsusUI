@@ -1,0 +1,61 @@
+{
+  "qualificationEligible": false,
+  "source": "42ecd78e01f0e8f52ad4ccbd7ffb87fea0d1c3d6",
+  "changedFields": [
+    {
+      "path": "/source/inputTreeHash",
+      "recorded": "8f3772cc51d36040782dd8da602bba89f96d4aee7ee55757e37cfdc521096198",
+      "projection": "3dc6a7119ba979263aefa0e9beff63c644a89ee02a8c9a5c5a699f521ac5d41b"
+    },
+    {
+      "path": "/source/outputHash",
+      "recorded": "195e70c3b81a0fbd788cdef26f843619a47afc9b5a5b3c1d8f34687d6fa42393",
+      "projection": "4a2c2a688cca7da6e04d000d96c307d3a1ba64e2332f234f9e8de12646c8a7d4"
+    },
+    {
+      "path": "/cssVariables",
+      "addedNames": [],
+      "removedNames": [],
+      "changedEntries": [
+        {
+          "name": "--fsus-space-1",
+          "recorded": {
+            "name": "--fsus-space-1",
+            "files": [
+              "vue/packages/theme-chalk/src/check-tag.scss",
+              "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+              "vue/packages/theme-chalk/src/descriptions.scss",
+              "vue/packages/theme-chalk/src/generated/tokens.css",
+              "vue/packages/theme-chalk/src/markdown-editor.scss",
+              "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
+              "vue/packages/theme-chalk/src/motion.scss",
+              "vue/packages/theme-chalk/src/perception-challenge.scss",
+              "vue/packages/theme-chalk/src/public-shell-critical.scss",
+              "vue/packages/theme-chalk/src/scrollbar.scss",
+              "vue/packages/theme-chalk/src/task-page-header.scss"
+            ],
+            "classification": "portable"
+          },
+          "projection": {
+            "name": "--fsus-space-1",
+            "files": [
+              "vue/packages/theme-chalk/src/check-tag.scss",
+              "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+              "vue/packages/theme-chalk/src/descriptions.scss",
+              "vue/packages/theme-chalk/src/generated/tokens.css",
+              "vue/packages/theme-chalk/src/markdown-editor.scss",
+              "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
+              "vue/packages/theme-chalk/src/motion.scss",
+              "vue/packages/theme-chalk/src/perception-challenge.scss",
+              "vue/packages/theme-chalk/src/public-shell-critical.scss",
+              "vue/packages/theme-chalk/src/public-shell.scss",
+              "vue/packages/theme-chalk/src/scrollbar.scss",
+              "vue/packages/theme-chalk/src/task-page-header.scss"
+            ],
+            "classification": "portable"
+          }
+        }
+      ]
+    }
+  ]
+}
