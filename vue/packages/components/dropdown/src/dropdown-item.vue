@@ -3,7 +3,7 @@
     :disabled="disabled"
     :text-value="textValue ?? textContent"
   >
-    <el-roving-focus-item :focusable="!disabled">
+    <el-roving-focus-item :focusable="!disabled" :active="checked === true">
       <el-dropdown-item-impl
         v-bind="propsAndAttrs"
         @pointerleave="handlePointerLeave"

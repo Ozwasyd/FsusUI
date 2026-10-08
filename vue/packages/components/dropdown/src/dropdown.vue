@@ -117,7 +117,12 @@ export default defineComponent({
     const scrollbar = ref(null)
     const currentTabId = ref<string | null>(null)
     const isUsingKeyboard = ref(false)
-    const triggerKeys = [EVENT_CODE.enter, EVENT_CODE.space, EVENT_CODE.down]
+    const triggerKeys = [
+      EVENT_CODE.enter,
+      EVENT_CODE.space,
+      EVENT_CODE.down,
+      EVENT_CODE.up,
+    ]
     const triggerTargetEl = computed(() => contentRef.value ?? undefined)
     const virtualRef = computed<Measurable | undefined>(
       () => triggeringElementRef.value?.$el ?? undefined,
