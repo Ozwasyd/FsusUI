@@ -52,7 +52,7 @@ Use `features` to disable an activation:
 </template>
 ```
 
-Shared theme changes immediately abort heavy-feature work, including pending runtime imports, before the debounced render of the new theme. The listener is installed as soon as activation starts, and unmount removes it.
+Shared theme changes immediately abort heavy-feature work, including pending runtime imports, before the debounced render of the new theme. The listener is installed as soon as activation starts, and unmount removes it. The subscription remains active while a replacement parse is pending. Aborted or superseded async stages cannot emit stale render completion/profile/error events, and disabling heavy features removes the subscription.
 
 Feature renderers no longer accept a consumer DOM adapter. Built-in Mermaid, KaTeX, and Shiki read only immutable source, theme, and controlled tokens, then return a `FeatureRenderOutput` with `kind`. Output is committed only after passing separate FsusUI-owned gateway policies for Mermaid SVG, KaTeX MathML, and Shiki HTML. Mermaid must use native SVG text instead of `foreignObject`, and color tokens are validated against the controlled color grammar before entering a third-party renderer. The three policies do not share a union of tags or attributes; unknown tags, namespaces, attributes, events, executable URLs, and external resources are removed. See [Converging the Markdown feature output gateway](../migration/markdown-feature-output-gateway.md) for migration.
 
