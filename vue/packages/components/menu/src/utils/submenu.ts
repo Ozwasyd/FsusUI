@@ -3,9 +3,13 @@ import { EVENT_CODE } from '@element-plus/constants'
 import type MenuItem from './menu-item'
 
 class SubMenu {
+  public parent: MenuItem
+  public domNode: ParentNode
   public subMenuItems!: NodeListOf<HTMLElement>
   public subIndex = 0
-  constructor(public parent: MenuItem, public domNode: ParentNode) {
+  constructor(parent: MenuItem, domNode: ParentNode) {
+    this.parent = parent
+    this.domNode = domNode
     this.subIndex = 0
     this.init()
   }
