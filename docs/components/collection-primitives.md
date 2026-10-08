@@ -159,6 +159,9 @@ announce their state; the cell slot receives `disabled` and `loading` alongside
 ```
 
 Interactive rows provide a system-color focus outline in forced-colors mode.
+Opt into `responsive` to stack columns at the existing extra-small viewport
+breakpoint. This preserves cell source order and full slot content when a
+multi-column row becomes too narrow, without a second mobile collection owner.
 With `interactive="false"` and no destination, rows are passive content and do
 not emit activation. Empty, loading, and error copy remains consumer owned;
 compose public feedback components through the empty slot or next to the list.

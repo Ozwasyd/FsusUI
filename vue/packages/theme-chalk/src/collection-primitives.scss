@@ -343,6 +343,14 @@
     }
   }
 
+  @include res(xs) {
+    @include when(responsive) {
+      @include e((head, row)) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  }
+
   @media (forced-colors: active) {
     @include when(interactive) {
       @include e(row) {
