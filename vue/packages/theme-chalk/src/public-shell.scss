@@ -771,6 +771,23 @@
       }
     }
 
+    @include e(mobile-search-trigger) {
+      padding-inline: var(--fsus-space-2, 8px);
+    }
+
+    @include when(mobile-nav-inline) {
+      .#{$namespace}-public-shell__auth-link--mobile {
+        padding-inline: 0;
+      }
+
+      .#{$namespace}-public-shell__mobile-nav-link {
+        flex: 0 0 auto;
+        width: auto;
+        min-inline-size: var(--fsus-public-shell-mobile-action-height, 44px);
+        padding-inline: var(--fsus-space-2, 8px);
+      }
+    }
+
     @include e(search-input) {
       min-inline-size: 0;
       max-inline-size: 100%;
