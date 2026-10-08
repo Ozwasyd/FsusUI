@@ -54,6 +54,7 @@
     "test:view-transitions": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.view-transitions.config.ts",
     "test:visual:reuse": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.reuse.config.ts",
     "test:dom-layout": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.dom-layout.config.ts",
+    "test:dialog:focus": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.dialog-focus.config.ts",
     "test:geometry:smoke": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.geometry.config.ts",
     "test:motion:ssr": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.motion-ssr.config.ts",
     "test:markdown-editor:interaction": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.markdown-editor.config.ts --project=chromium --project=firefox --project=webkit",
