@@ -722,14 +722,16 @@
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: var(--fsus-space-2, 8px);
+      gap: var(--fsus-space-1, 4px);
       padding-block: 0;
-      padding-inline: var(--fsus-space-2, 8px);
+      padding-inline: var(--fsus-space-1, 4px);
+      column-gap: 0;
     }
 
     @include e(primary-row) {
       flex: 1 1 0;
       min-inline-size: min-content;
+      gap: var(--fsus-space-1, 4px);
       grid-template-columns:
         minmax(var(--fsus-public-shell-mobile-action-height, 44px), 1fr)
         auto;
@@ -741,6 +743,7 @@
 
     @include e(mobile-primary-actions) {
       min-inline-size: min-content;
+      gap: var(--fsus-space-1, 4px);
     }
 
     @include e(mobile-toolbar) {
@@ -748,7 +751,7 @@
       flex: 1 1 0;
       align-items: center;
       flex-wrap: wrap;
-      gap: var(--fsus-space-2, 8px);
+      gap: var(--fsus-space-1, 4px);
       margin-block: 0;
     }
 
