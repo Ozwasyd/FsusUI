@@ -37,6 +37,14 @@ Public editor mode is exactly `source` / `live` / `split` / `preview`. Live
 capability tokens are exactly the six frozen values from
 `markdownLiveCapabilities`. There is no `write` mode alias.
 
+An open command palette owns exclusive Ctrl/Cmd+P locally inside its current
+teleported dialog, including repeated keydown. It prevents browser print without
+reopening the palette, resetting its query or selection, or running a command.
+Disabled/read-only editors, native or editor composition, extra modifiers,
+already-handled keys, unrelated targets and retired dialog elements are left
+unclaimed. The public `openCommandPalette()` method remains unchanged; consumers
+own the first shortcut within their host scope. No global listener is installed.
+
 `createMarkdownLiveSurface` is the #333 owner plan: one `source-textarea`
 selection/focus/IME host. Split and preview may show the safe renderer pane;
 live does not. Projection failure keeps the source bytes and falls back to a
