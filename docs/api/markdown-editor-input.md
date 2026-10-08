@@ -37,6 +37,13 @@ Public editor mode is exactly `source` / `live` / `split` / `preview`. Live
 capability tokens are exactly the six frozen values from
 `markdownLiveCapabilities`. There is no `write` mode alias.
 
+Command palette search leaves Enter to native composition when the keyboard
+event reports `isComposing`, the IME compatibility key code `229`, or the existing
+editor composition machine is active. It does not prevent that composition
+commit or execute a command. Ordinary Enter still executes the active eligible
+command after composition ends; command eligibility, arrow navigation, and
+Escape cancellation retain their existing behavior.
+
 `ElMarkdownEditor` emits `selection-change` for accepted transaction selection
 changes and native selection/caret movement, including Ctrl+Home/End and pointer
 selection. Its immutable payload contains `documentIdentity: { id, epoch }`,
