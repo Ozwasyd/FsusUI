@@ -3209,6 +3209,25 @@ const executePaletteCommand = (command: MarkdownEditorCommand) => {
   activateCommand(command)
 }
 const handleCommandPaletteKeydown = (event: KeyboardEvent) => {
+  if (
+    commandPaletteOpen.value &&
+    surfaceOptions.value.commandPalette &&
+    !editingBlocked.value &&
+    !event.defaultPrevented &&
+    !event.isComposing &&
+    event.keyCode !== 229 &&
+    !isComposing.value &&
+    !event.altKey &&
+    !event.shiftKey &&
+    event.ctrlKey !== event.metaKey &&
+    event.key.toLowerCase() === 'p' &&
+    event.currentTarget instanceof HTMLElement &&
+    event.currentTarget.contains(commandPaletteInputRef.value)
+  ) {
+    event.preventDefault()
+    event.stopPropagation()
+    return
+  }
   if (event.key === 'Escape') {
     event.preventDefault()
     event.stopPropagation()

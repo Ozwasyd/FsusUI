@@ -44,6 +44,14 @@ commit or execute a command. Ordinary Enter still executes the active eligible
 command after composition ends; command eligibility, arrow navigation, and
 Escape cancellation retain their existing behavior.
 
+An open command palette owns exclusive Ctrl/Cmd+P locally inside its current
+teleported dialog, including repeated keydown. It prevents browser print without
+reopening the palette, resetting its query or selection, or running a command.
+Disabled/read-only editors, native or editor composition, extra modifiers,
+already-handled keys, unrelated targets and retired dialog elements are left
+unclaimed. The public `openCommandPalette()` method remains unchanged; consumers
+own the first shortcut within their host scope. No global listener is installed.
+
 `ElMarkdownEditor` emits `selection-change` for accepted transaction selection
 changes and native selection/caret movement, including Ctrl+Home/End and pointer
 selection. Its immutable payload contains `documentIdentity: { id, epoch }`,
