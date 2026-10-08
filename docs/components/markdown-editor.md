@@ -228,6 +228,10 @@ selector/ref; source reveal, cancellation, and successful commit restore the sam
 
 The package root `@ozwasyd/element-plus` exports `currentMarkdownAnchors`,
 `planMarkdownAnchorInsert`, `planMarkdownAnchorEdit`, and `planMarkdownAnchorRemove`.
+For line-end insertion at a canonical paragraph's `rawRange.end`, the planner
+uses its final raw content endpoint so the marker precedes the terminal LF or
+CRLF. The existing newline and separator bytes remain unchanged, and insertion
+still commits through `dispatchTransaction`.
 These existing planners return transactions for the editor transaction authority;
 consumers must not apply them with a separate source writer.
 
