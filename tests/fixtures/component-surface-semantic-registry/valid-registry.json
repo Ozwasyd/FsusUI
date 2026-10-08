@@ -13,8 +13,8 @@
   },
   "allowlist": [],
   "generated": {
-    "producer": "scripts/generate-component-surface-semantic-registry.mjs",
-    "sourceRevision": "c463db9f2fbaa08baa249d5a792d128104087053",
+    "producer": "scripts/check-component-surface-semantic-registry.mjs",
+    "sourceRevision": "0842d736dcd8ef9884f8cfceb5e22eb74062bc2c",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -34,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "dfd912fbf97a0bc4b3370a1048993c100c1effb5fa712707bd99283c1b4abb8c"
+      "digest": "34ba7ccbadaf88958c340022e92ccb6bf1f86f839bc79f32ae57cfd2a87d231a"
     },
     "component-select": {
       "path": "docs/components/select.md",
@@ -58,7 +58,7 @@
       "path": "docs/components/dialog.md",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "155083fd7035a2142dff89f6194120e27e7e1a524f07d48673aeb7c6bbac7282"
+      "digest": "aa6745eb1fb0c6515e9e4301f0586c73e1f87ccbfc6a47700126496b02b462cf"
     },
     "implementation-select": {
       "path": "vue/packages/theme-chalk/src/select-dropdown.scss",

@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "712e38de6bb677474cfdd0cf2f2b8a1f960577f39b4d305cee2a8f43d652e9f2",
+      "hash": "9d93dfc62041a63409cc93a033b0f4af4775c618cb16bba4fb5917dac5dcec35",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -51625,7 +51625,7 @@
         "name": "ElImageViewer",
         "module": "image-viewer",
         "classification": "platform-override",
-        "exportStatus": "missing"
+        "exportStatus": "partial"
       },
       "bindings": {
         "web": {
@@ -51674,6 +51674,210 @@
       },
       "inputs": [
         {
+          "name": "activeIndex",
+          "kind": "input",
+          "web": {
+            "member": "activeIndex",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "number"
+            ],
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": {
+            "member": "ActiveIndex",
+            "categories": [
+              "number"
+            ],
+            "type": "System.Int32",
+            "nullable": false,
+            "propertyKind": "clr",
+            "defaultKnown": false,
+            "defaultValue": null,
+            "required": false,
+            "canRead": true,
+            "canWrite": true,
+            "isStatic": false,
+            "enumValuesKnown": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "status": "partial",
+          "drift": {
+            "type": null,
+            "default": "avalonia default metadata unavailable",
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.input.active-index"
+          ],
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "altList",
+          "kind": "input",
+          "web": {
+            "member": "altList",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "array"
+            ],
+            "runtimeType": "Array",
+            "semanticType": "string[]",
+            "nullable": false,
+            "default": {
+              "kind": "function",
+              "sourceHash": "a4a348b6f4e91da9c77bf69cf56383647597fdf2b7a64d71ae214a0261892537"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.input.alt-list"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "appendTo",
+          "kind": "input",
+          "web": {
+            "member": "appendTo",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": "body"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.input.append-to"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "ariaLabel",
+          "kind": "input",
+          "web": {
+            "member": "ariaLabel",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.input.aria-label"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "closeOnPressEscape",
           "kind": "input",
           "web": {
@@ -51712,6 +51916,52 @@
           },
           "scenarioIds": [
             "scenario.v2.el-image-viewer.input.close-on-press-escape"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "cspSafe",
+          "kind": "input",
+          "web": {
+            "member": "cspSafe",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.input.csp-safe"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -51861,6 +52111,53 @@
           }
         },
         {
+          "name": "labels",
+          "kind": "input",
+          "web": {
+            "member": "labels",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "object"
+            ],
+            "runtimeType": "Object",
+            "semanticType": "Partial<ImageViewerLabels>",
+            "nullable": false,
+            "default": {
+              "kind": "function",
+              "sourceHash": "d3a63129b65aed00ae18632b426020bfea8d9a107477eacaad812cad7d5d804d"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.input.labels"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "maxScale",
           "kind": "input",
           "web": {
@@ -51955,6 +52252,53 @@
           }
         },
         {
+          "name": "showToolbar",
+          "kind": "input",
+          "web": {
+            "member": "showToolbar",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.input.show-toolbar"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "teleported",
           "kind": "input",
           "web": {
@@ -52039,6 +52383,53 @@
           },
           "scenarioIds": [
             "scenario.v2.el-image-viewer.input.url-list"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "visible",
+          "kind": "input",
+          "web": {
+            "member": "visible",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.input.visible"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -52177,6 +52568,74 @@
           }
         },
         {
+          "name": "next",
+          "kind": "output",
+          "web": {
+            "member": "next",
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.output.next"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "previous",
+          "kind": "output",
+          "web": {
+            "member": "previous",
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.output.previous"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "rotate",
           "kind": "output",
           "web": {
@@ -52243,6 +52702,74 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "name": "update:activeIndex",
+          "kind": "output",
+          "web": {
+            "member": "update:activeIndex",
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.output.update-active-index"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "update:visible",
+          "kind": "output",
+          "web": {
+            "member": "update:visible",
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.output.update-visible"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "operations": [
@@ -52292,6 +52819,60 @@
         }
       ],
       "contentRegions": [
+        {
+          "name": "caption",
+          "kind": "contentRegion",
+          "scoped": true,
+          "web": {
+            "member": "caption",
+            "baseline": "spec/baselines/vue-current.json",
+            "nameKnown": true,
+            "nameExpression": null,
+            "scoped": true,
+            "payload": [
+              {
+                "name": "alt",
+                "expression": "altList[activeIndex] || ''",
+                "type": null
+              },
+              {
+                "name": "index",
+                "expression": "activeIndex",
+                "type": null
+              },
+              {
+                "name": "url",
+                "expression": "currentImg",
+                "type": null
+              }
+            ],
+            "payloadComplete": true,
+            "contentType": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.content-region.caption"
+          ],
+          "governance": {
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
         {
           "name": "default",
           "kind": "contentRegion",
@@ -52369,7 +52950,62 @@
       },
       "platformDifferences": [
         {
+          "member": "activeIndex",
+          "kind": "input",
+          "status": "partial",
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "altList",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "appendTo",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "ariaLabel",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "closeOnPressEscape",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "cspSafe",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -52413,6 +53049,17 @@
           }
         },
         {
+          "member": "labels",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "maxScale",
           "kind": "input",
           "status": "missing",
@@ -52435,6 +53082,17 @@
           }
         },
         {
+          "member": "showToolbar",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "teleported",
           "kind": "input",
           "status": "missing",
@@ -52447,6 +53105,17 @@
         },
         {
           "member": "urlList",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "visible",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -52490,6 +53159,28 @@
           }
         },
         {
+          "member": "next",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "previous",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "rotate",
           "kind": "output",
           "status": "missing",
@@ -52512,11 +53203,44 @@
           }
         },
         {
+          "member": "update:activeIndex",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "update:visible",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "setActiveItem",
           "kind": "operation",
           "status": "missing",
           "governance": {
             "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "caption",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -52548,21 +53272,6 @@
           },
           "scenarioIds": [
             "scenario.v2.el-image-viewer.avalonia-extra.accessible-name"
-          ]
-        },
-        {
-          "member": "ActiveIndex",
-          "kind": "avalonia-extra",
-          "surfaceKind": "property",
-          "surfaceHash": "3ace72a784e7e066e81450d7cf48ad4f2fda130a699fcb918e908299d2ffddd7",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-image-viewer.avalonia-extra.active-index"
           ]
         },
         {
@@ -53047,20 +53756,33 @@
         }
       ],
       "scenarioIds": [
+        "scenario.v2.el-image-viewer.input.active-index",
+        "scenario.v2.el-image-viewer.input.alt-list",
+        "scenario.v2.el-image-viewer.input.append-to",
+        "scenario.v2.el-image-viewer.input.aria-label",
         "scenario.v2.el-image-viewer.input.close-on-press-escape",
+        "scenario.v2.el-image-viewer.input.csp-safe",
         "scenario.v2.el-image-viewer.input.hide-on-click-modal",
         "scenario.v2.el-image-viewer.input.infinite",
         "scenario.v2.el-image-viewer.input.initial-index",
+        "scenario.v2.el-image-viewer.input.labels",
         "scenario.v2.el-image-viewer.input.max-scale",
         "scenario.v2.el-image-viewer.input.min-scale",
+        "scenario.v2.el-image-viewer.input.show-toolbar",
         "scenario.v2.el-image-viewer.input.teleported",
         "scenario.v2.el-image-viewer.input.url-list",
+        "scenario.v2.el-image-viewer.input.visible",
         "scenario.v2.el-image-viewer.input.z-index",
         "scenario.v2.el-image-viewer.input.zoom-rate",
         "scenario.v2.el-image-viewer.output.close",
+        "scenario.v2.el-image-viewer.output.next",
+        "scenario.v2.el-image-viewer.output.previous",
         "scenario.v2.el-image-viewer.output.rotate",
         "scenario.v2.el-image-viewer.output.switch",
+        "scenario.v2.el-image-viewer.output.update-active-index",
+        "scenario.v2.el-image-viewer.output.update-visible",
         "scenario.v2.el-image-viewer.operation.set-active-item",
+        "scenario.v2.el-image-viewer.content-region.caption",
         "scenario.v2.el-image-viewer.content-region.default",
         "scenario.v2.el-image-viewer.state.default",
         "scenario.v2.el-image-viewer.keyboard",
@@ -53072,12 +53794,12 @@
         "scenario.v2.el-image-viewer.perf"
       ],
       "coverage": {
-        "total": 15,
+        "total": 28,
         "alignedCandidate": 0,
-        "partial": 0,
-        "missing": 15,
+        "partial": 1,
+        "missing": 27,
         "webOnly": 0,
-        "mappedPercent": 0
+        "mappedPercent": 3.6
       }
     },
     {
@@ -189252,10 +189974,10 @@
   },
   "coverage": {
     "aligned-candidate": 17,
-    "partial": 191,
-    "missing": 2185,
+    "partial": 192,
+    "missing": 2197,
     "web-only": 62,
-    "total": 2455,
+    "total": 2468,
     "mappedPercent": 8.5
   }
 }
