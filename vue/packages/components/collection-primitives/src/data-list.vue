@@ -85,6 +85,7 @@ const listKls = computed(() => [
   ns.m(props.density),
   ns.m(props.variant),
   ns.is('interactive', isInteractiveList.value),
+  ns.is('responsive', props.responsive),
 ])
 const listAttrs = computed(() => ({
   role: 'list',

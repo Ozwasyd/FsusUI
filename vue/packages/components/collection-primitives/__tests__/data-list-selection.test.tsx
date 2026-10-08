@@ -25,6 +25,18 @@ describe('DataList controlled activation', () => {
     wrapper.unmount()
   })
 
+  test('opts into responsive layout without another collection or activation owner', async () => {
+    const wrapper = mount(DataList, { props: { rows, columns, responsive: true } })
+    expect(wrapper.classes()).toContain('is-responsive')
+    expect(wrapper.findAll('[role="listitem"]')).toHaveLength(2)
+    expect(wrapper.findAll('button')).toHaveLength(2)
+    await wrapper.findAll('button')[1].trigger('click')
+    expect(wrapper.emitted('change')).toHaveLength(1)
+    await wrapper.setProps({ responsive: false })
+    expect(wrapper.classes()).not.toContain('is-responsive')
+    wrapper.unmount()
+  })
+
   test('emits stable keys without moving current identity when declined', async () => {
     const wrapper = mount(DataList, {
       props: { rows, columns, activeKey: 'first' },

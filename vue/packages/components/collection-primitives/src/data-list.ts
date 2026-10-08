@@ -78,6 +78,10 @@ export const dataListProps = buildProps({
     default: () => [],
   },
   /**
+   * @description stack columns at the existing extra-small viewport breakpoint
+   */
+  responsive: Boolean,
+  /**
    * @description optional href getter; when present rows render as anchors
    */
   href: {
