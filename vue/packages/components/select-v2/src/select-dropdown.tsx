@@ -8,7 +8,7 @@ import {
   watch,
 } from 'vue'
 import { get } from 'lodash-unified'
-import { isObject, isUndefined } from '@element-plus/utils'
+import { definePropType, isObject, isUndefined } from '@element-plus/utils'
 import {
   DynamicSizeList,
   FixedSizeList,
@@ -38,7 +38,7 @@ export default defineComponent({
   props: {
     id: String,
     data: {
-      type: Array,
+      type: definePropType<Option[]>(Array),
       required: true,
     },
     hoveringIndex: Number,
