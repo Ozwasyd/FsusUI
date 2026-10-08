@@ -798,6 +798,10 @@
     @include e(mobile-actions) {
       flex-wrap: wrap;
       margin-block: 0;
+
+      &:empty {
+        display: none;
+      }
     }
 
     @include e(bottom-tab) {
