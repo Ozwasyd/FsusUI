@@ -767,7 +767,12 @@
     @include e(mobile-nav) {
       @include m(inline) {
         flex: 1 1 0;
-        min-inline-size: var(--fsus-public-shell-mobile-action-height, 44px);
+        box-sizing: border-box;
+        min-inline-size: calc(
+          var(--fsus-public-shell-mobile-action-height, 44px) +
+            var(--fsus-space-1, 4px)
+        );
+        padding-inline-end: var(--fsus-space-1, 4px);
       }
     }
 
