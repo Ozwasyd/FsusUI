@@ -205,3 +205,27 @@ describe('markdown embed presentation contract', () => {
     ])
   })
 })
+
+it.each([
+  'missing',
+  'deleted',
+  'unsupported',
+  'mode-mismatch',
+  'cancelled',
+] as const)(
+  'keeps %s explicit in the accessible presentation status',
+  (status) => {
+    const presentation = resolveMarkdownEmbedPresentation(
+      {
+        kind: 'provider-status',
+        status,
+        target: 'opaque',
+        embedMode: 'article',
+        directive: '::embed[target="opaque" mode="article"]',
+      },
+      'preview',
+    )
+    expect(presentation.accessibility.statusDescription).toContain(status)
+    expect(presentation.content.markdown).toBeNull()
+  },
+)

@@ -9,8 +9,13 @@ import {
   type MarkdownEmbedMode,
   type MarkdownEmbedValidNode,
 } from '../../../wasm/markdown-runtime'
-import type { MarkdownEmbedResult } from '../../../wasm/markdown-embed-provider'
 import {
+  commitMarkdownEmbedResult,
+  type MarkdownEmbedRequest,
+  type MarkdownEmbedResult,
+} from '../../../wasm/markdown-embed-provider'
+import {
+  resolveMarkdownEmbedPresentation,
   presentMarkdownEmbed,
   sanitizeEmbedExcerpt,
 } from '../../../wasm/markdown-embed-presentation'
@@ -39,6 +44,9 @@ export type MarkdownEmbedPresentationStatus =
   | 'rejected'
   | 'error'
   | 'missing'
+  | 'deleted'
+  | 'unsupported'
+  | 'cancelled'
   | 'forbidden'
   | 'cycle'
   | 'depth-exceeded'
@@ -65,6 +73,7 @@ export interface MarkdownEmbedPresentationPlan {
   readonly statusText: string
   readonly title: string
   readonly excerpt?: string
+  readonly markdown?: string
   readonly visible: boolean
   readonly card: false
   readonly hasNestedScroll: false
@@ -166,9 +175,26 @@ export const planMarkdownEmbedPresentation = (
   copy?: Readonly<{
     modes: Readonly<Record<MarkdownEmbedMode, string>>
     name: (target: string, mode: string) => string
-    statuses: Readonly<Record<MarkdownEmbedPresentationStatus, string>>
+    statuses: Readonly<Partial<Record<MarkdownEmbedPresentationStatus, string>>>
   }>,
+  request?: MarkdownEmbedRequest,
 ): MarkdownEmbedPresentationPlan => {
+  const presentation = resolveMarkdownEmbedPresentation(
+    { kind: 'valid', node, result, request },
+    'live',
+  )
+  if (request && result) result = commitMarkdownEmbedResult(request, result)
+  if (
+    (result?.projection || result?.targetVersion) &&
+    presentation.content.markdown === null
+  ) {
+    result = {
+      ...result,
+      status: 'stale',
+      title: undefined,
+      excerpt: undefined,
+    }
+  }
   const status: MarkdownEmbedPresentationStatus =
     (result?.status as MarkdownEmbedPresentationStatus) ?? 'pending'
   const isResolved = status === 'resolved'
@@ -201,7 +227,12 @@ export const planMarkdownEmbedPresentation = (
     status,
     statusText,
     title,
-    excerpt: excerpt.length > 0 ? excerpt : undefined,
+    excerpt: result?.projection
+      ? undefined
+      : excerpt.length > 0
+        ? excerpt
+        : undefined,
+    markdown: presentation.content.markdown ?? undefined,
     visible: isResolved || isPending || isFailure,
     card: false as const,
     hasNestedScroll: false as const,
@@ -389,7 +420,8 @@ export const evaluateMarkdownEmbedUiMutations = () => {
       }),
       Object.freeze({
         accepted: Boolean(plan.excerpt && plan.excerpt.includes('<script>')),
-        detail: 'unsafe provider html must not be accepted or passed through unescaped',
+        detail:
+          'unsafe provider html must not be accepted or passed through unescaped',
         equivalent: false,
         kind: 'innerHTML' as const,
       }),

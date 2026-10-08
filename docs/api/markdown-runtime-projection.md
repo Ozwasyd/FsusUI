@@ -40,17 +40,17 @@ Frozen positive and negative cases live in
 
 ## Consumer APIs
 
-| Tracking parent | Shipped function                                                                                                       | Reads                                                                |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| #273 outline    | `createMarkdownOutlineEntries`                                                                                         | heading `syn:` nodes                                                 |
-| #274 table      | `createMarkdownTableEntries`                                                                                           | table `syn:` nodes                                                   |
-| #277 search     | `searchMarkdownRawSource` / `searchMarkdownStableProjection` / `planMarkdownReplaceCurrent` / `planMarkdownReplaceAll` | raw UTF-16 matches, `syn:` hits, and source replace transactions     |
-| #278 technical  | `createMarkdownTechnicalEntries`                                                                                       | `code`, `latex`, `mermaid`                                           |
-| #279 properties | `createMarkdownPropertyEntries`                                                                                        | `link`, `image`                                                      |
-| #290 embed      | `parseMarkdownEmbedLine` / `collectMarkdownEmbedNodes` / `resolveMarkdownEmbedPresentation` / `evaluateMarkdownEmbedAcceptance` | `embed` projection nodes and the controlled presentation contract |
-| #314 caption    | `parseMarkdownCaptionLine` / `collectMarkdownCaptionNodes` / `renderMarkdownCaptionFigure`                             | `caption` projection nodes and safe `figure`/`figcaption`            |
-| #289 anchor     | `parseMarkdownAnchorMarker` / `collectMarkdownAnchorNodes`                                                             | `anchor` projection nodes                                            |
-| #291 import     | `importMarkdownClipboardSnapshot` / `convertMarkdownHtmlImportSnapshot`                                                | explicit clipboard snapshot → import tree → Markdown and loss report |
+| Tracking parent | Shipped function                                                                                                                | Reads                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| #273 outline    | `createMarkdownOutlineEntries`                                                                                                  | heading `syn:` nodes                                                 |
+| #274 table      | `createMarkdownTableEntries`                                                                                                    | table `syn:` nodes                                                   |
+| #277 search     | `searchMarkdownRawSource` / `searchMarkdownStableProjection` / `planMarkdownReplaceCurrent` / `planMarkdownReplaceAll`          | raw UTF-16 matches, `syn:` hits, and source replace transactions     |
+| #278 technical  | `createMarkdownTechnicalEntries`                                                                                                | `code`, `latex`, `mermaid`                                           |
+| #279 properties | `createMarkdownPropertyEntries`                                                                                                 | `link`, `image`                                                      |
+| #290 embed      | `parseMarkdownEmbedLine` / `collectMarkdownEmbedNodes` / `resolveMarkdownEmbedPresentation` / `evaluateMarkdownEmbedAcceptance` | `embed` projection nodes and the controlled presentation contract    |
+| #314 caption    | `parseMarkdownCaptionLine` / `collectMarkdownCaptionNodes` / `renderMarkdownCaptionFigure`                                      | `caption` projection nodes and safe `figure`/`figcaption`            |
+| #289 anchor     | `parseMarkdownAnchorMarker` / `collectMarkdownAnchorNodes`                                                                      | `anchor` projection nodes                                            |
+| #291 import     | `importMarkdownClipboardSnapshot` / `convertMarkdownHtmlImportSnapshot`                                                         | explicit clipboard snapshot → import tree → Markdown and loss report |
 
 All entries reuse `stabilizeMarkdownEditorProjection` identities.
 `resolveMarkdownConsumerIdentity` reports `current`, `deleted`, or `invalid`.
@@ -138,11 +138,103 @@ does not persist source or parser nodes as a second content model.
 `resolveMarkdownEmbedPresentation` maps a provider or budget outcome to a
 frozen presentation. `mode` (`article` | `heading` | `block`) is a semantic
 label only and never a visual variant; the layout stays single-column with no
-nested scroll. Resolved content is inert text routed through the unique
-Markdown runtime (`renderVia: "markdown-runtime"`), never HTML
-(`html: null`), never a second editor, and never an iframe surface. Provider
+nested scroll. Verified content is controlled Markdown routed through the unique Markdown
+runtime, never provider HTML (`html: null`), a second editor, or an iframe.
+`renderVia: "markdown-runtime"` identifies the destination; it is not evidence
+that a metadata-only result has been rendered. Provider
 output never expands the host source: the source contract stays the exact
 directive.
+
+### Controlled projection transport
+
+The public `/markdown-runtime` entry exports:
+
+```text
+createMarkdownEmbedProjectionRequest(input): Promise<MarkdownEmbedRequest>
+prepareMarkdownEmbedResult(request, result, authority): Promise<MarkdownEmbedResult>
+commitMarkdownEmbedResult(request, result): MarkdownEmbedResult
+cancelMarkdownEmbedRequest(requestOrRequestId): void
+resolveMarkdownEmbedPresentation(input, mode): MarkdownEmbedPresentation
+```
+
+`createMarkdownEmbedProjectionRequest` freezes the host document id/epoch,
+source revision, node, target token, mode and provider version. It computes a
+SHA-256 request digest using the platform Web Crypto implementation, or
+preserves a caller-supplied digest from its already-verified request. This UI
+digest is a correlation envelope; it does not verify Blog's actor, permission,
+provider result digest, accepted receipt, or dependency receipt. The consumer
+still owns those authorities. Legacy `createMarkdownEmbedRequest` and plain
+`title`/`excerpt` metadata remain supported.
+
+A projected result carries `requestDigest`, `targetVersion` and `projection`.
+`MarkdownEmbedTargetVersion` contains opaque `targetIdentity`,
+`resolvedRevision`, `targetVersionIdentity`, `projectionIdentity` and
+`projectionDigest` strings. The target revision is independent of the host's
+`revision`. Preserve a consumer's exact revision without numeric precision
+loss; the library never infers a revision or decodes a target identity.
+
+`MarkdownEmbedProjection` supports controlled Markdown bytes (`kind:
+'markdown'`, `source`) or a local Markdown reference (`kind:
+'markdown-reference'`). Both carry `projectionIdentity` and `contentDigest`.
+A reference alone has no renderable content. `MarkdownEmbedProjectionAuthority`
+requires `readTargetVersion(request)` from the consumer's current authorized
+facts, and a reference also needs `resolveMarkdown(reference, request)` to
+materialize already-authorized Markdown. No library network or product API
+fetch occurs. Renderer-specific projection kinds that cannot materialize
+Markdown remain explicitly unsupported.
+
+Preparation verifies the request binding, exact current target coordinate,
+projection identity, and SHA-256 of the actual UTF-8 bytes. It rechecks
+currentness after asynchronous materialization and hashing. A supplied digest,
+cloned result, arbitrary HTML/component/DOM field, unknown result status,
+unavailable resolver, or mismatched bytes cannot authorize content. Successful
+preparation freezes the payload and gives it a private, garbage-collectable
+receipt; synchronous commit and presentation check that receipt and the current
+authority again. Cancellation, document/epoch/revision/node/request/mode/provider
+drift and target-coordinate changes prevent old content from being displayed.
+The existing size, time, concurrency and node budgets bound work and retained
+requests; a timed-out resolver cannot admit a late payload.
+
+For projected presentation, pass the current host request as `input.request`.
+`content.markdown` is non-null only for a verified current payload. Render that
+string once through the existing `ElMarkdownRenderer`, with the host's normal
+base URL, CSP and feature options. Preparation does not parse Markdown. The
+renderer owns parsing, the URL/feature gateway and its existing safe output
+sink. It is read-only derived presentation and never enters host source,
+transactions or history. Source mode continues to show the exact directive.
+
+Automatic `ElMarkdownEditor` rendering still requires its reserved production
+call-site integration. The embed helpers expose verified Markdown, but this
+candidate does not change `markdown-editor.vue`. The exact owner patch is
+[`markdown-embed-editor-owner-integration.patch`](../../vue/tests/consumer-install/markdown-embed-editor-owner-integration.patch).
+It proposes request digests, cancellation, current host context and both existing
+embed renderer locations, preserving the original metadata fallback. Applying
+that patch, validating the real editor fixture and the consumer's authorized
+payload source, and independent UX acceptance remain required before claiming
+end-to-end completion. The companion
+[`markdown-embed-editor-projection-integration.test.ts`](../../vue/tests/consumer-install/markdown-embed-editor-projection-integration.test.ts)
+mounts the real public editor without mocks and deliberately remains RED until
+that reserved integration is completed.
+
+The portable public regression is
+[`markdown-embed-projection-public.test.ts`](../../vue/tests/consumer-install/markdown-embed-projection-public.test.ts).
+Run it through Blog's real local-alias Vitest configuration by copying it and
+its adjacent JSON fixture to `tests/frontend/unit/authoring/`. Its coordinate
+and reference fixture were serialized using the actual
+`ArticleEmbedDependencyCoordinate`, `ArticleEmbedSafeProjectionReference` and
+`ArticleEmbedContractDigest.ComputeDependency` at Blog commit
+`1194ee45037862aa30803650ec2a622700631224`. The adjacent fixture generator
+compiles those exact source files, not replacement DTOs. It does not produce an
+accepted authoring/dependency receipt or demonstrate live Blog permissions.
+
+```sh
+dotnet run --project vue/tests/consumer-install/markdown-embed-projection-blog-fixture.csproj \
+  -p:BlogEmbedContractRoot=<exact-Blog-checkout>/src/shared/Contracts/ArticleEmbeds
+# In the exact Blog consumer checkout's src/frontend directory:
+FSUSBLOG_USE_LOCAL_FSUSUI=1 FSUSBLOG_LOCAL_FSUSUI_ROOT=<UI-checkout> \
+  pnpm exec vitest run --config vitest.config.ts \
+  ../../tests/frontend/unit/authoring/articleEmbedProjectionPublicBoundary.test.ts
+```
 
 The accessibility contract exposes target mode, status, and the
 `enter-source` open-source operation with `tabStop: false`. Stale, forbidden,
