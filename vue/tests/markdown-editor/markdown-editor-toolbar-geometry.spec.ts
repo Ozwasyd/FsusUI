@@ -80,7 +80,7 @@ for (const theme of ['light', 'dark'] as const) {
     await page.setViewportSize({ width: 375, height: 812 })
     await page.emulateMedia({ colorScheme: theme })
     await page.goto(
-      '/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=long',
+      `/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=long${theme === 'dark' ? '&theme=dark' : ''}`,
       { waitUntil: 'domcontentloaded' },
     )
     const editor = page
@@ -91,6 +91,10 @@ for (const theme of ['light', 'dark'] as const) {
     const more = editor.locator('.el-markdown-editor__command-more')
     const buttons = commands.getByRole('button')
     await expect(buttons).toHaveCount(6)
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-theme-resolved',
+      theme,
+    )
     await page.evaluate(() => document.fonts.ready)
     await toolbar.evaluate((element) =>
       element.scrollIntoView({ block: 'start' }),
