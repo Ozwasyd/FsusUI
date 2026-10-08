@@ -1,0 +1,319 @@
+
+Running 15 tests using 3 workers
+
+  ✓   1 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture basic (2.7s)
+  ✘   3 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (5.5s)
+  ✓   4 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture navigation (3.9s)
+  ✓   2 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture form (7.6s)
+  ✓   5 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture others (3.1s)
+  ✓   7 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture icons (3.3s)
+  ✓   6 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture feedback (4.1s)
+  ✓   8 [desktop-dark] › vue/tests/visual/form-production.spec.ts:63:5 › keeps production form columns aligned for its project viewport and 320px (7.1s)
+  ✘   9 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (10.4s)
+  ✘  11 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale (7.1s)
+  ✘  12 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement (7.2s)
+  ✘  13 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 (7.3s)
+  ✓  15 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:106:5 › motion scss compiles without error (3.6s)
+  ✘  10 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (27.3s)
+  ✘  14 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms (7.0s)
+
+
+  1) [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ─────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      35 |
+      36 | test.afterEach(async ({ page }) => {
+    > 37 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      38 | })
+      39 |
+      40 | const sections: VisualSection[] = [
+        at /workspace/FsusUI/vue/tests/visual/capture-all.spec.ts:37:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5193/assets/core-Cmkhzapn.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5193/assets/engine-javascript-ZX5pI3G3.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5193/assets/core-Cmkhzapn.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5193/assets/engine-javascript-ZX5pI3G3.js net::ERR_ABORTED",[39m
+    [31m+ ][39m
+
+      133 |
+      134 | test.afterEach(async ({ page }) => {
+    > 135 |   expect(diagnostics.get(page) ?? []).toEqual([])
+          |                                       ^
+      136 | })
+      137 |
+      138 | test.describe('markdown editor chrome variants matrix (#429)', () => {
+        at /workspace/FsusUI/vue/tests/visual/markdown-editor-chrome.spec.ts:135:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')
+    Timeout: 20000ms
+    [32m- Expected substring  -  1[39m
+    [31m+ Received string     + 11[39m
+
+    [32m- 已同步到草稿箱[39m
+    [31m+ 227 字 · 45 词 · {[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ } · supported{[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ }[39m
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')[22m
+    [2m    23 × locator resolved to <span data-v-525503f0="" data-testid="chrome-visual-status-slot">227 字 · 45 词 · {↵  "mode": "source",↵  "readonly"…</span>[22m
+    [2m       - unexpected value "227 字 · 45 词 · {[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m} · supported{[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m}"[22m
+
+
+      424 |       await expect(
+      425 |         slotted.getByTestId('chrome-visual-status-slot'),
+    > 426 |       ).toContainText('已同步到草稿箱')
+          |         ^
+      427 |     },
+      428 |   )
+      429 |
+        at /workspace/FsusUI/vue/tests/visual/markdown-editor-chrome.spec.ts:426:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g3/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7 failed
+    [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ──────────────────────
+    [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+    [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+  8 passed (47.0s)

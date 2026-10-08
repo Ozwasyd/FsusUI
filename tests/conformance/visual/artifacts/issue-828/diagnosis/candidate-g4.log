@@ -1,0 +1,412 @@
+
+Running 19 tests using 1 worker
+
+  ✘   1 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server home route has no browser diagnostics (18.9s)
+  ✓   2 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server basic route has no browser diagnostics (4.5s)
+  ✓   3 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server form route has no browser diagnostics (5.8s)
+  ✘   4 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server data route has no browser diagnostics (4.1s)
+  ✓   5 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server navigation route has no browser diagnostics (3.9s)
+  ✓   6 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server feedback route has no browser diagnostics (3.8s)
+  ✓   7 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server others route has no browser diagnostics (3.5s)
+  ✓   8 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server icons route has no browser diagnostics (4.7s)
+  ✓   9 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server markdown-stress route has no browser diagnostics (5.7s)
+  ✓  10 vue/tests/demo-app-dev/demo-app-dev.spec.ts:181:5 › dev server serves the current Select V2 option emphasis styles (6.2s)
+  ✘  11 vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 › default home mounts only the virtual window and navigates to sections (9.5s)
+  ✘  12 vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 › default home TreeSelect dropdown does not bleed into the next section (9.8s)
+  ✓  13 vue/tests/demo-app-dev/demo-app-dev.spec.ts:323:5 › Others card header keeps title and action separated on narrow screens (5.2s)
+  ✘  14 vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 › Calendar header controls use soft segmented styling (5.4s)
+  ✘  15 vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 › Calendar title follows the browser locale in demo app (3.8s)
+  ✘  16 vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 › markdown stress route renders long raw HTML without browser diagnostics (1.2m)
+  ✘  17 vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 › markdown stress scrollbar thumb drag stays smooth without text blur (1.2m)
+  ✘  18 vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 › markdown stress preview scroll remains monotonic while renderer settles (1.0m)
+  ✘  19 vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 › markdown stress preview keeps position in narrow devtools-like viewport (26.5s)
+
+
+  1) vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server home route has no browser diagnostics 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      48 |
+      49 | test.afterEach(async ({ page }) => {
+    > 50 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      51 | })
+      52 |
+      53 | type MarkdownScrollSample = {
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:50:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ho-b234b--has-no-browser-diagnostics/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ho-b234b--has-no-browser-diagnostics/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ho-b234b--has-no-browser-diagnostics/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ho-b234b--has-no-browser-diagnostics/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server data route has no browser diagnostics 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      48 |
+      49 | test.afterEach(async ({ page }) => {
+    > 50 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      51 | })
+      52 |
+      53 | type MarkdownScrollSample = {
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:50:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-dev-server-da-951a7--has-no-browser-diagnostics/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-dev-server-da-951a7--has-no-browser-diagnostics/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-dev-server-da-951a7--has-no-browser-diagnostics/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-dev-server-da-951a7--has-no-browser-diagnostics/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 › default home mounts only the virtual window and navigates to sections 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 4[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      48 |
+      49 | test.afterEach(async ({ page }) => {
+    > 50 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      51 | })
+      52 |
+      53 | type MarkdownScrollSample = {
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:50:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-default-home--f3454-w-and-navigates-to-sections/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-default-home--f3454-w-and-navigates-to-sections/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-default-home--f3454-w-and-navigates-to-sections/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-default-home--f3454-w-and-navigates-to-sections/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 › default home TreeSelect dropdown does not bleed into the next section 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      48 |
+      49 | test.afterEach(async ({ page }) => {
+    > 50 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      51 | })
+      52 |
+      53 | type MarkdownScrollSample = {
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:50:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-default-home--77e8c-bleed-into-the-next-section/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-default-home--77e8c-bleed-into-the-next-section/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-default-home--77e8c-bleed-into-the-next-section/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-default-home--77e8c-bleed-into-the-next-section/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 › Calendar header controls use soft segmented styling 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      48 |
+      49 | test.afterEach(async ({ page }) => {
+    > 50 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      51 | })
+      52 |
+      53 | type MarkdownScrollSample = {
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:50:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-Calendar-head-998cc--use-soft-segmented-styling/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-Calendar-head-998cc--use-soft-segmented-styling/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-Calendar-head-998cc--use-soft-segmented-styling/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-Calendar-head-998cc--use-soft-segmented-styling/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 › Calendar title follows the browser locale in demo app 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      48 |
+      49 | test.afterEach(async ({ page }) => {
+    > 50 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      51 | })
+      52 |
+      53 | type MarkdownScrollSample = {
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:50:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-Calendar-titl-084eb--browser-locale-in-demo-app/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-Calendar-titl-084eb--browser-locale-in-demo-app/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-Calendar-titl-084eb--browser-locale-in-demo-app/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-Calendar-titl-084eb--browser-locale-in-demo-app/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 › markdown stress route renders long raw HTML without browser diagnostics 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('[data-testid="markdown-stress-status"]')
+    Expected: [32m"complete"[39m
+    Received: [31m"rendering"[39m
+    Timeout:  30000ms
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 30000ms[22m
+    [2m  - waiting for locator('[data-testid="markdown-stress-status"]')[22m
+    [2m    4 × locator resolved to <strong data-testid="markdown-stress-status">rendering</strong>[22m
+    [2m      - unexpected value "rendering"[22m
+
+
+      445 |   await expect(
+      446 |     page.locator('[data-testid="markdown-stress-status"]'),
+    > 447 |   ).toHaveText('complete', { timeout: 30_000 })
+          |     ^
+      448 |
+      449 |   const metrics = await page
+      450 |     .locator('[data-testid="markdown-stress-metrics"]')
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:447:5
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-6465b-without-browser-diagnostics/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-6465b-without-browser-diagnostics/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-6465b-without-browser-diagnostics/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 › markdown stress scrollbar thumb drag stays smooth without text blur 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('[data-testid="markdown-stress-status"]')
+    Expected: [32m"complete"[39m
+    Received: [31m"rendering"[39m
+    Timeout:  20000ms
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 20000ms[22m
+    [2m  - waiting for locator('[data-testid="markdown-stress-status"]')[22m
+    [2m    4 × locator resolved to <strong data-testid="markdown-stress-status">rendering</strong>[22m
+    [2m      - unexpected value "rendering"[22m
+
+
+      670 |   await expect(
+      671 |     page.locator('[data-testid="markdown-stress-status"]'),
+    > 672 |   ).toHaveText('complete', { timeout: 20_000 })
+          |     ^
+      673 |
+      674 |   const scrollbar = page.locator('.markdown-stress-scrollbar')
+      675 |   const wrap = scrollbar.locator('.el-scrollbar__wrap').first()
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:672:5
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-918da-ys-smooth-without-text-blur/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-918da-ys-smooth-without-text-blur/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-918da-ys-smooth-without-text-blur/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 › markdown stress preview scroll remains monotonic while renderer settles 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('.markdown-stress-renderer')
+    Expected substring: [32m"Stress Section 1"[39m
+    Received string:    [31m"Rendering markdown..."[39m
+    Timeout: 20000ms
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('.markdown-stress-renderer')[22m
+    [2m    - locator resolved to <div class="el-scrollbar__view markdown-stress-renderer">…</div>[22m
+    [2m    - unexpected value ""[22m
+    [2m    2 × locator resolved to <div class="el-scrollbar__view markdown-stress-renderer">…</div>[22m
+    [2m      - unexpected value "Rendering markdown..."[22m
+
+
+      822 |
+      823 |   const renderer = page.locator('.markdown-stress-renderer')
+    > 824 |   await expect(renderer).toContainText('Stress Section 1', {
+          |                          ^
+      825 |     timeout: 20_000,
+      826 |   })
+      827 |
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:824:26
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-9cf08-onic-while-renderer-settles/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-9cf08-onic-while-renderer-settles/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-9cf08-onic-while-renderer-settles/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 › markdown stress preview keeps position in narrow devtools-like viewport 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('[data-testid="markdown-stress-status"]')
+    Expected: [32m"complete"[39m
+    Received: [31m"rendering"[39m
+    Timeout:  20000ms
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 20000ms[22m
+    [2m  - waiting for locator('[data-testid="markdown-stress-status"]')[22m
+    [2m    4 × locator resolved to <strong data-testid="markdown-stress-status">rendering</strong>[22m
+    [2m      - unexpected value "rendering"[22m
+
+
+      848 |   await expect(
+      849 |     page.locator('[data-testid="markdown-stress-status"]'),
+    > 850 |   ).toHaveText('complete', { timeout: 20_000 })
+          |     ^
+      851 |
+      852 |   const samples = await sampleMarkdownStressScroll(page, {
+      853 |     delayMs: 8,
+        at /workspace/FsusUI/vue/tests/demo-app-dev/demo-app-dev.spec.ts:850:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-fdf27-rrow-devtools-like-viewport/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-fdf27-rrow-devtools-like-viewport/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-fdf27-rrow-devtools-like-viewport/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-diagnosis-g4/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-fdf27-rrow-devtools-like-viewport/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10 failed
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server home route has no browser diagnostics 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server data route has no browser diagnostics 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 › default home mounts only the virtual window and navigates to sections 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 › default home TreeSelect dropdown does not bleed into the next section 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 › Calendar header controls use soft segmented styling 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 › Calendar title follows the browser locale in demo app 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 › markdown stress route renders long raw HTML without browser diagnostics 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 › markdown stress scrollbar thumb drag stays smooth without text blur 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 › markdown stress preview scroll remains monotonic while renderer settles 
+    vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 › markdown stress preview keeps position in narrow devtools-like viewport 
+  9 passed (5.7m)
