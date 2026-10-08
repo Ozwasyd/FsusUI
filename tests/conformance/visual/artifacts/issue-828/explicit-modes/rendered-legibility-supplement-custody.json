@@ -1,0 +1,12 @@
+{
+  "testedCandidate": "d182cf93cbb852006047bc2b7eea0ba28daa4955",
+  "productSource": "69705ac1ca5d3c07fa955486646a1861ba5bb50a",
+  "immutableEvidenceHead": "957863ff82943840178c8e3d17e5c86093764de1",
+  "immutableManifestSHA256": "603bd03c3c69b6b5cf98e5a8369ff7ae0266f0bb3126c486faf822e63edad344",
+  "supplement": "rendered-legibility-handoff.md",
+  "supplementSHA256": "b01a336be3a26feb199b2a40a1992bb96327bd966833afd30bd7b11b71198c57",
+  "inspectedImage": "after-empty-light-667x375-z2-inline-search-expanded-full.png",
+  "imageSHA256": "600bca45ff41b9201bd8725480c354fc14d7457e3e531e95c1558d946c362759",
+  "qualificationEligible": false,
+  "original172SealedEntriesUnchanged": true
+}
