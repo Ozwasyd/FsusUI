@@ -208,6 +208,7 @@
     align-items: center;
     gap: 6px;
     flex: 0 0 auto;
+    max-inline-size: 50%;
     min-height: 2.25rem;
 
     @include when(expanded) {
@@ -222,8 +223,15 @@
     }
   }
 
+  @include e(command-more-label) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   @include e(command-more-count) {
     display: inline-grid;
+    flex-shrink: 0;
     min-width: 1.25rem;
     height: 1.25rem;
     place-items: center;

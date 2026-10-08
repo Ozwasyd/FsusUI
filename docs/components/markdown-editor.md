@@ -179,6 +179,8 @@ Scrolling primary commands keeps the trigger reachable without horizontal sticky
 or covering a command. It follows the toolbar during page scrolling; only the existing compact
 `editor-profile="prose"` toolbar has vertical sticky behavior. The tray keeps its command/action
 count, expanded state, and Escape focus return to the trigger.
+Long overflow labels are ellipsized within at most half of the command group, reserving usable
+space for primary commands. The full accessible label and overflow count remain available.
 
 Every command surface consumes the same `MarkdownEditorCommand` registry. Commands use stable
 `key`, `label`, `group`, controlled icon tokens, shortcuts, and presentation targets;
