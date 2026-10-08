@@ -1,0 +1,9 @@
+
+ RUN  v4.1.5 /workspace/FsusUI-828-geometry
+
+
+ Test Files  3 passed (3)
+      Tests  67 passed (67)
+   Start at  05:31:52
+   Duration  7.13s (transform 4.79s, setup 612ms, import 8.60s, tests 2.60s, environment 3.58s)
+

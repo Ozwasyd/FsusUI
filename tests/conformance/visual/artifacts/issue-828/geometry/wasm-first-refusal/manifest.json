@@ -1,0 +1,40 @@
+{
+  "configurationFingerprint": "16c4cf3b39c236fe5e10e1269e8d40548c0a20e959ff1237b0f8f1902c386ad4",
+  "createdAt": "2026-10-08T05:35:11.581Z",
+  "groups": {
+    "icons": {
+      "artifactFingerprint": "6635181125542bafec33cf0321a3a7184ca5caf5becd91ea118631e4c07fd6c7",
+      "runtimePath": "artifacts/icons",
+      "sourceFingerprint": "59882524fd5379de71360518a225645be641ad9f6cdc90079cbf5438976450dc"
+    },
+    "wasm": {
+      "artifactFingerprint": "a03898265a37aaa28e98acd9d8ce4041ae099f13b3c884e0edb725558fd53b77",
+      "runtimePath": "artifacts/wasm",
+      "sourceFingerprint": "6f1165e005d0b4c75f6a04bfc0bd9f2a95b31fcc3afc1c9d021dc99b27af9def"
+    },
+    "demo": {
+      "artifactFingerprint": "0a24558e951dcf95e935bbc3a9c4583e37a6522a553b6e37dec179a714715498",
+      "runtimePath": "demo-dist",
+      "sourceFingerprint": "5e83eeb24f88ac2d3cb5660c8f6ddf7c36f4f09fbd69d0bec932887dc77b9404"
+    }
+  },
+  "paths": {
+    "demoDist": "demo-dist",
+    "runtimeRoot": ".tmp/visual-runtime"
+  },
+  "readiness": {
+    "groups": [
+      "icons",
+      "wasm",
+      "demo"
+    ],
+    "ready": true
+  },
+  "schemaVersion": 1,
+  "sourceFingerprint": "8f684cb54e1ae94c1e6afb6ba84460d0c8c0fd547997cec88027dc5e8ad72811",
+  "tools": {
+    "node": "24.19.0",
+    "playwright": "1.59.1",
+    "pnpm": "pnpm@10.33.0"
+  }
+}

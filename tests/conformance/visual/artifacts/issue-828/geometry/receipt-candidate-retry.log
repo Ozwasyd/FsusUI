@@ -1,0 +1,3 @@
+strict mode: missing type "array" for keyword "maxItems" at "https://fsusui.dev/contracts/ux-acceptance-receipt.v2.schema.json#/allOf/0/then/properties/blockers" (strictTypes)
+strict mode: missing type "array" for keyword "minItems" at "https://fsusui.dev/contracts/ux-acceptance-receipt.v2.schema.json#/allOf/0/else/properties/blockers" (strictTypes)
+Candidate pair valid; rejected 5d6541461ccd96bd9edba0a223635920682a8e13 03950ee162c9bd58a6ae675772f18ab46c8a38d944c7fb4727418b07c9d2e296

@@ -1,0 +1,73 @@
+{
+  "source": "5d6541461ccd96bd9edba0a223635920682a8e13",
+  "runtimeSourceFingerprint": "8f684cb54e1ae94c1e6afb6ba84460d0c8c0fd547997cec88027dc5e8ad72811",
+  "command": "FSUS_VISUAL_DEV_PORT=5194 FSUS_VISUAL_PROFILE=issue-828-geometry-dev PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/playwright-browsers pnpm run test:visual:dev",
+  "exitCode": 1,
+  "passed": 9,
+  "failed": 10,
+  "total": 19,
+  "duration": "5.8m",
+  "separateFromOriginalFull": true,
+  "failedVariants": [
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 \u203a dev server home route has no browser diagnostics",
+      "cause": "external CDN TLS afterEach diagnostics",
+      "firstError": "Error: expect(received).toEqual(expected) // deep equality",
+      "selector": null
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 \u203a dev server data route has no browser diagnostics",
+      "cause": "external CDN TLS afterEach diagnostics",
+      "firstError": "Error: expect(received).toEqual(expected) // deep equality",
+      "selector": null
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 \u203a default home mounts only the virtual window and navigates to sections",
+      "cause": "external CDN TLS afterEach diagnostics",
+      "firstError": "Error: expect(received).toEqual(expected) // deep equality",
+      "selector": null
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 \u203a default home TreeSelect dropdown does not bleed into the next section",
+      "cause": "external CDN TLS afterEach diagnostics",
+      "firstError": "Error: expect(received).toEqual(expected) // deep equality",
+      "selector": null
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 \u203a Calendar header controls use soft segmented styling",
+      "cause": "external CDN TLS afterEach diagnostics",
+      "firstError": "Error: expect(received).toEqual(expected) // deep equality",
+      "selector": null
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:418:5 \u203a Calendar title follows the browser locale in demo app",
+      "cause": "external CDN TLS afterEach diagnostics",
+      "firstError": "Error: expect(received).toEqual(expected) // deep equality",
+      "selector": null
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 \u203a markdown stress route renders long raw HTML without browser diagnostics",
+      "cause": "stress renderer readiness/status timeout",
+      "firstError": "Error: expect(locator).toHaveText(expected) failed",
+      "selector": "[data-testid=\"markdown-stress-status\"]"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 \u203a markdown stress scrollbar thumb drag stays smooth without text blur",
+      "cause": "stress renderer readiness/status timeout",
+      "firstError": "Error: expect(locator).toHaveText(expected) failed",
+      "selector": "[data-testid=\"markdown-stress-status\"]"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 \u203a markdown stress preview scroll remains monotonic while renderer settles",
+      "cause": "stress renderer readiness/status timeout",
+      "firstError": "Error: expect(locator).toContainText(expected) failed",
+      "selector": ".markdown-stress-renderer"
+    },
+    {
+      "test": "vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 \u203a markdown stress preview keeps position in narrow devtools-like viewport",
+      "cause": "stress renderer readiness/status timeout",
+      "firstError": "Error: expect(locator).toHaveText(expected) failed",
+      "selector": "[data-testid=\"markdown-stress-status\"]"
+    }
+  ]
+}

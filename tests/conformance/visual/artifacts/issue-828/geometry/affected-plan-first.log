@@ -1,0 +1,30 @@
+
+> @ test:visual:affected /workspace/FsusUI-828-geometry
+> node ./scripts/with-node-heap.mjs node ./scripts/run-visual-tests.mjs --profile=affected -- --base=cecf260475fab0a3efb3225f6d7aa39f96a0ae6b --dry-run
+
+[visual-profile] profile=affected
+[visual-profile] base=cecf260475fab0a3efb3225f6d7aa39f96a0ae6b
+[visual-profile] changed-files=.changeset/complete-canonical-icon-alias-exports.md,.changeset/markdown-pending-theme-invalidation.md,.changeset/public-shell-320-landscape-budget.md,docs/components/markdown-renderer.md,docs/components/public-shell.md,tests/conformance/visual/artifacts/issue-828/geometry/preimplementation-classification-evidence.json,tests/conformance/visual/artifacts/issue-828/geometry/preimplementation-classification-receipt.json,vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx,vue/packages/components/markdown-renderer/src/markdown-renderer.vue,vue/packages/icons-vue/src/components/index.ts,vue/packages/theme-chalk/src/public-shell-critical.scss,vue/packages/theme-chalk/src/public-shell.scss
+[visual-profile] specs=vue/tests/visual/foundation-style-boundary.spec.ts,vue/tests/visual/material-contract.spec.ts,vue/tests/visual/theme-scale-contract.spec.ts,vue/tests/visual/typography-real-weights.spec.ts,vue/tests/visual/ui-audit-all.spec.ts
+[visual-profile] sections=markdown-stress
+[visual-profile] audit-components=ElMarkdownRenderer
+[visual-profile] full-required=yes files=vue/packages/theme-chalk/src/public-shell-critical.scss,vue/packages/theme-chalk/src/public-shell.scss
+[visual-profile] recommendation=pnpm test:visual:full
+Visual capacity: 4 CPU, 16384 MiB
+Suites: serial; preview=3, dev=1, audit buckets=6
+Budgets: reserve=1024 MiB, server=512 MiB each, worker=768 MiB
+- capacity base: cgroup v2 CPU quota 4 included in capacity
+- capacity base: cgroup v2 memory limit included in effective capacity
+- capacity base: CPU constrained the repository parallel lane budget
+- capacity base: reserved 1408 MiB for OS, filesystem cache, package coordinators, and native processes
+- capacity base: Unit workload 305 files selected 3 shard(s) with 1 worker(s) each
+- CPU limited visual workers
+- reserved capacity for Node orchestration, reports, filesystem cache, and web server
+- preview and dev suites run serially to avoid nested overcommit
+[visual-plan] suite=preview
+[visual-plan] selected-projects=desktop-light,mobile-light,desktop-dark,mobile-dark
+[visual-plan] argv=pnpm exec playwright test --config=vue/playwright.config.ts --project=desktop-light --project=mobile-light --project=desktop-dark --project=mobile-dark vue/tests/visual/foundation-style-boundary.spec.ts vue/tests/visual/material-contract.spec.ts vue/tests/visual/theme-scale-contract.spec.ts vue/tests/visual/typography-real-weights.spec.ts vue/tests/visual/ui-audit-all.spec.ts
+[visual-plan] workers=3
+[visual-plan] report-directory=playwright-report/profile-affected/suite-preview/shard-local
+[visual-plan] result-namespaces=vue/test-results/profile-affected/suite-preview/project-desktop-light/shard-local,vue/test-results/profile-affected/suite-preview/project-mobile-light/shard-local,vue/test-results/profile-affected/suite-preview/project-desktop-dark/shard-local,vue/test-results/profile-affected/suite-preview/project-mobile-dark/shard-local
+[visual-plan] environment=FSUS_UI_AUDIT_COMPONENTS=ElMarkdownRenderer

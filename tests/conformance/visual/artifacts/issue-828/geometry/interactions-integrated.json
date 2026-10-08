@@ -1,0 +1,2385 @@
+{
+  "source": "5d6541461ccd96bd9edba0a223635920682a8e13",
+  "runtimeManifest": {
+    "configurationFingerprint": "16c4cf3b39c236fe5e10e1269e8d40548c0a20e959ff1237b0f8f1902c386ad4",
+    "createdAt": "2026-10-08T05:34:11.256Z",
+    "groups": {
+      "icons": {
+        "artifactFingerprint": "6635181125542bafec33cf0321a3a7184ca5caf5becd91ea118631e4c07fd6c7",
+        "runtimePath": "artifacts/icons",
+        "sourceFingerprint": "59882524fd5379de71360518a225645be641ad9f6cdc90079cbf5438976450dc"
+      },
+      "wasm": {
+        "artifactFingerprint": "a03898265a37aaa28e98acd9d8ce4041ae099f13b3c884e0edb725558fd53b77",
+        "runtimePath": "artifacts/wasm",
+        "sourceFingerprint": "6f1165e005d0b4c75f6a04bfc0bd9f2a95b31fcc3afc1c9d021dc99b27af9def"
+      },
+      "demo": {
+        "artifactFingerprint": "0a24558e951dcf95e935bbc3a9c4583e37a6522a553b6e37dec179a714715498",
+        "runtimePath": "demo-dist",
+        "sourceFingerprint": "5e83eeb24f88ac2d3cb5660c8f6ddf7c36f4f09fbd69d0bec932887dc77b9404"
+      }
+    },
+    "paths": {
+      "demoDist": "demo-dist",
+      "runtimeRoot": ".tmp/visual-runtime"
+    },
+    "readiness": {
+      "groups": [
+        "icons",
+        "wasm",
+        "demo"
+      ],
+      "ready": true
+    },
+    "schemaVersion": 1,
+    "sourceFingerprint": "8f684cb54e1ae94c1e6afb6ba84460d0c8c0fd547997cec88027dc5e8ad72811",
+    "tools": {
+      "node": "24.19.0",
+      "playwright": "1.59.1",
+      "pnpm": "pnpm@10.33.0"
+    }
+  },
+  "rows": [
+    {
+      "theme": "light",
+      "width": 844,
+      "height": 390,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 579,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 579,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 579,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 579,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 44
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 579,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 99
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 844,
+      "height": 390,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 446,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 446,
+                "y": 162,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 31
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 446,
+                "y": 162,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 97
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 446,
+                "y": 162,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 163
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 446,
+                "y": 162,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 245
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 844,
+      "height": 390,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 19
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 107
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 195
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 283
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 393
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 667,
+      "height": 375,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 402,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 402,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 402,
+                "y": 165,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 8
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 402,
+                "y": 165,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 52
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 402,
+                "y": 165,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 107
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 667,
+      "height": 375,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 269,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 269,
+                "y": 154,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 39
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 269,
+                "y": 154,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 105
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 269,
+                "y": 154,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 171
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 269,
+                "y": 154,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 253
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 667,
+      "height": 375,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 27
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 115
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 203
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 291
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 401
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 736,
+      "height": 320,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 471,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 471,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 471,
+                "y": 138,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 35
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 471,
+                "y": 138,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 79
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 471,
+                "y": 138,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 134
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 736,
+      "height": 320,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 66
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 132
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 198
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 280
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 736,
+      "height": 320,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 54
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 142
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 230
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 318
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 428
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 932,
+      "height": 430,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 667,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 667,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 667,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 667,
+                "y": 193,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 24
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 667,
+                "y": 193,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 79
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 932,
+      "height": 430,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 534,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 534,
+                "y": 182,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 11
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 534,
+                "y": 182,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 77
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 534,
+                "y": 182,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 143
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 534,
+                "y": 182,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 225
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 932,
+      "height": 430,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 402,
+                "y": 170,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 402,
+                "y": 171,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 87
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 402,
+                "y": 171,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 175
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 402,
+                "y": 171,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 263
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 402,
+                "y": 171,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 373
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "height": 520,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 759,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 759,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 759,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 759,
+                "y": 217,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 759,
+                "y": 238,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 34
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "height": 520,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 626,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 626,
+                "y": 193,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 626,
+                "y": 227,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 32
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 626,
+                "y": 227,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 98
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 626,
+                "y": 227,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 180
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "height": 520,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 494,
+                "y": 170,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 494,
+                "y": 216,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 42
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 494,
+                "y": 216,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 130
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 494,
+                "y": 216,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 218
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 494,
+                "y": 216,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 328
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 844,
+      "height": 390,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 579,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 579,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 579,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 579,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 44
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 579,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 99
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 844,
+      "height": 390,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 446,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 446,
+                "y": 162,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 31
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 446,
+                "y": 162,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 97
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 446,
+                "y": 162,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 163
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 446,
+                "y": 162,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 245
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 844,
+      "height": 390,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 19
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 107
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 195
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 283
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 314,
+                "y": 151,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 393
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 667,
+      "height": 375,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 402,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 402,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 402,
+                "y": 165,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 8
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 402,
+                "y": 165,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 52
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 402,
+                "y": 165,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 107
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 667,
+      "height": 375,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 269,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 269,
+                "y": 154,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 39
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 269,
+                "y": 154,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 105
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 269,
+                "y": 154,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 171
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 269,
+                "y": 154,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 253
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 667,
+      "height": 375,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 27
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 115
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 203
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 291
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 137,
+                "y": 143,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 401
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 736,
+      "height": 320,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 471,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 471,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 471,
+                "y": 138,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 35
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 471,
+                "y": 138,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 79
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 471,
+                "y": 138,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 134
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 736,
+      "height": 320,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 66
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 132
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 198
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 338,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 280
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 736,
+      "height": 320,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 54
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 142
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 230
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 318
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 206,
+                "y": 116,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 428
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 932,
+      "height": 430,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 667,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 667,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 667,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 667,
+                "y": 193,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 24
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 667,
+                "y": 193,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 79
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 932,
+      "height": 430,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 534,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 534,
+                "y": 182,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 11
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 534,
+                "y": 182,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 77
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 534,
+                "y": 182,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 143
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 534,
+                "y": 182,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 225
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 932,
+      "height": 430,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 402,
+                "y": 170,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 402,
+                "y": 171,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 87
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 402,
+                "y": 171,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 175
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 402,
+                "y": 171,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 263
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 402,
+                "y": 171,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 373
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "height": 520,
+      "zoom": 1,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 759,
+                "y": 85,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 759,
+                "y": 129,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 759,
+                "y": 173,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 759,
+                "y": 217,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 759,
+                "y": 238,
+                "width": 210,
+                "height": 44
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 34
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "height": 520,
+      "zoom": 1.5,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 626,
+                "y": 127,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 626,
+                "y": 193,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 626,
+                "y": 227,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 32
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 626,
+                "y": 227,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 98
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 626,
+                "y": 227,
+                "width": 316,
+                "height": 66
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 180
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "height": 520,
+      "zoom": 2,
+      "checks": [
+        "brand first Tab",
+        "search Enter input focus Escape return",
+        "menu native Enter",
+        {
+          "menuReachability": [
+            {
+              "label": "Home",
+              "rect": {
+                "x": 494,
+                "y": 170,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 0
+            },
+            {
+              "label": "Archive",
+              "rect": {
+                "x": 494,
+                "y": 216,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 42
+            },
+            {
+              "label": "Topics",
+              "rect": {
+                "x": 494,
+                "y": 216,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 130
+            },
+            {
+              "label": "About",
+              "rect": {
+                "x": 494,
+                "y": 216,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 218
+            },
+            {
+              "label": "Sign in",
+              "rect": {
+                "x": 494,
+                "y": 216,
+                "width": 420,
+                "height": 88
+              },
+              "centerInViewport": true,
+              "hit": true,
+              "scrollY": 328
+            }
+          ]
+        },
+        "menu Escape focus return",
+        "touch search opens/focuses input"
+      ],
+      "failed": []
+    }
+  ]
+}

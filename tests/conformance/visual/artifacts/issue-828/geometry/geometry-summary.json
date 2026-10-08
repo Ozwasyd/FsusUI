@@ -1,0 +1,370 @@
+{
+  "sourcePaddingCommit": "ad82fbc053a7a19a1ca23d06e10446dd3b11d475",
+  "typeIntegrationCommit": "5d654146",
+  "baselineHead": "cecf260475fab0a3efb3225f6d7aa39f96a0ae6b",
+  "qualificationEligible": false,
+  "matrix": {
+    "before-stable": {
+      "sourceHead": "cecf260475fab0a3efb3225f6d7aa39f96a0ae6b",
+      "runtimeSourceFingerprint": "c8530892ad5dd84ab6ebf1371c6c9d069db027b8668a016abf0d2b7638940205",
+      "rows": 540,
+      "headerMisses": 284,
+      "totalChromeMisses": 332,
+      "pageErrors": 0,
+      "overflowRows": 0,
+      "groups": [
+        {
+          "style": "full",
+          "nav": "menu",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 2,
+          "totalChromeMisses": 2,
+          "headerHeights": [61, 91, 122]
+        },
+        {
+          "style": "full",
+          "nav": "menu",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 26,
+          "totalChromeMisses": 26,
+          "headerHeights": [135, 202, 270]
+        },
+        {
+          "style": "full",
+          "nav": "menu",
+          "state": "menu-expanded",
+          "rows": 30,
+          "headerMisses": 2,
+          "totalChromeMisses": 2,
+          "headerHeights": [61, 91, 122]
+        },
+        {
+          "style": "full",
+          "nav": "inline",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 26,
+          "totalChromeMisses": 26,
+          "headerHeights": [135, 202, 270]
+        },
+        {
+          "style": "full",
+          "nav": "inline",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 30,
+          "totalChromeMisses": 30,
+          "headerHeights": [191, 286, 382]
+        },
+        {
+          "style": "full",
+          "nav": "bottom",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 2,
+          "totalChromeMisses": 22,
+          "headerHeights": [61, 91, 122]
+        },
+        {
+          "style": "full",
+          "nav": "bottom",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 26,
+          "totalChromeMisses": 30,
+          "headerHeights": [135, 202, 270]
+        },
+        {
+          "style": "full",
+          "nav": "none",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 2,
+          "totalChromeMisses": 2,
+          "headerHeights": [61, 91, 122]
+        },
+        {
+          "style": "full",
+          "nav": "none",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 26,
+          "totalChromeMisses": 26,
+          "headerHeights": [135, 202, 270]
+        },
+        {
+          "style": "critical-only",
+          "nav": "menu",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 2,
+          "totalChromeMisses": 2,
+          "headerHeights": [60, 90, 120]
+        },
+        {
+          "style": "critical-only",
+          "nav": "menu",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 26,
+          "totalChromeMisses": 26,
+          "headerHeights": [134, 201, 268]
+        },
+        {
+          "style": "critical-only",
+          "nav": "menu",
+          "state": "menu-expanded",
+          "rows": 30,
+          "headerMisses": 2,
+          "totalChromeMisses": 2,
+          "headerHeights": [60, 90, 120]
+        },
+        {
+          "style": "critical-only",
+          "nav": "inline",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 26,
+          "totalChromeMisses": 26,
+          "headerHeights": [134, 201, 268]
+        },
+        {
+          "style": "critical-only",
+          "nav": "inline",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 30,
+          "totalChromeMisses": 30,
+          "headerHeights": [190, 285, 380]
+        },
+        {
+          "style": "critical-only",
+          "nav": "bottom",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 2,
+          "totalChromeMisses": 22,
+          "headerHeights": [60, 90, 120]
+        },
+        {
+          "style": "critical-only",
+          "nav": "bottom",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 26,
+          "totalChromeMisses": 30,
+          "headerHeights": [134, 201, 268]
+        },
+        {
+          "style": "critical-only",
+          "nav": "none",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 2,
+          "totalChromeMisses": 2,
+          "headerHeights": [60, 90, 120]
+        },
+        {
+          "style": "critical-only",
+          "nav": "none",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 26,
+          "totalChromeMisses": 26,
+          "headerHeights": [134, 201, 268]
+        }
+      ]
+    },
+    "after-stable": {
+      "sourceHead": "ad82fbc053a7a19a1ca23d06e10446dd3b11d475",
+      "runtimeSourceFingerprint": "e43f67900bf25acc8f8f4cebf2d70f391b5d69e97881a38e5bd4c5c61286785e",
+      "rows": 540,
+      "headerMisses": 236,
+      "totalChromeMisses": 292,
+      "pageErrors": 0,
+      "overflowRows": 0,
+      "groups": [
+        {
+          "style": "full",
+          "nav": "menu",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 0,
+          "totalChromeMisses": 0,
+          "headerHeights": [53, 79, 106]
+        },
+        {
+          "style": "full",
+          "nav": "menu",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 22,
+          "totalChromeMisses": 22,
+          "headerHeights": [127, 190, 254]
+        },
+        {
+          "style": "full",
+          "nav": "menu",
+          "state": "menu-expanded",
+          "rows": 30,
+          "headerMisses": 0,
+          "totalChromeMisses": 0,
+          "headerHeights": [53, 79, 106]
+        },
+        {
+          "style": "full",
+          "nav": "inline",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 22,
+          "totalChromeMisses": 22,
+          "headerHeights": [127, 190, 254]
+        },
+        {
+          "style": "full",
+          "nav": "inline",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 30,
+          "totalChromeMisses": 30,
+          "headerHeights": [183, 274, 366]
+        },
+        {
+          "style": "full",
+          "nav": "bottom",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 0,
+          "totalChromeMisses": 20,
+          "headerHeights": [53, 79, 106]
+        },
+        {
+          "style": "full",
+          "nav": "bottom",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 22,
+          "totalChromeMisses": 30,
+          "headerHeights": [127, 190, 254]
+        },
+        {
+          "style": "full",
+          "nav": "none",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 0,
+          "totalChromeMisses": 0,
+          "headerHeights": [53, 79, 106]
+        },
+        {
+          "style": "full",
+          "nav": "none",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 22,
+          "totalChromeMisses": 22,
+          "headerHeights": [127, 190, 254]
+        },
+        {
+          "style": "critical-only",
+          "nav": "menu",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 0,
+          "totalChromeMisses": 0,
+          "headerHeights": [52, 78, 104]
+        },
+        {
+          "style": "critical-only",
+          "nav": "menu",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 22,
+          "totalChromeMisses": 22,
+          "headerHeights": [126, 189, 252]
+        },
+        {
+          "style": "critical-only",
+          "nav": "menu",
+          "state": "menu-expanded",
+          "rows": 30,
+          "headerMisses": 0,
+          "totalChromeMisses": 0,
+          "headerHeights": [52, 78, 104]
+        },
+        {
+          "style": "critical-only",
+          "nav": "inline",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 22,
+          "totalChromeMisses": 22,
+          "headerHeights": [126, 189, 252]
+        },
+        {
+          "style": "critical-only",
+          "nav": "inline",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 30,
+          "totalChromeMisses": 30,
+          "headerHeights": [182, 273, 364]
+        },
+        {
+          "style": "critical-only",
+          "nav": "bottom",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 0,
+          "totalChromeMisses": 20,
+          "headerHeights": [52, 78, 104]
+        },
+        {
+          "style": "critical-only",
+          "nav": "bottom",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 22,
+          "totalChromeMisses": 30,
+          "headerHeights": [126, 189, 252]
+        },
+        {
+          "style": "critical-only",
+          "nav": "none",
+          "state": "collapsed",
+          "rows": 30,
+          "headerMisses": 0,
+          "totalChromeMisses": 0,
+          "headerHeights": [52, 78, 104]
+        },
+        {
+          "style": "critical-only",
+          "nav": "none",
+          "state": "search-expanded",
+          "rows": 30,
+          "headerMisses": 22,
+          "totalChromeMisses": 22,
+          "headerHeights": [126, 189, 252]
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Critical-only disables all production stylesheets; foundations, fonts and component CSS absent. Standalone geometry diagnostic only, not full/published style parity.",
+    "Early capture errors are harness errors, not component defects. Retry captures can include closing/fading transitions; settled matrices wait actual native aria state.",
+    "Full visual at new integrated source not yet terminal; original c325 full failure remains historical and unwaived.",
+    "Universal expanded/inline/bottom budget has no implicit exemption; public-mode contracts and 44px targets require owner adjudication."
+  ],
+  "localCSS": {
+    "index.css": {
+      "sha256": "419f3e6413d00ffb371abe64634b8025e6f844d12a9dcf10a1a1d27a0a66f05b",
+      "bytes": 558274
+    },
+    "el-public-shell-critical.css": {
+      "sha256": "0434427378e195b0ca7899f3430c54495b8485183e9a636d0ff0a882fb66787d",
+      "bytes": 16953
+    }
+  }
+}
