@@ -15,6 +15,12 @@
         "section": "DataSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -30,6 +36,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -45,6 +57,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -60,6 +78,12 @@
         "section": "gallery",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -75,6 +99,12 @@
         "section": "gallery",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -90,6 +120,12 @@
         "section": "gallery",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -105,6 +141,12 @@
         "section": "gallery",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -120,6 +162,12 @@
         "section": "DataSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -135,6 +183,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -150,6 +204,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -165,6 +225,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -180,6 +246,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -195,6 +267,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -210,6 +288,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -225,6 +309,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -240,6 +330,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -255,6 +351,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -270,6 +372,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -285,6 +393,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -300,6 +414,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -315,6 +435,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -330,6 +456,12 @@
         "section": "DataSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -345,6 +477,12 @@
         "section": "FormSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": false,
+        "group": "baseline-preview-paired-first.log",
+        "note": "dark form targeted replay passed on both candidates; variable failure is not evidence of repair"
       }
     },
     {
@@ -360,6 +498,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -375,6 +519,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -390,6 +540,12 @@
         "section": "gallery",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -405,6 +561,12 @@
         "section": "gallery",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -420,6 +582,12 @@
         "section": "gallery",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -435,6 +603,12 @@
         "section": "gallery",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -450,6 +624,12 @@
         "section": "DataSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -465,6 +645,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -480,6 +666,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -495,6 +687,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -510,6 +708,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -525,6 +729,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -540,6 +750,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -555,6 +771,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -570,6 +792,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -585,6 +813,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -600,6 +834,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -615,6 +855,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -630,6 +876,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -645,6 +897,12 @@
         "section": "MarkdownEditorChromeVisualSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-preview-paired-first.log",
+        "note": "Original baseline test/config, with unchanged expectations"
       }
     },
     {
@@ -660,6 +918,12 @@
         "section": "gallery/data",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "CDN certificate afterEach diagnostics"
       }
     },
     {
@@ -675,6 +939,12 @@
         "section": "gallery/data",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "CDN certificate afterEach diagnostics"
       }
     },
     {
@@ -690,6 +960,12 @@
         "section": "gallery/data",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "CDN certificate afterEach diagnostics"
       }
     },
     {
@@ -705,6 +981,12 @@
         "section": "gallery/data",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "CDN certificate afterEach diagnostics"
       }
     },
     {
@@ -720,6 +1002,12 @@
         "section": "gallery/data",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "CDN certificate afterEach diagnostics"
       }
     },
     {
@@ -735,6 +1023,12 @@
         "section": "MarkdownStressSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "stress renderer/status timeout"
       }
     },
     {
@@ -750,6 +1044,12 @@
         "section": "MarkdownStressSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "stress renderer/status timeout"
       }
     },
     {
@@ -765,6 +1065,12 @@
         "section": "MarkdownStressSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "stress renderer/status timeout"
       }
     },
     {
@@ -780,6 +1086,12 @@
         "section": "MarkdownStressSection",
         "publicShellOrSiteHeaderReferenceInSpecOrSection": false,
         "diagnosticProof": "selector-exposure.json; 16 changed selector lists, 16 route/theme observations, zero matches; not universal state qualification"
+      },
+      "pairedBaseline": {
+        "commit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+        "reproduced": true,
+        "group": "baseline-dev-paired-first.log",
+        "cause": "stress renderer/status timeout"
       }
     }
   ]

@@ -1,0 +1,55 @@
+{
+  "sourceRevision": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "sourceDirtyBeforeRun": false,
+  "preparation": {
+    "command": "node scripts/prepare-visual-runtime.mjs",
+    "exitCode": 0,
+    "log": "runtime-first.log"
+  },
+  "readiness": {
+    "command": "node scripts/prepare-visual-runtime.mjs --check",
+    "exitCode": 0,
+    "log": "runtime-check-first.log"
+  },
+  "runtimeManifestSHA256": "51c096177fc795d854c4f4a544f591d7df8a85aa6da576ef77a55dd2b760072c",
+  "runtimeManifest": {
+    "configurationFingerprint": "16c4cf3b39c236fe5e10e1269e8d40548c0a20e959ff1237b0f8f1902c386ad4",
+    "createdAt": "2026-10-08T04:17:36.620Z",
+    "groups": {
+      "icons": {
+        "artifactFingerprint": "87920d24537667a365a288fac867f8d2759c5b80eed3ec1fcc989f574c07332f",
+        "runtimePath": "artifacts/icons",
+        "sourceFingerprint": "8bc817f064f994d03c1a9efea3c50db91864e65054021d9e93c7c6a286060f86"
+      },
+      "wasm": {
+        "artifactFingerprint": "a03898265a37aaa28e98acd9d8ce4041ae099f13b3c884e0edb725558fd53b77",
+        "runtimePath": "artifacts/wasm",
+        "sourceFingerprint": "6f1165e005d0b4c75f6a04bfc0bd9f2a95b31fcc3afc1c9d021dc99b27af9def"
+      },
+      "demo": {
+        "artifactFingerprint": "217b147858e0d829a0f9533b34fd816d250ceb4e60953bf6460c3e2b998ab583",
+        "runtimePath": "demo-dist",
+        "sourceFingerprint": "e9d38b218e7719ab0256d56bd99316a24d0741f22469c467219ec2ba86b612fc"
+      }
+    },
+    "paths": {
+      "demoDist": "demo-dist",
+      "runtimeRoot": ".tmp/visual-runtime"
+    },
+    "readiness": {
+      "groups": ["icons", "wasm", "demo"],
+      "ready": true
+    },
+    "schemaVersion": 1,
+    "sourceFingerprint": "5b68ac63c74f12795fbb72e049195faffebb186c4a2deaa397366bb5d1010c75",
+    "tools": {
+      "node": "24.19.0",
+      "playwright": "1.59.1",
+      "pnpm": "pnpm@10.33.0"
+    }
+  },
+  "dependencyIsolation": "External dependency links with distinct node_modules/.vite/.cache paths; only unchanged WASM/icons dist and wasm/build copied for original producer validation; Demo source freshly built from exact baseline. No candidate runtime manifest or Demo dist reused.",
+  "sourceModifications": [],
+  "qualificationEligible": false,
+  "scope": "FsusUI baseline reproduction observation; not a Blog live-stack, security, device, package or release receipt."
+}

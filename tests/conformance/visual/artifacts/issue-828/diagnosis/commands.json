@@ -65,10 +65,16 @@
     "limitation": "Custom diagnostic, not canonical acceptance. First extractor skipped modern CSSStyleRule.cssRules; corrected and reran all observations; no test/helper/assertion changes."
   },
   "baselineDev": {
-    "status": "running",
+    "status": "completed",
     "owner": "parent root",
     "baseRevision": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+    "command": "pnpm exec playwright test --config=vue/playwright.dev.config.ts",
     "profile": "issue-828-baseline-dev",
-    "port": 5196
-  }
+    "port": 5196,
+    "exit": 1,
+    "passed": 9,
+    "failed": 10,
+    "total": 19
+  },
+  "frozenSourcePrHead": "49e64498d5f060482cd0c924070481f30e3e19d4"
 }
