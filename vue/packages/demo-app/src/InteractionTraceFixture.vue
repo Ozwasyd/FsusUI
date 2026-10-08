@@ -37,7 +37,7 @@
       <el-check-tag
         v-if="checkTagVisible"
         :checked="checkTagChecked"
-        data-testid="trace-check-tag"
+        v-bind="{ 'data-testid': 'trace-check-tag' }"
         @change="recordCheckTagEvent('change', $event)"
         @update:checked="updateCheckTag"
       >
@@ -119,6 +119,7 @@ import type {
   MarkdownEditorHistoryState,
   MarkdownEditorInstance,
   MarkdownEditorMode,
+  MarkdownEditorProfile,
   MarkdownEditorSelectionEvent,
   MarkdownEditorTransaction,
   MarkdownEditorTransactionEvent,
@@ -156,7 +157,7 @@ const markdownDocumentIdentity = ref<MarkdownEditorDocumentIdentity>(
 const markdownDocumentKey = ref(0)
 const markdownMode = ref<MarkdownEditorMode>('source')
 const markdownReadonly = ref(false)
-const markdownProfile = ref('markdown')
+const markdownProfile = ref<MarkdownEditorProfile>('markdown')
 const markdownLocale = ref('zh-CN')
 const markdownAtomicIdentity: MarkdownEditorDocumentIdentity = Object.freeze({
   id: 'markdown-editor-interaction-trace-atomic',
@@ -324,7 +325,7 @@ const setMountedMarkdownState = async (state: {
   readonly documentIdentity?: MarkdownEditorDocumentIdentity
   readonly locale?: string
   readonly mode?: MarkdownEditorMode
-  readonly profile?: string
+  readonly profile?: MarkdownEditorProfile
   readonly readonly?: boolean
 }) => {
   if (state.documentIdentity) {

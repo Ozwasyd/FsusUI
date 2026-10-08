@@ -21,6 +21,7 @@ import {
   focusFirstDescendant,
   focusableStack,
   getEdges,
+  getPointerFocusTarget,
   invalidateFocusableCache,
   isFocusCausedByUserEvent,
   obtainAllFocusableElements,
@@ -64,6 +65,8 @@ export default defineComponent({
     let lastFocusBeforeTrapped: HTMLElement | null
     let lastFocusAfterTrapped: HTMLElement | null
     let focusableObserver: MutationObserver | undefined
+    let trapGeneration = 0
+    let trapActive = false
 
     const { focusReason } = useFocusReason()
 
@@ -218,8 +221,13 @@ export default defineComponent({
         if (!isNil(relatedTarget) && !trapContainer.contains(relatedTarget)) {
           // Give embedded focus layer time to pause this layer before reclaiming focus
           // And only reclaim focus if it should currently be trapping
+          const generation = trapGeneration
           setTimeout(() => {
-            if (!focusLayer.paused && props.trapped) {
+            if (
+              generation === trapGeneration &&
+              !focusLayer.paused &&
+              props.trapped
+            ) {
               const focusoutPreventedEvent = createFocusOutPreventedEvent({
                 focusReason: focusReason.value,
               })
@@ -238,16 +246,23 @@ export default defineComponent({
     }
 
     async function startTrap() {
+      const generation = ++trapGeneration
+      const pointerTarget = getPointerFocusTarget()
+      const activeElement = document.activeElement
       // Wait for forwardRef to resolve
       await nextTick()
+      if (generation !== trapGeneration || !props.trapped) return
       const trapContainer = unref(forwardRef)
       if (trapContainer) {
+        trapActive = true
+        focusLayer.resume()
         focusableStack.push(focusLayer)
-        const prevFocusedElement = trapContainer.contains(
-          document.activeElement,
-        )
-          ? lastFocusBeforeTrapped
-          : document.activeElement
+        const prevFocusedElement =
+          pointerTarget?.isConnected && !trapContainer.contains(pointerTarget)
+            ? pointerTarget
+            : trapContainer.contains(activeElement)
+              ? lastFocusBeforeTrapped
+              : activeElement
         lastFocusBeforeTrapped = prevFocusedElement as HTMLElement | null
         const isPrevFocusContained = trapContainer.contains(prevFocusedElement)
         if (!isPrevFocusContained) {
@@ -259,6 +274,13 @@ export default defineComponent({
           trapContainer.dispatchEvent(focusEvent)
           if (!focusEvent.defaultPrevented) {
             nextTick(() => {
+              if (
+                generation !== trapGeneration ||
+                !props.trapped ||
+                focusLayer.paused ||
+                trapContainer !== unref(forwardRef)
+              )
+                return
               let focusStartEl = props.focusStartEl
               if (!isString(focusStartEl)) {
                 tryFocus(focusStartEl)
@@ -285,6 +307,11 @@ export default defineComponent({
     }
 
     function stopTrap() {
+      ++trapGeneration
+      if (!trapActive) return
+      trapActive = false
+      const wasPaused = focusLayer.paused
+      focusableStack.remove(focusLayer)
       const trapContainer = unref(forwardRef)
 
       if (trapContainer) {
@@ -300,15 +327,20 @@ export default defineComponent({
         trapContainer.dispatchEvent(releasedEvent)
         if (
           !releasedEvent.defaultPrevented &&
+          !wasPaused &&
           (focusReason.value == 'keyboard' ||
             !isFocusCausedByUserEvent() ||
+            document.activeElement === document.body ||
             trapContainer.contains(document.activeElement))
         ) {
-          tryFocus(lastFocusBeforeTrapped ?? document.body)
+          tryFocus(
+            lastFocusBeforeTrapped?.isConnected
+              ? lastFocusBeforeTrapped
+              : document.body,
+          )
         }
 
         trapContainer.removeEventListener(FOCUS_AFTER_RELEASED, releaseOnFocus)
-        focusableStack.remove(focusLayer)
       }
     }
 
@@ -332,9 +364,7 @@ export default defineComponent({
     onBeforeUnmount(() => {
       focusableObserver?.disconnect()
       focusableObserver = undefined
-      if (props.trapped) {
-        stopTrap()
-      }
+      stopTrap()
     })
 
     return {
