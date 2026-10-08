@@ -438,7 +438,7 @@ describe('issue #448: source reconstructs anchors without DOM, editor, or databa
 
   it('survives CRLF, BOM, CJK, emoji, RTL, and composition text with exact ranges', () => {
     const vectors: readonly [label: string, source: string, id: string][] = [
-      ['crlf', 'Paragraph ^crlf\r\nSecond ^two\r\n', 'crlf'],
+      ['crlf', 'Paragraph ^crlf\r\n\r\nSecond ^two\r\n', 'crlf'],
       ['bom', '\uFEFFParagraph ^bom\n', 'bom'],
       ['cjk', '中文段落 ^cjk\n', 'cjk'],
       ['emoji', 'Party 😀👩‍💻 ^emoji\n', 'emoji'],
@@ -464,11 +464,11 @@ describe('issue #448: source reconstructs anchors without DOM, editor, or databa
       ).toBe(id)
     }
 
-    const crlf = validNodes('Paragraph ^crlf\r\nSecond ^two\r\n')
+    const crlf = validNodes('Paragraph ^crlf\r\n\r\nSecond ^two\r\n')
     expect(crlf.map((node) => node.id)).toEqual(['crlf', 'two'])
     // The same document with LF newlines yields the same identities.
     expect(
-      validNodes('Paragraph ^crlf\nSecond ^two\n').map((node) => node.fragment),
+      validNodes('Paragraph ^crlf\n\nSecond ^two\n').map((node) => node.fragment),
     ).toEqual(crlf.map((node) => node.fragment))
   })
 })
@@ -565,8 +565,11 @@ describe('issue #448: anchor security corpus', () => {
   it('maps ids to fragments injectively with no ^ in renderer identity', () => {
     const source = [
       'a ^intro',
+      '',
       'b ^intro-',
+      '',
       'c ^intro1',
+      '',
       'd ^intro2',
       '',
       '```ts',

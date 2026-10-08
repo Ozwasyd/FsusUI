@@ -384,11 +384,11 @@ describe('Markdown editor command surface integration', () => {
             invalidAnchor: 'ANCHOR-INVALID-L10N',
           },
         },
-        modelValue: 'First ^duplicate\nSecond',
+        modelValue: 'First ^duplicate\n\nSecond',
         surfaces: { commandPalette: true },
       },
     })
-    await selectRange(wrapper, 23, 23)
+    await selectRange(wrapper, 24, 24)
     ;(
       wrapper.vm as unknown as { openCommandPalette: () => void }
     ).openCommandPalette()
