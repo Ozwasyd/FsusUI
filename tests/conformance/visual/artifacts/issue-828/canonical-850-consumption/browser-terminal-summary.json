@@ -1,0 +1,21 @@
+{
+  "qualificationEligible": false,
+  "testedSource": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+  "exitCode": 1,
+  "passed": 60,
+  "failed": 2,
+  "skipped": 1,
+  "totalSelected": 63,
+  "failedTests": [
+    {
+      "file": "vue/tests/markdown-editor/markdown-editor-paste-markdown.spec.ts:440",
+      "cause": "Command strip is not mounted; stale ancestor geometry assumption after canonical825 sibling layout",
+      "canonicalOwner": "UI825 owner through parent"
+    },
+    {
+      "file": "vue/tests/markdown-editor/markdown-heavy-feature-lifecycle.spec.ts:404",
+      "cause": "retainedResources predicate timeout during virtual top/bottom cycles before theme",
+      "canonicalOwner": "canonical renderer/virtualization owner; parent must supply exact owner/capability"
+    }
+  ]
+}

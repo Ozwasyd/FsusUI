@@ -1,0 +1,27 @@
+[
+  {
+    "entry": "tests/conformance/visual/artifacts/issue-381-390/candidate-embed-states-desktop-dark.png",
+    "bytes": 102299,
+    "sha256": "75b797cfb09598378f5ad33e8e38a73b3781dcde7f66fa53a658198776dfc7d9"
+  },
+  {
+    "entry": "tests/conformance/visual/artifacts/issue-381-390/candidate-live-embed-states-desktop-dark.png",
+    "bytes": 113786,
+    "sha256": "2621f0dadb0309bd402a815a890f8b35d92d4e99d12ffc7fc1d919318d8097ab"
+  },
+  {
+    "entry": "tests/conformance/visual/artifacts/issue-381-390/candidate-mobile-dark-zoom-200.png",
+    "bytes": 37075,
+    "sha256": "fd02a29a5d9acb70bf657f2ab000606c7bebac9503596c6fa977d42abac09128"
+  },
+  {
+    "entry": "tests/conformance/visual/artifacts/issue-381-390/candidate-mobile-screen-reader-report.json",
+    "bytes": 2780,
+    "sha256": "6f8ec196fae8432ed1673f9ced6eb4cc1325aabc8994c48e57f3e46dcb64d5c7"
+  },
+  {
+    "entry": "tests/conformance/visual/artifacts/issue-381-390/candidate-search-preview-desktop-light.png",
+    "bytes": 99228,
+    "sha256": "0440bbe4e43c74a09bbbc7fc191b39ff3ccc8a5f6de0a1093dc2b5a4bb18c0ab"
+  }
+]

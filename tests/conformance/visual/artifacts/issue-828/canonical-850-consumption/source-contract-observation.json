@@ -1,0 +1,67 @@
+{
+  "qualificationEligible": false,
+  "freshUiMain": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "latestObservedBlogMaster": "a4fa942e95b6141e1f1dec42f7cddf1daf54144d",
+  "testedBlogSource": "d1b2c66cdf982d9a9f58db4a98ca2f83db3a71fd",
+  "partialUiSource": "c469dfdc4de45ddf6163748224522f0df805f189",
+  "integratedUiSource": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+  "canonicalSource": "37f3b44ad6a2ee18d8ad5c7d57fa0eb182489bae",
+  "canonical829Source": "5d9303f66c5979432cf4c20fff027765a1f42d99",
+  "canonical829RegressionSource": "ae0d6c37de6085c549975923ec38dbd243a7cd0b",
+  "probeSourceSha256": "7ee8c0098af5f30ed915a2ebe8d7d8f54d64ad4a398608d2c082b0b64c1c87e5",
+  "canonicalCapabilityBlobs": [
+    {
+      "path": "vue/packages/wasm/markdown-syntax-identity.ts",
+      "sha256": "795d1cde03e965483c2ebf5cf3adad5e849c24ab7fe9ac9106fa9e52ede9029f",
+      "canonicalBytesIdentical": true
+    },
+    {
+      "path": "vue/packages/wasm/markdown-projection-worker.ts",
+      "sha256": "34b6c2e99d2b842a4aa794a710f951318848ff35cef70871fca1b3ece3beee2b",
+      "canonicalBytesIdentical": true
+    },
+    {
+      "path": "vue/packages/wasm/markdown/src/markdown_contract.cpp",
+      "sha256": "8d5c486a2bcf538eb5c32083c62d937e805dbe50614eb41ee5fbb57ca1114cb5",
+      "canonicalBytesIdentical": true
+    },
+    {
+      "path": "vue/packages/wasm/markdown/syntax-collect.generated.ts",
+      "sha256": "38d491d7ee7d6821cae53d35a814e4082d9b0d65626b5e743830b718391d42e1",
+      "canonicalBytesIdentical": true
+    },
+    {
+      "path": "vue/packages/wasm/markdown/syntax-collect.wasm",
+      "sha256": "88ea6cdd6d8fb1e925603e4de376b5449342afc0368857c534b710e3a367da45",
+      "canonicalBytesIdentical": true
+    },
+    {
+      "path": "vue/packages/components/markdown-editor/src/markdown-editor-outline.ts",
+      "sha256": "3f04242d8ebd80aa1555d65c655c1c69a63b182d7bcdcc7a4ae76035ab721fc8",
+      "canonicalBytesIdentical": true
+    }
+  ],
+  "rootExportsConfirmedByRuntimeProbe": [
+    "createMarkdownOutlineTree",
+    "resolveMarkdownOutlineActive"
+  ],
+  "canonicalAncestryVerified": true,
+  "integratedTests": {
+    "source": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+    "unitExit": 0,
+    "unitTests": 51,
+    "unitFiles": 9,
+    "actualNoCacheTypes": [
+      "web",
+      "node",
+      "vite-config",
+      "vitest"
+    ],
+    "noCacheTypeExitCodes": [
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}

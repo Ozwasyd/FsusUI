@@ -1,0 +1,123 @@
+{
+  "qualificationEligible": false,
+  "sourceHead": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+  "servers": [
+    {
+      "pid": 206948,
+      "ppid": 206354,
+      "command": "node /workspace/.setup/tools/node_modules/.bin/pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port 5291 --strictPort",
+      "cwdRead": "permission denied; no escalation/bypass"
+    },
+    {
+      "pid": 206979,
+      "ppid": 206948,
+      "command": "node /workspace/FsusUI-828-consume-850/node_modules/.bin/vite preview --host 127.0.0.1 --port 5291 --strictPort",
+      "cwdRead": "permission denied; no escalation/bypass"
+    }
+  ],
+  "indexMatchesOwnBuild": true,
+  "builtIndexSha256": "0115b37ca1674a22740cba082532a1bcc94f9aef8d0928186f3186eb32aab5ac",
+  "assets": [
+    {
+      "asset": "/assets/index-caekxER1.js",
+      "sha256": "f704d6ec09b2aeb3f31ab9d90a991440916d09c6dd1c79b81a7100a5ea012c46",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vue-vendor-BAqfWcF5.js",
+      "sha256": "f21243604bb58f19d57ee8210874b644ecc4139657cc1fcd198e31d6d98487e0",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-normalize-wheel-es-BikNlmlf.js",
+      "sha256": "d5102b62188852c210a7067f88f4b430cba7332a511504c0bb9e8a5caf4350c2",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-lodash-BuTv5Xf3.js",
+      "sha256": "fef56db0b26eaf06e71507c60723e48a8615b1aafda5110394a19e4daf521147",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-motion-utils-CR9CRx3u.js",
+      "sha256": "ab1cb74b061635ccef946186d536fc70ef549638ab27a0674ed94e083bcff8bf",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-motion-dom-DpEFtvUV.js",
+      "sha256": "21d6737e64937eab9b93a0a9029f0702b96a1a9f40b6e18018a2f22076b85ae5",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-floating-ui-utils-GzetoTNp.js",
+      "sha256": "391e857e0657d7422565c126b6563d3d759c4051ed9fae97acb7050e892a9697",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-floating-ui-core-CPkXyvmC.js",
+      "sha256": "2007f15f0227704195d7bd06f0034c34aafbb56c054ba3e7a0e8a32e6c66e6da",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-floating-ui-dom-DhS5uynv.js",
+      "sha256": "70d83b0d6a85c1ce3a92dd18b1e42459f1e09cc7c6dc0722f5c53acfc9c9835e",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-popperjs-core-CUumdR8o.js",
+      "sha256": "979614321beaebff160e09fab029fd4e7654bc044a63ae1f9b24f901a427c8bb",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-ctrl-tinycolor-BuyEbX8F.js",
+      "sha256": "39536c7be3d5db46469638bc6ff45cddcc9a7a5d9144e3890a1a1bf29ee54cae",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-dayjs-CE3JMyRd.js",
+      "sha256": "e5b0ce6b150ce2e50d66ef251c33e1bb40812b7cf55faccd0bec443c379b8595",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-async-validator-Cp9QasH9.js",
+      "sha256": "87c1eca2af3cf7ebef3772eeb45a61d2bef04ee4cab05b25c4e893b2adb16302",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-escape-html-3I37OdEr.js",
+      "sha256": "30baaee4567c6fb297e15c6533e8ecef4101129c56e858c8e425f21e74584898",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-gsap-a3sj5zmn.js",
+      "sha256": "11f2be75561459741488a454669fb26b048799f90e44d4fee6288c765734b1a8",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/fsus-ui-CkYWQyOS.js",
+      "sha256": "3c47785607a6a52846a345726fa981d965ffdfcae009892fe414b28f7f2a4f12",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/fsus-ui-BveAwJ2u.css",
+      "sha256": "8a927ca8dd01078422db0dd369a88b4a447eb15ca972f4ab778e63d0f1f08059",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/index-0PXY4b7E.css",
+      "sha256": "1219459e763bf813a06c4bd523962aba27eb50f98ff35291302347a5ade48b91",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-fontsource-google-sans-CKSNzMDF.css",
+      "sha256": "c118da24c552f2a3d173e0b46eebaecd7db068e318a89809ecc62df8dc9af626",
+      "ownBuiltBytesMatch": true
+    },
+    {
+      "asset": "/assets/vendor-fontsource-noto-sans-sc-CucVcRXd.css",
+      "sha256": "6c60423f52060c740a849d38dbddc1878c639a8efc6a03e7b71cb092aa07e49a",
+      "ownBuiltBytesMatch": true
+    }
+  ],
+  "initialProcCwdAttempt": "PermissionError; corrected read-only process/served-byte observation retained, no escalation"
+}

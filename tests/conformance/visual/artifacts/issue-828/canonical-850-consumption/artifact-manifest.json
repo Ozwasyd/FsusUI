@@ -1,0 +1,114 @@
+{
+  "qualificationEligible": false,
+  "productTestedSource": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+  "metadataSource": "943f36ba480aebb348ea1c3808973851c8db92e3",
+  "canonicalSource": "37f3b44ad6a2ee18d8ad5c7d57fa0eb182489bae",
+  "browserSummary": {
+    "exitCode": 1,
+    "passed": 60,
+    "failed": 2,
+    "skipped": 1
+  },
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/README.md",
+      "bytes": 10843,
+      "sha256": "8605c9ea1f9ed9c38f329416a9e1982c8b3f1562410501882b25ce0559be2724"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/browser-terminal-summary.json",
+      "bytes": 788,
+      "sha256": "50f25c8f36eab89e78f4ee17dfdc4f6804647bf260d9a0777277287c3e3406c6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/failed-browser/markdown-editor-paste-mark-785b8-returns-focus-to-the-editor-chromium/test-failed-1.png",
+      "bytes": 29071,
+      "sha256": "c3c4155a7f3a61c5288f1f2cc3e7d83de187860170656a13d7722279e896bab1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/failed-browser/markdown-editor-paste-mark-785b8-returns-focus-to-the-editor-chromium/trace.zip",
+      "bytes": 1186811,
+      "sha256": "6d96a06901739ee2b0b7f353a1c039ad06c6c2d312c95d9cff91eff04c150939"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/failed-browser/markdown-heavy-feature-lif-ca61e-cle-across-virtual-remounts-chromium/trace.zip",
+      "bytes": 1704306,
+      "sha256": "fdfc61d8d705830241186bc06d5bcc45f6dd75fac8055bac3864eae6791f1694"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/original-commands-and-contexts-index.json",
+      "bytes": 7603,
+      "sha256": "5a6b5bdb8deb480af15bd961ecb800f693a32011925c3855d644da0fd6f62546"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/original-commands-and-contexts.zip",
+      "bytes": 85382,
+      "sha256": "0d84fa48f0886f2dba3f3b0feb159579a3189d99101056aabe20b1736e3f9608"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/original-runner-metric-deltas-index.json",
+      "bytes": 1085,
+      "sha256": "68bdb427d285c7fe0058c18e98fa26f39f7c6f040dcc58f7661b17ec55f13852"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/original-runner-metric-deltas.zip",
+      "bytes": 313451,
+      "sha256": "658bc7d53caa05377f0b2cb716c01a1432563ef998716d47c7bd3595cd4a3faa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/production-server-observation.json",
+      "bytes": 4618,
+      "sha256": "5f284dc48e615acc96283f73c6c9fece96ff3d684b191a74b388d28b04818370"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/public-root-and-opaque-id-probe.ts",
+      "bytes": 1772,
+      "sha256": "7ee8c0098af5f30ed915a2ebe8d7d8f54d64ad4a398608d2c082b0b64c1c87e5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/review-frames/markdown-editor-toolbar-ge-7ff56-ontal-commands-dark-375x812-chromium.jpeg",
+      "bytes": 16030,
+      "sha256": "aa3297efbc0a7c821f980e759448df384114d15e2e9c083072c223475e6a69e5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/review-frames/markdown-editor-toolbar-ge-9c4ef-ntal-commands-light-844x390-chromium.jpeg",
+      "bytes": 42031,
+      "sha256": "7db025c508aef1f07586daef0b8b956439250fd47cddebef48554a3a809f1eb6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/source-contract-observation.json",
+      "bytes": 2408,
+      "sha256": "2411d0440b77574358e579baaa0cd0cef04abc6cac943d669fe9621237ffa2d1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/successful-toolbar-traces/markdown-editor-toolbar-ge-54ec0-al-commands-light-1280x1100-chromium/trace.zip",
+      "bytes": 1800059,
+      "sha256": "12f5c57780573a41c3733ede113f433e0d74bfa51b93eeff5de51e193c6f5443"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/successful-toolbar-traces/markdown-editor-toolbar-ge-7ee27-tal-commands-dark-1280x1100-chromium/trace.zip",
+      "bytes": 1780917,
+      "sha256": "a3ab6d3176b992ed2938311e85b7477fdf32352de2be987c38ad2b27190a0e88"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/successful-toolbar-traces/markdown-editor-toolbar-ge-7ff56-ontal-commands-dark-375x812-chromium/trace.zip",
+      "bytes": 1429013,
+      "sha256": "55f7cd7722d5c85f12d664a9bbf9e926eb03f35ca4c55d7ad046ba1546b23bdb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/successful-toolbar-traces/markdown-editor-toolbar-ge-9c4ef-ntal-commands-light-844x390-chromium/trace.zip",
+      "bytes": 1883423,
+      "sha256": "051cc68c4c63836e8772d438bc96a9079cc5503dced4e5e3167d46beea4ab439"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/successful-toolbar-traces/markdown-editor-toolbar-ge-caa77-ntal-commands-light-375x812-chromium/trace.zip",
+      "bytes": 1451897,
+      "sha256": "fb509f0d4026b11862dbd0f7f2821798401af708a6a9cdff1d297de469497d54"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/canonical-850-consumption/successful-toolbar-traces/markdown-editor-toolbar-ge-dbe15-ontal-commands-dark-844x390-chromium/trace.zip",
+      "bytes": 1879210,
+      "sha256": "bed1eca0b5363cb4cbb361e228c2c2f2236d4541b63c6a7030c07b5393d4016a"
+    }
+  ]
+}
