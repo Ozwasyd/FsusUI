@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { createSSRApp, computed, h } from 'vue'
+import { createSSRApp, computed, h, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import {
   afterEach,
@@ -22,6 +22,7 @@ import {
   resolveMarkdownSourceIdentity,
 } from '@element-plus/wasm'
 import { activateMarkdownHeavyFeatures } from '../../../wasm/markdown-heavy-feature-activation'
+import { provideMarkdownHeavyFeatureDocumentContext } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import { createFsusError, fsusErr, fsusOk } from '@element-plus/utils'
 import type {
   MarkdownRuntimeHtmlResult,
@@ -44,6 +45,26 @@ const rawImageSource = getMarkdownXssSourceAttackFragment(
 const markdownAuthorityMocks = vi.hoisted(() => ({
   results: new WeakSet<object>(),
 }))
+
+const heavyProjectionMocks = vi.hoisted(() => ({ project: vi.fn() }))
+
+vi.mock('../../../wasm/markdown-heavy-feature-identity', async () => {
+  const actual = await vi.importActual<
+    typeof import('../../../wasm/markdown-heavy-feature-identity')
+  >('../../../wasm/markdown-heavy-feature-identity')
+  return {
+    ...actual,
+    createMarkdownHeavyFeatureProjectionTracker: () => {
+      const tracker = actual.createMarkdownHeavyFeatureProjectionTracker()
+      return {
+        project: (input: Parameters<typeof tracker.project>[0]) => {
+          heavyProjectionMocks.project(input)
+          return tracker.project(input)
+        },
+      }
+    },
+  }
+})
 
 vi.mock('@element-plus/wasm', async () => {
   const actual =
@@ -299,6 +320,7 @@ describe('MarkdownRenderer.vue', () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
+    heavyProjectionMocks.project.mockClear()
     MarkdownWorkerHarness.instances = []
     renderMarkdownChunks.mockReset()
     renderMarkdownHtml.mockReset()
@@ -685,6 +707,73 @@ describe('MarkdownRenderer.vue', () => {
       wrapper.unmount()
       settleActivation?.({ activated: [], errors: [] })
       await flushRenderer()
+    }
+  })
+
+  test('reuses only the current document projection across heavy activations', async () => {
+    const source = ref('```typescript\nconst current = 1\n```')
+    const documentKey = ref('projection-document-a')
+    const documentEpoch = ref(1)
+    const revision = ref(1)
+    renderMarkdownResult.mockImplementation(async (request) =>
+      fsusOk(
+        makeResult(
+          typeof request === 'string' ? request : request.source,
+          '<pre><code>current</code></pre>',
+        ),
+      ),
+    )
+    const host = mount({
+      setup() {
+        provideMarkdownHeavyFeatureDocumentContext({
+          documentKey: () => documentKey.value,
+          documentEpoch: () => documentEpoch.value,
+          revision: () => revision.value,
+        })
+        return () => h(MarkdownRenderer, { content: source.value })
+      },
+    })
+    const nodeIds = () =>
+      JSON.parse(
+        host
+          .find('[data-markdown-renderer="wasm"]')
+          .attributes('data-markdown-heavy-lifecycle'),
+      ).projectionNodeIds['code-highlight'] as string[]
+    try {
+      await flushRenderer()
+      await vi.dynamicImportSettled()
+      await flushRenderer()
+      expect(heavyProjectionMocks.project).toHaveBeenCalledTimes(1)
+      const firstIds = nodeIds()
+      expect(firstIds).toHaveLength(1)
+
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change'),
+      )
+      await flushRenderer()
+      expect(heavyProjectionMocks.project).toHaveBeenCalledTimes(1)
+      expect(nodeIds()).toEqual(firstIds)
+
+      source.value = `Introduction\n\n${source.value}`
+      revision.value += 1
+      await flushRenderer()
+      expect(heavyProjectionMocks.project).toHaveBeenCalledTimes(2)
+      expect(nodeIds()).toEqual(firstIds)
+
+      documentKey.value = 'projection-document-b'
+      await flushRenderer()
+      expect(heavyProjectionMocks.project).toHaveBeenCalledTimes(3)
+      const secondDocumentIds = nodeIds()
+      expect(secondDocumentIds).not.toEqual(firstIds)
+      expect(secondDocumentIds[0]).toContain('syn:projection-document-b:1:')
+
+      documentEpoch.value = 2
+      await flushRenderer()
+      expect(heavyProjectionMocks.project).toHaveBeenCalledTimes(4)
+      expect(nodeIds()).not.toEqual(secondDocumentIds)
+      expect(nodeIds()[0]).toContain('syn:projection-document-b:2:')
+    } finally {
+      host.unmount()
     }
   })
 

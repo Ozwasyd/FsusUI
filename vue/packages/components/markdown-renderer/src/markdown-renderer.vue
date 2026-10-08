@@ -287,6 +287,12 @@ let heavyLifecycleProjectionNodeIds: Partial<
 > = {}
 let heavyProjectionTrackerPromise: Promise<MarkdownHeavyFeatureProjectionTracker> | null =
   null
+let heavyProjectionSnapshot: Readonly<{
+  documentEpoch: number | string
+  documentKey: string
+  source: string
+  projection: MarkdownHeavyFeatureProjectionSnapshot | null
+}> | null = null
 
 const loadHeavyProjectionTracker = () =>
   (heavyProjectionTrackerPromise ??=
@@ -920,12 +926,29 @@ const createHeavyFeatureIdentityResolver = async (
     result.sourceIdentity
   heavyLifecycle.resetDocument(documentKey, documentEpoch)
   const tracker = await loadHeavyProjectionTracker()
-  const projection: MarkdownHeavyFeatureProjectionSnapshot | null =
-    tracker.project({
+  const cached = heavyProjectionSnapshot
+  let projection: MarkdownHeavyFeatureProjectionSnapshot | null
+  if (
+    cached?.documentKey === documentKey &&
+    cached.documentEpoch === documentEpoch &&
+    cached.source === result.rawSource
+  ) {
+    projection = cached.projection
+  } else {
+    // Each mounted chunk consumes the same immutable canonical projection.
+    // Rebuilding it per activation repeats whole-document identity alignment.
+    projection = tracker.project({
       source: result.rawSource,
       documentKey,
       documentEpoch,
     })
+    heavyProjectionSnapshot = Object.freeze({
+      documentKey,
+      documentEpoch,
+      source: result.rawSource,
+      projection,
+    })
+  }
   const resultChunks: readonly MarkdownRenderChunk[] =
     'chunks' in result && Array.isArray(result.chunks)
       ? (result.chunks as readonly MarkdownRenderChunk[])
@@ -1351,6 +1374,7 @@ onBeforeUnmount(() => {
   currentTaskId += 1
   isRendering.value = false
   heavyLifecycle.dispose()
+  heavyProjectionSnapshot = null
 })
 
 defineExpose({
