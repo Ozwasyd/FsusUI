@@ -1,0 +1,63 @@
+{
+  "source": "3edfed2c6d119a302b7d50031e300761d1d22e59",
+  "generatedBy": "unchanged original pnpm run test:visual:full; terminal exit 1",
+  "outputs": [
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-1366-zoom-100.png",
+      "sha256": "db0757f483d3c972e586c0d7b8b3da2deadf6e0576eba2065d79008aea1dcb0e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-1366-zoom-150.png",
+      "sha256": "725a76a8e89c7f2a580f64ffdcedf12b2358b32c0ae4965ba0fbede7807caa98"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-1366-zoom-200.png",
+      "sha256": "147962a6c44251fa04c2626dbe7ed3e96ecba135704e1cc8b5a3941868f06781"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-320-zoom-100.png",
+      "sha256": "7895a2632474d1697acfac12acc9a964f3b9cf2ec5b20c73439fa7f0eec01efd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-375-zoom-100.png",
+      "sha256": "95bcc9ecdb7dd76e2b349b48f2a68bda74b5aea0312804209eb1bd4621c0a7ca"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-375-zoom-150.png",
+      "sha256": "577c1dd683d33eb8d5b36451439053e21c787a11b31b6ddd4aaa2733e40d1f74"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-dark-768-zoom-100.png",
+      "sha256": "0b563aac5834600a8f5e995dfb768b7870b355bf1d4b3b1bdb0cb54a04f158b4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-1366-zoom-100.png",
+      "sha256": "599858370f7a97be7830ed0349cf283ffb9b7a8a6ddc53b52ae2663832c21ebc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-1366-zoom-150.png",
+      "sha256": "4dd6b895ce00e981b22354e0e3d8b14a0c1effec2fc70450873ec35a94152115"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-1366-zoom-200.png",
+      "sha256": "1c8238f7ba9123460f67fcfcf9bdea56c47133e527b57e10358cbec317bb03d5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-320-zoom-100.png",
+      "sha256": "1cab933a16f643d843c412967a6a111ecbf6a72769a9bc95b2a4554dc2b82ca0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-375-zoom-100.png",
+      "sha256": "25267195c405393f1c45a96e0ea18e4fc18a7ea00dfa7304376a0749c61d76e8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-375-zoom-150.png",
+      "sha256": "fecbd31b51b262cca799f1ac531a382c7a7da349dc7f313827b51e8760977036"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-468-metric-light-768-zoom-100.png",
+      "sha256": "fe6e7e27ffa791208205e49e294da9d288d63329bacf78801b22ca9aeaed9f62"
+    }
+  ],
+  "acceptedAsGoldenUpdates": false
+}

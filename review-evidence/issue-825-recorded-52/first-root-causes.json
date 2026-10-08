@@ -1,0 +1,430 @@
+{
+  "candidate": "3edfed2c6d119a302b7d50031e300761d1d22e59",
+  "freshBase": "a96047c3a281df6f0ae035f27fc471ad4a645173",
+  "continuation": "74a232ff312f1ded70007beb224c9218ecc2ad7e",
+  "rootCauses": [
+    {
+      "id": "npm-preparer",
+      "command": "pnpm package:candidate:build; fast reproduction after its compiled output: node scripts/prepare-npm-package.mjs --strict",
+      "firstError": "Unable to rewrite bundled workspace dependency reference in dist/index.full.js.",
+      "cause": "Substring check fires on @element-plus/icons-vue in bundled license comment; there are zero exact quoted dependency specifiers. Runtime rewrite resolver then rejects dist/ instead of recognizing there is nothing to replace.",
+      "owner": "Canonical #827 packaging producer; no package-source edit by original825.",
+      "files": [
+        "scripts/prepare-npm-package.mjs",
+        "scripts/package-candidate.mjs"
+      ],
+      "action": "Owner should require an actual quoted dependency reference before resolving its replacement; preserve strict import-leak checks. Use compiled bundle diagnostic JSON; no full build needed to reproduce first failure.",
+      "candidateBaseComparison": [
+        {
+          "file": "scripts/prepare-npm-package.mjs",
+          "candidateBlob": "91447370fb3bdb97aa0edb1427ed073d00439f2d",
+          "baseBlob": "91447370fb3bdb97aa0edb1427ed073d00439f2d",
+          "identical": true
+        },
+        {
+          "file": "scripts/package-candidate.mjs",
+          "candidateBlob": "9d5a7e58b6b5a096f6d4a9436b1bed21ae009bdc",
+          "baseBlob": "9d5a7e58b6b5a096f6d4a9436b1bed21ae009bdc",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "boundary-server",
+      "command": "node scripts/boundary-playwright-owner-run.mjs --owner playwright-boundary --group main --runtime-dir .tmp/visual-runtime --skip-prepare --evidence-dir .tmp/issue825-3ed-boundary --server-port 5442",
+      "firstError": "http://127.0.0.1:5442 is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.",
+      "cause": "Owner starts its managed preview, but child only gets port and CI=true. Config starts a second strict server on that same port. All8 cells fail setup, zero product tests.",
+      "owner": "Explicit continuation setup scope.",
+      "files": [
+        "scripts/boundary-playwright-runner.mjs",
+        "vue/playwright.boundary-audit.config.ts"
+      ],
+      "action": "Implemented on separate e72d117914412315c19b484f79304039cddb665e: pass existing FSUS_PLAYWRIGHT_EXTERNAL_SERVER protocol; omit child-owned server only for that URL. Strict standalone port rejection preserved.",
+      "candidateBaseComparison": [
+        {
+          "file": "scripts/boundary-playwright-runner.mjs",
+          "candidateBlob": "4fa11ffd3ca2cd14f68e651eb2152fff7d8ac3bd",
+          "baseBlob": "4fa11ffd3ca2cd14f68e651eb2152fff7d8ac3bd",
+          "identical": true
+        },
+        {
+          "file": "vue/playwright.boundary-audit.config.ts",
+          "candidateBlob": "68d95617ed9fc1e7a3e2af31f8b2dc986dde019b",
+          "baseBlob": "68d95617ed9fc1e7a3e2af31f8b2dc986dde019b",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "alias-ssr",
+      "command": "node scripts/motion-playwright-owner-run.mjs --owner playwright-motion --group main --cell motion-ssr/chromium --evidence-dir .tmp/issue825-3ed-motion-clean",
+      "firstError": "[Vue warn]: Hydration node mismatch: rendered on server [object Comment]; expected on client span at <ElButton onClick=fn> at <SsrMotionFixture>; Hydration completed but contains mismatches.",
+      "cause": "Component Vue resolves through preserved Blog-owned alias to3.5.33 while createSSRApp/renderToString/server-renderer resolve UI3.5.32. Same C isolated all3.5.32 passes4/4; alias root fails4/4.",
+      "owner": "Local-alias dependency owner / SSR fixture owner; original825 must not rewrite alias.",
+      "files": [
+        "vue/tests/motion-ssr/serve-motion-ssr.mjs",
+        "vue/packages/demo-app/src/ssr-motion-server.ts",
+        "vue/packages/demo-app/src/ssr-motion-app.ts",
+        "vue/packages/demo-app/vite.config.ts",
+        "pnpm-lock.yaml",
+        "vue/packages/demo-app/src/ssr-motion-server.ts"
+      ],
+      "action": "Implemented74a232ff public vue/server-renderer import. Preserved Blog alias resolves paired Vue3.5.33/renderer3.5.33. Original probe4 PASS; first clean owner run3 PASS/1 cadence-count FAIL(15<16) retained; dedicated clean-SHA owner cell4 PASS. Whole owner remains FAIL because required view/browser cells are missing.",
+      "candidateBaseComparison": [
+        {
+          "file": "vue/tests/motion-ssr/serve-motion-ssr.mjs",
+          "candidateBlob": "5af5a4824a6781378a27a5bbc6e72b4c6a2bedc8",
+          "baseBlob": "5af5a4824a6781378a27a5bbc6e72b4c6a2bedc8",
+          "identical": true
+        },
+        {
+          "file": "vue/packages/demo-app/src/ssr-motion-server.ts",
+          "candidateBlob": "444f5d6ce12356f3584c2412bbfc057c0726dd9e",
+          "baseBlob": "444f5d6ce12356f3584c2412bbfc057c0726dd9e",
+          "identical": true
+        },
+        {
+          "file": "vue/packages/demo-app/src/ssr-motion-app.ts",
+          "candidateBlob": "00359123dbe8dc5d40c4b699b677536bd108402e",
+          "baseBlob": "00359123dbe8dc5d40c4b699b677536bd108402e",
+          "identical": true
+        },
+        {
+          "file": "vue/packages/demo-app/vite.config.ts",
+          "candidateBlob": "7af62abcce7d4cf3aa5275944864e80fbf3d1f0c",
+          "baseBlob": "7af62abcce7d4cf3aa5275944864e80fbf3d1f0c",
+          "identical": true
+        },
+        {
+          "file": "pnpm-lock.yaml",
+          "candidateBlob": "4995327f5bdde1603b3d806841650902631e5b3c",
+          "baseBlob": "4995327f5bdde1603b3d806841650902631e5b3c",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "npm-cache",
+      "command": "NPM_CONFIG_CACHE=/workspace/.setup/issue825-npm-validation-cache pnpm test:package-candidate (isolated library)",
+      "firstError": "Original fixture invocation: ENOENT mkdir /home/agent/.npm/_cacache.",
+      "cause": "Candidate helper strips lowercase npm_config_*; uppercase ordinary NPM_CONFIG_CACHE survives and permits task-local writes. This is a local cache-path failure, not an npm dependency-permission refusal.",
+      "owner": "Task-local execution setup.",
+      "files": [
+        "scripts/npm-candidate-lib.mjs"
+      ],
+      "action": "Already repaired without source modification; immutable package guards and heavy-feature2 tests PASS, consumer fixtures13 PASS. No npm registry/auth settings changed.",
+      "candidateBaseComparison": [
+        {
+          "file": "scripts/npm-candidate-lib.mjs",
+          "candidateBlob": "134deec864ca537c9aa899203c40ba92f23e71a8",
+          "baseBlob": "134deec864ca537c9aa899203c40ba92f23e71a8",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "locked-il-link",
+      "command": "RestoreLockedMode=true pnpm run dotnet:platform:verify (MSBuild environment property); emitted failing subprocess: dotnet restore dotnet/FsusUI.Avalonia.slnx --disable-parallel --maxcpucount:1",
+      "firstError": "NU1004 Microsoft.NET.ILLink.Tasks reference10.0.8\u219210.0.12; committed lock inconsistent with selected SDK10.0.401.",
+      "cause": "Existing canonical #827 SDK/lock/provenance mismatch prevents locked producer and qualified alignment, NuGet and nativeAOT candidates.",
+      "owner": "Canonical #827 sole SDK/lock producer.",
+      "files": [
+        "dotnet/FsusUI.Avalonia/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.Icons/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.Themes/packages.lock.json"
+      ],
+      "action": "Owner must align selected SDK and committed restore provenance; no independent lock changes or unlocked restore.",
+      "candidateBaseComparison": [
+        {
+          "file": "dotnet/FsusUI.Avalonia/packages.lock.json",
+          "candidateBlob": "ecaa61a71cf55dbc00bd27659da7e5610bf37b87",
+          "baseBlob": "ecaa61a71cf55dbc00bd27659da7e5610bf37b87",
+          "identical": true
+        },
+        {
+          "file": "dotnet/FsusUI.Avalonia.Icons/packages.lock.json",
+          "candidateBlob": "948e30490f028499a4c38a0e68fe047fd00b3c18",
+          "baseBlob": "948e30490f028499a4c38a0e68fe047fd00b3c18",
+          "identical": true
+        },
+        {
+          "file": "dotnet/FsusUI.Avalonia.Themes/packages.lock.json",
+          "candidateBlob": "948e30490f028499a4c38a0e68fe047fd00b3c18",
+          "baseBlob": "948e30490f028499a4c38a0e68fe047fd00b3c18",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "demo-cdn",
+      "command": "pnpm exec playwright test --config=vue/playwright.config.ts --project=desktop-light vue/tests/visual/capture-all.spec.ts '--grep=capture\\ data' --workers=1",
+      "firstError": "GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",
+      "cause": "Repeated strict diagnostics from same demo image dependency (two cube.elemecdn image URLs in demo-state.ts:131/133), propagating to17 failed tests. Eight motion cases are diagnostics, not failed motion geometry. Curl --head --fail without TLS bypass returns200 for official image; no official-dependency permission refusal is evidenced.",
+      "owner": "Demo dependency/asset owner; do not edit another component owner or disable certificate diagnostics.",
+      "files": [
+        "vue/packages/demo-app/src/demo-state.ts",
+        "vue/tests/support/page-diagnostics.ts",
+        "vue/tests/demo-app-dev/demo-app-dev.spec.ts"
+      ],
+      "action": "Portable browser failures and successful strict-curl connectivity evidence supplied. Owner can source trusted public demo assets through existing asset pipeline; no test interception or validation bypass.",
+      "candidateBaseComparison": [
+        {
+          "file": "vue/packages/demo-app/src/demo-state.ts",
+          "candidateBlob": "f85441d19dfaae8373bdd89d8c175633cea90bd8",
+          "baseBlob": "f85441d19dfaae8373bdd89d8c175633cea90bd8",
+          "identical": true
+        },
+        {
+          "file": "vue/tests/support/page-diagnostics.ts",
+          "candidateBlob": "dfdf6acd6f01447984402b0188e27717e11b7c32",
+          "baseBlob": "dfdf6acd6f01447984402b0188e27717e11b7c32",
+          "identical": true
+        },
+        {
+          "file": "vue/tests/demo-app-dev/demo-app-dev.spec.ts",
+          "candidateBlob": "c31af25cf08e611a76abdaae76621fd9a5c63c97",
+          "baseBlob": "c31af25cf08e611a76abdaae76621fd9a5c63c97",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "status-fixture",
+      "command": "pnpm exec playwright test --config=vue/playwright.config.ts --project=desktop-light vue/tests/visual/markdown-editor-chrome.spec.ts '--grep=renders\\ toolbar,\\ status,\\ and\\ slot\\ visibility\\ contract' --workers=1",
+      "firstError": "Expected status slot to contain \u5df2\u540c\u6b65\u5230\u8349\u7a3f\u7bb1; received serialized structured state twice.",
+      "cause": "Chrome fixture:29 destructures structured state and renders slotState twice while original test:426 expects supplied prose status text. Fixture and test are byte-identical to current main; mismatch is already in accepted base, not introduced by command-more candidate. Controlled default-toolbar source reproduces it.",
+      "owner": "Canonical Markdown status fixture / #429 owner.",
+      "files": [
+        "vue/packages/demo-app/src/sections/MarkdownEditorChromeVisualSection.vue",
+        "vue/tests/visual/markdown-editor-chrome.spec.ts"
+      ],
+      "action": "Route exact fixture/API mismatch; original825 has not rewritten frozen fixture, expectations or slot public contract.",
+      "candidateBaseComparison": [
+        {
+          "file": "vue/packages/demo-app/src/sections/MarkdownEditorChromeVisualSection.vue",
+          "candidateBlob": "ff39ec50661409356f1f81007a23d92acddbea4b",
+          "baseBlob": "ff39ec50661409356f1f81007a23d92acddbea4b",
+          "identical": true
+        },
+        {
+          "file": "vue/tests/visual/markdown-editor-chrome.spec.ts",
+          "candidateBlob": "5e327dab5e5aa88b2e1e035a4970fe8d251249c0",
+          "baseBlob": "5e327dab5e5aa88b2e1e035a4970fe8d251249c0",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "chrome-snapshot",
+      "command": "pnpm exec playwright test --config=vue/playwright.config.ts --project=mobile-light vue/tests/visual/markdown-editor-chrome.spec.ts '--grep=renders\\ framed\\ chrome\\ in\\ source\\ mode\\ with\\ correct\\ geometry\\ and\\ semantics' --workers=1",
+      "firstError": "toHaveScreenshot mismatch (individual pixel counts and snapshot names retained in52 rows).",
+      "cause": "22 unchanged snapshots fail. Default-toolbar controlled subtraction also reproduces22 failures: body/padding/scroll captures differ; candidate/control toolbar-only changes are43\u2013418px normal and2159\u20132238px zoom, below unchanged1.2% tolerance. Six minimal captures byte-identical. A full fresh-main render is NOT proven.",
+      "owner": "Canonical Markdown chrome/runtime fixture owner.",
+      "files": [
+        "vue/tests/visual/markdown-editor-chrome.spec.ts",
+        "vue/packages/demo-app/src/sections/MarkdownEditorChromeVisualSection.vue",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/components/markdown-editor/src/markdown-editor.vue"
+      ],
+      "action": "Use inspected candidate/control captures and preserved baseline evidence to repair owning renderer/fixture; no golden or threshold change.",
+      "candidateBaseComparison": [
+        {
+          "file": "vue/tests/visual/markdown-editor-chrome.spec.ts",
+          "candidateBlob": "5e327dab5e5aa88b2e1e035a4970fe8d251249c0",
+          "baseBlob": "5e327dab5e5aa88b2e1e035a4970fe8d251249c0",
+          "identical": true
+        },
+        {
+          "file": "vue/packages/demo-app/src/sections/MarkdownEditorChromeVisualSection.vue",
+          "candidateBlob": "ff39ec50661409356f1f81007a23d92acddbea4b",
+          "baseBlob": "ff39ec50661409356f1f81007a23d92acddbea4b",
+          "identical": true
+        },
+        {
+          "file": "vue/packages/theme-chalk/src/markdown-editor.scss",
+          "candidateBlob": "af744bff4d41f050a443e8a77a7a8c5f1c95b025",
+          "baseBlob": "8923598d9f90377ce5f2a3938148b491a0311f19",
+          "identical": false
+        },
+        {
+          "file": "vue/packages/components/markdown-editor/src/markdown-editor.vue",
+          "candidateBlob": "1400da1124838fecdd5986fae89cc9971894692a",
+          "baseBlob": "5fdd20b98ca8705439558ac301212b62ed414a44",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "id": "local-abort",
+      "command": "pnpm exec playwright test --config=vue/playwright.config.ts --project=desktop-light vue/tests/visual/markdown-editor-chrome.spec.ts '--grep=keeps\\ one\\ editor\\ instance\\ through\\ rapid\\ mode\\ switches' --workers=1",
+      "firstError": "Local demo request net::ERR_ABORTED retained by strict page diagnostics.",
+      "cause": "Three local request cancellation diagnostics, one involving rapid Markdown mode switching; unchanged test/fixture source. Controlled default-toolbar case also reproduces request abort. Exact initiating request URLs/actions retained in original traces. Deeper cancellation cause not yet proven.",
+      "owner": "Canonical Markdown runtime/lifecycle #641/#640 coordination.",
+      "files": [
+        "vue/tests/support/page-diagnostics.ts",
+        "vue/tests/visual/markdown-editor-chrome.spec.ts",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue"
+      ],
+      "action": "Route exact trace request/action rather than marking ordinary cancellation an environment waiver. Renderer has canonical borrowed two-line pending-theme listener change relative main; no new duplicate kernel.",
+      "candidateBaseComparison": [
+        {
+          "file": "vue/tests/support/page-diagnostics.ts",
+          "candidateBlob": "dfdf6acd6f01447984402b0188e27717e11b7c32",
+          "baseBlob": "dfdf6acd6f01447984402b0188e27717e11b7c32",
+          "identical": true
+        },
+        {
+          "file": "vue/tests/visual/markdown-editor-chrome.spec.ts",
+          "candidateBlob": "5e327dab5e5aa88b2e1e035a4970fe8d251249c0",
+          "baseBlob": "5e327dab5e5aa88b2e1e035a4970fe8d251249c0",
+          "identical": true
+        },
+        {
+          "file": "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+          "candidateBlob": "27da0f4b5acf8d84cc03f4cb84072372fa67a611",
+          "baseBlob": "2f9239351789941252b3e90cdff01fe8c1b28e64",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "id": "markdown-stress",
+      "command": "pnpm exec playwright test --config=vue/playwright.dev.config.ts vue/tests/demo-app-dev/demo-app-dev.spec.ts '--grep=dev\\ server\\ markdown\\-stress\\ route\\ has\\ no\\ browser\\ diagnostics' --workers=1",
+      "firstError": "Test timeout60000ms / expected markdown-stress-status complete, received rendering (other case page.evaluate timeout).",
+      "cause": "Five development cases time out; recovered missing52nd row is markdown-stress route has no browser diagnostics, with bare60000ms timeout. Original terminal and trace exist; older extractor omitted it because no trace action error. Rendering/scroll sampling never settles; deeper algorithmic cause remains unproven, so no fabricated attribution to toolbar.",
+      "owner": "Canonical Markdown runtime/render-pipeline #641/#640 coordination.",
+      "files": [
+        "vue/packages/demo-app/src/sections/MarkdownStressSection.vue",
+        "vue/tests/demo-app-dev/demo-app-dev.spec.ts",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue"
+      ],
+      "action": "Portable exact commands, original trace and first errors supplied; isolate canonical render pipeline before changing limits or tests.",
+      "candidateBaseComparison": [
+        {
+          "file": "vue/packages/demo-app/src/sections/MarkdownStressSection.vue",
+          "candidateBlob": "3f16aa9733e3973db76fab876fb99d68a3b6c31f",
+          "baseBlob": "3f16aa9733e3973db76fab876fb99d68a3b6c31f",
+          "identical": true
+        },
+        {
+          "file": "vue/tests/demo-app-dev/demo-app-dev.spec.ts",
+          "candidateBlob": "c31af25cf08e611a76abdaae76621fd9a5c63c97",
+          "baseBlob": "c31af25cf08e611a76abdaae76621fd9a5c63c97",
+          "identical": true
+        },
+        {
+          "file": "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+          "candidateBlob": "27da0f4b5acf8d84cc03f4cb84072372fa67a611",
+          "baseBlob": "2f9239351789941252b3e90cdff01fe8c1b28e64",
+          "identical": false
+        }
+      ]
+    },
+    {
+      "id": "tree-select-audit",
+      "command": "pnpm exec playwright test --config=vue/playwright.config.ts --project=desktop-light vue/tests/visual/audit.spec.ts '--grep=audit\\ component\\ styles' --workers=1",
+      "firstError": "locator.evaluate timeout60000ms waiting for unique-tree-select .el-select__popper .el-tree-node__content hasText Level one1.",
+      "cause": "One original audit times out at audit.spec.ts:54 while attempting to focus TreeSelect item. Candidate/base audit source identical; no command-more API is involved. Precise fixture DOM/locator mismatch requires owning TreeSelect audit inspection.",
+      "owner": "TreeSelect/audit fixture owner.",
+      "files": [
+        "vue/tests/visual/audit.spec.ts"
+      ],
+      "action": "Route exact locator and captured error context; no TreeSelect component edit or force-green assertion by original825.",
+      "candidateBaseComparison": [
+        {
+          "file": "vue/tests/visual/audit.spec.ts",
+          "candidateBlob": "40816ac003a1a45a3099949d7f3c128dc8cd5715",
+          "baseBlob": "40816ac003a1a45a3099949d7f3c128dc8cd5715",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "strict-counts",
+      "command": "node --test tests/contract-v2.test.mjs",
+      "firstError": "Candidate3ed contract tests46 PASS/3 stale exact-count FAIL.",
+      "cause": "Accepted main test counts lag regenerated owned authorities. Canonical #827 source0027 contains exact current counts2115/410/124/116/26 with no weakened predicates.",
+      "owner": "Explicit metadata continuation scope; canonical source consumed.",
+      "files": [
+        "tests/contract-v2.test.mjs"
+      ],
+      "action": "Exact canonical blob8f0ab4b37c47a160a0cd09e0f1f5f65ddaaeef9f applied;49/49PASS.",
+      "candidateBaseComparison": [
+        {
+          "file": "tests/contract-v2.test.mjs",
+          "candidateBlob": "4d786656b71c83520e8eaf40249c3a24c6d22cda",
+          "baseBlob": "4d786656b71c83520e8eaf40249c3a24c6d22cda",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "expired-overrides",
+      "command": "pnpm conformance",
+      "firstError": "platform override governance failed: scroll-anchoring-avalonia-presenter and visual-markdown-source-surface-002 expired reviewAfter2026-10-01.",
+      "cause": "After correcting stale count tests, conformance now reaches two existing expired governed overrides. Files unchanged from accepted main.",
+      "owner": "Governance/override owners; renewal is an owner decision, not original825 setup fix.",
+      "files": [
+        "spec/platform-overrides/avalonia-virtualization.yaml",
+        "spec/platform-overrides/visual-thresholds.yaml"
+      ],
+      "action": "Remain FAIL. Do not extend dates, change thresholds or waive expiration.",
+      "candidateBaseComparison": [
+        {
+          "file": "spec/platform-overrides/avalonia-virtualization.yaml",
+          "candidateBlob": "f39371561311502f21f0ce2ae30f60454437157d",
+          "baseBlob": "f39371561311502f21f0ce2ae30f60454437157d",
+          "identical": true
+        },
+        {
+          "file": "spec/platform-overrides/visual-thresholds.yaml",
+          "candidateBlob": "95bef1e9586097ee02a7ea7dfae057bf067d64f1",
+          "baseBlob": "95bef1e9586097ee02a7ea7dfae057bf067d64f1",
+          "identical": true
+        }
+      ]
+    },
+    {
+      "id": "drawer-safe-area-after-setup",
+      "source": "e72d117914412315c19b484f79304039cddb665e",
+      "command": "node scripts/boundary-playwright-owner-run.mjs --owner playwright-boundary --group main --cell visual-boundary-audit/safe-area-chromium --runtime-dir .tmp/visual-runtime --skip-prepare --evidence-dir .tmp/issue825-e72-boundary --server-port 5444",
+      "firstError": "Error: drawer-ttb/landscape-notch must stay inside safe rect {\"left\":59,\"top\":0,\"right\":785,\"bottom\":369,\"width\":726,\"height\":369} under profile landscape-notch\n\nexpect(received).toEqual(expected) // deep equality\n\n- Expected  -  1\n+ Received  + 10\n\n- Array []\n+ Array [\n+   Object {\n+     \"bottom\": 71,\n+     \"className\": \"el-drawer__close-btn\",\n+     \"left\": 765,\n+     \"right\": 819,\n+     \"role\": \"button\",\n+     \"top\": 17,\n+   },\n+ ]\n\n   at ../support/dom-layout-assertions.ts:776\n\n  774 |     offenders,\n  775 |     `${label} must stay inside safe rect ${JSON.stringify(safeRect)} under profile ${profile.id}`,\n> 776 |   ).toEqual([])\n      |     ^\n  777 | }\n  778 |\n  779 | /**\n    at assertControlsInsideSafeRect (/workspace/FsusUI/vue/tests/support/dom-layout-assertions.ts:776:5)\n    at runCase (/workspace/FsusUI/vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts:253:3)\n    at /workspace/FsusUI/vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts:330:9",
+      "cause": "Original product assertions now execute: Drawer ttb landscape-notch close control spans left765,right819,top17,bottom71; safe rect right785. Tests1 PASS/1 FAIL. Runtime prepared from unchanged component inputs; no second server collision.",
+      "owner": "Drawer/safe-area owner, outside original825 component ownership.",
+      "files": [
+        "vue/packages/components/drawer/src/drawer.vue",
+        "vue/packages/theme-chalk/src/drawer.scss",
+        "vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts",
+        "vue/tests/support/dom-layout-assertions.ts"
+      ],
+      "action": "Route exact geometry/reproduction; assertions, safe inset simulation and 54px hit target remain strict. Remaining cases in same loop are unrun after first failing assertion.",
+      "candidateBaseComparison": [
+        {
+          "file": "vue/packages/components/drawer/src/drawer.vue",
+          "candidateBlob": "6619eb0237c1a450fd07d1371ca65ef3a4ad70b3",
+          "baseBlob": "6619eb0237c1a450fd07d1371ca65ef3a4ad70b3",
+          "identical": true
+        },
+        {
+          "file": "vue/packages/theme-chalk/src/drawer.scss",
+          "candidateBlob": "db3a705afea55d2b647bde816503aa9e74c7c7f4",
+          "baseBlob": "db3a705afea55d2b647bde816503aa9e74c7c7f4",
+          "identical": true
+        },
+        {
+          "file": "vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts",
+          "candidateBlob": "d290025bc8bc94408471b4861bd695b6b6581606",
+          "baseBlob": "d290025bc8bc94408471b4861bd695b6b6581606",
+          "identical": true
+        },
+        {
+          "file": "vue/tests/support/dom-layout-assertions.ts",
+          "candidateBlob": "96a1032776720eb75f7c226cf4823edea0ffcc79",
+          "baseBlob": "96a1032776720eb75f7c226cf4823edea0ffcc79",
+          "identical": true
+        }
+      ]
+    }
+  ],
+  "officialDependencyPermissionRefusal": "None evidenced by current commands; distinguish successful strict-curl access, browser certificate diagnostics, local cache path refusal, and locked-provenance NU1004."
+}

@@ -1,0 +1,1177 @@
+{
+  "recordedSourceSha": "3edfed2c6d119a302b7d50031e300761d1d22e59",
+  "rowCount": 52,
+  "traceCount": 52,
+  "files": [
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-Calendar-head-998cc--use-soft-segmented-styling/error-context.md",
+      "bytes": 25811,
+      "sha256": "e12f0f8cb456a73647854d3cef827b439a8337eb9195f36b078fa493d57b397b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-Calendar-head-998cc--use-soft-segmented-styling/test-failed-1.png",
+      "bytes": 79775,
+      "sha256": "dafa76e59900412283ee9b97f10c12d52fa0244557919173c5e4679f1086010f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-Calendar-head-998cc--use-soft-segmented-styling/trace.zip",
+      "bytes": 1247618,
+      "sha256": "b3281481df81fa169a936b4ccaf682971035a1e11b0c446e207c0148681c4c3e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-default-home--77e8c-bleed-into-the-next-section/error-context.md",
+      "bytes": 72555,
+      "sha256": "1cea61f03c2c92e5a6175be24f88582e93b25b7b59f6256a24824dbe2b833fa5"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-default-home--77e8c-bleed-into-the-next-section/test-failed-1.png",
+      "bytes": 48665,
+      "sha256": "ea0dc6da231838e610c7258bb6a13cfacbf00c4d00c78bfcdee5b44721b9e625"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-default-home--77e8c-bleed-into-the-next-section/trace.zip",
+      "bytes": 1643418,
+      "sha256": "b5faa88bad77ee1f6eb0a43fec3b19e9a2f8ff2f8418ec3b67ae504f0644878b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-default-home--f3454-w-and-navigates-to-sections/error-context.md",
+      "bytes": 27553,
+      "sha256": "d2b04f65d137b2a6f9d00b804b8214d1c4d5d0e04e725ff4d4304db2c8cc52e0"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-default-home--f3454-w-and-navigates-to-sections/test-failed-1.png",
+      "bytes": 24286,
+      "sha256": "8bea6be3f7225a89fc9fb39361c99bd08728888f17e06cf6a660e0d84f625ba4"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-default-home--f3454-w-and-navigates-to-sections/trace.zip",
+      "bytes": 1813232,
+      "sha256": "b3f0049c9d22748af49ccb31ba7caea9f592f0516f137283e95520b3647dbe78"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-dev-server-da-951a7--has-no-browser-diagnostics/error-context.md",
+      "bytes": 25808,
+      "sha256": "d9bf95c8ee564a35425fb2a3044cd0e22f092d4eb7f7bf139359d83e160c6f61"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-dev-server-da-951a7--has-no-browser-diagnostics/test-failed-1.png",
+      "bytes": 79775,
+      "sha256": "dafa76e59900412283ee9b97f10c12d52fa0244557919173c5e4679f1086010f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-dev-server-da-951a7--has-no-browser-diagnostics/trace.zip",
+      "bytes": 1297883,
+      "sha256": "be02d10ae8578eea37c6d4329a8e337d955d781d9d19a0b56238104b41647376"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ho-b234b--has-no-browser-diagnostics/error-context.md",
+      "bytes": 55750,
+      "sha256": "d65614b7864151bb587e7268e89db7e9026591d1a0cdc6dd7876212a3648cca3"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ho-b234b--has-no-browser-diagnostics/test-failed-1.png",
+      "bytes": 90759,
+      "sha256": "aa9a75223bc42e09d232ff5d5a754e3cd5a3dbfc9443081e36ab66f019b1bccb"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ho-b234b--has-no-browser-diagnostics/trace.zip",
+      "bytes": 1468942,
+      "sha256": "49c26bbd2e319aabe7c6889662ff11b20f40add84deb334b9ffd273eb0dfa301"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ma-dfdbb--has-no-browser-diagnostics/error-context.md",
+      "bytes": 396,
+      "sha256": "31316db6966e222e494e07359ad30ac3e1440a7f2c32aafbbca0385dc88f298c"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-dev-server-ma-dfdbb--has-no-browser-diagnostics/trace.zip",
+      "bytes": 724013,
+      "sha256": "bbd33cd8939462f0cd5304629762694f3fc5cabdfcda9e5443d0c2a4715b27d7"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-6465b-without-browser-diagnostics/error-context.md",
+      "bytes": 8871,
+      "sha256": "026a6f02324f458be7c5a3c5b4370fa6938c22f5859c5c0047d1e776e34087a9"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-6465b-without-browser-diagnostics/trace.zip",
+      "bytes": 795228,
+      "sha256": "8dc6461c57e402f65ffebebed8afe6d0df345e82d8060f709b23f79d869fa7e2"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-918da-ys-smooth-without-text-blur/error-context.md",
+      "bytes": 9296,
+      "sha256": "90c1e8a1a777ab076ecb5bdb5106bfdb48ef74fab9135dba0d576459f9b678c9"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-918da-ys-smooth-without-text-blur/trace.zip",
+      "bytes": 759698,
+      "sha256": "88f457565a24b5ac75037a26aff06cf5674e604fafdba7211178f025895d067f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-9cf08-onic-while-renderer-settles/error-context.md",
+      "bytes": 6731,
+      "sha256": "55dee108fad4d57c4df17c45d491d74e97a7d3d9b414a8d96ee51df20f79121a"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-9cf08-onic-while-renderer-settles/trace.zip",
+      "bytes": 818318,
+      "sha256": "759a89cfdfc7386c3016ef6ee1318b7ae1ed492b09f3c2be46266c621b71005d"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-fdf27-rrow-devtools-like-viewport/error-context.md",
+      "bytes": 5379,
+      "sha256": "1ff5e599c2d7af47d86dd36dc4630f90f36693da18f3eb9566292ec39dc8bbca"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-dev/project-default/shard-local/demo-app-dev-markdown-stre-fdf27-rrow-devtools-like-viewport/trace.zip",
+      "bytes": 774300,
+      "sha256": "1056f86433785636396cf8a327ce5164ba82e623aaf57c4787d7724793f46e76"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/error-context.md",
+      "bytes": 23404,
+      "sha256": "7f6b56fafac33abf1297c09f1b94e3d5f7bc29a48ba141aa5b247e47165b4c2e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/screenshots/capture-all/desktop-dark/data/dark-full-page.png",
+      "bytes": 242825,
+      "sha256": "9df8aa276d36c9a817707d2c03285111c59f27c80be0fe2f16bb3e5c38ba14f2"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/test-failed-1.png",
+      "bytes": 82634,
+      "sha256": "4edf5044657ea1944eff3a1fe08393aa7fc8163f636b69f0156f6e1841ad5416"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/trace.zip",
+      "bytes": 1229792,
+      "sha256": "09d0524612c1c0c99e6cd0841b9c1916da360b21ff669f894d33c98784e5176f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/error-context.md",
+      "bytes": 12423,
+      "sha256": "e10a55a6d76f34d9ff0d1fe13fad1b9946f3a40d81d6863a8d49072319adeb8e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/test-failed-1.png",
+      "bytes": 93105,
+      "sha256": "f0511e43bd91ad829639a6a0fadc4d08972bf163b8cd4c73546eb9c05fbb2c17"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/trace.zip",
+      "bytes": 1164364,
+      "sha256": "fc6de4f67448eb47697585c64f0fc07753f9e7ac8e8a0f5c6f3a928d806279c6"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/error-context.md",
+      "bytes": 14136,
+      "sha256": "c21ccc9183f10a72d5f938421cf43630a17ed951a43b01e6685229ef4a0158b4"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/test-failed-1.png",
+      "bytes": 79012,
+      "sha256": "0b9c5270126a5da5cb1d0499cc122e4a9958283272acd65affa9a3f6879ffdbe"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/trace.zip",
+      "bytes": 2481303,
+      "sha256": "c417f668092ae05515f4fac2c5c7d52d213e416c273999312963b0b57f7a2179"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/error-context.md",
+      "bytes": 55484,
+      "sha256": "86cc19ed4353c1c3e7dcc9c96cfb06c0c839b3dd3d309160e26f55523dda94cf"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/test-failed-1.png",
+      "bytes": 89922,
+      "sha256": "cbe36c3665f8f45c1975acf30b829d4bb7cc80e683e640d09e3fc79fd2bc8f72"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/trace.zip",
+      "bytes": 1829059,
+      "sha256": "4e5f7cb32a5b2afdd8a72ae8feaff63ba9bd12e1c1ce04cc9daec03e6473f96b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/error-context.md",
+      "bytes": 55491,
+      "sha256": "9c2b4216f4d680831ba4ad6528b477068222db92a09e9b98880636c32e350a86"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/test-failed-1.png",
+      "bytes": 89922,
+      "sha256": "cbe36c3665f8f45c1975acf30b829d4bb7cc80e683e640d09e3fc79fd2bc8f72"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/trace.zip",
+      "bytes": 1829028,
+      "sha256": "2d5a643f8a3fc0bae52035d31b6f1ad388e5063dd2a4360362439259b0abef25"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/error-context.md",
+      "bytes": 55501,
+      "sha256": "09be1eacbf3af5353df751c7f8659962c258073b059557d6371a6fa46b7276e8"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/test-failed-1.png",
+      "bytes": 89922,
+      "sha256": "cbe36c3665f8f45c1975acf30b829d4bb7cc80e683e640d09e3fc79fd2bc8f72"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/trace.zip",
+      "bytes": 1828952,
+      "sha256": "9575368181fc30124b72f226784994811f7437802726111868fc750b15ed6f0e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/error-context.md",
+      "bytes": 55469,
+      "sha256": "38e9050734a847241c9c6011e47d2880d4bfb1447f3abf44f73db612bc40d44f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/test-failed-1.png",
+      "bytes": 89922,
+      "sha256": "cbe36c3665f8f45c1975acf30b829d4bb7cc80e683e640d09e3fc79fd2bc8f72"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/trace.zip",
+      "bytes": 1854694,
+      "sha256": "15d055e65fb09b5279d9836f860c8349a8150459ee64829711bf8ab61d89f835"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/audit-audit-component-styles-desktop-light/error-context.md",
+      "bytes": 45190,
+      "sha256": "565bea041fc57e5eb41079bf592d691799add79a6bd9a3b911201f3759447fd2"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/audit-audit-component-styles-desktop-light/test-failed-1.png",
+      "bytes": 103014,
+      "sha256": "30ec2a43a3c8270c954a7c0e945ead88b37be376c0f1ae1cd3a6bce48feef71b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/audit-audit-component-styles-desktop-light/trace.zip",
+      "bytes": 2735248,
+      "sha256": "7f1cb331790168a30f77234bbf31f246d813c9be5c65153e4f783c256067daaa"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/error-context.md",
+      "bytes": 23404,
+      "sha256": "7f6b56fafac33abf1297c09f1b94e3d5f7bc29a48ba141aa5b247e47165b4c2e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/screenshots/capture-all/desktop-light/data/light-full-page.png",
+      "bytes": 237933,
+      "sha256": "a05342f7a0aa53979c6d23921b9535ddadb17f7ea295e7833d28f2c6d74b4ddc"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/test-failed-1.png",
+      "bytes": 79775,
+      "sha256": "dafa76e59900412283ee9b97f10c12d52fa0244557919173c5e4679f1086010f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/trace.zip",
+      "bytes": 1238071,
+      "sha256": "e8899ce5756926236dda8d296d6353c3f1c6425288f142869bbacf4437e82802"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-light/error-context.md",
+      "bytes": 12423,
+      "sha256": "60336649a1b7a63595c3328c5b2e88e7d740854ff4224b53bac1b98b6efe6389"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-light/test-failed-1.png",
+      "bytes": 91554,
+      "sha256": "5ce2ba8e0d2d80cbfab24955dc2529f3cd3ae9689fc560829720709f96c45ded"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-light/trace.zip",
+      "bytes": 1140134,
+      "sha256": "db40276b601983e20b6f2912250bffadab3f71339444ae45e02bc7ceba642576"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-light/error-context.md",
+      "bytes": 13666,
+      "sha256": "38f793cf57a6a06d6ad4e5ac5b08d0609fda1e1a928373aa673451951cff6f7e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-light/test-failed-1.png",
+      "bytes": 77723,
+      "sha256": "d04d1c9651e92d86c7b1ebccc54a6d3693ac46476044cf9cdd519cb2696d6960"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-light/trace.zip",
+      "bytes": 2297051,
+      "sha256": "69b929374a45210027a1a32c5ce9f8f06bba49f061de598024ddd7ff8efb7cce"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-light/error-context.md",
+      "bytes": 55484,
+      "sha256": "86cc19ed4353c1c3e7dcc9c96cfb06c0c839b3dd3d309160e26f55523dda94cf"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-light/test-failed-1.png",
+      "bytes": 90795,
+      "sha256": "6abe20825a4d4ccdfe9e65bedba3b74f910c66b53020fd09ca5ea318f2031a0f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-light/trace.zip",
+      "bytes": 1835543,
+      "sha256": "2a9a1042dc5186b080e5f916b8db8b257be806f8beec26d78e3e7610e951ff90"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-light/error-context.md",
+      "bytes": 55491,
+      "sha256": "9c2b4216f4d680831ba4ad6528b477068222db92a09e9b98880636c32e350a86"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-light/test-failed-1.png",
+      "bytes": 90795,
+      "sha256": "6abe20825a4d4ccdfe9e65bedba3b74f910c66b53020fd09ca5ea318f2031a0f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-light/trace.zip",
+      "bytes": 1835574,
+      "sha256": "4e7ca52a40cde32aec5db862074e15141f612a65984305c4bab413b0d7ac4c3e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-light/error-context.md",
+      "bytes": 55501,
+      "sha256": "09be1eacbf3af5353df751c7f8659962c258073b059557d6371a6fa46b7276e8"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-light/test-failed-1.png",
+      "bytes": 90795,
+      "sha256": "6abe20825a4d4ccdfe9e65bedba3b74f910c66b53020fd09ca5ea318f2031a0f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-light/trace.zip",
+      "bytes": 1835562,
+      "sha256": "5606f322c65e8daf2f5a3633cfbd18dd90d1e095bfee658bb0379c339723fd0b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-light/error-context.md",
+      "bytes": 55469,
+      "sha256": "38e9050734a847241c9c6011e47d2880d4bfb1447f3abf44f73db612bc40d44f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-light/test-failed-1.png",
+      "bytes": 90795,
+      "sha256": "6abe20825a4d4ccdfe9e65bedba3b74f910c66b53020fd09ca5ea318f2031a0f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-light/trace.zip",
+      "bytes": 1862664,
+      "sha256": "63794f3d6670f63f3b06fcaccf1e2d6e58bab6e2f1bd1a55c434a5e38da7e9a0"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/capture-all-capture-data-mobile-dark/error-context.md",
+      "bytes": 20903,
+      "sha256": "4ef66e9915b9e8f300d06d18c59664cf1e2416b8f9ad4284df86baa9c7b3a8a8"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/capture-all-capture-data-mobile-dark/screenshots/capture-all/mobile-dark/data/dark-full-page.png",
+      "bytes": 562438,
+      "sha256": "8bc7c3a27b102c3c393e065a509cc5b4b43970eec529e1739e22350c752e207e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/capture-all-capture-data-mobile-dark/test-failed-1.png",
+      "bytes": 127287,
+      "sha256": "9588446113d235a09d076932f091fd5e3ef24a7da8e011cfa25d200d017e9231"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/capture-all-capture-data-mobile-dark/trace.zip",
+      "bytes": 1238269,
+      "sha256": "572fa96db693c96ccddfd1bf0a2f51e0377466d90e89fa0c657d00f55282377f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-live-actual.png",
+      "bytes": 77445,
+      "sha256": "f857115f1511b5f26398c6a08e15e634581f0eb1658dda5c31d2a7eef77b13fc"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-live-diff.png",
+      "bytes": 87424,
+      "sha256": "f6f45a3511799a38bc55a5bcdc9690724f6173448d06e236ef63c1f3a61ed690"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-live-expected.png",
+      "bytes": 82677,
+      "sha256": "3b32acb8a42aa8cdbd56ef625742249932f93bf2c6b600e5964c23c693fa858d"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 11814,
+      "sha256": "e2f1a32262b3bb5a8fe84f749496914df4adb9d73f4549bfc6bbaeb6470c2f95"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 233209,
+      "sha256": "21147510015ddb091f66d9f7d64c164c3d523cd2670978fa716e930964b6c374"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1377346,
+      "sha256": "682a08955ec3086dadd11250c95452b4566e8c3cbbf6b9de5f95967712828793"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-split-actual.png",
+      "bytes": 96386,
+      "sha256": "6d29b895e91d1ed00f34fa24859800fa6fe2b2ec8964ad63f43dab2d877c4fd8"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-split-diff.png",
+      "bytes": 115223,
+      "sha256": "acc5bec1893bcbfb24b34425331504199e364d35a1ebc09688edeef291692df1"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-split-expected.png",
+      "bytes": 104477,
+      "sha256": "d1c5277ec97cfeda09a78fc815e446f5eba5cfd6c70171a804d2a1efbd35ec20"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 11437,
+      "sha256": "63168f60c9795d29d9c40de5d013f42153243dffd1bf836ce3482a01597f8238"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 292937,
+      "sha256": "3fbea2b8bab951da8a043e9b403e4c0a5aaaa10f416fb1bb166227bc6bbe3184"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1844712,
+      "sha256": "a2209b5ed7e947ac123819d90cf99704f0644446a6491f793930c7df436c7eaa"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-dark/error-context.md",
+      "bytes": 12371,
+      "sha256": "07b0f0e0bd17b6fbc2d3e1d3c5f97d90aa0f35c7e2c22b06bab4b5a786d0e20f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-dark/test-failed-1.png",
+      "bytes": 256927,
+      "sha256": "16c0baf7040c0a321a91ffc18f177011ee235f4e3b3bbb64698438f22236f24b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-dark/trace.zip",
+      "bytes": 1564460,
+      "sha256": "698d60d3d2d0d79c04a35024bde113f46a9d141e213953ffb9d52c18fd0969fc"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-source-actual.png",
+      "bytes": 75928,
+      "sha256": "50febaaf5b3089c081e3a3c36bf021baab1092fc406b3e9224514d6b78b69cc2"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-source-diff.png",
+      "bytes": 86585,
+      "sha256": "c352743ed686a272022674ff693193c034358a605c0bdf56d27ea1eef961e49d"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-source-expected.png",
+      "bytes": 81632,
+      "sha256": "cca59fe6ee197b5c670a612a913e0bab31d5221ca542b23a2d8241eda92e5d1e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 11727,
+      "sha256": "c5e5506236f70ab19d1ff7cd0cb4652ee48cdc54c48c6dec0874f752226da6fb"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 229664,
+      "sha256": "938b7fac150f156e90b364bd977f26872b523215cbdbb0e35574090884ef9150"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1394828,
+      "sha256": "8dd7c3b5add30123838974d6c855b3b9c92aab5120001326ba0e11027711c29a"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-split-actual.png",
+      "bytes": 95075,
+      "sha256": "02876123a3f99ae50459b396f484e2d52481d65f1c84ed7dc1193740fd568e0a"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-split-diff.png",
+      "bytes": 102876,
+      "sha256": "dd1b25878fa7272fd694725741e8a82ad7b801eb5157bd8a70bc9b7f06f64c91"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-split-expected.png",
+      "bytes": 96058,
+      "sha256": "724174100ce311cb16db0aab53fe9351d76ed0cfd1ccd469f698d229ebd72115"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 12527,
+      "sha256": "c242c9d5a5a845645822ed9f57424fe88bf8a4f1df69f42793f60dcd8a99445a"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 288122,
+      "sha256": "fd27a8bd91c8e1348a8ce97672baeb3f76de6ed1d982f191413ded725cc57fc6"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1819045,
+      "sha256": "3289b4a1af9daa9aa225dc66652a47f21dd6a14049a14d1f9f6c9e67eb1d312f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/chrome-evidence/forced-colors-actual.png",
+      "bytes": 67042,
+      "sha256": "83ab690d40a0b5081178cf196ac6d1c62746dd29c160d37347ef967adc808293"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/chrome-evidence/forced-colors-diff.png",
+      "bytes": 89825,
+      "sha256": "47be718b7c2e5c3144c5093d54b961dedc2e68f4f35793edf11c8577970c58b6"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/chrome-evidence/forced-colors-expected.png",
+      "bytes": 71554,
+      "sha256": "c0129659af9d74b49bf5aace6d1b0ae47501238f892563c25cdfcaee8aaa9a73"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/error-context.md",
+      "bytes": 8031,
+      "sha256": "77ce013e8028014615b086167529dcbee900f38ddc43d963e2de5b53bcc535d9"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/test-failed-1.png",
+      "bytes": 213363,
+      "sha256": "560b908365363b8aa1e9b02536d1c70d1cc28b8ff76fd5f19a89ecb29e53603d"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/trace.zip",
+      "bytes": 1461437,
+      "sha256": "4f8e1db8b0fb53f9975cf2e500e69eb3026f8dc01a5d099a10c1e66f7d481f52"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-live-actual.png",
+      "bytes": 66456,
+      "sha256": "3d300356e998ea2365660ef4aa1bc078acf9ba5f6b588faa9ac0c277bef22065"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-live-diff.png",
+      "bytes": 78755,
+      "sha256": "a1d3aaa55b86c8220381fc53655e23d5353d243229e554d3279f12eabe6232f7"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-live-expected.png",
+      "bytes": 72216,
+      "sha256": "4284325c56cb43024dd2556d2abd4d0fdb70fed869266cb9f594f9674e676e6b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 10713,
+      "sha256": "f6cd78299d3781715417d65e2f9ae09b1625429de382ae3baf5121f2196a67ea"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 198956,
+      "sha256": "6c83d472ef8597dcdf9c07d83b946cf9207f33c474c5e0cff951e7b7c8f9889f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1284174,
+      "sha256": "871115a3753f018b028983234da644d70012e881438321e2e6899bf569910a32"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-live-actual.png",
+      "bytes": 75767,
+      "sha256": "ee4f81e28c68615ba5e712c050800f10a9b71d84d85d898c8c1aa73bfab75ba6"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-live-diff.png",
+      "bytes": 86252,
+      "sha256": "8b4943db16e496356c97731af8fb55c6fbf2b9698b50bea3c2b04460c577b983"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-live-expected.png",
+      "bytes": 81405,
+      "sha256": "5606b0b2388997bd6648f8a8a67b9a9f889af61cb007b0d9c2439608507b381f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 11719,
+      "sha256": "23b5d880ff57da107ddfc834305eb6b07cf5905f83b7f86706d7b085ffc53571"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 229330,
+      "sha256": "850572f218fe5d12b8962d36a7f9388c4804fb7181cdd062c5c03aecbc3e15cb"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1427959,
+      "sha256": "935642eff353881a87d7138593a1c1b37da5cebe502d0627d635572cae1b2892"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/chrome-evidence/zoom-150-actual.png",
+      "bytes": 79941,
+      "sha256": "e1f9994fbfdac6305da6d2144a6f63ba157843abb8ee54cc710d37992a0e94e3"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/chrome-evidence/zoom-150-diff.png",
+      "bytes": 79501,
+      "sha256": "82b70093662259517d145fea692dfa3334367b06f40618e5733e49cb102e58c5"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/chrome-evidence/zoom-150-expected.png",
+      "bytes": 82342,
+      "sha256": "9671c75f74adac87eb4f9663af7755e2379979a644caca0a8696301e9946f63f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/error-context.md",
+      "bytes": 12471,
+      "sha256": "14ef0908a9d62c9f90be3e377660933a695ea00cbdc0a50c3c712eeb24f99df4"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/test-failed-1.png",
+      "bytes": 222878,
+      "sha256": "481247ac327b3addd89309b74d349d6f556a39e1f52e19c1e60db7a4f53c2206"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/trace.zip",
+      "bytes": 1654568,
+      "sha256": "2638884ef92100093c06fd6242c992c7a0012a45bdd1f8eb2f79b8e9b4a0c765"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-source-actual.png",
+      "bytes": 77578,
+      "sha256": "4dc915c3bc07aacd4007d9f8be1c8716c0de359ee4ad12060006118be426f3b0"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-source-diff.png",
+      "bytes": 87746,
+      "sha256": "6530e9790e41e41fab2c21e9fe64d94ffabafcbc81b2f309049fe4f401944b9f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-source-expected.png",
+      "bytes": 82755,
+      "sha256": "c7da738da136aebfc666610204c369ab6505a5565f85b17a47c7b9133215f7c8"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 11822,
+      "sha256": "13b2938e9f60d3fe90aec2755a48d25c2abf49d72010e65bdead009752f2d968"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 233681,
+      "sha256": "d83b86d58e82253c88adb83606f493a6ef70e13d432fddb2d12f6f03ab13e978"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1413198,
+      "sha256": "2ca657f60d8471de617d40db0786dec9730487c844b119315b70021b73b35392"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-source-actual.png",
+      "bytes": 66595,
+      "sha256": "f834c6ebd31b0246a20f9c5379fb7e8420ed771ba8b87b81963d8c8ba9ca5a17"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-source-diff.png",
+      "bytes": 78962,
+      "sha256": "8c73486b03d5cb22079ecf6dc61f8cacdbf369ff1d477d143f3e785c581ef9ca"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-source-expected.png",
+      "bytes": 72390,
+      "sha256": "c95358b5153c140019f8d353ef299e3201d00c6f89725959fb44973af724f867"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 10721,
+      "sha256": "90d8a554dd8b1dcf2d6f5137b82afbea719be11ec855811d103bd5f5b04ac70d"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 199466,
+      "sha256": "f620a86e1b7233a8873bd3b87b62b22ff9618bb736474a4609881b1c7550fe9a"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1314891,
+      "sha256": "0e0f96692a04adb8bfd2e5955779fbfc76f136d6b04700dea86c9dc487ee169e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-split-actual.png",
+      "bytes": 97901,
+      "sha256": "a377ea42f3e883cba51b57cfbcbe6cd05e6e8504913ffba1353d99a6df20fd6c"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-split-diff.png",
+      "bytes": 108296,
+      "sha256": "c134a7c8603755887c9ac9b4faedece160b3d3f429e92fa3b62e6752391a8ea3"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-split-expected.png",
+      "bytes": 101525,
+      "sha256": "28d2bb3d044029d69c2f0d8fa6e76f63d84f477621bb8a2c019ee3306fe42b24"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/error-context.md",
+      "bytes": 12432,
+      "sha256": "24142de60c7b58a25ade7ed4de3ed677f348bd07b539116e0e57197272789349"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/test-failed-1.png",
+      "bytes": 296330,
+      "sha256": "47dfcc40520019d3c2f07b0f413b19eca6d59d7315b12394ee04738f6f3a2718"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/trace.zip",
+      "bytes": 1805490,
+      "sha256": "21226506a4be539f73ab3682bf2c9cda314addd1197571dc4031c518ef44e2a4"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-dark/error-context.md",
+      "bytes": 13839,
+      "sha256": "86655babee7612de58a54b5af0d49279f4ce9dea57b4ddfb50ccb46cb3ebc2cf"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-dark/test-failed-1.png",
+      "bytes": 216902,
+      "sha256": "363e20ebda866c8a0cfaa17c4efdc42a931b55332bd34bc7932404cf9c292110"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-dark/trace.zip",
+      "bytes": 2128731,
+      "sha256": "0fd33860c88f43cd1b49ed07c7f2e483f3619c337cc33d9933f90fc598ccf410"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/capture-all-capture-data-mobile-light/error-context.md",
+      "bytes": 20903,
+      "sha256": "4ef66e9915b9e8f300d06d18c59664cf1e2416b8f9ad4284df86baa9c7b3a8a8"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/capture-all-capture-data-mobile-light/screenshots/capture-all/mobile-light/data/light-full-page.png",
+      "bytes": 549178,
+      "sha256": "e7eeec30324b1b561fba2ae63f70f2b2025cc1eeacd71ce8b9e0a39c1f9d1d94"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/capture-all-capture-data-mobile-light/test-failed-1.png",
+      "bytes": 120720,
+      "sha256": "03f85c980cc63a31ef14b11f54d6033e34804e93e5b116ad7365f1e381a996a0"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/capture-all-capture-data-mobile-light/trace.zip",
+      "bytes": 1225567,
+      "sha256": "6cf3c44b803a40b8464ed3a630c975d8a642c171645d9f48d74b9173a79bb262"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-live-actual.png",
+      "bytes": 76111,
+      "sha256": "2ad129a977d2ebf6d07cd5dcd4c11f771fc5c2c5986802d63d421fcb59197eec"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-live-diff.png",
+      "bytes": 81345,
+      "sha256": "451324d520200ea6e28d7da638925ae2d710e66686e115af32b0bf89d27235c9"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-live-expected.png",
+      "bytes": 80348,
+      "sha256": "d6439db4b12ad2c67d6bf23ab5722a98550e47423f2d18b9ce4b478920af2498"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 11814,
+      "sha256": "d5600818e3d4031e364f4355acfaf2b96a58491a97304406716439f0cc30610e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 229947,
+      "sha256": "524ba1aa5718993a8e204e0c92d584c0da25b9107e8d6da73d01ca9fadcf035f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1435623,
+      "sha256": "70934958d104981501fb5600426941201555ff20706b6360738481d001362c2a"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-split-actual.png",
+      "bytes": 95107,
+      "sha256": "906532d8f61bfd38176abf2344863895f376746eac75d7d1be45202f7c8869de"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-split-diff.png",
+      "bytes": 104332,
+      "sha256": "9c5a181acfa6861133d5f18c5ee97f6e2fc62be2dfb10087751718ac11854eb6"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-split-expected.png",
+      "bytes": 101380,
+      "sha256": "2c76a836716e7518a359bfdf951f986fc173c23b2ed96a8905916f47faa8d909"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 11437,
+      "sha256": "3988109db1f1e8245fb5b895dd01a67de74b536e188e2d1534e52d25787dbe3f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 289648,
+      "sha256": "2bd53d345511b3b3cbbe8d8bbb55cc46547ead9b169d4201b2ee6647ff1fea41"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1646649,
+      "sha256": "64f305725155f1d156b9c03d17cdbef3b684f0d8869fb9b016deef1c1bddde9c"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-light/error-context.md",
+      "bytes": 12371,
+      "sha256": "1a436ca15bd3e35f474a120393b620ac89c298cc68ff5f392400b6d0a17e92b3"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-light/test-failed-1.png",
+      "bytes": 252861,
+      "sha256": "85aaa4321f7d21be69776b191e036cf39ebd3ae921aaf9be2f4ee6f77abfa942"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-light/trace.zip",
+      "bytes": 1503552,
+      "sha256": "b860307a9d71d38fce3ec9edc98466443123fdaf2da60014140bd8d42e5b6916"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-source-actual.png",
+      "bytes": 74599,
+      "sha256": "301c89bd646f793f86f4d06d67b3ee7a58e97144fa0d3ed1f9fffd2b32a3bee6"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-source-diff.png",
+      "bytes": 80515,
+      "sha256": "8f2fc05e9c5c39ad3541f25b5c07df6872be5c18d457fdb4cb5d6692fbdc1f63"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-source-expected.png",
+      "bytes": 79323,
+      "sha256": "0c63bad5051f376e991c519bd30f2f80004a623e16e29b5c0763aca2fc0e11d0"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 11727,
+      "sha256": "2b40a75b99bebcb635e47a3035e42d8cb7a5ad3bb0a5b4051c94e119ba7271e5"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 226504,
+      "sha256": "4dac83123d6f0c306fbe9e427b26354f5cde49f1c01508164eac1c2ee319e0e5"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1414809,
+      "sha256": "9729d2e852a76122362c5564ee7f23cbfe554864e05745674e0ab9c848c4ec55"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-split-actual.png",
+      "bytes": 93129,
+      "sha256": "ed2b52fbc91892a8ecc79ddef7ba5253757267478c713b2661d5583ae6eeeaac"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-split-diff.png",
+      "bytes": 91908,
+      "sha256": "c78726fadd9901acb46dd89ae396dd67fd04e626d4c627cddecd0b427aad2817"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-split-expected.png",
+      "bytes": 93313,
+      "sha256": "eb2412353bd6e2032d94e2cef10aaea26799ea238cdc4a8d02a175e006c513f0"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 12527,
+      "sha256": "29ca44d8f596f757694f4f4b800fc5e6c73687da0e0e83ca0394bad089113360"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 283314,
+      "sha256": "91c1816dfae5b61b53b932ccdebd334767304237fccde6812ff1a70a6de62e74"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1764256,
+      "sha256": "edbe7b31ae83b27c8a55e57cc406bf6ca8fd4e0414d40d72b06b9a22e8bba0e6"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/chrome-evidence/forced-colors-actual.png",
+      "bytes": 66625,
+      "sha256": "ae4fc73f53e8baa58051242c162ec00ae30655c2714a561696d91cfcfdabc538"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/chrome-evidence/forced-colors-diff.png",
+      "bytes": 82084,
+      "sha256": "9925593fb2a933ab36b6c7b81387ecc85dea3779f771a8caa9eaeb9d8ea1b319"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/chrome-evidence/forced-colors-expected.png",
+      "bytes": 68189,
+      "sha256": "8aab57d942cfd110185423584ea70857dea501b8dc3d3059457bbef54333b046"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/error-context.md",
+      "bytes": 8031,
+      "sha256": "a233ba74ff7b39ef9f903a2ba48a0ca3015722bf1b6bd35b9c5e106bb1e7cf0e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/test-failed-1.png",
+      "bytes": 213360,
+      "sha256": "d59b0ce1662b448f8c3ded379e99f9d7d4cf745fa1485ee291237367872415c5"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/trace.zip",
+      "bytes": 1527035,
+      "sha256": "11cc954c1c5eca3459a74555576162e301984d707f0bd82e6df075afcd5b3817"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-live-actual.png",
+      "bytes": 65658,
+      "sha256": "6f0cfc206570c869d39738973ccfe654aab776c2a07d340e01d37a9900f52f6e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-live-diff.png",
+      "bytes": 73042,
+      "sha256": "6a6dc0df16ebe0e7d5ead462f4f7f304c98df30dfb855eef0e4326cefb286472"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-live-expected.png",
+      "bytes": 70535,
+      "sha256": "55620cd8d95e8eaacb03b0ab90883b638eeadfd30734ee6ee0cd0c5a2548e365"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 10713,
+      "sha256": "7ee5f97b239fee0f9150dba44e6ec68f070ab375c4c5c7094eccd0aa3fdbb75b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 197171,
+      "sha256": "63a359d92f80b8f13331741fe1372b8142f06052e54a85fe6b84636407600750"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1304932,
+      "sha256": "8a42161a0415af905d2f4648af6e0f345277fbcabf34853008db6c5d090e6cad"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-live-actual.png",
+      "bytes": 74493,
+      "sha256": "947f616fc7b513c2edad7c28c83712af12f6a6c2df400554728ce582ac162716"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-live-diff.png",
+      "bytes": 80269,
+      "sha256": "998fdeb1d772efc21cbca12455c799aa816b76e7f3aae05e0090bf9466f42815"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-live-expected.png",
+      "bytes": 79248,
+      "sha256": "bf8af6563fdbd7fda819c245bf170bd3036f53af410119fbabd3a3b3dcf20c0a"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 11719,
+      "sha256": "c3778fd8bb90e35b75ad1913ae2c16fb29e6d791923e06137c15a91e68907bcf"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 226223,
+      "sha256": "93cc4872b26b31cc68668fbd1e78c9c7e134c342217d0aedc60065d76b0d1c87"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1381046,
+      "sha256": "86071bf188e71006c5f8de4bf1397bad646b208030d8e100da8b6bca51b63632"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/chrome-evidence/zoom-150-actual.png",
+      "bytes": 78219,
+      "sha256": "3c93693a11e8eef0f6d85ed9f34095ed3dda388bb0f1e6563ac459981b4148dd"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/chrome-evidence/zoom-150-diff.png",
+      "bytes": 72377,
+      "sha256": "c7fc0f1b19f61abd35ffa55b4da1ea7871628ab472d90f964f83884675dfc55f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/chrome-evidence/zoom-150-expected.png",
+      "bytes": 80400,
+      "sha256": "f447269f0a7695c6b5d936b54ef3b4bf4e28dd2370623e3521edbb54c0414952"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/error-context.md",
+      "bytes": 12471,
+      "sha256": "7c0d3ad758dc81ae1ad47e31844166ecad84214c2c8bbe76ae07359e42839930"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/test-failed-1.png",
+      "bytes": 218343,
+      "sha256": "1b33fee087e02ea7083592d18c4873b472638cf28c217b6b2a0222bf6d553e6b"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/trace.zip",
+      "bytes": 1598220,
+      "sha256": "f1edda4963c1155f990a8f900b7d778563e7ad5234d4dd9814021bfdaf8e828c"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-source-actual.png",
+      "bytes": 76205,
+      "sha256": "5b93aae8b5f863ad1ed5f1635c6b0df45be3e23c4436016a7501e2437007e95f"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-source-diff.png",
+      "bytes": 81605,
+      "sha256": "387428586810287a6d4bbedcba4b8b5122401160b87e8de6e57d388d6bee9933"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-source-expected.png",
+      "bytes": 80418,
+      "sha256": "f305508820c607acddbcd51cf44337085be6bac802455c081f39158a2c28e399"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 11822,
+      "sha256": "1be3318725cbad0afa6d586c04020f5a82132fd9bbbf547a6b7f1ec340edb784"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 230178,
+      "sha256": "e670b79189ec8873a57ec5575ec00b8310d08feb674e5cb6405cd92b6365a2fc"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1436060,
+      "sha256": "d687cb93172befe8ac487e65bff3da7dfce4b0adc9a86d98c774d9ceb34faa8c"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-source-actual.png",
+      "bytes": 65842,
+      "sha256": "c9f78b06c40c66886c3af46991fa1892f750eab1694f86c075adcb0d71ce35a5"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-source-diff.png",
+      "bytes": 73238,
+      "sha256": "d1fe4369d3790e76d23c7fd0a381867f91e9aa83055002637e8823e66ea0122d"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-source-expected.png",
+      "bytes": 70682,
+      "sha256": "5158b3d030c25386640825ffe1897f72678f4d0ffde396e192dba32977b63d25"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 10721,
+      "sha256": "a86603bc287a2c13662f4481d5a3fce58984ee69460ab5d42686d95858660429"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 197565,
+      "sha256": "ae6b0e29c788379d363350d6824be51115e2734378937e7391a25562095133db"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1245669,
+      "sha256": "804dfd0ff562ea9ebb0a36923f0697c23f4304d40099877c22c0cdc6470c3eb6"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-split-actual.png",
+      "bytes": 95943,
+      "sha256": "e2962ebadf02c5fec938ff3d956ca2df805bbc36675c84d28067f98357f9aa3e"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-split-diff.png",
+      "bytes": 97279,
+      "sha256": "1d6dda8f7b4eee02104e6e0bd841d81c9fef311330475e086ab654abcfdd45f1"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-split-expected.png",
+      "bytes": 98629,
+      "sha256": "b1683a0dd9a3d3984f8e70af2b180d5b3810aba1e7f0bcec056535c90452a219"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/error-context.md",
+      "bytes": 12432,
+      "sha256": "10f950886ba3337bf117e8e497f853db7bc9b93eb5b9a1d511137a9c38d48f45"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/test-failed-1.png",
+      "bytes": 291558,
+      "sha256": "6e3c9b0616f4949800a4dbe0c06eac603335ab281553414dd32bf705e1840bbe"
+    },
+    {
+      "path": "artifacts/vue/test-results/profile-full/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/trace.zip",
+      "bytes": 1787310,
+      "sha256": "d361abeccd46cb3235261e09657cee5f976c56ce69732d1fd05acb204f365427"
+    },
+    {
+      "path": "current52-case-table.json",
+      "bytes": 290780,
+      "sha256": "9bd58e9a90cb199dadfbd9865bd5e22ba245311df868aba8fc3a72ea2747fc00"
+    },
+    {
+      "path": "failure-artifacts-index.json",
+      "bytes": 18991,
+      "sha256": "9bb9a4f232b51d62a3836dbcd85c03b451e7137c5685d65dc3c7c62fa9988f35"
+    },
+    {
+      "path": "first-root-causes.json",
+      "bytes": 25815,
+      "sha256": "db9e42993a5d8f3b3b895c96607c796a269262789c726ef9b41e0d5ce3a7f314"
+    },
+    {
+      "path": "first-root-causes.md",
+      "bytes": 14682,
+      "sha256": "8d6ebda37238d5d2a6b64f39585439ba4be5c0a0c09d6438d44685399275163f"
+    },
+    {
+      "path": "full-visual-tracked-output.json",
+      "bytes": 3051,
+      "sha256": "cd69c786b7f612e28dde8ad254a4aaa1469a0e5d158159672bf45abfbd55b789"
+    },
+    {
+      "path": "issue825-3ed-first-visual-errors.json",
+      "bytes": 39083,
+      "sha256": "2c8d2c3b1f72d354f6fe2d7136c74c2bf76b264b041d168c6129cd80cb48bdc2"
+    },
+    {
+      "path": "issue825-3ed-full-visual-errors.json",
+      "bytes": 208396,
+      "sha256": "2aecd39aa1b46b2ec765f16af1e19f3bf2fa2e7646842f1ac8af4836cd6153e3"
+    },
+    {
+      "path": "issue825-corrected-full-visual.log",
+      "bytes": 378454,
+      "sha256": "7d825abcf61088421cb33b703e9f0e52834e6179afc49b570fc2832061a29722"
+    },
+    {
+      "path": "prepared-runtime/fingerprints/demo.sha256",
+      "bytes": 65,
+      "sha256": "9b5478a17d9160c7ea8e7e10c59909133476c272b27acf079fc1cc2c9eb5ca05"
+    },
+    {
+      "path": "prepared-runtime/fingerprints/icons.sha256",
+      "bytes": 65,
+      "sha256": "739d25c45576ed1eb8ce81535b3db8b08a5f25465479892644e32b040dccbabe"
+    },
+    {
+      "path": "prepared-runtime/fingerprints/wasm.sha256",
+      "bytes": 65,
+      "sha256": "1305a2cc6f1624b62d951489f3dd504de6636c01c8d9eb71a2a31dc19a8854db"
+    },
+    {
+      "path": "prepared-runtime/manifest.json",
+      "bytes": 1314,
+      "sha256": "b7852afe77498bfdc4afd3513be83f200b53a4cf818f53cdf786dc4b2425d5ed"
+    },
+    {
+      "path": "prepared-runtime/original-prepare.log",
+      "bytes": 78987,
+      "sha256": "a2052b83d2877bab030fc660bc002726075261f363e2f9187a807cce01847440"
+    }
+  ]
+}

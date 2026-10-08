@@ -1,0 +1,209 @@
+[
+  {
+    "trace": "vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-light/trace.zip",
+    "errors": [
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/github-light-Rcb2q3L5.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/typescript-BqvgUolh.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/github-light-Rcb2q3L5.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/typescript-BqvgUolh.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/markdown-editor-chrome.spec.ts:135:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/github-light-Rcb2q3L5.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/typescript-BqvgUolh.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/github-light-Rcb2q3L5.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/typescript-BqvgUolh.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/markdown-editor-chrome.spec.ts:135:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/github-light-Rcb2q3L5.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/typescript-BqvgUolh.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 4\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/github-light-Rcb2q3L5.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET http://127.0.0.1:4173/assets/typescript-BqvgUolh.js net::ERR_ABORTED\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/markdown-editor-chrome.spec.ts:135:39"
+        }
+      }
+    ]
+  },
+  {
+    "trace": "vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/audit-audit-component-styles-desktop-light/trace.zip",
+    "errors": [
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: locator.evaluate: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"unique-tree-select\"]').locator('.el-select__popper').locator('.el-tree-node__content').filter({ hasText: 'Level one 1' }).first()\u001b[22m\n",
+          "stack": "Error: locator.evaluate: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"unique-tree-select\"]').locator('.el-select__popper').locator('.el-tree-node__content').filter({ hasText: 'Level one 1' }).first()\u001b[22m\n\n    at /workspace/FsusUI/vue/tests/visual/audit.spec.ts:54:18"
+        }
+      }
+    ]
+  },
+  {
+    "trace": "vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-light/trace.zip",
+    "errors": [
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      }
+    ]
+  },
+  {
+    "trace": "vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-light/trace.zip",
+    "errors": [
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      }
+    ]
+  },
+  {
+    "trace": "vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-light/trace.zip",
+    "errors": [
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      }
+    ]
+  },
+  {
+    "trace": "vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/trace.zip",
+    "errors": [
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/capture-all.spec.ts:37:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/capture-all.spec.ts:37:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/capture-all.spec.ts:37:39"
+        }
+      }
+    ]
+  },
+  {
+    "trace": "vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-light/trace.zip",
+    "errors": [
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')\nTimeout: 20000ms\n\u001b[32m- Expected substring  -  1\u001b[39m\n\u001b[31m+ Received string     + 11\u001b[39m\n\n\u001b[32m- \u5df2\u540c\u6b65\u5230\u8349\u7a3f\u7bb1\u001b[39m\n\u001b[31m+ 227 \u5b57 \u00b7 45 \u8bcd \u00b7 {\u001b[39m\n\u001b[31m+   \"mode\": \"source\",\u001b[39m\n\u001b[31m+   \"readonly\": false,\u001b[39m\n\u001b[31m+   \"disabled\": false,\u001b[39m\n\u001b[31m+   \"loading\": false\u001b[39m\n\u001b[31m+ } \u00b7 supported{\u001b[39m\n\u001b[31m+   \"mode\": \"source\",\u001b[39m\n\u001b[31m+   \"readonly\": false,\u001b[39m\n\u001b[31m+   \"disabled\": false,\u001b[39m\n\u001b[31m+   \"loading\": false\u001b[39m\n\u001b[31m+ }\u001b[39m\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')\u001b[22m\n\u001b[2m    21 \u00d7 locator resolved to <span data-v-525503f0=\"\" data-testid=\"chrome-visual-status-slot\">227 \u5b57 \u00b7 45 \u8bcd \u00b7 {\u21b5  \"mode\": \"source\",\u21b5  \"readonly\"\u2026</span>\u001b[22m\n\u001b[2m       - unexpected value \"227 \u5b57 \u00b7 45 \u8bcd \u00b7 {\u001b[22m\n\u001b[2m  \"mode\": \"source\",\u001b[22m\n\u001b[2m  \"readonly\": false,\u001b[22m\n\u001b[2m  \"disabled\": false,\u001b[22m\n\u001b[2m  \"loading\": false\u001b[22m\n\u001b[2m} \u00b7 supported{\u001b[22m\n\u001b[2m  \"mode\": \"source\",\u001b[22m\n\u001b[2m  \"readonly\": false,\u001b[22m\n\u001b[2m  \"disabled\": false,\u001b[22m\n\u001b[2m  \"loading\": false\u001b[22m\n\u001b[2m}\"\u001b[22m\n",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')\nTimeout: 20000ms\n\u001b[32m- Expected substring  -  1\u001b[39m\n\u001b[31m+ Received string     + 11\u001b[39m\n\n\u001b[32m- \u5df2\u540c\u6b65\u5230\u8349\u7a3f\u7bb1\u001b[39m\n\u001b[31m+ 227 \u5b57 \u00b7 45 \u8bcd \u00b7 {\u001b[39m\n\u001b[31m+   \"mode\": \"source\",\u001b[39m\n\u001b[31m+   \"readonly\": false,\u001b[39m\n\u001b[31m+   \"disabled\": false,\u001b[39m\n\u001b[31m+   \"loading\": false\u001b[39m\n\u001b[31m+ } \u00b7 supported{\u001b[39m\n\u001b[31m+   \"mode\": \"source\",\u001b[39m\n\u001b[31m+   \"readonly\": false,\u001b[39m\n\u001b[31m+   \"disabled\": false,\u001b[39m\n\u001b[31m+   \"loading\": false\u001b[39m\n\u001b[31m+ }\u001b[39m\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 20000ms\u001b[22m\n\u001b[2m  - waiting for locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')\u001b[22m\n\u001b[2m    21 \u00d7 locator resolved to <span data-v-525503f0=\"\" data-testid=\"chrome-visual-status-slot\">227 \u5b57 \u00b7 45 \u8bcd \u00b7 {\u21b5  \"mode\": \"source\",\u21b5  \"readonly\"\u2026</span>\u001b[22m\n\u001b[2m       - unexpected value \"227 \u5b57 \u00b7 45 \u8bcd \u00b7 {\u001b[22m\n\u001b[2m  \"mode\": \"source\",\u001b[22m\n\u001b[2m  \"readonly\": false,\u001b[22m\n\u001b[2m  \"disabled\": false,\u001b[22m\n\u001b[2m  \"loading\": false\u001b[22m\n\u001b[2m} \u00b7 supported{\u001b[22m\n\u001b[2m  \"mode\": \"source\",\u001b[22m\n\u001b[2m  \"readonly\": false,\u001b[22m\n\u001b[2m  \"disabled\": false,\u001b[22m\n\u001b[2m  \"loading\": false\u001b[22m\n\u001b[2m}\"\u001b[22m\n\n    at /workspace/FsusUI/vue/tests/visual/markdown-editor-chrome.spec.ts:426:9"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "Expect",
+          "message": "Expect failed"
+        }
+      }
+    ]
+  },
+  {
+    "trace": "vue/test-results/profile-full/suite-preview/project-desktop-light/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-light/trace.zip",
+    "errors": [
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      },
+      {
+        "type": "after",
+        "error": {
+          "name": "",
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+          "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 6\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+   \"console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at /workspace/FsusUI/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39"
+        }
+      }
+    ]
+  }
+]
