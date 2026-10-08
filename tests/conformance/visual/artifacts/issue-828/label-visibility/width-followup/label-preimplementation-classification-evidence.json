@@ -1,0 +1,8 @@
+{
+  "baseline": "dc8aed9b0d50c69f27999722a434cf3c0d164fac",
+  "parentReview": "01a11b52-ec77-7602-9d9e-3f040157403f; parent reported actual live Blog d1b2c66cdf982d9a9f58db4a98ca2f83db3a71fd, not root894 replay report as source",
+  "scope": "Owned full/critical short-landscape CSS: preserve natural inline-link widths, original text and native focus; let long auth labels and constrained inline links wrap, reserve existing44px input content plus its existing horizontal padding, no font shrink; inspect667x375 zoom2 after native focus, standard modes/themes/layouts, retain separate260/264 header90 and736x320 bottom204 budget conflicts",
+  "prohibited": "No mode hiding/remap, no44px target shrink, no34percent relaxation, no authority/snapshot/test changes, no package publication",
+  "unresolved": "Arbitrary low heights cannot simultaneously fit minimum controls and34percent; bottom56-64px contract retained",
+  "changeset": "consumer-visible layout patch"
+}
