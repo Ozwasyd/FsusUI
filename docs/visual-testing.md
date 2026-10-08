@@ -16,6 +16,10 @@ validated runtime manifest.
 
 The boundary owner passes its managed preview URL through
 `FSUS_PLAYWRIGHT_EXTERNAL_SERVER`, as the layout and preview runners do.
+Before running cells, the boundary owner requires its launched child to acknowledge
+the successful bind over IPC, then checks the live child's address and runtime
+fingerprint. An arbitrary HTTP 200 does not establish ownership; a startup error
+or child exit refuses the run before browser tests.
 The boundary config starts its strict standalone server only when that URL is
 absent; an unrelated process on the standalone port is still rejected in CI.
 
