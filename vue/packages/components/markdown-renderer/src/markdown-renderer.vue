@@ -11,7 +11,7 @@
     ]"
     role="article"
     aria-live="polite"
-    :aria-busy="isRendering ? 'true' : 'false'"
+    :aria-busy="isRendering"
     v-bind="rootRenderAttrs()"
   >
     <div
@@ -889,12 +889,12 @@ const resolveMarkdownFeatureOptions = () => ({
 })
 
 const hasEnabledHeavyFeature = (
-  result: MarkdownSafeRenderResult,
+  { features: renderedFeatures }: MarkdownSafeRenderResult,
   features: ReturnType<typeof resolveMarkdownFeatureOptions>,
 ) =>
-  (features.codeHighlight && result.features.includes('code_block')) ||
-  (features.latex && result.features.includes('latex')) ||
-  (features.mermaid && result.features.includes('mermaid'))
+  (features.codeHighlight && renderedFeatures.includes('code_block')) ||
+  (features.latex && renderedFeatures.includes('latex')) ||
+  (features.mermaid && renderedFeatures.includes('mermaid'))
 
 const resetFeatureActivation = () => {
   removeHeavyFeatureThemeListener()
