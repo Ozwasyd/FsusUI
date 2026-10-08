@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "712e38de6bb677474cfdd0cf2f2b8a1f960577f39b4d305cee2a8f43d652e9f2",
+      "hash": "17c436c2a4125916e190f062c9c21fd147802c7299f02e92131247e48f6470f6",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -42748,6 +42748,82 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "name": "description",
+          "kind": "contentRegion",
+          "scoped": false,
+          "web": {
+            "member": "description",
+            "baseline": "spec/baselines/vue-current.json",
+            "nameKnown": true,
+            "nameExpression": null,
+            "scoped": false,
+            "payload": [],
+            "payloadComplete": true,
+            "contentType": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-dropdown-item.content-region.description"
+          ],
+          "governance": {
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "suffix",
+          "kind": "contentRegion",
+          "scoped": false,
+          "web": {
+            "member": "suffix",
+            "baseline": "spec/baselines/vue-current.json",
+            "nameKnown": true,
+            "nameExpression": null,
+            "scoped": false,
+            "payload": [],
+            "payloadComplete": true,
+            "contentType": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-dropdown-item.content-region.suffix"
+          ],
+          "governance": {
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "states": {
@@ -42830,6 +42906,28 @@
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
           }
+        },
+        {
+          "member": "description",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "suffix",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No explicit semantic binding selects a real Avalonia content region.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
         }
       ],
       "avaloniaExtras": [
@@ -42899,6 +42997,8 @@
         "scenario.v2.el-dropdown-item.output.pointerleave",
         "scenario.v2.el-dropdown-item.output.pointermove",
         "scenario.v2.el-dropdown-item.content-region.default",
+        "scenario.v2.el-dropdown-item.content-region.description",
+        "scenario.v2.el-dropdown-item.content-region.suffix",
         "scenario.v2.el-dropdown-item.state.default",
         "scenario.v2.el-dropdown-item.keyboard",
         "scenario.v2.el-dropdown-item.pointer",
@@ -42909,10 +43009,10 @@
         "scenario.v2.el-dropdown-item.perf"
       ],
       "coverage": {
-        "total": 4,
+        "total": 6,
         "alignedCandidate": 0,
         "partial": 0,
-        "missing": 4,
+        "missing": 6,
         "webOnly": 0,
         "mappedPercent": 0
       }
@@ -189253,9 +189353,9 @@
   "coverage": {
     "aligned-candidate": 17,
     "partial": 191,
-    "missing": 2185,
+    "missing": 2187,
     "web-only": 62,
-    "total": 2455,
+    "total": 2457,
     "mappedPercent": 8.5
   }
 }
