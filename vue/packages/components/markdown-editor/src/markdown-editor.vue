@@ -357,6 +357,7 @@
         @pointerup="handleSelectionDragEnd"
         @scroll="handleLayoutScroll"
         @select="handleSelectionMove"
+        @selectionchange="handleSelectionMove"
         @touchmove="handleLayoutTouch"
         @wheel="handleLayoutWheel"
       />
@@ -2463,6 +2464,7 @@ const dispatchEditorOperation = (
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: result.documentIdentity,
         revision: result.revision,
         selection: result.selection,
       }),
@@ -2514,6 +2516,7 @@ const captureSelection = (breakMerge = true) => {
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: transactionStore.documentIdentity,
         revision: transactionStore.revision,
         selection,
       }),
@@ -5482,7 +5485,10 @@ const handleKeydown = (event: KeyboardEvent) => {
                 : event.key === 'PageDown'
                   ? 'page-down'
                   : null
-    if (motionKey) {
+    const nativeDocumentNavigation =
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End')
+    if (motionKey && !nativeDocumentNavigation) {
       event.preventDefault()
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return

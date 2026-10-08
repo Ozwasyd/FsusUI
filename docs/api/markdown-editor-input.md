@@ -37,6 +37,24 @@ Public editor mode is exactly `source` / `live` / `split` / `preview`. Live
 capability tokens are exactly the six frozen values from
 `markdownLiveCapabilities`. There is no `write` mode alias.
 
+`ElMarkdownEditor` emits `selection-change` for accepted transaction selection
+changes and native selection/caret movement, including Ctrl+Home/End and pointer
+selection. Its immutable payload contains `documentIdentity: { id, epoch }`,
+`revision`, and the normalized, direction-preserving `selection`. Transaction
+observations use the accepted dispatch result's identity/revision; native
+observations capture the existing transaction store's identity/revision when
+the host selection is read. Opaque IDs are preserved exactly. No new epoch or
+selection authority is introduced, and unchanged selections do not emit twice.
+
+`MarkdownEditorSelectionEvent.documentIdentity` remains optional in the public
+TypeScript type to preserve compatibility with previously constructed event
+objects. The editor always supplies it. A consumer requiring document isolation
+must reject absent or stale identities/epochs/revisions, including observations
+delivered after a document replacement or host rebind; it must not fill in an
+identity from its current props. Replacements retain the existing revision/reset
+and cancellation semantics. Selection observations do not imply a public
+viewport-change event or complete viewport arbitration.
+
 `createMarkdownLiveSurface` is the #333 owner plan: one `source-textarea`
 selection/focus/IME host. Split and preview may show the safe renderer pane;
 live does not. Projection failure keeps the source bytes and falls back to a
