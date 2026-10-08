@@ -83,6 +83,11 @@ in the default slot; public `visible-change` and `handleOpen` / `handleClose`
 provide an observable visibility contract. Changing `checked` does not move
 focus away from a user who is navigating pending or retry content.
 
+Forced-colors mode preserves the trigger and item inset keyboard focus rings when the browser
+suppresses box shadows. The ring uses the existing focus tokens and lets the
+browser map its border color to the user's contrast palette; it does not change
+row geometry or require a consumer style override.
+
 ## URL and Command Activation Adapter
 
 The `command` event receives `(command, instance, event)`. Use a public

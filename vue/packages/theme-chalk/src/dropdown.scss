@@ -244,3 +244,20 @@ $dropdown-menu-padding-vertical: map.merge(
     }
   }
 }
+
+@media (forced-colors: active) {
+  .#{$namespace}-dropdown [aria-haspopup='menu']:focus-visible,
+  .#{$namespace}-dropdown-menu__item:not(.is-disabled):focus-visible {
+    position: relative;
+
+    // Forced colors suppresses box-shadow; preserve the same inset ring.
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: var(--fsus-focus-ring-width, 2px) solid var(--fsus-scholarly-blue);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+  }
+}
