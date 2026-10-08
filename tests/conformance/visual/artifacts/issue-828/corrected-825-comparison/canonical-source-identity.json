@@ -1,0 +1,22 @@
+{
+  "qualificationEligible": false,
+  "canonicalCandidate": "5fb35c3b6fa8bc96661e55e5cf4ad5e9142d9cfc",
+  "testedSource": "6ddb84c8b5c1b0ae69b1ded4f54bd32553e8e1a3",
+  "blobs": [
+    {
+      "file": "vue/packages/components/markdown-editor/src/markdown-editor.vue",
+      "same": true,
+      "sha256": "2bc280a561206a9ed4f32410e7c62ba00db4a6f635f0f38f1697ba211234e79a"
+    },
+    {
+      "file": "vue/packages/theme-chalk/src/markdown-editor.scss",
+      "same": true,
+      "sha256": "3dc4cbcd94b8306cced163d12abb66dc5cd8ac81a3f635aa9f2e3a37e727f4cb"
+    },
+    {
+      "file": "vue/tests/markdown-editor/markdown-editor-toolbar-geometry.spec.ts",
+      "same": true,
+      "sha256": "514f4b3abb1aeebb72162f58aad88489d467cc2544d464ec998836734bc7304e"
+    }
+  ]
+}

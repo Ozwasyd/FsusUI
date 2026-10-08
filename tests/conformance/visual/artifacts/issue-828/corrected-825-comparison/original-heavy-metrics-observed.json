@@ -1,0 +1,573 @@
+{
+  "qualificationEligible": false,
+  "source": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+  "observations": [
+    {
+      "callId": "call@3198",
+      "startTime": 333296.726,
+      "endTime": 333299.426,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 0,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3200",
+      "startTime": 333302.481,
+      "endTime": 333306.208,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 0,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3202",
+      "startTime": 333308.394,
+      "endTime": 333311.637,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 0,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3210",
+      "startTime": 333330.958,
+      "endTime": 333340.691,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 3,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3212",
+      "startTime": 333346.166,
+      "endTime": 339682.811,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 3,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3214",
+      "startTime": 345802.53,
+      "endTime": 356589.955,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 3,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3220",
+      "startTime": 360219.405,
+      "endTime": 360222.12,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 3,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3222",
+      "startTime": 360327.086,
+      "endTime": 363785.93,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 3,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3224",
+      "startTime": 366764.358,
+      "endTime": 374746.091,
+      "metrics": {
+        "aborts": 1,
+        "active": 1,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 0,
+        "unmounted": 3,
+        "static": 2,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3226",
+      "startTime": 376186.531,
+      "endTime": 376190.729,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 1,
+        "unmounted": 3,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3228",
+      "startTime": 376197.589,
+      "endTime": 376200.46,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 1,
+        "unmounted": 3,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3236",
+      "startTime": 385639.846,
+      "endTime": 398982.385,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 1,
+        "unmounted": 6,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3238",
+      "startTime": 398993.325,
+      "endTime": 402550.451,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 1,
+        "unmounted": 6,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3240",
+      "startTime": 402563.91,
+      "endTime": 405314.875,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 1,
+        "unmounted": 6,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3248",
+      "startTime": 430329.202,
+      "endTime": 436427.932,
+      "metrics": {
+        "aborts": 1,
+        "active": 1,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 1,
+        "unmounted": 6,
+        "static": 2,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3250",
+      "startTime": 438336.721,
+      "endTime": 439086.706,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 2,
+        "unmounted": 6,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3252",
+      "startTime": 439092.845,
+      "endTime": 439095.978,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 2,
+        "unmounted": 6,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3254",
+      "startTime": 439100.563,
+      "endTime": 439103.348,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 2,
+        "unmounted": 6,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3262",
+      "startTime": 447939.79,
+      "endTime": 455139.025,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 2,
+        "unmounted": 9,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3264",
+      "startTime": 457859.909,
+      "endTime": 462340.015,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 2,
+        "unmounted": 9,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3266",
+      "startTime": 465178.324,
+      "endTime": 466075.008,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 2,
+        "unmounted": 9,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3274",
+      "startTime": 472627.682,
+      "endTime": 478613.84,
+      "metrics": {
+        "aborts": 1,
+        "active": 1,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 2,
+        "unmounted": 9,
+        "static": 2,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3276",
+      "startTime": 480493.854,
+      "endTime": 481242.385,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 3,
+        "unmounted": 9,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3278",
+      "startTime": 481248.837,
+      "endTime": 481252.917,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 3,
+        "unmounted": 9,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3280",
+      "startTime": 481261.329,
+      "endTime": 481264.344,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 3,
+        "unmounted": 9,
+        "static": 3,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3288",
+      "startTime": 490907.879,
+      "endTime": 499706.709,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 3,
+        "unmounted": 12,
+        "static": 0,
+        "stale": 1
+      }
+    },
+    {
+      "callId": "call@3290",
+      "startTime": 501465.379,
+      "endTime": 521284.289,
+      "metrics": {
+        "aborts": 1,
+        "active": 0,
+        "activations": 2,
+        "cacheBytes": 1292,
+        "cacheEntries": 1,
+        "retainedResources": 0,
+        "retainedListeners": 0,
+        "retainedObservers": 0,
+        "retainedRuntimes": 0,
+        "retainedTasks": 0,
+        "reuses": 3,
+        "unmounted": 12,
+        "static": 0,
+        "stale": 1
+      }
+    }
+  ]
+}

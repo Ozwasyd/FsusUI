@@ -1,0 +1,88 @@
+[
+  {
+    "type": "before",
+    "callId": "expect@111",
+    "stepId": "expect@111",
+    "startTime": 490907.057,
+    "class": "Test",
+    "method": "expect",
+    "title": "Expect \"poll toBe\"",
+    "params": {},
+    "stack": [
+      {
+        "file": "/workspace/FsusUI-828-consume-850/vue/tests/markdown-editor/markdown-heavy-feature-lifecycle.spec.ts",
+        "line": 403,
+        "column": 10
+      }
+    ]
+  },
+  {
+    "type": "after",
+    "callId": "expect@111",
+    "endTime": 501464.219,
+    "annotations": []
+  },
+  {
+    "type": "before",
+    "callId": "expect@114",
+    "stepId": "expect@114",
+    "startTime": 501464.664,
+    "class": "Test",
+    "method": "expect",
+    "title": "Expect \"poll toBe\"",
+    "params": {},
+    "stack": [
+      {
+        "file": "/workspace/FsusUI-828-consume-850/vue/tests/markdown-editor/markdown-heavy-feature-lifecycle.spec.ts",
+        "line": 406,
+        "column": 10
+      }
+    ]
+  },
+  {
+    "type": "before",
+    "callId": "pw:api@115",
+    "stepId": "pw:api@115",
+    "parentId": "expect@114",
+    "startTime": 501465.105,
+    "class": "Test",
+    "method": "pw:api",
+    "title": "Evaluate",
+    "params": {
+      "expression": "() => {\n  var _document$querySelect;\n  const encoded = (_document$querySelect = document.querySelector('[data-markdown-renderer=\"wasm\"]')) === null || _document$querySelect === void 0 ? void 0 : _document$querySelect.dataset.markdownHeavyLifecycle;\n  return encoded ? JSON.parse(encoded) : null;\n}",
+      "isFunction": "true",
+      "arg": "Object"
+    },
+    "stack": [
+      {
+        "file": "/workspace/FsusUI-828-consume-850/vue/tests/markdown-editor/markdown-heavy-feature-lifecycle.spec.ts",
+        "line": 87,
+        "column": 8,
+        "function": "readMetrics"
+      }
+    ]
+  },
+  {
+    "type": "after",
+    "callId": "expect@114",
+    "endTime": 521464.606,
+    "annotations": [],
+    "error": {
+      "name": "",
+      "message": "Error: Timeout 20000ms exceeded while waiting on the predicate",
+      "stack": "Error: Timeout 20000ms exceeded while waiting on the predicate\n    at /workspace/FsusUI-828-consume-850/vue/tests/markdown-editor/markdown-heavy-feature-lifecycle.spec.ts:404:7"
+    }
+  },
+  {
+    "type": "before",
+    "callId": "expect@119",
+    "stepId": "expect@119",
+    "parentId": "expect@114",
+    "startTime": 529587.191,
+    "class": "Test",
+    "method": "expect",
+    "title": "Expect \"toBe\"",
+    "params": {},
+    "stack": []
+  }
+]

@@ -1,0 +1,125 @@
+{
+  "qualificationEligible": false,
+  "canonical825Candidate": "5fb35c3b6fa8bc96661e55e5cf4ad5e9142d9cfc",
+  "testedCorrectedProductSource": "6ddb84c8b5c1b0ae69b1ded4f54bd32553e8e1a3",
+  "apiDerivativeCommit": "e4ea6c49df2188cb615dd6fe8da0b2757a512764",
+  "originalFailedProductionSource": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+  "separateMinimalAttemptSource": "f7f64d44985b7d6a9d280f43b51cf17f27946684",
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/README.md",
+      "bytes": 15919,
+      "sha256": "6be24e2abad86459a8bd88539a15a60230f7c089cf32fac1d912c6ed3c487813"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-geometry-traces/markdown-editor-toolbar-ge-54ec0-al-commands-light-1280x1100-chromium/trace.zip",
+      "bytes": 1909883,
+      "sha256": "fb21e572528f86b2628b19d603a1f840cbf44a29c169003550d202e4f1799717"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-geometry-traces/markdown-editor-toolbar-ge-7acf0-nd-keyboard-reachable-light-chromium/trace.zip",
+      "bytes": 1432332,
+      "sha256": "5b717101130bf0df8979bdda9839de116c851347a0063c3389eed1db9842a159"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-geometry-traces/markdown-editor-toolbar-ge-7cab0-and-keyboard-reachable-dark-chromium/trace.zip",
+      "bytes": 1400807,
+      "sha256": "7c29ca67d69068319e2d6c9bba1f2e1d7fd1f7accbb199bae9cfdf23a71e2dd5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-geometry-traces/markdown-editor-toolbar-ge-7ee27-tal-commands-dark-1280x1100-chromium/trace.zip",
+      "bytes": 1895753,
+      "sha256": "c31984aabf0e8e554ca925b119b824abcd66866cbdfc5b83edf5cd03d74a165e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-geometry-traces/markdown-editor-toolbar-ge-7ff56-ontal-commands-dark-375x812-chromium/trace.zip",
+      "bytes": 1419055,
+      "sha256": "d7531c5e9f73e129b9ceafa0534e4730bbf879bcb8b79424997e9fc0c2aa997f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-geometry-traces/markdown-editor-toolbar-ge-9c4ef-ntal-commands-light-844x390-chromium/trace.zip",
+      "bytes": 1832457,
+      "sha256": "9d02623c486808f657ec5fffdeecf75640ef881fb2d34f46e1bc8603fb2ef204"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-geometry-traces/markdown-editor-toolbar-ge-caa77-ntal-commands-light-375x812-chromium/trace.zip",
+      "bytes": 1442050,
+      "sha256": "622e843b8a286ba968a84790385f5022254a085c93e9e5f120f435892f88b322"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-geometry-traces/markdown-editor-toolbar-ge-dbe15-ontal-commands-dark-844x390-chromium/trace.zip",
+      "bytes": 1812188,
+      "sha256": "2e81d2e249d35db8de996f3ec8e52ef1b60fab5b9f63e58a8942ea7dacc6a238"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/canonical-source-identity.json",
+      "bytes": 763,
+      "sha256": "6215f3f22dadcdd1a1496ea23ac4e1d58d26cacb99fb86b96d4fee3e3606e12c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/corrected-first-touch-failure/markdown-editor-paste-mark-785b8-returns-focus-to-the-editor-chromium/error-context.md",
+      "bytes": 63997,
+      "sha256": "ceb509e3cd4762ddcee33872e8a7493febde0f87391e1d750bc93a328ffd0db5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/corrected-first-touch-failure/markdown-editor-paste-mark-785b8-returns-focus-to-the-editor-chromium/test-failed-1.png",
+      "bytes": 29071,
+      "sha256": "c3c4155a7f3a61c5288f1f2cc3e7d83de187860170656a13d7722279e896bab1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/corrected-first-touch-failure/markdown-editor-paste-mark-785b8-returns-focus-to-the-editor-chromium/trace.zip",
+      "bytes": 1186315,
+      "sha256": "f13ccf46787a8b476d2a7b3f56428341f79c8e417549c53b3866c4a94df1d415"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/geometry-observed.json",
+      "bytes": 10296,
+      "sha256": "1ba2a3063d515be6b775366cb38dcf43f03ffa334db8767d9df150fd6a411947"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/original-contexts-index.json",
+      "bytes": 7592,
+      "sha256": "9a611ed9530d34a2ec10e692e5152f8d22fbc0cc75b915fff8343efbf522a628"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/original-contexts.zip",
+      "bytes": 145509,
+      "sha256": "a0256868ee8bc50b8b56ccdb904cb5e90a55b23bbb5fff7dd3afd172eaab4716"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/original-heavy-metrics-observed.json",
+      "bytes": 13396,
+      "sha256": "5ed7b6de861492854007958ae577133f66e1dfe9e9d6c662c3d24c9705e881ee"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/original-heavy-poll-timeline.json",
+      "bytes": 2469,
+      "sha256": "6cf480fe1cad8850d76c7323b1b8a58e9d815f0207a341f7188103abdc69d4be"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/own-preview-identity.json",
+      "bytes": 361784,
+      "sha256": "6407e6e6317d27800a21de3227a25198384620ba587d2b2a4c95eb4be882e15c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/review-frames/markdown-editor-toolbar-ge-7acf0-nd-keyboard-reachable-light-chromium.jpeg",
+      "bytes": 21089,
+      "sha256": "77aa15a34ef49a380f1cad12f3e8178d123777e2783777f638fa15c4a30036a1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/review-frames/markdown-editor-toolbar-ge-7cab0-and-keyboard-reachable-dark-chromium.jpeg",
+      "bytes": 17462,
+      "sha256": "c560e9bfe379f9fa54d20f46e552aad89b56fa2ea08faa909c8ef16da51cad64"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/separate-heavy-minimal-attempt/.last-run.json",
+      "bytes": 45,
+      "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/corrected-825-comparison/separate-heavy-minimal-attempt/markdown-heavy-feature-lif-ca61e-cle-across-virtual-remounts-chromium/trace.zip",
+      "bytes": 2600511,
+      "sha256": "09c17bf09c9255fc44db111113b28217491efaa7c9748f4cd5414555ff24a077"
+    }
+  ]
+}

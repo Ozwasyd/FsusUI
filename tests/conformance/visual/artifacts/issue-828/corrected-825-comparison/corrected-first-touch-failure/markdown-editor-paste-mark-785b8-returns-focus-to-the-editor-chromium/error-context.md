@@ -1,0 +1,1627 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: markdown-editor-paste-markdown.spec.ts >> touch path >> chooses Markdown import by touch and returns focus to the editor
+- Location: vue/tests/markdown-editor/markdown-editor-paste-markdown.spec.ts:414:7
+
+# Error details
+
+```
+Error: locator.evaluate: Error: Command strip is not mounted
+    at eval (eval at evaluate (:302:30), <anonymous>:4:31)
+    at UtilityScript.evaluate (<anonymous>:304:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - heading "FsusUI Component State Audit" [level=1] [ref=e5]
+    - paragraph [ref=e6]: 121 components · focus
+  - generic [ref=e7]:
+    - heading "Safe-area surfaces" [level=2] [ref=e8]
+    - generic [ref=e9]:
+      - button "Open Overlay" [ref=e10] [cursor=pointer]:
+        - generic [ref=e11]: Open Overlay
+      - button "Open Dialog" [ref=e12] [cursor=pointer]:
+        - generic [ref=e13]: Open Dialog
+      - button "Open Fullscreen Dialog" [ref=e14] [cursor=pointer]:
+        - generic [ref=e15]: Open Fullscreen Dialog
+      - button "Open MessageBox" [ref=e16] [cursor=pointer]:
+        - generic [ref=e17]: Open MessageBox
+      - button "Open Drawer LTR" [ref=e18] [cursor=pointer]:
+        - generic [ref=e19]: Open Drawer LTR
+      - button "Open Drawer RTL" [ref=e20] [cursor=pointer]:
+        - generic [ref=e21]: Open Drawer RTL
+      - button "Open Drawer TTB" [ref=e22] [cursor=pointer]:
+        - generic [ref=e23]: Open Drawer TTB
+      - button "Open Drawer BTT" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: Open Drawer BTT
+      - button "Open ImageViewer" [ref=e26] [cursor=pointer]:
+        - generic [ref=e27]: Open ImageViewer
+  - generic [ref=e28]:
+    - region "Markdown 编辑器" [ref=e29]:
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - button "加粗" [ref=e33] [cursor=pointer]
+          - button "斜体" [ref=e34] [cursor=pointer]
+          - button "标题" [ref=e35] [cursor=pointer]
+          - button "引用" [ref=e36] [cursor=pointer]
+          - button "代码" [ref=e37] [cursor=pointer]
+          - button "链接" [ref=e38] [cursor=pointer]
+        - button "格式工具，2 个工具" [ref=e39] [cursor=pointer]:
+          - generic [ref=e40]: 格式工具
+          - generic [ref=e41]: "2"
+      - generic [ref=e42]:
+        - textbox "Markdown 源码编辑区" [ref=e43]:
+          - /placeholder: ""
+          - text: A😀éאב - 列表
+        - button [ref=e44]
+      - generic [ref=e47]:
+        - generic [ref=e48]: 10 字符
+        - generic [ref=e49]: 3 词
+    - generic "Markdown transaction controls" [ref=e50]:
+      - button "Programmatic insert" [ref=e51]
+      - button "Insert placeholder" [ref=e52]
+      - button "Replace placeholder" [ref=e53]
+      - button "Dispatch stale replacement" [ref=e54]
+      - button "Undo" [ref=e55]
+      - button "Redo" [ref=e56]
+      - button "External reset" [ref=e57]
+      - button "Load 100k document" [ref=e58]
+      - button "Attachment progress" [disabled] [ref=e59]
+      - button "Resolve attachment" [disabled] [ref=e60]
+      - button "Load image figure" [ref=e61]
+    - status [ref=e62]: "12"
+    - status [ref=e63]: "0"
+    - status [ref=e64]: "{\"canRedo\":false,\"canUndo\":false,\"redoDepth\":0,\"retainedUnits\":0,\"undoDepth\":0}"
+    - status [ref=e65]: "null"
+    - status [ref=e66]: "null"
+    - status [ref=e67]: "null"
+  - generic [ref=e68]:
+    - article [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]: FixedSizeList
+        - generic [ref=e72]: focus
+      - generic [ref=e77]:
+        - generic [ref=e78]: Fixed row 0
+        - generic [ref=e79]: Fixed row 1
+        - generic [ref=e80]: Fixed row 2
+        - generic [ref=e81]: Fixed row 3
+        - generic [ref=e82]: Fixed row 4
+        - generic [ref=e83]: Fixed row 5
+    - article [ref=e85]:
+      - generic [ref=e86]:
+        - generic [ref=e87]: DynamicSizeList
+        - generic [ref=e88]: focus
+      - generic [ref=e93]:
+        - generic [ref=e94]: Dynamic row 0
+        - generic [ref=e95]: Dynamic row 1
+        - generic [ref=e96]: Dynamic row 2
+        - generic [ref=e97]: Dynamic row 3
+        - generic [ref=e98]: Dynamic row 4
+        - generic [ref=e99]: Dynamic row 5
+    - article [ref=e101]:
+      - generic [ref=e102]:
+        - generic [ref=e103]: FixedSizeGrid
+        - generic [ref=e104]: focus
+      - generic [ref=e109]:
+        - generic [ref=e110]: 0,0
+        - generic [ref=e111]: 0,1
+        - generic [ref=e112]: 0,2
+        - generic [ref=e113]: 0,3
+        - generic [ref=e114]: 0,4
+        - generic [ref=e115]: 1,0
+        - generic [ref=e116]: 1,1
+        - generic [ref=e117]: 1,2
+        - generic [ref=e118]: 1,3
+        - generic [ref=e119]: 1,4
+        - generic [ref=e120]: 2,0
+        - generic [ref=e121]: 2,1
+        - generic [ref=e122]: 2,2
+        - generic [ref=e123]: 2,3
+        - generic [ref=e124]: 2,4
+        - generic [ref=e125]: 3,0
+        - generic [ref=e126]: 3,1
+        - generic [ref=e127]: 3,2
+        - generic [ref=e128]: 3,3
+        - generic [ref=e129]: 3,4
+        - generic [ref=e130]: 4,0
+        - generic [ref=e131]: 4,1
+        - generic [ref=e132]: 4,2
+        - generic [ref=e133]: 4,3
+        - generic [ref=e134]: 4,4
+        - generic [ref=e135]: 5,0
+        - generic [ref=e136]: 5,1
+        - generic [ref=e137]: 5,2
+        - generic [ref=e138]: 5,3
+        - generic [ref=e139]: 5,4
+    - article [ref=e142]:
+      - generic [ref=e143]:
+        - generic [ref=e144]: DynamicSizeGrid
+        - generic [ref=e145]: focus
+      - generic [ref=e150]:
+        - generic [ref=e151]: 0,0
+        - generic [ref=e152]: 0,1
+        - generic [ref=e153]: 0,2
+        - generic [ref=e154]: 0,3
+        - generic [ref=e155]: 0,4
+        - generic [ref=e156]: 1,0
+        - generic [ref=e157]: 1,1
+        - generic [ref=e158]: 1,2
+        - generic [ref=e159]: 1,3
+        - generic [ref=e160]: 1,4
+        - generic [ref=e161]: 2,0
+        - generic [ref=e162]: 2,1
+        - generic [ref=e163]: 2,2
+        - generic [ref=e164]: 2,3
+        - generic [ref=e165]: 2,4
+        - generic [ref=e166]: 3,0
+        - generic [ref=e167]: 3,1
+        - generic [ref=e168]: 3,2
+        - generic [ref=e169]: 3,3
+        - generic [ref=e170]: 3,4
+        - generic [ref=e171]: 4,0
+        - generic [ref=e172]: 4,1
+        - generic [ref=e173]: 4,2
+        - generic [ref=e174]: 4,3
+        - generic [ref=e175]: 4,4
+        - generic [ref=e176]: 5,0
+        - generic [ref=e177]: 5,1
+        - generic [ref=e178]: 5,2
+        - generic [ref=e179]: 5,3
+        - generic [ref=e180]: 5,4
+    - article [ref=e183]:
+      - generic [ref=e184]:
+        - generic [ref=e185]: ElVisuallyHidden
+        - generic [ref=e186]: focus
+      - generic [ref=e187]:
+        - generic [ref=e188]: Hidden audit text
+        - text: Visible companion text
+    - article [ref=e189]:
+      - generic [ref=e190]:
+        - generic [ref=e191]: ElAffix
+        - generic [ref=e192]: focus
+      - button "Affix action" [ref=e196] [cursor=pointer]:
+        - generic [ref=e197]: Affix action
+    - article [ref=e198]:
+      - generic [ref=e199]:
+        - generic [ref=e200]: ElAlert
+        - generic [ref=e201]: focus
+      - alert [ref=e203]:
+        - img [ref=e205]
+        - generic [ref=e207]:
+          - generic [ref=e208]: Focused feedback
+          - img [ref=e210] [cursor=pointer]
+    - article [ref=e212]:
+      - generic [ref=e213]:
+        - generic [ref=e214]: ElAside
+        - generic [ref=e215]: focus
+      - generic [ref=e217]:
+        - complementary [ref=e218]: Aside
+        - main [ref=e219]: Main
+    - article [ref=e220]:
+      - generic [ref=e221]:
+        - generic [ref=e222]: ElAutocomplete
+        - generic [ref=e223]: focus
+      - combobox [ref=e225]:
+        - textbox [ref=e228]
+    - article [ref=e229]:
+      - generic [ref=e230]:
+        - generic [ref=e231]: ElAvatar
+        - generic [ref=e232]: focus
+      - generic [ref=e234]:
+        - img [ref=e237]
+        - generic [ref=e239]: UI
+    - article [ref=e240]:
+      - generic [ref=e241]:
+        - generic [ref=e242]: ElBacktop
+        - generic [ref=e243]: focus
+      - generic [ref=e245]:
+        - generic [ref=e246]: Scroll shell
+        - button [ref=e247] [cursor=pointer]:
+          - img [ref=e249]
+    - article [ref=e251]:
+      - generic [ref=e252]:
+        - generic [ref=e253]: ElBadge
+        - generic [ref=e254]: focus
+      - generic [ref=e256]:
+        - button "Inbox" [ref=e257] [cursor=pointer]:
+          - generic [ref=e258]: Inbox
+        - superscript [ref=e259]: "8"
+    - article [ref=e260]:
+      - generic [ref=e261]:
+        - generic [ref=e262]: ElBreadcrumb
+        - generic [ref=e263]: focus
+      - navigation "Breadcrumb" [ref=e265]:
+        - list [ref=e266]:
+          - listitem [ref=e267]:
+            - generic [ref=e268]: Home
+            - generic: /
+          - listitem [ref=e269]:
+            - generic "Library" [ref=e270]
+    - article [ref=e271]:
+      - generic [ref=e272]:
+        - generic [ref=e273]: ElBreadcrumbItem
+        - generic [ref=e274]: focus
+      - navigation "Breadcrumb" [ref=e276]:
+        - list [ref=e277]:
+          - listitem [ref=e278]:
+            - link "Current item" [ref=e279]
+    - article [ref=e280]:
+      - generic [ref=e281]:
+        - generic [ref=e282]: ElButton
+        - generic [ref=e283]: focus
+      - button "Button" [ref=e285] [cursor=pointer]:
+        - generic [ref=e286]: Button
+    - article [ref=e287]:
+      - generic [ref=e288]:
+        - generic [ref=e289]: ElButtonGroup
+        - generic [ref=e290]: focus
+      - generic [ref=e292]:
+        - button "Prev" [ref=e293] [cursor=pointer]:
+          - img [ref=e295]
+          - generic [ref=e297]: Prev
+        - button "Next" [ref=e298] [cursor=pointer]:
+          - generic [ref=e299]:
+            - text: Next
+            - img [ref=e301]
+    - article [ref=e303]:
+      - generic [ref=e304]:
+        - generic [ref=e305]: ElCalendar
+        - generic [ref=e306]: focus
+      - generic [ref=e309]:
+        - generic [ref=e311]: 2026年5月
+        - generic [ref=e312]:
+          - table [ref=e313]:
+            - rowgroup [ref=e314]:
+              - columnheader "一" [ref=e315]
+              - columnheader "二" [ref=e316]
+              - columnheader "三" [ref=e317]
+              - columnheader "四" [ref=e318]
+              - columnheader "五" [ref=e319]
+              - columnheader "六" [ref=e320]
+              - columnheader "日" [ref=e321]
+            - rowgroup [ref=e322]:
+              - row "17 18 19 20 21 22 23" [ref=e323]:
+                - cell "17" [ref=e324]:
+                  - generic [ref=e325]: "17"
+                - cell "18" [ref=e326]:
+                  - generic [ref=e327]: "18"
+                - cell "19" [ref=e328]:
+                  - generic [ref=e329]: "19"
+                - cell "20" [ref=e330]:
+                  - generic [ref=e331]: "20"
+                - cell "21" [ref=e332]:
+                  - generic [ref=e333]: "21"
+                - cell "22" [ref=e334]:
+                  - generic [ref=e335]: "22"
+                - cell "23" [ref=e336]:
+                  - generic [ref=e337]: "23"
+              - row "24 25 26 27 28 29 30" [ref=e338]:
+                - cell "24" [ref=e339]:
+                  - generic [ref=e340]: "24"
+                - cell "25" [ref=e341]:
+                  - generic [ref=e342]: "25"
+                - cell "26" [ref=e343]:
+                  - generic [ref=e344]: "26"
+                - cell "27" [ref=e345]:
+                  - generic [ref=e346]: "27"
+                - cell "28" [ref=e347]:
+                  - generic [ref=e348]: "28"
+                - cell "29" [ref=e349]:
+                  - generic [ref=e350]: "29"
+                - cell "30" [ref=e351]:
+                  - generic [ref=e352]: "30"
+              - row "31 1 2 3 4 5 6" [ref=e353]:
+                - cell "31" [ref=e354]:
+                  - generic [ref=e355]: "31"
+                - cell "1" [ref=e356]:
+                  - generic [ref=e357]: "1"
+                - cell "2" [ref=e358]:
+                  - generic [ref=e359]: "2"
+                - cell "3" [ref=e360]:
+                  - generic [ref=e361]: "3"
+                - cell "4" [ref=e362]:
+                  - generic [ref=e363]: "4"
+                - cell "5" [ref=e364]:
+                  - generic [ref=e365]: "5"
+                - cell "6" [ref=e366]:
+                  - generic [ref=e367]: "6"
+          - table:
+            - rowgroup
+    - article [ref=e368]:
+      - generic [ref=e369]:
+        - generic [ref=e370]: ElCard
+        - generic [ref=e371]: focus
+      - generic [ref=e373]:
+        - generic [ref=e374]: Card header
+        - paragraph [ref=e376]: Curated surface content
+    - article [ref=e377]:
+      - generic [ref=e378]:
+        - generic [ref=e379]: ElCarousel
+        - generic [ref=e380]: focus
+      - generic [ref=e382]:
+        - generic [ref=e383]:
+          - generic [ref=e385]: Slide 1
+          - generic [ref=e387]: Slide 2
+          - generic [ref=e389]: Slide 3
+        - list [ref=e390]:
+          - listitem [ref=e391] [cursor=pointer]:
+            - button "切换到第 1 张" [ref=e392]
+          - listitem [ref=e393] [cursor=pointer]:
+            - button "切换到第 2 张" [ref=e394]
+          - listitem [ref=e395] [cursor=pointer]:
+            - button "切换到第 3 张" [ref=e396]
+    - article [ref=e397]:
+      - generic [ref=e398]:
+        - generic [ref=e399]: ElCarouselItem
+        - generic [ref=e400]: focus
+      - generic [ref=e402]:
+        - generic [ref=e405]: Carousel item
+        - list [ref=e406]:
+          - listitem [ref=e407] [cursor=pointer]:
+            - button "切换到第 1 张" [ref=e408]
+    - article [ref=e409]:
+      - generic [ref=e410]:
+        - generic [ref=e411]: ElCascader
+        - generic [ref=e412]: focus
+      - generic [ref=e416]:
+        - textbox "Cascader" [ref=e417] [cursor=pointer]
+        - img [ref=e420]
+    - article [ref=e422]:
+      - generic [ref=e423]:
+        - generic [ref=e424]: ElCascaderPanel
+        - generic [ref=e425]: focus
+      - menu [ref=e430]:
+        - menuitem "Guide" [ref=e431] [cursor=pointer]:
+          - generic [ref=e432]: Guide
+          - img [ref=e434]
+    - article [ref=e436]:
+      - generic [ref=e437]:
+        - generic [ref=e438]: ElCheckbox
+        - generic [ref=e439]: focus
+      - generic [ref=e441] [cursor=pointer]:
+        - generic [ref=e442]:
+          - checkbox "Checkbox"
+        - generic [ref=e444]: Checkbox
+    - article [ref=e445]:
+      - generic [ref=e446]:
+        - generic [ref=e447]: ElCheckboxButton
+        - generic [ref=e448]: focus
+      - group "checkbox-group" [ref=e450]:
+        - generic [ref=e451]:
+          - checkbox "推送到首页" [ref=e452]
+          - generic [ref=e453] [cursor=pointer]: 推送到首页
+    - article [ref=e454]:
+      - generic [ref=e455]:
+        - generic [ref=e456]: ElCheckboxGroup
+        - generic [ref=e457]: focus
+      - group "checkbox-group" [ref=e459]:
+        - generic [ref=e460] [cursor=pointer]:
+          - generic [ref=e461]:
+            - checkbox "A" [checked]
+          - generic [ref=e463]: A
+        - generic [ref=e464] [cursor=pointer]:
+          - generic [ref=e465]:
+            - checkbox "B"
+          - generic [ref=e467]: B
+    - article [ref=e468]:
+      - generic [ref=e469]:
+        - generic [ref=e470]: ElCheckTag
+        - generic [ref=e471]: focus
+      - checkbox "Check tag" [ref=e473] [cursor=pointer]
+    - article [ref=e474]:
+      - generic [ref=e475]:
+        - generic [ref=e476]: ElCol
+        - generic [ref=e477]: focus
+      - generic [ref=e479]:
+        - generic [ref=e481]: "12"
+        - generic [ref=e483]: "12"
+    - article [ref=e484]:
+      - generic [ref=e485]:
+        - generic [ref=e486]: ElCollapse
+        - generic [ref=e487]: focus
+      - generic [ref=e489]:
+        - generic [ref=e490]:
+          - button "Consistency" [expanded] [ref=e491] [cursor=pointer]:
+            - text: Consistency
+            - img [ref=e493]
+          - region "Consistency" [ref=e495]:
+            - generic [ref=e496]: First panel
+        - button "Interaction" [ref=e498] [cursor=pointer]:
+          - text: Interaction
+          - img [ref=e500]
+    - article [ref=e502]:
+      - generic [ref=e503]:
+        - generic [ref=e504]: ElCollapseItem
+        - generic [ref=e505]: focus
+      - button "Collapse item" [ref=e509] [cursor=pointer]:
+        - text: Collapse item
+        - img [ref=e511]
+    - article [ref=e513]:
+      - generic [ref=e514]:
+        - generic [ref=e515]: ElCollapseTransition
+        - generic [ref=e516]: focus
+      - button "Toggle" [ref=e518] [cursor=pointer]:
+        - generic [ref=e519]: Toggle
+    - article [ref=e520]:
+      - generic [ref=e521]:
+        - generic [ref=e522]: ElColorPicker
+        - generic [ref=e523]: focus
+      - button "el.colorpicker.defaultLabel" [ref=e525]
+    - article [ref=e529]:
+      - generic [ref=e530]:
+        - generic [ref=e531]: ElCollectionToolbar
+        - generic [ref=e532]: focus
+      - generic [ref=e533]:
+        - group "Collection controls" [ref=e534]:
+          - textbox "Search" [ref=e538]
+          - group "State" [ref=e540]:
+            - generic [ref=e541]: State
+            - radiogroup "Filter state" [ref=e543]:
+              - radio "All" [checked] [ref=e544] [cursor=pointer]
+              - radio "Open" [ref=e545] [cursor=pointer]
+              - radio "Closed" [ref=e546] [cursor=pointer]
+          - button "Refresh" [ref=e548] [cursor=pointer]:
+            - generic [ref=e549]: Refresh
+        - generic [ref=e551]:
+          - paragraph [ref=e552]: Results
+          - generic [ref=e553]: 12 items
+        - navigation "Results pagination" [ref=e554]:
+          - generic [ref=e555]: Page 1 of 4
+          - generic [ref=e557]:
+            - button "上一页" [disabled] [ref=e558]:
+              - generic:
+                - img
+            - list [ref=e559]:
+              - listitem "第 1 页" [ref=e560]: "1"
+              - listitem "第 2 页" [ref=e561] [cursor=pointer]: "2"
+              - listitem "第 3 页" [ref=e562] [cursor=pointer]: "3"
+              - listitem "第 4 页" [ref=e563] [cursor=pointer]: "4"
+            - button "下一页" [ref=e564] [cursor=pointer]:
+              - generic:
+                - img
+    - article [ref=e565]:
+      - generic [ref=e566]:
+        - generic [ref=e567]: ElConfigProvider
+        - generic [ref=e568]: focus
+      - button "Provider child" [ref=e570] [cursor=pointer]:
+        - generic [ref=e571]: Provider child
+    - article [ref=e572]:
+      - generic [ref=e573]:
+        - generic [ref=e574]: ElContainer
+        - generic [ref=e575]: focus
+      - generic [ref=e577]:
+        - generic [ref=e578]: Header
+        - main [ref=e579]: Main
+        - generic [ref=e580]: Footer
+    - article [ref=e581]:
+      - generic [ref=e582]:
+        - generic [ref=e583]: ElCountdown
+        - generic [ref=e584]: focus
+      - generic [ref=e586]:
+        - generic [ref=e587]: Countdown
+        - generic [ref=e588]: 23:59:58
+    - article [ref=e589]:
+      - generic [ref=e590]:
+        - generic [ref=e591]: ElDatePicker
+        - generic [ref=e592]: focus
+      - combobox [ref=e594]:
+        - generic [ref=e595]:
+          - img [ref=e598]
+          - textbox "Pick day" [ref=e600]: 2026-05-20
+    - article [ref=e601]:
+      - generic [ref=e602]:
+        - generic [ref=e603]: ElDescriptions
+        - generic [ref=e604]: focus
+      - generic [ref=e606]:
+        - generic [ref=e608]: Profile
+        - generic "Description fields" [ref=e610]:
+          - generic [ref=e611]:
+            - term [ref=e612]: Name
+            - definition [ref=e613]: FsusUI
+          - generic [ref=e614]:
+            - term [ref=e615]: State
+            - definition [ref=e616]: Ready
+    - article [ref=e617]:
+      - generic [ref=e618]:
+        - generic [ref=e619]: ElDescriptionsItem
+        - generic [ref=e620]: focus
+      - generic "Description fields" [ref=e624]:
+        - generic [ref=e625]:
+          - term [ref=e626]: 文章状态
+          - definition [ref=e627]: 等待复核
+    - article [ref=e628]:
+      - generic [ref=e629]:
+        - generic [ref=e630]: ElDialog
+        - generic [ref=e631]: focus
+      - button "Open dialog" [ref=e633] [cursor=pointer]:
+        - generic [ref=e634]: Open dialog
+    - article [ref=e635]:
+      - generic [ref=e636]:
+        - generic [ref=e637]: ElDivider
+        - generic [ref=e638]: focus
+      - generic [ref=e639]:
+        - text: Before
+        - separator [ref=e640]:
+          - generic [ref=e641]: Divider
+        - text: After
+    - article [ref=e642]:
+      - generic [ref=e643]:
+        - generic [ref=e644]: ElDrawer
+        - generic [ref=e645]: focus
+      - button "Open drawer" [ref=e647] [cursor=pointer]:
+        - generic [ref=e648]: Open drawer
+    - article [ref=e649]:
+      - generic [ref=e650]:
+        - generic [ref=e651]: ElDropdown
+        - generic [ref=e652]: focus
+      - button "Dropdown" [ref=e655] [cursor=pointer]:
+        - generic [ref=e656]:
+          - text: Dropdown
+          - img [ref=e658]
+    - article [ref=e660]:
+      - generic [ref=e661]:
+        - generic [ref=e662]: ElDropdownItem
+        - generic [ref=e663]: focus
+      - button "Dropdown item" [ref=e666] [cursor=pointer]:
+        - generic [ref=e667]: Dropdown item
+    - article [ref=e668]:
+      - generic [ref=e669]:
+        - generic [ref=e670]: ElDropdownMenu
+        - generic [ref=e671]: focus
+      - button "Dropdown menu" [ref=e674] [cursor=pointer]:
+        - generic [ref=e675]: Dropdown menu
+    - article [ref=e676]:
+      - generic [ref=e677]:
+        - generic [ref=e678]: ElEmpty
+        - generic [ref=e679]: focus
+      - generic [ref=e681]:
+        - img [ref=e683]
+        - generic [ref=e688]: No records
+    - article [ref=e689]:
+      - generic [ref=e690]:
+        - generic [ref=e691]: ElEmptyState
+        - generic [ref=e692]: focus
+      - generic [ref=e694]:
+        - paragraph [ref=e695]: No records
+        - paragraph [ref=e696]: Adjust filters or create a new item.
+        - button "Create item" [ref=e698] [cursor=pointer]:
+          - generic [ref=e699]: Create item
+    - article [ref=e700]:
+      - generic [ref=e701]:
+        - generic [ref=e702]: ElMetricList
+        - generic [ref=e703]: focus
+      - generic [ref=e705]:
+        - generic [ref=e706]:
+          - list [ref=e707]:
+            - listitem [ref=e708]:
+              - generic [ref=e709]:
+                - generic [ref=e710]: Metric Alpha
+                - strong [ref=e711]: P75 22ms
+              - generic [ref=e713]: Avg 23ms
+              - generic [ref=e714]: 58 samples
+            - listitem [ref=e715]:
+              - generic [ref=e716]:
+                - generic [ref=e717]: Metric Beta
+                - strong [ref=e718]: 99.4%
+              - generic [ref=e720]: Target 99%
+              - generic [ref=e721]: 12 checks
+          - generic [ref=e722]:
+            - generic [ref=e723]:
+              - term [ref=e724]: State
+              - definition [ref=e725]: Ready
+            - generic [ref=e726]:
+              - term [ref=e727]: Queue
+              - definition [ref=e728]: 0 / 0
+        - list [ref=e729]:
+          - listitem [ref=e730]:
+            - generic [ref=e731]: "1"
+            - generic [ref=e732]: Segment Alpha
+            - generic [ref=e733]: "245"
+          - listitem [ref=e736]:
+            - generic [ref=e737]: "2"
+            - generic [ref=e738]: Segment Beta
+            - generic [ref=e739]: "106"
+        - article [ref=e742]:
+          - generic [ref=e743]:
+            - generic [ref=e744]: Generic status
+            - generic [ref=e745]: Stable
+            - generic [ref=e746]: 2026-06-14 20:30
+          - generic [ref=e747]: Product-owned detail copy.
+          - button "Inspect" [ref=e749] [cursor=pointer]:
+            - generic [ref=e750]: Inspect
+        - list [ref=e751]:
+          - listitem [ref=e752]:
+            - generic [ref=e753]:
+              - generic [ref=e754]:
+                - strong [ref=e755]: diagnostic.event
+                - paragraph [ref=e756]: Recent event summary.
+                - generic [ref=e757]: warning - 17:48:11 - 3 times
+              - generic [ref=e759]:
+                - code [ref=e760]: diagnostic-node:runCheck:sample-0001
+                - button "Copy detail" [ref=e761] [cursor=pointer]: Copy
+            - group [ref=e763]:
+              - generic "Details" [ref=e764] [cursor=pointer]
+    - article [ref=e765]:
+      - generic [ref=e766]:
+        - generic [ref=e767]: ElFooter
+        - generic [ref=e768]: focus
+      - generic [ref=e770]:
+        - main [ref=e771]: Main
+        - generic [ref=e772]: Footer
+    - article [ref=e773]:
+      - generic [ref=e774]:
+        - generic [ref=e775]: ElForm
+        - generic [ref=e776]: focus
+      - generic [ref=e779]:
+        - generic [ref=e780]: Name
+        - textbox "Name" [ref=e784]
+    - article [ref=e785]:
+      - generic [ref=e786]:
+        - generic [ref=e787]: ElFormItem
+        - generic [ref=e788]: focus
+      - generic [ref=e791]:
+        - generic [ref=e792]: Region
+        - generic [ref=e797] [cursor=pointer]:
+          - combobox "Region" [ref=e798]
+          - img [ref=e801]
+    - article [ref=e803]:
+      - generic [ref=e804]:
+        - generic [ref=e805]: ElHeader
+        - generic [ref=e806]: focus
+      - generic [ref=e808]:
+        - generic [ref=e809]: Header
+        - main [ref=e810]: Main
+    - article [ref=e811]:
+      - generic [ref=e812]:
+        - generic [ref=e813]: ElIcon
+        - generic [ref=e814]: focus
+      - img [ref=e817]
+    - article [ref=e819]:
+      - generic [ref=e820]:
+        - generic [ref=e821]: ElImage
+        - generic [ref=e822]: focus
+      - img [ref=e825] [cursor=pointer]
+    - article [ref=e826]:
+      - generic [ref=e827]:
+        - generic [ref=e828]: ElImageViewer
+        - generic [ref=e829]: focus
+      - generic [ref=e830]:
+        - img [ref=e832]
+        - button "Preview" [ref=e833] [cursor=pointer]:
+          - generic [ref=e834]: Preview
+    - article [ref=e835]:
+      - generic [ref=e836]:
+        - generic [ref=e837]: ElInboxLayout
+        - generic [ref=e838]: focus
+      - region "Generic item detail" [ref=e841]:
+        - region "评论权限讨论" [ref=e842]:
+          - generic [ref=e844]:
+            - heading "评论权限讨论" [level=3] [ref=e845]
+            - generic [ref=e847]: Ready
+          - generic [ref=e849]:
+            - generic [ref=e850]: "Kind: Generic"
+            - generic [ref=e851]: "Source: Neutral"
+          - list [ref=e853]:
+            - listitem [ref=e854]:
+              - generic [ref=e855]:
+                - generic [ref=e856]: A
+                - generic [ref=e857]: 09:00
+              - generic [ref=e858]: Neutral timeline content.
+            - listitem [ref=e859]:
+              - generic [ref=e860]:
+                - generic [ref=e861]: B
+                - generic [ref=e862]: 09:10
+              - generic [ref=e863]: Reply content with enough length to test wrapping in a compact panel.
+            - listitem [ref=e864]:
+              - generic [ref=e865]: Generic state changed.
+          - generic [ref=e867]:
+            - strong [ref=e869]: Reply
+            - textbox "Reply body" [ref=e872]
+            - button "Send" [ref=e874] [cursor=pointer]:
+              - generic [ref=e875]: Send
+    - article [ref=e876]:
+      - generic [ref=e877]:
+        - generic [ref=e878]: ElInput
+        - generic [ref=e879]: focus
+      - textbox "Input" [ref=e883]
+    - article [ref=e884]:
+      - generic [ref=e885]:
+        - generic [ref=e886]: ElInputNumber
+        - generic [ref=e887]: focus
+      - generic [ref=e889]:
+        - button "el.inputNumber.decrease" [ref=e890] [cursor=pointer]:
+          - img [ref=e892]
+        - button "el.inputNumber.increase" [ref=e894] [cursor=pointer]:
+          - img [ref=e896]
+        - spinbutton [ref=e900]: "2"
+    - article [ref=e901]:
+      - generic [ref=e902]:
+        - generic [ref=e903]: ElLink
+        - generic [ref=e904]: focus
+      - link "Link action" [ref=e906] [cursor=pointer]:
+        - /url: "#audit-link"
+        - generic [ref=e907]: Link action
+    - article [ref=e908]:
+      - generic [ref=e909]:
+        - generic [ref=e910]: ElMain
+        - generic [ref=e911]: focus
+      - main [ref=e914]: Main surface
+    - article [ref=e915]:
+      - generic [ref=e916]:
+        - generic [ref=e917]: ElMarkdownEditor
+        - generic [ref=e918]: focus
+      - region "Markdown 编辑器" [ref=e921]:
+        - generic [ref=e922]:
+          - generic [ref=e923]:
+            - generic [ref=e924]:
+              - button "加粗" [ref=e925] [cursor=pointer]
+              - button "斜体" [ref=e926] [cursor=pointer]
+              - button "标题" [ref=e927] [cursor=pointer]
+              - button "引用" [ref=e928] [cursor=pointer]
+              - button "代码" [ref=e929] [cursor=pointer]
+              - button "链接" [ref=e930] [cursor=pointer]
+            - button "格式工具，2 个工具" [ref=e931] [cursor=pointer]:
+              - generic [ref=e932]: 格式工具
+              - generic [ref=e933]: "2"
+          - tablist "Markdown 模式" [ref=e934]:
+            - tab "源码" [ref=e935] [cursor=pointer]
+            - tab "实时" [ref=e936] [cursor=pointer]
+            - tab "预览" [ref=e937] [cursor=pointer]
+          - generic [ref=e938]:
+            - button "上传图片" [ref=e939] [cursor=pointer]
+            - button "保存" [ref=e940] [cursor=pointer]
+            - button "提交" [ref=e941] [cursor=pointer]
+        - generic [ref=e942]:
+          - textbox "Markdown 源码编辑区" [ref=e943]:
+            - /placeholder: ""
+            - text: "## Editor Compact editable content."
+          - button [ref=e944]
+          - article [ref=e946]:
+            - generic [ref=e947]:
+              - heading "Editor" [level=2] [ref=e948]
+              - paragraph [ref=e949]: Compact editable content.
+        - generic [ref=e951]:
+          - generic [ref=e952]: 36 字符
+          - generic [ref=e953]: 4 词
+    - article [ref=e954]:
+      - generic [ref=e955]:
+        - generic [ref=e956]: ElMarkdownRenderer
+        - generic [ref=e957]: focus
+      - article [ref=e960]:
+        - generic [ref=e961]:
+          - heading "Markdown" [level=1] [ref=e962]
+          - paragraph [ref=e963]: Compact rendered content.
+    - article [ref=e964]:
+      - generic [ref=e965]:
+        - generic [ref=e966]: ElMenu
+        - generic [ref=e967]: focus
+      - menubar [ref=e969]:
+        - menuitem "Dashboard" [ref=e970] [cursor=pointer]
+        - menuitem "Workspace" [ref=e971]:
+          - generic [ref=e972] [cursor=pointer]:
+            - text: Workspace
+            - img [ref=e974]
+    - article [ref=e976]:
+      - generic [ref=e977]:
+        - generic [ref=e978]: ElMenuItem
+        - generic [ref=e979]: focus
+      - menubar [ref=e981]:
+        - menuitem "Overview" [ref=e982] [cursor=pointer]
+        - menuitem "Active item" [ref=e983] [cursor=pointer]
+    - article [ref=e984]:
+      - generic [ref=e985]:
+        - generic [ref=e986]: ElMenuItemGroup
+        - generic [ref=e987]: focus
+      - menubar [ref=e989]:
+        - menuitem "Group" [expanded] [ref=e990]:
+          - generic [ref=e991] [cursor=pointer]:
+            - text: Group
+            - img [ref=e993]
+          - menu [ref=e995]:
+            - listitem [ref=e996]:
+              - generic [ref=e997]: Group label
+              - list [ref=e998]:
+                - menuitem "Grouped item" [ref=e999] [cursor=pointer]
+    - article [ref=e1000]:
+      - generic [ref=e1001]:
+        - generic [ref=e1002]: ElOption
+        - generic [ref=e1003]: focus
+      - generic [ref=e1008] [cursor=pointer]:
+        - combobox "选择发布范围" [ref=e1009]
+        - img [ref=e1012]
+    - article [ref=e1014]:
+      - generic [ref=e1015]:
+        - generic [ref=e1016]: ElOptionGroup
+        - generic [ref=e1017]: focus
+      - generic [ref=e1022] [cursor=pointer]:
+        - combobox "选择推荐策略" [ref=e1023]
+        - img [ref=e1026]
+    - article [ref=e1028]:
+      - generic [ref=e1029]:
+        - generic [ref=e1030]: ElOverlay
+        - generic [ref=e1031]: focus
+      - button "Overlay trigger" [ref=e1034] [cursor=pointer]:
+        - generic [ref=e1035]: Overlay trigger
+    - article [ref=e1036]:
+      - generic [ref=e1037]:
+        - generic [ref=e1038]: ElPageHeader
+        - generic [ref=e1039]: focus
+      - generic [ref=e1043]:
+        - button "Back Back" [ref=e1044] [cursor=pointer]:
+          - generic "Back" [ref=e1045]:
+            - img [ref=e1047]
+          - generic [ref=e1050]: Back
+        - separator [ref=e1051]
+        - generic [ref=e1052]: Detail
+    - article [ref=e1053]:
+      - generic [ref=e1054]:
+        - generic [ref=e1055]: ElTaskPageHeader
+        - generic [ref=e1056]: focus
+      - generic [ref=e1058]:
+        - generic [ref=e1059]:
+          - heading "Review release evidence" [level=1] [ref=e1060]
+          - paragraph [ref=e1061]: Confirm the final production checks before publishing.
+        - button "Open evidence" [ref=e1063] [cursor=pointer]:
+          - generic [ref=e1064]: Open evidence
+    - article [ref=e1065]:
+      - generic [ref=e1066]:
+        - generic [ref=e1067]: ElPublicShell
+        - generic [ref=e1068]: focus
+      - generic [ref=e1070]:
+        - generic "Site header" [ref=e1071]:
+          - generic [ref=e1072]:
+            - generic [ref=e1073]:
+              - link "Fsus" [ref=e1076] [cursor=pointer]:
+                - /url: "#brand"
+              - group [ref=e1078]:
+                - button "Menu" [ref=e1079] [cursor=pointer]
+            - button "Go" [ref=e1082] [cursor=pointer]:
+              - generic [ref=e1083]: Go
+        - main [ref=e1084]:
+          - paragraph [ref=e1085]: Public shell content
+        - generic [ref=e1087]: Fsus
+    - article [ref=e1088]:
+      - generic [ref=e1089]:
+        - generic [ref=e1090]: ElPagination
+        - generic [ref=e1091]: focus
+      - generic [ref=e1093]:
+        - button "上一页" [disabled] [ref=e1094]:
+          - generic:
+            - img
+        - list [ref=e1095]:
+          - listitem "第 1 页" [ref=e1096]: "1"
+          - listitem "第 2 页" [ref=e1097] [cursor=pointer]: "2"
+          - listitem "第 3 页" [ref=e1098] [cursor=pointer]: "3"
+          - listitem "第 4 页" [ref=e1099] [cursor=pointer]: "4"
+          - listitem "第 5 页" [ref=e1100] [cursor=pointer]: "5"
+        - button "下一页" [ref=e1101] [cursor=pointer]:
+          - generic:
+            - img
+        - generic [ref=e1102]: 共 50 条
+    - article [ref=e1103]:
+      - generic [ref=e1104]:
+        - generic [ref=e1105]: ElPerceptionChallenge
+        - generic [ref=e1106]: focus
+      - generic [ref=e1108]:
+        - generic [ref=e1109]:
+          - generic [ref=e1110]:
+            - generic [ref=e1111]:
+              - paragraph [ref=e1112]: Signal
+              - heading "Challenge review" [level=3] [ref=e1113]
+            - button "Refresh" [ref=e1115] [cursor=pointer]:
+              - generic [ref=e1116]: Refresh
+          - generic [ref=e1117]:
+            - generic [ref=e1118]:
+              - paragraph [ref=e1119]: Read the prompt and respond.
+              - paragraph [ref=e1120]: Text task is ready for review.
+            - generic [ref=e1121]:
+              - textbox "Challenge answer" [ref=e1124]:
+                - /placeholder: ""
+              - button "Submit" [disabled] [ref=e1125]:
+                - generic [ref=e1126]: Submit
+        - generic [ref=e1127]:
+          - generic [ref=e1128]:
+            - generic [ref=e1129]:
+              - paragraph [ref=e1130]: Signal
+              - heading "Challenge review" [level=3] [ref=e1131]
+            - button "Refresh" [ref=e1133] [cursor=pointer]:
+              - generic [ref=e1134]: Refresh
+          - generic [ref=e1135]:
+            - generic [ref=e1136]:
+              - paragraph [ref=e1137]: Select the marked region.
+              - paragraph [ref=e1138]: Localization task is ready for review.
+            - button "Challenge image" [ref=e1139]:
+              - img "Localization target" [ref=e1140]
+        - generic [ref=e1141]:
+          - generic [ref=e1142]:
+            - generic [ref=e1143]:
+              - paragraph [ref=e1144]: Signal
+              - heading "Challenge review" [level=3] [ref=e1145]
+            - button "Refresh" [ref=e1147] [cursor=pointer]:
+              - generic [ref=e1148]: Refresh
+          - generic [ref=e1149]:
+            - generic [ref=e1150]:
+              - paragraph [ref=e1151]: Micro-interaction challenge
+              - paragraph [ref=e1152]: Confirm the interaction.
+              - paragraph [ref=e1153]: Micro-interaction task is ready for review.
+            - button "Confirm interaction" [ref=e1154] [cursor=pointer]:
+              - generic [ref=e1155]: Confirm interaction
+    - article [ref=e1156]:
+      - generic [ref=e1157]:
+        - generic [ref=e1158]: ElPopconfirm
+        - generic [ref=e1159]: focus
+      - button "Popconfirm" [ref=e1161] [cursor=pointer]:
+        - generic [ref=e1162]: Popconfirm
+    - article [ref=e1163]:
+      - generic [ref=e1164]:
+        - generic [ref=e1165]: ElPopover
+        - generic [ref=e1166]: focus
+      - button "Popover" [ref=e1168] [cursor=pointer]:
+        - generic [ref=e1169]: Popover
+    - article [ref=e1170]:
+      - generic [ref=e1171]:
+        - generic [ref=e1172]: ElPopper
+        - generic [ref=e1173]: focus
+      - generic [ref=e1174]:
+        - button "Raw popper" [ref=e1175] [cursor=pointer]:
+          - generic [ref=e1176]: Raw popper
+        - tooltip "Raw content" [ref=e1177]: Raw content
+    - article [ref=e1179]:
+      - generic [ref=e1180]:
+        - generic [ref=e1181]: ElPopperArrow
+        - generic [ref=e1182]: focus
+      - generic [ref=e1183]:
+        - button "Arrow" [ref=e1184] [cursor=pointer]:
+          - generic [ref=e1185]: Arrow
+        - tooltip "Arrow content" [ref=e1186]: Arrow content
+    - article [ref=e1188]:
+      - generic [ref=e1189]:
+        - generic [ref=e1190]: ElPopperContent
+        - generic [ref=e1191]: focus
+      - generic [ref=e1192]:
+        - button "Content trigger" [ref=e1193] [cursor=pointer]:
+          - generic [ref=e1194]: Content trigger
+        - tooltip "Popper content" [ref=e1195]
+    - article [ref=e1196]:
+      - generic [ref=e1197]:
+        - generic [ref=e1198]: ElPopperTrigger
+        - generic [ref=e1199]: focus
+      - button "Trigger" [ref=e1201] [cursor=pointer]:
+        - generic [ref=e1202]: Trigger
+    - article [ref=e1203]:
+      - generic [ref=e1204]:
+        - generic [ref=e1205]: ElProgress
+        - generic [ref=e1206]: focus
+      - generic [ref=e1207]:
+        - progressbar [ref=e1208]:
+          - generic [ref=e1212]: 44%
+        - progressbar [ref=e1213]:
+          - img [ref=e1215]
+          - generic [ref=e1218]: 28%
+    - article [ref=e1219]:
+      - generic [ref=e1220]:
+        - generic [ref=e1221]: ElRadio
+        - generic [ref=e1222]: focus
+      - generic [ref=e1224] [cursor=pointer]:
+        - radio "Radio" [ref=e1226]
+        - generic [ref=e1228]: Radio
+    - article [ref=e1229]:
+      - generic [ref=e1230]:
+        - generic [ref=e1231]: ElRadioButton
+        - generic [ref=e1232]: focus
+      - radiogroup "radio-group" [ref=e1234]:
+        - generic [ref=e1235]:
+          - radio "A" [checked] [ref=e1236]
+          - generic [ref=e1237] [cursor=pointer]: A
+        - generic [ref=e1238]:
+          - radio "B" [ref=e1239]
+          - generic [ref=e1240] [cursor=pointer]: B
+    - article [ref=e1241]:
+      - generic [ref=e1242]:
+        - generic [ref=e1243]: ElRadioGroup
+        - generic [ref=e1244]: focus
+      - radiogroup "radio-group" [ref=e1246]:
+        - generic [ref=e1247] [cursor=pointer]:
+          - radio "One" [checked] [ref=e1249]
+          - generic [ref=e1251]: One
+        - generic [ref=e1252] [cursor=pointer]:
+          - radio "Two" [ref=e1254]
+          - generic [ref=e1256]: Two
+    - article [ref=e1257]:
+      - generic [ref=e1258]:
+        - generic [ref=e1259]: ElRate
+        - generic [ref=e1260]: focus
+      - slider "rating" [ref=e1262]:
+        - img [ref=e1265] [cursor=pointer]
+        - img [ref=e1269] [cursor=pointer]
+        - img [ref=e1273] [cursor=pointer]
+        - img [ref=e1277] [cursor=pointer]
+        - img [ref=e1281] [cursor=pointer]
+    - article [ref=e1283]:
+      - generic [ref=e1284]:
+        - generic [ref=e1285]: ElResult
+        - generic [ref=e1286]: focus
+      - generic [ref=e1288]:
+        - img [ref=e1290]
+        - generic [ref=e1292]: Success
+        - generic [ref=e1293]: Result detail
+        - button "Confirm" [ref=e1295] [cursor=pointer]:
+          - generic [ref=e1296]: Confirm
+    - article [ref=e1297]:
+      - generic [ref=e1298]:
+        - generic [ref=e1299]: ElResponsiveCollection
+        - generic [ref=e1300]: focus
+      - generic [ref=e1305]:
+        - table [ref=e1307]:
+          - rowgroup [ref=e1311]:
+            - row "Name State" [ref=e1312]:
+              - columnheader "Name" [ref=e1313]:
+                - generic [ref=e1314]: Name
+              - columnheader "State" [ref=e1315]:
+                - generic [ref=e1316]: State
+        - table [ref=e1321]:
+          - rowgroup [ref=e1325]:
+            - row "Alpha Ready" [ref=e1326]:
+              - cell "Alpha" [ref=e1327]:
+                - generic [ref=e1328]: Alpha
+              - cell "Ready" [ref=e1329]:
+                - generic [ref=e1330]: Ready
+            - row "Beta Review" [ref=e1331]:
+              - cell "Beta" [ref=e1332]:
+                - generic [ref=e1333]: Beta
+              - cell "Review" [ref=e1334]:
+                - generic [ref=e1335]: Review
+    - article [ref=e1336]:
+      - generic [ref=e1337]:
+        - generic [ref=e1338]: ElRow
+        - generic [ref=e1339]: focus
+      - generic [ref=e1341]:
+        - generic [ref=e1343]: "8"
+        - generic [ref=e1345]: "16"
+    - article [ref=e1346]:
+      - generic [ref=e1347]:
+        - generic [ref=e1348]: ElScrollbar
+        - generic [ref=e1349]: focus
+      - generic [ref=e1353]:
+        - generic [ref=e1354]: Scroll item 1
+        - generic [ref=e1355]: Scroll item 2
+        - generic [ref=e1356]: Scroll item 3
+        - generic [ref=e1357]: Scroll item 4
+        - generic [ref=e1358]: Scroll item 5
+        - generic [ref=e1359]: Scroll item 6
+    - article [ref=e1360]:
+      - generic [ref=e1361]:
+        - generic [ref=e1362]: ElSectionNav
+        - generic [ref=e1363]: focus
+      - generic [ref=e1365]:
+        - navigation "Settings audit sections" [ref=e1366]:
+          - link "Overview" [ref=e1367] [cursor=pointer]:
+            - /url: "#audit-overview"
+          - link "Resources" [ref=e1368] [cursor=pointer]:
+            - /url: "#audit-resources"
+          - generic: Disabled
+        - generic [ref=e1369]:
+          - generic [ref=e1370]:
+            - generic [ref=e1371]:
+              - heading "Generic settings" [level=3] [ref=e1372]
+              - paragraph [ref=e1373]: Reusable layout for copy supplied by the product.
+            - button "Update" [ref=e1375] [cursor=pointer]:
+              - generic [ref=e1376]: Update
+          - generic [ref=e1377]:
+            - generic [ref=e1379]:
+              - heading "Standalone header" [level=4] [ref=e1380]
+              - paragraph [ref=e1381]: Header primitive without an eyebrow.
+            - generic [ref=e1382]:
+              - generic [ref=e1384]:
+                - heading "Form group" [level=4] [ref=e1385]
+                - paragraph [ref=e1386]: Labels and inputs remain owned by the form.
+              - generic [ref=e1388]:
+                - text: Label
+                - textbox "Label" [ref=e1389]
+            - list [ref=e1390]:
+              - listitem [ref=e1391]:
+                - generic [ref=e1392]:
+                  - generic [ref=e1393]:
+                    - generic [ref=e1394]:
+                      - strong [ref=e1395]: Resource Alpha
+                      - generic [ref=e1397]: Ready
+                    - generic [ref=e1398]: Updated recently
+                    - generic [ref=e1399]:
+                      - generic [ref=e1400]:
+                        - term [ref=e1401]: Created
+                        - definition [ref=e1402]: 2026-01-01
+                      - generic [ref=e1403]:
+                        - term [ref=e1404]: Fingerprint
+                        - definition [ref=e1405]: "-"
+                  - group "Resource actions" [ref=e1407]:
+                    - button "Edit" [ref=e1408] [cursor=pointer]:
+                      - generic [ref=e1409]: Edit
+              - listitem [ref=e1410]:
+                - generic [ref=e1412]:
+                  - strong [ref=e1414]: Empty resource group
+                  - generic [ref=e1415]:
+                    - paragraph [ref=e1416]: No resources
+                    - paragraph [ref=e1417]: Add product-owned copy here.
+        - generic [ref=e1418]:
+          - generic [ref=e1419]:
+            - heading "Risk area" [level=3] [ref=e1420]
+            - paragraph [ref=e1421]: Use explicit text in addition to color.
+          - generic [ref=e1422]:
+            - note [ref=e1423]:
+              - strong [ref=e1424]: Review
+              - generic [ref=e1425]: Confirm consequences before continuing.
+            - generic [ref=e1426]:
+              - generic [ref=e1427]:
+                - strong [ref=e1428]: Destructive action
+                - paragraph [ref=e1429]: Product copy explains the outcome and recovery path.
+              - button "Continue" [ref=e1431] [cursor=pointer]:
+                - generic [ref=e1432]: Continue
+            - generic [ref=e1433]:
+              - generic [ref=e1434]: Confirmation phrase
+              - paragraph [ref=e1435]: Type the exact phrase to continue.
+              - code [ref=e1436]: CONFIRM
+              - textbox "Confirmation phrase" [ref=e1437]: CONF
+    - article [ref=e1438]:
+      - generic [ref=e1439]:
+        - generic [ref=e1440]: ElSiteHeader
+        - generic [ref=e1441]: focus
+      - generic "Audit site header" [ref=e1443]:
+        - generic [ref=e1445]:
+          - link "FsusUI" [ref=e1448] [cursor=pointer]:
+            - /url: "#audit-brand"
+          - button "Menu" [ref=e1450] [cursor=pointer]:
+            - generic [ref=e1451]: Menu
+    - article [ref=e1452]:
+      - generic [ref=e1453]:
+        - generic [ref=e1454]: ElSelect
+        - generic [ref=e1455]: focus
+      - generic [ref=e1460] [cursor=pointer]:
+        - combobox "Select" [ref=e1461]
+        - img [ref=e1464]
+    - article [ref=e1466]:
+      - generic [ref=e1467]:
+        - generic [ref=e1468]: ElSelectV2
+        - generic [ref=e1469]: focus
+      - generic [ref=e1472] [cursor=pointer]:
+        - combobox [ref=e1474]
+        - img [ref=e1477]
+    - article [ref=e1479]:
+      - generic [ref=e1480]:
+        - generic [ref=e1481]: ElSlider
+        - generic [ref=e1482]: focus
+      - slider "el.slider.defaultLabel" [ref=e1487] [cursor=pointer]
+    - article [ref=e1489]:
+      - generic [ref=e1490]:
+        - generic [ref=e1491]: ElSkeleton
+        - generic [ref=e1492]: focus
+      - img [ref=e1496]
+    - article [ref=e1499]:
+      - generic [ref=e1500]:
+        - generic [ref=e1501]: ElSkeletonItem
+        - generic [ref=e1502]: focus
+    - article [ref=e1506]:
+      - generic [ref=e1507]:
+        - generic [ref=e1508]: ElSpace
+        - generic [ref=e1509]: focus
+      - generic [ref=e1511]:
+        - button "A" [ref=e1513] [cursor=pointer]:
+          - generic [ref=e1514]: A
+        - button "B" [ref=e1516] [cursor=pointer]:
+          - generic [ref=e1517]: B
+    - article [ref=e1518]:
+      - generic [ref=e1519]:
+        - generic [ref=e1520]: ElStatistic
+        - generic [ref=e1521]: focus
+      - generic [ref=e1523]:
+        - generic [ref=e1524]: Active users
+        - generic [ref=e1525]: 128,000
+    - article [ref=e1526]:
+      - generic [ref=e1527]:
+        - generic [ref=e1528]: ElStep
+        - generic [ref=e1529]: focus
+      - list [ref=e1531]:
+        - listitem [ref=e1532]:
+          - generic [ref=e1533]:
+            - generic [ref=e1537]: "1"
+            - generic [ref=e1539]: Draft
+            - generic [ref=e1540]: finish
+        - listitem [ref=e1541]:
+          - generic [ref=e1542]:
+            - generic [ref=e1546]: "2"
+            - generic [ref=e1548]: Review
+            - generic [ref=e1549]: process
+        - listitem [ref=e1550]:
+          - generic [ref=e1551]:
+            - generic [ref=e1554]: "3"
+            - generic [ref=e1556]: Ship
+            - generic [ref=e1557]: wait
+    - article [ref=e1558]:
+      - generic [ref=e1559]:
+        - generic [ref=e1560]: ElSteps
+        - generic [ref=e1561]: focus
+      - list [ref=e1563]:
+        - listitem [ref=e1564]:
+          - generic [ref=e1565]:
+            - generic [ref=e1569]: "1"
+            - generic [ref=e1570]:
+              - generic [ref=e1571]: 撰写
+              - generic [ref=e1572]: 整理正文
+            - generic [ref=e1573]: finish
+        - listitem [ref=e1574]:
+          - generic [ref=e1575]:
+            - generic [ref=e1579]: "2"
+            - generic [ref=e1580]:
+              - generic [ref=e1581]: 复核
+              - generic [ref=e1582]: 检查权限
+            - generic [ref=e1583]: process
+        - listitem [ref=e1584]:
+          - generic [ref=e1585]:
+            - generic [ref=e1588]: "3"
+            - generic [ref=e1589]:
+              - generic [ref=e1590]: 发布
+              - generic [ref=e1591]: 同步公开页
+            - generic [ref=e1592]: wait
+    - article [ref=e1593]:
+      - generic [ref=e1594]:
+        - generic [ref=e1595]: ElSubMenu
+        - generic [ref=e1596]: focus
+      - menubar [ref=e1598]:
+        - menuitem "Sub menu" [expanded] [ref=e1599]:
+          - generic [ref=e1600] [cursor=pointer]:
+            - text: Sub menu
+            - img [ref=e1602]
+          - menu [ref=e1604]:
+            - menuitem "Nested item" [ref=e1605] [cursor=pointer]
+    - article [ref=e1606]:
+      - generic [ref=e1607]:
+        - generic [ref=e1608]: ElSwitch
+        - generic [ref=e1609]: focus
+      - generic [ref=e1611]:
+        - switch
+        - generic [ref=e1613] [cursor=pointer]: Closed
+        - generic [ref=e1617] [cursor=pointer]: Open
+    - article [ref=e1618]:
+      - generic [ref=e1619]:
+        - generic [ref=e1620]: ElTabPane
+        - generic [ref=e1621]: focus
+      - generic [ref=e1623]:
+        - tablist [ref=e1627]:
+          - tab "First" [selected] [ref=e1629]
+          - tab "Second" [ref=e1630]
+        - tabpanel "First" [ref=e1632]: First pane
+    - article [ref=e1633]:
+      - generic [ref=e1634]:
+        - generic [ref=e1635]: ElTable
+        - generic [ref=e1636]: focus
+      - generic [ref=e1639]:
+        - table [ref=e1641]:
+          - rowgroup [ref=e1645]:
+            - row "Name State" [ref=e1646]:
+              - columnheader "Name" [ref=e1647]:
+                - generic [ref=e1648]: Name
+              - columnheader "State" [ref=e1649]:
+                - generic [ref=e1650]: State
+        - table [ref=e1655]:
+          - rowgroup [ref=e1659]:
+            - row "Alpha Ready" [ref=e1660]:
+              - cell "Alpha" [ref=e1661]:
+                - generic [ref=e1662]: Alpha
+              - cell "Ready" [ref=e1663]:
+                - generic [ref=e1664]: Ready
+            - row "Beta Idle" [ref=e1665]:
+              - cell "Beta" [ref=e1666]:
+                - generic [ref=e1667]: Beta
+              - cell "Idle" [ref=e1668]:
+                - generic [ref=e1669]: Idle
+    - article [ref=e1671]:
+      - generic [ref=e1672]:
+        - generic [ref=e1673]: ElTableColumn
+        - generic [ref=e1674]: focus
+      - generic [ref=e1677]:
+        - table [ref=e1679]:
+          - rowgroup [ref=e1682]:
+            - row "Column" [ref=e1683]:
+              - generic [ref=e1685]: Column
+        - table [ref=e1690]:
+          - rowgroup [ref=e1693]:
+            - row "Alpha" [ref=e1694]:
+              - cell "Alpha" [ref=e1695]:
+                - generic [ref=e1696]: Alpha
+            - row "Beta" [ref=e1697]:
+              - cell "Beta" [ref=e1698]:
+                - generic [ref=e1699]: Beta
+    - article [ref=e1701]:
+      - generic [ref=e1702]:
+        - generic [ref=e1703]: ElAutoResizer
+        - generic [ref=e1704]: focus
+      - table [ref=e1709]:
+        - rowgroup [ref=e1710]:
+          - generic [ref=e1712]:
+            - row "Row 0 Ready" [ref=e1713]:
+              - cell "Row 0" [ref=e1714]:
+                - generic "Row 0" [ref=e1715]
+              - cell "Ready" [ref=e1716]:
+                - generic "Ready" [ref=e1717]
+            - row "Row 1 Review" [ref=e1718]:
+              - cell "Row 1" [ref=e1719]:
+                - generic "Row 1" [ref=e1720]
+              - cell "Review" [ref=e1721]:
+                - generic "Review" [ref=e1722]
+            - row "Row 2 Ready" [ref=e1723]:
+              - cell "Row 2" [ref=e1724]:
+                - generic "Row 2" [ref=e1725]
+              - cell "Ready" [ref=e1726]:
+                - generic "Ready" [ref=e1727]
+            - row "Row 3 Review" [ref=e1728]:
+              - cell "Row 3" [ref=e1729]:
+                - generic "Row 3" [ref=e1730]
+              - cell "Review" [ref=e1731]:
+                - generic "Review" [ref=e1732]
+            - row "Row 4 Ready" [ref=e1733]:
+              - cell "Row 4" [ref=e1734]:
+                - generic "Row 4" [ref=e1735]
+              - cell "Ready" [ref=e1736]:
+                - generic "Ready" [ref=e1737]
+        - rowgroup [ref=e1739]:
+          - row "Name State" [ref=e1741]:
+            - columnheader "Name" [ref=e1742]:
+              - generic "Name" [ref=e1743]
+            - columnheader "State" [ref=e1744]:
+              - generic "State" [ref=e1745]
+    - article [ref=e1746]:
+      - generic [ref=e1747]:
+        - generic [ref=e1748]: ElTableV2
+        - generic [ref=e1749]: focus
+      - table [ref=e1753]:
+        - rowgroup [ref=e1754]:
+          - generic [ref=e1756]:
+            - row "Row 0 Ready" [ref=e1757]:
+              - cell "Row 0" [ref=e1758]:
+                - generic "Row 0" [ref=e1759]
+              - cell "Ready" [ref=e1760]:
+                - generic "Ready" [ref=e1761]
+            - row "Row 1 Review" [ref=e1762]:
+              - cell "Row 1" [ref=e1763]:
+                - generic "Row 1" [ref=e1764]
+              - cell "Review" [ref=e1765]:
+                - generic "Review" [ref=e1766]
+            - row "Row 2 Ready" [ref=e1767]:
+              - cell "Row 2" [ref=e1768]:
+                - generic "Row 2" [ref=e1769]
+              - cell "Ready" [ref=e1770]:
+                - generic "Ready" [ref=e1771]
+            - row "Row 3 Review" [ref=e1772]:
+              - cell "Row 3" [ref=e1773]:
+                - generic "Row 3" [ref=e1774]
+              - cell "Review" [ref=e1775]:
+                - generic "Review" [ref=e1776]
+            - row "Row 4 Ready" [ref=e1777]:
+              - cell "Row 4" [ref=e1778]:
+                - generic "Row 4" [ref=e1779]
+              - cell "Ready" [ref=e1780]:
+                - generic "Ready" [ref=e1781]
+        - rowgroup [ref=e1783]:
+          - row "Name State" [ref=e1785]:
+            - columnheader "Name" [ref=e1786]:
+              - generic "Name" [ref=e1787]
+            - columnheader "State" [ref=e1788]:
+              - generic "State" [ref=e1789]
+    - article [ref=e1790]:
+      - generic [ref=e1791]:
+        - generic [ref=e1792]: ElTabs
+        - generic [ref=e1793]: focus
+      - generic [ref=e1795]:
+        - tablist [ref=e1799]:
+          - tab "First" [selected] [ref=e1801]
+          - tab "Second" [ref=e1802]
+        - tabpanel "First" [ref=e1804]: First content
+    - article [ref=e1805]:
+      - generic [ref=e1806]:
+        - generic [ref=e1807]: ElTag
+        - generic [ref=e1808]: focus
+      - generic [ref=e1810]:
+        - generic [ref=e1812]: Tag
+        - generic [ref=e1814]: Info
+    - article [ref=e1815]:
+      - generic [ref=e1816]:
+        - generic [ref=e1817]: ElText
+        - generic [ref=e1818]: focus
+      - generic [ref=e1820]: Editorial text sample
+    - article [ref=e1821]:
+      - generic [ref=e1822]:
+        - generic [ref=e1823]: ElThemeModeToggle
+        - generic [ref=e1824]: focus
+      - radiogroup "Theme mode" [ref=e1826]:
+        - generic [ref=e1827]:
+          - radio "Light" [checked] [ref=e1828]
+          - generic [ref=e1829] [cursor=pointer]: Light
+        - generic [ref=e1830]:
+          - radio "Dark" [ref=e1831]
+          - generic [ref=e1832] [cursor=pointer]: Dark
+        - generic [ref=e1833]:
+          - radio "System" [ref=e1834]
+          - generic [ref=e1835] [cursor=pointer]: System
+    - article [ref=e1836]:
+      - generic [ref=e1837]:
+        - generic [ref=e1838]: ElTimePicker
+        - generic [ref=e1839]: focus
+      - combobox [ref=e1841]:
+        - generic [ref=e1842]:
+          - img [ref=e1845]
+          - textbox "Pick time" [ref=e1849]: 17:30:00
+    - article [ref=e1850]:
+      - generic [ref=e1851]:
+        - generic [ref=e1852]: ElTimeSelect
+        - generic [ref=e1853]: focus
+      - generic [ref=e1858] [cursor=pointer]:
+        - img [ref=e1861]
+        - combobox "Select time" [ref=e1865]
+        - img [ref=e1868]
+    - article [ref=e1870]:
+      - generic [ref=e1871]:
+        - generic [ref=e1872]: ElTimeline
+        - generic [ref=e1873]: focus
+      - list [ref=e1875]:
+        - listitem [ref=e1876]:
+          - generic [ref=e1879]:
+            - generic [ref=e1880]: 2026/05/20
+            - generic [ref=e1881]: Audit started
+        - listitem [ref=e1882]:
+          - generic [ref=e1884]:
+            - generic [ref=e1885]: 2026/05/21
+            - generic [ref=e1886]: Review
+    - article [ref=e1887]:
+      - generic [ref=e1888]:
+        - generic [ref=e1889]: ElTimelineItem
+        - generic [ref=e1890]: focus
+      - list [ref=e1892]:
+        - listitem [ref=e1893]:
+          - generic [ref=e1895]:
+            - generic [ref=e1896]: Timeline item
+            - generic [ref=e1897]: 2026/05/20
+    - article [ref=e1898]:
+      - generic [ref=e1899]:
+        - generic [ref=e1900]: ElTooltip
+        - generic [ref=e1901]: focus
+      - button "Tooltip" [ref=e1903] [cursor=pointer]:
+        - generic [ref=e1904]: Tooltip
+    - article [ref=e1905]:
+      - generic [ref=e1906]:
+        - generic [ref=e1907]: ElTooltipV2
+        - generic [ref=e1908]: focus
+      - button "Tooltip V2" [ref=e1910] [cursor=pointer]:
+        - generic [ref=e1911]: Tooltip V2
+    - article [ref=e1912]:
+      - generic [ref=e1913]:
+        - generic [ref=e1914]: ElTransfer
+        - generic [ref=e1915]: focus
+      - generic [ref=e1918]:
+        - generic [ref=e1919]:
+          - paragraph [ref=e1920]:
+            - generic [ref=e1921] [cursor=pointer]:
+              - generic [ref=e1922]:
+                - checkbox "列表 1 0/5"
+              - generic [ref=e1924]:
+                - text: 列表 1
+                - generic [ref=e1925]: 0/5
+          - generic [ref=e1926]:
+            - generic [ref=e1928]:
+              - img [ref=e1931]
+              - textbox "Search" [ref=e1933]
+            - group "checkbox-group" [ref=e1934]:
+              - generic [ref=e1935] [cursor=pointer]:
+                - generic [ref=e1936]:
+                  - checkbox "发布前校对"
+                - generic "发布前校对" [ref=e1939]
+              - generic [ref=e1940] [cursor=pointer]:
+                - generic [ref=e1941]:
+                  - checkbox "更新封面图"
+                - generic "更新封面图" [ref=e1944]
+              - generic [ref=e1945] [cursor=pointer]:
+                - generic [ref=e1946]:
+                  - checkbox "复核评论设置"
+                - generic "复核评论设置" [ref=e1949]
+              - generic [ref=e1950]:
+                - generic [ref=e1951] [cursor=pointer]:
+                  - checkbox "写入审计记录" [disabled]
+                - generic "写入审计记录" [ref=e1954]
+              - generic [ref=e1955] [cursor=pointer]:
+                - generic [ref=e1956]:
+                  - checkbox "刷新搜索索引"
+                - generic "刷新搜索索引" [ref=e1959]
+        - generic [ref=e1960]:
+          - button "列表 2 → 列表 1" [disabled] [ref=e1961]:
+            - img [ref=e1964]
+          - button "列表 1 → 列表 2" [disabled] [ref=e1966]:
+            - img [ref=e1969]
+        - generic [ref=e1971]:
+          - paragraph [ref=e1972]:
+            - generic [ref=e1973] [cursor=pointer]:
+              - generic [ref=e1974]:
+                - checkbox "列表 2 0/1"
+              - generic [ref=e1976]:
+                - text: 列表 2
+                - generic [ref=e1977]: 0/1
+          - generic [ref=e1978]:
+            - generic [ref=e1980]:
+              - img [ref=e1983]
+              - textbox "Search" [ref=e1985]
+            - group "checkbox-group" [ref=e1986]:
+              - generic [ref=e1987] [cursor=pointer]:
+                - generic [ref=e1988]:
+                  - checkbox "同步成员权限"
+                - generic "同步成员权限" [ref=e1991]
+    - article [ref=e1992]:
+      - generic [ref=e1993]:
+        - generic [ref=e1994]: ElTree
+        - generic [ref=e1995]: focus
+      - tree [ref=e1997]:
+        - treeitem "Level one" [expanded] [ref=e1998]:
+          - generic [ref=e1999] [cursor=pointer]:
+            - img [ref=e2001]
+            - generic [ref=e2004]:
+              - checkbox
+            - generic [ref=e2006]: Level one
+          - group [ref=e2007]:
+            - treeitem "Level two" [ref=e2008]:
+              - generic [ref=e2009] [cursor=pointer]:
+                - img [ref=e2011]
+                - generic [ref=e2014]:
+                  - checkbox
+                - generic [ref=e2016]: Level two
+    - article [ref=e2017]:
+      - generic [ref=e2018]:
+        - generic [ref=e2019]: ElTreeSelect
+        - generic [ref=e2020]: focus
+      - generic [ref=e2025] [cursor=pointer]:
+        - combobox "请选择" [ref=e2026]: Level one
+        - img [ref=e2029]
+    - article [ref=e2031]:
+      - generic [ref=e2032]:
+        - generic [ref=e2033]: ElTreeV2
+        - generic [ref=e2034]: focus
+      - tree [ref=e2036]:
+        - generic [ref=e2039]:
+          - treeitem "Node 0" [expanded] [ref=e2040]:
+            - generic [ref=e2041] [cursor=pointer]:
+              - img [ref=e2043]
+              - generic [ref=e2045]: Node 0
+          - treeitem "Nested node" [ref=e2046]:
+            - generic [ref=e2048] [cursor=pointer]: Nested node
+          - treeitem "Node 1" [ref=e2049]:
+            - generic [ref=e2051] [cursor=pointer]: Node 1
+          - treeitem "Node 2" [ref=e2052]:
+            - generic [ref=e2054] [cursor=pointer]: Node 2
+          - treeitem "Node 3" [ref=e2055]:
+            - generic [ref=e2057] [cursor=pointer]: Node 3
+          - treeitem "Node 4" [ref=e2058]:
+            - generic [ref=e2060] [cursor=pointer]: Node 4
+          - treeitem "Node 5" [ref=e2061]:
+            - generic [ref=e2063] [cursor=pointer]: Node 5
+    - article [ref=e2065]:
+      - generic [ref=e2066]:
+        - generic [ref=e2067]: ElUpload
+        - generic [ref=e2068]: focus
+      - generic [ref=e2070]:
+        - generic [ref=e2072] [cursor=pointer]:
+          - img [ref=e2074]
+          - generic [ref=e2076]:
+            - text: Drop a file here or
+            - emphasis [ref=e2077]: browse
+          - paragraph [ref=e2078]: PNG/JPG, max 10 MB
+        - list
+    - article [ref=e2079]:
+      - generic [ref=e2080]:
+        - generic [ref=e2081]: ElWatermark
+        - generic [ref=e2082]: focus
+```

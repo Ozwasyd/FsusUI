@@ -1,0 +1,418 @@
+{
+  "qualificationEligible": false,
+  "diagnosticOnly": true,
+  "observations": [
+    {
+      "source": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+      "baseURL": "http://127.0.0.1:5333",
+      "path": "/?audit=ui-states&markdownEditorTransaction=1",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "geometry": {
+        "oldTestClosestCommands": false,
+        "trigger": {
+          "x": 243,
+          "y": 400,
+          "width": 112,
+          "height": 44,
+          "top": 400,
+          "right": 355,
+          "bottom": 444,
+          "left": 243
+        },
+        "commands": {
+          "x": 35,
+          "y": 400,
+          "width": 200,
+          "height": 44,
+          "top": 400,
+          "right": 235,
+          "bottom": 444,
+          "left": 35
+        },
+        "directlyTappable": true,
+        "accessibleLabel": "格式工具，2 个工具",
+        "resolvedTheme": "light"
+      },
+      "focus": []
+    },
+    {
+      "source": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+      "baseURL": "http://127.0.0.1:5333",
+      "path": "/?audit=ui-states&markdownEditorTransaction=1",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "geometry": {
+        "oldTestClosestCommands": false,
+        "trigger": {
+          "x": 173,
+          "y": 298,
+          "width": 112,
+          "height": 44,
+          "top": 298,
+          "right": 285,
+          "bottom": 342,
+          "left": 173
+        },
+        "commands": {
+          "x": 35,
+          "y": 298,
+          "width": 130,
+          "height": 44,
+          "top": 298,
+          "right": 165,
+          "bottom": 342,
+          "left": 35
+        },
+        "directlyTappable": true,
+        "accessibleLabel": "格式工具，2 个工具",
+        "resolvedTheme": "light"
+      },
+      "focus": []
+    },
+    {
+      "source": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+      "baseURL": "http://127.0.0.1:5333",
+      "path": "/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=long",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "geometry": {
+        "oldTestClosestCommands": false,
+        "trigger": {
+          "x": 43,
+          "y": 384,
+          "width": 625,
+          "height": 44,
+          "top": 384,
+          "right": 668,
+          "bottom": 428,
+          "left": 43
+        },
+        "commands": {
+          "x": 35,
+          "y": 384,
+          "width": 0,
+          "height": 44,
+          "top": 384,
+          "right": 35,
+          "bottom": 428,
+          "left": 35
+        },
+        "directlyTappable": true,
+        "accessibleLabel": "A deliberately extended localization fixture that preserves every semantic label 2 format tools",
+        "resolvedTheme": "light"
+      },
+      "focus": [
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        }
+      ]
+    },
+    {
+      "source": "9dadbc7320f80ebc2c2e6f88905e97f4784e5cdd",
+      "baseURL": "http://127.0.0.1:5333",
+      "path": "/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=long&theme=dark",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "geometry": {
+        "oldTestClosestCommands": false,
+        "trigger": {
+          "x": 43,
+          "y": 384,
+          "width": 625,
+          "height": 44,
+          "top": 384,
+          "right": 668,
+          "bottom": 428,
+          "left": 43
+        },
+        "commands": {
+          "x": 35,
+          "y": 384,
+          "width": 0,
+          "height": 44,
+          "top": 384,
+          "right": 35,
+          "bottom": 428,
+          "left": 35
+        },
+        "directlyTappable": true,
+        "accessibleLabel": "A deliberately extended localization fixture that preserves every semantic label 2 format tools",
+        "resolvedTheme": "dark"
+      },
+      "focus": [
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 0
+        }
+      ]
+    },
+    {
+      "source": "6ddb84c8b5c1b0ae69b1ded4f54bd32553e8e1a3",
+      "baseURL": "http://127.0.0.1:5334",
+      "path": "/?audit=ui-states&markdownEditorTransaction=1",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "geometry": {
+        "oldTestClosestCommands": false,
+        "trigger": {
+          "x": 243,
+          "y": 400,
+          "width": 112,
+          "height": 44,
+          "top": 400,
+          "right": 355,
+          "bottom": 444,
+          "left": 243
+        },
+        "commands": {
+          "x": 35,
+          "y": 400,
+          "width": 200,
+          "height": 44,
+          "top": 400,
+          "right": 235,
+          "bottom": 444,
+          "left": 35
+        },
+        "directlyTappable": true,
+        "accessibleLabel": "格式工具，2 个工具",
+        "resolvedTheme": "light"
+      },
+      "focus": []
+    },
+    {
+      "source": "6ddb84c8b5c1b0ae69b1ded4f54bd32553e8e1a3",
+      "baseURL": "http://127.0.0.1:5334",
+      "path": "/?audit=ui-states&markdownEditorTransaction=1",
+      "viewport": {
+        "width": 320,
+        "height": 640
+      },
+      "geometry": {
+        "oldTestClosestCommands": false,
+        "trigger": {
+          "x": 173,
+          "y": 298,
+          "width": 112,
+          "height": 44,
+          "top": 298,
+          "right": 285,
+          "bottom": 342,
+          "left": 173
+        },
+        "commands": {
+          "x": 35,
+          "y": 298,
+          "width": 130,
+          "height": 44,
+          "top": 298,
+          "right": 165,
+          "bottom": 342,
+          "left": 35
+        },
+        "directlyTappable": true,
+        "accessibleLabel": "格式工具，2 个工具",
+        "resolvedTheme": "light"
+      },
+      "focus": []
+    },
+    {
+      "source": "6ddb84c8b5c1b0ae69b1ded4f54bd32553e8e1a3",
+      "baseURL": "http://127.0.0.1:5334",
+      "path": "/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=long",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "geometry": {
+        "oldTestClosestCommands": false,
+        "trigger": {
+          "x": 187.5,
+          "y": 384,
+          "width": 152.5,
+          "height": 44,
+          "top": 384,
+          "right": 340,
+          "bottom": 428,
+          "left": 187.5
+        },
+        "commands": {
+          "x": 35,
+          "y": 384,
+          "width": 144.5,
+          "height": 44,
+          "top": 384,
+          "right": 179.5,
+          "bottom": 428,
+          "left": 35
+        },
+        "directlyTappable": true,
+        "accessibleLabel": "A deliberately extended localization fixture that preserves every semantic label 2 format tools",
+        "resolvedTheme": "light"
+      },
+      "focus": [
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        }
+      ]
+    },
+    {
+      "source": "6ddb84c8b5c1b0ae69b1ded4f54bd32553e8e1a3",
+      "baseURL": "http://127.0.0.1:5334",
+      "path": "/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=long&theme=dark",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "geometry": {
+        "oldTestClosestCommands": false,
+        "trigger": {
+          "x": 187.5,
+          "y": 384,
+          "width": 152.5,
+          "height": 44,
+          "top": 384,
+          "right": 340,
+          "bottom": 428,
+          "left": 187.5
+        },
+        "commands": {
+          "x": 35,
+          "y": 384,
+          "width": 144.5,
+          "height": 44,
+          "top": 384,
+          "right": 179.5,
+          "bottom": 428,
+          "left": 35
+        },
+        "directlyTappable": true,
+        "accessibleLabel": "A deliberately extended localization fixture that preserves every semantic label 2 format tools",
+        "resolvedTheme": "dark"
+      },
+      "focus": [
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        },
+        {
+          "focused": true,
+          "minimumWidth": 44,
+          "visibleWidth": 144.5
+        }
+      ]
+    }
+  ]
+}
