@@ -443,6 +443,14 @@ an independent acceptance lane and is not replaced by these simulations.
 
 ## Outline and writing aids
 
+`createMarkdownOutlineModel(source, documentIdentity, previousProjection)` from
+`@ozwasyd/element-plus` retains parser-recognized empty ATX headings, including
+bare `#` at end of line or end of file. Each empty item carries an
+`empty-heading` diagnostic bound to its stable `nodeId`. `sourceRange` includes
+the parser-owned whole heading; `contentRange` consumes parser content ranges
+and is collapsed at the opening marker end when there is no content. Consumers
+must render these diagnostics rather than deriving them from heading text.
+
 `revealHeading(nodeId)` and `revealSourceRange(range)` use the current document identity,
 revision, and projection. On success, the component mounts the live virtual window containing
 the target, restores source selection, focuses the sole textarea input owner, and scrolls the

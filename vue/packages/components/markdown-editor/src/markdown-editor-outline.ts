@@ -99,6 +99,7 @@ export const createMarkdownOutlineModelFromProjection = (
   readonly items: readonly MarkdownEditorOutlineItem[]
 } => {
   const entries = createMarkdownOutlineEntries(projection)
+  const nodesById = new Map(projection.nodes.map((node) => [node.id, node]))
   const stack: MarkdownEditorOutlineItem[] = []
   const items: MarkdownEditorOutlineItem[] = []
   const seenTitles = new Map<string, number>()
@@ -109,6 +110,9 @@ export const createMarkdownOutlineModelFromProjection = (
     }
     const parent = stack[stack.length - 1]
     const diagnostics: MarkdownOutlineDiagnostic[] = []
+    if (!entry.title) {
+      diagnostics.push({ code: 'empty-heading', nodeId: entry.id })
+    }
     if (heading.level === 1 && seenTitles.get('#')) {
       diagnostics.push({ code: 'duplicate-h1', nodeId: entry.id })
     }
@@ -122,6 +126,10 @@ export const createMarkdownOutlineModelFromProjection = (
       '#',
       (seenTitles.get('#') ?? 0) + (heading.level === 1 ? 1 : 0),
     )
+    const node = nodesById.get(entry.id)!
+    const firstContent = node.rawContentRanges[0]
+    const lastContent = node.rawContentRanges[node.rawContentRanges.length - 1]
+    const emptyContentOffset = node.rawMarkerRanges[0]?.end ?? entry.range.start
     const item: MarkdownEditorOutlineItem = Object.freeze({
       id: entry.id,
       nodeId: entry.id,
@@ -129,8 +137,8 @@ export const createMarkdownOutlineModelFromProjection = (
       text: entry.title,
       sourceRange: Object.freeze({ ...entry.range }),
       contentRange: Object.freeze({
-        start: Math.min(entry.range.end, entry.range.start + heading.level + 1),
-        end: entry.range.end,
+        start: firstContent?.start ?? emptyContentOffset,
+        end: lastContent?.end ?? emptyContentOffset,
       }),
       parentId: parent?.id ?? null,
       diagnostics: Object.freeze(diagnostics),

@@ -120,6 +120,11 @@ describe('markdown outline projection model', () => {
       sourceRange: { start: 0, end: 1 }, contentRange: { start: 1, end: 1 }, text: '',
     })
     expect(createMarkdownOutlineModel('#not a heading\n\n#######\n', identity).items).toHaveLength(0)
+    const opaqueDocument = createMarkdownOutlineModel(source, { id: 'article-a:tab', epoch: 1 })
+    expect(opaqueDocument.items).toHaveLength(2)
+    expect(opaqueDocument.items.map((item) => item.contentRange)).toEqual(
+      first.items.map((item) => item.contentRange),
+    )
   })
 
   it('uses stable projection identities instead of title or offset keys', () => {
