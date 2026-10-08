@@ -175,7 +175,7 @@
                   nsSelectV2.is(selectSize),
                   nsSelectV2.e('combobox-input'),
                 ]"
-                :disabled="disabled"
+                :disabled="selectDisabled"
                 role="combobox"
                 :readonly="!filterable"
                 spellcheck="false"
@@ -223,7 +223,7 @@
                 autocapitalize="off"
                 :autocomplete="autocomplete"
                 :class="nsSelectV2.e('combobox-input')"
-                :disabled="disabled"
+                :disabled="selectDisabled"
                 :name="name"
                 role="combobox"
                 :readonly="!filterable"

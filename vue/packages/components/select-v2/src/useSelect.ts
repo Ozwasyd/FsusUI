@@ -563,27 +563,39 @@ const useSelect = (props: ISelectProps, emit) => {
   } = useInput((e) => onInput(e))
 
   // methods
+  let focusGeneration = 0
+  const focusInput = (generation: number) => {
+    if (generation === focusGeneration && !selectDisabled.value) {
+      inputRef.value?.focus()
+    }
+  }
+
   const focus = () => {
-    inputRef.value?.focus()
+    focusInput(++focusGeneration)
   }
 
   const blur = () => {
+    ++focusGeneration
     expanded.value = false
+    states.softFocus = false
     inputRef.value?.blur()
   }
 
-  const focusAndUpdatePopup = () => {
-    focus()
+  const focusAndUpdatePopup = (generation: number) => {
+    if (generation !== focusGeneration) return
+    focusInput(generation)
     popper.value?.updatePopper()
   }
 
   const toggleMenu = () => {
     if (props.automaticDropdown) return
     if (!selectDisabled.value) {
+      const generation = focusGeneration
       if (states.isComposing) states.softFocus = true
       return nextTick(() => {
+        if (generation !== focusGeneration || selectDisabled.value) return
         expanded.value = !expanded.value
-        inputRef.value?.focus?.()
+        focusInput(generation)
       })
     }
   }
@@ -677,6 +689,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const onSelect = (option: Option, idx: number, byClick = true) => {
+    const generation = focusGeneration
     if (props.multiple) {
       let selectedOptions = (props.modelValue as any[]).slice()
 
@@ -704,7 +717,7 @@ const useSelect = (props: ISelectProps, emit) => {
         states.inputLength = 20
       }
       if (props.filterable && !props.reserveKeyword) {
-        inputRef.value.focus?.()
+        focusInput(generation)
         onUpdateInputValue('')
       }
       if (props.filterable) {
@@ -712,7 +725,7 @@ const useSelect = (props: ISelectProps, emit) => {
           calculatorRef.value.getBoundingClientRect().width
       }
       resetInputHeight()
-      setSoftFocus()
+      setSoftFocus(generation)
     } else {
       selectedIndex.value = idx
       states.selectedLabel = getLabel(option)
@@ -729,6 +742,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const deleteTag = (event: MouseEvent, option: Option) => {
+    const generation = focusGeneration
     let selectedOptions = (props.modelValue as any[]).slice()
 
     const index = getValueIndex(selectedOptions, getValue(option))
@@ -741,9 +755,9 @@ const useSelect = (props: ISelectProps, emit) => {
       states.cachedOptions.splice(index, 1)
       update(selectedOptions)
       emit('remove-tag', getValue(option))
-      states.softFocus = true
+      if (generation === focusGeneration) states.softFocus = true
       removeNewOption(option)
-      return nextTick(focusAndUpdatePopup)
+      return nextTick(() => focusAndUpdatePopup(generation))
     }
     event.stopPropagation()
   }
@@ -760,24 +774,20 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleBlur = (event: FocusEvent) => {
+    const focused = states.isComposing
+    const silent = states.isSilentBlur
     states.softFocus = false
+    states.isComposing = false
+    states.isSilentBlur = false
 
     // reset input value when blurred
     // https://github.com/ElemeFE/element/pull/10822
     return nextTick(() => {
-      inputRef.value?.blur?.()
       if (calculatorRef.value) {
         states.calculatedWidth =
           calculatorRef.value.getBoundingClientRect().width
       }
-      if (states.isSilentBlur) {
-        states.isSilentBlur = false
-      } else {
-        if (states.isComposing) {
-          emit('blur', event)
-        }
-      }
-      states.isComposing = false
+      if (focused && !silent) emit('blur', event)
     })
   }
 
@@ -801,6 +811,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleClear = () => {
+    const generation = focusGeneration
     let emptyValue: string | any[]
     if (isArray(props.modelValue)) {
       emptyValue = []
@@ -818,7 +829,7 @@ const useSelect = (props: ISelectProps, emit) => {
     update(emptyValue)
     emit('clear')
     clearAllNewOption()
-    return nextTick(focusAndUpdatePopup)
+    return nextTick(() => focusAndUpdatePopup(generation))
   }
 
   const onUpdateInputValue = (val: string) => {
@@ -892,11 +903,8 @@ const useSelect = (props: ISelectProps, emit) => {
     states.hoveringIndex = -1
   }
 
-  const setSoftFocus = () => {
-    const _input = inputRef.value
-    if (_input) {
-      _input.focus?.()
-    }
+  const setSoftFocus = (generation: number) => {
+    focusInput(generation)
   }
 
   const onInput = (event) => {
@@ -918,7 +926,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleClickOutside = () => {
-    expanded.value = false
+    blur()
     return handleBlur()
   }
 
