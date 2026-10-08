@@ -57,7 +57,9 @@ Anchor candidate recognition retains malformed trailing `^id` tokens for
 longer than 64 characters. Validation still accepts exactly
 `[a-z][a-z0-9-]{0,63}`; raw ranges and `#id` fragments are unchanged.
 A line-end marker requires exactly one ASCII space after non-whitespace content;
-repeated whitespace or indentation returns `anchor-placement`. Whitespace,
+repeated whitespace or indentation returns `anchor-placement`. Paragraph markers
+must also occupy their owning paragraph’s final source line. Ownership is read
+from the canonical parser and mapped back to raw BOM/CRLF source ranges. Whitespace,
 backticks, and atomic literal regions keep ordinary source outside this marker
 boundary. This repairs the historical #446 contract; it does not renew #448
 aggregate acceptance.
