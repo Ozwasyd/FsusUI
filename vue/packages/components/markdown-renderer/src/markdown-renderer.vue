@@ -890,7 +890,6 @@ const hasEnabledHeavyFeature = (
   (features.mermaid && result.features.includes('mermaid'))
 
 const resetFeatureActivation = () => {
-  removeHeavyFeatureThemeListener()
   activationController?.abort()
   activationController = new AbortController()
   activationObserver?.disconnect()
@@ -1044,6 +1043,8 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+  if (heavyFeaturesEnabled) ensureHeavyFeatureThemeListener()
+  else removeHeavyFeatureThemeListener()
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null
