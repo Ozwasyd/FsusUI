@@ -45,7 +45,7 @@ with the registry's declared producer:
 node scripts/check-component-surface-semantic-registry.mjs --refresh-source-digests
 ```
 
-This explicit mode changes only source digests and the generated source revision.
+This explicit mode changes only source digests and the generated producer/revision.
 It validates the complete registry before writing; rules, ownership, mappings,
 review policy, and negative controls remain unchanged. The default checker stays
 read-only and continues to reject source drift. A registry fixture that references

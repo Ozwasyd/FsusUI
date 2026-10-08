@@ -27,7 +27,7 @@ const temporaryRegistry = async (t) => {
 }
 const semanticPayload = (registry) => {
   const copy = structuredClone(registry)
-  delete copy.generated.sourceRevision
+  delete copy.generated
   for (const source of Object.values(copy.sourceDigests)) delete source.digest
   return copy
 }
@@ -47,8 +47,13 @@ test('explicit digest refresh preserves registry semantics and default validatio
     registryPath,
   })
   assert.deepEqual(result.writePaths, [registryPath])
+  assert.deepEqual(result.executedCommands, ['git rev-parse HEAD'])
   const serialized = await fs.readFile(registryPath, 'utf8')
   const refreshed = JSON.parse(serialized)
+  assert.equal(
+    refreshed.generated.producer,
+    'scripts/check-component-surface-semantic-registry.mjs',
+  )
   assert.deepEqual(semanticPayload(refreshed), semanticPayload(registry))
   for (const source of Object.values(refreshed.sourceDigests)) {
     assert.equal(

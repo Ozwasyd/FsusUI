@@ -1058,6 +1058,8 @@ export const refreshComponentSurfaceSemanticRegistrySourceDigests = async (
       .update(await fs.readFile(resolveInputPath(root, source.path)))
       .digest('hex')
   }
+  registry.generated.producer =
+    'scripts/check-component-surface-semantic-registry.mjs'
   registry.generated.sourceRevision = execFileSync(
     'git',
     ['rev-parse', 'HEAD'],
@@ -1072,7 +1074,11 @@ export const refreshComponentSurfaceSemanticRegistrySourceDigests = async (
   assertSemanticOwnership(registry, options.expectedSemanticOwnership)
   const outputPath = resolveInputPath(root, registryPath)
   await fs.writeFile(outputPath, `${JSON.stringify(registry, null, 2)}\n`)
-  return { ...validation, writePaths: [outputPath] }
+  return {
+    ...validation,
+    writePaths: [outputPath],
+    executedCommands: ['git rev-parse HEAD'],
+  }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
