@@ -738,6 +738,10 @@
       min-inline-size: var(--fsus-public-shell-mobile-action-height, 44px);
     }
 
+    @include e(mobile-primary-actions) {
+      min-inline-size: min-content;
+    }
+
     @include e(mobile-toolbar) {
       display: flex;
       flex: 1 1 0;
@@ -751,6 +755,17 @@
       @include m(inline) {
         flex: 1 1 0;
         min-inline-size: var(--fsus-public-shell-mobile-action-height, 44px);
+      }
+    }
+
+    @include e(search-input) {
+      min-inline-size: 0;
+      max-inline-size: 100%;
+
+      .#{$namespace}-input__inner {
+        min-inline-size: 0;
+        max-inline-size: 100%;
+        box-sizing: border-box;
       }
     }
 
