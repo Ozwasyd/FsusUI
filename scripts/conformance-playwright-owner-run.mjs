@@ -10,7 +10,10 @@ import {
   loadConformanceReceiptsFromDirectory,
   verifyConformanceOwnerReceipts,
 } from './conformance-playwright-verify.mjs'
-import { filterOwnerPlanByImpact } from './playwright-impact-filter.mjs'
+import {
+  filterOwnerPlanByImpact,
+  loadPlaywrightImpactPlan,
+} from './playwright-impact-filter.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -93,9 +96,11 @@ export async function runConformanceOwner(argv = process.argv.slice(2)) {
 
   const results = []
   let overallFailed = false
+  const impactPlan = loadPlaywrightImpactPlan(root, impactPlanPath)
   for (const cell of cells) {
     const result = await runConformanceCell(ownerId, cell.id, group, {
       evidenceDir,
+      impactPlan,
     })
     results.push(result)
     if (!result.ok) overallFailed = true
