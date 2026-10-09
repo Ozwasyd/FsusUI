@@ -1,0 +1,22 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "command": [
+    "node",
+    "scripts/conformance-playwright-runner.mjs",
+    "--cell",
+    "web-interaction-conformance/chromium",
+    "--group",
+    "pr",
+    "--impact-plan",
+    ".tmp/ui861-complete-projections-impact.json",
+    "--evidence-dir",
+    ".tmp/ui861-complete-projections-conformance"
+  ],
+  "exitCode": 0,
+  "seconds": 67.86936548000085,
+  "environment": {
+    "CI": "true",
+    "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.setup/ms-playwright",
+    "FSUS_CONFORMANCE_INTERACTION_PORT": "5314"
+  }
+}

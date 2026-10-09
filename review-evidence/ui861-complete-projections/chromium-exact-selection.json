@@ -1,0 +1,15 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "actualSelection": [
+    {
+      "title": "mounts representative Vue components and traces real public interactions",
+      "projectName": "chromium"
+    },
+    {
+      "title": "traces MarkdownEditor input, paste, drop, exposed methods, and public state",
+      "projectName": "chromium"
+    }
+  ],
+  "count": 2,
+  "selectionExact": true
+}

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "baseRef": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "headRef": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "group": "pr",
+  "registryHash": "5666d3d139e25ac93cae2b2d63b7f2f11f626b9cd0de5947c4fa1167f8ad638a",
+  "generatedAt": "2026-10-09T12:26:42.711Z",
+  "changedFiles": [
+    ".changeset/markdown-pending-theme-invalidation.md",
+    ".changeset/select-v2-focus-accessibility.md",
+    "config/dependencies/migration-baseline.json",
+    "docs/avalonia/vue-public-api-baseline.md",
+    "docs/components/markdown-renderer.md",
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "spec/baselines/vue-current.json",
+    "spec/components/contracts/v1/vue-public-contracts.json",
+    "spec/components/contracts/v2/contract-v2.json",
+    "tests/conformance-playwright-identity.test.mjs",
+    "tests/contract-v2.test.mjs",
+    "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+    "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+    "vue/packages/components/select-v2/__tests__/select.test.ts",
+    "vue/packages/components/select-v2/src/option-item.vue",
+    "vue/packages/components/select-v2/src/select-dropdown.tsx",
+    "vue/packages/components/select-v2/src/select.vue",
+    "vue/packages/components/select-v2/src/useSelect.ts"
+  ],
+  "decisions": [
+    {
+      "suiteId": "view-transitions",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx, vue/packages/components/markdown-renderer/src/markdown-renderer.vue, vue/packages/components/select-v2/__tests__/select.test.ts +4 more",
+      "cells": [
+        "view-transitions/chromium",
+        "view-transitions/firefox",
+        "view-transitions/webkit"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "motion-ssr",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx, vue/packages/components/markdown-renderer/src/markdown-renderer.vue, vue/packages/components/select-v2/__tests__/select.test.ts +4 more",
+      "cells": [
+        "motion-ssr/chromium"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "dom-layout",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx, vue/packages/components/markdown-renderer/src/markdown-renderer.vue, vue/packages/components/select-v2/__tests__/select.test.ts +4 more",
+      "cells": [
+        "dom-layout/desktop-light",
+        "dom-layout/mobile-light",
+        "dom-layout/desktop-dark",
+        "dom-layout/mobile-dark"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "geometry-smoke",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx, vue/packages/components/markdown-renderer/src/markdown-renderer.vue, vue/packages/components/select-v2/__tests__/select.test.ts +4 more",
+      "cells": [
+        "geometry-smoke/chromium"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "markdown-editor-interaction",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx, vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+      "cells": [
+        "markdown-editor-interaction/chromium",
+        "markdown-editor-interaction/firefox",
+        "markdown-editor-interaction/webkit"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue"
+      ]
+    },
+    {
+      "suiteId": "visual-boundary-audit",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx, vue/packages/components/markdown-renderer/src/markdown-renderer.vue, vue/packages/components/select-v2/__tests__/select.test.ts +4 more",
+      "cells": [
+        "visual-boundary-audit/desktop-light",
+        "visual-boundary-audit/mobile-light",
+        "visual-boundary-audit/tiny-light",
+        "visual-boundary-audit/desktop-dark",
+        "visual-boundary-audit/mobile-dark",
+        "visual-boundary-audit/tiny-dark",
+        "visual-boundary-audit/safe-area-chromium",
+        "visual-boundary-audit/safe-area-webkit"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "web-interaction-conformance",
+      "decision": "run",
+      "reasonCode": "suite-test-changed",
+      "reason": "suite test/config changed: spec/components/contracts/v1/vue-public-contracts.json, spec/components/contracts/v2/contract-v2.json, vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx +6 more",
+      "cells": [
+        "web-interaction-conformance/chromium",
+        "web-interaction-conformance/firefox",
+        "web-interaction-conformance/webkit"
+      ],
+      "matchedRoots": [
+        "spec/components/contracts/v1/vue-public-contracts.json",
+        "spec/components/contracts/v2/contract-v2.json",
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ]
+    },
+    {
+      "suiteId": "visual-runtime-reuse",
+      "decision": "run",
+      "reasonCode": "unknown-production-change",
+      "reason": "unknown production change; conservative run",
+      "cells": [
+        "visual-runtime-reuse/desktop-light",
+        "visual-runtime-reuse/mobile-light",
+        "visual-runtime-reuse/desktop-dark",
+        "visual-runtime-reuse/mobile-dark"
+      ],
+      "matchedRoots": []
+    }
+  ],
+  "planDigest": "88d0ed56e350b1d8cb4db7bd16dddb79eaba847f71832954de5ad18e1036f29a"
+}

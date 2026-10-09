@@ -1,0 +1,5 @@
+
+> @ component-contracts:check /workspace/ui861-complete-projections
+> node ./scripts/with-node-heap.mjs node ./scripts/component-contract-registry.mjs --check
+
+component-contracts check passed

@@ -1,0 +1,31 @@
+{
+  "sourceSha": "977b406a01b8dae24e434405e2892e55e1ff980c",
+  "sourceParent": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "files": [
+    {
+      "file": "spec/baselines/vue-current.json",
+      "changedFields": [
+        "/source/commitSha",
+        "/source/inputTreeHash",
+        "/source/outputHash"
+      ],
+      "allOtherPayloadUnchanged": true
+    },
+    {
+      "file": "spec/components/contracts/v1/vue-public-contracts.json",
+      "changedFields": [
+        "/baseline/hash"
+      ],
+      "allOtherPayloadUnchanged": true
+    },
+    {
+      "file": "spec/components/contracts/v2/contract-v2.json",
+      "changedFields": [
+        "/baselines/web/hash"
+      ],
+      "allOtherPayloadUnchanged": true
+    }
+  ],
+  "generatedReportOnlyCommitChanged": true,
+  "rulesAndThresholdsUnchanged": true
+}

@@ -1,0 +1,16 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "command": [
+    "node",
+    "scripts/playwright-impact-plan.mjs",
+    "--base",
+    "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+    "--head",
+    "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+    "--receipt",
+    ".tmp/ui861-complete-projections-impact.json",
+    "--group",
+    "pr"
+  ],
+  "exitCode": 0
+}

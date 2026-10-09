@@ -1,0 +1,29 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "parent": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "producerSha": "977b406a01b8dae24e434405e2892e55e1ff980c",
+  "onlyFourOutputPaths": true,
+  "outputs": [
+    {
+      "path": "docs/avalonia/vue-public-api-baseline.md",
+      "producerBlob": "4a54e9497ed9452a4956e9e6ca6a5cc7b3c03d1d",
+      "consumerBlob": "4a54e9497ed9452a4956e9e6ca6a5cc7b3c03d1d"
+    },
+    {
+      "path": "spec/baselines/vue-current.json",
+      "producerBlob": "c285a5b8c64ca245e7dfc011bb3bd02d620bc02a",
+      "consumerBlob": "c285a5b8c64ca245e7dfc011bb3bd02d620bc02a"
+    },
+    {
+      "path": "spec/components/contracts/v1/vue-public-contracts.json",
+      "producerBlob": "0f5c9552432339f657dcf3365d0b6354663423c7",
+      "consumerBlob": "0f5c9552432339f657dcf3365d0b6354663423c7"
+    },
+    {
+      "path": "spec/components/contracts/v2/contract-v2.json",
+      "producerBlob": "19edc41969ec5071cc88cfef453c7455ce6e5a65",
+      "consumerBlob": "19edc41969ec5071cc88cfef453c7455ce6e5a65"
+    }
+  ],
+  "sourceStatus": ""
+}

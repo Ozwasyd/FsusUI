@@ -1,0 +1,59 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "reviewedSourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "changedPathsAreOnlyFourGeneratedOutputs": true,
+  "unchangedSource": [
+    {
+      "path": "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+      "reviewed66Blob": "483c146c430a04424310cb60ba917acb446e40ec",
+      "currentBlob": "483c146c430a04424310cb60ba917acb446e40ec",
+      "match": true
+    },
+    {
+      "path": "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+      "reviewed66Blob": "901d60d9f0eb68abb19bb8a48795c8ef9e34dc32",
+      "currentBlob": "901d60d9f0eb68abb19bb8a48795c8ef9e34dc32",
+      "match": true
+    },
+    {
+      "path": "vue/vitest.config.ts",
+      "reviewed66Blob": "c854a9179717eb090c89c6ee13315adaa6e5ae1e",
+      "currentBlob": "c854a9179717eb090c89c6ee13315adaa6e5ae1e",
+      "match": true
+    },
+    {
+      "path": "vue/playwright.conformance-interaction.config.ts",
+      "reviewed66Blob": "26ecb2d8730f7cac5bd3ea201d5487ae4c9a1ce8",
+      "currentBlob": "26ecb2d8730f7cac5bd3ea201d5487ae4c9a1ce8",
+      "match": true
+    },
+    {
+      "path": "vue/tests/markdown-editor/markdown-interaction-trace.spec.ts",
+      "reviewed66Blob": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734",
+      "currentBlob": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734",
+      "match": true
+    },
+    {
+      "path": "scripts/conformance-playwright-runner.mjs",
+      "reviewed66Blob": "58cdccded73e4b5ac9993bfc2ce840430095f28c",
+      "currentBlob": "58cdccded73e4b5ac9993bfc2ce840430095f28c",
+      "match": true
+    },
+    {
+      "path": "scripts/markdown-playwright-runner.mjs",
+      "reviewed66Blob": "1a65c11a22438fef05aeb97bd4561350dae5fc24",
+      "currentBlob": "1a65c11a22438fef05aeb97bd4561350dae5fc24",
+      "match": true
+    },
+    {
+      "path": "scripts/playwright-impact-plan.mjs",
+      "reviewed66Blob": "247c4e9f8a745099fae8c7d22c2c17ec19aa1bb2",
+      "currentBlob": "247c4e9f8a745099fae8c7d22c2c17ec19aa1bb2",
+      "match": true
+    }
+  ],
+  "unitResults": "Original CI637 and pending/sync-cancel source66 each PASS1/36unselected; reused unchanged source receipts, not new unit executions",
+  "unitEvidence": "https://github.com/Ozwasyd/FsusUI/tree/52941d9d86d16e1743b0be6228c204e2ab50a14a/review-evidence/ui861-renderer-lint-successor",
+  "olderCaseCorrectionPreserved": true,
+  "older3bBrowserReceiptsNotRebound": true
+}

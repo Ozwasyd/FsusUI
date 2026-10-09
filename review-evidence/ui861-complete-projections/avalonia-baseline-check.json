@@ -1,0 +1,10 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "command": [
+    "pnpm",
+    "run",
+    "avalonia:baseline:check"
+  ],
+  "exitCode": 0,
+  "seconds": 15.146086792999995
+}

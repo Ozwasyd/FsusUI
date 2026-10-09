@@ -1,0 +1,32 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "originalProducersUnchanged": true,
+  "first": {
+    "spec/baselines/vue-current.json": "d8f0c59a027148dd97fef791aca0b5d9507f5b73a7916adbbf05c34479497cf4",
+    "docs/avalonia/vue-public-api-baseline.md": "5bb8da5cdf0ad61e6ee131ff4ee8b48f93308e3f08b452e3d203787234653c20",
+    "spec/components/contracts/v1/vue-public-contracts.json": "8dce2b90df61378a0793b90a95ba9cb541455baad033ac41e5f2c6aa8cb66b4a",
+    "spec/components/contracts/v2/contract-v2.json": "518eb9cc6640f88abb8910ac2e12ec00cfadfc80973cd726c002b0f86a0b7250"
+  },
+  "second": {
+    "spec/baselines/vue-current.json": "d8f0c59a027148dd97fef791aca0b5d9507f5b73a7916adbbf05c34479497cf4",
+    "docs/avalonia/vue-public-api-baseline.md": "5bb8da5cdf0ad61e6ee131ff4ee8b48f93308e3f08b452e3d203787234653c20",
+    "spec/components/contracts/v1/vue-public-contracts.json": "8dce2b90df61378a0793b90a95ba9cb541455baad033ac41e5f2c6aa8cb66b4a",
+    "spec/components/contracts/v2/contract-v2.json": "518eb9cc6640f88abb8910ac2e12ec00cfadfc80973cd726c002b0f86a0b7250"
+  },
+  "byteIdentical": true,
+  "results": {
+    "before": 1,
+    "baseline-first": 0,
+    "v1-first": 0,
+    "v2-first": 0,
+    "baseline-second": 0,
+    "v1-second": 0,
+    "v2-second": 0,
+    "baseline-check": 0,
+    "v1-check": 0,
+    "v2-check": 0,
+    "contract-v2-tests": 0,
+    "surface-check": 0,
+    "docs-check": 0
+  }
+}

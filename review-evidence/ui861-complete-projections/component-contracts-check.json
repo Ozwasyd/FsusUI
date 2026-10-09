@@ -1,0 +1,10 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "command": [
+    "pnpm",
+    "run",
+    "component-contracts:check"
+  ],
+  "exitCode": 0,
+  "seconds": 2.7403078349998395
+}

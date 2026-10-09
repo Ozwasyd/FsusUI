@@ -1,0 +1,8 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "husky"
+  ],
+  "exitCode": 0
+}

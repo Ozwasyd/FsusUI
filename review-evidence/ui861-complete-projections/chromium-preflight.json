@@ -1,0 +1,15 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "command": [
+    "pnpm",
+    "exec",
+    "playwright",
+    "test",
+    "--config=vue/playwright.conformance-interaction.config.ts",
+    "--project=chromium",
+    "--list",
+    "--reporter=json"
+  ],
+  "exitCode": 0,
+  "seconds": 2.2541953990003094
+}

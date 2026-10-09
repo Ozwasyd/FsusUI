@@ -1,0 +1,65 @@
+{
+  "sourceSha": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "status": "success",
+  "tests": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0
+  },
+  "conformance": {
+    "contractHash": "518eb9cc6640f88abb8910ac2e12ec00cfadfc80973cd726c002b0f86a0b7250",
+    "vueBaselineHash": "d8f0c59a027148dd97fef791aca0b5d9507f5b73a7916adbbf05c34479497cf4",
+    "scenarioRegistryHash": "6bad383c9a08420e54e8d397d61b923fc0698754555553e586f6cfa2cadb1dc1",
+    "runnerHash": "84ec1959634de11bc13c0776c64bf5fce76044a5ca4ecc50a7e898d1d930b1bd",
+    "browserRevision": "chromium-1217",
+    "representativeComponents": [
+      "ElButton, ElInput, ElDialog",
+      "ElMarkdownEditor"
+    ],
+    "scenarioCount": 2,
+    "actionStepCount": 14,
+    "traceSchema": "fsusui.interaction.v2",
+    "traceVersion": 2,
+    "traceBrowsers": [
+      "chromium"
+    ],
+    "traceCandidates": [
+      "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76"
+    ],
+    "traceDigest": "48e94cca246f5433b078a3661c48a198e4dab56777517f0e75e44d0cb962d9e4",
+    "traces": [
+      {
+        "path": ".tmp/ui861-complete-projections-conformance/traces/chromium/markdown-editor-chromium.interaction-trace.json",
+        "sha256": "87fddd2ddecadfa8e2791159b474939a8863463792efa868b7bbb98ef1802432"
+      },
+      {
+        "path": ".tmp/ui861-complete-projections-conformance/traces/chromium/representative-components-chromium.interaction-trace.json",
+        "sha256": "d52298f83828b5b8a1964d14ddd89448c727cfec9b239490748c5d310113dd04"
+      }
+    ],
+    "nativeImeAutomated": false,
+    "nativeImeEvidenceReferences": [
+      "#319",
+      "#320"
+    ]
+  },
+  "verifiedTraceFiles": [
+    {
+      "path": ".tmp/ui861-complete-projections-conformance/traces/chromium/markdown-editor-chromium.interaction-trace.json",
+      "sha256": "87fddd2ddecadfa8e2791159b474939a8863463792efa868b7bbb98ef1802432",
+      "actions": 8
+    },
+    {
+      "path": ".tmp/ui861-complete-projections-conformance/traces/chromium/representative-components-chromium.interaction-trace.json",
+      "sha256": "d52298f83828b5b8a1964d14ddd89448c727cfec9b239490748c5d310113dd04",
+      "actions": 6
+    }
+  ],
+  "requiredOtherBrowserCells": {
+    "firefox": "UNRUN",
+    "webkit": "UNRUN"
+  },
+  "aggregate": "UNRUN; missing required other browser receipts; no aggregate PASS claim"
+}
