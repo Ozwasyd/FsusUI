@@ -1,0 +1,69 @@
+Title: WIP: fix(avalonia): pin TableV2 rendered fixture fonts
+
+## Summary
+
+WIP — deterministic fixture setup correction, pending Windows/macOS execution, the original owner's SDK 10.0.401 dependency repair, full Quality Gates and independent review.
+
+The TableV2 fixtures inherited an unspecified font. Explicitly embedding and selecting unmodified Noto Sans 2.004 restores both unchanged frozen PNGs byte-for-byte on Linux. No production rendering regression is demonstrated: TableV2 production source and its virtualization theme are byte-identical at the golden-generating revision, failed head and current-main base. The correction belongs in fixture setup, rather than an unsupported production renderer change.
+
+Select the bundled font in the two sealed rendered tests and the existing mounted payload test. Retain ordinary captures under the established ignored headless evidence directory before the unchanged full-byte Assert.Equal. Add two licensed upstream font faces, their provenance and one correctly named AvaloniaResource item. All assertions, PNGs, thresholds, budgets, shared font setup and CI configuration remain unchanged. Seven files change, all within FsusUI.Avalonia.HeadlessTests.
+
+Base: b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2.
+Head: 24a7ba8c3feffbe4f040a5ccf6332af70f7a74d4.
+Branch: fix/table-v2-rendered-output-20261009.
+Diagnostic combination: head plus the exact approved dependency patch from 8840c3834f4d1cb67cdccd5238b1cbcc8558141a. Those three complete lock inputs were checked against that commit, consumed temporarily and removed before delivery. No dependency locks are included in this branch.
+
+## Linked Issue
+
+Related to #285's rendered fixtures. Investigates Quality Gates run 37798728109, failed head 83036006069be5cfcd09724273d5705d8f848ad0, Linux job 113384931201 and macOS job 113384931043. No issue-closing claim.
+
+## Impact Checklist
+
+- [x] Component or public API impact: none; production controls are unchanged.
+- [x] Theme token impact: none; original light/reduced-motion fixture configuration retained.
+- [x] Motion token impact: none.
+- [x] Element Plus compatibility impact: none.
+- [x] Visual snapshot impact: both frozen PNG files retained unchanged; strict encoded-byte assertions retained.
+- [x] Accessibility impact: no semantics changed; existing DataGrid/DataItem, keyboard, focus/status and automation-write assertions retained and executed.
+- [x] README or docs: test-font provenance, license and capture behavior documented beside the assets.
+
+## Release Notes
+
+- [ ] Changeset added for user-facing package changes — not applicable.
+- [x] Changeset not needed because this is internal-only test setup; no package or public API change.
+- [ ] Breaking changes are marked in the changeset and migration docs — not applicable.
+
+## Validation
+
+- [ ] pnpm run lint — UNRUN.
+- [ ] pnpm run typecheck — UNRUN.
+- [ ] pnpm run test — UNRUN; no broad suite executed.
+- [ ] pnpm run build — UNRUN.
+- [ ] pnpm run verify:visual:affected — UNRUN; no Vue/product visual implementation changed.
+- [ ] pnpm run test:consumer-install — UNRUN; public package output unaffected.
+- [x] PASS: locked restore of the headless test project and its references, Release compilation, and the precise ordinary allowlist: 12 passed, 0 failed, 0 skipped. The two original methods passed, plus ten TableV2 payload, geometry, virtualization budget, keyboard/automation and theme-contract checks. Source hooks inspected and list-tests count confirmed before execution; no broad suite followed by output filtering.
+- [x] PASS: decoded RGBA equality and complete PNG byte equality for both inspected candidate images. Populated/empty: 488x540, 38,293 bytes, SHA-256 12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8. Header/overlay: 488x320, 17,037 bytes, SHA-256 3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d. Zero changed pixels across 419,680 pixels. Both use RGBA 8-bit, a 96-DPI render target and identical IHDR/sBIT/IDAT/IEND chunks; no timestamp/text/profile metadata. No encoded-byte nondeterminism demonstrated locally.
+- [x] PASS: git diff --check; clean delivered worktree; original FsusUI/FsusBlog checkouts unchanged; baseline-update switch never enabled.
+
+Actual toolchain: official checksum-verified SDK 10.0.108, SDK commit 94ea82652c, runtime 10.0.8, MSBuild 18.0.11+94ea82652, Debian 13 linux-x64, Avalonia 12.0.4, SkiaSharp 3.119.4. SDK archive SHA-512 e32f76b768017718aa5a3a51fcac4b617ab4428c5f2d10b1b30f07dd7f1ea3dad4df917df48d855d78a347d635e48ce0ec309787899c53a32c4c10dd216b6b19 matches Microsoft's release metadata. This evidence does not qualify SDK 10.0.401.
+
+FAIL before correction: both original local cases could not resolve the inherited Inter glyphTypeface. Local Inter/DejaVu probes rendered with real pixel and layout differences. The mounted payload test had the same missing-font failure until its own fixture window selected the bundled font. Final allowlist is green.
+
+Original official archives retrieved through the GitHub connector, with published digests verified: Linux artifact 11559887369, SHA-256 827c49e687d6319bd115a19dfe445f8c93cd6d98339c45357dcc89ff14248c0d; macOS artifact 11559428406, SHA-256 cc5d401fdc3e87336331ae20f6ac5d3f37721c8663e47814336ad4360c0aab59. Each contains four TRX files and no failing PNG. Original logs show SDK 10.0.401 and byte differences in IDAT at offsets 61/59. The original helper never saved the actual PNG bytes. Exact original-CI decoded pixel differences are therefore unavailable; local font probes are not represented as original CI captures.
+
+UNRUN / blockers: Windows and macOS candidate execution, actual CI SDK 10.0.401 (separately owned ILLink 10.0.12 NU1004 dependency task), full Quality Gates, independent UX acceptance. Platform raster equivalence is not established by Linux-local equality. Frozen comparison semantics and baseline governance were not changed. Held receipt/resource-root/cohort/Git-ref/race/custody work was not retried; no acceptance receipts were created. Keep this PR draft.
+
+Supporting evidence in the selected environment: /workspace/tablev2-delivery/evidence.json, allowlist.txt, candidate/pixel-differences.json, results/*.trx, original archives/logs and inspect-pixels.py. The archive /workspace/tablev2-delivery.tar.gz packages this evidence.
+
+### Next commands
+
+For an isolated SDK 10.0.108 review combination, consume exactly the approved 8840c383 prerequisite before locked restore. Keep its lock changes out of this PR. On each eligible host, after its original owner resolves the toolchain-specific dependency input:
+
+    dotnet --info
+    dotnet restore dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --locked-mode --disable-parallel --maxcpucount:1
+    dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --configuration Release --list-tests --filter "$(cat /workspace/tablev2-delivery/allowlist.txt)" --maxcpucount:1
+    dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --configuration Release --filter "$(cat /workspace/tablev2-delivery/allowlist.txt)" --maxcpucount:1 --logger trx
+
+Confirm the expected count is 12. Keep FSUSUI_UPDATE_VISUAL_ARTIFACTS unset. Inspect any differing ordinary captures before proposing a renderer or comparison-policy change. Run required Quality Gates and independent review before marking ready. Root owns draft PR creation, metadata and merging; none was performed by this task.
+
+Rollback: revert only 24a7ba8c3feffbe4f040a5ccf6332af70f7a74d4 if the isolated fixture-font setup causes a regression. Preserve the original PNGs and separately owned dependency repair.

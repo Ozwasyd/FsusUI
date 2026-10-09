@@ -1,0 +1,226 @@
+[
+  {
+    "name": "table-v2-content-regions-light.png",
+    "expectedSize": [
+      488,
+      540
+    ],
+    "actualSize": [
+      488,
+      540
+    ],
+    "expectedBytes": 38293,
+    "actualBytes": 38293,
+    "expectedSha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+    "actualSha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+    "differentPixels": 0,
+    "pixels": 263520,
+    "differenceBounds": null,
+    "maxChannelDifference": 0,
+    "alphaDifferentPixels": 0,
+    "pixelsByYBand": [
+      [
+        0,
+        60,
+        0
+      ],
+      [
+        60,
+        78,
+        0
+      ],
+      [
+        78,
+        114,
+        0
+      ],
+      [
+        114,
+        220,
+        0
+      ],
+      [
+        220,
+        320,
+        0
+      ],
+      [
+        320,
+        420,
+        0
+      ],
+      [
+        420,
+        540,
+        0
+      ]
+    ],
+    "expectedChunks": [
+      [
+        "IHDR",
+        13
+      ],
+      [
+        "sBIT",
+        4
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        5404
+      ],
+      [
+        "IEND",
+        0
+      ]
+    ],
+    "actualChunks": [
+      [
+        "IHDR",
+        13
+      ],
+      [
+        "sBIT",
+        4
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        5404
+      ],
+      [
+        "IEND",
+        0
+      ]
+    ]
+  },
+  {
+    "name": "table-v2-whole-header-overlay-light.png",
+    "expectedSize": [
+      488,
+      320
+    ],
+    "actualSize": [
+      488,
+      320
+    ],
+    "expectedBytes": 17037,
+    "actualBytes": 17037,
+    "expectedSha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+    "actualSha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+    "differentPixels": 0,
+    "pixels": 156160,
+    "differenceBounds": null,
+    "maxChannelDifference": 0,
+    "alphaDifferentPixels": 0,
+    "pixelsByYBand": [
+      [
+        0,
+        60,
+        0
+      ],
+      [
+        60,
+        78,
+        0
+      ],
+      [
+        78,
+        114,
+        0
+      ],
+      [
+        114,
+        220,
+        0
+      ],
+      [
+        220,
+        320,
+        0
+      ]
+    ],
+    "expectedChunks": [
+      [
+        "IHDR",
+        13
+      ],
+      [
+        "sBIT",
+        4
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        556
+      ],
+      [
+        "IEND",
+        0
+      ]
+    ],
+    "actualChunks": [
+      [
+        "IHDR",
+        13
+      ],
+      [
+        "sBIT",
+        4
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        8192
+      ],
+      [
+        "IDAT",
+        556
+      ],
+      [
+        "IEND",
+        0
+      ]
+    ]
+  }
+]

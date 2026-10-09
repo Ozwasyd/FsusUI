@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c85bda4c-c49c-4704-8c8e-f79320c09a28" name="@d45ac3896e5a 2026-10-09 06:17:30" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T06:17:30.9455792+00:00" queuing="2026-10-09T06:17:30.9455793+00:00" start="2026-10-09T06:17:27.6790061+00:00" finish="2026-10-09T06:17:30.9526127+00:00" />
+  <TestSettings name="default" id="cf248dd0-d0d0-410b-b7d9-d8ad7c24a6cb">
+    <Deployment runDeploymentRoot="_d45ac3896e5a_2026-10-09_06_17_30" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="1fe3b369-2606-4904-af98-a0397dbe015f" testId="40399829-855d-99c7-5313-c0dc809af389" testName="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng" computerName="d45ac3896e5a" duration="00:00:00.6151274" startTime="2026-10-09T06:17:30.1346946+00:00" endTime="2026-10-09T06:17:30.7776812+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1fe3b369-2606-4904-af98-a0397dbe015f">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : Could not create glyphTypeface. Font family: Inter (key: compositefont:fonts:Inter#Inter, $Default). Style: Normal. Weight: DemiBold. Stretch: Normal</Message>
+          <StackTrace>   at Avalonia.Media.Typeface.get_GlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextCharacters.CreateShapeableRun(ReadOnlyMemory`1 text, TextRunProperties defaultProperties, SByte biDiLevel, FontManager fontManager, TextRunProperties&amp; previousProperties)
+   at Avalonia.Media.TextFormatting.TextCharacters.GetShapeableCharacters(ReadOnlyMemory`1 text, SByte biDiLevel, FontManager fontManager, TextRunProperties&amp; previousProperties, RentedList`1 results)
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.CoalesceLevels(IReadOnlyList`1 textCharacters, ReadOnlySpan`1 levels, FontManager fontManager, RentedList`1 processedRuns)
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.ShapeTextRuns(IReadOnlyList`1 textRuns, TextParagraphProperties paragraphProperties, FormattingObjectPool objectPool, FontManager fontManager, FlowDirection&amp; resolvedFlowDirection)
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+   at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+   at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+   at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+   at Avalonia.Controls.TextBlock.get_TextLayout()
+   at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Controls.StackPanel.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+   at Avalonia.Controls.Border.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+   at Avalonia.Controls.Presenters.ContentPresenter.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding)
+   at Avalonia.Controls.Decorator.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.Primitives.VisualLayerManager.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.Window.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.WindowBase.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Controls.TopLevelHost.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+   at Avalonia.Layout.LayoutManager.ExecuteInitialLayoutPass()
+   at Avalonia.Controls.Window.ShowCore[TResult](Window owner, Boolean modal)
+   at Avalonia.Controls.Window.Show()
+   at FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng() in /workspace/tablev2-fix/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs:line 207
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="958f936e-c078-4686-b00b-44c64ba6107c" testId="f234703f-6246-cc01-8834-f797af99acc2" testName="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng" computerName="d45ac3896e5a" duration="00:00:00.0183989" startTime="2026-10-09T06:17:30.8158636+00:00" endTime="2026-10-09T06:17:30.8348256+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="958f936e-c078-4686-b00b-44c64ba6107c">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : Could not create glyphTypeface. Font family: Inter (key: compositefont:fonts:Inter#Inter, $Default). Style: Normal. Weight: DemiBold. Stretch: Normal</Message>
+          <StackTrace>   at Avalonia.Media.Typeface.get_GlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextCharacters.CreateShapeableRun(ReadOnlyMemory`1 text, TextRunProperties defaultProperties, SByte biDiLevel, FontManager fontManager, TextRunProperties&amp; previousProperties)
+   at Avalonia.Media.TextFormatting.TextCharacters.GetShapeableCharacters(ReadOnlyMemory`1 text, SByte biDiLevel, FontManager fontManager, TextRunProperties&amp; previousProperties, RentedList`1 results)
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.CoalesceLevels(IReadOnlyList`1 textCharacters, ReadOnlySpan`1 levels, FontManager fontManager, RentedList`1 processedRuns)
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.ShapeTextRuns(IReadOnlyList`1 textRuns, TextParagraphProperties paragraphProperties, FormattingObjectPool objectPool, FontManager fontManager, FlowDirection&amp; resolvedFlowDirection)
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+   at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+   at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+   at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+   at Avalonia.Controls.TextBlock.get_TextLayout()
+   at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Controls.StackPanel.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+   at Avalonia.Controls.Border.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+   at Avalonia.Controls.Presenters.ContentPresenter.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding)
+   at Avalonia.Controls.Decorator.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.Primitives.VisualLayerManager.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.Window.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.WindowBase.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Controls.TopLevelHost.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+   at Avalonia.Layout.LayoutManager.ExecuteInitialLayoutPass()
+   at Avalonia.Controls.Window.ShowCore[TResult](Window owner, Boolean modal)
+   at Avalonia.Controls.Window.Show()
+   at FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng() in /workspace/tablev2-fix/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs:line 110
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng" storage="/workspace/tablev2-fix/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="40399829-855d-99c7-5313-c0dc809af389">
+      <Execution id="1fe3b369-2606-4904-af98-a0397dbe015f" />
+      <TestMethod codeBase="/workspace/tablev2-fix/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests" name="RendersWholeHeaderAndOverlayContentRegionsToPng" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng" storage="/workspace/tablev2-fix/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="f234703f-6246-cc01-8834-f797af99acc2">
+      <Execution id="958f936e-c078-4686-b00b-44c64ba6107c" />
+      <TestMethod codeBase="/workspace/tablev2-fix/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests" name="RendersPopulatedAndEmptyContentRegionsToPng" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="40399829-855d-99c7-5313-c0dc809af389" executionId="1fe3b369-2606-4904-af98-a0397dbe015f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f234703f-6246-cc01-8834-f797af99acc2" executionId="958f936e-c078-4686-b00b-44c64ba6107c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.24]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.85]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:01.10]   Starting:    FsusUI.Avalonia.HeadlessTests
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+[xUnit.net 00:00:02.54]       System.InvalidOperationException : Could not create glyphTypeface. Font family: Inter (key: compositefont:fonts:Inter#Inter, $Default). Style: Normal. Weight: DemiBold. Stretch: Normal
+[xUnit.net 00:00:02.54]       Stack Trace:
+[xUnit.net 00:00:02.54]            at Avalonia.Media.Typeface.get_GlyphTypeface()
+[xUnit.net 00:00:02.54]            at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+[xUnit.net 00:00:02.54]            at Avalonia.Media.TextFormatting.TextCharacters.CreateShapeableRun(ReadOnlyMemory`1 text, TextRunProperties defaultProperties, SByte biDiLevel, FontManager fontManager, TextRunProperties&amp; previousProperties)
+[xUnit.net 00:00:02.54]            at Avalonia.Media.TextFormatting.TextCharacters.GetShapeableCharacters(ReadOnlyMemory`1 text, SByte biDiLevel, FontManager fontManager, TextRunProperties&amp; previousProperties, RentedList`1 results)
+[xUnit.net 00:00:02.54]            at Avalonia.Media.TextFormatting.TextFormatterImpl.CoalesceLevels(IReadOnlyList`1 textCharacters, ReadOnlySpan`1 levels, FontManager fontManager, RentedList`1 processedRuns)
+[xUnit.net 00:00:02.54]            at Avalonia.Media.TextFormatting.TextFormatterImpl.ShapeTextRuns(IReadOnlyList`1 textRuns, TextParagraphProperties paragraphProperties, FormattingObjectPool objectPool, FontManager fontManager, FlowDirection&amp; resolvedFlowDirection)
+[xUnit.net 00:00:02.54]            at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+[xUnit.net 00:00:02.54]            at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+[xUnit.net 00:00:02.54]            at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.TextBlock.get_TextLayout()
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.StackPanel.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.Border.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.Presenters.ContentPresenter.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.Decorator.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.Primitives.VisualLayerManager.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.Window.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.WindowBase.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.TopLevelHost.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+[xUnit.net 00:00:02.54]            at Avalonia.Layout.LayoutManager.ExecuteInitialLayoutPass()
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.Window.ShowCore[TResult](Window owner, Boolean modal)
+[xUnit.net 00:00:02.54]            at Avalonia.Controls.Window.Show()
+[xUnit.net 00:00:02.54]         /workspace/tablev2-fix/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs(207,0): at FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng()
+[xUnit.net 00:00:02.54]            at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+[xUnit.net 00:00:02.54]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:02.59]       System.InvalidOperationException : Could not create glyphTypeface. Font family: Inter (key: compositefont:fonts:Inter#Inter, $Default). Style: Normal. Weight: DemiBold. Stretch: Normal
+[xUnit.net 00:00:02.59]       Stack Trace:
+[xUnit.net 00:00:02.59]            at Avalonia.Media.Typeface.get_GlyphTypeface()
+[xUnit.net 00:00:02.59]            at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+[xUnit.net 00:00:02.59]            at Avalonia.Media.TextFormatting.TextCharacters.CreateShapeableRun(ReadOnlyMemory`1 text, TextRunProperties defaultProperties, SByte biDiLevel, FontManager fontManager, TextRunProperties&amp; previousProperties)
+[xUnit.net 00:00:02.59]            at Avalonia.Media.TextFormatting.TextCharacters.GetShapeableCharacters(ReadOnlyMemory`1 text, SByte biDiLevel, FontManager fontManager, TextRunProperties&amp; previousProperties, RentedList`1 results)
+[xUnit.net 00:00:02.59]            at Avalonia.Media.TextFormatting.TextFormatterImpl.CoalesceLevels(IReadOnlyList`1 textCharacters, ReadOnlySpan`1 levels, FontManager fontManager, RentedList`1 processedRuns)
+[xUnit.net 00:00:02.59]            at Avalonia.Media.TextFormatting.TextFormatterImpl.ShapeTextRuns(IReadOnlyList`1 textRuns, TextParagraphProperties paragraphProperties, FormattingObjectPool objectPool, FontManager fontManager, FlowDirection&amp; resolvedFlowDirection)
+[xUnit.net 00:00:02.59]            at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+[xUnit.net 00:00:02.59]            at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+[xUnit.net 00:00:02.59]            at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.TextBlock.get_TextLayout()
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.StackPanel.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.Border.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.Presenters.ContentPresenter.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.Decorator.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.Primitives.VisualLayerManager.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.Window.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.WindowBase.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.TopLevelHost.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+[xUnit.net 00:00:02.59]            at Avalonia.Layout.LayoutManager.ExecuteInitialLayoutPass()
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.Window.ShowCore[TResult](Window owner, Boolean modal)
+[xUnit.net 00:00:02.59]            at Avalonia.Controls.Window.Show()
+[xUnit.net 00:00:02.59]         /workspace/tablev2-fix/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs(110,0): at FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng()
+[xUnit.net 00:00:02.59]            at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+[xUnit.net 00:00:02.59]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:02.60]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="d45ac3896e5a" outcome="Error" timestamp="2026-10-09T06:17:30.7863389+00:00">
+        <Text>[xUnit.net 00:00:02.54]     FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="d45ac3896e5a" outcome="Error" timestamp="2026-10-09T06:17:30.8395318+00:00">
+        <Text>[xUnit.net 00:00:02.59]     FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>
