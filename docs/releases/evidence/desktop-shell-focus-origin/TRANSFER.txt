@@ -1,0 +1,39 @@
+FOR THE SAME INDEPENDENT REVIEWER 01a11f70-e3dc-73b6-ba6c-969277d75023
+
+Frozen source parent: df6c9d917104ca63327ff802382b1bcbe49d4ce9, unchanged.
+Separate four-path correction: 4ab7a563ecd680cd5e29de9988de281337e5c219 on fix/desktop-shell-focus-origin.
+Implementation delta is delta.patch. No original assertion removed. Exactly the existing production file, ordinary test file, DesktopShell contract page and existing patch changeset changed. No shared menu/shortcut, lock, CI, Tree, PDF, Markdown discovery, frozen PNG/budget/acceptance, or denied resource-root file changed.
+
+P2: actual runtime reproduction now exists. With frozen df6c production plus final regression test source, actual focus returns to the moved tab but :focus-visible becomes false after Tab-origin reorder at both header widths. before.trx/before.log record 3 passes, 2 failures, zero skipped, expected five.
+The correction records NavigationMethod in FsusDocumentTab.OnGotFocus only when NewFocusedElement is that header, captures it before reorder, and restores Focus with that exact method. Tests cover Tab, Directional, Pointer and Unspecified origins; actual focus, last observed origin and visible pseudo-class; focus brush and thickness for keyboard-origin indication; and moving another header. GotFocus observer includes handled events because Avalonia's selection handling can consume the event. No new focus event is required when focus remains intact; the last observed origin must stay correct.
+
+P3: both Shift+F10 and Apps each require exactly one additional DocumentContextRequested event, retaining all original key/source/selection assertions. Each count assertion passes in the retained red run before reaching the P2 failure, and in green. The P3 finding was a coverage hole, not a reproduced failure to generate an Apps event.
+
+Final green after.trx/after.log: expected/executed/passed five, failed0, skipped0. The Release test command rebuilds the selected project/references under SDK10.0.108. Locked restore in restore.log passes with approved8840 locks. Single unrelated existing Markdown xUnit2013 warning retained, not changed.
+
+Exact allowed method prefix: FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.
+DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback --1
+DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget --1
+DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling --2 (headerWidth120,220)
+AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics --1
+Literal exact VSTest filter: ordinary.filter. Commands/environment: commands.txt. Expected total5 on every run. No whole-class wildcard, renderer or FindRepositoryRoot route was selected or executed.
+
+Exact SDK/runtime/OS and checksum identity: inputs.json and toolchain.txt. Actual SDK10.0.108, runtime10.0.8, Avalonia12.0.4, Debian13/linux-x64. PATH points only to separately installed official SHA512-verified108 SDK. FSUS_HEADLESS_GSANS unset; writable XDG_CACHE_HOME. Test parallelism remains disabled, headless Skia options unchanged. No audit/signature/locked setting disabled, no scratch locks or lock edits.
+
+Approved lock prerequisite8840c3834f4d1cb67cdccd5238b1cbcc8558141a is consumed only in diagnostic composition based on b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2 and represented by cherry-pick64c7e4b2669d4a12fae0733ae8f0572f8c0b91d9. Source-only candidate and this evidence branch exclude prerequisite lock changes. Blob identities:
+dotnet/FsusUI.Avalonia/packages.lock.json fc3eeee35caa4ec3e49e9a987e59625543d434e5
+dotnet/FsusUI.Avalonia.Icons/packages.lock.json 284a0ce4f7f7b13b942a6d6a870dddb38160332e
+dotnet/FsusUI.Avalonia.Themes/packages.lock.json 284a0ce4f7f7b13b942a6d6a870dddb38160332e
+dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json 802a270312b3f47bc38f25999563888cd5ef8a94
+dotnet/FsusUI.Avalonia.Demo/packages.lock.json 23e03b0ff5b6d34419d4761c6e8c5bcf6777a77d
+dotnet/FsusUI.Avalonia.FormGenerator/packages.lock.json d69565e30ae7491fd052ed5c47f2dbc044fb5c82
+Signature verification remains the independently approved prerequisite evidence supplied by Root; this handoff does not invent a new signature claim.
+
+The same final test source is retained as red-test-source.cs and is byte-identical to the published candidate test source. red-production-source.cs is byte-identical to frozen df6c production, green-production-source.cs to corrected candidate production. These snapshots make historical red/green composition reviewable; none belongs to a new test assembly.
+Initial-event-assertion / initial-focus-away / initial-handled-event attempt files are archived diagnostic test-setup iterations, not final qualification evidence. The final before/after reports use the same final regression test source and correct observer/setup. Earlier named TRX files were overwritten during iteration; no missing reports reconstructed. All transferred log/TRX snapshots are copied, not regenerated for transfer.
+
+Other checks PASS: node scripts/check-avalonia-docs.mjs; node scripts/check-documentation-architecture.mjs; git diff --check. No full visual or independent UX acceptance claim. No new screenshots generated or frozen PNGs edited. Remaining UNRUN: .401 composition, fullCI, native Windows/macOS, renderer, FindRepositoryRoot, whole suite and independent UX acceptance. Reviewer's earlier .401/original-lock NU1004 was UNRUN, not a runtime reproduction. Independently approved2d1d/.401 composition was not consumed, and no108 result qualifies it or plain-head restore. Held audits/resource-root task untouched; no receipt/cohort/Git-ref/race/custody audits recreated. Root retains GitHub metadata/review/merge ownership; no duplicate PR or review created, no GitHub content API writes or package publication.
+
+Primary pinned source references explaining focus-visible and handled focus observation:
+https://github.com/AvaloniaUI/Avalonia/blob/12.0.4/src/Avalonia.Base/Input/InputElement.cs#L526
+https://github.com/AvaloniaUI/Avalonia/blob/12.0.4/src/Avalonia.Controls/Primitives/SelectingItemsControl.cs#L826

@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="6c5cecf8-7d9f-45f3-bec8-e00b943e9b92" name="@845b6801dd61 2026-10-09 07:10:07" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T07:10:07.0704052+00:00" queuing="2026-10-09T07:10:07.0704052+00:00" start="2026-10-09T07:09:56.8973607+00:00" finish="2026-10-09T07:10:11.2512853+00:00" />
+  <TestSettings name="default" id="501aad8e-c723-495c-8d44-24cd0fe4a54e">
+    <Deployment runDeploymentRoot="_845b6801dd61_2026-10-09_07_10_07" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="ad5574aa-446c-4001-99f3-d48db8a43901" testId="fa788278-2654-5fd2-c0dc-95709ee17d4e" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)" computerName="845b6801dd61" duration="00:00:03.4644892" startTime="2026-10-09T07:10:07.0478314+00:00" endTime="2026-10-09T07:10:10.5147504+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ad5574aa-446c-4001-99f3-d48db8a43901">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure: Values differ
+Expected: Directional
+Actual:   null</Message>
+          <StackTrace>   at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(Double headerWidth) in /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs:line 303
+   at InvokeStub_FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a435e076-8c5f-4f6a-9972-cd0caa2d936c" testId="29c47670-ef74-4102-ac09-252ceb215acc" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback" computerName="845b6801dd61" duration="00:00:00.0028179" startTime="2026-10-09T07:10:11.1158634+00:00" endTime="2026-10-09T07:10:11.1187747+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a435e076-8c5f-4f6a-9972-cd0caa2d936c" />
+    <UnitTestResult executionId="3c6cab38-a7df-473a-8478-1dd33474808c" testId="aff47b5d-39ec-8507-0a46-926d183fdf46" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics" computerName="845b6801dd61" duration="00:00:00.5638031" startTime="2026-10-09T07:10:10.5407133+00:00" endTime="2026-10-09T07:10:11.1051877+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3c6cab38-a7df-473a-8478-1dd33474808c" />
+    <UnitTestResult executionId="a57aed29-b30b-42dd-80d5-0d0b8550ab5e" testId="c66ea2c4-21e9-f01c-161d-8c5ec08eb299" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)" computerName="845b6801dd61" duration="00:00:05.4471665" startTime="2026-10-09T07:10:01.4793433+00:00" endTime="2026-10-09T07:10:06.9522793+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a57aed29-b30b-42dd-80d5-0d0b8550ab5e">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Equal() Failure: Values differ
+Expected: Directional
+Actual:   null</Message>
+          <StackTrace>   at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(Double headerWidth) in /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs:line 303
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="6a0810ed-9a53-4f40-962d-79b6c879f84d" testId="da6b8b94-76a4-80eb-8fed-d24b0b257204" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget" computerName="845b6801dd61" duration="00:00:00.0011234" startTime="2026-10-09T07:10:11.1115135+00:00" endTime="2026-10-09T07:10:11.1127405+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a0810ed-9a53-4f40-962d-79b6c879f84d" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="da6b8b94-76a4-80eb-8fed-d24b0b257204">
+      <Execution id="6a0810ed-9a53-4f40-962d-79b6c879f84d" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="aff47b5d-39ec-8507-0a46-926d183fdf46">
+      <Execution id="3c6cab38-a7df-473a-8478-1dd33474808c" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="c66ea2c4-21e9-f01c-161d-8c5ec08eb299">
+      <Execution id="a57aed29-b30b-42dd-80d5-0d0b8550ab5e" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="29c47670-ef74-4102-ac09-252ceb215acc">
+      <Execution id="a435e076-8c5f-4f6a-9972-cd0caa2d936c" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="fa788278-2654-5fd2-c0dc-95709ee17d4e">
+      <Execution id="ad5574aa-446c-4001-99f3-d48db8a43901" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="fa788278-2654-5fd2-c0dc-95709ee17d4e" executionId="ad5574aa-446c-4001-99f3-d48db8a43901" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="29c47670-ef74-4102-ac09-252ceb215acc" executionId="a435e076-8c5f-4f6a-9972-cd0caa2d936c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="aff47b5d-39ec-8507-0a46-926d183fdf46" executionId="3c6cab38-a7df-473a-8478-1dd33474808c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c66ea2c4-21e9-f01c-161d-8c5ec08eb299" executionId="a57aed29-b30b-42dd-80d5-0d0b8550ab5e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="da6b8b94-76a4-80eb-8fed-d24b0b257204" executionId="6a0810ed-9a53-4f40-962d-79b6c879f84d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="5" executed="5" passed="3" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.75]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:02.53]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:03.32]   Starting:    FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:09.45]       Assert.Equal() Failure: Values differ
+[xUnit.net 00:00:09.45]       Expected: Directional
+[xUnit.net 00:00:09.45]       Actual:   null
+[xUnit.net 00:00:09.45]       Stack Trace:
+[xUnit.net 00:00:09.45]         /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs(303,0): at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(Double headerWidth)
+[xUnit.net 00:00:09.45]            at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+[xUnit.net 00:00:09.45]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+[xUnit.net 00:00:13.01]       Assert.Equal() Failure: Values differ
+[xUnit.net 00:00:13.01]       Expected: Directional
+[xUnit.net 00:00:13.01]       Actual:   null
+[xUnit.net 00:00:13.01]       Stack Trace:
+[xUnit.net 00:00:13.01]         /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs(303,0): at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(Double headerWidth)
+[xUnit.net 00:00:13.01]            at InvokeStub_FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(Object, Span`1)
+[xUnit.net 00:00:13.01]            at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:00:13.63]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="845b6801dd61" outcome="Error" timestamp="2026-10-09T07:10:06.9608138+00:00">
+        <Text>[xUnit.net 00:00:09.45]     FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220) [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="845b6801dd61" outcome="Error" timestamp="2026-10-09T07:10:10.5267085+00:00">
+        <Text>[xUnit.net 00:00:13.01]     FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120) [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

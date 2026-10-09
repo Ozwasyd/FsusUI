@@ -1,0 +1,154 @@
+diff --git a/.changeset/avalonia-document-tab-reorder-focus.md b/.changeset/avalonia-document-tab-reorder-focus.md
+index 7b94742a..737bf171 100644
+--- a/.changeset/avalonia-document-tab-reorder-focus.md
++++ b/.changeset/avalonia-document-tab-reorder-focus.md
+@@ -2,4 +2,4 @@
+ 'element-plus': patch
+ ---
+ 
+-Preserve keyboard focus on an Avalonia document-tab header when drag or programmatic reorder removes and reinserts it, while retaining the active document identity and focus on other controls.
++Preserve focus and its original keyboard or pointer navigation origin on an Avalonia document-tab header when drag or programmatic reorder removes and reinserts it, keeping the keyboard focus ring visible and retaining the active document identity and focus indication on other controls.
+diff --git a/docs/avalonia/components/desktop-shell.md b/docs/avalonia/components/desktop-shell.md
+index 0e24763b..e5d961c2 100644
+--- a/docs/avalonia/components/desktop-shell.md
++++ b/docs/avalonia/components/desktop-shell.md
+@@ -62,7 +62,9 @@ that was the last document, the previous adjacent tab is selected.
+ 
+ Pointer drag calls `ReorderDocument` and raises typed `Reordered` arguments with
+ the old/new indexes and source. Reordering preserves the active document and
+-the focused document header; moving another header does not take focus.
++the focused document header, including its keyboard or pointer focus origin and
++corresponding visible focus indication; moving another header does not take focus
++or change that indication.
+ The horizontally scrollable header reveals the
+ selected tab; `CanScrollBackward`, `CanScrollForward`, `ScrollHeaders`, and the
+ header extent/viewport/offset properties expose overflow without product
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
+index b43a3adc..2f4fd4e3 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
+@@ -217,11 +217,15 @@ public class FsusDesktopShellHeadlessTests
+     Assert.Same(contextTarget, contextRequests[^1].Anchor);
+     Assert.Equal(FsusTreeInteractionSource.Pointer, contextRequests[^1].InteractionSource);
+     Assert.True(contextTarget.Focus(NavigationMethod.Tab));
++    var contextRequestCount = contextRequests.Count;
+     window.KeyPress(Key.F10, RawInputModifiers.Shift, PhysicalKey.F10, string.Empty);
++    Assert.Equal(contextRequestCount + 1, contextRequests.Count);
+     Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
+     Assert.Equal(FsusTreeInteractionSource.Keyboard, contextRequests[^1].InteractionSource);
+     Assert.Equal(firstKey, tabs.SelectedKey);
++    contextRequestCount = contextRequests.Count;
+     window.KeyPress(Key.Apps, RawInputModifiers.None, PhysicalKey.ContextMenu, string.Empty);
++    Assert.Equal(contextRequestCount + 1, contextRequests.Count);
+     Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
+     Assert.Equal(FsusTreeInteractionSource.Keyboard, contextRequests[^1].InteractionSource);
+     Assert.Equal(firstKey, tabs.SelectedKey);
+@@ -277,6 +281,63 @@ public class FsusDesktopShellHeadlessTests
+     Assert.Same(dragTarget, tabs.SelectedItem);
+     Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
+ 
++    NavigationMethod? lastFocusOrigin = null;
++    dragTarget.AddHandler(InputElement.GotFocusEvent, (_, e) =>
++    {
++      if (ReferenceEquals(e.NewFocusedElement, dragTarget))
++      {
++        lastFocusOrigin = e.NavigationMethod;
++      }
++    }, handledEventsToo: true);
++    foreach (var focusOrigin in new[]
++    {
++      NavigationMethod.Tab,
++      NavigationMethod.Directional,
++      NavigationMethod.Pointer,
++      NavigationMethod.Unspecified,
++    })
++    {
++      Assert.True(other.Focus(NavigationMethod.Pointer));
++      Assert.Same(other, window.FocusManager.GetFocusedElement());
++      Assert.True(dragTarget.Focus(focusOrigin));
++      Assert.Equal(focusOrigin, lastFocusOrigin);
++      Dispatcher.UIThread.RunJobs();
++      var focusVisible = focusOrigin is NavigationMethod.Tab or NavigationMethod.Directional;
++      Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
++
++      var index = tabs.Documents.ToList().IndexOf(dragTarget);
++      Assert.True(tabs.ReorderDocument(dragTarget.Key, index == 0 ? 1 : 0));
++      Dispatcher.UIThread.RunJobs();
++      Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
++      Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
++      Assert.Equal(focusOrigin, lastFocusOrigin);
++      if (focusVisible)
++      {
++        Assert.Same(window.Resources[FsusThemeResourceKeys.FocusBrush], dragTarget.BorderBrush);
++        Assert.Equal(
++          Assert.IsType<Thickness>(window.Resources["FsusThemeFocusBorderThickness"]),
++          dragTarget.BorderThickness);
++      }
++
++      otherIndex = tabs.Documents.ToList().IndexOf(other);
++      lastFocusOrigin = null;
++      Assert.True(tabs.ReorderDocument(other.Key, otherIndex == 0 ? 1 : 0));
++      Dispatcher.UIThread.RunJobs();
++      Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
++      Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
++      Assert.Null(lastFocusOrigin);
++      if (focusVisible)
++      {
++        Assert.Same(window.Resources[FsusThemeResourceKeys.FocusBrush], dragTarget.BorderBrush);
++        Assert.Equal(
++          Assert.IsType<Thickness>(window.Resources["FsusThemeFocusBorderThickness"]),
++          dragTarget.BorderThickness);
++      }
++      Assert.Equal(dragTarget.Key, tabs.SelectedKey);
++      Assert.Equal(dragTarget.Key, tabs.FocusedKey);
++      Assert.Same(dragTarget, tabs.SelectedItem);
++    }
++
+     window.Close();
+   }
+ 
+diff --git a/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs b/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
+index 06313477..62b6ddc2 100644
+--- a/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
++++ b/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
+@@ -81,6 +81,7 @@ public class FsusDocumentTab : FsusTabPane
+   private bool pointerDragMoved;
+ 
+   internal FsusDocumentTabs? ParentDocumentTabs { get; set; }
++  internal NavigationMethod FocusNavigationMethod { get; private set; }
+ 
+   public FsusDocumentTab()
+   {
+@@ -203,6 +204,15 @@ public class FsusDocumentTab : FsusTabPane
+     e.Pointer.Capture(null);
+   }
+ 
++  protected override void OnGotFocus(FocusChangedEventArgs e)
++  {
++    base.OnGotFocus(e);
++    if (ReferenceEquals(e.NewFocusedElement, this))
++    {
++      FocusNavigationMethod = e.NavigationMethod;
++    }
++  }
++
+   protected override void OnKeyDown(KeyEventArgs e)
+   {
+     if (
+@@ -429,6 +439,7 @@ public class FsusDocumentTabs : FsusTabs
+ 
+     var selectedKey = SelectedKey;
+     var wasFocused = document.IsFocused;
++    var focusNavigationMethod = document.FocusNavigationMethod;
+     isReordering = true;
+     try
+     {
+@@ -446,7 +457,7 @@ public class FsusDocumentTabs : FsusTabs
+     }
+     if (wasFocused)
+     {
+-      document.Focus();
++      document.Focus(focusNavigationMethod);
+     }
+     Reordered?.Invoke(
+       this,
