@@ -58,6 +58,11 @@ $dropdown-divider-width: 1px !default;
   @include e(popper) {
     @include set-component-css-var('dropdown', $dropdown);
 
+    @include when(viewport-bounded) {
+      max-inline-size: calc(var(--el-dropdown-viewport-width, 100dvw) - 10px);
+      box-sizing: border-box;
+    }
+
     // using attributes selector to override
 
     @include picker-popper(
@@ -191,7 +196,37 @@ $dropdown-menu-padding-vertical: map.merge(
     }
   }
 
-  @include option-row.fsus-overlay-option-row-primitive('.el-dropdown-menu__item');
+  @include option-row.fsus-overlay-option-row-primitive(
+    '.el-dropdown-menu__item'
+  );
+
+  // Explicit rich content keeps the flat option-row states and default density.
+  .#{$namespace}-dropdown-menu__item.is-multiline {
+    block-size: auto;
+    min-block-size: var(--fsus-select-option-height);
+    line-height: map.get($dropdown-item-line-height, 'default');
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+  }
+
+  @include e(item-content) {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    flex: 1;
+  }
+
+  @include e(item-description) {
+    font-size: getCssVar('font-size', 'small');
+    color: getCssVar('text-color', 'secondary');
+  }
+
+  @include e(item-suffix) {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-inline-start: auto;
+  }
 
   @each $size in (large, small) {
     @include m($size) {
