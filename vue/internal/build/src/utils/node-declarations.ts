@@ -172,7 +172,11 @@ export function rewriteNodeDeclaration(
       arguments_,
       value,
     )
-  const typeParameters = (specifier: string, symbol: ts.Symbol) => {
+  const typeParameters = (
+    specifier: string,
+    symbol: ts.Symbol,
+    binding: ts.Identifier,
+  ) => {
     const declaration = symbol.declarations?.find(
       (node) =>
         ts.isClassDeclaration(node) ||
@@ -184,7 +188,68 @@ export function rewriteNodeDeclaration(
       | ts.TypeAliasDeclaration
       | undefined
     if (!declaration?.typeParameters) return undefined
+    const parameters = declaration.typeParameters
     const { checker, exports } = externalModule(specifier)
+    const hasPrivateOwner = (type: ts.TypeNode) => {
+      let privateOwner = false
+      const visit = (node: ts.Node) => {
+        if (ts.isTypeReferenceNode(node) || ts.isTypeQueryNode(node)) {
+          const referenced = checker.getSymbolAtLocation(
+            ts.isTypeReferenceNode(node) ? node.typeName : node.exprName,
+          )
+          if (
+            referenced &&
+            !(referenced.flags & ts.SymbolFlags.TypeParameter) &&
+            !exports.some(
+              (entry) =>
+                targetSymbol(checker, entry) ===
+                targetSymbol(checker, referenced),
+            ) &&
+            targetSymbol(checker, referenced).declarations?.some((owner) =>
+              ts.isExternalModule(owner.getSourceFile()),
+            )
+          ) {
+            privateOwner = true
+          }
+        }
+        ts.forEachChild(node, visit)
+      }
+      visit(type)
+      return privateOwner
+    }
+    const projectParameter = (index: number, defaults: boolean) => {
+      const inferred = parameters.map(() => privateName())
+      const instance = defaults
+        ? ts.factory.createTypeReferenceNode(
+            binding,
+            index
+              ? declaration
+                  .typeParameters!.slice(0, index)
+                  .map((parameter) =>
+                    ts.factory.createTypeReferenceNode(
+                      parameter.name,
+                      undefined,
+                    ),
+                  )
+              : undefined,
+          )
+        : ts.factory.createTypeReferenceNode('InstanceType', [
+            ts.factory.createTypeQueryNode(binding),
+          ])
+      return ts.factory.createConditionalTypeNode(
+        instance,
+        ts.factory.createTypeReferenceNode(
+          binding,
+          inferred.map((name) =>
+            ts.factory.createInferTypeNode(
+              ts.factory.createTypeParameterDeclaration(undefined, name),
+            ),
+          ),
+        ),
+        ts.factory.createTypeReferenceNode(inferred[index], undefined),
+        ts.factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword),
+      )
+    }
     const qualifyType = (type: ts.TypeNode) => {
       const result = ts.transform(type, [
         (context) => {
@@ -224,12 +289,21 @@ export function rewriteNodeDeclaration(
         result.dispose()
       }
     }
-    return declaration.typeParameters.map((parameter) =>
+    return declaration.typeParameters.map((parameter, index) =>
       ts.factory.createTypeParameterDeclaration(
-        parameter.modifiers,
+        parameter.modifiers?.filter(
+          (modifier) => modifier.kind !== ts.SyntaxKind.ConstKeyword,
+        ),
         parameter.name.text,
-        parameter.constraint && qualifyType(parameter.constraint),
-        parameter.default && qualifyType(parameter.default),
+        parameter.constraint &&
+          (ts.isClassDeclaration(declaration) &&
+          hasPrivateOwner(parameter.constraint)
+            ? projectParameter(index, false)
+            : qualifyType(parameter.constraint)),
+        parameter.default &&
+          (hasPrivateOwner(parameter.default)
+            ? projectParameter(index, true)
+            : qualifyType(parameter.default)),
       ),
     )
   }
@@ -264,7 +338,7 @@ export function rewriteNodeDeclaration(
     // its value export. Merge a local type alias with the exact constructor or
     // callable type, then export that one local symbol (including as default).
     if (symbol.flags & ts.SymbolFlags.Type) {
-      const parameters = typeParameters(specifier, symbol)
+      const parameters = typeParameters(specifier, symbol, binding)
       statements.push(
         ts.factory.createTypeAliasDeclaration(
           undefined,
