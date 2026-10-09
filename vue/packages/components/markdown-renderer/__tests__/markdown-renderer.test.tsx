@@ -688,6 +688,105 @@ describe('MarkdownRenderer.vue', () => {
     }
   })
 
+  test('refreshes the theme while heavy feature activation is pending', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    const result = makeResult(
+      source,
+      '<figure data-mermaid-placeholder="true"></figure>',
+    )
+    renderMarkdownResult.mockResolvedValue(fsusOk(result))
+    const finishActivations: (() => void)[] = []
+    activateFeatures.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishActivations.push(() => resolve({ activated: [], errors: [] }))
+        }),
+    )
+    const wrapper = mount(MarkdownRenderer, { props: { content: source } })
+    await flushRenderer()
+    await vi.dynamicImportSettled()
+    await flushRenderer()
+    expect(activateFeatures).toHaveBeenCalledOnce()
+    const signal = activateFeatures.mock.calls[0]?.[0].signal
+    expect(signal?.aborted).toBe(false)
+
+    document.documentElement.dispatchEvent(new CustomEvent('fsus:theme-change'))
+    await flushRenderer()
+    expect(renderMarkdownResult).toHaveBeenCalledTimes(2)
+    expect(signal?.aborted).toBe(true)
+
+    finishActivations[0]()
+    await flushRenderer()
+    expect(wrapper.emitted('features-activated')).toBeUndefined()
+    expect(wrapper.emitted('render-complete')).toBeUndefined()
+
+    wrapper.unmount()
+    finishActivations.forEach((finish) => finish())
+    await flushRenderer()
+    document.documentElement.dispatchEvent(new CustomEvent('fsus:theme-change'))
+    await flushRenderer()
+    expect(renderMarkdownResult).toHaveBeenCalledTimes(2)
+  })
+
+  test('retains theme invalidation while the replacement parse is pending', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    const result = makeResult(
+      source,
+      '<figure data-mermaid-placeholder="true"></figure>',
+    )
+    renderMarkdownResult.mockResolvedValueOnce(fsusOk(result))
+    activateFeatures.mockResolvedValue({
+      activated: [{ count: 1, kind: 'mermaid' }],
+      errors: [],
+    })
+    const wrapper = mount(MarkdownRenderer, { props: { content: source } })
+    await flushRenderer()
+    await vi.dynamicImportSettled()
+    await flushRenderer()
+    expect(activateFeatures).toHaveBeenCalledOnce()
+    const finishParses: (() => void)[] = []
+    renderMarkdownResult.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishParses.push(() => resolve(fsusOk(result)))
+        }),
+    )
+
+    document.documentElement.dispatchEvent(new CustomEvent('fsus:theme-change'))
+    await flushRenderer()
+    expect(renderMarkdownResult).toHaveBeenCalledTimes(2)
+    document.documentElement.dispatchEvent(new CustomEvent('fsus:theme-change'))
+    await flushRenderer()
+    expect(renderMarkdownResult).toHaveBeenCalledTimes(3)
+
+    wrapper.unmount()
+    finishParses.forEach((finish) => finish())
+    document.documentElement.dispatchEvent(new CustomEvent('fsus:theme-change'))
+    await flushRenderer()
+    expect(renderMarkdownResult).toHaveBeenCalledTimes(3)
+  })
+
+  test('does not invalidate disabled heavy features on theme changes', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    renderMarkdownResult.mockResolvedValue(
+      fsusOk(
+        makeResult(source, '<figure data-mermaid-placeholder="true"></figure>'),
+      ),
+    )
+    activateFeatures.mockResolvedValue({ activated: [], errors: [] })
+    const wrapper = mount(MarkdownRenderer, {
+      props: {
+        content: source,
+        features: { codeHighlight: false, latex: false, mermaid: false },
+      },
+    })
+    await flushRenderer()
+    document.documentElement.dispatchEvent(new CustomEvent('fsus:theme-change'))
+    await flushRenderer()
+    expect(renderMarkdownResult).toHaveBeenCalledOnce()
+    wrapper.unmount()
+  })
+
   test('keeps the scroll anchor when the full result changes html', async () => {
     let resolveFull:
       | ((result: FsusResult<MarkdownRuntimeRenderResult>) => void)
