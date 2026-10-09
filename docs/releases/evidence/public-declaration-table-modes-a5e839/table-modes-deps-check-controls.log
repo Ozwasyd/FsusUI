@@ -1,0 +1,21 @@
+
+> @ test:deps-check /workspace/FsusUI-public-declaration-integration
+> node ./scripts/test-deps-check.mjs
+
+[test-deps-check] ok: source hygiene (no write / no sync / no registry)
+[test-deps-check] ok: positive projection green + working tree unchanged
+[test-deps-check] ok: root/workspace/fixture drift field-level errors
+[test-deps-check] ok: published range excludes install
+[test-deps-check] ok: peer floor unresolvable
+[test-deps-check] ok: peer floor profile mismatch
+[test-deps-check] ok: unregistered external dependency
+[test-deps-check] ok: same package different exact versions
+[test-deps-check] ok: candidate vs authority mismatch
+[test-deps-check] ok: authority/schema missing fields
+[test-deps-check] ok: forbidden * / latest / git / file
+[test-deps-check] ok: wide-range bypass killed
+[test-deps-check] ok: missing fixture scan killed
+[test-deps-check] ok: auto-fix-and-pass killed (file unchanged after fail)
+[test-deps-check] ok: formatDriftError file/field/expected/actual
+[test-deps-check] ok: lockfile resolved matches install pins
+[test-deps-check] all mutation tests passed

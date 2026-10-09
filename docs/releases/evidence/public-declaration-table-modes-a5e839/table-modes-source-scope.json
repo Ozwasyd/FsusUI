@@ -1,0 +1,22 @@
+{
+  "sourceHead": "a5e839e4160ec64dafabb162c6168851de54b1b1",
+  "frozenPredecessor": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "offeredSource": "c95d49a2f89b19b122f164fcb553c3af3724fff0",
+  "changedFiles": [
+    "vue/packages/components/table/__tests__/table-core-popper-declaration-controls.mjs",
+    "vue/packages/components/table/__tests__/table-core-popper-return.test-d.ts"
+  ],
+  "canonicalProducerEligibleChangedFiles": [],
+  "officialExclusionLogicUnchanged": true,
+  "blobIds": [
+    {
+      "path": "vue/packages/components/table/__tests__/table-core-popper-declaration-controls.mjs",
+      "blob": "a17df0e8453c447dbe449eb00b1039c791f00ba6"
+    },
+    {
+      "path": "vue/packages/components/table/__tests__/table-core-popper-return.test-d.ts",
+      "blob": "3e14a4e6de2ee329e1bac35249a18d8b8a19b4c1"
+    }
+  ],
+  "packageBuild": "UNRUN on test-only successor; actual source/artifact qualification remains frozen at 2d05f"
+}

@@ -1,0 +1,83 @@
+{
+  "preimageRef": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "producerTypeScript": "5.9.2",
+  "strict": true,
+  "skipLibCheck": false,
+  "before": {
+    "sourceControls": [
+      {
+        "code": 2344,
+        "message": "Type 'false' does not satisfy the constraint 'true'."
+      },
+      {
+        "code": 2344,
+        "message": "Type 'false' does not satisfy the constraint 'true'."
+      }
+    ],
+    "sourceNullability": {
+      "strictNullChecks": true,
+      "tableAcceptsNull": true,
+      "coreAcceptsNull": false
+    },
+    "vitestSourceControls": [
+      {
+        "code": 2344,
+        "message": "Type 'false' does not satisfy the constraint 'true'."
+      }
+    ],
+    "vitestSourceNullability": {
+      "strictNullChecks": false,
+      "tableAcceptsNull": true,
+      "coreAcceptsNull": true
+    },
+    "declarationDiagnostics": [
+      {
+        "code": 2344,
+        "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.   Index signature for type 'string' is missing in type 'GlobalComponents'."
+      }
+    ],
+    "declarationControls": [
+      {
+        "code": 2344,
+        "message": "Type 'false' does not satisfy the constraint 'true'."
+      },
+      {
+        "code": 2344,
+        "message": "Type 'false' does not satisfy the constraint 'true'."
+      }
+    ],
+    "declarationNullability": {
+      "strictNullChecks": true,
+      "tableAcceptsNull": true,
+      "coreAcceptsNull": false
+    },
+    "declarationSha256": "83c937c007496e4397cc3a86cfa685fea5de3ac281caf30b384732e7cc4269dc",
+    "returnType": "Nullable<import(\"vue\").CreateComponentPublicInstanceWithMixins<Readonly<import(\"vue\").ExtractPropTypes<{\n    readonly role: {\n        readonly type: import(\"vue\").PropType<import(\"@element-plus/utils\").EpPropMergeType<StringConstructor, \"dialog\" | \"menu\" | \"grid\" | \"group\" | \"listbox\" | \"navigation\" | \"tooltip\" | \"tree\", unknown>>;\n        readonly required: false;\n        readonly validator?: (val: unknown) => boolean;\n        readonly default: \"tooltip\";\n        __epPropKey: true;\n    };\n}>> & Readonly<{}>, {\n    props: import(\"@vue/shared\").LooseRequired<Readonly<import(\"vue\").ExtractPropTypes<{\n        readonly role: {\n            readonly type: import(\"vue\").PropType<import(\"@element-plus/utils\").EpPropMergeType<StringConstructor, \"dialog\" | \"menu\" | \"grid\" | \"group\" | \"listbox\" | \"navigation\" | \"tooltip\" | \"tree\", unknown>>;\n            readonly required: false;\n            readonly validator?: (val: unknown) => boolean;\n            readonly default: \"tooltip\";\n            __epPropKey: true;\n        };\n    }>> & Readonly<{}> & {}>;\n    triggerRef: import(\"vue\").Ref<HTMLElement | undefined, HTMLElement | undefined>;\n    popperInstanceRef: import(\"vue\").Ref<import(\"@popperjs/core\").Instance | undefined, import(\"@popperjs/core\").Instance | undefined>;\n    contentRef: import(\"vue\").Ref<HTMLElement | undefined, HTMLElement | undefined>;\n    referenceRef: import(\"vue\").Ref<HTMLElement | undefined, HTMLElement | undefined>;\n    role: import(\"vue\").ComputedRef<import(\"@element-plus/utils\").EpPropMergeType<StringConstructor, \"dialog\" | \"menu\" | \"grid\" | \"group\" | \"listbox\" | \"navigation\" | \"tooltip\" | \"tree\", unknown>>;\n    popperProvides: import(\"@element-plus/components/popper\").ElPopperInjectionContext;\n}, {}, {}, {}, import(\"vue\").ComponentOptionsMixin, import(\"vue\").ComponentOptionsMixin, {}, import(\"vue\").PublicProps, {\n    readonly role: import(\"@element-plus/utils\").EpPropMergeType<StringConstructor, \"dialog\" | \"menu\" | \"grid\" | \"group\" | \"listbox\" | \"navigation\" | \"tooltip\" | \"tree\", unknown>;\n}, true, {}, {}, import(\"vue\").GlobalComponents, import(\"vue\").GlobalDirectives, string, {}, any, import(\"vue\").ComponentProvideOptions, {\n    P: {};\n    B: {};\n    D: {};\n    C: {};\n    M: {};\n    Defaults: {};\n}, Readonly<import(\"vue\").ExtractPropTypes<{\n    readonly role: {\n        readonly type: import(\"vue\").PropType<import(\"@element-plus/utils\").EpPropMergeType<StringConstructor, \"dialog\" | \"menu\" | \"grid\" | \"group\" | \"listbox\" | \"navigation\" | \"tooltip\" | \"tree\", unknown>>;\n        readonly required: false;\n        readonly validator?: (val: unknown) => boolean;\n        readonly default: \"tooltip\";\n        __epPropKey: true;\n    };\n}>> & Readonly<{}>, {\n    props: import(\"@vue/shared\").LooseRequired<Readonly<import(\"vue\").ExtractPropTypes<{\n        readonly role: {\n            readonly type: import(\"vue\").PropType<import(\"@element-plus/utils\").EpPropMergeType<StringConstructor, \"dialog\" | \"menu\" | \"grid\" | \"group\" | \"listbox\" | \"navigation\" | \"tooltip\" | \"tree\", unknown>>;\n            readonly required: false;\n            readonly validator?: (val: unknown) => boolean;\n            readonly default: \"tooltip\";\n            __epPropKey: true;\n        };\n    }>> & Readonly<{}> & {}>;\n    triggerRef: import(\"vue\").Ref<HTMLElement | undefined, HTMLElement | undefined>;\n    popperInstanceRef: import(\"vue\").Ref<import(\"@popperjs/core\").Instance | undefined, import(\"@popperjs/core\").Instance | undefined>;\n    contentRef: import(\"vue\").Ref<HTMLElement | undefined, HTMLElement | undefined>;\n    referenceRef: import(\"vue\").Ref<HTMLElement | undefined, HTMLElement | undefined>;\n    role: import(\"vue\").ComputedRef<import(\"@element-plus/utils\").EpPropMergeType<StringConstructor, \"dialog\" | \"menu\" | \"grid\" | \"group\" | \"listbox\" | \"navigation\" | \"tooltip\" | \"tree\", unknown>>;\n    popperProvides: import(\"@element-plus/components/popper\").ElPopperInjectionContext;\n}, {}, {}, {}, {\n    readonly role: import(\"@element-plus/utils\").EpPropMergeType<StringConstructor, \"dialog\" | \"menu\" | \"grid\" | \"group\" | \"listbox\" | \"navigation\" | \"tooltip\" | \"tree\", unknown>;\n}>>"
+  },
+  "after": {
+    "sourceControls": [],
+    "sourceNullability": {
+      "strictNullChecks": true,
+      "tableAcceptsNull": false,
+      "coreAcceptsNull": false
+    },
+    "vitestSourceControls": [],
+    "vitestSourceNullability": {
+      "strictNullChecks": false,
+      "tableAcceptsNull": true,
+      "coreAcceptsNull": true
+    },
+    "declarationDiagnostics": [],
+    "declarationControls": [],
+    "declarationNullability": {
+      "strictNullChecks": true,
+      "tableAcceptsNull": false,
+      "coreAcceptsNull": false
+    },
+    "declarationSha256": "16299f91459c6f8475a87a139864ec1d72e1ac6b916636e43064f5edd9c41bf6",
+    "returnType": "ReturnType<typeof createPopper>"
+  },
+  "runtimeSha256": "d061ef5089fedd95db3f9c298fdcd46a99ee8f3e96e17aab0aebeee941239c8b",
+  "preimageSha256": "94629a4fb8af5c2c4e1a773452941aa31db7ad47699884aee0899e164b9f5f87",
+  "sourceSha256": "0df53f5cc5d9fd0345eb9fb118c756ee85d61d959e8e36a353df9b007b779a3b"
+}
