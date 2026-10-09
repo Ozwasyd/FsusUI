@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { URL } from 'node:url'
 
 const authority = JSON.parse(await readFile(new URL('./authority.json', import.meta.url), 'utf8'))
 const hash = (value) => createHash('sha256').update(value).digest('hex')
@@ -40,10 +41,10 @@ export function normalizedDiagnostics(rows) {
 
 export function assertInstalledDiagnostics(profile, mode, name, rows) {
   const bundler = profile.installedDiagnostics[`bundler-${name}`]
-  const expected = mode === 'bundler' ? bundler : mode === 'node16' && bundler && [
+  const expected = profile.installedDiagnostics[`${mode}-${name}`] ?? (mode === 'node16' && bundler && [
     ...bundler, ...authority.node16BoundaryDiagnostics,
     ...(name === 'positive' ? authority.node16PositiveDiagnostics : []),
-  ]
+  ])
   assert.ok(expected, `No authority for ${profile.name}/${mode}/${name}`)
   assert.deepEqual(normalizedDiagnostics(rows), normalizedDiagnostics(expected), `Every diagnostic must match ${profile.name}/${mode}/${name}; unknown diagnostics fail.`)
 }

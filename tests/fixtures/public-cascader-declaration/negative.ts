@@ -25,3 +25,4 @@ ElCascader.install?.('invalid') // invalid
 instance.$emit('change', null) // invalid
 instance.$emit('update:modelValue', false) // invalid
 instance.$emit('blur', new Event('blur')) // invalid
+void [disabled, size, config, filter, nodes, element, slot]

@@ -1,8 +1,8 @@
-const assert = require('node:assert/strict')
-const fs = require('node:fs')
-const path = require('node:path')
-const { execFileSync } = require('node:child_process')
-const { createRequire } = require('node:module')
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
+import { execFileSync } from 'node:child_process'
+import { createRequire } from 'node:module'
 const root = process.cwd()
 const output = process.argv[2]
 const base = '2d05f240e5fb04ac0cd602b4ed638ffe00b1859b'
@@ -87,7 +87,7 @@ type ContentParity = Assert<Same<CurrentInstance['contentRef'], OriginalInstance
       ],
       originalDiagnosticReturnUnchanged: true,
     }
-    fs.writeFileSync(output, JSON.stringify(result, null, 2) + '\n')
+    fs.writeFileSync(output, `${JSON.stringify(result, null, 2)}\n`)
     assert.deepEqual(result.parityErrors, [])
     assert.equal(result.originalSfc7056, true)
   } finally {
@@ -112,7 +112,7 @@ generateTypesDefinitions((error) => {
       path.join(root, 'dist/types/packages/components/cascader', file),
     ),
   }))
-  fs.writeFileSync(output, JSON.stringify(result, null, 2) + '\n')
+  fs.writeFileSync(output, `${JSON.stringify(result, null, 2)}\n`)
   assert.ok(result.entries.every((entry) => entry.emitted))
   assert.deepEqual(
     result.diagnostics.filter((d) =>
@@ -120,5 +120,7 @@ generateTypesDefinitions((error) => {
     ),
     [],
   )
-  console.log('PASS canonical emission and original inferred contract parity')
+  process.stdout.write(
+    'PASS canonical emission and original inferred contract parity\n',
+  )
 })

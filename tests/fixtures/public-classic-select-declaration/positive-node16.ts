@@ -1,5 +1,7 @@
 import Select, { ElSelect, ElOption, ElOptionGroup } from '@ozwasyd/element-plus/es/components/select'
-import CjsSelect, { type ElSelect as CjsNamedSelect } from '@ozwasyd/element-plus/lib/components/select'
+import CjsSelect = require('@ozwasyd/element-plus/lib/components/select')
+import type NativeCjsDefault from '@ozwasyd/element-plus/lib/components/select'
+import type CjsNamespace = require('@ozwasyd/element-plus/lib/components/select')
 import { type useSelect, type SelectTooltipRef } from '@ozwasyd/element-plus/es/components/select/src/useSelect'
 import type { App } from 'vue'
 
@@ -8,7 +10,10 @@ Select.install?.(app)
 ElOption.install?.(app)
 ElOptionGroup.install?.(app)
 const defaultIsNamed: typeof ElSelect = Select
-const cjsDefaultIsNamed: typeof CjsNamedSelect = CjsSelect
+const CjsNamedSelect = CjsSelect.ElSelect
+const nativeDefaultIsModule: typeof NativeCjsDefault = CjsSelect
+const cjsModuleIsNamespace: typeof CjsNamespace = CjsSelect
+const cjsDefaultIsNamed: typeof CjsNamedSelect = CjsSelect.default
 const esmIsCjs: typeof CjsNamedSelect = ElSelect
 const optionExtra: typeof ElSelect.Option = ElOption
 const groupExtra: typeof ElSelect.OptionGroup = ElOptionGroup
@@ -37,4 +42,4 @@ tooltip.value = result.tagTooltipRef.value
 result.toggleMenu(new PointerEvent('click'))
 result.handleBlur(new FocusEvent('blur'))
 
-void [defaultIsNamed, cjsDefaultIsNamed, esmIsCjs, optionExtra, groupExtra, props, optionProps, groupProps]
+void [CjsNamedSelect, nativeDefaultIsModule, cjsModuleIsNamespace, defaultIsNamed, cjsDefaultIsNamed, esmIsCjs, optionExtra, groupExtra, props, optionProps, groupProps]

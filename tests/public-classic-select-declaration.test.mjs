@@ -49,11 +49,11 @@ test('canonical producer emits Select; preserves ref contracts and records Optio
   const authority = await sourceAuthority(root)
   await mkdir(evidenceDir, { recursive: true })
   const originalDiagnostics = Project.prototype.getPreEmitDiagnostics
-  let capturedProject
+  const capturedProjects = []
   let diagnostics
   Project.prototype.getPreEmitDiagnostics = function (...args) {
     const rows = originalDiagnostics.apply(this, args)
-    capturedProject = this
+    capturedProjects.push(this)
     diagnostics = rows.map((row) => ({
       code: row.getCode(),
       file: row.getSourceFile() && path.relative(root, row.getSourceFile().getFilePath()),
@@ -68,14 +68,16 @@ test('canonical producer emits Select; preserves ref contracts and records Optio
     await new Promise((resolve, reject) => generateTypesDefinitions((error) => error ? reject(error) : resolve()))
   } finally {
     Project.prototype.getPreEmitDiagnostics = originalDiagnostics
-    await writeFile(path.join(evidenceDir, 'producer-diagnostics.json'), JSON.stringify({
+    await writeFile(path.join(evidenceDir, 'producer-diagnostics.json'), `${JSON.stringify({
       sourceSha: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
       compiler: ts.version,
       authority: authority.name,
       originalDiagnosticReturnUnchanged: true,
       diagnostics,
-    }, null, 2) + '\n')
+    }, null, 2)}\n`)
   }
+  assert.equal(capturedProjects.length, 1, 'Observe the one real canonical producer project.')
+  const capturedProject = capturedProjects[0]
   assertProducerDiagnostics(authority, diagnostics)
   const unknownProbe = capturedProject.createSourceFile(path.join(root, 'vue/classic-select-unknown-diagnostic.ts'), 'export const unrelatedValue: number = "unexpected";\n')
   const unknownProgram = capturedProject.getProgram().compilerObject
@@ -84,7 +86,7 @@ test('canonical producer emits Select; preserves ref contracts and records Optio
     message: ts.flattenDiagnosticMessageText(row.messageText, '\n'),
   }))
   assert.deepEqual(unknownDiagnostics.map((row) => row.code), [2322])
-  await writeFile(path.join(evidenceDir, 'unknown-diagnostic-refusal.json'), JSON.stringify({ diagnostics: [...diagnostics, ...unknownDiagnostics], expectedAuthorityResult: 'FAIL' }, null, 2) + '\n')
+  await writeFile(path.join(evidenceDir, 'unknown-diagnostic-refusal.json'), `${JSON.stringify({ diagnostics: [...diagnostics, ...unknownDiagnostics], expectedAuthorityResult: 'FAIL' }, null, 2)}\n`)
   assert.throws(() => assertProducerDiagnostics(authority, [...diagnostics, ...unknownDiagnostics]), /Complete canonical diagnostics must match/)
   const affected = [
     `${selectDir}/index.ts`, `${selectDir}/src/select.vue.ts`, `${selectDir}/src/useSelect.ts`,
@@ -123,7 +125,7 @@ test('canonical producer emits Select; preserves ref contracts and records Optio
     line: row.file && row.start != null ? row.file.getLineAndCharacterOfPosition(row.start).line + 1 : null,
     message: ts.flattenDiagnosticMessageText(row.messageText, '\n'),
   }))
-  await writeFile(path.join(evidenceDir, 'raw-options-compatibility-diagnostics.json'), JSON.stringify(optionsDiagnostics, null, 2) + '\n')
+  await writeFile(path.join(evidenceDir, 'raw-options-compatibility-diagnostics.json'), `${JSON.stringify(optionsDiagnostics, null, 2)}\n`)
   const optionsLine = (name) => optionsProbeText.split('\n').findIndex((line) => line.includes(name)) + 1
   assert.deepEqual(optionsDiagnostics.map(({ code, line }) => ({ code, line })), [
     { code: 2322, line: optionsLine('const repairedInvalidPlacement') },
@@ -149,15 +151,15 @@ test('canonical producer emits Select; preserves ref contracts and records Optio
     line: row.file && row.start != null ? row.file.getLineAndCharacterOfPosition(row.start).line + 1 : null,
     message: ts.flattenDiagnosticMessageText(row.messageText, '\n'),
   }))
-  await writeFile(path.join(evidenceDir, 'inferred-contract-diagnostics.json'), JSON.stringify(contractDiagnostics, null, 2) + '\n')
+  await writeFile(path.join(evidenceDir, 'inferred-contract-diagnostics.json'), `${JSON.stringify(contractDiagnostics, null, 2)}\n`)
   assert.deepEqual(contractDiagnostics, [])
   const negative = capturedProject.createSourceFile(path.join(root, 'vue/classic-select-inferred-negative.ts'),
-    probeText + '\ntype BrokenReturn = Omit<ReturnType<typeof RepairedUseSelect>, "tooltipRef"> & { tooltipRef: null };\ntype RejectBrokenReturn = Assert<Both<BrokenReturn, ReturnType<typeof OriginalUseSelect>>>;\n',
+    `${probeText}\ntype BrokenReturn = Omit<ReturnType<typeof RepairedUseSelect>, "tooltipRef"> & { tooltipRef: null };\ntype RejectBrokenReturn = Assert<Both<BrokenReturn, ReturnType<typeof OriginalUseSelect>>>;\n`,
   )
   const negativeProgram = capturedProject.getProgram().compilerObject
   const negativeDiagnostics = ts.getPreEmitDiagnostics(negativeProgram, negativeProgram.getSourceFile(negative.getFilePath()))
   assert.ok(negativeDiagnostics.some((row) => row.code === 2344), 'The same checker must reject an altered ref return contract.')
-  await writeFile(path.join(evidenceDir, 'inferred-contract-results.json'), JSON.stringify({
+  await writeFile(path.join(evidenceDir, 'inferred-contract-results.json'), `${JSON.stringify({
     originalSha, compiler: ts.version, positive: 'PASS', negative: 'PASS',
     originalUseSelectComparedUnmodified: true,
     originalSfcOptionsBinding: 'UNBOUND',
@@ -167,5 +169,5 @@ test('canonical producer emits Select; preserves ref contracts and records Optio
     normalizedEqualityPurpose: 'Check the intended declared contract after fixing the original free Options name; not raw original public type parity.',
     negativeCodes: negativeDiagnostics.map((row) => row.code),
     checked: ['parameters', 'return keys and fields', 'ref getter/setter', 'props', 'emits', 'slots', 'instance', 'default/named exports', 'installer extras'],
-  }, null, 2) + '\n')
+  }, null, 2)}\n`)
 })

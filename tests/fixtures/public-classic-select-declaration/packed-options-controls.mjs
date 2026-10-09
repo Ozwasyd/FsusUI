@@ -37,10 +37,10 @@ const record = {
   mode: 'Bundler', strict: true, skipLibCheck: false,
   popperOptionsType, rawCompile: 'FAIL', diagnostics,
 }
-await writeFile(path.join(consumerRoot, 'packed-options-compatibility-diagnostics.json'), JSON.stringify(record, null, 2) + '\n')
+await writeFile(path.join(consumerRoot, 'packed-options-compatibility-diagnostics.json'), `${JSON.stringify(record, null, 2)}\n`)
 assert.equal(popperOptionsType, 'Partial<Options> | undefined')
 assertInstalledDiagnostics(authority, 'bundler', 'options', diagnostics)
 assert.deepEqual(diagnostics.filter((row) => row.file === 'packed-options-compatibility.ts').map(({ code, line }) => ({ code, line })), [
   { code: 2322, line: 7 }, { code: 2322, line: 8 },
 ])
-console.log(`${authority.name}: packed Options controls PASS; invalid placement/strategy TS2322, complete legal Partial<Options>, omission and undefined accepted. Raw negative compilation FAIL; every inherited diagnostic also checked.`)
+process.stdout.write(`${authority.name}: packed Options controls PASS; invalid placement/strategy TS2322, complete legal Partial<Options>, omission and undefined accepted. Raw negative compilation FAIL; every inherited diagnostic also checked.\n`)

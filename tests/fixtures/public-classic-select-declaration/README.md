@@ -9,6 +9,7 @@ Run from the repository root, with the original locked dependencies and hooks:
 FSUS_NODE_HEAP_PROFILE=build node scripts/with-node-heap.mjs node --test tests/public-classic-select-declaration.test.mjs
 node tests/fixtures/public-classic-select-declaration/packed-controls.mjs <installed-consumer-directory>
 node tests/fixtures/public-classic-select-declaration/packed-options-controls.mjs <installed-consumer-directory>
+node tests/fixtures/public-classic-select-declaration/runtime-default-controls.mjs <installed-consumer-directory>
 ```
 
 The packed consumer must contain the three original, nonempty positive,
@@ -56,3 +57,46 @@ Public four-component reference evidence is at commit
 The original failed residual-count assertion and Node16 errors remain in that
 record. No production source, producer, config, lock or frozen golden is changed
 by this fixture repair.
+
+Each packed phase runs a fresh actual TypeScript process through
+`compile-control.mjs`, with the same strict options and version assertions.
+This bounds checker memory without changing the selected controls; the earlier
+multi-program heap exhaustion remains recorded as a failed harness run.
+
+## Node16 CJS default contract
+
+The inspected shared 2b78cfa source and actual canonical candidate have a separate
+identity, including their complete manifest, changed shared lock identity and
+ESM `.d.mts` declarations. The original two identities and their complete old
+Node16 failures remain recorded. No shared input is merged into the independent
+Select source branch.
+
+Bundler retains the original `positive.ts` and all eight negatives. For the
+new shared format, Node16 uses `positive-node16.ts`: its supported CJS entry is
+`import = require`, with a type-only native default import checking the same
+module-object type. The module object equals the declaration namespace; its
+`.default` property equals named ElSelect. All original props/emits/slots/ref,
+export and installer assertions remain. Node16's original eight negatives still
+run, as do two additional module-as-component/plugin negatives. The unchanged
+Bundler positive fixture, when deliberately compiled as a Node16 negative,
+must reject precisely its former direct module-to-component assertion. The new
+Node16 positive must compile with zero diagnostics; that failure is not accepted
+as a positive result.
+
+Native Node executes the actual public require path and ESM-loads its exact
+`require.resolve` target: native default is the whole require result and native
+default.default is requireResult.ElSelect. Vite 7.3.1 bundles that same actual
+CJS file: its interop default is ElSelect, with matching installer extras.
+These loader checks are separate from public export-condition qualification.
+The inspected candidate exposes the lib directory path under `require` only:
+direct native ESM package import fails ERR_PACKAGE_PATH_NOT_EXPORTED, and direct
+Vite static package import fails with no matching export condition. Both real
+failures are retained in the runtime result, which reports public import
+qualification FAIL. Loading the require-resolved file checks the CJS loader
+contract; it does not establish support for those blocked package spellings.
+No export alias or resolver plugin is introduced to make them work.
+
+The `packageQualification` field in packed controls records only strict
+TypeScript whole-package compilation. It does not accept the shared declaration
+producer's outstanding AST review items or public runtime export conditions;
+those remain owned by the shared producer/package writer.

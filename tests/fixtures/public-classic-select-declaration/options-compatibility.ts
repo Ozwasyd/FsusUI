@@ -1,6 +1,6 @@
 import type { Options } from '@popperjs/core'
-import OriginalSelect from './packages/components/select/src/select.raworiginal'
-import RepairedSelect from './packages/components/select/src/select.vue'
+import type OriginalSelect from './packages/components/select/src/select.raworiginal'
+import type RepairedSelect from './packages/components/select/src/select.vue'
 
 type OriginalProps = InstanceType<typeof OriginalSelect>['$props']
 type RepairedProps = InstanceType<typeof RepairedSelect>['$props']
@@ -11,7 +11,7 @@ const originalInvalidPlacement: OriginalProps = { popperOptions: { placement: 12
 const originalInvalidStrategy: OriginalProps = { popperOptions: { strategy: 'invalid' } }
 const repairedInvalidPlacement: RepairedProps = { popperOptions: { placement: 123 } }
 const repairedInvalidStrategy: RepairedProps = { popperOptions: { strategy: 'invalid' } }
-type RawPropsEquality = Assert<Equal<OriginalProps, RepairedProps>>
+export type RawPropsEquality = Assert<Equal<OriginalProps, RepairedProps>>
 
 const validOptions: Partial<Options> = {
   placement: 'bottom-start',
