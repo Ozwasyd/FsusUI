@@ -19,9 +19,11 @@ export const useSlide = (
 
   const slider = shallowRef<HTMLElement>()
 
-  const firstButton = ref<SliderButtonInstance>()
+  const firstButton: Ref<SliderButtonInstance | undefined> =
+    ref<SliderButtonInstance>()
 
-  const secondButton = ref<SliderButtonInstance>()
+  const secondButton: Ref<SliderButtonInstance | undefined> =
+    ref<SliderButtonInstance>()
 
   const buttonRefs: ButtonRefs = {
     firstButton,
