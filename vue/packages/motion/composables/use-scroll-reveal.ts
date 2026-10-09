@@ -1,3 +1,4 @@
+/// <reference types="gsap" preserve="true" />
 import { getCurrentScope, onScopeDispose } from 'vue'
 import {
   getGsap,
@@ -11,8 +12,6 @@ import {
   sanitizeGsapVars,
 } from '../gsap/resolve'
 import { isMotionReducedOrDisabled } from '../runtime'
-import type { gsap as Gsap } from 'gsap'
-import type { ScrollTrigger as GsapScrollTrigger } from 'gsap/ScrollTrigger'
 import type { MotionTarget } from '../gsap/resolve'
 import type { MotionPresetInput, MotionPresetName } from '../types'
 
@@ -27,8 +26,8 @@ export type ScrollRevealOptions = {
   markers?: boolean
   scrub?: boolean | number
   scroller?: Element | Window | string
-  vars?: Gsap.TweenVars
-  scrollTrigger?: GsapScrollTrigger.StaticVars
+  vars?: gsap.TweenVars
+  scrollTrigger?: ScrollTrigger.StaticVars
 }
 
 export type ScrollRevealRunOptions = Omit<ScrollRevealOptions, 'target'>
@@ -37,8 +36,8 @@ const defaultScrollRevealPreset: MotionPresetName = 'paper-settle'
 
 const applyReducedState = (
   target: ReturnType<typeof resolveMotionTarget>,
-  vars: Gsap.TweenVars,
-  fallback: (target: Gsap.TweenTarget, vars: Gsap.TweenVars) => void,
+  vars: gsap.TweenVars,
+  fallback: (target: gsap.TweenTarget, vars: gsap.TweenVars) => void,
 ) => {
   if (target instanceof Element && 'style' in target) {
     const element = target as HTMLElement | SVGElement
@@ -49,12 +48,12 @@ const applyReducedState = (
     return
   }
 
-  fallback(target as Gsap.TweenTarget, vars)
+  fallback(target as gsap.TweenTarget, vars)
 }
 
 export const useScrollReveal = (defaults: ScrollRevealOptions = {}) => {
   const gsap = getGsap()
-  const tweens = new Set<Gsap.core.Tween>()
+  const tweens = new Set<gsap.core.Tween>()
 
   const reveal = (
     target: MotionTarget = defaults.target,

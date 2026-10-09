@@ -1,6 +1,6 @@
+/// <reference types="gsap" preserve="true" />
 import { getCurrentScope, onScopeDispose, unref } from 'vue'
 import { getGsap } from '../gsap/register'
-import type { gsap as Gsap } from 'gsap'
 import type { Ref } from 'vue'
 
 export type GsapScope =
@@ -14,7 +14,7 @@ type GsapInstance = ReturnType<typeof getGsap>
 export type GsapContextCallback = Parameters<GsapInstance['context']>[0]
 
 export const useGsapContext = (scope?: GsapScope) => {
-  const contexts = new Set<Gsap.Context>()
+  const contexts = new Set<gsap.Context>()
   const gsap = getGsap()
 
   const resolveScope = () => unref(scope) || undefined

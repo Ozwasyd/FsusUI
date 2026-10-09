@@ -1,3 +1,4 @@
+/// <reference types="gsap" preserve="true" />
 import { getCurrentScope, onScopeDispose } from 'vue'
 import { getGsap } from '../gsap/register'
 import {
@@ -7,7 +8,6 @@ import {
 } from '../gsap/resolve'
 import { normalizeMotionRecipeOptions } from '../recipes'
 import { isMotionReducedOrDisabled } from '../runtime'
-import type { gsap as Gsap } from 'gsap'
 import type { MotionTarget } from '../gsap/resolve'
 import type {
   MotionPresetInput,
@@ -20,16 +20,16 @@ export type MotionTimelineStep = {
   preset?: MotionPresetInput
   recipe?: MotionRecipeName
   duration?: string | number
-  position?: Gsap.Position
-  from?: Gsap.TweenVars
-  to?: Gsap.TweenVars
-  vars?: Gsap.TweenVars
+  position?: gsap.Position
+  from?: gsap.TweenVars
+  to?: gsap.TweenVars
+  vars?: gsap.TweenVars
 }
 
 export type UseTimelineOptions = {
   disabled?: boolean
   paused?: boolean
-  timeline?: Gsap.TimelineVars
+  timeline?: gsap.TimelineVars
 }
 
 const defaultTimelinePreset: MotionPresetName = 'paper-settle'

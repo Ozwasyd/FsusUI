@@ -1,3 +1,4 @@
+/// <reference types="gsap" preserve="true" />
 import { getCurrentScope, onScopeDispose } from 'vue'
 import {
   getGsap,
@@ -12,8 +13,6 @@ import {
 } from '../gsap/resolve'
 import { normalizeMotionRecipeOptions } from '../recipes'
 import { isMotionReducedOrDisabled } from '../runtime'
-import type { gsap as Gsap } from 'gsap'
-import type { ScrollTrigger as GsapScrollTrigger } from 'gsap/ScrollTrigger'
 import type { MotionTarget } from '../gsap/resolve'
 import type { MotionRecipeName } from '../types'
 
@@ -23,9 +22,9 @@ export type ScrollTimelineSegment = {
   to: number
   recipe?: MotionRecipeName
   duration?: string | number
-  vars?: Gsap.TweenVars
-  fromVars?: Gsap.TweenVars
-  toVars?: Gsap.TweenVars
+  vars?: gsap.TweenVars
+  fromVars?: gsap.TweenVars
+  toVars?: gsap.TweenVars
 }
 
 export type UseScrollTimelineOptions = {
@@ -46,14 +45,14 @@ export type UseScrollTimelineOptions = {
   // Caller-supplied ScrollTrigger overrides. `pin` and `snap` are passed
   // through to gsap verbatim when provided; the safe defaults (pin: false,
   // snap: undefined) only apply when the caller omits them.
-  scrollTrigger?: GsapScrollTrigger.StaticVars
+  scrollTrigger?: ScrollTrigger.StaticVars
 }
 
 const clampProgress = (value: number) => Math.min(Math.max(value, 0), 1)
 
 export const useScrollTimeline = (defaults: UseScrollTimelineOptions = {}) => {
   const gsap = getGsap()
-  const timelines = new Set<Gsap.core.Timeline>()
+  const timelines = new Set<gsap.core.Timeline>()
 
   const create = (overrides: UseScrollTimelineOptions = {}) => {
     const options = {
@@ -85,7 +84,7 @@ export const useScrollTimeline = (defaults: UseScrollTimelineOptions = {}) => {
           recipeOptions.name,
           segment.duration ?? recipeOptions.duration,
         )
-        gsap.set(target as Gsap.TweenTarget, {
+        gsap.set(target as gsap.TweenTarget, {
           ...sanitizeGsapVars(preset.to),
           ...segment.toVars,
           ...segment.vars,
@@ -99,7 +98,7 @@ export const useScrollTimeline = (defaults: UseScrollTimelineOptions = {}) => {
     // Respect caller-supplied pin/snap. The safe defaults only kick in
     // when the caller omits them; explicit values pass through.
     const callerScrollTrigger = options.scrollTrigger ?? {}
-    const rest: GsapScrollTrigger.StaticVars = { ...callerScrollTrigger }
+    const rest: ScrollTrigger.StaticVars = { ...callerScrollTrigger }
     delete rest.pin
     delete rest.snap
     const pin = callerScrollTrigger.pin ?? false
@@ -134,7 +133,7 @@ export const useScrollTimeline = (defaults: UseScrollTimelineOptions = {}) => {
       )
 
       timeline.fromTo(
-        target as Gsap.TweenTarget,
+        target as gsap.TweenTarget,
         {
           ...sanitizeGsapVars(preset.from),
           ...segment.fromVars,
