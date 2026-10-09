@@ -1,0 +1,5 @@
+Test run for /workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+Results File: /workspace/parity-resource-evidence/gsans-1/typography.trx
+
+Passed!  - Failed:     0, Passed:    11, Skipped:     0, Total:    11, Duration: 617 ms - FsusUI.Avalonia.HeadlessTests.dll (net10.0)

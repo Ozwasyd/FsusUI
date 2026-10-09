@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="575676f3-085d-49cc-af52-a07d479d1028" name="@d45ac3896e5a 2026-10-09 08:31:44" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T08:31:44.4619413+00:00" queuing="2026-10-09T08:31:44.4619414+00:00" start="2026-10-09T08:31:41.4849071+00:00" finish="2026-10-09T08:31:44.8989799+00:00" />
+  <TestSettings name="default" id="6df49517-95ae-48eb-89c2-e561352001fb">
+    <Deployment runDeploymentRoot="_d45ac3896e5a_2026-10-09_08_31_44" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="1a005bd0-4ba2-4f83-973a-ef245c1db041" testId="57e99e52-6c26-309a-baf7-45877e9bbeed" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace" computerName="d45ac3896e5a" duration="00:00:00.0027347" startTime="2026-10-09T08:31:44.4191789+00:00" endTime="2026-10-09T08:31:44.4219991+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1a005bd0-4ba2-4f83-973a-ef245c1db041" />
+    <UnitTestResult executionId="8ebf00f0-3937-43ce-9b7b-f8bf503f66e1" testId="af08ffac-41b3-8a68-10ea-abe184150610" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 500)" computerName="d45ac3896e5a" duration="00:00:00.0147579" startTime="2026-10-09T08:31:44.3726416+00:00" endTime="2026-10-09T08:31:44.3874942+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8ebf00f0-3937-43ce-9b7b-f8bf503f66e1" />
+    <UnitTestResult executionId="6d407b70-cced-43f0-a404-e414bfa7388b" testId="54d35a49-b1ec-cb80-a21c-26a5cd3f1f5c" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 400)" computerName="d45ac3896e5a" duration="00:00:00.0061681" startTime="2026-10-09T08:31:44.3488999+00:00" endTime="2026-10-09T08:31:44.3552919+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d407b70-cced-43f0-a404-e414bfa7388b" />
+    <UnitTestResult executionId="d75d087c-96dc-448b-b17a-01bf6e306e6a" testId="12e63efa-882d-34be-ca6a-b9edeb8d3df2" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 700)" computerName="d45ac3896e5a" duration="00:00:00.0030787" startTime="2026-10-09T08:31:44.4012074+00:00" endTime="2026-10-09T08:31:44.4044011+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d75d087c-96dc-448b-b17a-01bf6e306e6a" />
+    <UnitTestResult executionId="10a86287-f308-4a29-91ca-0d08afd02acf" testId="9932f364-90c3-56ba-6c71-f2b49816696f" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 400)" computerName="d45ac3896e5a" duration="00:00:00.0035884" startTime="2026-10-09T08:31:44.3930815+00:00" endTime="2026-10-09T08:31:44.3967538+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="10a86287-f308-4a29-91ca-0d08afd02acf" />
+    <UnitTestResult executionId="2cdfc837-bd0b-4b12-bd28-0bab32a882e0" testId="50220a4b-8677-b1c1-c76d-72e5158da53a" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected" computerName="d45ac3896e5a" duration="00:00:00.0050159" startTime="2026-10-09T08:31:44.4099333+00:00" endTime="2026-10-09T08:31:44.4150332+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2cdfc837-bd0b-4b12-bd28-0bab32a882e0" />
+    <UnitTestResult executionId="194c6976-2646-481a-a64e-19af4b273b40" testId="2fdd2205-ba22-b822-1e2f-b6c4850c0e4e" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 700)" computerName="d45ac3896e5a" duration="00:00:00.0060625" startTime="2026-10-09T08:31:44.3596385+00:00" endTime="2026-10-09T08:31:44.3657811+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="194c6976-2646-481a-a64e-19af4b273b40" />
+    <UnitTestResult executionId="e644b9db-9cec-4505-a1e1-0c33478ab582" testId="d1c0515f-084b-840c-fd9f-d433e1e47d8d" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks" computerName="d45ac3896e5a" duration="00:00:00.0013061" startTime="2026-10-09T08:31:44.4309171+00:00" endTime="2026-10-09T08:31:44.4322904+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e644b9db-9cec-4505-a1e1-0c33478ab582" />
+    <UnitTestResult executionId="ecf5e51e-9c6b-4e61-b771-0d9199b93118" testId="735d809e-c653-6dfd-881f-28525e94f2cd" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode" computerName="d45ac3896e5a" duration="00:00:00.3387213" startTime="2026-10-09T08:31:44.4360998+00:00" endTime="2026-10-09T08:31:44.7749233+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ecf5e51e-9c6b-4e61-b771-0d9199b93118" />
+    <UnitTestResult executionId="6d09a605-fa67-46d4-a156-53fccf2fc812" testId="dac79eae-043b-3543-6da8-dbf2703922c8" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 500)" computerName="d45ac3896e5a" duration="00:00:00.1522652" startTime="2026-10-09T08:31:44.1578385+00:00" endTime="2026-10-09T08:31:44.3206947+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d09a605-fa67-46d4-a156-53fccf2fc812" />
+    <UnitTestResult executionId="bdda8144-4060-482e-b4c0-39def81b5300" testId="981aa8aa-c6c9-d56f-8311-e4d55e70ac7f" testName="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected" computerName="d45ac3896e5a" duration="00:00:00.0002870" startTime="2026-10-09T08:31:44.4264086+00:00" endTime="2026-10-09T08:31:44.4267678+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bdda8144-4060-482e-b4c0-39def81b5300" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 700)" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="12e63efa-882d-34be-ca6a-b9edeb8d3df2">
+      <Execution id="d75d087c-96dc-448b-b17a-01bf6e306e6a" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="PinnedFacesHaveRealWeightsAndGlyphCoverage" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 700)" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="2fdd2205-ba22-b822-1e2f-b6c4850c0e4e">
+      <Execution id="194c6976-2646-481a-a64e-19af4b273b40" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="MixedLayoutsUsePinnedLatinCjkAndSymbolFaces" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="50220a4b-8677-b1c1-c76d-72e5158da53a">
+      <Execution id="2cdfc837-bd0b-4b12-bd28-0bab32a882e0" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="UnavailableResourceFamilyIsRejected" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="981aa8aa-c6c9-d56f-8311-e4d55e70ac7f">
+      <Execution id="bdda8144-4060-482e-b4c0-39def81b5300" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="MissingResourceIsRejected" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="d1c0515f-084b-840c-fd9f-d433e1e47d8d">
+      <Execution id="e644b9db-9cec-4505-a1e1-0c33478ab582" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="StandaloneModeKeepsCjkBeforeGenericFallbacks" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="57e99e52-6c26-309a-baf7-45877e9bbeed">
+      <Execution id="1a005bd0-4ba2-4f83-973a-ef245c1db041" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="MissingWeightCannotUseANearestOrSynthesizedFace" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 400)" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="54d35a49-b1ec-cb80-a21c-26a5cd3f1f5c">
+      <Execution id="6d407b70-cced-43f0-a404-e414bfa7388b" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="MixedLayoutsUsePinnedLatinCjkAndSymbolFaces" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="735d809e-c653-6dfd-881f-28525e94f2cd">
+      <Execution id="ecf5e51e-9c6b-4e61-b771-0d9199b93118" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="FixtureUsesExplicitGsansMode" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 500)" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="af08ffac-41b3-8a68-10ea-abe184150610">
+      <Execution id="8ebf00f0-3937-43ce-9b7b-f8bf503f66e1" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="PinnedFacesHaveRealWeightsAndGlyphCoverage" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 500)" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="dac79eae-043b-3543-6da8-dbf2703922c8">
+      <Execution id="6d09a605-fa67-46d4-a156-53fccf2fc812" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="MixedLayoutsUsePinnedLatinCjkAndSymbolFaces" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 400)" storage="/workspace/parity-resource-integration/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="9932f364-90c3-56ba-6c71-f2b49816696f">
+      <Execution id="10a86287-f308-4a29-91ca-0d08afd02acf" />
+      <TestMethod codeBase="/workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests" name="PinnedFacesHaveRealWeightsAndGlyphCoverage" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="57e99e52-6c26-309a-baf7-45877e9bbeed" executionId="1a005bd0-4ba2-4f83-973a-ef245c1db041" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="af08ffac-41b3-8a68-10ea-abe184150610" executionId="8ebf00f0-3937-43ce-9b7b-f8bf503f66e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="54d35a49-b1ec-cb80-a21c-26a5cd3f1f5c" executionId="6d407b70-cced-43f0-a404-e414bfa7388b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12e63efa-882d-34be-ca6a-b9edeb8d3df2" executionId="d75d087c-96dc-448b-b17a-01bf6e306e6a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9932f364-90c3-56ba-6c71-f2b49816696f" executionId="10a86287-f308-4a29-91ca-0d08afd02acf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="50220a4b-8677-b1c1-c76d-72e5158da53a" executionId="2cdfc837-bd0b-4b12-bd28-0bab32a882e0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2fdd2205-ba22-b822-1e2f-b6c4850c0e4e" executionId="194c6976-2646-481a-a64e-19af4b273b40" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d1c0515f-084b-840c-fd9f-d433e1e47d8d" executionId="e644b9db-9cec-4505-a1e1-0c33478ab582" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="735d809e-c653-6dfd-881f-28525e94f2cd" executionId="ecf5e51e-9c6b-4e61-b771-0d9199b93118" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dac79eae-043b-3543-6da8-dbf2703922c8" executionId="6d09a605-fa67-46d4-a156-53fccf2fc812" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="981aa8aa-c6c9-d56f-8311-e4d55e70ac7f" executionId="bdda8144-4060-482e-b4c0-39def81b5300" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="11" executed="11" passed="11" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.12)
+[xUnit.net 00:00:00.33]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.90]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:01.17]   Starting:    FsusUI.Avalonia.HeadlessTests
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+[xUnit.net 00:00:02.66]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

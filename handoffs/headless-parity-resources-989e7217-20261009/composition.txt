@@ -1,0 +1,6 @@
+989e721734a0b18188905c67057e6bcc617a204a fix(headless): embed released Vue parity typography resources
+7fdf8b08ee7a52e7db2059c22f370b2aa8ab9d43 fix(headless): consume pinned Web fonts in Batch3 parity fixtures
+480585222bf7839e5f8d9f8e967744d7ab6cf021 fix(avalonia): embed existing Google Sans font resources
+7cd456a2c0d220b20a4a2541759fa48db7f1131a fix(avalonia): isolate TableV2 font asset prefix
+30ca005656fef10bd72b0cc0f556d3d207f2ea45 fix(avalonia): pin TableV2 rendered fixture fonts
+8db0ac8f49749e3e5f28be5051bb3d3ed71ada71 fix(dotnet): bind native verifiers to SDK policy and locked graph

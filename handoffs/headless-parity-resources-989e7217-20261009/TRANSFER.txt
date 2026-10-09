@@ -1,0 +1,76 @@
+WIP: committed headless parity typography resource integration
+
+Source head: 989e721734a0b18188905c67057e6bcc617a204a
+Published independent branch: fix/headless-parity-resource-integration-20261009
+Current-main base: 8db0ac8f49749e3e5f28be5051bb3d3ed71ada71
+Increment parent: 7fdf8b08ee7a52e7db2059c22f370b2aa8ab9d43
+Only new integration delta: one singular AvaloniaResource include in the headless csproj:
+Assets/VueParityTypography/**/*.ttf;Assets/VueParityTypography/Source/*/LICENSE;Assets/VueParityTypography/Source/*/COPYRIGHT.txt
+
+The exact source composition is in composition.txt and preflight.json.
+Released TableV2/shared-font commits 24a7ba8c, 90a7d58a and 1a1fb1b8 were
+cherry-picked intact onto main; the frozen original branches were not edited.
+Supplier be0a1127cc1ba8abce36b96559cd2bad9effe8fa was cherry-picked as its
+single 36-file increment, not imported as a dependency/mother branch.
+All 36 supplier files are byte-identical to the published source. No supplier
+files were authored by this integration owner. No dependency branch was pushed.
+
+PASS: real normal committed-project SDK 10.0.401 resource evaluation.
+No external resource-staging targets, import, synthetic project or test host.
+Before: 6 singular items (shared4, TableV2 2).
+After: 19 singular items (shared4, TableV2 2, parity13), zero plural items.
+Parity13 consists of nine TTF files, two LICENSEs, two COPYRIGHT.txt files.
+The previous six resource identities are unchanged.
+
+PASS: actual SDK 10.0.401 / Microsoft.NETCore.App 10.0.12 linux-x64
+locked restore and Release build, using current-main unchanged dependency locks.
+Build: zero errors, one existing xUnit2013 warning at Markdown test line162.
+No .108 dependency patch or diagnostic composition was needed/applied here.
+
+PASS: ordinary original-project controls, exact seven-FQN positive allowlist.
+All hooks inspected: original assembly AvaloniaTestApplication, original
+TestAppBuilder UseSkia/UseHeadless with real drawing and conditional shared
+collection; original assembly disables test parallelism. Selected class has
+no added class/collection fixtures or before/after hooks. Disposable layouts
+and streams are scoped; theme binding test closes its Window in finally.
+Each mode's discovery matched all eleven expected names before execution.
+GSANS=0: total=executed=passed=11, failed=skipped=0.
+GSANS=1: total=executed=passed=11, failed=skipped=0.
+TRX results independently checked for exact case equality, outcomes and counts.
+run-controls.py records the actual executable commands and admission checks.
+The tests verify embedded real faces at weights400/500/700, Latin/CJK/symbol
+coverage and mixed shaping, exact fallback collection/weights/no synthesis,
+embedded licenses/notices, fixture-local mode/theme binding, missing assets,
+missing families and missing weights. These are actual new committed-source
+results, not inherited supplier external-include results.
+
+Commands from the isolated branch (source /workspace/.setup/activate.sh first):
+  dotnet msbuild dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj -getItem:AvaloniaResource,AvaloniaResources
+From dotnet/:
+  dotnet --info
+  dotnet restore FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --locked-mode
+  dotnet build FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore -c Release
+From checkout root:
+  python3 /workspace/parity-resource-evidence/run-controls.py
+Raw filter.txt preserves the seven exact FullyQualifiedName= terms.
+
+Preserved: all frozen PNGs, assertions, budgets, locks, project references,
+global defaults, original TestAppBuilder/TestAssembly, supplier assets and
+TableV2 unique prefix. FSUSUI_UPDATE_VISUAL_ARTIFACTS unset. No baseline refresh.
+RepositoryRoot, all eight Batch3 capture cases and held routes were excluded;
+their output/helper paths were inspected but never invoked or changed.
+
+UNRUN: TableV2 rendered cases on this new composed source; previous TableV2
+evidence remains qualified only to its exact source/toolchain combinations.
+UNRUN: Batch3 capture, screenshot comparison and independent visual acceptance.
+UNRUN: broad suite/npm gates, Windows/macOS, official CI and package publication.
+No visual/parity acceptance or held receipt/custody audit is claimed or created.
+
+Root owns draft PR creation, metadata, review and merge. Full public PR body
+is PR-DRAFT.md. For source-only integration consume 989e7217 after its recorded
+prerequisites; do not merge the evidence branch as implementation.
+Next command within the demonstrated ordinary route: run the recorded exact
+selector under both modes on any reviewed new composition, checking eleven
+discovered cases first. Further capture/visual routes require Root's separately
+released scope; no broad or empty fallback is prescribed.
+Rollback of this increment: revert 989e721734a0b18188905c67057e6bcc617a204a.

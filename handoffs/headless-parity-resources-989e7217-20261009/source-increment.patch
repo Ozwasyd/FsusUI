@@ -1,0 +1,19 @@
+commit 989e721734a0b18188905c67057e6bcc617a204a
+Author:     djsms <lyuaoss@gmail.com>
+AuthorDate: Fri Oct 9 08:29:57 2026 +0000
+Commit:     djsms <lyuaoss@gmail.com>
+CommitDate: Fri Oct 9 08:29:57 2026 +0000
+
+    fix(headless): embed released Vue parity typography resources
+
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
+index f1c2ba0e..b9fc11f5 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
+@@ -28,5 +28,6 @@
+   <ItemGroup>
+     <AvaloniaResource Include="Assets/Fonts/*.ttf" />
+     <AvaloniaResource Include="Assets/TableV2Fonts/*.ttf" />
++    <AvaloniaResource Include="Assets/VueParityTypography/**/*.ttf;Assets/VueParityTypography/Source/*/LICENSE;Assets/VueParityTypography/Source/*/COPYRIGHT.txt" />
+   </ItemGroup>
+ </Project>

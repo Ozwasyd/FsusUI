@@ -1,0 +1,13 @@
+Test run for /workspace/parity-resource-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+The following Tests are available:
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 400)
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 500)
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 700)
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 400)
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 500)
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 700)
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected
+    FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace
