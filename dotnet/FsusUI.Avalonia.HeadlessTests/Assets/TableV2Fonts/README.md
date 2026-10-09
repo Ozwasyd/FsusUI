@@ -17,7 +17,9 @@ under `hinted/ttf/NotoSans/`. Their SHA-256 hashes are:
 
 The upstream SIL Open Font License is included in `OFL.txt`. Font metadata
 also identifies Copyright 2015 Google LLC and the same OFL 1.1 license.
-Keep these faces isolated from the existing optional Google Sans collection.
+The dedicated `Assets/TableV2Fonts/` prefix is outside `Assets/Fonts/`, which
+is recursively enumerated by the optional shared Google Sans collection.
+This keeps the TableV2 faces out of that collection when `FSUS_HEADLESS_GSANS=1`.
 
 Ordinary captures are retained in
 `TestResults/visual-evidence/issue-285-table-v2/`, or the directory selected by
