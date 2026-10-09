@@ -1,7 +1,7 @@
 {
   "testedFunctionalCommit": "c7723c8e59bba7b64e9b0556c7ae929310647d80",
   "independentBranch": "fix/slider-public-declaration-2d05f",
-  "ownedDelta": "Slider tests/fixture only; six original source-offer paths inherited unchanged",
+  "ownedDelta": "Slider tests/fixture only; original production repair, positive/negative fixtures and changeset inherited byte-identical; original harness/observer intentionally updated",
   "commands": {
     "preflight": "PATH=/workspace/.setup/tools/node_modules/.bin:$PATH pnpm exec vitest list --config vue/vitest.config.ts vue/packages/components/slider/__tests__/slider.test.tsx --json=/tmp/slider-composition-reviewfix/slider-selection.json",
     "independent": "FSUS_NODE_HEAP_PROFILE=build SLIDER_EVIDENCE_DIR=/tmp/slider-composition-reviewfix/standalone-final SLIDER_CONSUMER_ROOT=/tmp/slider-evidence/after-consumer node scripts/with-node-heap.mjs node --test tests/public-slider-declaration.test.mjs",
@@ -461,5 +461,19 @@
     "publication",
     "same-reviewer acceptance of new test delta"
   ],
-  "rollback": "Omit/revert only commits after 4214f38b38c8d891c3b25b0e2e56d5e28839edee from this independent source branch"
+  "rollback": "Omit/revert only commits after 4214f38b38c8d891c3b25b0e2e56d5e28839edee from this independent source branch",
+  "inheritedUnchangedPaths": [
+    ".changeset/fix-slider-public-declaration.md",
+    "tests/fixtures/public-slider-declaration/positive.ts",
+    "tests/fixtures/public-slider-declaration/negative.ts",
+    "vue/packages/components/slider/src/composables/use-slide.ts"
+  ],
+  "ownedDeltaPaths": [
+    "tests/public-slider-declaration.test.mjs",
+    "tests/fixtures/public-slider-declaration/observe-producer.mjs",
+    "tests/fixtures/public-slider-declaration/authority.mjs",
+    "tests/fixtures/public-slider-declaration/authority.json",
+    "tests/fixtures/public-slider-declaration/README.md",
+    "tests/fixtures/public-slider-declaration/reviewfix-results.json"
+  ]
 }
