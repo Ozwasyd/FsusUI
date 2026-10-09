@@ -1,0 +1,14 @@
+  FsusUI.Avalonia.FormGenerator -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.FormGenerator/bin/Release/netstandard2.0/FsusUI.Avalonia.FormGenerator.dll
+  FsusUI.Avalonia -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia/bin/Release/net10.0/FsusUI.Avalonia.dll
+  FsusUI.Avalonia.Icons -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.Icons/bin/Release/net10.0/FsusUI.Avalonia.Icons.dll
+  FsusUI.Avalonia.Themes -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.Themes/bin/Release/net10.0/FsusUI.Avalonia.Themes.dll
+  FsusUI.Avalonia.Demo -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.Demo/bin/Release/net10.0/FsusUI.Avalonia.Demo.dll
+  FsusUI.Avalonia.HeadlessTests -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll
+Test run for /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Results File: /tmp/desktop-tabs-recycling-evidence/after.trx
+
+Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 7 s - FsusUI.Avalonia.HeadlessTests.dll (net10.0)

@@ -1,0 +1,1 @@
+PASS: exact nonempty positive lifecycle FQN; 1 method/2 false,true cases; shared hooks unchanged and reviewed. Final null-matching recycling template (Grid or null) returns same Grid. Direct template replacement, theme lifecycle and remount/finally checked. Old1556 production and final candidate test source byte-exact. Earlier attempt count matched2.

@@ -1,0 +1,149 @@
+diff --git a/.changeset/avalonia-document-tab-reorder-focus.md b/.changeset/avalonia-document-tab-reorder-focus.md
+index 66be12ac..6e61ed3d 100644
+--- a/.changeset/avalonia-document-tab-reorder-focus.md
++++ b/.changeset/avalonia-document-tab-reorder-focus.md
+@@ -4,4 +4,4 @@
+ 
+ Preserve focus and its original keyboard or pointer navigation origin on an Avalonia document-tab header when drag or programmatic reorder removes and reinserts it, keeping the keyboard focus ring visible and retaining the active document identity and focus indication on other controls.
+ 
+-Release the outgoing document-body presenter during template replacement so removing and restoring a theme can mount the same active document content without a visual-parent conflict.
++Retire the outgoing document-body presenter's template before releasing its child during template replacement so removing and restoring a theme can mount the same active document content without a visual-parent conflict, including recycling templates that accept null content. Preserve the document's own Content and ContentTemplate for normal reuse on remount.
+diff --git a/docs/avalonia/components/desktop-shell.md b/docs/avalonia/components/desktop-shell.md
+index 40700e8d..aef53a02 100644
+--- a/docs/avalonia/components/desktop-shell.md
++++ b/docs/avalonia/components/desktop-shell.md
+@@ -66,9 +66,11 @@ the focused document header, including its keyboard or pointer focus origin and
+ corresponding visible focus indication; moving another header does not take focus
+ or change that indication.
+ The selected document body retains its `Content` identity across template or
+-theme replacement. The outgoing selected-content presenter releases its visual
+-child before the replacement presenter mounts that same body; the document
+-header does not present the body.
++theme replacement. The outgoing selected-content presenter retires its template
++before releasing its visual child, including when the template can recycle a
++view for null content. The document's own `ContentTemplate` remains available to
++the replacement presenter and on remount; the document header does not present
++the body.
+ The horizontally scrollable header reveals the
+ selected tab; `CanScrollBackward`, `CanScrollForward`, `ScrollHeaders`, and the
+ header extent/viewport/offset properties expose overflow without product
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
+index 76cd68e8..fc2d3f70 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
+@@ -5,6 +5,7 @@ using Avalonia.Automation.Provider;
+ using Avalonia.Controls;
+ using Avalonia.Controls.Presenters;
+ using Avalonia.Controls.Primitives;
++using Avalonia.Controls.Templates;
+ using Avalonia.Headless;
+ using Avalonia.Headless.XUnit;
+ using Avalonia.Input;
+@@ -342,8 +343,10 @@ public class FsusDesktopShellHeadlessTests
+     window.Close();
+   }
+ 
+-  [AvaloniaFact]
+-  public void DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount()
++  [AvaloniaTheory]
++  [InlineData(false)]
++  [InlineData(true)]
++  public void DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(bool useRecyclingTemplate)
+   {
+     var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
+     var theme = new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
+@@ -354,12 +357,21 @@ public class FsusDesktopShellHeadlessTests
+     {
+       Children = { new Border { Background = Brushes.Blue, Width = 160, Height = 80 } },
+     };
++    var templateBuildCount = 0;
++    var contentTemplate = useRecyclingTemplate
++      ? new FuncDataTemplate(content => content is Grid or null, (_, _) =>
++      {
++        templateBuildCount++;
++        return body;
++      }, supportsRecycling: true)
++      : null;
+     var document = new FsusDocumentTab
+     {
+       Key = "document",
+       Header = new Border { Background = Brushes.Gray, Width = 80, Height = 16 },
+       IsClosable = false,
+       Content = body,
++      ContentTemplate = contentTemplate,
+     };
+     var tabs = new FsusDocumentTabs();
+     tabs.AddDocument(document);
+@@ -371,16 +383,25 @@ public class FsusDesktopShellHeadlessTests
+       Dispatcher.UIThread.RunJobs();
+       AssertDocumentBodyParent();
+ 
++      var outgoingHost = Assert.IsType<ContentPresenter>(body.GetVisualParent());
++
++      tabs.Template = null;
++      AssertRetiredPresenter(outgoingHost);
++      Dispatcher.UIThread.RunJobs();
++      tabs.ClearValue(TemplatedControl.TemplateProperty);
++      Dispatcher.UIThread.RunJobs();
++      AssertDocumentBodyParent();
++
++      outgoingHost = Assert.IsType<ContentPresenter>(body.GetVisualParent());
++
+       Assert.True(application.Styles.Remove(theme));
+       Dispatcher.UIThread.RunJobs();
+-      Assert.Same(body, document.Content);
+-      Assert.Same(body, tabs.SelectedContent);
+-      Assert.Null(body.GetVisualParent());
+-      Assert.DoesNotContain(document.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
++      AssertRetiredPresenter(outgoingHost);
+ 
+       application.Styles.Add(theme);
+       Dispatcher.UIThread.RunJobs();
+       AssertDocumentBodyParent();
++      Assert.True(!useRecyclingTemplate || templateBuildCount >= 3);
+ 
+       window.Content = null;
+       Dispatcher.UIThread.RunJobs();
+@@ -394,6 +415,18 @@ public class FsusDesktopShellHeadlessTests
+       application.Styles.Remove(theme);
+     }
+ 
++    void AssertRetiredPresenter(ContentPresenter outgoingHost)
++    {
++      Assert.Same(body, document.Content);
++      Assert.Same(body, tabs.SelectedContent);
++      Assert.Same(contentTemplate, document.ContentTemplate);
++      Assert.Null(outgoingHost.Content);
++      Assert.Null(body.GetVisualParent());
++      Assert.Null(outgoingHost.Child);
++      Assert.Null(outgoingHost.ContentTemplate);
++      Assert.DoesNotContain(document.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
++    }
++
+     void AssertDocumentBodyParent()
+     {
+       var contentHost = tabs.GetVisualDescendants()
+@@ -401,6 +434,10 @@ public class FsusDesktopShellHeadlessTests
+         .Single(presenter => presenter.Name == "PART_SelectedContentHost");
+       Assert.Same(body, document.Content);
+       Assert.Same(body, tabs.SelectedContent);
++      Assert.Same(contentTemplate, document.ContentTemplate);
++      Assert.Same(contentTemplate, tabs.SelectedContentTemplate);
++      Assert.Same(contentTemplate, contentHost.ContentTemplate);
++      Assert.Same(body, contentHost.Child);
+       Assert.Same(document, tabs.SelectedItem);
+       Assert.Same(contentHost, body.GetVisualParent());
+       Assert.Single(tabs.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
+diff --git a/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs b/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
+index ee9b83a7..f5cb38c4 100644
+--- a/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
++++ b/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
+@@ -571,6 +571,8 @@ public class FsusDocumentTabs : FsusTabs
+     {
+       // A detached presenter can still own the document body after retemplating.
+       // Release that visual child without changing the document's Content.
++      // Retire its template first so null content cannot rebuild or recycle a child.
++      selectedContentHost.ContentTemplate = null;
+       selectedContentHost.Content = null;
+       selectedContentHost.UpdateChild();
+       selectedContentHost = null;

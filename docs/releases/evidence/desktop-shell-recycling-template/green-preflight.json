@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "positiveFQNs": [
+    "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback",
+    "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget",
+    "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling",
+    "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics",
+    "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount"
+  ],
+  "expectedMethods": 5,
+  "expectedCases": 7,
+  "precedingRedCount": {
+    "total": "2",
+    "executed": "2",
+    "passed": "1",
+    "failed": "1",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "hooks": "Reviewed fixture/helper graph, shared assembly/host/project unchanged; no selected constructor/class/collection fixtures or custom MSBuild test hook; renderer/RepositoryRoot excluded. Lifecycle original cleanup retained.",
+  "source": "Production and final test source byte-exact to candidate; locked restore PASS."
+}

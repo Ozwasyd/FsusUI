@@ -1,0 +1,44 @@
+.NET SDK:
+ Version:           10.0.108
+ Commit:            94ea82652c
+ Workload version:  10.0.100-manifests.b47d7e23
+ MSBuild version:   18.0.11+94ea82652
+
+Runtime Environment:
+ OS Name:     debian
+ OS Version:  13
+ OS Platform: Linux
+ RID:         linux-x64
+ Base Path:   /tmp/desktop-tabs-sdk/sdk/sdk/10.0.108/
+
+.NET workloads installed:
+There are no installed workloads to display.
+Configured to use workload sets when installing new manifests.
+No workload sets are installed. Run "dotnet workload restore" to install a workload set.
+
+Host:
+  Version:      10.0.8
+  Architecture: x64
+  Commit:       94ea82652c
+
+.NET SDKs installed:
+  10.0.108 [/tmp/desktop-tabs-sdk/sdk/sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.App 10.0.8 [/tmp/desktop-tabs-sdk/sdk/shared/Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 10.0.8 [/tmp/desktop-tabs-sdk/sdk/shared/Microsoft.NETCore.App]
+
+Other architectures found:
+  None
+
+Environment variables:
+  Not set
+
+global.json file:
+  Not found
+
+Learn more:
+  https://aka.ms/dotnet/info
+
+Download .NET:
+  https://aka.ms/dotnet/download

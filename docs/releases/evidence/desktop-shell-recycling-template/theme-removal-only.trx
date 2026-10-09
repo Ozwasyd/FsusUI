@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="6b1e9b0c-77b7-4ff2-b88e-0335e92ce62c" name="@845b6801dd61 2026-10-09 08:17:48" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T08:17:48.3015998+00:00" queuing="2026-10-09T08:17:48.3015999+00:00" start="2026-10-09T08:17:45.7646700+00:00" finish="2026-10-09T08:17:48.3081315+00:00" />
+  <TestSettings name="default" id="fce79b47-458f-434a-bbe3-7f1bb552424b">
+    <Deployment runDeploymentRoot="_845b6801dd61_2026-10-09_08_17_48" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a7f7731c-47be-488b-97dc-77f2a2c91da9" testId="86c0ca7a-3821-852a-1a27-990f9a3fc7f1" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)" computerName="845b6801dd61" duration="00:00:00.0266217" startTime="2026-10-09T08:17:48.1576908+00:00" endTime="2026-10-09T08:17:48.1974066+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a7f7731c-47be-488b-97dc-77f2a2c91da9">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.Null() Failure: Value is not null
+Expected: null
+Actual:   FuncDataTemplate { }</Message>
+          <StackTrace>   at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(Boolean useRecyclingTemplate) in /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs:line 396
+   at InvokeStub_FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="4e2eb576-7591-4f0d-84f4-388fadd62727" testId="fc857c20-91d7-3dc5-ffa2-6b50f37d9849" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)" computerName="845b6801dd61" duration="00:00:00.5806838" startTime="2026-10-09T08:17:47.5478654+00:00" endTime="2026-10-09T08:17:48.1371704+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4e2eb576-7591-4f0d-84f4-388fadd62727" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="86c0ca7a-3821-852a-1a27-990f9a3fc7f1">
+      <Execution id="a7f7731c-47be-488b-97dc-77f2a2c91da9" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="fc857c20-91d7-3dc5-ffa2-6b50f37d9849">
+      <Execution id="4e2eb576-7591-4f0d-84f4-388fadd62727" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="86c0ca7a-3821-852a-1a27-990f9a3fc7f1" executionId="a7f7731c-47be-488b-97dc-77f2a2c91da9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="fc857c20-91d7-3dc5-ffa2-6b50f37d9849" executionId="4e2eb576-7591-4f0d-84f4-388fadd62727" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="1" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.27]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.71]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.92]   Starting:    FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:01.87]       Assert.Null() Failure: Value is not null
+[xUnit.net 00:00:01.87]       Expected: null
+[xUnit.net 00:00:01.87]       Actual:   FuncDataTemplate { }
+[xUnit.net 00:00:01.87]       Stack Trace:
+[xUnit.net 00:00:01.87]         /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs(396,0): at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(Boolean useRecyclingTemplate)
+[xUnit.net 00:00:01.87]            at InvokeStub_FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(Object, Span`1)
+[xUnit.net 00:00:01.87]            at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:00:01.88]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="845b6801dd61" outcome="Error" timestamp="2026-10-09T08:17:48.2107085+00:00">
+        <Text>[xUnit.net 00:00:01.87]     FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True) [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>
