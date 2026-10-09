@@ -295,13 +295,16 @@ public class FsusTree : ContentControl
   private readonly HashSet<string> selectedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<string> checkedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<FsusTreeNode> presentationSubscriptions = [];
-  private readonly Dictionary<string, Border> renderedRows = new(StringComparer.Ordinal);
+  private sealed record RenderedTreeRow(FsusTreeNode? Node, Border Row);
+
+  private readonly Dictionary<string, RenderedTreeRow> renderedRows = new(StringComparer.Ordinal);
   private readonly Dictionary<string, FsusTreeLazyLoadState> lazyLoadStates = new(StringComparer.Ordinal);
   private readonly StackPanel rowsPanel = new();
   private CancellationTokenSource? loadCancellation;
   private TextBox? inlineEditor;
   private TopLevel? inlineEditTopLevel;
   private FsusTreeRowPresenter? rowPresenter;
+  private FsusTreeRowPresenter? renderedPresenter;
   private double? rowMinHeight;
   private Thickness? rowPadding;
   private int loadVersion;
@@ -425,7 +428,7 @@ public class FsusTree : ContentControl
   public bool RefreshNodePresentation(string key)
   {
     var view = flattenedNodes.FirstOrDefault(candidate => candidate.Node.Key == key);
-    if (view is null || !renderedRows.TryGetValue(key, out var row))
+    if (view is null || !renderedRows.TryGetValue(key, out var rendered))
     {
       return false;
     }
@@ -441,6 +444,7 @@ public class FsusTree : ContentControl
     }
 
     var context = CreateRowContext(view);
+    var row = rendered.Row;
     ApplyRowState(row, context);
     row.Child = BuildNodeContent(view, context);
     return true;
@@ -843,8 +847,8 @@ public class FsusTree : ContentControl
 
   private Rect ResolveNodeAnchorBounds(string key) =>
     NodeAnchorBoundsResolver?.Invoke(key) ??
-    (renderedRows.TryGetValue(key, out var row)
-      ? new Rect(row.TranslatePoint(default, this) ?? default, row.Bounds.Size)
+    (renderedRows.TryGetValue(key, out var rendered)
+      ? new Rect(rendered.Row.TranslatePoint(default, this) ?? default, rendered.Row.Bounds.Size)
       : new Rect(0, 0, 0, 0));
 
   private bool GestureExpand(string key, FsusTreeInteractionSource source)
@@ -891,32 +895,45 @@ public class FsusTree : ContentControl
 
   private void RefreshRows()
   {
+    var previousRows = new Dictionary<string, RenderedTreeRow>(renderedRows, StringComparer.Ordinal);
+    var desiredRows = new List<Control>();
     renderedRows.Clear();
-    rowsPanel.Children.Clear();
     foreach (var view in flattenedNodes)
     {
       var node = view.Node;
       var context = CreateRowContext(view);
-      var label = BuildNodeContent(view, context);
-      var row = new Border
+      Border row;
+      if (previousRows.Remove(node.Key, out var previous) && ReferenceEquals(previous.Node, node))
       {
-        Child = label,
-        MinHeight = ResolveRowMinHeight(),
-        Padding = RowPadding ?? global::FsusUI.Avalonia.FsusTokens.Space2Thickness,
-        Margin = new Thickness(
-          Math.Max(0, view.Level - 1) *
-          global::FsusUI.Avalonia.FsusTokens.Space5Thickness.Left,
-          0,
-          0,
-          0),
-        Focusable = false,
-        IsEnabled = !node.IsDisabled,
-      };
-      FsusComponentClasses.SetBaseClasses(row, "fsus-tree-row");
+        row = previous.Row;
+      }
+      else
+      {
+        row = new Border { Focusable = false };
+        FsusComponentClasses.SetBaseClasses(row, "fsus-tree-row");
+        row.PointerPressed += (_, e) => HandleRowPointerPressed(node, row, e);
+      }
+
+      // Keep unchanged text layouts and attached rows through expansion/focus
+      // updates. Custom presenters and editors still rebuild their content.
+      if (RowPresenter is null && renderedPresenter is null &&
+          ActiveInlineEdit?.Key != node.Key && row.Child is TextBlock label)
+      {
+        label.Text = GetDefaultNodeText(context);
+      }
+      else
+      {
+        row.Child = BuildNodeContent(view, context);
+      }
+      row.Margin = new Thickness(
+        Math.Max(0, view.Level - 1) *
+        global::FsusUI.Avalonia.FsusTokens.Space5Thickness.Left,
+        0,
+        0,
+        0);
       ApplyRowState(row, context);
-      row.PointerPressed += (_, e) => HandleRowPointerPressed(view, row, e);
-      renderedRows[node.Key] = row;
-      rowsPanel.Children.Add(row);
+      renderedRows[node.Key] = new RenderedTreeRow(node, row);
+      desiredRows.Add(row);
 
       if (
         ActiveInlineEdit is
@@ -925,14 +942,35 @@ public class FsusTree : ContentControl
           ParentKey: var parentKey,
         } && parentKey == node.Key)
       {
-        rowsPanel.Children.Add(BuildTransientInlineEditRow(view.Level + 1));
+        desiredRows.Add(BuildTransientInlineEditRow(view.Level + 1));
       }
     }
 
     if (ActiveInlineEdit is { Kind: FsusTreeInlineEditKind.Create, ParentKey: null })
     {
-      rowsPanel.Children.Add(BuildTransientInlineEditRow(1));
+      desiredRows.Add(BuildTransientInlineEditRow(1));
     }
+
+    var retained = new HashSet<Control>(desiredRows);
+    foreach (var removed in rowsPanel.Children.Where(child => !retained.Contains(child)).ToArray())
+    {
+      rowsPanel.Children.Remove(removed);
+    }
+    for (var index = 0; index < desiredRows.Count; index++)
+    {
+      var row = desiredRows[index];
+      if (index < rowsPanel.Children.Count && ReferenceEquals(rowsPanel.Children[index], row))
+      {
+        continue;
+      }
+
+      if (ReferenceEquals(row.Parent, rowsPanel))
+      {
+        rowsPanel.Children.Remove(row);
+      }
+      rowsPanel.Children.Insert(index, row);
+    }
+    renderedPresenter = RowPresenter;
   }
 
   private Control BuildNodeContent(FsusTreeNodeView view, FsusTreeRowContext context)
@@ -952,15 +990,20 @@ public class FsusTree : ContentControl
       return RowPresenter(context);
     }
 
-    var statePrefix = context.IsExpandable
-      ? context.IsExpanded ? "▾" : "▸"
-      : " ";
     return new TextBlock
     {
-      Text = $"{statePrefix} {view.Node.Label}",
+      Text = GetDefaultNodeText(context),
       VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
       TextTrimming = global::Avalonia.Media.TextTrimming.CharacterEllipsis,
     };
+  }
+
+  private static string GetDefaultNodeText(FsusTreeRowContext context)
+  {
+    var statePrefix = context.IsExpandable
+      ? context.IsExpanded ? "▾" : "▸"
+      : " ";
+    return $"{statePrefix} {context.Node.Label}";
   }
 
   private FsusTreeRowContext CreateRowContext(FsusTreeNodeView view)
@@ -1042,7 +1085,7 @@ public class FsusTree : ContentControl
       string.IsNullOrWhiteSpace(edit.ValidationError)
         ? $"editing create, level {level.ToString(CultureInfo.InvariantCulture)}"
         : $"editing create, invalid, level {level.ToString(CultureInfo.InvariantCulture)}");
-    renderedRows[edit.Key] = row;
+    renderedRows[edit.Key] = new RenderedTreeRow(null, row);
     return row;
   }
 
@@ -1234,11 +1277,11 @@ public class FsusTree : ContentControl
   }
 
   private void HandleRowPointerPressed(
-    FsusTreeNodeView view,
+    FsusTreeNode node,
     Border row,
     PointerPressedEventArgs e)
   {
-    if (e.Handled || view.Node.IsDisabled)
+    if (e.Handled || node.IsDisabled)
     {
       return;
     }
@@ -1246,7 +1289,7 @@ public class FsusTree : ContentControl
     var point = e.GetCurrentPoint(row);
     if (point.Properties.IsRightButtonPressed)
     {
-      var rowAnchor = ResolveNodeAnchorBounds(view.Node.Key);
+      var rowAnchor = ResolveNodeAnchorBounds(node.Key);
       var pointerAnchor = new Rect(
         rowAnchor.X + point.Position.X,
         rowAnchor.Y + point.Position.Y,
@@ -1254,7 +1297,7 @@ public class FsusTree : ContentControl
         1);
       Focus();
       if (RequestNodeContext(
-        view.Node.Key,
+        node.Key,
         FsusTreeInteractionSource.Pointer,
         pointerAnchor))
       {
@@ -1269,22 +1312,22 @@ public class FsusTree : ContentControl
     }
 
     Focus();
-    var expandable = IsExpandable(view.Node);
+    var expandable = IsExpandable(node);
     if (
       expandable &&
       point.Position.X <= global::FsusUI.Avalonia.FsusTokens.Space6Thickness.Left)
     {
       e.Handled = GestureToggleExpansion(
-        view.Node.Key,
+        node.Key,
         FsusTreeInteractionSource.Pointer);
       return;
     }
 
-    if (!selectedKeys.Contains(view.Node.Key))
+    if (!selectedKeys.Contains(node.Key))
     {
-      ToggleSelection(view.Node.Key);
+      ToggleSelection(node.Key);
     }
-    e.Handled = Activate(view.Node.Key, FsusTreeInteractionSource.Pointer);
+    e.Handled = Activate(node.Key, FsusTreeInteractionSource.Pointer);
   }
 
   private void RaiseSelectionChanged(IReadOnlyList<string> added, IReadOnlyList<string> removed)
