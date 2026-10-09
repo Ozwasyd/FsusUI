@@ -36,8 +36,9 @@ test('canonical compiler boundary retains inherited props and rejects illegal mo
     )
     const consumer = project.createSourceFile(
       path.join(process.cwd(), 'vue/typed-props-consumer.ts'),
-      `import Component from './typed-props-fixture'\nimport type { TransitionProps } from 'vue'\ntype Props = InstanceType<typeof Component>['$props']\ntype Equal<A, B> = (<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false\ntype Assert<T extends true> = T\n${ 
-        controls}`,
+      `import Component from './typed-props-fixture'\nimport type { TransitionProps } from 'vue'\ntype Props = InstanceType<typeof Component>['$props']\ntype Equal<A, B> = (<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false\ntype Assert<T extends true> = T\n${
+        controls
+      }`,
     )
     const diagnostics = project.getPreEmitDiagnostics()
     assert.ok(
