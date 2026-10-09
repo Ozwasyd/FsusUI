@@ -1,0 +1,166 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 47629a02152a7d2a090c63bd4b3ccc1739b78476..7a14a15de3182d944f6718dc690e49eed858ff95 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -558,12 +558,61 @@ async function resolveTSReferencedType(ref, stacks = []) {
+ }
+ 
+ // src/ts/namespace.ts
++var { AsyncLocalStorage } = require("node:async_hooks");
+ var namespaceSymbol = Symbol("namespace");
+ function isTSNamespace(val) {
+   return !!val && typeof val === "object" && namespaceSymbol in val;
+ }
++// A published namespace can still be in flight. Await other callers, but
++// retain partial namespaces on recursive dependency cycles.
++var namespaceResolutions = new WeakMap();
++var namespaceContext = new AsyncLocalStorage();
++function namespaceWaitsFor(scope, target, seen = new Set()) {
++  if (scope === target) return true;
++  if (seen.has(scope)) return false;
++  seen.add(scope);
++  const state = namespaceResolutions.get(scope);
++  return state?.status === "pending" && [...state.waitingOn].some(
++    (dependency) => namespaceWaitsFor(dependency, target, seen)
++  );
++}
+ async function resolveTSNamespace(scope) {
+-  if (scope.exports) return;
++  const caller = namespaceContext.getStore();
++  const callerState = namespaceResolutions.get(caller);
++  let state = namespaceResolutions.get(scope);
++  let start = false;
++  if (!state) {
++    if (scope.exports) return;
++    let resolve, reject;
++    const promise = new Promise((done, fail) => {
++      resolve = done;
++      reject = fail;
++    });
++    state = { promise, resolve, reject, status: "pending", waitingOn: new Set() };
++    namespaceResolutions.set(scope, state);
++    start = true;
++  }
++  if (caller && namespaceWaitsFor(scope, caller)) return;
++  if (callerState) callerState.waitingOn.add(scope);
++  if (start) {
++    namespaceContext.run(scope, () => resolveTSNamespaceExports(scope)).then(
++      () => {
++        state.status = "completed";
++        state.resolve();
++      },
++      (error) => {
++        state.status = "failed";
++        state.reject(error);
++      }
++    );
++  }
++  try {
++    await state.promise;
++  } finally {
++    callerState?.waitingOn.delete(scope);
++  }
++}
++async function resolveTSNamespaceExports(scope) {
+   const exports2 = {
+     [namespaceSymbol]: true
+   };
+@@ -574,6 +623,15 @@ async function resolveTSNamespace(scope) {
+   };
+   scope.declarations = declarations;
+   const { body, file } = resolveTSScope(scope);
++  // Cycles must see lexical declarations even before their import statements finish.
++  for (const stmt of body || []) {
++    const declaration = stmt.type === "ExportNamedDeclaration" ? stmt.declaration : stmt;
++    if (isTSDeclaration(declaration) && declaration.id?.type === "Identifier") {
++      const name = declaration.id.name;
++      declarations[name] = { scope, type: declaration };
++      if (stmt.type === "ExportNamedDeclaration") exports2[name] = declarations[name];
++    }
++  }
+   for (const stmt of body || []) {
+     if (stmt.type === "ExportDefaultDeclaration" && isTSDeclaration(stmt.declaration)) {
+       exports2.default = await resolveTSReferencedType({
+diff --git a/dist/index.js b/dist/index.js
+index ce125685cbf3e602a87155b73a4c72bc12843e7e..13b5e4daa84612768b980c91cc5bc9de92c9b0b3 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,3 +1,4 @@
++import { AsyncLocalStorage } from "node:async_hooks";
+ // src/index.ts
+ export * from "@vue-macros/common";
+ 
+@@ -518,8 +519,56 @@ var namespaceSymbol = Symbol("namespace");
+ function isTSNamespace(val) {
+   return !!val && typeof val === "object" && namespaceSymbol in val;
+ }
++// A published namespace can still be in flight. Await other callers, but
++// retain partial namespaces on recursive dependency cycles.
++var namespaceResolutions = new WeakMap();
++var namespaceContext = new AsyncLocalStorage();
++function namespaceWaitsFor(scope, target, seen = new Set()) {
++  if (scope === target) return true;
++  if (seen.has(scope)) return false;
++  seen.add(scope);
++  const state = namespaceResolutions.get(scope);
++  return state?.status === "pending" && [...state.waitingOn].some(
++    (dependency) => namespaceWaitsFor(dependency, target, seen)
++  );
++}
+ async function resolveTSNamespace(scope) {
+-  if (scope.exports) return;
++  const caller = namespaceContext.getStore();
++  const callerState = namespaceResolutions.get(caller);
++  let state = namespaceResolutions.get(scope);
++  let start = false;
++  if (!state) {
++    if (scope.exports) return;
++    let resolve, reject;
++    const promise = new Promise((done, fail) => {
++      resolve = done;
++      reject = fail;
++    });
++    state = { promise, resolve, reject, status: "pending", waitingOn: new Set() };
++    namespaceResolutions.set(scope, state);
++    start = true;
++  }
++  if (caller && namespaceWaitsFor(scope, caller)) return;
++  if (callerState) callerState.waitingOn.add(scope);
++  if (start) {
++    namespaceContext.run(scope, () => resolveTSNamespaceExports(scope)).then(
++      () => {
++        state.status = "completed";
++        state.resolve();
++      },
++      (error) => {
++        state.status = "failed";
++        state.reject(error);
++      }
++    );
++  }
++  try {
++    await state.promise;
++  } finally {
++    callerState?.waitingOn.delete(scope);
++  }
++}
++async function resolveTSNamespaceExports(scope) {
+   const exports = {
+     [namespaceSymbol]: true
+   };
+@@ -530,6 +579,15 @@ async function resolveTSNamespace(scope) {
+   };
+   scope.declarations = declarations;
+   const { body, file } = resolveTSScope(scope);
++  // Cycles must see lexical declarations even before their import statements finish.
++  for (const stmt of body || []) {
++    const declaration = stmt.type === "ExportNamedDeclaration" ? stmt.declaration : stmt;
++    if (isTSDeclaration(declaration) && declaration.id?.type === "Identifier") {
++      const name = declaration.id.name;
++      declarations[name] = { scope, type: declaration };
++      if (stmt.type === "ExportNamedDeclaration") exports[name] = declarations[name];
++    }
++  }
+   for (const stmt of body || []) {
+     if (stmt.type === "ExportDefaultDeclaration" && isTSDeclaration(stmt.declaration)) {
+       exports.default = await resolveTSReferencedType({
