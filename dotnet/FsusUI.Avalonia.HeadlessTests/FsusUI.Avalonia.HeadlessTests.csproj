@@ -28,5 +28,6 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets/Fonts/*.ttf" />
     <AvaloniaResource Include="Assets/TableV2Fonts/*.ttf" />
+    <AvaloniaResource Include="Assets/VueParityTypography/**/*.ttf;Assets/VueParityTypography/Source/*/LICENSE;Assets/VueParityTypography/Source/*/COPYRIGHT.txt" />
   </ItemGroup>
 </Project>
