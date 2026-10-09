@@ -92,6 +92,47 @@ public class FsusCommandPaletteTests
   }
 
   [Fact]
+  public async Task PlatformFormatsLocalAndProviderCommandsWithoutChangingGestures()
+  {
+    foreach (var platform in new[]
+      {
+        FsusShortcutPlatform.Windows,
+        FsusShortcutPlatform.Linux,
+        FsusShortcutPlatform.macOS,
+        FsusShortcutPlatform.Auto,
+      })
+    {
+      var gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control | KeyModifiers.Alt);
+      var local = new FsusPlatformCommand("file.save", "Save") { Gesture = gesture };
+      var provided = new FsusPlatformCommand("workspace.save", "Save workspace")
+      {
+        Gesture = gesture,
+        IsEnabled = false,
+      };
+      var palette = new FsusCommandPalette
+      {
+        ShortcutPlatform = platform,
+        CommandTree = [FsusNativeMenuItemModel.Action(local)],
+        Providers = [(_, _) => ValueTask.FromResult<IReadOnlyList<FsusPlatformCommand>>([provided])],
+      };
+      await palette.OpenAsync(new FsusOverlayHost());
+
+      var isMac = platform == FsusShortcutPlatform.macOS ||
+        (platform == FsusShortcutPlatform.Auto && OperatingSystem.IsMacOS());
+      Assert.Equal(2, palette.Results.Count);
+      Assert.All(palette.Results, result =>
+        Assert.Equal(isMac ? "Command+Option+S" : "Ctrl+Alt+S", result.DisplayShortcut));
+      Assert.True(palette.Results[0].IsEnabled);
+      Assert.False(palette.Results[1].IsEnabled);
+      Assert.Same(gesture, local.Gesture);
+      Assert.Same(gesture, provided.Gesture);
+      Assert.Equal("Ctrl+Alt+S", gesture.SerializedText);
+      Assert.Equal(KeyModifiers.Control | KeyModifiers.Alt, gesture.ToKeyGesture().KeyModifiers);
+      await palette.CloseAsync();
+    }
+  }
+
+  [Fact]
   public async Task WraparoundNavigationNestedBackImeAndEscapeUsePublicControlApi()
   {
     var child = new FsusPlatformCommand("format.heading", "Heading")
