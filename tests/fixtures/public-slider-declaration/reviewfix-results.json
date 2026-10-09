@@ -1,0 +1,465 @@
+{
+  "testedFunctionalCommit": "c7723c8e59bba7b64e9b0556c7ae929310647d80",
+  "independentBranch": "fix/slider-public-declaration-2d05f",
+  "ownedDelta": "Slider tests/fixture only; six original source-offer paths inherited unchanged",
+  "commands": {
+    "preflight": "PATH=/workspace/.setup/tools/node_modules/.bin:$PATH pnpm exec vitest list --config vue/vitest.config.ts vue/packages/components/slider/__tests__/slider.test.tsx --json=/tmp/slider-composition-reviewfix/slider-selection.json",
+    "independent": "FSUS_NODE_HEAP_PROFILE=build SLIDER_EVIDENCE_DIR=/tmp/slider-composition-reviewfix/standalone-final SLIDER_CONSUMER_ROOT=/tmp/slider-evidence/after-consumer node scripts/with-node-heap.mjs node --test tests/public-slider-declaration.test.mjs",
+    "composedSource": "FSUS_NODE_HEAP_PROFILE=build SLIDER_EVIDENCE_DIR=/tmp/slider-composition-reviewfix/composed-source-rerun node scripts/with-node-heap.mjs node --test --test-name-pattern='pinned independent|real canonical' tests/public-slider-declaration.test.mjs"
+  },
+  "originalNonemptySelection": {
+    "count": 35,
+    "receipt": {
+      "file": "/tmp/slider-composition-reviewfix/slider-selection.json",
+      "bytes": 5510,
+      "sha256": "aa2cb104a50042ec637b24dfb6cddbfc7b95316c51e80d7656ff77045e17f7c7"
+    },
+    "runtimeRerun": "UNRUN for this test-only delta; previous actual 35 PASS retained",
+    "originalHooksUnchanged": true
+  },
+  "independent": {
+    "nodeTests": "PASS 3/3, 0 skipped",
+    "log": "PASS: strict packed slider controls (independent-slider); full-library strict FAIL with 8 diagnostics\n\u2714 pinned independent and composed inventories reject unknown diagnostics (7.469887ms)\n\u2714 real canonical declaration producer retains original slider contracts (120442.146847ms)\n\u2714 actual installed tarball checks strict slider positive and negative controls (41145.880553ms)\n\u2139 tests 3\n\u2139 suites 0\n\u2139 pass 3\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 161825.17914\n",
+    "producer": {
+      "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+      "sourceProfile": "independent-slider",
+      "sourceInputsSha256": "aada160779f8b093850f18346216b89b3895716bd37c92f95cb054b7e03061f8",
+      "head": "c7723c8e59bba7b64e9b0556c7ae929310647d80",
+      "producerTypeScript": "5.9.2",
+      "originalDiagnosticReturnUnchanged": true,
+      "diagnostics": [
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/index.ts",
+          "start": 441,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/src/cascader.vue",
+          "start": 1642,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/date-picker/src/panel-utils.ts",
+          "start": 284,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/pagination/src/components/sizes.vue",
+          "start": 371,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/index.ts",
+          "start": 207,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/select.vue",
+          "start": 1314,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/useSelect.ts",
+          "start": 1693,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/index.ts",
+          "start": 463,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/src/time-select.vue",
+          "start": 539,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        }
+      ],
+      "pairDiagnostics": [],
+      "fields": [
+        {
+          "name": "elFormItem",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "slider",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "firstButton",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "secondButton",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "sliderDisabled",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "minValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "maxValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "runwayStyle",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "barStyle",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "resetSize",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "emitChange",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderWrapperPrevent",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderClick",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderDown",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setFirstPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setFirstValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setSecondPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setSecondValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        }
+      ],
+      "runtime": [
+        {
+          "file": "vue/packages/components/slider/index.ts",
+          "equal": true
+        },
+        {
+          "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+          "equal": true
+        },
+        {
+          "file": "vue/packages/components/slider/src/slider.vue",
+          "equal": true
+        }
+      ]
+    },
+    "installed": {
+      "sourceProfile": "independent-slider",
+      "fixtureControls": "PASS",
+      "wholeLibraryStrict": "FAIL",
+      "positiveDiagnostics": 8,
+      "negativeLocalDiagnostics": 16,
+      "externalDiagnostics": 8,
+      "wholeArtifactRuntimeParity": "UNRUN (separate retained FAIL evidence)"
+    },
+    "artifact": {
+      "sourceProfile": "independent-slider",
+      "tarballSha256": "c3b064aa8cca53d7e1d78a3ba921171d47d4a1e02f9679bfa3d34e73eecb5fe7",
+      "sliderRuntimeFiles": 36
+    }
+  },
+  "composed": {
+    "sourceInputCommit": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+    "nodeSourceTests": "PASS 2/2, 0 skipped",
+    "log": "\u2714 pinned independent and composed inventories reject unknown diagnostics (5.437862ms)\n\u2714 real canonical declaration producer retains original slider contracts (98044.416822ms)\n\u2139 tests 2\n\u2139 suites 0\n\u2139 pass 2\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 98144.043164\n",
+    "producer": {
+      "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+      "sourceProfile": "four-component",
+      "sourceInputsSha256": "a10d8222fb1844856a4b52374afc37f48244fec59c70152251fb17034c0c81fa",
+      "head": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+      "producerTypeScript": "5.9.2",
+      "originalDiagnosticReturnUnchanged": true,
+      "diagnostics": [],
+      "pairDiagnostics": [],
+      "fields": [
+        {
+          "name": "elFormItem",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "slider",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "firstButton",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "secondButton",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "sliderDisabled",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "minValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "maxValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "runwayStyle",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "barStyle",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "resetSize",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "emitChange",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderWrapperPrevent",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderClick",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderDown",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setFirstPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setFirstValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setSecondPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setSecondValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        }
+      ],
+      "runtime": [
+        {
+          "file": "vue/packages/components/slider/index.ts",
+          "equal": true
+        },
+        {
+          "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+          "equal": true
+        },
+        {
+          "file": "vue/packages/components/slider/src/slider.vue",
+          "equal": true
+        }
+      ]
+    },
+    "newActualInstalledTest": "UNRUN: actual SHA827 tarball is absent from this execution environment; no replacement build or label used",
+    "publishedActualInstalledReconciliation": {
+      "status": "PASS (read-only evidence assertion; not a new compiler/install run)",
+      "evidenceCommit": "736b981fba100a0c2e956e74b61ddef62ff4d508",
+      "positiveDiagnostics": 0,
+      "negativeDiagnostics": 16,
+      "log": "PASS read-only published actual controls positive 0\nPASS read-only published actual controls negative 16\n"
+    }
+  },
+  "protectedOriginalInputs": [
+    {
+      "file": "package.json",
+      "sha256": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "pnpm-lock.yaml",
+      "sha256": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "config/dependencies/npm-authority.json",
+      "sha256": "09ff97e13767b2226ea9ac49256136c9c1c3a9e14fbc40d9f7d7f7906f5cbf34",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "vue/packages/element-plus/package.json",
+      "sha256": "7bbb40ed812927e56a198d439023224fe750ab4ad368e372b5775bf57d6b910b",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "vue/internal/build/src/tasks/types-definitions.ts",
+      "sha256": "e3a5bdc2789da788c05bae5df5b7770076663c2856a8c5d955bbb3b82f0a49cd",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "vue/vitest.config.ts",
+      "sha256": "5d1c92ec3090edb0dff1cba72cb655fdaf2d88d1ec004a9fe4a5a30e01cfb9d9",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "vue/vitest.setup.ts",
+      "sha256": "f18c169e7d1f7bdfd67377dbb243aa9eb33a9525d720627d118d3e81a8f16bb8",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "vue/packages/components/slider/__tests__/slider.test.tsx",
+      "sha256": "62169e7c5b8e28bca5c367148bcdb56b3bae554ddacbf470b885423d95b1ef56",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "vue/packages/components/slider/index.ts",
+      "sha256": "52840caf62b4608f4b932a101ea8750613c90dc8438559031ed42e512f7fecd0",
+      "originalByteIdentity": true
+    },
+    {
+      "file": "vue/packages/components/slider/src/slider.vue",
+      "sha256": "26e082a589cf3a3979c0c9e5330e473a708c8aae7105ee0dc8ba1215d8293ec8",
+      "originalByteIdentity": true
+    }
+  ],
+  "retainedFailures": [
+    {
+      "case": "initial lint",
+      "status": "FAIL",
+      "reason": "URL was not imported from node:url; ordinary owned-test import repair, exact lint rerun PASS",
+      "receipt": {
+        "file": "/tmp/slider-composition-reviewfix/lint-initial.log",
+        "bytes": 165,
+        "sha256": "bea82629d1d4b80959ce8af3ac168700059fcb4c38a7950d250a88ec62f93390"
+      }
+    },
+    {
+      "case": "initial commit hook",
+      "status": "FAIL",
+      "reason": "default pnpm failed ENOENT mkdir /home/agent/.local/share/pnpm; original tool output retained in thread; exact hook rerun with pinned pnpm PASS"
+    },
+    {
+      "case": "initial installed archive comparison",
+      "status": "FAIL",
+      "reason": "pnpm-added node_modules/.bin/katex is not an archive file; dependency-install scope corrected, package archive byte assertion retained",
+      "receipt": {
+        "file": "/tmp/slider-composition-reviewfix/standalone-installed.log",
+        "bytes": 21671,
+        "sha256": "0e96e0b61f1bddcf96155c6f27f9919e17b93bb1e12256ee8669f29f3f0aedc1"
+      }
+    },
+    {
+      "case": "small-heap installed rerun",
+      "status": "FAIL",
+      "reason": "512 MiB heap exhausted; existing build heap hook exact rerun PASS",
+      "receipt": {
+        "file": "/tmp/slider-composition-reviewfix/standalone-installed-rerun.log",
+        "bytes": 1747,
+        "sha256": "87b3f0983d52ce205ba8eb1ed0c134661f6f77ee4c98ace9be8e27ba89a7696a"
+      }
+    },
+    {
+      "case": "initial composed producer",
+      "status": "FAIL",
+      "reason": "generated WASM stub had no final safe type exports; exact same-source prepared declarations reused after stubs; unchanged canonical exact rerun PASS",
+      "receipt": {
+        "file": "/tmp/slider-composition-reviewfix/composed-source.log",
+        "bytes": 1693,
+        "sha256": "645c0d29afc6be3c091a67b59b5414e2bb9199897f18d1b2908cf21d43402844"
+      }
+    },
+    {
+      "case": "original composition fixture failures",
+      "status": "FAIL retained",
+      "evidenceCommit": "736b981fba100a0c2e956e74b61ddef62ff4d508",
+      "files": ["slider-source-test.log", "slider-installed-test.log"],
+      "reasons": ["0 !== 9", "0 !== 8"]
+    }
+  ],
+  "wholeArtifactRuntimeParity": "FAIL remains retained in independent and integration evidence; no Motion difference waiver or producer edit",
+  "unrun": [
+    "new composed actual packed fixture (missing actual tarball)",
+    "full repository tests",
+    "Node16 qualification",
+    "browser/device/native qualification",
+    "remote CI",
+    "publication",
+    "same-reviewer acceptance of new test delta"
+  ],
+  "rollback": "Omit/revert only commits after 4214f38b38c8d891c3b25b0e2e56d5e28839edee from this independent source branch"
+}

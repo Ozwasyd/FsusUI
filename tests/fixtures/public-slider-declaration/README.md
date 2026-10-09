@@ -3,7 +3,7 @@
 Run only this nonempty Node test file with the existing heap wrapper:
 
 ```sh
-SLIDER_EVIDENCE_DIR=/absolute/evidence/path SLIDER_CONSUMER_ROOT=/absolute/frozen-consumer/path \
+FSUS_NODE_HEAP_PROFILE=build SLIDER_EVIDENCE_DIR=/absolute/evidence/path SLIDER_CONSUMER_ROOT=/absolute/frozen-consumer/path \
   node scripts/with-node-heap.mjs node --test tests/public-slider-declaration.test.mjs
 ```
 
@@ -45,3 +45,28 @@ This follow-up changes tests only; changeset not needed because the public sourc
 contract and runtime are unchanged. Review the complete test delta from `4214f38b`
 with the original reviewer before combination. Do not discard the original
 composition fixture failures (`0 !== 9` and `0 !== 8`) or earlier failed runs.
+
+## Actual follow-up verification
+
+Functional test delta at `c7723c8e59bba7b64e9b0556c7ae929310647d80`:
+
+| Check                                                                                   | Actual result                                                                                   |
+| --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Exact original Slider Vitest list, original setup/cleanup hooks                         | PASS: 35 discovered; runtime rerun UNRUN for this test-only delta                               |
+| Independent canonical, installed controls and inventory refusals                        | PASS: 3/3, zero skipped; producer 9, strict positive 8 external, negative 16 local + 8 external |
+| Actual f4 canonical and inventory refusals                                              | PASS: 2/2, zero skipped; complete producer diagnostics 0                                        |
+| Original inferred parameters/return, all 19 fields, three source runtime scripts        | PASS in both actual canonical runs                                                              |
+| Actual independent tarball/installed byte identity and 36 original Slider runtime files | PASS                                                                                            |
+| Public f4 actual installed evidence checked against new exact assertions                | PASS: positive 0, negative 16; read-only reconciliation                                         |
+| New f4 installed fixture execution in this environment                                  | UNRUN: actual SHA827 tarball unavailable; no substitute rebuilt artifact                        |
+| Whole-library strict on independent artifact                                            | FAIL: all eight original unrelated errors retained                                              |
+| Whole-artifact runtime byte parity                                                      | Retained FAIL; Motion differences remain owned by Original827                                   |
+| Same-reviewer acceptance of this new delta                                              | Pending                                                                                         |
+
+[reviewfix-results.json](./reviewfix-results.json) contains the real source reports,
+commands, packed identity/status, nonempty-selection receipt, original protected
+file hashes and first-failure receipts. Initial lint, default-pnpm commit hook,
+archive-scope assertion, small-heap OOM and generated-WASM-stub failure remain
+recorded. Only owned tests/setup reuse were corrected; no production contract,
+generator/config, dependency or frozen input was edited. Final documentation and
+evidence additions do not change the tested functional files or input fingerprints.
