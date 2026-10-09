@@ -3,6 +3,7 @@ using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -339,6 +340,72 @@ public class FsusDesktopShellHeadlessTests
     }
 
     window.Close();
+  }
+
+  [AvaloniaFact]
+  public void DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount()
+  {
+    var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
+    var theme = new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
+    {
+      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
+    };
+    var body = new Grid
+    {
+      Children = { new Border { Background = Brushes.Blue, Width = 160, Height = 80 } },
+    };
+    var document = new FsusDocumentTab
+    {
+      Key = "document",
+      Header = new Border { Background = Brushes.Gray, Width = 80, Height = 16 },
+      IsClosable = false,
+      Content = body,
+    };
+    var tabs = new FsusDocumentTabs();
+    tabs.AddDocument(document);
+    var window = new Window { Content = tabs, Width = 520, Height = 360 };
+    application.Styles.Add(theme);
+    try
+    {
+      window.Show();
+      Dispatcher.UIThread.RunJobs();
+      AssertDocumentBodyParent();
+
+      Assert.True(application.Styles.Remove(theme));
+      Dispatcher.UIThread.RunJobs();
+      Assert.Same(body, document.Content);
+      Assert.Same(body, tabs.SelectedContent);
+      Assert.Null(body.GetVisualParent());
+      Assert.DoesNotContain(document.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
+
+      application.Styles.Add(theme);
+      Dispatcher.UIThread.RunJobs();
+      AssertDocumentBodyParent();
+
+      window.Content = null;
+      Dispatcher.UIThread.RunJobs();
+      window.Content = tabs;
+      Dispatcher.UIThread.RunJobs();
+      AssertDocumentBodyParent();
+    }
+    finally
+    {
+      window.Close();
+      application.Styles.Remove(theme);
+    }
+
+    void AssertDocumentBodyParent()
+    {
+      var contentHost = tabs.GetVisualDescendants()
+        .OfType<ContentPresenter>()
+        .Single(presenter => presenter.Name == "PART_SelectedContentHost");
+      Assert.Same(body, document.Content);
+      Assert.Same(body, tabs.SelectedContent);
+      Assert.Same(document, tabs.SelectedItem);
+      Assert.Same(contentHost, body.GetVisualParent());
+      Assert.Single(tabs.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
+      Assert.DoesNotContain(document.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
+    }
   }
 
   [AvaloniaFact]
