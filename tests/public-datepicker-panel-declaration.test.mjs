@@ -89,6 +89,26 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
       true,
       producerTs.ScriptKind.JS,
     )
+    const roles = new Map()
+    const panels = {
+      'panel-date-pick': 'DatePickPanel',
+      'panel-date-range': 'DateRangePickPanel',
+      'panel-month-range': 'MonthRangePickPanel',
+    }
+    for (const node of file.statements) {
+      if (!producerTs.isImportDeclaration(node) || !node.importClause?.name)
+        continue
+      const match = node.moduleSpecifier.text.match(
+        /\/(panel-date-pick|panel-date-range|panel-month-range)\.vue(?:2?\.mjs)?$/,
+      )
+      if (match) roles.set(node.importClause.name.text, panels[match[1]])
+    }
+    assert.equal(roles.size, 3, 'retain the three original panel imports')
+    assert.equal(
+      new Set(roles.values()).size,
+      3,
+      'retain each distinct panel owner',
+    )
     const statement = file.statements.find(
       (node) =>
         producerTs.isVariableStatement(node) &&
@@ -102,10 +122,14 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
     ).initializer
     const normalized = producerTs.transform(selector, [
       (context) => {
-        const visit = (node) =>
-          producerTs.isStringLiteral(node)
-            ? producerTs.factory.createStringLiteral(node.text)
-            : producerTs.visitEachChild(node, visit, context)
+        const visit = (node) => {
+          if (producerTs.isStringLiteral(node))
+            return producerTs.factory.createStringLiteral(node.text)
+          if (producerTs.isIdentifier(node) && roles.has(node.text)) {
+            return producerTs.factory.createIdentifier(roles.get(node.text))
+          }
+          return producerTs.visitEachChild(node, visit, context)
+        }
         return (node) => producerTs.visitNode(node, visit)
       },
     ])
