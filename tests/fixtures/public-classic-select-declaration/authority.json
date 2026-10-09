@@ -1,0 +1,726 @@
+{
+  "schema": 1,
+  "referenceEvidenceCommit": "736b981fba100a0c2e956e74b61ddef62ff4d508",
+  "producerCompiler": "5.9.2",
+  "consumerCompiler": "6.0.2",
+  "vue": "3.5.32",
+  "declarationPaths": [
+    "es/components/index.d.ts",
+    "global.d.ts",
+    "es/components/select/index.d.ts",
+    "es/components/select/src/select.vue.d.ts",
+    "es/components/select/src/useSelect.d.ts",
+    "es/components/cascader/index.d.ts",
+    "es/components/cascader/src/cascader.vue.d.ts",
+    "es/components/date-picker/src/panel-utils.d.ts",
+    "es/components/slider/index.d.ts",
+    "es/components/slider/src/composables/use-slide.d.ts",
+    "es/components/slider/src/slider.vue.d.ts",
+    "lib/components/select/index.d.ts",
+    "lib/components/select/src/select.vue.d.ts",
+    "lib/components/select/src/useSelect.d.ts",
+    "lib/components/cascader/index.d.ts",
+    "lib/components/cascader/src/cascader.vue.d.ts",
+    "lib/components/date-picker/src/panel-utils.d.ts",
+    "lib/components/slider/index.d.ts",
+    "lib/components/slider/src/composables/use-slide.d.ts",
+    "lib/components/slider/src/slider.vue.d.ts"
+  ],
+  "node16BoundaryDiagnostics": [
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 2,
+      "code": 1541,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu.d.ts",
+      "line": 2,
+      "code": 1541,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/types.d.ts",
+      "line": 2,
+      "code": 1541,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/utils/arrays.d.ts",
+      "line": 5,
+      "code": 1479,
+      "message": "The current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import(\"lodash-unified\")' call instead."
+    }
+  ],
+  "node16PositiveDiagnostics": [
+    {
+      "file": "positive.ts",
+      "line": 7,
+      "code": 2339,
+      "message": "Property 'install' does not exist on type 'typeof import(\"PACKAGE/es/components/select/index\")'."
+    },
+    {
+      "file": "positive.ts",
+      "line": 10,
+      "code": 2322,
+      "message": "Type 'typeof import(\"PACKAGE/es/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"PACKAGE/es/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"PACKAGE/es/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"PACKAGE/es/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+    },
+    {
+      "file": "positive.ts",
+      "line": 11,
+      "code": 2322,
+      "message": "Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"PACKAGE/lib/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+    },
+    {
+      "file": "positive.ts",
+      "line": 16,
+      "code": 2344,
+      "message": "Type 'typeof import(\"PACKAGE/es/components/select/index\")' does not satisfy the constraint 'abstract new (...args: any) => any'.\n  Type 'typeof import(\"PACKAGE/es/components/select/index\")' provides no match for the signature 'new (...args: any): any'."
+    },
+    {
+      "file": "positive.ts",
+      "line": 23,
+      "code": 2344,
+      "message": "Type 'typeof import(\"PACKAGE/es/components/select/index\")' does not satisfy the constraint 'abstract new (...args: any) => any'.\n  Type 'typeof import(\"PACKAGE/es/components/select/index\")' provides no match for the signature 'new (...args: any): any'."
+    }
+  ],
+  "profiles": [
+    {
+      "name": "independent-classic-select-2d05f",
+      "sourceSha": "6dd7dc60158ee4a9ffeea18612e1143c47f4b600",
+      "sourceFingerprint": "0a2702054e7477c22233f2084c670c333ec72e2f87f030f94a856cf724f2d8e6",
+      "installedFingerprint": "aa05365982e678ea09a1b213e81fb4697d74d2b21c1eec6503d8497fe3b70b18",
+      "referenceArtifactSha256": "3863df16ffafc85627e338002d8cb275804f61299e8d847bf8d2654298327e44",
+      "producerDiagnostics": [
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/index.ts",
+          "start": 441,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/src/cascader.vue.ts",
+          "start": 1642,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/date-picker/src/panel-utils.ts",
+          "start": 284,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/index.ts",
+          "start": 103,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+          "start": 480,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/src/slider.vue.ts",
+          "start": 644,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        }
+      ],
+      "installedDiagnostics": {
+        "bundler-positive": [
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 12,
+            "code": 2307,
+            "message": "Cannot find module './cascader' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 61,
+            "code": 2307,
+            "message": "Cannot find module './slider' or its corresponding type declarations."
+          }
+        ],
+        "bundler-negative": [
+          {
+            "file": "negative.ts",
+            "line": 4,
+            "code": 2322,
+            "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 6,
+            "code": 2322,
+            "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'string'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 9,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 10,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 12,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 13,
+            "code": 2345,
+            "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 12,
+            "code": 2307,
+            "message": "Cannot find module './cascader' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 61,
+            "code": 2307,
+            "message": "Cannot find module './slider' or its corresponding type declarations."
+          }
+        ],
+        "bundler-whole-package": [
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 12,
+            "code": 2307,
+            "message": "Cannot find module './cascader' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 61,
+            "code": 2307,
+            "message": "Cannot find module './slider' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/global.d.ts",
+            "line": 19,
+            "code": 2339,
+            "message": "Property 'ElCascader' does not exist on type 'typeof import(\"PACKAGE/es/index\")'."
+          },
+          {
+            "file": "PACKAGE/global.d.ts",
+            "line": 141,
+            "code": 2339,
+            "message": "Property 'ElSlider' does not exist on type 'typeof import(\"PACKAGE/es/index\")'."
+          }
+        ],
+        "bundler-options": [
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 12,
+            "code": 2307,
+            "message": "Cannot find module './cascader' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 61,
+            "code": 2307,
+            "message": "Cannot find module './slider' or its corresponding type declarations."
+          },
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'Placement | undefined'."
+          },
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 8,
+            "code": 2322,
+            "message": "Type '\"invalid\"' is not assignable to type 'PositioningStrategy | undefined'."
+          }
+        ]
+      }
+    },
+    {
+      "name": "four-component-f4a094",
+      "sourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+      "sourceFingerprint": "d98ffad51d924ed037a24d3f9c328bb6afeb7beb6ef4f18f67640938b813724e",
+      "installedFingerprint": "59b6a2f0d00f25331e8d8508bf9371a088e344a17cf0a0621d6ae35bf2e3bfa9",
+      "referenceArtifactSha256": "82724daaa96d47e22bf5ec17694224bfc40192d50ff3a1554b6e8a6775bec4d9",
+      "producerDiagnostics": [],
+      "installedDiagnostics": {
+        "bundler-positive": [],
+        "bundler-negative": [
+          {
+            "file": "negative.ts",
+            "line": 4,
+            "code": 2322,
+            "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 6,
+            "code": 2322,
+            "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'string'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 9,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 10,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 12,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 13,
+            "code": 2345,
+            "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+          }
+        ],
+        "bundler-whole-package": [],
+        "bundler-options": [
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'Placement | undefined'."
+          },
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 8,
+            "code": 2322,
+            "message": "Type '\"invalid\"' is not assignable to type 'PositioningStrategy | undefined'."
+          }
+        ]
+      },
+      "verifiedLocalArtifactSha256": "ae7b65c71e8e1de0f856a42159e6ee25a8c2b8dce16ba88792f68d5b34306fdc",
+      "buildInputFingerprint": "8dc5a6987ba3a43a6a60d41ef589725b93ab578a396d81e11d21ac12b335771f"
+    }
+  ]
+}

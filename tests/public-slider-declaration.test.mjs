@@ -11,6 +11,13 @@ import {
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import {
+  assertInstalled,
+  assertProducer,
+  authority,
+  installedArtifact,
+  sourceProfile,
+} from './fixtures/public-slider-declaration/authority.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const fixtures = path.join(root, 'tests/fixtures/public-slider-declaration')
@@ -20,6 +27,46 @@ assert.ok(
   'Set SLIDER_EVIDENCE_DIR to retain actual diagnostics and logs',
 )
 mkdirSync(evidence, { recursive: true })
+
+test('pinned independent and composed inventories reject unknown diagnostics', () => {
+  for (const profile of authority.profiles) {
+    assertProducer(profile, profile.producerDiagnostics)
+    assertInstalled(profile, 'positive', profile.externalDiagnostics)
+    assertInstalled(profile, 'negative', [
+      ...profile.externalDiagnostics,
+      ...authority.negative,
+    ])
+    const unexpected = {
+      file: 'unknown.ts',
+      line: 1,
+      code: 7056,
+      message: 'unexpected',
+    }
+    assert.throws(() =>
+      assertProducer(profile, [...profile.producerDiagnostics, unexpected]),
+    )
+    assert.throws(() =>
+      assertInstalled(profile, 'positive', [
+        ...profile.externalDiagnostics,
+        unexpected,
+      ]),
+    )
+    assert.throws(() =>
+      assertInstalled(profile, 'negative', [
+        ...profile.externalDiagnostics,
+        ...authority.negative.slice(1),
+      ]),
+    )
+    assert.throws(() =>
+      assertInstalled(profile, 'negative', [
+        ...profile.externalDiagnostics,
+        ...authority.negative.map((row, i) =>
+          i === 0 ? { ...row, code: 2345 } : row,
+        ),
+      ]),
+    )
+  }
+})
 
 test(
   'real canonical declaration producer retains original slider contracts',
@@ -76,6 +123,16 @@ test('actual installed tarball checks strict slider positive and negative contro
   )
   assert.equal(manifest.name, '@ozwasyd/element-plus')
   assert.equal(manifest.version, '1.5.1')
+  const profile = sourceProfile(root)
+  const tarball = path.resolve(
+    consumer,
+    installManifest.dependencies['@ozwasyd/element-plus'].slice('file:'.length),
+  )
+  const artifact = installedArtifact(profile, tarball, packageRoot)
+  writeFileSync(
+    path.join(evidence, 'packed-identity.json'),
+    `${JSON.stringify({ sourceProfile: profile.name, ...artifact }, null, 2)}\n`,
+  )
   for (const module of ['es', 'lib'])
     assert.ok(
       existsSync(
@@ -113,39 +170,28 @@ test('actual installed tarball checks strict slider positive and negative contro
       path.join(evidence, 'packed-strict.json'),
       `${JSON.stringify(report, null, 2)}\n`,
     )
-    const local = rows.filter((d) => d.file === `slider-${phase}.ts`)
-    const external = rows.filter((d) => d.file !== `slider-${phase}.ts`)
-    // Other component owners remain open on the exact published baseline.
-    assert.equal(external.length, 8, JSON.stringify(external, null, 2))
-    assert.ok(
-      external.every(
-        (d) =>
-          [2307, 2339].includes(d.code) &&
-          (d.code === 2307
-            ? /'\.\/(cascader|select|time-select)'/.test(d.message)
-            : /Property '(ElCascader|ElOption|ElOptionGroup|ElSelect|ElTimeSelect)'/.test(
-                d.message,
-              )) &&
-          !/Property 'ElSlider'|'\.\/slider'/.test(d.message),
-      ),
-      'only original unrelated installed-package failures remain',
-    )
-    if (phase === 'positive')
-      assert.deepEqual(local, [], JSON.stringify(local, null, 2))
-    else {
-      assert.deepEqual(
-        local.map((d) => d.line).sort((a, b) => a - b),
-        [8, 10, 11, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 28],
-        JSON.stringify(local, null, 2),
-      )
-      assert.ok(
-        local.every((d) => [2322, 2345, 2769].includes(d.code)),
-        JSON.stringify(local, null, 2),
-      )
-    }
+    assertInstalled(profile, phase, rows)
   }
+  writeFileSync(
+    path.join(evidence, 'packed-status.json'),
+    `${JSON.stringify(
+      {
+        sourceProfile: profile.name,
+        fixtureControls: 'PASS',
+        wholeLibraryStrict: report.positive.length === 0 ? 'PASS' : 'FAIL',
+        positiveDiagnostics: report.positive.length,
+        negativeLocalDiagnostics: report.negative.filter(
+          (d) => d.file === 'slider-negative.ts',
+        ).length,
+        externalDiagnostics: profile.externalDiagnostics.length,
+        wholeArtifactRuntimeParity: 'UNRUN (separate retained FAIL evidence)',
+      },
+      null,
+      2,
+    )}\n`,
+  )
   process.stdout.write(
-    'PASS: strict packed slider controls; full-library strict check remains FAIL with 8 unrelated diagnostics\n',
+    `PASS: strict packed slider controls (${profile.name}); full-library strict ${report.positive.length === 0 ? 'PASS' : 'FAIL'} with ${report.positive.length} diagnostics\n`,
   )
   assert.equal(options.skipLibCheck, false)
   assert.equal(options.strict, true)

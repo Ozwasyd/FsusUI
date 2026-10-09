@@ -1,11 +1,22 @@
 import assert from 'node:assert/strict'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, copyFileSync, writeFileSync } from 'node:fs'
+import {
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  copyFileSync,
+  writeFileSync,
+} from 'node:fs'
 import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import {
+  authority,
+  readArtifactAuthority,
+  readSourceAuthority,
+} from './fixtures/public-datepicker-panel-declaration/authority.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const fixture = path.join(
@@ -15,6 +26,7 @@ const fixture = path.join(
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'))
 
 test('canonical producer preserves the inferred panel contract and emits named types', () => {
+  const sourceAuthority = readSourceAuthority(root)
   const evidence =
     process.env.PUBLIC_DATEPICKER_PANEL_EVIDENCE_DIR ??
     mkdtempSync(path.join(os.tmpdir(), 'datepicker-panel-producer-'))
@@ -41,14 +53,16 @@ test('canonical producer preserves the inferred panel contract and emits named t
   writeFileSync(path.join(evidence, 'producer.log'), run.stdout + run.stderr)
   assert.equal(run.status, 0, run.stderr || run.error?.message || run.stdout)
   const result = readJson(output)
+  assert.deepEqual(result.sourceAuthority, sourceAuthority)
   assert.equal(result.canonicalProducerError, null)
   assert.equal(result.originalDiagnosticReturnUnchanged, true)
   assert.equal(result.inferredParameterAndReturnParity, 'PASS')
   assert.equal(result.intentionalContractMutationsRejected, 2)
-  assert.equal(result.diagnostics.filter((row) => row.code === 7056).length, 11)
+  assert.deepEqual(result.diagnostics, sourceAuthority.producerDiagnostics)
 })
 
 test('actual installed tarball accepts the exact panel contract and rejects invalid calls', () => {
+  const sourceAuthority = readSourceAuthority(root)
   const consumer = process.env.PUBLIC_DATEPICKER_PANEL_CONSUMER
   assert.ok(
     consumer,
@@ -77,6 +91,8 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
     },
   }).outputText
   const packageRoot = path.join(consumer, 'node_modules/@ozwasyd/element-plus')
+  const artifactAuthority = readArtifactAuthority(root, consumer, packageRoot)
+  const installedRoot = realpathSync(packageRoot)
   const packedJs = readFileSync(
     path.join(packageRoot, 'es/components/date-picker/src/panel-utils.mjs'),
     'utf8',
@@ -169,24 +185,68 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
           options.options,
         ),
       )
-      .map((diagnostic) => ({
-        code: diagnostic.code,
-        file:
-          diagnostic.file && path.relative(consumer, diagnostic.file.fileName),
-        message: ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
-      }))
+      .map((diagnostic) => {
+        const packageFile =
+          diagnostic.file &&
+          path.relative(installedRoot, diagnostic.file.fileName)
+        return {
+          code: diagnostic.code,
+          file:
+            diagnostic.file &&
+            (packageFile.startsWith('..')
+              ? path.relative(consumer, diagnostic.file.fileName)
+              : `package/${packageFile}`),
+          line:
+            diagnostic.file && diagnostic.start !== undefined
+              ? diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
+                  .line + 1
+              : undefined,
+          message: ts.flattenDiagnosticMessageText(
+            diagnostic.messageText,
+            '\n',
+          ),
+        }
+      })
   const positive = diagnostics('positive.ts')
   const negative = diagnostics('negative.ts')
+  const libraryRow = ({ code, file, message }) => ({ code, file, message })
+  assert.deepEqual(
+    positive.map(libraryRow),
+    artifactAuthority.libraryDiagnostics,
+  )
+  assert.deepEqual(
+    negative.map((diagnostic) =>
+      diagnostic.file === 'datepicker-panel-negative.ts'
+        ? {
+            code: diagnostic.code,
+            file: diagnostic.file,
+            line: diagnostic.line,
+          }
+        : libraryRow(diagnostic),
+    ),
+    [
+      ...authority.negativeTargets.map((target) => ({
+        code: target.code,
+        file: 'datepicker-panel-negative.ts',
+        line: target.line,
+      })),
+      ...artifactAuthority.libraryDiagnostics,
+    ],
+  )
   const result = {
+    sourceAuthority,
+    artifactAuthority,
     strict: true,
     skipLibCheck: false,
+    diagnosticExpectationControl: 'PASS',
+    strictPositiveResult: positive.length === 0 ? 'PASS' : 'FAIL',
     actualPackedRuntimeSelectorParity: 'PASS',
     positive,
     negative,
   }
   writeFileSync(
     path.join(consumer, 'datepicker-panel-controls.json'),
-    JSON.stringify(result, null, 2) + '\n',
+    `${JSON.stringify(result, null, 2)}\n`,
   )
   assert.deepEqual(positive, [])
   assert.equal(negative.length, 4)

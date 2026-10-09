@@ -1,15 +1,25 @@
-const assert = require('node:assert/strict')
-const fs = require('node:fs')
-const path = require('node:path')
-const { execFileSync } = require('node:child_process')
-const { createHash } = require('node:crypto')
-const { Project, ts } = require('ts-morph')
+const filename = process
+  .getBuiltinModule('node:fs')
+  .realpathSync(process.argv[1])
+const requireSource = process
+  .getBuiltinModule('node:module')
+  .createRequire(filename)
+const assert = requireSource('node:assert/strict')
+const fs = requireSource('node:fs')
+const path = requireSource('node:path')
+const { execFileSync } = requireSource('node:child_process')
+const { createHash } = requireSource('node:crypto')
+const { Buffer } = requireSource('node:buffer')
+const { Project, ts } = requireSource('ts-morph')
+const { readSourceAuthority } = requireSource('./authority.mjs')
 
-const root = path.resolve(__dirname, '../../..')
+const root = path.resolve(path.dirname(filename), '../../..')
+const sourceAuthority = readSourceAuthority(root)
 const baseline = '2d05f240e5fb04ac0cd602b4ed638ffe00b1859b'
 const target = 'vue/packages/components/date-picker/src/panel-utils.ts'
 const mode = process.argv[2]
 assert.ok(['baseline', 'verify'].includes(mode))
+assert.equal(sourceAuthority.name === 'original', mode === 'baseline')
 const output = path.resolve(process.argv[3])
 const originalSource = execFileSync('git', ['show', `${baseline}:${target}`], {
   cwd: root,
@@ -30,6 +40,8 @@ assert.equal(
   'runtime JS must be identical',
 )
 assert.equal(ts.version, '5.9.2')
+assert.equal(requireSource('ts-morph/package.json').version, '27.0.2')
+assert.equal(requireSource('vue/package.json').version, '3.5.32')
 for (const file of [
   'package.json',
   'pnpm-lock.yaml',
@@ -51,20 +63,6 @@ for (const file of [
   )
 }
 
-const expectedFiles = [
-  'cascader/index.ts',
-  'cascader/src/cascader.vue.ts',
-  'date-picker/src/panel-utils.ts',
-  'pagination/src/components/sizes.vue.ts',
-  'select/index.ts',
-  'select/src/select.vue.ts',
-  'select/src/useSelect.ts',
-  'slider/index.ts',
-  'slider/src/composables/use-slide.ts',
-  'slider/src/slider.vue.ts',
-  'time-select/index.ts',
-  'time-select/src/time-select.vue.ts',
-].map((file) => `vue/packages/components/${file}`)
 const diagnosticRows = (diagnostics) =>
   diagnostics.map((diagnostic) => ({
     code: diagnostic.getCode(),
@@ -84,8 +82,9 @@ Project.prototype.getPreEmitDiagnostics = function (...args) {
   const rows = diagnosticRows(diagnostics)
   const actual = rows.filter((row) => row.code === 7056)
   assert.deepEqual(
-    actual.map((row) => row.file),
-    expectedFiles.filter((file) => mode === 'baseline' || file !== target),
+    rows,
+    sourceAuthority.producerDiagnostics,
+    'all diagnostics must match the exact recognized source inputs',
   )
   assert.equal(rows.filter((row) => ![7056, 2742].includes(row.code)).length, 0)
   if (mode === 'baseline') {
@@ -121,9 +120,13 @@ type ParameterMutationRejected = Assert<Same<Parameters<typeof getPanel>, [numbe
 type ReturnMutationRejected = Assert<Same<ReturnType<typeof getPanel>, typeof DatePickPanel>>
 `)
     try {
-      const controls = diagnosticRows(
-        originalDiagnostics.apply(this, args),
-      ).filter((row) => row.file === target)
+      const paired = diagnosticRows(originalDiagnostics.apply(this, args))
+      const controls = paired.filter((row) => row.file === target)
+      assert.deepEqual(
+        paired.filter((row) => row.file !== target),
+        rows,
+        'in-memory controls must retain every other producer diagnostic',
+      )
       assert.equal(
         controls.length,
         2,
@@ -156,9 +159,10 @@ type ReturnMutationRejected = Assert<Same<ReturnType<typeof getPanel>, typeof Da
       cwd: root,
       encoding: 'utf8',
     }).trim(),
+    sourceAuthority,
     baseline,
     producerTypeScript: ts.version,
-    producerTsMorph: require('ts-morph/package.json').version,
+    producerTsMorph: requireSource('ts-morph/package.json').version,
     lockfileSha256: digest(fs.readFileSync(path.join(root, 'pnpm-lock.yaml'))),
     originalDiagnosticReturnUnchanged: true,
     runtimeJsSha256: digest(runtime(source)),
@@ -169,7 +173,7 @@ type ReturnMutationRejected = Assert<Same<ReturnType<typeof getPanel>, typeof Da
   return diagnostics
 }
 
-const { generateTypesDefinitions } = require(
+const { generateTypesDefinitions } = requireSource(
   path.join(root, 'vue/internal/build/src/tasks/types-definitions.ts'),
 )
 assert.equal(typeof generateTypesDefinitions, 'function')
@@ -189,7 +193,7 @@ generateTypesDefinitions((error) => {
     declaration,
   }
   fs.mkdirSync(path.dirname(output), { recursive: true })
-  fs.writeFileSync(output, JSON.stringify(result, null, 2) + '\n')
+  fs.writeFileSync(output, `${JSON.stringify(result, null, 2)}\n`)
   if (error) {
     console.error(error)
     process.exitCode = 1
@@ -204,7 +208,7 @@ generateTypesDefinitions((error) => {
       /getPanel: \(type: IDatePickerType\) => typeof DatePickPanel \| typeof DateRangePickPanel \| typeof MonthRangePickPanel/,
     )
   }
-  console.log(
-    `PASS canonical producer ${mode}; TS7056=${observation.diagnostics.filter((row) => row.code === 7056).length}`,
+  process.stdout.write(
+    `PASS canonical producer ${mode}; TS7056=${observation.diagnostics.filter((row) => row.code === 7056).length}\n`,
   )
 })
