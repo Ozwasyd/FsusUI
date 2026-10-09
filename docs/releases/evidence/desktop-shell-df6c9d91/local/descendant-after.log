@@ -1,0 +1,48 @@
+  FsusUI.Avalonia.FormGenerator -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.FormGenerator/bin/Release/netstandard2.0/FsusUI.Avalonia.FormGenerator.dll
+  FsusUI.Avalonia -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia/bin/Release/net10.0/FsusUI.Avalonia.dll
+  FsusUI.Avalonia.Icons -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.Icons/bin/Release/net10.0/FsusUI.Avalonia.Icons.dll
+  FsusUI.Avalonia.Themes -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.Themes/bin/Release/net10.0/FsusUI.Avalonia.Themes.dll
+  FsusUI.Avalonia.Demo -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.Demo/bin/Release/net10.0/FsusUI.Avalonia.Demo.dll
+/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorPageAndHistoryHeadlessTests.cs(162,5): warning xUnit2013: Do not use Assert.Equal() to check for collection size. Use Assert.Single instead. (https://xunit.net/xunit.analyzers/rules/xUnit2013) [/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj]
+  FsusUI.Avalonia.HeadlessTests -> /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll
+Test run for /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:02.21]     FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus [FAIL]
+  Failed FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus [888 ms]
+  Error Message:
+   System.InvalidOperationException : Could not create glyphTypeface. Font family: $Default (key: ). Style: Normal. Weight: Normal. Stretch: Normal
+  Stack Trace:
+     at Avalonia.Media.Typeface.get_GlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextLineImpl.CreateLineMetrics()
+   at Avalonia.Media.TextFormatting.TextLineImpl.FinalizeLine()
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+   at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+   at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+   at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+   at Avalonia.Controls.TextBlock.get_TextLayout()
+   at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+   at Avalonia.Layout.LayoutManager.ExecuteMeasurePass()
+   at Avalonia.Layout.LayoutManager.InnerLayoutPass()
+   at Avalonia.Layout.LayoutManager.ExecuteLayoutPass()
+   at Avalonia.Layout.LayoutManager.ExecuteQueuedLayoutPass()
+   at Avalonia.Media.MediaContext.FireInvokeOnRenderCallbacks()
+   at Avalonia.Media.MediaContext.RenderCore()
+   at Avalonia.Media.MediaContext.Render()
+   at Avalonia.Threading.DispatcherOperation.InvokeCore()
+   at Avalonia.Threading.DispatcherOperation.Execute()
+   at Avalonia.Threading.Dispatcher.ExecuteJob(DispatcherOperation job)
+   at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority, CancellationToken cancellationToken)
+   at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority)
+   at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus() in /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs:line 294
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+Results File: /tmp/desktop-tabs-evidence/descendant-after.trx
+
+Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1, Duration: 914 ms - FsusUI.Avalonia.HeadlessTests.dll (net10.0)
