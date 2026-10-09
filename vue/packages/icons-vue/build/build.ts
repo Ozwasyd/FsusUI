@@ -10,14 +10,23 @@ const __dirname = path.dirname(__filename)
 const packageRoot = path.resolve(__dirname, '..')
 const distDir = path.join(packageRoot, 'dist')
 
-await rm(distDir, { recursive: true, force: true })
+// Invalidate certification without deleting declarations built in parallel.
+await rm(path.join(distDir, '.artifact-fingerprint'), { force: true })
 await mkdir(distDir, { recursive: true })
 
 const entries = [
   { entry: 'src/index.ts', outfile: 'dist/index.js', format: 'esm' as Format },
   { entry: 'src/index.ts', outfile: 'dist/index.cjs', format: 'cjs' as Format },
-  { entry: 'src/global.ts', outfile: 'dist/global.js', format: 'esm' as Format },
-  { entry: 'src/global.ts', outfile: 'dist/global.cjs', format: 'cjs' as Format },
+  {
+    entry: 'src/global.ts',
+    outfile: 'dist/global.js',
+    format: 'esm' as Format,
+  },
+  {
+    entry: 'src/global.ts',
+    outfile: 'dist/global.cjs',
+    format: 'cjs' as Format,
+  },
 ]
 
 for (const item of entries) {
@@ -33,7 +42,9 @@ for (const item of entries) {
     external: ['vue'],
     plugins: [Vue()],
     define: {
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'production'),
+      'process.env.NODE_ENV': JSON.stringify(
+        process.env.NODE_ENV ?? 'production',
+      ),
     },
   })
 }
