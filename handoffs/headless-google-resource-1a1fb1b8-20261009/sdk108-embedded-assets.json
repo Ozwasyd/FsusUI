@@ -1,0 +1,22 @@
+{
+  "gsans": "1",
+  "sharedFontAssetCount": 4,
+  "sharedFontAssets": [
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Bold.ttf",
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Regular.ttf",
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Bold.ttf",
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Regular.ttf"
+  ],
+  "dedicatedTableV2AssetCount": 2,
+  "dedicatedTableV2Assets": [
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Bold.ttf",
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Regular.ttf"
+  ],
+  "collectionKey": "fonts:GoogleSans?family=Google%20Sans",
+  "collectionFamilies": [
+    "Google Sans 18pt"
+  ],
+  "googleSans18ptRegular": true,
+  "googleSans18ptBold": true,
+  "sharedNoto": false
+}

@@ -1,0 +1,44 @@
+WIP handoff: shared headless font resource item correction
+
+Source: 1a1fb1b820ca08f254ab8773041d023c0da0a0e5
+Branch: fix/headless-google-sans-resource-item-20261009
+Parent: 90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7 (frozen TableV2 font-prefix candidate)
+Only delta: existing Assets/Fonts/*.ttf item type AvaloniaResources -> AvaloniaResource.
+No supplier files, dependency locks, CI, TestAppBuilder, PNGs, assertions or budgets changed.
+
+PASS: actual SDK 10.0.401 MSBuild item evaluation, before/after raw JSON attached.
+Shared Google Sans singular items: 0 -> 4.
+Plural items: 4 -> 0. Total singular items: 2 -> 6.
+Dedicated TableV2 singular resources: 2 -> 2, paths unchanged.
+Command (both source states):
+  source /workspace/.setup/activate.sh
+  dotnet msbuild dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj -getItem:AvaloniaResource,AvaloniaResources
+
+PASS: actual SDK 10.0.108 diagnostic composition with the exact approved
+8840c3834f4d1cb67cdccd5238b1cbcc8558141a dependency prerequisite.
+Locked restore and Release build passed; one existing xunit2013 warning.
+PATH used /workspace/tablev2-sdk-10.0.108 first; approval/checksum provenance is
+in the preceding TableV2 evidence handoffs. Exact applied lock hashes are in qualification.json.
+Commands:
+  dotnet restore dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --locked-mode --disable-parallel --maxcpucount:1
+  dotnet build dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --configuration Release --maxcpucount:1
+The approved dependency patch was reversed after diagnostics; source branch is clean.
+
+PASS: external EmbeddedAssetProbe.cs compiled with the actual SDK 10.0.108
+Roslyn compiler (arguments in probe-csc.rsp), reading the actual built test assembly.
+With FSUS_HEADLESS_GSANS=1, embedded shared assets=4 and dedicated TableV2 assets=2.
+Google Sans 18pt regular and bold resolve; Noto Sans is absent from shared collection.
+Raw result: sdk108-embedded-assets.json. Fontconfig stderr retained separately.
+FSUSUI_UPDATE_VISUAL_ARTIFACTS was unset. No fixtures generated or overwritten.
+
+UNRUN: SDK 10.0.401 restore/build/runtime and combined finite supplier tests.
+Supplier 0a71ad9cc32bc98d4952bcc3eb822c639ddfc4d7 was inspected read-only,
+not composed. Shared owner's contact route and exact approved SDK .401
+dependency inputs were requested for coordination. No test suite was run here.
+These .108 embedding results do not qualify .401 CI or macOS/Windows execution.
+
+Next owner-coordinated commands: compose the approved .401 dependencies,
+this minimal commit and supplier 0a71ad9 in an isolated diagnostic branch;
+first agree the precise named-family finite test allowlist and expected count,
+then locked restore/Release build and run that allowlist with GSANS off and on.
+Root retains PR creation/metadata/merge authority.

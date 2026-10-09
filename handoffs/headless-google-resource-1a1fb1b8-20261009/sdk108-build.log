@@ -1,0 +1,15 @@
+  FsusUI.Avalonia.FormGenerator -> /workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.FormGenerator/bin/Release/netstandard2.0/FsusUI.Avalonia.FormGenerator.dll
+  FsusUI.Avalonia -> /workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia/bin/Release/net10.0/FsusUI.Avalonia.dll
+  FsusUI.Avalonia.Icons -> /workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.Icons/bin/Release/net10.0/FsusUI.Avalonia.Icons.dll
+  FsusUI.Avalonia.Themes -> /workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.Themes/bin/Release/net10.0/FsusUI.Avalonia.Themes.dll
+  FsusUI.Avalonia.Demo -> /workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.Demo/bin/Release/net10.0/FsusUI.Avalonia.Demo.dll
+/workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorPageAndHistoryHeadlessTests.cs(162,5): warning xUnit2013: Do not use Assert.Equal() to check for collection size. Use Assert.Single instead. (https://xunit.net/xunit.analyzers/rules/xUnit2013) [/workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj]
+  FsusUI.Avalonia.HeadlessTests -> /workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll
+
+Build succeeded.
+
+/workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorPageAndHistoryHeadlessTests.cs(162,5): warning xUnit2013: Do not use Assert.Equal() to check for collection size. Use Assert.Single instead. (https://xunit.net/xunit.analyzers/rules/xUnit2013) [/workspace/tablev2-google-resource/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:27.08

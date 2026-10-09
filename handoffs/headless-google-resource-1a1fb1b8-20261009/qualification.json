@@ -1,0 +1,24 @@
+{
+  "source": "1a1fb1b820ca08f254ab8773041d023c0da0a0e5",
+  "parent": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+  "delta": "Only AvaloniaResources -> AvaloniaResource on the existing Assets/Fonts/*.ttf include",
+  "sdk401": "Actual 10.0.401 MSBuild evaluation only; no restore/build/runtime claim",
+  "sdk108": "Actual 10.0.108 locked restore/Release build/embedded asset probe with exact approved 8840c3834f4d1cb67cdccd5238b1cbcc8558141a prerequisite",
+  "approvedLockInputs": [
+    {
+      "path": "dotnet/FsusUI.Avalonia.Icons/packages.lock.json",
+      "sha256": "64d63bd753fbe52a2661338563c868b25da6e0b54679f67eed9804737f489d35"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.Themes/packages.lock.json",
+      "sha256": "64d63bd753fbe52a2661338563c868b25da6e0b54679f67eed9804737f489d35"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia/packages.lock.json",
+      "sha256": "eb94ae63f2336fcf4dde84e6bd548e1875f4e48a19b0bdae0b63f3fc27376d59"
+    }
+  ],
+  "supplier": "0a71ad9cc32bc98d4952bcc3eb822c639ddfc4d7 inspected read-only; not composed into this probe",
+  "combinedFiniteTests": "UNRUN: shared font owner route and exact approved .401 dependencies requested for coordination",
+  "preserved": "All other project/resource/lock settings, dedicated TableV2 prefix and assets, TestAppBuilder, frozen PNGs, assertions, budgets and denied scopes unchanged"
+}
