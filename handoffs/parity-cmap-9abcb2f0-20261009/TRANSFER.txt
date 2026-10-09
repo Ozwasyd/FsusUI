@@ -1,0 +1,74 @@
+Parity provenance correction handoff for existing independent reviewer
+01a11fd1-6e9b-7747-bcff-464e17528022
+
+Published parity source: 9abcb2f0a8b530154c986cb6fb2d673ce88688b5
+Branch: fix/headless-parity-resource-integration-20261009
+Parent: 989e721734a0b18188905c67057e6bcc617a204a
+Supplier: 88394484c60b9578d34fdeb7063128d2fadeddd6, based on be0a1127.
+Only its exact eight-file delta was cherry-picked, with no conflict or edits.
+All eight source blobs match the supplier exactly; paths/hashes are recorded.
+Frozen native integration a0253323cd2442184aa5a42e8ff84fca86a10118 remains
+unchanged and clean. No typography correction entered that tree.
+
+Withdrawn old claim: the checksum-only decoded-table equality attestation
+was wrong for the three Noto cmap tables. FontTools getTableData compiled a
+loaded table after OS/2 triggered cmap access, producing derived serialization
+while reporting it as original source. Original history and failed intermediate
+attempts remain in supplier records; the false attestation is not a valid pass.
+
+Truthful corrected contract at each Noto400/500/700:
+Untouched source cmap:33328 bytes,
+SHA256 e45bc35798d276268a8973d8fb052731c7366e9cc1ee50e6831b746e9199ab59.
+Existing derived cmap:33336 bytes,
+SHA256 cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218.
+All three subtable metadata/character maps and both variation selectors are
+semantically equal; semantic SHA256 both
+674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8.
+The source verifier snapshots untouched WOFF2Reader/SFNTReader table bytes
+before any compilation. It checks all cmap subtables, not only getBestCmap,
+and permits the explicitly recorded semantic-neutral reserialization while
+rejecting semantic or unrelated table changes. No font was regenerated.
+
+PASS on new committed source: normal actual SDK10.0.401 project resource
+evaluation; all19 identities exactly match parent989 (shared4/TableV2 2/
+parity13); no external include/import. All resource/font/license/notice bytes,
+csproj, native fixtures/tests, locks, PNGs and budgets unchanged.
+
+PASS on new committed source: exactly six allowed pure Python regressions,
+six passed/zero failed, actual runtime26.884 seconds. AST preflight required
+exactly the six allowed test methods; setUpClass verifies complete official
+archive SHA512 before tests. Hook/test source inspected: no application/host,
+capture/RepositoryRoot call or font write; mutation tests operate in memory.
+No derive.main invocation. Bytecode writing disabled; source worktree clean.
+
+Inputs: Python3.12.14, fontTools4.61.1, Brotli1.2.0. The missing Brotli was
+installed from official PyPI to an isolated workspace prefix only; no global
+environment or shared dependency files changed. Complete official Fontsource
+archives fetched directly from registry.npmjs.org and matched both locked
+SHA512 integrity and recorded SHA256; urls/hashes/sizes are in archive-inputs.json.
+No archive repacking, source font alteration or fixture update occurred.
+
+Actual command (full executable argv also in actual-command.json):
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/workspace/parity-cmap-python:$PYTHONPATH python3 \
+  dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/test_derive.py \
+  /workspace/parity-cmap-archives -v \
+  DerivationTests.test_snapshot_catches_old_false_source_equality \
+  DerivationTests.test_nine_provenance_entries_match_independent_container_bytes \
+  DerivationTests.test_non_best_character_map_mutation_is_rejected \
+  DerivationTests.test_variation_selector_mutation_is_rejected \
+  DerivationTests.test_subtable_metadata_mutation_is_rejected \
+  DerivationTests.test_unrelated_table_change_is_rejected
+
+UNRUN by instruction: unchanged eleven native cases and native restore/build
+on this verifier/docs-only correction; parent989 actual results remain tied
+to parent989, not relabeled as new-head execution. Supplier's earlier native
+history and correction results remain untouched. The prior45-codepoint/three-
+weight Web-shard comparisons are inherited provenance, not rerun here.
+UNRUN: captures, RepositoryRoot/held routes, broad suites, complete CI,
+Windows/macOS and independent visual acceptance. FSUSUI_UPDATE_VISUAL_ARTIFACTS
+not enabled. No content API write or package publication.
+
+Full corrected public WIP body: PR-DRAFT.md. Root/monitor retain PR metadata
+and review; this submission targets only independently owned source/evidence
+branches. Source push succeeded without errors; no submission queued.
+Rollback: revert 9abcb2f0a8b530154c986cb6fb2d673ce88688b5 on parity only.

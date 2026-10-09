@@ -1,0 +1,12 @@
+{
+  "selected": 6,
+  "passed": 6,
+  "failed": 0,
+  "exit": 0,
+  "nativeCases": "UNRUN by instruction",
+  "deriveMain": "NOT INVOKED",
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONPATH": "isolated Brotli prefix plus configured environment"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "archive-inputs.json": "a15b89d63204dfc386543b00aaf3885770cfdd87e09e7a1fffbc9fc8aa225cdd",
+  "TRANSFER.txt": "fbadbf07c6b84d43be14223aef32fc22dd584479ee32daa08900914d69ae3bc1",
+  "python-inputs.json": "0394a87531d082cc1125c944791480583fde9dc977ab1927647b7370cbec75f1",
+  "brotli-setup.log": "6085bc7451df9e5eb464bd0246808bbeed3aeb9be5c78a8461d61ba439c34516",
+  "six-regressions.log": "2ade52edc118d2bda4a19602abed2125117a62a3b88648dbffaaf4aebd368444",
+  "resources.json": "5e84e9cd4e9056c0491748b337c8a89f7b20adce85920c431810dd9c06de6539",
+  "PR-DRAFT.md": "ff94e9d8087bac0fb96da52aa0f8b44f664bbcb2c0d5e9af0d3ee5dedd136659",
+  "integration-preflight.json": "da868d1913da7c5bfb6b0503e615f2ce09fe5f10585cc8e3a16e1fb01385239a",
+  "actual-command.json": "dedb44bc06547c35cb911b2279067fe57395879821893519d237e469fdda269c",
+  "six-regression-result.json": "711409c26777355541ab70ceb9b9d55031722eea5140218866060e42c09df573",
+  "allowed-methods.json": "935ffe6c57af7867bb0b9bc6612524e87d432ba85dd580fe7f0d6e4f986516b1"
+}

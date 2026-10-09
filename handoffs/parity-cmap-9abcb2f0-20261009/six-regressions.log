@@ -1,0 +1,11 @@
+test_snapshot_catches_old_false_source_equality (__main__.DerivationTests.test_snapshot_catches_old_false_source_equality) ... ok
+test_nine_provenance_entries_match_independent_container_bytes (__main__.DerivationTests.test_nine_provenance_entries_match_independent_container_bytes) ... ok
+test_non_best_character_map_mutation_is_rejected (__main__.DerivationTests.test_non_best_character_map_mutation_is_rejected) ... ok
+test_variation_selector_mutation_is_rejected (__main__.DerivationTests.test_variation_selector_mutation_is_rejected) ... ok
+test_subtable_metadata_mutation_is_rejected (__main__.DerivationTests.test_subtable_metadata_mutation_is_rejected) ... ok
+test_unrelated_table_change_is_rejected (__main__.DerivationTests.test_unrelated_table_change_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 26.884s
+
+OK

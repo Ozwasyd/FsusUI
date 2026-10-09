@@ -1,0 +1,8 @@
+[
+  "DerivationTests.test_snapshot_catches_old_false_source_equality",
+  "DerivationTests.test_nine_provenance_entries_match_independent_container_bytes",
+  "DerivationTests.test_non_best_character_map_mutation_is_rejected",
+  "DerivationTests.test_variation_selector_mutation_is_rejected",
+  "DerivationTests.test_subtable_metadata_mutation_is_rejected",
+  "DerivationTests.test_unrelated_table_change_is_rejected"
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "package": "@fontsource/google-sans",
+    "version": "5.2.1",
+    "url": "https://registry.npmjs.org/@fontsource/google-sans/-/google-sans-5.2.1.tgz",
+    "bytes": 10776749,
+    "integrity": "sha512-FteXH18YS0288Bcrjefwyyp7hLwxd8yQBEcmjU/P0BED9c8n8kxwgna3gtMtYyFQx/wIkpyrzj8RaYQyl/4quw==",
+    "sha256": "b8fb63765304b4f2b14c6ddbc379af470ccb7e033eeddfee7ccb841b122b9e7a"
+  },
+  {
+    "package": "@fontsource/noto-sans-sc",
+    "version": "5.2.9",
+    "url": "https://registry.npmjs.org/@fontsource/noto-sans-sc/-/noto-sans-sc-5.2.9.tgz",
+    "bytes": 73833077,
+    "integrity": "sha512-bTUIWGBgJDpwi5qAr+x0/lcgv80IHTB9vl6s2f6EymZEa7qYV99yNRBZuKFT+SYDKVunZrjCEhWtpxqmbXWl5Q==",
+    "sha256": "4b43cc1d86475924cf1d3a81a85b2c11bcbc3c24f05f3366f90edfd96a1a9000"
+  }
+]
