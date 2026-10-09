@@ -1,0 +1,66 @@
+{
+  "status": "proposed separate component regions; coordinator must check current owners before assigning writers",
+  "noForeignComponentSourceEdited": true,
+  "regions": [
+    {
+      "scope": "component alias declaration expansion (144 TS2344)",
+      "files": [
+        "vue/packages/components/inbox-primitives/index.ts",
+        "vue/packages/components/metric-primitives/index.ts",
+        "vue/packages/components/settings-primitives/index.ts"
+      ],
+      "finding": "Object-spread component aliases expand Vue public-instance generics containing GlobalComponents. A producer 5.9.2 probe reproduces two TS2344 with the original helper; annotating only the helper return does not fix it. An explicit public exported alias type typeof Base & {name:string} preserves the named component and removes both probe errors. This proves the mechanism and a bounded source direction, not these components repaired.",
+      "acceptance": "Actual final tarball must remove the 144 diagnostics while preserving original component props, emits, slots, instances, alias name and installer/extras contracts. No index signature suppression or casts to any."
+    },
+    {
+      "scope": "wrong Table popper instance declaration (1 TS2344)",
+      "files": [
+        "vue/packages/components/table/src/util.ts"
+      ],
+      "finding": "createTablePopper calls @popperjs/core createPopper but annotates popperInstance with the Vue component PopperInstance from @element-plus/components/popper. Existing @ts-nocheck hides the source mismatch and the exported return emits an invalid expanded Vue instance.",
+      "acceptance": "Use the actual core return contract and preserve runtime behavior; independently coordinate with ordinary Table owner before source edit."
+    },
+    {
+      "scope": "duplicate emitted payload names (34 TS2300)",
+      "files": [
+        "vue/packages/components/color-picker/src/color-picker.ts",
+        "vue/packages/components/inbox-primitives/src/shared.ts",
+        "vue/packages/components/markdown-editor/src/markdown-editor.ts",
+        "vue/packages/components/tree-v2/src/virtual-tree.ts"
+      ],
+      "finding": "Vue emits event-name parameter event plus payload parameters also named event: ColorPicker focus/blur, Conversation select, Markdown transaction/selection-change, Tree node-contextmenu. Rename payload parameters and references without altering argument types/order or validation.",
+      "acceptance": "Actual regenerated tarball has no duplicate parameter identifiers, original event payload positive/negative contracts retained. Markdown source remains with existing owner until coordinator releases the exact hunk."
+    },
+    {
+      "scope": "omitted serialized component declarations (4 TS2307 + 6 global exports)",
+      "files": [
+        "vue/packages/components/cascader/index.ts",
+        "vue/packages/components/cascader/src/cascader.vue.ts",
+        "vue/packages/components/date-picker/src/panel-utils.ts",
+        "vue/packages/components/pagination/src/components/sizes.vue.ts",
+        "vue/packages/components/select/index.ts",
+        "vue/packages/components/select/src/select.vue.ts",
+        "vue/packages/components/select/src/useSelect.ts",
+        "vue/packages/components/slider/index.ts",
+        "vue/packages/components/slider/src/composables/use-slide.ts",
+        "vue/packages/components/slider/src/slider.vue.ts",
+        "vue/packages/components/time-select/index.ts",
+        "vue/packages/components/time-select/src/time-select.vue.ts"
+      ],
+      "finding": "The canonical producer was observed with its original diagnostic return unchanged. It reports TS7056 for all 12 listed source/compiled-SFC units and emits none of their matching declarations. All four absent entry points are now linked to exact TS7056, not merely inferred. Fixing only barrels may expose their absent SFC/helper dependencies.",
+      "acceptance": "Source-level representable named types must yield all required declaration dependencies and all six global exports. Do not edit emitted files or relax existing checks."
+    },
+    {
+      "scope": "TableV2 JSX ambient leaks (2 TS2503); coordinate with original826",
+      "files": [
+        "vue/packages/components/table-v2/src/types.ts",
+        "vue/packages/components/table-v2/src/components/sort-icon.tsx"
+      ],
+      "hunks": [
+        "types.ts: add HTMLAttributes to existing type import from vue; replace class?: JSX.IntrinsicAttributes['class'] with class?: HTMLAttributes['class'].",
+        "sort-icon.tsx: import type { FunctionalComponent, HTMLAttributes } from vue; replace class?: JSX.IntrinsicAttributes['class'] with class?: HTMLAttributes['class']."
+      ],
+      "acceptance": "Both installed declarations compile without private JSX globals; preserve the original class prop and runtime/performance behavior. No source edit by this worker; coordinator must give hunks to 826 before assignment."
+    }
+  ]
+}

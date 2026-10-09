@@ -1,0 +1,14 @@
+{
+  "compiler": {
+    "typescript": "6.0.2",
+    "vueTsc": "3.2.6",
+    "vue": "3.5.32"
+  },
+  "unchangedPriorThirdPartyBlocks": true,
+  "addedSourceLockedBlocks": [
+    "@vue/devtools-api@6.6.4",
+    "type-fest@4.41.0",
+    "vue-router@4.6.4"
+  ],
+  "localTarballIntegrity": "sha512-VNrP85CSMlOP1oVLtQ1Zk2CKtyws99rO+HQlOV6o/iXORxMS38IcEdh1mg35z1LBYHgIqh7Wn42q0GBT3sd0oA=="
+}

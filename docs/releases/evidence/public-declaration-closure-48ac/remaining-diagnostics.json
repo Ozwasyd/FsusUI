@@ -1,0 +1,1366 @@
+{
+  "sourceHead": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "total": 191,
+  "byCode": {
+    "TS2300": 34,
+    "TS2344": 145,
+    "TS2307": 4,
+    "TS2503": 2,
+    "TS2339": 6
+  },
+  "byFile": {
+    "es/components/color-picker/index.d.ts": 4,
+    "es/components/color-picker/src/color-picker.vue.d.ts": 4,
+    "es/components/inbox-primitives/index.d.ts": 58,
+    "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts": 2,
+    "es/components/index.d.ts": 4,
+    "es/components/markdown-editor/index.d.ts": 4,
+    "es/components/markdown-editor/src/markdown-editor.vue.d.ts": 4,
+    "es/components/metric-primitives/index.d.ts": 44,
+    "es/components/settings-primitives/index.d.ts": 56,
+    "es/components/table-v2/src/components/sort-icon.d.ts": 1,
+    "es/components/table-v2/src/types.d.ts": 1,
+    "es/components/table/src/util.d.ts": 1,
+    "es/components/tree-v2/index.d.ts": 2,
+    "global.d.ts": 6
+  },
+  "diagnostics": [
+    {
+      "file": "es/components/color-picker/index.d.ts",
+      "line": "101",
+      "column": "124",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/color-picker/index.d.ts",
+      "line": "101",
+      "column": "139",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/color-picker/index.d.ts",
+      "line": "101",
+      "column": "171",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/color-picker/index.d.ts",
+      "line": "101",
+      "column": "187",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/color-picker/src/color-picker.vue.d.ts",
+      "line": "102",
+      "column": "124",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/color-picker/src/color-picker.vue.d.ts",
+      "line": "102",
+      "column": "139",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/color-picker/src/color-picker.vue.d.ts",
+      "line": "102",
+      "column": "171",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/color-picker/src/color-picker.vue.d.ts",
+      "line": "102",
+      "column": "187",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "207",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "392",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "484",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "669",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "878",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1063",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1155",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1340",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1505",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1654",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1728",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1877",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1974",
+      "column": "12",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "1974",
+      "column": "29",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2159",
+      "column": "20",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2159",
+      "column": "37",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2199",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2302",
+      "column": "20",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2302",
+      "column": "37",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2440",
+      "column": "16",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2440",
+      "column": "33",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2480",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2581",
+      "column": "16",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2581",
+      "column": "33",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2621",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2724",
+      "column": "16",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2724",
+      "column": "33",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2862",
+      "column": "12",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2862",
+      "column": "29",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "2902",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "3091",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "3264",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "3350",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "3523",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "3651",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "3770",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "3829",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "3948",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "4162",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "4353",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "4448",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "4639",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "4730",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "4819",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "4863",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "4952",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "5097",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "5232",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "5299",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "5434",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "5611",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "5772",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "5852",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "6013",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "6190",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "6351",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "6431",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "line": "6592",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts",
+      "line": "95",
+      "column": "12",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts",
+      "line": "95",
+      "column": "29",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "line": "12",
+      "column": "15",
+      "code": "TS2307",
+      "message": "Cannot find module './cascader' or its corresponding type declarations."
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "line": "56",
+      "column": "15",
+      "code": "TS2307",
+      "message": "Cannot find module './select' or its corresponding type declarations."
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "line": "61",
+      "column": "15",
+      "code": "TS2307",
+      "message": "Cannot find module './slider' or its corresponding type declarations."
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "line": "74",
+      "column": "15",
+      "code": "TS2307",
+      "message": "Cannot find module './time-select' or its corresponding type declarations."
+    },
+    {
+      "file": "es/components/markdown-editor/index.d.ts",
+      "line": "987",
+      "column": "378",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/markdown-editor/index.d.ts",
+      "line": "987",
+      "column": "405",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/markdown-editor/index.d.ts",
+      "line": "987",
+      "column": "558",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/markdown-editor/index.d.ts",
+      "line": "987",
+      "column": "580",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/markdown-editor/src/markdown-editor.vue.d.ts",
+      "line": "1039",
+      "column": "337",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/markdown-editor/src/markdown-editor.vue.d.ts",
+      "line": "1039",
+      "column": "364",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/markdown-editor/src/markdown-editor.vue.d.ts",
+      "line": "1039",
+      "column": "517",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/markdown-editor/src/markdown-editor.vue.d.ts",
+      "line": "1039",
+      "column": "539",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "126",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "245",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "304",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "423",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "678",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "903",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "1015",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "1240",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "1368",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "1487",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "1546",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "1665",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "1924",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2153",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2267",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2496",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2587",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2676",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2720",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2809",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2900",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "2989",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "3033",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "3122",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "3334",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "3523",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "3617",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "3806",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "4061",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "4286",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "4398",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "4623",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "4751",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "4870",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "4929",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "5048",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "5384",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "5675",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "5820",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "6111",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "6383",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "6621",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "6741",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "line": "6979",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "172",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "329",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "407",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "564",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "664",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "761",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "809",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "906",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "1139",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "1346",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "1449",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "1656",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "1877",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "2074",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "2172",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "2369",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "2602",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "2809",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "2912",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "3119",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "3284",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "3433",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "3507",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "3656",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "3835",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "3998",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4079",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4242",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4333",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4422",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4466",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4555",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4722",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4873",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "4948",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "5099",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "5195",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "5288",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "5334",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "5427",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "5646",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "5841",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "5938",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "6133",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "6310",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "6471",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "6551",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "6712",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "6878",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "7029",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "7104",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "7255",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "7555",
+      "column": "26",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "7819",
+      "column": "24",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "7952",
+      "column": "22",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "line": "8216",
+      "column": "20",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/table-v2/src/components/sort-icon.d.ts",
+      "line": "5",
+      "column": "13",
+      "code": "TS2503",
+      "message": "Cannot find namespace 'JSX'."
+    },
+    {
+      "file": "es/components/table-v2/src/types.d.ts",
+      "line": "92",
+      "column": "13",
+      "code": "TS2503",
+      "message": "Cannot find namespace 'JSX'."
+    },
+    {
+      "file": "es/components/table/src/util.d.ts",
+      "line": "55",
+      "column": "18",
+      "code": "TS2344",
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'."
+    },
+    {
+      "file": "es/components/tree-v2/index.d.ts",
+      "line": "267",
+      "column": "547",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "es/components/tree-v2/index.d.ts",
+      "line": "267",
+      "column": "574",
+      "code": "TS2300",
+      "message": "Duplicate identifier 'event'."
+    },
+    {
+      "file": "global.d.ts",
+      "line": "19",
+      "column": "58",
+      "code": "TS2339",
+      "message": "Property 'ElCascader' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/consumer-final/node_modules/.pnpm/@ozwasyd+element-plus@file+..+final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "global.d.ts",
+      "line": "108",
+      "column": "56",
+      "code": "TS2339",
+      "message": "Property 'ElOption' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/consumer-final/node_modules/.pnpm/@ozwasyd+element-plus@file+..+final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "global.d.ts",
+      "line": "109",
+      "column": "61",
+      "code": "TS2339",
+      "message": "Property 'ElOptionGroup' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/consumer-final/node_modules/.pnpm/@ozwasyd+element-plus@file+..+final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "global.d.ts",
+      "line": "136",
+      "column": "56",
+      "code": "TS2339",
+      "message": "Property 'ElSelect' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/consumer-final/node_modules/.pnpm/@ozwasyd+element-plus@file+..+final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "global.d.ts",
+      "line": "141",
+      "column": "56",
+      "code": "TS2339",
+      "message": "Property 'ElSlider' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/consumer-final/node_modules/.pnpm/@ozwasyd+element-plus@file+..+final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "global.d.ts",
+      "line": "157",
+      "column": "60",
+      "code": "TS2339",
+      "message": "Property 'ElTimeSelect' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/consumer-final/node_modules/.pnpm/@ozwasyd+element-plus@file+..+final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    }
+  ]
+}

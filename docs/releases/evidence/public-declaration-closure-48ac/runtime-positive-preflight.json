@@ -1,0 +1,9 @@
+{
+  "scope": "two authorized existing motion runtime cases; no held audit routes",
+  "sourceHead": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "tests": [
+    "reveals scroll content through a managed ScrollTrigger wrapper",
+    "finishes scroll reveal immediately when motion is reduced"
+  ],
+  "positiveSelectionConfirmed": true
+}

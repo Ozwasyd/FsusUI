@@ -1,0 +1,161 @@
+{
+  "sourceHead": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "producerTypeScript": "5.9.2",
+  "observationOnly": true,
+  "originalDiagnosticReturnUnchanged": true,
+  "diagnostics": [
+    {
+      "code": 7056,
+      "file": "vue/packages/components/cascader/index.ts",
+      "start": 441,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/cascader/src/cascader.vue.ts",
+      "start": 1642,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/date-picker/src/panel-utils.ts",
+      "start": 284,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/pagination/src/components/sizes.vue.ts",
+      "start": 371,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/select/index.ts",
+      "start": 207,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/select/src/select.vue.ts",
+      "start": 1314,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/select/src/useSelect.ts",
+      "start": 1693,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/slider/index.ts",
+      "start": 103,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+      "start": 480,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/slider/src/slider.vue.ts",
+      "start": 644,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/time-select/index.ts",
+      "start": 463,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    },
+    {
+      "code": 7056,
+      "file": "vue/packages/components/time-select/src/time-select.vue.ts",
+      "start": 539,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    }
+  ],
+  "entries": [
+    {
+      "component": "cascader",
+      "emitted": false
+    },
+    {
+      "component": "select",
+      "emitted": false
+    },
+    {
+      "component": "slider",
+      "emitted": false
+    },
+    {
+      "component": "time-select",
+      "emitted": false
+    }
+  ],
+  "error": null,
+  "diagnosticDeclarationOutputs": [
+    {
+      "source": "vue/packages/components/cascader/index.ts",
+      "declaration": "dist/types/packages/components/cascader/index.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/cascader/src/cascader.vue.ts",
+      "declaration": "dist/types/packages/components/cascader/src/cascader.vue.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/date-picker/src/panel-utils.ts",
+      "declaration": "dist/types/packages/components/date-picker/src/panel-utils.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/pagination/src/components/sizes.vue.ts",
+      "declaration": "dist/types/packages/components/pagination/src/components/sizes.vue.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/select/index.ts",
+      "declaration": "dist/types/packages/components/select/index.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/select/src/select.vue.ts",
+      "declaration": "dist/types/packages/components/select/src/select.vue.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/select/src/useSelect.ts",
+      "declaration": "dist/types/packages/components/select/src/useSelect.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/slider/index.ts",
+      "declaration": "dist/types/packages/components/slider/index.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/slider/src/composables/use-slide.ts",
+      "declaration": "dist/types/packages/components/slider/src/composables/use-slide.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/slider/src/slider.vue.ts",
+      "declaration": "dist/types/packages/components/slider/src/slider.vue.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/time-select/index.ts",
+      "declaration": "dist/types/packages/components/time-select/index.d.ts",
+      "emitted": false
+    },
+    {
+      "source": "vue/packages/components/time-select/src/time-select.vue.ts",
+      "declaration": "dist/types/packages/components/time-select/src/time-select.vue.d.ts",
+      "emitted": false
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "sourceHead": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "sourceBranch": "fix/public-declaration-closure-20261009",
+  "UIFreshMain": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "BlogFreshMaster": "c04f6bfcac4849638a9ee59e4a3aa34ceb5bb07f",
+  "freshUIConflictExit": 0,
+  "aliasUnchanged": "73a61e481fc6a2f684704585c496d004f86000cc",
+  "tarballSHA256": "91dbac01c30df9c9b3d9f29811a3d045244ceb65f82845fba9f23f210f391256",
+  "sourceLockSHA256": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+  "consumerLockSHA256": "bbfa09dbafb4fb0b8aa8657a97b3f2df0449f655e671cb97e1ff05387e02fe15",
+  "strictPackage": {
+    "exit": 2,
+    "diagnostics": 191,
+    "status": "OPEN genuine source defects; not an environment excuse"
+  },
+  "strictRootMotion": {
+    "exit": 2,
+    "diagnostics": 185
+  },
+  "strictStandaloneMotion": {
+    "Bundler": {
+      "timeline": 0,
+      "context": 0,
+      "reveal": 0,
+      "scrollTimeline": 0
+    },
+    "Node16": {
+      "timeline": 0,
+      "context": 0,
+      "reveal": 0,
+      "scrollTimeline": 0
+    }
+  },
+  "actualRuntimeTests": {
+    "pass": 2,
+    "outsideExactSelection": 36,
+    "environment": "Vitest/jsdom; no browser/device geometry acceptance"
+  },
+  "declarationPathControls": {
+    "pass": 10,
+    "fail": 0
+  },
+  "packageRefusalControls": {
+    "pass": 9,
+    "fail": 0
+  },
+  "buildUtilsPathControls": {
+    "pass": 2,
+    "fail": 0
+  },
+  "buildUtilsStrictProducerExit": 0,
+  "buildUtilsExactTypeContractExit": 0,
+  "transientFailuresRetained": [
+    "Undeclared @pnpm/types strict warning reproduced exit1; derived 8.7 manifest contract failed against original 8.10 and was withdrawn.",
+    "Provisional d919 package standalone timeline failed 10 missing GSAP namespaces.",
+    "f45 canonical producer rejected aliasing the GSAP value as a namespace; corrected through preserved type reference.",
+    "Initial Context negative probe used an extension method which GSAP deliberately permits; TS2578; corrected to original typed kill(boolean)."
+  ],
+  "unrunOrUnavailable": [
+    "No new Blog viewport browser, physical-device, keyboard/focus, hit-test or landscape geometry qualification on this declaration-only source.",
+    "No published npm artifact: publication expressly prohibited.",
+    "GitHub CI unavailable; no green remote/full-local CI claim.",
+    "UI825 Firefox/WebKit setup failed su authentication in coordinator environment; not retried or rerouted."
+  ],
+  "files": {
+    "final-candidate-build-corrected.log": "9d2a4c25c174222e381ad99c119ef4419ca5e1ed085f452f1d734d87be2d3977",
+    "final-candidate-verify.log": "e9938020fa1a0c026b4afc7481739804c9fe0dd52508f8e29006ef3c109e43e7",
+    "final-consumer-frozen-install.log": "b3fcc945f424bd8219b9fa5611c480316fbd43bf66e887d563f8c99bf2d57ce1",
+    "final-strict-package.log": "625a554d77e1e3d856e603c47250af8df70a3209eb096627c5ce6c652b1cd0ba",
+    "final-motion-types.log": "a590f4390aab49e6c4b06a0d562c0b5affd5c4ee17eddd0f7742ce7341ef37b3",
+    "final-deep-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-deep-context-types.log": "765e084baef83280ff2ea5d76a171eeae775c04093e6e75203e72ddaef0e386c",
+    "final-deep-context-corrected-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-deep-reveal-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-deep-scroll-timeline-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-deep-node16-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-deep-context-node16-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-deep-reveal-node16-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-deep-scroll-timeline-node16-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-motion-runtime.log": "b2ddaffa8a77c53599b95113d0e28b31a725c24998fc523f45acba770a31c749",
+    "build-utils-producer-at-final-head.log": "7bed7c7307e500098f55d0dcf5dee26aeef7dce55158d398ef969b1060c29472",
+    "build-utils-final-contract-after-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-declaration-path-controls.log": "b23a14f6099e36a2c3d4d0f41d4bf7f1aa63d66b5b1e03a1fab32d645895ed37",
+    "final-package-refusal-controls.log": "024fcc81e79afc34c62f99ab7544fd8869329a60d869ca396cfcb44ad1a86370",
+    "final-build-utils-path-controls.log": "1d0551165a6f60d2d289b5b92836bc3303775cddeb9e2fadd216c7fffa3bdeae",
+    "observed-producer.log": "186b2e31eae3a1d4615ad087f87cde64acf22fad4a0c0463a4300e7484408c77",
+    "provisional-deep-types.log": "437944015e89715aff140a4c9f520365089a6b0f994e6244783e73fe2789949e",
+    "gsap-ambient-emitter-probe.log": "035a4e0f6935c9342b880944f32329ed76f3f3ae32770a080532e9a3c8559c27",
+    "alias-producer-probe.log": "3f4632f2e0883956ccf402ce298782dadca914e167b3cb831f336423c0dc4705",
+    "alias-public-annotation-probe.log": "a5a5347dea8604920566c2cc631938a315b96ade8b5d23188bf1e99d46a1abac",
+    "final-candidate.manifest.json": "e130ef894dbcf436f486af0a8d401c924ac6a78e082fcb2775cceee942faacd9",
+    "consumer-input-preservation.json": "862c090de30a009eb66a2e83079c6aab531d2aa2cf9dfe8e00009a42f6c3e67c",
+    "runtime-positive-preflight.json": "b8a91258d4beaedc746995a8a00814cacf84f323dad5ba5278645dd59be7e627",
+    "observed-producer-diagnostics.json": "da8e94afd2d5737000f26005d29b67fec3acaafe18ab0b492b6ba5be66d9854c",
+    "observe-declaration-producer.cjs": "bcd976ea731e9c6ed85efbb5770729197e0d2f2b7fb5955c01adccd30b5bad29",
+    "build-utils-manifest-contract-probe.ts": "cd9e56205e889583573177b2fdac8bb4325037fa89de786157155e47ab1d29ce"
+  }
+}
