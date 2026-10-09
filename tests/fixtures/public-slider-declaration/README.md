@@ -107,3 +107,19 @@ runtime qualification remains separate. In particular, it neither compares nor
 waives Motion compiler variations: the four full-bundle byte differences and
 Node16 failures remain FAIL in their original evidence. The historical 35 runtime
 controls retain their original source identities.
+
+Actual successor validation at `946d6da410562f45445e46c4ac47adf68c35fdb6`:
+installed-only invocation PASS 1/1 (zero skipped), including a fresh real canonical
+run, all 7,240 installed/archive payload files, 32 Slider declarations, 36 original
+runtime files, all 16 strict negative diagnostics and candidate/declaration refusal
+controls. Whole-library strict remains FAIL with the original eight external
+errors. Actual f4 canonical/inventory controls PASS 2/2 (zero skipped), diagnostics
+zero, 19 paired fields and all 16 generated Slider declarations preserved.
+
+The reviewer's actual `14ecb9b2` candidate bytes are in its own environment; this
+environment has not executed the new composed installed phases. The same reviewer
+must run the command above with its real frozen consumer and adjacent original
+candidate sidecars. This is a pending actual run, not a user-permission request or
+an inferred shared path. [rebuild-results.json](./rebuild-results.json) records the
+actual commands, source/input/manifest/payload identities, results, refusal checks
+and remaining UNRUN checks. Previous result files and failed logs are retained.
