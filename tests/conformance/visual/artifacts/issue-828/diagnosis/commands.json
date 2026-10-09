@@ -1,0 +1,74 @@
+{
+  "baseline": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "candidateRuntimeSource": "c325c600ea2760156d467bfaa375613879211cd9",
+  "candidateEvidenceHead": "55f7951abb75ee5b28f4781ed91ee5aa11f70320",
+  "browserPath": "/workspace/.setup/playwright-browsers",
+  "activation": "source /workspace/.setup/activate.sh",
+  "runtimeCheck": {
+    "command": "pnpm run visual:runtime:check",
+    "exit": 0
+  },
+  "candidateG1": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/playwright-browsers FSUS_VISUAL_PROFILE=issue-828-diagnosis-g1 FSUS_VISUAL_PREVIEW_PORT=5193 pnpm exec playwright test --config=vue/playwright.config.ts vue/tests/visual/capture-all.spec.ts vue/tests/visual/motion-transition-acceptance.spec.ts vue/tests/visual/markdown-editor-chrome.spec.ts --project=desktop-light --grep 'capture data|zoom-in transitions|list transitions|zoom-in overlay|no transition uses|keeps one editor instance|renders toolbar'",
+    "exit": 1,
+    "passed": 0,
+    "failed": 7
+  },
+  "candidateG2": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/playwright-browsers FSUS_VISUAL_PROFILE=issue-828-diagnosis-g2 FSUS_VISUAL_PREVIEW_PORT=5193 pnpm exec playwright test --config=vue/playwright.config.ts vue/tests/visual/markdown-editor-chrome.spec.ts --project=mobile-light --project=mobile-dark --grep 'renders .* chrome in (source|live|split) mode with correct geometry|keeps one editor instance|stays usable at|renders toolbar|keeps framed geometry under forced'",
+    "status": "completed",
+    "exit": 1,
+    "passed": 1,
+    "failed": 25,
+    "variation": "mobile-light rapid mode switching passed; original full failed with aborted local assets"
+  },
+  "candidateG4": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/playwright-browsers FSUS_VISUAL_PROFILE=issue-828-diagnosis-g4 FSUS_VISUAL_DEV_PORT=5194 pnpm exec playwright test --config=vue/playwright.dev.config.ts",
+    "status": "completed",
+    "exit": 1,
+    "passed": 9,
+    "failed": 10,
+    "variation": "Original nine failures reproduced; additional Calendar-title case418 failed only afterEach external CDN TLS diagnostics."
+  },
+  "sharedCommit": {
+    "sha": "384112ac023a49a8a4fb605f31c05fbd25dd09f5",
+    "fetchedAndDiffVerified": true,
+    "scope": "only InteractionTraceFixture.vue public profile types and fallthrough data-testid binding",
+    "consumed": false,
+    "reason": "No causal connection to the 52 runtime failures; no qualification capability unlocked by speculative consumption."
+  },
+  "candidateG3": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/playwright-browsers FSUS_VISUAL_PROFILE=issue-828-diagnosis-g3 FSUS_VISUAL_PREVIEW_PORT=5193 pnpm exec playwright test --config=vue/playwright.config.ts vue/tests/visual/capture-all.spec.ts:67 vue/tests/visual/motion-transition-acceptance.spec.ts vue/tests/visual/markdown-editor-chrome.spec.ts:186 vue/tests/visual/markdown-editor-chrome.spec.ts:400 vue/tests/visual/form-production.spec.ts:63 --project=desktop-dark",
+    "exit": 1,
+    "passed": 8,
+    "failed": 7,
+    "variation": "dark form originally failed slider overflow; targeted replay passed; line67 expands all seven capture loop tests."
+  },
+  "candidateG5First": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/playwright-browsers FSUS_VISUAL_PROFILE=issue-828-diagnosis-g5 FSUS_VISUAL_PREVIEW_PORT=5193 pnpm exec playwright test --config=vue/playwright.config.ts vue/tests/visual/capture-all.spec.ts:67 --project=mobile-light --project=mobile-dark --grep '^capture data'",
+    "exit": 1,
+    "result": "No tests selected; not a test result. Anchored grep was corrected without changing tests."
+  },
+  "candidateG5Retry": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/playwright-browsers FSUS_VISUAL_PROFILE=issue-828-diagnosis-g5-retry FSUS_VISUAL_PREVIEW_PORT=5193 pnpm exec playwright test --config=vue/playwright.config.ts vue/tests/visual/capture-all.spec.ts:67 --project=mobile-light --project=mobile-dark --grep 'capture data'",
+    "exit": 1,
+    "passed": 0,
+    "failed": 2
+  },
+  "selectorExposure": {
+    "command": "PLAYWRIGHT_BROWSERS_PATH=/workspace/.setup/playwright-browsers node .tmp/issue-828/diagnosis/selector-exposure.mjs",
+    "exit": 0,
+    "changedSelectorLists": 16,
+    "observations": 16,
+    "publicShellNodes": 0,
+    "changedSelectorMatches": 0,
+    "limitation": "Custom diagnostic, not canonical acceptance. First extractor skipped modern CSSStyleRule.cssRules; corrected and reran all observations; no test/helper/assertion changes."
+  },
+  "baselineDev": {
+    "status": "running",
+    "owner": "parent root",
+    "baseRevision": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+    "profile": "issue-828-baseline-dev",
+    "port": 5196
+  }
+}

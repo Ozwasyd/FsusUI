@@ -1,0 +1,84 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": [
+    "ElPublicShell public-header short-landscape geometry"
+  ],
+  "uiDecisionClass": "layout-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "docs/index.md",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "docs/design.md",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "docs/design/governance.md",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "docs/design/change-classification.md",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "docs/workflows/visual-change.md",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "docs/components/public-shell.md",
+      "path": "docs/components/public-shell.md",
+      "digest": "6a20a7ed2d99bbb5608c60e6f7540ea0b88f1045c250906b89df3a0865ce41fe"
+    },
+    {
+      "id": "docs/consumers/design-integration.md",
+      "path": "docs/consumers/design-integration.md",
+      "digest": "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b"
+    },
+    {
+      "id": "spec/tokens/tokens.json",
+      "path": "spec/tokens/tokens.json",
+      "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "8b5077b69a778fa4828e5a427cc1f94e9fda3fe9a60e5be6f41020262aea231b",
+    "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidateSha": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "candidateDigest": "7454216afffce640e87dfd0937856150b5565742dfe27ad93275a99717d923c7",
+  "stateEvidenceMatrix": [
+    {
+      "state": "Collapsed navigation/search; expanded disclosures remain reachable; preserve portrait and desktop",
+      "viewport": "844x390 at CSS zoom 1/1.5/2; 390x844 and 1280x800 controls",
+      "theme": "both",
+      "evidenceDigest": "46f5e654697d354192f2750c07ad148ff52e78bee18ff043952bc50148299c9e"
+    }
+  ],
+  "inScope": [
+    "Full and critical ElPublicShell inner padding at max-height 520px and landscape",
+    "Consumer-visible patch changeset and exact evidence report"
+  ],
+  "outOfScope": [
+    "FsusBlog implementation, fixtures, helpers, matrix, assertions",
+    "Other public navigation modes, consumer routes and copy",
+    "New design tokens, package publishing, deployment and merging"
+  ],
+  "classificationEvidenceDigest": "46f5e654697d354192f2750c07ad148ff52e78bee18ff043952bc50148299c9e",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "41885147ac9679f2b4a32c9e5d3dc39557a6607723f9c223589651a5176fcd91"
+}

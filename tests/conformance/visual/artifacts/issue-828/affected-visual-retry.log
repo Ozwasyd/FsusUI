@@ -1,0 +1,87 @@
+
+> @ verify:visual:affected /workspace/FsusUI
+> pnpm run test:visual:affected -- --base=f2b3bb89ffe5f749da26c388f058efdbb6aee864
+
+
+> @ test:visual:affected /workspace/FsusUI
+> node ./scripts/with-node-heap.mjs node ./scripts/run-visual-tests.mjs --profile=affected -- --base=f2b3bb89ffe5f749da26c388f058efdbb6aee864
+
+[visual-profile] profile=affected
+[visual-profile] base=f2b3bb89ffe5f749da26c388f058efdbb6aee864
+[visual-profile] changed-files=.changeset/public-shell-short-landscape.md,docs/components/public-shell.md,vue/packages/theme-chalk/src/public-shell-critical.scss,vue/packages/theme-chalk/src/public-shell.scss
+[visual-profile] specs=vue/tests/visual/foundation-style-boundary.spec.ts,vue/tests/visual/material-contract.spec.ts,vue/tests/visual/theme-scale-contract.spec.ts,vue/tests/visual/typography-real-weights.spec.ts
+[visual-profile] sections=none
+[visual-profile] audit-components=none
+[visual-profile] full-required=yes files=vue/packages/theme-chalk/src/public-shell-critical.scss,vue/packages/theme-chalk/src/public-shell.scss
+[visual-profile] recommendation=pnpm test:visual:full
+Visual capacity: 4 CPU, 16384 MiB
+Suites: serial; preview=3, dev=1, audit buckets=6
+Budgets: reserve=1024 MiB, server=512 MiB each, worker=768 MiB
+- capacity base: cgroup v2 CPU quota 4 included in capacity
+- capacity base: cgroup v2 memory limit included in effective capacity
+- capacity base: CPU constrained the repository parallel lane budget
+- capacity base: reserved 1408 MiB for OS, filesystem cache, package coordinators, and native processes
+- capacity base: Unit workload 305 files selected 3 shard(s) with 1 worker(s) each
+- CPU limited visual workers
+- reserved capacity for Node orchestration, reports, filesystem cache, and web server
+- preview and dev suites run serially to avoid nested overcommit
+[visual-plan] suite=preview
+[visual-plan] selected-projects=desktop-light,mobile-light,desktop-dark,mobile-dark
+[visual-plan] argv=pnpm exec playwright test --config=vue/playwright.config.ts --project=desktop-light --project=mobile-light --project=desktop-dark --project=mobile-dark vue/tests/visual/foundation-style-boundary.spec.ts vue/tests/visual/material-contract.spec.ts vue/tests/visual/theme-scale-contract.spec.ts vue/tests/visual/typography-real-weights.spec.ts
+[visual-plan] workers=3
+[visual-plan] report-directory=playwright-report/profile-affected/suite-preview/shard-local
+[visual-plan] result-namespaces=vue/test-results/profile-affected/suite-preview/project-desktop-light/shard-local,vue/test-results/profile-affected/suite-preview/project-mobile-light/shard-local,vue/test-results/profile-affected/suite-preview/project-desktop-dark/shard-local,vue/test-results/profile-affected/suite-preview/project-mobile-dark/shard-local
+[visual-plan] runtime-prepare=pnpm run visual:prepare
+
+> @ visual:prepare /workspace/FsusUI
+> node ./scripts/with-node-heap.mjs node ./scripts/prepare-visual-runtime.mjs
+
+[visual-runtime] icons reuse: fingerprints match
+[visual-runtime] wasm reuse: fingerprints match
+[visual-runtime] demo reuse: fingerprints match
+[visual-runtime] ready manifest=.tmp/visual-runtime/manifest.json
+[visual-runtime] demo-dist=demo-dist source-fingerprint=c8530892ad5dd84ab6ebf1371c6c9d069db027b8668a016abf0d2b7638940205
+[visual-plan] evidence=failures-only
+
+Running 38 tests using 3 workers
+
+  ✓   3 [desktop-light] › vue/tests/visual/foundation-style-boundary.spec.ts:63:5 › preserves external SVG paint while keeping the explicit line-icon recipe (1.2s)
+  ✓   2 [desktop-light] › vue/tests/visual/foundation-style-boundary.spec.ts:109:5 › applies editorial decoration only after fsus-prose opt-in (1.2s)
+  ✓   1 [desktop-light] › vue/tests/visual/foundation-style-boundary.spec.ts:23:5 › keeps native and renderer-owned content outside product styling (1.2s)
+  ✓   4 [desktop-light] › vue/tests/visual/material-contract.spec.ts:117:5 › paper overlays keep blur disabled (1.8s)
+  ✓   5 [desktop-light] › vue/tests/visual/material-contract.spec.ts:148:5 › dialog drawer notification keep correct overlay depth hierarchy (2.0s)
+  ✓   6 [desktop-light] › vue/tests/visual/material-contract.spec.ts:209:5 › image viewer owns the only public glass mask (2.4s)
+  ✓   7 [desktop-light] › vue/tests/visual/material-contract.spec.ts:237:5 › site and public headers keep glass opt-in (2.3s)
+  ✓   9 [desktop-light] › vue/tests/visual/theme-scale-contract.spec.ts:96:7 › tab focus ring follows the public scale in light (1.8s)
+  ✓   8 [desktop-light] › vue/tests/visual/theme-scale-contract.spec.ts:53:7 › form focus rings follow the public scale in light (4.7s)
+  ✓  10 [desktop-light] › vue/tests/visual/theme-scale-contract.spec.ts:108:7 › overlay focus rings and reduced motion follow the public scale in light (3.0s)
+  ✓  12 [desktop-light] › vue/tests/visual/theme-scale-contract.spec.ts:96:7 › tab focus ring follows the public scale in dark (1.8s)
+  ✓  11 [desktop-light] › vue/tests/visual/theme-scale-contract.spec.ts:53:7 › form focus rings follow the public scale in dark (5.0s)
+  ✓  14 [desktop-light] › vue/tests/visual/typography-real-weights.spec.ts:4:5 › CJK and Latin use real bundled weights in light and dark modes (1.2s)
+  ✓  13 [desktop-light] › vue/tests/visual/theme-scale-contract.spec.ts:108:7 › overlay focus rings and reduced motion follow the public scale in dark (2.7s)
+  ✓  15 [mobile-light] › vue/tests/visual/foundation-style-boundary.spec.ts:23:5 › keeps native and renderer-owned content outside product styling (1.2s)
+  ✓  16 [mobile-light] › vue/tests/visual/foundation-style-boundary.spec.ts:63:5 › preserves external SVG paint while keeping the explicit line-icon recipe (1.2s)
+  ✓  17 [mobile-light] › vue/tests/visual/foundation-style-boundary.spec.ts:109:5 › applies editorial decoration only after fsus-prose opt-in (1.3s)
+  ✓  18 [mobile-light] › vue/tests/visual/material-contract.spec.ts:117:5 › paper overlays keep blur disabled (1.8s)
+  ✓  19 [mobile-light] › vue/tests/visual/material-contract.spec.ts:148:5 › dialog drawer notification keep correct overlay depth hierarchy (2.1s)
+  ✓  20 [mobile-light] › vue/tests/visual/material-contract.spec.ts:209:5 › image viewer owns the only public glass mask (2.5s)
+  ✓  21 [mobile-light] › vue/tests/visual/material-contract.spec.ts:237:5 › site and public headers keep glass opt-in (2.1s)
+  ✓  22 [mobile-light] › vue/tests/visual/typography-real-weights.spec.ts:4:5 › CJK and Latin use real bundled weights in light and dark modes (1.3s)
+  ✓  23 [desktop-dark] › vue/tests/visual/foundation-style-boundary.spec.ts:23:5 › keeps native and renderer-owned content outside product styling (1.3s)
+  ✓  25 [desktop-dark] › vue/tests/visual/foundation-style-boundary.spec.ts:109:5 › applies editorial decoration only after fsus-prose opt-in (1.1s)
+  ✓  24 [desktop-dark] › vue/tests/visual/foundation-style-boundary.spec.ts:63:5 › preserves external SVG paint while keeping the explicit line-icon recipe (1.1s)
+  ✓  26 [desktop-dark] › vue/tests/visual/material-contract.spec.ts:117:5 › paper overlays keep blur disabled (1.7s)
+  ✓  28 [desktop-dark] › vue/tests/visual/material-contract.spec.ts:209:5 › image viewer owns the only public glass mask (2.2s)
+  ✓  27 [desktop-dark] › vue/tests/visual/material-contract.spec.ts:148:5 › dialog drawer notification keep correct overlay depth hierarchy (2.3s)
+  ✓  29 [desktop-dark] › vue/tests/visual/material-contract.spec.ts:237:5 › site and public headers keep glass opt-in (2.2s)
+  ✓  30 [desktop-dark] › vue/tests/visual/typography-real-weights.spec.ts:4:5 › CJK and Latin use real bundled weights in light and dark modes (1.3s)
+  ✓  31 [mobile-dark] › vue/tests/visual/foundation-style-boundary.spec.ts:23:5 › keeps native and renderer-owned content outside product styling (1.0s)
+  ✓  32 [mobile-dark] › vue/tests/visual/foundation-style-boundary.spec.ts:63:5 › preserves external SVG paint while keeping the explicit line-icon recipe (1.2s)
+  ✓  34 [mobile-dark] › vue/tests/visual/foundation-style-boundary.spec.ts:109:5 › applies editorial decoration only after fsus-prose opt-in (1.1s)
+  ✓  33 [mobile-dark] › vue/tests/visual/material-contract.spec.ts:117:5 › paper overlays keep blur disabled (1.9s)
+  ✓  35 [mobile-dark] › vue/tests/visual/material-contract.spec.ts:148:5 › dialog drawer notification keep correct overlay depth hierarchy (2.2s)
+  ✓  36 [mobile-dark] › vue/tests/visual/material-contract.spec.ts:209:5 › image viewer owns the only public glass mask (2.4s)
+  ✓  37 [mobile-dark] › vue/tests/visual/material-contract.spec.ts:237:5 › site and public headers keep glass opt-in (2.2s)
+  ✓  38 [mobile-dark] › vue/tests/visual/typography-real-weights.spec.ts:4:5 › CJK and Latin use real bundled weights in light and dark modes (1.1s)
+
+  38 passed (29.1s)

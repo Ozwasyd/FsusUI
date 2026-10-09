@@ -1,0 +1,1658 @@
+[
+  {
+    "theme": "light",
+    "locale": "en",
+    "session": "anonymous",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 336,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 654,
+        "y": 32,
+        "width": 72,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 734,
+        "y": 32,
+        "width": 62,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "en",
+    "session": "anonymous",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 430,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 562,
+        "y": 48,
+        "width": 105,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 679,
+        "y": 48,
+        "width": 93,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "en",
+    "session": "anonymous",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 291,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 467,
+        "y": 64,
+        "width": 140,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 623,
+        "y": 64,
+        "width": 125,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "en",
+    "session": "authenticated",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 336,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 654,
+        "y": 32,
+        "width": 72,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 734,
+        "y": 32,
+        "width": 62,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "en",
+    "session": "authenticated",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 430,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 562,
+        "y": 48,
+        "width": 105,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 679,
+        "y": 48,
+        "width": 93,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "en",
+    "session": "authenticated",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 291,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 467,
+        "y": 64,
+        "width": 140,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 623,
+        "y": 64,
+        "width": 125,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "zh",
+    "session": "anonymous",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 288,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 680,
+        "y": 32,
+        "width": 54,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 742,
+        "y": 32,
+        "width": 54,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "zh",
+    "session": "anonymous",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 432,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 600,
+        "y": 48,
+        "width": 80,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 692,
+        "y": 48,
+        "width": 80,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "zh",
+    "session": "anonymous",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 340,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 516,
+        "y": 64,
+        "width": 108,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 640,
+        "y": 64,
+        "width": 108,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "zh",
+    "session": "authenticated",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 288,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 680,
+        "y": 32,
+        "width": 54,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 742,
+        "y": 32,
+        "width": 54,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "zh",
+    "session": "authenticated",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 432,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 600,
+        "y": 48,
+        "width": 80,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 692,
+        "y": 48,
+        "width": 80,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "zh",
+    "session": "authenticated",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 340,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 516,
+        "y": 64,
+        "width": 108,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 640,
+        "y": 64,
+        "width": 108,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "long",
+    "session": "anonymous",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 464,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 581,
+        "y": 32,
+        "width": 72,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 661,
+        "y": 32,
+        "width": 135,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "long",
+    "session": "anonymous",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 321,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 453,
+        "y": 48,
+        "width": 105,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 570,
+        "y": 48,
+        "width": 202,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "long",
+    "session": "anonymous",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 144,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 320,
+        "y": 64,
+        "width": 140,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 476,
+        "y": 64,
+        "width": 272,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "long",
+    "session": "authenticated",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 464,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 581,
+        "y": 32,
+        "width": 72,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 661,
+        "y": 32,
+        "width": 135,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "long",
+    "session": "authenticated",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 321,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 453,
+        "y": 48,
+        "width": 105,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 570,
+        "y": 48,
+        "width": 202,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "light",
+    "locale": "long",
+    "session": "authenticated",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 144,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 320,
+        "y": 64,
+        "width": 140,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 476,
+        "y": 64,
+        "width": 272,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "en",
+    "session": "anonymous",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 336,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 654,
+        "y": 32,
+        "width": 72,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 734,
+        "y": 32,
+        "width": 62,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "en",
+    "session": "anonymous",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 430,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 562,
+        "y": 48,
+        "width": 105,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 679,
+        "y": 48,
+        "width": 93,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "en",
+    "session": "anonymous",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 291,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 467,
+        "y": 64,
+        "width": 140,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 623,
+        "y": 64,
+        "width": 125,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "en",
+    "session": "authenticated",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 336,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 654,
+        "y": 32,
+        "width": 72,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 734,
+        "y": 32,
+        "width": 62,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "en",
+    "session": "authenticated",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 430,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 562,
+        "y": 48,
+        "width": 105,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 679,
+        "y": 48,
+        "width": 93,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "en",
+    "session": "authenticated",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 291,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 467,
+        "y": 64,
+        "width": 140,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 623,
+        "y": 64,
+        "width": 125,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "zh",
+    "session": "anonymous",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 288,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 680,
+        "y": 32,
+        "width": 54,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 742,
+        "y": 32,
+        "width": 54,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "zh",
+    "session": "anonymous",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 432,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 600,
+        "y": 48,
+        "width": 80,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 692,
+        "y": 48,
+        "width": 80,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "zh",
+    "session": "anonymous",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 340,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 516,
+        "y": 64,
+        "width": 108,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 640,
+        "y": 64,
+        "width": 108,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "zh",
+    "session": "authenticated",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 288,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 680,
+        "y": 32,
+        "width": 54,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 742,
+        "y": 32,
+        "width": 54,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "zh",
+    "session": "authenticated",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 432,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 600,
+        "y": 48,
+        "width": 80,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 692,
+        "y": 48,
+        "width": 80,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "zh",
+    "session": "authenticated",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 340,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 516,
+        "y": 64,
+        "width": 108,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 640,
+        "y": 64,
+        "width": 108,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "long",
+    "session": "anonymous",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 464,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 581,
+        "y": 32,
+        "width": 72,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 661,
+        "y": 32,
+        "width": 135,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "long",
+    "session": "anonymous",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 321,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 453,
+        "y": 48,
+        "width": 105,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 570,
+        "y": 48,
+        "width": 202,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "long",
+    "session": "anonymous",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 144,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 320,
+        "y": 64,
+        "width": 140,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 476,
+        "y": 64,
+        "width": 272,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "long",
+    "session": "authenticated",
+    "zoom": 1,
+    "measurements": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 61,
+        "display": "block"
+      },
+      "brand": {
+        "x": 48,
+        "y": 32,
+        "width": 464,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 581,
+        "y": 32,
+        "width": 72,
+        "height": 44,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 661,
+        "y": 32,
+        "width": 135,
+        "height": 44,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "long",
+    "session": "authenticated",
+    "zoom": 1.5,
+    "measurements": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 91,
+        "display": "block"
+      },
+      "brand": {
+        "x": 72,
+        "y": 48,
+        "width": 321,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 453,
+        "y": 48,
+        "width": 105,
+        "height": 66,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 570,
+        "y": 48,
+        "width": 202,
+        "height": 66,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  },
+  {
+    "theme": "dark",
+    "locale": "long",
+    "session": "authenticated",
+    "zoom": 2,
+    "measurements": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 122,
+        "display": "block"
+      },
+      "brand": {
+        "x": 96,
+        "y": 64,
+        "width": 144,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "search": {
+        "x": 320,
+        "y": 64,
+        "width": 140,
+        "height": 88,
+        "display": "flex"
+      },
+      "menu": {
+        "x": 476,
+        "y": 64,
+        "width": 272,
+        "height": 88,
+        "display": "inline-flex"
+      },
+      "desktopNav": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none"
+      },
+      "overflow": 0
+    },
+    "keyboardMenuSearch": "open/escape/focus-return passed",
+    "touchContext": true
+  }
+]
