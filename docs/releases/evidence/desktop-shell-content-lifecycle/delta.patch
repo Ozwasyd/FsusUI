@@ -1,0 +1,158 @@
+diff --git a/.changeset/avalonia-document-tab-reorder-focus.md b/.changeset/avalonia-document-tab-reorder-focus.md
+index 737bf171..66be12ac 100644
+--- a/.changeset/avalonia-document-tab-reorder-focus.md
++++ b/.changeset/avalonia-document-tab-reorder-focus.md
+@@ -3,3 +3,5 @@
+ ---
+ 
+ Preserve focus and its original keyboard or pointer navigation origin on an Avalonia document-tab header when drag or programmatic reorder removes and reinserts it, keeping the keyboard focus ring visible and retaining the active document identity and focus indication on other controls.
++
++Release the outgoing document-body presenter during template replacement so removing and restoring a theme can mount the same active document content without a visual-parent conflict.
+diff --git a/docs/avalonia/components/desktop-shell.md b/docs/avalonia/components/desktop-shell.md
+index e5d961c2..40700e8d 100644
+--- a/docs/avalonia/components/desktop-shell.md
++++ b/docs/avalonia/components/desktop-shell.md
+@@ -65,6 +65,10 @@ the old/new indexes and source. Reordering preserves the active document and
+ the focused document header, including its keyboard or pointer focus origin and
+ corresponding visible focus indication; moving another header does not take focus
+ or change that indication.
++The selected document body retains its `Content` identity across template or
++theme replacement. The outgoing selected-content presenter releases its visual
++child before the replacement presenter mounts that same body; the document
++header does not present the body.
+ The horizontally scrollable header reveals the
+ selected tab; `CanScrollBackward`, `CanScrollForward`, `ScrollHeaders`, and the
+ header extent/viewport/offset properties expose overflow without product
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
+index 2f4fd4e3..76cd68e8 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
+@@ -3,6 +3,7 @@ using Avalonia.Automation;
+ using Avalonia.Automation.Peers;
+ using Avalonia.Automation.Provider;
+ using Avalonia.Controls;
++using Avalonia.Controls.Presenters;
+ using Avalonia.Controls.Primitives;
+ using Avalonia.Headless;
+ using Avalonia.Headless.XUnit;
+@@ -341,6 +342,72 @@ public class FsusDesktopShellHeadlessTests
+     window.Close();
+   }
+ 
++  [AvaloniaFact]
++  public void DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount()
++  {
++    var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
++    var theme = new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
++    {
++      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
++    };
++    var body = new Grid
++    {
++      Children = { new Border { Background = Brushes.Blue, Width = 160, Height = 80 } },
++    };
++    var document = new FsusDocumentTab
++    {
++      Key = "document",
++      Header = new Border { Background = Brushes.Gray, Width = 80, Height = 16 },
++      IsClosable = false,
++      Content = body,
++    };
++    var tabs = new FsusDocumentTabs();
++    tabs.AddDocument(document);
++    var window = new Window { Content = tabs, Width = 520, Height = 360 };
++    application.Styles.Add(theme);
++    try
++    {
++      window.Show();
++      Dispatcher.UIThread.RunJobs();
++      AssertDocumentBodyParent();
++
++      Assert.True(application.Styles.Remove(theme));
++      Dispatcher.UIThread.RunJobs();
++      Assert.Same(body, document.Content);
++      Assert.Same(body, tabs.SelectedContent);
++      Assert.Null(body.GetVisualParent());
++      Assert.DoesNotContain(document.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
++
++      application.Styles.Add(theme);
++      Dispatcher.UIThread.RunJobs();
++      AssertDocumentBodyParent();
++
++      window.Content = null;
++      Dispatcher.UIThread.RunJobs();
++      window.Content = tabs;
++      Dispatcher.UIThread.RunJobs();
++      AssertDocumentBodyParent();
++    }
++    finally
++    {
++      window.Close();
++      application.Styles.Remove(theme);
++    }
++
++    void AssertDocumentBodyParent()
++    {
++      var contentHost = tabs.GetVisualDescendants()
++        .OfType<ContentPresenter>()
++        .Single(presenter => presenter.Name == "PART_SelectedContentHost");
++      Assert.Same(body, document.Content);
++      Assert.Same(body, tabs.SelectedContent);
++      Assert.Same(document, tabs.SelectedItem);
++      Assert.Same(contentHost, body.GetVisualParent());
++      Assert.Single(tabs.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
++      Assert.DoesNotContain(document.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
++    }
++  }
++
+   [AvaloniaFact]
+   public void NativeTitleBarTracksWindowActionsFullscreenThemeAndNoDragSlots()
+   {
+diff --git a/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs b/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
+index 62b6ddc2..ee9b83a7 100644
+--- a/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
++++ b/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
+@@ -3,6 +3,7 @@ using Avalonia.Automation;
+ using Avalonia.Automation.Peers;
+ using Avalonia.Automation.Provider;
+ using Avalonia.Controls;
++using Avalonia.Controls.Presenters;
+ using Avalonia.Controls.Primitives;
+ using Avalonia.Input;
+ using Avalonia.Interactivity;
+@@ -320,6 +321,7 @@ public class FsusDocumentTabs : FsusTabs
+     AvaloniaProperty.Register<FsusDocumentTabs, double>(nameof(HeaderScrollStep), 120d);
+ 
+   private ScrollViewer? headerScrollViewer;
++  private ContentPresenter? selectedContentHost;
+   private bool isReordering;
+   private string requestedSelectedKey = string.Empty;
+ 
+@@ -540,6 +542,7 @@ public class FsusDocumentTabs : FsusTabs
+       headerScrollViewer.ScrollChanged -= OnHeaderScrollChanged;
+     }
+     base.OnApplyTemplate(e);
++    selectedContentHost = e.NameScope.Find<ContentPresenter>("PART_SelectedContentHost");
+     headerScrollViewer = e.NameScope.Find<ScrollViewer>("PART_HeaderScrollViewer");
+     if (headerScrollViewer is not null)
+     {
+@@ -561,6 +564,19 @@ public class FsusDocumentTabs : FsusTabs
+     RevealActiveDocument();
+   }
+ 
++  protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
++  {
++    base.OnPropertyChanged(change);
++    if (change.Property == TemplateProperty && selectedContentHost is not null)
++    {
++      // A detached presenter can still own the document body after retemplating.
++      // Release that visual child without changing the document's Content.
++      selectedContentHost.Content = null;
++      selectedContentHost.UpdateChild();
++      selectedContentHost = null;
++    }
++  }
++
+   protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+   {
+     base.OnAttachedToVisualTree(e);

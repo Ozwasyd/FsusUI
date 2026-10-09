@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="d3cb2568-4ae8-4f8b-b62f-71b111aaab20" name="@845b6801dd61 2026-10-09 07:21:01" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T07:21:01.3195143+00:00" queuing="2026-10-09T07:21:01.3195143+00:00" start="2026-10-09T07:20:58.6393045+00:00" finish="2026-10-09T07:21:01.3275783+00:00" />
+  <TestSettings name="default" id="2a47ed12-68de-4e71-ba69-e9412119f672">
+    <Deployment runDeploymentRoot="_845b6801dd61_2026-10-09_07_21_01" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="141c1779-4700-4d8b-882f-2f7be0072f57" testId="00debd70-412d-d2f3-6176-e3924c93d3ae" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount" computerName="845b6801dd61" duration="00:00:00.6128526" startTime="2026-10-09T07:21:00.5705139+00:00" endTime="2026-10-09T07:21:01.2043818+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="141c1779-4700-4d8b-882f-2f7be0072f57">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : The control Grid already has a visual parent ContentPresenter (Name = PART_SelectedContentHost) while trying to add it as a child of ContentPresenter (Name = PART_SelectedContentHost, Host = FsusUI.Avalonia.Controls.FsusDocumentTabs).</Message>
+          <StackTrace>   at Avalonia.Visual.Avalonia.Collections.IAvaloniaListItemValidator&lt;Avalonia.Visual&gt;.Validate(Visual item)
+   at Avalonia.Collections.AvaloniaList`1.Add(T item)
+   at Avalonia.Controls.Presenters.ContentPresenter.UpdateChild(Object content)
+   at Avalonia.Controls.Presenters.ContentPresenter.UpdateChild()
+   at Avalonia.Controls.Presenters.ContentPresenter.ApplyTemplate()
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Controls.Grid.MeasureCell(Int32 cell, Boolean forceInfinityV)
+   at Avalonia.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Boolean ignoreDesiredSizeU, Boolean forceInfinityV, Boolean&amp; hasDesiredSizeUChanged)
+   at Avalonia.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Boolean ignoreDesiredSizeU, Boolean forceInfinityV)
+   at Avalonia.Controls.Grid.MeasureOverride(Size constraint)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+   at Avalonia.Controls.Presenters.ContentPresenter.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding)
+   at Avalonia.Controls.Decorator.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.Primitives.VisualLayerManager.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.Window.MeasureOverride(Size availableSize)
+   at Avalonia.Controls.WindowBase.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Controls.TopLevelHost.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+   at Avalonia.Layout.LayoutManager.ExecuteMeasurePass()
+   at Avalonia.Layout.LayoutManager.InnerLayoutPass()
+   at Avalonia.Layout.LayoutManager.ExecuteLayoutPass()
+   at Avalonia.Layout.LayoutManager.ExecuteQueuedLayoutPass()
+   at Avalonia.Media.MediaContext.FireInvokeOnRenderCallbacks()
+   at Avalonia.Media.MediaContext.RenderCore()
+   at Avalonia.Media.MediaContext.Render()
+   at Avalonia.Threading.DispatcherOperation.InvokeCore()
+   at Avalonia.Threading.DispatcherOperation.Execute()
+   at Avalonia.Threading.Dispatcher.ExecuteJob(DispatcherOperation job)
+   at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority, CancellationToken cancellationToken)
+   at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority)
+   at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount() in /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs:line 381
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="00debd70-412d-d2f3-6176-e3924c93d3ae">
+      <Execution id="141c1779-4700-4d8b-882f-2f7be0072f57" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="00debd70-412d-d2f3-6176-e3924c93d3ae" executionId="141c1779-4700-4d8b-882f-2f7be0072f57" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.26]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.97]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:01.18]   Starting:    FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:02.07]       System.InvalidOperationException : The control Grid already has a visual parent ContentPresenter (Name = PART_SelectedContentHost) while trying to add it as a child of ContentPresenter (Name = PART_SelectedContentHost, Host = FsusUI.Avalonia.Controls.FsusDocumentTabs).
+[xUnit.net 00:00:02.07]       Stack Trace:
+[xUnit.net 00:00:02.08]            at Avalonia.Visual.Avalonia.Collections.IAvaloniaListItemValidator&lt;Avalonia.Visual&gt;.Validate(Visual item)
+[xUnit.net 00:00:02.08]            at Avalonia.Collections.AvaloniaList`1.Add(T item)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Presenters.ContentPresenter.UpdateChild(Object content)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Presenters.ContentPresenter.UpdateChild()
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Presenters.ContentPresenter.ApplyTemplate()
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Grid.MeasureCell(Int32 cell, Boolean forceInfinityV)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Boolean ignoreDesiredSizeU, Boolean forceInfinityV, Boolean&amp; hasDesiredSizeUChanged)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Grid.MeasureCellsGroup(Int32 cellsHead, Boolean ignoreDesiredSizeU, Boolean forceInfinityV)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Grid.MeasureOverride(Size constraint)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding, Thickness borderThickness)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Presenters.ContentPresenter.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.LayoutHelper.MeasureChild(Layoutable control, Size availableSize, Thickness padding)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Decorator.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Primitives.VisualLayerManager.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.Window.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.WindowBase.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Controls.TopLevelHost.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.LayoutManager.ExecuteMeasurePass()
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.LayoutManager.InnerLayoutPass()
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.LayoutManager.ExecuteLayoutPass()
+[xUnit.net 00:00:02.08]            at Avalonia.Layout.LayoutManager.ExecuteQueuedLayoutPass()
+[xUnit.net 00:00:02.08]            at Avalonia.Media.MediaContext.FireInvokeOnRenderCallbacks()
+[xUnit.net 00:00:02.08]            at Avalonia.Media.MediaContext.RenderCore()
+[xUnit.net 00:00:02.08]            at Avalonia.Media.MediaContext.Render()
+[xUnit.net 00:00:02.08]            at Avalonia.Threading.DispatcherOperation.InvokeCore()
+[xUnit.net 00:00:02.08]            at Avalonia.Threading.DispatcherOperation.Execute()
+[xUnit.net 00:00:02.08]            at Avalonia.Threading.Dispatcher.ExecuteJob(DispatcherOperation job)
+[xUnit.net 00:00:02.08]            at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority, CancellationToken cancellationToken)
+[xUnit.net 00:00:02.08]            at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority)
+[xUnit.net 00:00:02.08]         /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs(381,0): at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount()
+[xUnit.net 00:00:02.08]            at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+[xUnit.net 00:00:02.08]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:02.09]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="845b6801dd61" outcome="Error" timestamp="2026-10-09T07:21:01.2128785+00:00">
+        <Text>[xUnit.net 00:00:02.07]     FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

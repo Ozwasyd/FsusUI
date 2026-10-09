@@ -1,0 +1,3 @@
+Initial reproducer: exact method in reproducer.filter, expected 1 case.
+Final ordinary allowlist: exact methods in ordinary.filter, expected 6 cases (four existing methods = 5, lifecycle = 1), zero skipped.
+Existing headless Skia host and parallelism settings unchanged. FSUS_HEADLESS_GSANS unset. No renderer, ThemeManager, RepositoryRoot or whole-class route selected.
