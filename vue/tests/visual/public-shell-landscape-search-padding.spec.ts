@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
@@ -31,9 +32,9 @@ for (const mode of modes) {
         await page.evaluate(() => document.fonts.ready)
         if (style === 'critical-only') {
           const css = await readFile(
-            new URL(
+            resolve(
+              testInfo.project.testDir,
               '../../packages/theme-chalk/dist/el-public-shell-critical.css',
-              import.meta.url,
             ),
             'utf8',
           )
