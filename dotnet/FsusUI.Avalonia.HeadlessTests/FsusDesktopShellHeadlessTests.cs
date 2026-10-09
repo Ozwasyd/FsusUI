@@ -217,11 +217,15 @@ public class FsusDesktopShellHeadlessTests
     Assert.Same(contextTarget, contextRequests[^1].Anchor);
     Assert.Equal(FsusTreeInteractionSource.Pointer, contextRequests[^1].InteractionSource);
     Assert.True(contextTarget.Focus(NavigationMethod.Tab));
+    var contextRequestCount = contextRequests.Count;
     window.KeyPress(Key.F10, RawInputModifiers.Shift, PhysicalKey.F10, string.Empty);
+    Assert.Equal(contextRequestCount + 1, contextRequests.Count);
     Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
     Assert.Equal(FsusTreeInteractionSource.Keyboard, contextRequests[^1].InteractionSource);
     Assert.Equal(firstKey, tabs.SelectedKey);
+    contextRequestCount = contextRequests.Count;
     window.KeyPress(Key.Apps, RawInputModifiers.None, PhysicalKey.ContextMenu, string.Empty);
+    Assert.Equal(contextRequestCount + 1, contextRequests.Count);
     Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
     Assert.Equal(FsusTreeInteractionSource.Keyboard, contextRequests[^1].InteractionSource);
     Assert.Equal(firstKey, tabs.SelectedKey);
@@ -276,6 +280,63 @@ public class FsusDesktopShellHeadlessTests
     Assert.Equal(dragTarget.Key, tabs.FocusedKey);
     Assert.Same(dragTarget, tabs.SelectedItem);
     Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
+
+    NavigationMethod? lastFocusOrigin = null;
+    dragTarget.AddHandler(InputElement.GotFocusEvent, (_, e) =>
+    {
+      if (ReferenceEquals(e.NewFocusedElement, dragTarget))
+      {
+        lastFocusOrigin = e.NavigationMethod;
+      }
+    }, handledEventsToo: true);
+    foreach (var focusOrigin in new[]
+    {
+      NavigationMethod.Tab,
+      NavigationMethod.Directional,
+      NavigationMethod.Pointer,
+      NavigationMethod.Unspecified,
+    })
+    {
+      Assert.True(other.Focus(NavigationMethod.Pointer));
+      Assert.Same(other, window.FocusManager.GetFocusedElement());
+      Assert.True(dragTarget.Focus(focusOrigin));
+      Assert.Equal(focusOrigin, lastFocusOrigin);
+      Dispatcher.UIThread.RunJobs();
+      var focusVisible = focusOrigin is NavigationMethod.Tab or NavigationMethod.Directional;
+      Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
+
+      var index = tabs.Documents.ToList().IndexOf(dragTarget);
+      Assert.True(tabs.ReorderDocument(dragTarget.Key, index == 0 ? 1 : 0));
+      Dispatcher.UIThread.RunJobs();
+      Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
+      Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
+      Assert.Equal(focusOrigin, lastFocusOrigin);
+      if (focusVisible)
+      {
+        Assert.Same(window.Resources[FsusThemeResourceKeys.FocusBrush], dragTarget.BorderBrush);
+        Assert.Equal(
+          Assert.IsType<Thickness>(window.Resources["FsusThemeFocusBorderThickness"]),
+          dragTarget.BorderThickness);
+      }
+
+      otherIndex = tabs.Documents.ToList().IndexOf(other);
+      lastFocusOrigin = null;
+      Assert.True(tabs.ReorderDocument(other.Key, otherIndex == 0 ? 1 : 0));
+      Dispatcher.UIThread.RunJobs();
+      Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
+      Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
+      Assert.Null(lastFocusOrigin);
+      if (focusVisible)
+      {
+        Assert.Same(window.Resources[FsusThemeResourceKeys.FocusBrush], dragTarget.BorderBrush);
+        Assert.Equal(
+          Assert.IsType<Thickness>(window.Resources["FsusThemeFocusBorderThickness"]),
+          dragTarget.BorderThickness);
+      }
+      Assert.Equal(dragTarget.Key, tabs.SelectedKey);
+      Assert.Equal(dragTarget.Key, tabs.FocusedKey);
+      Assert.Same(dragTarget, tabs.SelectedItem);
+    }
 
     window.Close();
   }

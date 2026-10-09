@@ -81,6 +81,7 @@ public class FsusDocumentTab : FsusTabPane
   private bool pointerDragMoved;
 
   internal FsusDocumentTabs? ParentDocumentTabs { get; set; }
+  internal NavigationMethod FocusNavigationMethod { get; private set; }
 
   public FsusDocumentTab()
   {
@@ -201,6 +202,15 @@ public class FsusDocumentTab : FsusTabPane
     pointerDragMoved = false;
     FsusComponentClasses.Ensure(this, "fsus-dragging", false);
     e.Pointer.Capture(null);
+  }
+
+  protected override void OnGotFocus(FocusChangedEventArgs e)
+  {
+    base.OnGotFocus(e);
+    if (ReferenceEquals(e.NewFocusedElement, this))
+    {
+      FocusNavigationMethod = e.NavigationMethod;
+    }
   }
 
   protected override void OnKeyDown(KeyEventArgs e)
@@ -429,6 +439,7 @@ public class FsusDocumentTabs : FsusTabs
 
     var selectedKey = SelectedKey;
     var wasFocused = document.IsFocused;
+    var focusNavigationMethod = document.FocusNavigationMethod;
     isReordering = true;
     try
     {
@@ -446,7 +457,7 @@ public class FsusDocumentTabs : FsusTabs
     }
     if (wasFocused)
     {
-      document.Focus();
+      document.Focus(focusNavigationMethod);
     }
     Reordered?.Invoke(
       this,
