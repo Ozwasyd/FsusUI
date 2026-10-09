@@ -1,0 +1,15 @@
+{
+  "sourceHead": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "paths": [
+    {
+      "path": "spec/baselines/vue-current.json",
+      "sha256": "90e32f22db470f1586f7c55205b84ed7e5675ec6abc9a734e037bdec9de9177c",
+      "secondOriginalProducerRunByteIdentical": true
+    },
+    {
+      "path": "docs/avalonia/vue-public-api-baseline.md",
+      "sha256": "6316ea4e03f290e4bf49fa8d173d234a7154cfff3052607d7e94997c68b58a6e",
+      "secondOriginalProducerRunByteIdentical": true
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "sourceHead": "18b03e8e81a6787bea5b5bf09d8177227ce61f5d",
+  "baseSource": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "changedFiles": [
+    "docs/avalonia/vue-public-api-baseline.md",
+    "spec/baselines/vue-current.json",
+    "spec/components/contracts/v1/vue-public-contracts.json",
+    "spec/components/contracts/v2/contract-v2.json"
+  ],
+  "allOriginalObservedProducerInputsUnchanged": true,
+  "generatedAtActualBaseSourceHead": true,
+  "generatedBlobIds": [
+    {
+      "path": "docs/avalonia/vue-public-api-baseline.md",
+      "blob": "429861d1606c4f91c0d663c5a037e4c7f21de932"
+    },
+    {
+      "path": "spec/baselines/vue-current.json",
+      "blob": "cb43c742f15993bf05f77683262e4cf566c4be72"
+    },
+    {
+      "path": "spec/components/contracts/v1/vue-public-contracts.json",
+      "blob": "7bfd68d18770c3cc0e0aacc8bf829c386ec7b71f"
+    },
+    {
+      "path": "spec/components/contracts/v2/contract-v2.json",
+      "blob": "c2fc3410db51456ede0dd01ef784029dbfb5f02b"
+    }
+  ]
+}

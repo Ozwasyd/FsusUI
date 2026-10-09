@@ -1,0 +1,19 @@
+{
+  "sourceHead": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "pid": 163002,
+  "argv": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "/workspace/.setup/tools/node_modules/.bin/pnpm",
+    "run",
+    "avalonia:baseline"
+  ],
+  "observationOnly": true,
+  "originalReadArgumentsAndReturnUnchanged": true,
+  "inputs": [
+    {
+      "path": ".npmrc",
+      "sha256": "50578ceda70527f30f3239f4a15478d8510d1b62c828565fe786280f975473aa",
+      "bytes": 150
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "v1OnlyBaselineHashChanged": true,
+  "v2OnlyWebBaselineHashChanged": true,
+  "everyContractAndMemberUnchanged": true,
+  "changes": {
+    "baseline.hash": {
+      "before": "8c8445252478c02700345883c0a5d0b2d04f7cbd59d50899681ff86086749e90",
+      "after": "a56fd67db94edbc7e18a67fbc22defde7ff3c6ecaf0eb60b0a73f4706a04fccd"
+    },
+    "baselines.web.hash": {
+      "before": "b5bd07b742500a5295a7bd5770640243fdc00722b30c22dbb5402507ea5960b8",
+      "after": "90e32f22db470f1586f7c55205b84ed7e5675ec6abc9a734e037bdec9de9177c"
+    }
+  }
+}

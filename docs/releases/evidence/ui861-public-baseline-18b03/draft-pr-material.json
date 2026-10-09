@@ -1,0 +1,8 @@
+{
+  "title": "chore(baseline): refresh UI861 observed public projections",
+  "base": "main",
+  "head": "fix/ui861-public-baseline-projection-20261009",
+  "draft": true,
+  "body": "The original public API baseline check on actual UI861 integration source 3baff077 failed because its source-tree hash and semantic output hash were stale. Run the unchanged canonical baseline and dependent v1/v2 registry producers on that real source; generated commit 18b03e8e81a6787bea5b5bf09d8177227ce61f5d changes only four generated paths, six lines, with no API/member/classification/threshold/runtime changes. It records the actual capture commit and propagates the two consumed-baseline fingerprints. Original checks pass at the committed source, second generator runs are byte-identical, all 1600 observed/explicit original inputs remain unchanged, and 49 Contract V2 tests pass on identical committed candidate bytes. Fresh main 8db0 has no conflicts. No browser/device/native/runtime or package acceptance is inferred from this static projection. Root/825 retains ownership of those checks; no package publication, parent/default push or merge.",
+  "creationStatus": "Not created; root coordinator owns metadata."
+}

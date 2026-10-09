@@ -1,0 +1,6 @@
+
+> @ component-contracts:check /workspace/FsusUI-ui861-baseline-projection
+> node ./scripts/with-node-heap.mjs node ./scripts/component-contract-registry.mjs --check
+
+component contract registry is stale; run pnpm run component-contracts:generate
+ ELIFECYCLE  Command failed with exit code 1.

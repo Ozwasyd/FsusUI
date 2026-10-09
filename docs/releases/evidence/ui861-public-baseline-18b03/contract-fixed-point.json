@@ -1,0 +1,15 @@
+{
+  "outputs": [
+    {
+      "path": "spec/components/contracts/v1/vue-public-contracts.json",
+      "sha256": "38d25203397a2bca40da16d5f6085e8b93356ca477886e5dd168961a4d849a41",
+      "secondOriginalProducerRunByteIdentical": true
+    },
+    {
+      "path": "spec/components/contracts/v2/contract-v2.json",
+      "sha256": "30da6785ef867f93a4364ae1c8dd23ce2338c7cb73c129f16108de29952fffd2",
+      "secondOriginalProducerRunByteIdentical": true
+    }
+  ],
+  "all1600ObservedOriginalProducerInputsRemainUnchanged": true
+}
