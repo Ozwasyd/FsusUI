@@ -290,8 +290,7 @@ let heavyProjectionTrackerPromise: Promise<MarkdownHeavyFeatureProjectionTracker
 const loadHeavyProjectionTracker = () =>
   (heavyProjectionTrackerPromise ??=
     import('./markdown-renderer-heavy-projection').then(
-      ({ createRendererHeavyProjectionTracker }) =>
-        createRendererHeavyProjectionTracker(),
+      ({ default: createTracker }) => createTracker(),
     ))
 
 function recordHeavyLifecycleMetrics() {

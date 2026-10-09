@@ -3,7 +3,7 @@ import type {
   MarkdownHeavyFeatureProjectionTracker,
 } from '../../../wasm/markdown-heavy-feature-identity'
 
-export const createRendererHeavyProjectionTracker = async () => {
+const createRendererHeavyProjectionTracker = async () => {
   const { createMarkdownHeavyFeatureProjectionTracker } =
     await import('../../../wasm/markdown-heavy-feature-identity')
   const tracker = createMarkdownHeavyFeatureProjectionTracker()
@@ -29,3 +29,5 @@ export const createRendererHeavyProjectionTracker = async () => {
     },
   })
 }
+
+export default createRendererHeavyProjectionTracker
