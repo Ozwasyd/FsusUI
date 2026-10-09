@@ -11,7 +11,8 @@ export function addComponentDirectoryExports(packageJson, packageRoot) {
   ]) {
     const prefix = `./${format}/components/`
     const pattern = packageJson.exports?.[`${prefix}*`]
-    const branch = pattern?.[condition]
+    if (pattern === undefined || pattern === null) continue
+    const branch = pattern[condition]
     const runtime = typeof branch === 'string' ? branch : branch?.default
     const declarations =
       typeof branch === 'string' ? pattern.types : branch?.types

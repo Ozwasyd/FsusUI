@@ -79,6 +79,7 @@ function inputDigests(repoRoot) {
     'scripts/npm-candidate-lib.mjs',
     'scripts/package-candidate.mjs',
     'scripts/prepare-npm-package.mjs',
+    'scripts/prepare-component-exports.mjs',
     'vue/packages/element-plus/package.json',
   ]
   return Object.fromEntries(
@@ -159,7 +160,11 @@ function isPublicRegistry(registry) {
 function validateDependencyManifest(packageJson) {
   for (const field of DEPENDENCY_FIELDS) {
     const dependencies = packageJson[field]
-    if (!dependencies || typeof dependencies !== 'object' || Array.isArray(dependencies)) {
+    if (
+      !dependencies ||
+      typeof dependencies !== 'object' ||
+      Array.isArray(dependencies)
+    ) {
       continue
     }
     for (const [name, specifier] of Object.entries(dependencies)) {
@@ -170,7 +175,10 @@ function validateDependencyManifest(packageJson) {
           `Candidate dependency '${name}' leaks a ${protocolMatch[1]} protocol reference: ${specifier}`,
         )
       }
-      if (/^https?:\/\//u.test(specifier) && !specifier.startsWith(`${PUBLIC_NPM_REGISTRY}/`)) {
+      if (
+        /^https?:\/\//u.test(specifier) &&
+        !specifier.startsWith(`${PUBLIC_NPM_REGISTRY}/`)
+      ) {
         throw new Error(
           `Candidate dependency '${name}' references a non-public registry URL: ${specifier}`,
         )
@@ -179,7 +187,9 @@ function validateDependencyManifest(packageJson) {
   }
   const registry = packageJson.publishConfig?.registry
   if (registry && !isPublicRegistry(registry)) {
-    throw new Error(`Candidate publishConfig leaks a private registry: ${registry}`)
+    throw new Error(
+      `Candidate publishConfig leaks a private registry: ${registry}`,
+    )
   }
 }
 
