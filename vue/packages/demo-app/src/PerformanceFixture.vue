@@ -665,7 +665,15 @@ const dataPipelineProbe = async () => {
   }
 }
 
+const workerProbeCancels = new Set<() => void>()
+let workerProbeDisposed = false
+onBeforeUnmount(() => {
+  workerProbeDisposed = true
+  for (const cancel of workerProbeCancels) cancel()
+})
+
 const workerProbe = async (iteration: number) => {
+  if (workerProbeDisposed) throw new Error('worker_probe_fixture_unmounted')
   const source = `
     self.onmessage = ({ data }) => {
       const received = performance.now()
@@ -676,28 +684,58 @@ const workerProbe = async (iteration: number) => {
     }
   `
   const workerUrl = URL.createObjectURL(new Blob([source]))
-  const worker = new Worker(workerUrl)
-  URL.revokeObjectURL(workerUrl)
-  const payload = new Uint32Array(16_384 + iteration * 17)
-  const queued = performance.now()
-  return await new Promise<{
-    queueWaitMs: number
-    computeMs: number
-    transferMs: number
-  }>((resolve) => {
-    worker.onmessage = ({ data }) => {
-      const completed = performance.now()
-      worker.terminate()
-      // Translate Worker timestamps into the window's performance time origin.
-      const workerOffset = data.timeOrigin - performance.timeOrigin
-      resolve({
-        queueWaitMs: workerOffset + data.received - queued,
-        computeMs: data.computed - data.received,
-        transferMs: completed - (workerOffset + data.computed),
-      })
-    }
-    worker.postMessage(payload)
-  })
+  let worker: Worker
+  try {
+    worker = new Worker(workerUrl)
+  } finally {
+    URL.revokeObjectURL(workerUrl)
+  }
+  let cancel: (() => void) | undefined
+  let settled = false
+  const cleanup = () => {
+    if (settled) return false
+    settled = true
+    if (cancel) workerProbeCancels.delete(cancel)
+    worker.onmessage = null
+    worker.onerror = null
+    worker.onmessageerror = null
+    worker.terminate()
+    return true
+  }
+  try {
+    const payload = new Uint32Array(16_384 + iteration * 17)
+    const queued = performance.now()
+    return await new Promise<{
+      queueWaitMs: number
+      computeMs: number
+      transferMs: number
+    }>((resolve, reject) => {
+      const fail = (error: Error) => {
+        if (cleanup()) reject(error)
+      }
+      cancel = () => fail(new Error('worker_probe_fixture_unmounted'))
+      workerProbeCancels.add(cancel)
+      worker.onerror = (event) => {
+        event.preventDefault()
+        fail(new Error(event.message || 'worker_probe_error'))
+      }
+      worker.onmessageerror = () => fail(new Error('worker_probe_message_error'))
+      worker.onmessage = ({ data }) => {
+        const completed = performance.now()
+        if (!cleanup()) return
+        // Translate Worker timestamps into the window's performance time origin.
+        const workerOffset = data.timeOrigin - performance.timeOrigin
+        resolve({
+          queueWaitMs: workerOffset + data.received - queued,
+          computeMs: data.computed - data.received,
+          transferMs: completed - (workerOffset + data.computed),
+        })
+      }
+      worker.postMessage(payload)
+    })
+  } finally {
+    cleanup()
+  }
 }
 
 let initialWasmProfile: {
