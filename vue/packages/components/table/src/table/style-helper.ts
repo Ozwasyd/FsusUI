@@ -54,6 +54,10 @@ function useStyle<T>(
   const footerScrollHeight = ref(0)
   const appendScrollHeight = ref(0)
   let layoutFrame = 0
+  let resizeFrame = 0
+  let pendingScrollbarUpdate = false
+  let disposed = false
+  const stopResizeEvents: (() => void)[] = []
   let syncPositionFrame = 0
   let wheelScrollFrame = 0
   let pendingWheelScrollLeft = 0
@@ -98,10 +102,15 @@ function useStyle<T>(
   }
 
   onBeforeUnmount(() => {
+    disposed = true
+    stopResizeEvents.forEach((stop) => stop())
     cancelFrame(layoutFrame)
+    cancelFrame(resizeFrame)
     cancelFrame(syncPositionFrame)
     cancelFrame(wheelScrollFrame)
     layoutFrame = 0
+    resizeFrame = 0
+    pendingScrollbarUpdate = false
     syncPositionFrame = 0
     wheelScrollFrame = 0
     pendingWheelScrollLeft = 0
@@ -256,6 +265,7 @@ function useStyle<T>(
   }
   onMounted(async () => {
     await nextTick()
+    if (disposed) return
     store.updateColumns()
     bindEvents()
     store.recordLayoutReason('container-resize')
@@ -332,29 +342,54 @@ function useStyle<T>(
   const bindEvents = () => {
     if (!table.refs.scrollBarRef) return
     if (table.refs.scrollBarRef.wrapRef) {
-      useEventListener(
-        table.refs.scrollBarRef.wrapRef,
-        'scroll',
-        scheduleSyncPositionFrame,
-        {
-          passive: true,
-        },
+      stopResizeEvents.push(
+        useEventListener(
+          table.refs.scrollBarRef.wrapRef,
+          'scroll',
+          scheduleSyncPositionFrame,
+          {
+            passive: true,
+          },
+        ),
       )
     }
     if (props.fit) {
-      useResizeObserver(table.vnode.el as HTMLElement, resizeListener)
+      stopResizeEvents.push(
+        useResizeObserver(table.vnode.el as HTMLElement, () => {
+          scheduleResizeFrame()
+        }).stop,
+      )
     } else {
-      useEventListener(window, 'resize', resizeListener)
+      stopResizeEvents.push(useEventListener(window, 'resize', resizeListener))
     }
 
-    useResizeObserver(table.refs.bodyWrapper, () => {
-      resizeListener()
-      table.refs?.scrollBarRef?.update()
-    })
+    stopResizeEvents.push(
+      useResizeObserver(table.refs.bodyWrapper, () => {
+        scheduleResizeFrame(true)
+      }).stop,
+    )
+  }
+  const scheduleResizeFrame = (updateScrollbar = false) => {
+    if (disposed || !table.$ready) return
+    pendingScrollbarUpdate ||= updateScrollbar
+    if (resizeFrame) return
+    // A microtask still runs inside native ResizeObserver delivery. Defer the
+    // measurements and resulting column/height writes to the next frame.
+    scheduleFrame(
+      resizeFrame,
+      () => {
+        resizeListener()
+        if (pendingScrollbarUpdate) table.refs?.scrollBarRef?.update()
+        pendingScrollbarUpdate = false
+      },
+      (frame) => {
+        resizeFrame = frame
+      },
+    )
   }
   const resizeListener = () => {
     const el = table.vnode.el
-    if (!table.$ready || !el) return
+    if (disposed || !table.$ready || !el) return
 
     let shouldUpdateLayout = false
     const {
