@@ -11,18 +11,20 @@ import type { FormItemContext } from '@element-plus/components/form'
 import type { SliderEmits, SliderInitData, SliderProps } from '../slider'
 import type { ButtonRefs, SliderButtonInstance } from '../button'
 
+export type SliderButtonRef = Ref<SliderButtonInstance | undefined>
+
 export interface UseSlideReturn {
   elFormItem: FormItemContext | undefined
   slider: ShallowRef<HTMLElement | undefined>
-  firstButton: Ref<SliderButtonInstance | undefined>
-  secondButton: Ref<SliderButtonInstance | undefined>
+  firstButton: SliderButtonRef
+  secondButton: SliderButtonRef
   sliderDisabled: ComputedRef<boolean>
   minValue: ComputedRef<number>
   maxValue: ComputedRef<number>
   runwayStyle: ComputedRef<CSSProperties>
   barStyle: ComputedRef<CSSProperties>
   resetSize: () => void
-  setPosition: (percent: number) => Ref<SliderButtonInstance | undefined>
+  setPosition: (percent: number) => SliderButtonRef
   emitChange: () => Promise<void>
   onSliderWrapperPrevent: (event: TouchEvent) => void
   onSliderClick: (event: MouseEvent | TouchEvent) => void
