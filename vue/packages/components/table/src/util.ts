@@ -10,7 +10,6 @@ import {
   throwError,
 } from '@element-plus/utils'
 import { useDelayedToggle } from '@element-plus/hooks'
-import type { PopperInstance } from '@element-plus/components/popper'
 import type { Nullable } from '@element-plus/utils'
 import type { TableColumnCtx } from './table-column/defaults'
 import type { ElTooltipProps } from '@element-plus/components/tooltip'
@@ -333,7 +332,7 @@ export function createTablePopper(
   popperContent: string,
   nextZIndex: () => number,
   tooltipOptions?: TableOverflowTooltipOptions
-) {
+): ReturnType<typeof createPopper> {
   // TODO transition
   tooltipOptions = merge(
     {
@@ -378,7 +377,7 @@ export function createTablePopper(
       removePopper = undefined
     } catch {}
   }
-  let popperInstance: Nullable<PopperInstance> = null
+  let popperInstance: Nullable<ReturnType<typeof createPopper>> = null
   let onOpen = showPopper
   let onClose = removePopper
   if (tooltipOptions.enterable) {
