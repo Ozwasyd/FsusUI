@@ -61,7 +61,9 @@ After a selected document closes, the tab at the same index is selected; when
 that was the last document, the previous adjacent tab is selected.
 
 Pointer drag calls `ReorderDocument` and raises typed `Reordered` arguments with
-the old/new indexes and source. The horizontally scrollable header reveals the
+the old/new indexes and source. Reordering preserves the active document and
+the focused document header; moving another header does not take focus.
+The horizontally scrollable header reveals the
 selected tab; `CanScrollBackward`, `CanScrollForward`, `ScrollHeaders`, and the
 header extent/viewport/offset properties expose overflow without product
 state. Right-click and Shift+F10/Apps raise `DocumentContextRequested` with the
